@@ -118,10 +118,7 @@ public class Axis2FlexibleMEPClient {
 
         // set all the details of the endpoint only to the cloned message context
         // so that we can use the original message context for resending through different endpoints
-        String eprAddress = null;
-        if (endpoint != null && endpoint.getAddress() != null) {
-
-            eprAddress = endpoint.getAddress().toString();
+        if (endpoint != null) {
 
             if (endpoint.isForcePOX()) {
                 axisOutMsgCtx.setDoingREST(true);
@@ -149,11 +146,13 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.setDoingSwA(true);
             }
 
+            if (endpoint.getAddress() != null) {
+                axisOutMsgCtx.setTo(new EndpointReference(endpoint.getAddress()));
+            }
+
             if (endpoint.isUseSeparateListener()) {
                 axisOutMsgCtx.getOptions().setUseSeparateListener(true);
             }
-
-            axisOutMsgCtx.setTo(new EndpointReference(eprAddress));
         }
 
         if (wsAddressingEnabled) {
@@ -295,7 +294,7 @@ public class Axis2FlexibleMEPClient {
 
         return newMC;
     }
-    
+
     private static void copyRMOptions(MessageContext oriContext, Options targetOptions) {
         Options oriOptions = oriContext.getOptions();
         if(oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE) != null) {
@@ -315,7 +314,7 @@ public class Axis2FlexibleMEPClient {
                     oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID));
         }
     }
-    
+
     /**
      * Get the Policy object for the given name from the Synapse configuration at runtime
      * @param synCtx the current synapse configuration to get to the synapse configuration

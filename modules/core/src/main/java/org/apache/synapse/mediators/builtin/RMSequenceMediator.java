@@ -52,74 +52,84 @@ public class RMSequenceMediator extends AbstractMediator {
     private static final long SEQUENCE_EXPIRY_TIME = 300000;
     private static Map sequenceMap = Collections.synchronizedMap(new HashMap());
 
-    public boolean mediate(MessageContext smc) {
-        if (log.isDebugEnabled()) {
-            log.debug("RMSequence Mediator  ::  mediate() ");
-        }
-        boolean shouldTrace = shouldTrace(smc.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : RMSequence mediator");
-        }
-        if (!(smc instanceof Axis2MessageContext)) {
-            if (log.isDebugEnabled()) {
-                log.debug("RMSequence Mediator  ::  only axis2 message context is supported ");
+    public boolean mediate(MessageContext synCtx) {
+
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : RMSequence mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
             }
-            return true;
-        }
-        Axis2MessageContext axis2MessageCtx = (Axis2MessageContext) smc;
-        org.apache.axis2.context.MessageContext orgMessageCtx =
-            axis2MessageCtx.getAxis2MessageContext();
-
-        cleanupSequenceMap();
-
-        String version = getVersionValue();
-        orgMessageCtx.getOptions().setProperty(
-            SynapseConstants.SANDESHA_SPEC_VERSION, version);
-        if (log.isDebugEnabled()) {
-            log.debug("using WS-RM version " + version);
         }
 
-        if (isSingle()) {
-            String sequenceID = UUIDGenerator.getUUID();
+        if (!(synCtx instanceof Axis2MessageContext)) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Only axis2 message contexts are supported");
+            }
+
+        } else {
+            Axis2MessageContext axis2MessageCtx = (Axis2MessageContext) synCtx;
+            org.apache.axis2.context.MessageContext orgMessageCtx =
+                axis2MessageCtx.getAxis2MessageContext();
+
+            cleanupSequenceMap();
+
+            String version = getVersionValue();
             orgMessageCtx.getOptions().setProperty(
-                SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
-            orgMessageCtx.getOptions().setProperty(
-                SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
-            orgMessageCtx.getOptions().setProperty(
-                SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
-            return true;
+                SynapseConstants.SANDESHA_SPEC_VERSION, version);
+
+            if (isSingle()) {
+                String sequenceID = UUIDGenerator.getUUID();
+                String offeredSeqID = UUIDGenerator.getUUID();
+
+                orgMessageCtx.getOptions().setProperty(
+                    SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
+                orgMessageCtx.getOptions().setProperty(
+                    SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
+                orgMessageCtx.getOptions().setProperty(
+                    SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Using WS-RM version " + version +
+                        " and a single message sequence : " + sequenceID +
+                        " and offering sequence : " + offeredSeqID);
+                }
+
+            } else {
+
+                String correlationValue = getCorrelationValue(synCtx);
+                boolean lastMessage = isLastMessage(synCtx);
+                String offeredSeqID = null;
+
+                if (!sequenceMap.containsKey(correlationValue)) {
+                    offeredSeqID = UUIDGenerator.getUUID();
+                    orgMessageCtx.getOptions().setProperty(
+                        SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
+                }
+
+                String sequenceID = retrieveSequenceID(correlationValue);
+                orgMessageCtx.getOptions().setProperty(
+                    SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
+
+                if (lastMessage) {
+                    orgMessageCtx.getOptions().setProperty(
+                        SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
+                    sequenceMap.remove(correlationValue);
+                }
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Correlation value : " + correlationValue +
+                        " last message = " + lastMessage + " using sequence : " + sequenceID +
+                        (offeredSeqID != null ? " offering sequence : " + offeredSeqID : ""));
+                }
+            }
         }
 
-        String correlationValue = getCorrelationValue(smc);
-        if (log.isDebugEnabled()) {
-            log.debug("correlation value is " + correlationValue);
-        }
-
-        boolean lastMessage = isLastMessage(smc);
-        if (log.isDebugEnabled()) {
-            log.debug("Is this message the last message in sequence: " + lastMessage);
-        }
-
-        if (!sequenceMap.containsKey(correlationValue)) {
-            orgMessageCtx.getOptions().setProperty(
-                SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());       
-        }
-
-        String sequenceID = retrieveSequenceID(correlationValue);
-        orgMessageCtx.getOptions().setProperty(
-            SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
-        if (log.isDebugEnabled()) {
-            log.debug("RMSequence Mediator  ::  using sequence " + sequenceID);
-        }
-
-        if (lastMessage) {
-            orgMessageCtx.getOptions().setProperty(
-                SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
-            sequenceMap.remove(correlationValue);
-        }
-
-        if (shouldTrace) {
-            trace.trace("End : RMSequence mediator");
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : RMSequence mediator");
         }
         return true;
     }
@@ -148,17 +158,19 @@ public class RMSequenceMediator extends AbstractMediator {
         OMElement node = null;
         try {
             node = (OMElement) getCorrelation().selectSingleNode(smc.getEnvelope());
-        } catch (JaxenException e) {
-            log.error("XPath error : " + e.getMessage());
-            throw new SynapseException("XPath error : " + e.getMessage());
-        }
-        if (node == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("XPath expression did not return any node");
+
+            if (node != null) {
+                return node.getText();
+            } else {
+                handleException("XPath expression : " + getCorrelation() +
+                    " did not return any node", smc);
             }
-            throw new SynapseException("XPath expression did not return any node");
+
+        } catch (JaxenException e) {
+            handleException("Error evaluating XPath expression to determine correlation : " +
+                getCorrelation(), e, smc);
         }
-        return node.getText();
+        return null; // never called
     }
 
     private String getVersionValue() {
@@ -172,12 +184,14 @@ public class RMSequenceMediator extends AbstractMediator {
     private boolean isLastMessage(MessageContext smc) {
         if (getLastMessage() == null) {
             return false;
-        }
-        try {
-            return getLastMessage().booleanValueOf(smc.getEnvelope());
-        } catch (JaxenException e) {
-            log.error("XPath error : " + e.getMessage());
-            throw new SynapseException("XPath error : " + e.getMessage());
+        } else {
+            try {
+                return getLastMessage().booleanValueOf(smc.getEnvelope());
+            } catch (JaxenException e) {
+                handleException("Error evaluating XPath expression to determine if last message : " +
+                    getLastMessage(), e, smc);
+            }
+            return false;
         }
     }
 

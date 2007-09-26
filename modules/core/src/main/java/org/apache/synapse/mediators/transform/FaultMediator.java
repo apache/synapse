@@ -44,6 +44,9 @@ import java.util.Iterator;
  *
  * This class exposes methods to set SOAP 1.1 and 1.2 fault elements and uses
  * these as required.
+ *
+ * Directs the fault messages' "To" EPR to the "FaultTo" or the "ReplyTo" or to
+ * null of the original SOAP message
  */
 public class FaultMediator extends AbstractMediator {
 
@@ -72,40 +75,59 @@ public class FaultMediator extends AbstractMediator {
     private String faultDetail = null;
 
     public boolean mediate(MessageContext synCtx) {
-        if (log.isDebugEnabled()) {
-            log.debug("Fault mediator mediate()");
+
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Fault mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if(shouldTrace) {
-            trace.trace("Start : Fault mediator");
-        }
+
         switch (soapVersion) {
             case SOAP11:
-                return makeSOAPFault(synCtx, SOAP11,shouldTrace);
+                return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
             case SOAP12:
-                return makeSOAPFault(synCtx, SOAP12,shouldTrace);
+                return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+
             default : {
+                // determine from current message's SOAP envelope namespace
                 SOAPEnvelope envelop = synCtx.getEnvelope();
                 if (envelop != null) {
                     if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
                         envelop.getNamespace().getNamespaceURI())) {
                         soapVersion = SOAP12;
-                        return makeSOAPFault(synCtx, SOAP12,shouldTrace);
+                        return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
                     } else {
                         soapVersion = SOAP11;
-                        return makeSOAPFault(synCtx, SOAP11,shouldTrace);
+                        return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
                     }
                 } else {
-                    return makeSOAPFault(synCtx, SOAP11,shouldTrace);
+                    // default to SOAP 11
+                    return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
                 }
             }
         }
     }
 
-    private boolean makeSOAPFault(MessageContext synCtx, int soapVersion,boolean shouldTrace) {
-        if (log.isDebugEnabled()) {
-            log.debug("Creating a SOAP fault using SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2"));
+    /**
+     * Actual transformation of the current message into a fault message
+     * @param synCtx the current message context
+     * @param soapVersion SOAP version of the resulting fault desired
+     * @param traceOrDebugOn is trace or debug logging on?
+     * @param traceOn is tracing on?
+     * @return true, always
+     */
+    private boolean makeSOAPFault(MessageContext synCtx, int soapVersion,
+        boolean traceOrDebugOn, boolean traceOn) {
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Creating a SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2") + "fault");
         }
+
         // get the correct SOAP factory to be used
         SOAPFactory factory = (
             soapVersion == SOAP11 ? OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory());
@@ -143,19 +165,24 @@ public class FaultMediator extends AbstractMediator {
                 }
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug("The fault message as : " + fault);
+
+        if (traceOrDebugOn) {
+            String msg =
+                "Original SOAP Message : " + synCtx.getEnvelope().toString() +
+                "Fault Message created : " + faultEnvelope.toString();
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace(msg);
+            }
+            if (log.isTraceEnabled()) {
+                log.trace(msg);
+            }
         }
+
         // overwrite current message envelope with new fault envelope
         try {
-            if (shouldTrace) {
-                trace.trace("Original SOAP Message : " + synCtx.getEnvelope().toString());
-                trace.trace("Fault Message created : " + faultEnvelope.toString());
-            }
             synCtx.setEnvelope(faultEnvelope);
         } catch (AxisFault af) {
-            String msg = "Error replacing SOAP envelope with a fault envelope " + af.getMessage();
-            handleException(msg,af);
+            handleException("Error replacing current SOAP envelope with the fault envelope", af, synCtx);
         }
 
         if (synCtx.getFaultTo() != null) {
@@ -166,9 +193,10 @@ public class FaultMediator extends AbstractMediator {
             synCtx.setTo(null);
         }
 
-        if (shouldTrace) {
-            trace.trace("End : Fault mediator");
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Fault mediator");
         }
+        
         return true;
     }
 
@@ -177,7 +205,7 @@ public class FaultMediator extends AbstractMediator {
         QName fault_code = null;
 
         if (faultCodeValue == null && faultCodeExpr == null) {
-            handleException("A valid fault code QName value or expression is required");
+            handleException("A valid fault code QName value or expression is required", synCtx);
         } else if (faultCodeValue != null) {
             fault_code = faultCodeValue;
         } else {
@@ -201,7 +229,7 @@ public class FaultMediator extends AbstractMediator {
         String reasonString = null;
 
         if (faultReasonValue == null && faultReasonExpr == null) {
-            handleException("A valid fault reason value or expression is required");
+            handleException("A valid fault reason value or expression is required", synCtx);
         } else if (faultReasonValue != null) {
             reasonString = faultReasonValue;
         } else {
@@ -246,11 +274,6 @@ public class FaultMediator extends AbstractMediator {
         }
     }
 
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
     public int getSoapVersion() {
         return soapVersion;
     }
@@ -282,14 +305,10 @@ public class FaultMediator extends AbstractMediator {
 
             } else {
                 String msg = "Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue;
-                handleException(msg);
+                log.error(msg);
+                throw new SynapseException(msg);
             }
         }
-    }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 
     public AXIOMXPath getFaultCodeExpr() {
@@ -322,7 +341,9 @@ public class FaultMediator extends AbstractMediator {
 
     public void setFaultNode(URI faultNode) {
         if (soapVersion == SOAP11) {
-            handleException("A fault node does not apply to a SOAP 1.1 fault");
+            String msg = "A fault node does not apply to a SOAP 1.1 fault";
+            log.error(msg);
+            throw new SynapseException(msg);
         }
         this.faultNode = faultNode;
     }

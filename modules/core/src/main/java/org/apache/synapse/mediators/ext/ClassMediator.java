@@ -28,18 +28,26 @@ import org.apache.synapse.mediators.AbstractMediator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
- * The class mediator delegates the mediation to a new instance of a specified
- * class. The specified class must implement the Mediator interface
+ * The class mediator delegates the mediation to a single instance of a specified
+ * class. The specified class must implement the Mediator interface and optionally
+ * may implement the ManagedLifecycle interface. At initialization time, a single
+ * instance of the class is instantiated using a public no argument constructor, and
+ * any one-time properties (parameter constants specified through the Synapse config)
+ * are set on the instance. If each request needs synchronization, the user must
+ * implement it within the specified class.
  * 
  * @see Mediator
  */
 public class ClassMediator extends AbstractMediator implements ManagedLifecycle {
 
-	private Mediator mediator = null;
-
-    private List properties = new ArrayList();
+    /** The reference to the actual class that implments the Mediator interface */
+    private Mediator mediator = null;
+    /** A list of simple properties that would be set on the class before being used */
+    private Map properties = new HashMap();
 
     /**
 	 * Don't use a new instance... do one instance of the object per instance of
@@ -51,42 +59,39 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 	 */
 	public boolean mediate(MessageContext synCtx) {
 
-		if (log.isDebugEnabled()) {
-			log.debug("Class mediator <" + mediator.getClass()
-					+ ">:: mediate()");
-		}
-		boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-		if (shouldTrace) {
-			trace.trace("Start : Class mediator");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Class mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
+        }
+
+        if (traceOrDebugOn) {
+			traceOrDebug(traceOn, "invoking : " + mediator.getClass() + ".mediate()");
 		}
 
-		try {
-
-			if (mediator == null) {
-				if (log.isDebugEnabled()) {
-					log.debug("The instance of the specified mediator is null");
-				}
-				return true;
-			}
-			if (shouldTrace) {
-				trace.trace("Executing an instance of the specified class : "
-						+ mediator.getClass());
-			}
-			return mediator.mediate(synCtx);
+        boolean result = true;
+        try {
+			result = mediator.mediate(synCtx);
         } catch (Exception e) {
             // throw Synapse Exception for any exception in class meditor
             // so that the fault handler will be invoked
             throw new SynapseException("Error occured in the mediation of the class mediator", e);
-        } finally {
-			if (shouldTrace) {
-				trace.trace("End : Class mediator");
-			}
-		}
-	}
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Class mediator");
+        }
+        return result;
+    }
 
 	public void destroy() {
         if (log.isDebugEnabled()) {
-            log.debug("Class Mediator::destroy()");
+            log.debug("Destroying class mediator instance for : " + mediator.getClass());
         }
         if (mediator instanceof ManagedLifecycle) {
 			((ManagedLifecycle) mediator).destroy();
@@ -95,18 +100,15 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 
 	public void init(SynapseEnvironment se) {
         if (log.isDebugEnabled()) {
-            log.debug("Class Mediator::init()");
+            log.debug("Initializing class mediator instance for : " + mediator.getClass());
         }
         if (mediator == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("init called before mediator set");
-            }
+            log.warn("init() called before mediator reference set");
             return;
 		}
 
 		if (mediator instanceof ManagedLifecycle) {
 			((ManagedLifecycle) mediator).init(se);
-
 		}
 	}
 
@@ -118,11 +120,11 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 		return mediator;
 	}
 
-    public void addProperty(OMElement property) {
-        properties.add(property);
+    public void addProperty(String name, Object value) {
+        properties.put(name, value);
     }
 
-    public List getProperties() {
+    public Map getProperties() {
         return this.properties;
     }
 }

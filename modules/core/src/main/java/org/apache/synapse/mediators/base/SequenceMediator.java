@@ -135,6 +135,15 @@ public class SequenceMediator extends AbstractListMediator {
                     }
                 }
 
+                if (traceOrDebugOn) {
+                    if (traceOn && trace.isTraceEnabled()) {
+                        trace.trace("Message : " + synCtx);
+                    }
+
+                    traceOrDebug(traceOn,
+                        "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
+                }
+
                 return result;
 
             } finally {
@@ -145,15 +154,6 @@ public class SequenceMediator extends AbstractListMediator {
                 }
                 //If this sequence is a IN or OUT sequence of a proxy service
                 StatisticsUtils.processProxyServiceStatistics(synCtx);
-
-                if (traceOrDebugOn) {
-                    if (traceOn && trace.isTraceEnabled()) {
-                        trace.trace("Message : " + synCtx);
-                    }
-
-                    traceOrDebug(traceOn,
-                        "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
-                }
             }
 
         } else {
@@ -166,7 +166,13 @@ public class SequenceMediator extends AbstractListMediator {
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Executing sequence named " + key);
                 }
-                return m.mediate(synCtx);
+
+                boolean result = m.mediate(synCtx);
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
+                }
+                return result;
             }
         }
 

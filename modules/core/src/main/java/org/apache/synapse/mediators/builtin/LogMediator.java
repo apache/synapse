@@ -43,10 +43,13 @@ import java.util.List;
  */
 public class LogMediator extends AbstractMediator {
 
-    /** Log levels, according to the log level selected, the information logged will change */
+    /** Only properties specified to the Log mediator */
     public static final int CUSTOM  = 0;
+    /** To, From, WSAction, SOAPAction, ReplyTo, MessageID and any properties */
     public static final int SIMPLE  = 1;
+    /** All SOAP header blocks and any properties */
     public static final int HEADERS = 2;
+    /** all attributes of level 'simple' and the SOAP envelope and any properties */
     public static final int FULL    = 3;
 
     public static final String DEFAULT_SEP = ", ";
@@ -77,10 +80,15 @@ public class LogMediator extends AbstractMediator {
             }
         }
 
-        if (log.isInfoEnabled()) {
-            String logMessage = getLogMessage(synCtx);
-        }
+        String logMessage = getLogMessage(synCtx);
+        synCtx.getServiceLog().info(logMessage);
 
+        if (log.isInfoEnabled()) {
+            log.info(logMessage);
+        }
+        if (traceOn) {
+            trace.info("Log message : " + logMessage);
+        }
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Log mediator");
@@ -125,6 +133,7 @@ public class LogMediator extends AbstractMediator {
             sb.append(separator + "ReplyTo: " + synCtx.getReplyTo().getAddress());
         if (synCtx.getMessageID() != null)
             sb.append(separator + "MessageID: " + synCtx.getMessageID());
+        sb.append(separator + "Direction: " + (synCtx.isResponse() ? "response" : "request"));
         setCustomProperties(sb, synCtx);
         return trimLeadingSeparator(sb);
     }

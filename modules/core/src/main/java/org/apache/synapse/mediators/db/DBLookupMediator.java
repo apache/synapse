@@ -83,7 +83,7 @@ public class DBLookupMediator extends AbstractDBMediator {
             
         } catch (SQLException e) {
             handleException("Error executing statement : " + stmnt.getRawStatement() +
-                " against DataSource : " + getDSName() + " :: " + e.getMessage(), e, msgCtx);
+                " against DataSource : " + getDSName(), e, msgCtx);
         }
     }
 

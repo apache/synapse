@@ -24,7 +24,6 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
 
 import javax.xml.namespace.QName;
@@ -44,9 +43,6 @@ import java.util.Iterator;
  */
 public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(POJOCommandMediatorSerializer.class);
-    private static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
-
     public OMElement serializeMediator(OMElement parent, Mediator m) {
         
         if (!(m instanceof POJOCommandMediator)) {
@@ -56,7 +52,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
         POJOCommandMediator mediator = (POJOCommandMediator) m;
         
         OMElement pojoCommand = fac.createOMElement("pojoCommand", synNS);
-        finalizeSerialization(pojoCommand, mediator);
+        saveTracingState(pojoCommand, mediator);
 
         if (mediator.getCommand() != null && mediator.getCommand().getClass().getName() != null) {
             pojoCommand.addAttribute(fac.createOMAttribute(
@@ -93,10 +89,5 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
     public String getMediatorClassName() {
         return POJOCommandMediator.class.getName();
-    }
-
-    private void handleException(String message) {
-        log.error(message);
-        throw new SynapseException(message);
     }
 }

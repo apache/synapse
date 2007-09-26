@@ -69,8 +69,6 @@ import java.sql.Types;
  */
 public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(AbstractDBMediatorSerializer.class);
-    
     protected void serializeDBInformation(AbstractDBMediator mediator, OMElement dbParent) {
 
         OMElement connElt = fac.createOMElement("connection", synNS);
@@ -160,10 +158,5 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
 
             dbParent.addChild(stmntElt);
         }
-    }
-
-    protected void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

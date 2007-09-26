@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.MediatorSerializer;
@@ -54,7 +53,7 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer
         } else {
             handleException("Invalid mediator. Bean name required.");
         }
-        finalizeSerialization(spring,mediator);
+        saveTracingState(spring,mediator);
 
         if (mediator.getConfigKey() != null) {
             spring.addAttribute(fac.createOMAttribute(
@@ -71,10 +70,5 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer
 
     public String getMediatorClassName() {
         return SpringMediator.class.getName();
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

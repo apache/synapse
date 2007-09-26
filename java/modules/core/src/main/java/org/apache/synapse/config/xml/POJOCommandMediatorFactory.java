@@ -46,21 +46,15 @@ import java.util.Iterator;
  */
 public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(POJOCommandMediatorFactory.class);
-
     private static final QName POJO_COMMAND_Q =
-            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
-
-    private static final QName ATT_NAME  = new QName("name");
-    private static final QName ATT_VALUE = new QName("value");
-    private static final QName ATT_EXPRN = new QName("expression");
+        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
 
     public Mediator createMediator(OMElement elem) {
 
         POJOCommandMediator pojoMediator = new POJOCommandMediator();
 
         // Class name of the Command object should be present
-        OMAttribute name = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        OMAttribute name = elem.getAttribute(ATT_NAME);
         if (name == null) {
             String msg = "The name of the actual POJO command implementation class" +
                     " is a required attribute";
@@ -117,16 +111,6 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return POJO_COMMAND_Q;
-    }
-
-    private void handleException(String message, Exception e) {
-        log.error(message, e);
-        throw new SynapseException(message, e);
-    }
-
-    private void handleException(String message) {
-        log.error(message);
-        throw new SynapseException(message);
     }
 
 }

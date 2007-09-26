@@ -30,8 +30,6 @@ import java.util.List;
 
 public abstract class AbstractListMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(AbstractListMediatorSerializer.class);
-
     protected static void serializeChildren(OMElement parent, List list)
     {
         Iterator iter = list.iterator();
@@ -45,10 +43,4 @@ public abstract class AbstractListMediatorSerializer extends AbstractMediatorSer
             }
         }
     }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }

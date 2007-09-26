@@ -24,7 +24,6 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.ClassMediator;
 
 import javax.xml.namespace.QName;
@@ -39,9 +38,6 @@ import java.util.Iterator;
  */
 public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
 
-    private static final Log log = LogFactory.getLog(ClassMediatorSerializer.class);
-    private static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
-
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof ClassMediator)) {
@@ -49,7 +45,7 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
         }
         ClassMediator mediator = (ClassMediator) m;
         OMElement clazz = fac.createOMElement("class", synNS);
-        finalizeSerialization(clazz, mediator);
+        saveTracingState(clazz, mediator);
 
         if (mediator.getMediator() != null && mediator.getMediator().getClass().getName() != null) {
             clazz.addAttribute(fac.createOMAttribute(
@@ -81,10 +77,5 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
 
     public String getMediatorClassName() {
         return ClassMediator.class.getName();
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

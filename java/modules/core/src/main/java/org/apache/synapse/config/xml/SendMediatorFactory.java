@@ -77,9 +77,8 @@ import javax.xml.namespace.QName;
  */
 public class SendMediatorFactory extends AbstractMediatorFactory  {
 
-    private static final Log log = LogFactory.getLog(SendMediatorFactory.class);
-
     private static final QName SEND_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "send");
+    private static final QName ENDPOINT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -87,9 +86,9 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(sm,elem);
+        processTraceState(sm,elem);
 
-        OMElement epElement = elem.getFirstChildWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
+        OMElement epElement = elem.getFirstChildWithName(ENDPOINT_Q);
         if (epElement != null) {
             // get the factory for the element
             // create the endpoint and set it in the send medaitor

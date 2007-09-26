@@ -34,8 +34,6 @@ import java.util.Iterator;
 
 public abstract class AnonymousListMediatorFactory extends AbstractListMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(AnonymousListMediator.class);
-
     /**
      * To create an anonymous list mediator form OMElement
      * @param el

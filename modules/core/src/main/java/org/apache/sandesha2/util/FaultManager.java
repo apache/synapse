@@ -761,6 +761,13 @@ public class FaultManager {
 				log.debug("Exit: FaultManager::processCreateSequenceRefusedFault Unable to find RMSBean");
 			return;
 		}
+		if(rmsBean.getSequenceID()!=null){
+			//we got a cseqRefused but the sequence is already setup - this implies a timing condition whereby several resends of the cSeqReq have been sent out.
+			//The best thing to do here is to ignore it.
+			if (log.isDebugEnabled())
+				log.debug("Exit: FaultManager::processCreateSequenceRefusedFault Sequence already established - no requirement to cleanup");
+			return;			
+		}
 		
 	/*	if (rmsBean.getLastSendError() == null) {
 			// Indicate that there was an error when sending the Create Sequence.

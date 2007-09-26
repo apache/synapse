@@ -21,7 +21,6 @@ package org.apache.synapse.mediators.throttle;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
@@ -69,7 +68,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(throttleMediator,elem);
+        processTraceState(throttleMediator,elem);
         SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
         OMAttribute onReject = elem.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.ONREJECT));
@@ -102,11 +101,6 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
             }
         }
         return throttleMediator;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public QName getTagQName() {

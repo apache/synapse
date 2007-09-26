@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
@@ -64,17 +63,12 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
 
              // after successfully creating the mediator
              // set its common attributes such as tracing etc
-            initMediator(sm,elem);
+            processTraceState(sm,elem);
             sm.setBeanName(bean.getAttributeValue());
             sm.setConfigKey(key.getAttributeValue());
             return sm;
         }
         return null;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public QName getTagQName() {

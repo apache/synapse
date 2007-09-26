@@ -48,17 +48,16 @@ import java.util.Iterator;
  */
 public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
-    private static final Log log = LogFactory.getLog(HeaderMediatorFactory.class);
-
     private static final QName HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "header");
+    private static final QName ATT_ACTION = new QName("action");
 
     public Mediator createMediator(OMElement elem) {
 
         HeaderMediator headerMediator = new HeaderMediator();
-        OMAttribute name   = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
-        OMAttribute value  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "value"));
-        OMAttribute exprn  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "expression"));
-        OMAttribute action = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "action"));
+        OMAttribute name   = elem.getAttribute(ATT_NAME);
+        OMAttribute value  = elem.getAttribute(ATT_VALUE);
+        OMAttribute exprn  = elem.getAttribute(ATT_EXPRN);
+        OMAttribute action = elem.getAttribute(ATT_ACTION);
 
         if (name == null || name.getAttributeValue() == null) {
             String msg = "A valid name attribute is required for the header mediator";
@@ -86,7 +85,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(headerMediator,elem);
+        processTraceState(headerMediator,elem);
 
         // The action attribute is optional, if provided and equals to 'remove' the
         // header mediator will act as a header remove mediator

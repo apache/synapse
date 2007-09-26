@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
@@ -41,8 +40,6 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  */
 public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(SequenceMediatorSerializer.class);
-
     public OMElement serializeAnonymousSequence(OMElement parent, SequenceMediator mediator) {
         OMElement sequence = fac.createOMElement("sequence", synNS);
         int isEnableStatistics = mediator.getStatisticsState();
@@ -60,7 +57,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
             sequence.addAttribute(fac.createOMAttribute(
                     "onError", nullNS, mediator.getErrorHandler()));
         }
-        finalizeSerialization(sequence, mediator);
+        saveTracingState(sequence, mediator);
         serializeChildren(sequence, mediator.getList());
         if (parent != null) {
             parent.addChild(sequence);
@@ -110,7 +107,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
                     sequence.addAttribute(fac.createOMAttribute(
                             "onError", nullNS, mediator.getErrorHandler()));
                 }
-                finalizeSerialization(sequence, mediator);
+                saveTracingState(sequence, mediator);
                 serializeChildren(sequence, mediator.getList());
             }
         }
@@ -124,10 +121,4 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
     public String getMediatorClassName() {
         return SequenceMediator.class.getName();
     }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }

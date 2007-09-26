@@ -22,11 +22,8 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
-
-import javax.xml.namespace.QName;
 
 /**
  * <pre>
@@ -39,10 +36,7 @@ import javax.xml.namespace.QName;
  * &lt;/makefault&gt;
  * </pre>
  */
-public class FaultMediatorSerializer extends AbstractMediatorSerializer
-     {
-
-    private static final Log log = LogFactory.getLog(FaultMediatorSerializer.class);
+public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final String SOAP11 = "soap11";
 
@@ -56,7 +50,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer
 
         FaultMediator mediator = (FaultMediator) m;
         OMElement fault = fac.createOMElement("makefault", synNS);
-        finalizeSerialization(fault,mediator);
+        saveTracingState(fault,mediator);
 
         if(mediator.getSoapVersion()==FaultMediator.SOAP11) {
            fault.addAttribute(fac.createOMAttribute(
@@ -121,10 +115,5 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer
 
     public String getMediatorClassName() {
         return FaultMediator.class.getName();
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

@@ -39,19 +39,18 @@ import org.jaxen.JaxenException;
  * </pre>
  */
 public class PropertyMediatorFactory extends AbstractMediatorFactory {
-
-    private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
-
-    private static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+    private static final QName ATT_SCOPE = new QName("scope");
+    private static final QName ATT_ACTION = new QName("action");
 
     public Mediator createMediator(OMElement elem) {
 
         PropertyMediator propMediator = new PropertyMediator();
-        OMAttribute name = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
-        OMAttribute value = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "value"));
-        OMAttribute expression = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "expression"));
-        OMAttribute scope = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "scope"));
-        OMAttribute action = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "action"));
+        OMAttribute name = elem.getAttribute(ATT_NAME);
+        OMAttribute value = elem.getAttribute(ATT_VALUE);
+        OMAttribute expression = elem.getAttribute(ATT_EXPRN);
+        OMAttribute scope = elem.getAttribute(ATT_SCOPE);
+        OMAttribute action = elem.getAttribute(ATT_ACTION);
+
         if (name == null) {
             String msg = "The 'name' attribute is required for the configuration of a property mediator";
             log.error(msg);
@@ -90,7 +89,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(propMediator, elem);
+        processTraceState(propMediator, elem);
         // The action attribute is optional, if provided and equals to 'remove' the
         // property mediator will act as a property remove mediator
         if (action != null && "remove".equals(action.getAttributeValue())) {

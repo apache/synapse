@@ -30,17 +30,28 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.MediatorProperty;
 
+import javax.xml.namespace.QName;
 import java.util.Collection;
 import java.util.Iterator;
 
 public abstract class AbstractMediatorSerializer implements MediatorSerializer {
+
+    /** the standard log for mediators, will assign the logger for the actual subclass */
+    protected static Log log;
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS
             = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
     protected static final OMNamespace nullNS
             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
-    private static final Log log = LogFactory.getLog(AbstractMediatorSerializer.class);
+    protected static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+
+    /**
+     * A constructor that makes subclasses pick up the correct logger
+     */
+    protected AbstractMediatorSerializer() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     /**
      * Perform common functions and finalize the mediator serialization.
@@ -49,7 +60,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
      * @param mediatorOmElement the OMElement being created
      * @param mediator          the Mediator instance being serialized
      */
-    protected static void finalizeSerialization(OMElement mediatorOmElement, Mediator mediator) {
+    protected static void saveTracingState(OMElement mediatorOmElement, Mediator mediator) {
         int traceState = mediator.getTraceState();
         String traceValue = null;
         if (traceState == org.apache.synapse.SynapseConstants.TRACING_ON) {
@@ -64,7 +75,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
     }
 
-    public void serializeMediatorProperties(OMElement parent, Collection props) {
+    protected void serializeMediatorProperties(OMElement parent, Collection props) {
 
         Iterator iter = props.iterator();
         while (iter.hasNext()) {
@@ -90,11 +101,11 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
         }
     }
 
-    public void serializeProperties(OMElement parent, Collection props) {
+    protected void serializeProperties(OMElement parent, Collection props) {
         serializeMediatorProperties(parent, props);
     }
 
-    public void serializeNamespaces(OMElement elem, AXIOMXPath xpath) {
+    protected void serializeNamespaces(OMElement elem, AXIOMXPath xpath) {
         Iterator iter = xpath.getNamespaces().keySet().iterator();
         while (iter.hasNext()) {
             String prefix = (String) iter.next();
@@ -105,9 +116,13 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
         }
     }
 
-    private static void handleException(String msg) {
+    protected static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }
 
+    protected static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
 }

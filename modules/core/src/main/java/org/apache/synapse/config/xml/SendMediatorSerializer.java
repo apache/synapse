@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
@@ -72,10 +71,7 @@ import org.apache.synapse.endpoints.Endpoint;
  * &lt;/send&gt;
  * </pre>
  */
-public class SendMediatorSerializer extends AbstractMediatorSerializer
-     {
-
-    private static final Log log = LogFactory.getLog(SendMediatorSerializer.class);
+public class SendMediatorSerializer extends AbstractMediatorSerializer {
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
@@ -85,7 +81,7 @@ public class SendMediatorSerializer extends AbstractMediatorSerializer
 
         SendMediator mediator = (SendMediator) m;
         OMElement send = fac.createOMElement("send", synNS);
-        finalizeSerialization(send, mediator);
+        saveTracingState(send, mediator);
 
         Endpoint activeEndpoint = mediator.getEndpoint();
         if (activeEndpoint != null) {
@@ -105,10 +101,4 @@ public class SendMediatorSerializer extends AbstractMediatorSerializer
     public String getMediatorClassName() {
         return SendMediator.class.getName();
     }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }

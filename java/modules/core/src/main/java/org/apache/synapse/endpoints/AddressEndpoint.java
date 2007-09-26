@@ -146,7 +146,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     public void send(MessageContext synCtx) {
 
         String endPointName = this.getName();
-        if(endPointName ==null) {
+        if(endPointName == null) {
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINTS;
         }
         // Setting Required property to collect the End Point statistics

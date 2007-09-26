@@ -119,8 +119,8 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         if (endpt.getAddress() != null) {
             address.addAttribute(fac.createOMAttribute(
                     "uri", null, endpt.getAddress()));
-        } else {
-            handleException("Invalid Endpoint. Address is required");
+//        } else {
+//            handleException("Invalid Endpoint. Address is required");
         }
 
         int isEnableStatistics = endpt.getStatisticsEnable();

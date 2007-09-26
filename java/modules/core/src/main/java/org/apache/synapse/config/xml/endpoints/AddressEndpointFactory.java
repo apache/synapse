@@ -150,9 +150,9 @@ public class AddressEndpointFactory implements EndpointFactory {
         }
         if (address != null) {
             endpoint.setAddress(address.getAttributeValue());
-        } else {
-            handleException("One of the 'address' or 'ref' attributes are required in an "
-                    + "anonymous endpoint");
+//        } else {
+//            handleException("One of the 'address' or 'ref' attributes are required in an "
+//                    + "anonymous endpoint");
         }
         if (format != null)
         {
@@ -220,7 +220,7 @@ public class AddressEndpointFactory implements EndpointFactory {
                     try {
                         long timeoutSeconds = new Long(d.trim()).longValue();
                         endpoint.setTimeoutDuration(timeoutSeconds * 1000);
-                        
+
                     } catch (NumberFormatException e) {
                         handleException(
                             "The timeout seconds should be specified as a valid number :: "

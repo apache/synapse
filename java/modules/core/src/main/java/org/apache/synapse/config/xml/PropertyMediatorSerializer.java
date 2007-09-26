@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 
@@ -33,8 +32,6 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
  */
 public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(PropertyMediatorSerializer.class);
-
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof PropertyMediator)) {
@@ -43,7 +40,7 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
         PropertyMediator mediator = (PropertyMediator) m;
         OMElement property = fac.createOMElement("property", synNS);
-        finalizeSerialization(property, mediator);
+        saveTracingState(property, mediator);
 
         if (mediator.getName() != null) {
             property.addAttribute(fac.createOMAttribute(
@@ -81,10 +78,4 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
     public String getMediatorClassName() {
         return PropertyMediator.class.getName();
     }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }

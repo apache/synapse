@@ -44,19 +44,13 @@ import java.util.Iterator;
  */
 public class ClassMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(ClassMediatorFactory.class);
     private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "class");
-    private static final QName PROPERTY_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
-    private static final QName ATT_NAME = new QName("name");
-    private static final QName ATT_VALUE = new QName("value");
-
 
     public Mediator createMediator(OMElement elem) {
 
         ClassMediator classMediator = new ClassMediator();
 
-        OMAttribute name = elem.getAttribute(new QName(
-                XMLConfigConstants.NULL_NAMESPACE, "name"));
+        OMAttribute name = elem.getAttribute(ATT_NAME);
         if (name == null) {
             String msg = "The name of the actual mediator class is a required attribute";
             log.error(msg);
@@ -74,7 +68,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
             throw new SynapseException(msg, e);
         }
 
-        for (Iterator it = elem.getChildrenWithName(PROPERTY_Q); it.hasNext();) {
+        for (Iterator it = elem.getChildrenWithName(PROP_Q); it.hasNext();) {
             OMElement child = (OMElement) it.next();
 
             String propName = child.getAttribute(ATT_NAME).getAttributeValue();
@@ -102,17 +96,12 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         classMediator.setMediator(m);
-        initMediator(classMediator, elem);
+        processTraceState(classMediator, elem);
 
         return classMediator;
     }
 
     public QName getTagQName() {
         return CLASS_Q;
-    }
-
-    private void handleException(String message) {
-        log.error(message);
-        throw new SynapseException(message);
     }
 }

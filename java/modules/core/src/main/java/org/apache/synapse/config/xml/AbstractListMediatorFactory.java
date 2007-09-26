@@ -26,6 +26,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.Mediator;
 
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
@@ -33,8 +34,6 @@ import java.util.Iterator;
  * configuration. It recursively builds the child mediators of the list.
  */
 public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
-
-    private static final Log log = LogFactory.getLog(AbstractListMediatorFactory.class);
 
     protected static void addChildren(OMElement el, ListMediator m) {
         Iterator it = el.getChildElements();

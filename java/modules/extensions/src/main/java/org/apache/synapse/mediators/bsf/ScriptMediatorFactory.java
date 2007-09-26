@@ -86,7 +86,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
             mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText());
         }
 
-        initMediator(mediator, elem);
+        processTraceState(mediator, elem);
         return mediator;
     }
 

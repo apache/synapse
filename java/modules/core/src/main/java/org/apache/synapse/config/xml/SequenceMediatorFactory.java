@@ -46,8 +46,6 @@ import javax.xml.namespace.QName;
  */
 public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(SequenceMediatorFactory.class);
-
     private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
 
     public QName getTagQName() {
@@ -56,14 +54,13 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
     public SequenceMediator createAnonymousSequence(OMElement elem) {
         SequenceMediator seqMediator = new SequenceMediator();
-        OMAttribute e = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "onError"));
+        OMAttribute e = elem.getAttribute(ATT_ONERROR);
         if (e != null) {
             seqMediator.setErrorHandler(e.getAttributeValue());
         }
-        initMediator(seqMediator, elem);
+        processTraceState(seqMediator, elem);
         addChildren(elem, seqMediator);
-        OMAttribute statistics = elem.getAttribute(
-                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+        OMAttribute statistics = elem.getAttribute(ATT_STATS);
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
@@ -81,18 +78,18 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
         SequenceMediator seqMediator = new SequenceMediator();
 
-        OMAttribute n = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
-        OMAttribute e = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "onError"));
+        OMAttribute n = elem.getAttribute(ATT_NAME);
+        OMAttribute e = elem.getAttribute(ATT_ONERROR);
         if (n != null) {
             seqMediator.setName(n.getAttributeValue());
             if (e != null) {
                 seqMediator.setErrorHandler(e.getAttributeValue());
             }
-            initMediator(seqMediator, elem);
+            processTraceState(seqMediator, elem);
             addChildren(elem, seqMediator);
 
         } else {
-            n = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+            n = elem.getAttribute(ATT_KEY);
             if (n != null) {
                 seqMediator.setKey(n.getAttributeValue());
                 if (e != null) {
@@ -108,8 +105,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             }
         }
 
-        OMAttribute statistics = elem.getAttribute(
-                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+        OMAttribute statistics = elem.getAttribute(ATT_STATS);
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {

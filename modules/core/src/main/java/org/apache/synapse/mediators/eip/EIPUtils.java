@@ -61,25 +61,26 @@ public class EIPUtils {
      * @param expression - AXIOMXPath expression describing the elements
      * @return List of OMElements in the envelope matching the expression
      */
-    public static List getElements(SOAPEnvelope envelope, AXIOMXPath expression) {
-        try {
-            Object o = expression.evaluate(envelope);
-            if (o instanceof OMNode) {
-                List list = new ArrayList();
-                list.add(o);
-                return list;
-            } else if (o instanceof List) {
-                return (List) o;
-            } else {
-                handleException("The evaluation of the XPath expression "
-                        + expression + " must result in an OMNode");
-            }
-        } catch (JaxenException e) {
-            handleException("Error evaluating XPath " + expression + " on message");
-        }
-
-        return null;
-    }
+// asankha - 26 sep - pending review
+//    public static List getElements(SOAPEnvelope envelope, AXIOMXPath expression) {
+//        try {
+//            Object o = expression.evaluate(envelope);
+//            if (o instanceof OMNode) {
+//                List list = new ArrayList();
+//                list.add(o);
+//                return list;
+//            } else if (o instanceof List) {
+//                return (List) o;
+//            } else {
+//                handleException("The evaluation of the XPath expression "
+//                        + expression + " must result in an OMNode");
+//            }
+//        } catch (JaxenException e) {
+//            handleException("Error evaluating XPath " + expression + " on message");
+//        }
+//
+//        return null;
+//    }
 
     /**
      * This static util method will be used to create a new MessageContext by passing the
@@ -90,7 +91,7 @@ public class EIPUtils {
      * @return MessageContext created from the paased arguments
      */
     public static MessageContext createNewMessageContext(
-            MessageContext synCtx, SOAPEnvelope envelope) {
+            MessageContext synCtx, SOAPEnvelope envelope) throws AxisFault {
 
         // create the message context and then copy the transportIn/Out from the original message
         MessageContext newCtx = synCtx.getEnvironment().createMessageContext();
@@ -111,7 +112,7 @@ public class EIPUtils {
         newAxis2MC.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
                 axis2MC.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
 
-        try {
+        //try {
             newCtx.setEnvelope(envelope);
 
             // copy all the properties to the newCtx
@@ -133,9 +134,10 @@ public class EIPUtils {
             newCtx.setSoapAction(synCtx.getSoapAction());
             newCtx.setWSAAction(synCtx.getWSAAction());
 
-        } catch (AxisFault axisFault) {
-            handleException("Unable to split the message" + axisFault.getMessage(), axisFault);
-        }
+// asankha - 26 sep - pending review
+//         } catch (AxisFault axisFault) {
+//            handleException("Unable to split the message" + axisFault.getMessage(), axisFault);
+//        }
 
         return newCtx;
     }
@@ -148,25 +150,26 @@ public class EIPUtils {
      * @param enricher - SOAPEnvelope from which the enriching element will be extracted
      * @param expression - AXIOMXPath describing the enriching element
      */
-    public static void enrichEnvelope(SOAPEnvelope envelope,
-                                      SOAPEnvelope enricher, AXIOMXPath expression) {
-        OMElement enrichingElement;
-        Object o = getElements(envelope, expression).get(0);
-        if (o instanceof OMElement && ((OMElement) o).getParent() instanceof OMElement) {
-            enrichingElement = (OMElement) ((OMElement) o).getParent();
-        } else {
-            enrichingElement = envelope.getBody();
-        }
-        
-        Iterator itr = getElements(enricher, expression).iterator();
-        while (itr.hasNext()) {
-            o = itr.next();
-            if (o != null && o instanceof OMElement) {
-                enrichingElement.addChild((OMElement) o);
-            }
-        }
-        
-    }
+// asankha - 26 - sep - pending review
+//     public static void enrichEnvelope(SOAPEnvelope envelope,
+//                                      SOAPEnvelope enricher, AXIOMXPath expression) {
+//        OMElement enrichingElement;
+//        Object o = getElements(envelope, expression).get(0);
+//        if (o instanceof OMElement && ((OMElement) o).getParent() instanceof OMElement) {
+//            enrichingElement = (OMElement) ((OMElement) o).getParent();
+//        } else {
+//            enrichingElement = envelope.getBody();
+//        }
+//
+//        Iterator itr = getElements(enricher, expression).iterator();
+//        while (itr.hasNext()) {
+//            o = itr.next();
+//            if (o != null && o instanceof OMElement) {
+//                enrichingElement.addChild((OMElement) o);
+//            }
+//        }
+//
+//    }
 
     /**
      * This static util method will be used to clone the SOAPEnvelope passed to the method
@@ -195,30 +198,5 @@ public class EIPUtils {
         }
         
         return envelope;
-    }
-
-    /**
-     * Private method to handle exceptions
-     *
-     * @param message - String message to be logged and to be put as the exception message
-     */
-    private static void handleException(String message) {
-        if (log.isDebugEnabled()) {
-            log.debug(message);
-        }
-        throw new SynapseException(message);
-    }
-
-    /**
-     * Private method to handle exceptions
-     *
-     * @param message - String message to be logged and to be put as the exception message
-     * @param e - Cause Exception for this exception
-     */
-    private static void handleException(String message, Exception e) {
-        if (log.isDebugEnabled()) {
-            log.debug(message);
-        }
-        throw new SynapseException(message, e);
     }
 }

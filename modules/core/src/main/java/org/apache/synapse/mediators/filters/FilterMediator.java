@@ -49,30 +49,42 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Filter mediator mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        try {
-            if (shouldTrace) {
-                trace.trace("Start : Filter mediator ");
-            }
-            if (test(synCtx)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Filter condition satisfied.. executing child mediators");
-                }
-                return super.mediate(synCtx);
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Filter condition failed.. will skip executing child mediators");
-                }
-                return true;
-            }
-        } finally {
-            if (shouldTrace) {
-                trace.trace("End : Filter mediator ");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Filter mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
             }
         }
+
+        boolean result = false;
+        if (test(synCtx)) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, (xpath == null ?
+                    "Source : " + source + " against : " + regex.pattern() + " matches" :
+                    "XPath expression : "  + xpath + " evaluates to true") +
+                    " - executing child mediators");
+            }
+            result = super.mediate(synCtx);
+
+        } else {
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, (xpath == null ?
+                    "Source : " + source + " against : " + regex.pattern() + " does not match" :
+                    "XPath expression : "  + xpath + " evaluates to false") +
+                    " - skipping child mediators");
+            }
+            result = true;
+        }
+
+        if (traceOrDebugOn) {
+            trace.trace("End : Filter mediator ");
+        }
+        return result;
     }
 
     /**
@@ -85,50 +97,37 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * @return true if evaluation of the XPath/Regex results in true
      */
     public boolean test(MessageContext synCtx) {
-        try {
-            if (xpath != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Evaluating XPath expression : " + xpath);
-                }
-                if (shouldTrace(synCtx.getTracingState())) {
-                    trace.trace("XPath expression : " + xpath + " evaluates to : " +
-                            xpath.booleanValueOf(synCtx.getEnvelope()));
-                }
-                return xpath.booleanValueOf(synCtx.getEnvelope());
 
-            } else if (source != null && regex != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Evaluating regular expression : " + regex.pattern() +
-                            " against source : " + source);
-                }
-                String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
-                if (sourceString == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Source String has been evaluated to Null");
-                    }
-                    return false;
-                }
-                if (shouldTrace(synCtx.getTracingState())) {
-                    trace.trace("Regular expression : " + regex.pattern() + " and Source " +
-                            sourceString + " matches : " + regex.matcher(sourceString).matches());
-                }
-                Matcher matcher = regex.matcher(sourceString);
-                if (matcher == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Can not find a Regex Pattren Matcher");
-                    }
-                    return false;
-                }
-                return matcher.matches();
-            } else {
-                log.error("Invalid configuration specified");
-                return false;
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (xpath != null) {
+            try {
+                return xpath.booleanValueOf(synCtx.getEnvelope());
+            } catch (JaxenException e) {
+                handleException("Error evaluating XPath expression : " + xpath, e, synCtx);
             }
 
-        } catch (JaxenException e) {
-            log.error("XPath error : " + e.getMessage());
-            return false;
+        } else if (source != null && regex != null) {
+            String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
+            if (sourceString == null) {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Source String : " + source + " evaluates to null");
+                }
+                return false;
+            }
+            Matcher matcher = regex.matcher(sourceString);
+            if (matcher == null) {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Regex pattren matcher for : " + regex.pattern() +
+                        "against source : " + sourceString + " is null");
+                }
+                return false;
+            }
+            return matcher.matches();
         }
+
+        return false; // never executes
     }
 
 

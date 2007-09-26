@@ -59,33 +59,31 @@ public class SynapseMediator extends AbstractListMediator {
             }
         }
 
-        try {
-            // If the message flow path is OUT, then process the satatistics
-            if (synCtx.isResponse()) {
-                StatisticsUtils.processAllSequenceStatistics(synCtx);
-            }
-
-            //put the required property for the collecttng statistics for the message mediation
-            StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
-                    SynapseConstants.SEQUENCE_STATISTICS_STACK);
-            if (sequenceStack == null) {
-                sequenceStack = new SequenceStatisticsStack();
-                synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK,sequenceStack);
-            }
-            String seqName = "MainSequence";
-            boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-            sequenceStack.put(seqName,System.currentTimeMillis(),!synCtx.isResponse(),true,isFault);
-
-            return super.mediate(synCtx);
-
-        } finally {
-            if (traceOrDebugOn) {
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace("Message : " + synCtx);
-                }
-                traceOrDebug(traceOn, "End : Mediation using '" +
-                    SynapseConstants.MAIN_SEQUENCE_KEY + "' sequence");
-            }
+        // If the message flow path is OUT, then process the satatistics
+        if (synCtx.isResponse()) {
+            StatisticsUtils.processAllSequenceStatistics(synCtx);
         }
+
+        //put the required property for the collecttng statistics for the message mediation
+        StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
+                SynapseConstants.SEQUENCE_STATISTICS_STACK);
+        if (sequenceStack == null) {
+            sequenceStack = new SequenceStatisticsStack();
+            synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK,sequenceStack);
+        }
+        String seqName = "MainSequence";
+        boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+        sequenceStack.put(seqName,System.currentTimeMillis(),!synCtx.isResponse(),true,isFault);
+
+        boolean result = super.mediate(synCtx);
+
+        if (traceOrDebugOn) {
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
+            traceOrDebug(traceOn, "End : Mediation using '" +
+                SynapseConstants.MAIN_SEQUENCE_KEY + "' sequence");
+        }
+        return result;        
     }
 }

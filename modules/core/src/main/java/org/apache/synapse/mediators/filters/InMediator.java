@@ -41,30 +41,35 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("In mediator mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        try {
-            if (shouldTrace) {
-                trace.trace("Start : In mediator");
-            }
-            if (test(synCtx)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Current message is incoming.. executing child mediators");
-                }
-                return super.mediate(synCtx);
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Current message is not incoming.. skipping child mediators");
-                }
-                return true;
-            }
-        } finally {
-            if (shouldTrace) {
-                trace.trace("End : In mediator");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : In mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
             }
         }
+
+        boolean result = true;
+        if (test(synCtx)) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Current message is incoming - executing child mediators");
+            }
+            result = super.mediate(synCtx);
+
+        } else {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Current message is a response - skipping child mediators");
+            }
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : In mediator");
+        }
+
+        return result;
     }
 
     /**

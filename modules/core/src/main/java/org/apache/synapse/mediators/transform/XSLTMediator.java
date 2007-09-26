@@ -31,9 +31,6 @@ import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -80,7 +77,7 @@ public class XSLTMediator extends AbstractMediator {
      * The feature for which deciding swiching between DOM and Stream during the
      * transformation process
      */
-    public static final String FEATURE =
+    public static final String USE_DOM_SOURCE_AND_RESULTS =
         "http://ws.apache.org/ns/synapse/transform/feature/dom";
     /**
      * The resource key/name which refers to the XSLT to be used for the transformation
@@ -126,11 +123,11 @@ public class XSLTMediator extends AbstractMediator {
     /**
      *  Is it need to use DOMSource and DOMResult?
      */
-    private boolean isDOMRequired = true;
+    private boolean useDOMSourceAndResults = true;
 
     // todo - this is a hack to get the handler module case working - ruwan
-//    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-//            "//s12:Envelope/s12:Body/child::*[position()=1]";
+    //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+    //            "//s12:Envelope/s12:Body/child::*[position()=1]";
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
             "s12:Body/child::*[position()=1]";
 
@@ -151,7 +148,9 @@ public class XSLTMediator extends AbstractMediator {
             this.source.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             this.source.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
-            handleException("Error creating source XPath expression", e);
+            String msg = "Error creating default source XPath expression : " + DEFAULT_XPATH;
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
         }
     }
 
@@ -163,74 +162,82 @@ public class XSLTMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
+
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : XSLT mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
+        }
+
         try {
-            boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-            if (shouldTrace) {
-                trace.trace("Start : XSLT mediator : Using style sheet with key : " + xsltKey +
-                    (sourceXPathString == null ? "" : " against source XPath : " + sourceXPathString));
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("Performing XSLT using style sheet with key : " + xsltKey  +
-                    (sourceXPathString == null ? "" : " against source XPath : " + sourceXPathString));
-            }
-
-            performXLST(synCtx, shouldTrace);
-
-            if (shouldTrace) {
-                trace.trace("End : XSLT mediator");
-            }
+            performXLST(synCtx, traceOrDebugOn, traceOn);
             return true;
 
         } catch (Exception e) {
-            handleException("Unable to perform transformation. XSLT : " + xsltKey +
-                (sourceXPathString == null ? "" : " source XPath : " + sourceXPathString), e);
+            handleException("Unable to perform XSLT transformation using : " + xsltKey +
+                " against source XPath : " +
+                (sourceXPathString == null ? DEFAULT_XPATH : " source XPath : " +
+                 sourceXPathString), e, synCtx);
+
         }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : XSLT mediator");
+        }
+
         return false;
     }
 
-    private void performXLST(MessageContext msgCtx, boolean shouldTrace) {
+    /**
+     * Perform actual XSLT transformation
+     * @param synCtx current message
+     * @param traceOrDebugOn is trace or debug on?
+     * @param traceOn is trace on?
+     */
+    private void performXLST(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
 
         boolean reCreate = false;
-        OMNode sourceNode = getTransformSource(msgCtx);
-        if (shouldTrace) {
+        OMNode sourceNode = getTransformSource(synCtx);
+        ByteArrayOutputStream baosForTarget = null;
+
+        if (traceOrDebugOn) {
             trace.trace("Transformation source : " + sourceNode.toString());
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Transformation source : " + sourceNode);
         }
 
         Source transformSrc = null;
         Result transformTgt = null;
-        ByteArrayOutputStream baosForTarget = new ByteArrayOutputStream();
 
-        if (isDOMRequired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Using a DOMSource for transformation");
-            }
-            if (shouldTrace) {
-                trace.debug("Using a DOMSource for transformation");
+        if (useDOMSourceAndResults) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Using a DOMSource for transformation");
             }
 
             // for fast transformations create a DOMSource - ** may not work always though **
             transformSrc = new DOMSource(
-                    ((Element) ElementHelper.importOMElement((OMElement) sourceNode,
-                            DOOMAbstractFactory.getOMFactory())).getOwnerDocument());
+                ((Element) ElementHelper.importOMElement((OMElement) sourceNode,
+                DOOMAbstractFactory.getOMFactory())).getOwnerDocument());
             DocumentBuilderFactoryImpl.setDOOMRequired(true);
+
             try {
-                transformTgt = new DOMResult(DocumentBuilderFactoryImpl.newInstance().
-                    newDocumentBuilder().newDocument());
+                transformTgt = new DOMResult(
+                    DocumentBuilderFactoryImpl.newInstance().newDocumentBuilder().newDocument());
             } catch (ParserConfigurationException e) {
-                handleException("Error creating a DOMResult ", e);
+                handleException("Error creating a DOMResult for the transformation," +
+                    " Consider setting optimization feature : " + USE_DOM_SOURCE_AND_RESULTS +
+                    " off", e, synCtx);
             }
 
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Using byte array serialization");
-            }
-            if (shouldTrace) {
-                trace.trace("Using byte array serialization");
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Using byte array serialization for transformation");
             }
 
+            baosForTarget = new ByteArrayOutputStream();
             try {
                 // create a byte array output stream and serialize the source node into it
                 ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
@@ -245,20 +252,19 @@ public class XSLTMediator extends AbstractMediator {
                 transformTgt = new StreamResult(baosForTarget);
 
             } catch (XMLStreamException e) {
-                handleException("Error gettting transform source " + e.getMessage(), e);
+                handleException("Error creating a StreamResult for the transformation", e, synCtx);
             }
         }
 
         if (transformTgt == null) {
-            log.error("Was unable to get a transformation target created");
-            if (shouldTrace) {
-                trace.trace("Was unable to get a transformation target created");
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Was unable to get a javax.xml.transform.Result created");
             }
             return;
         }
 
         // build transformer - if necessary
-        Entry dp = msgCtx.getConfiguration().getEntryDefinition(xsltKey);
+        Entry dp = synCtx.getConfiguration().getEntryDefinition(xsltKey);
 
         // if the xsltKey refers to a dynamic resource
         if (dp != null && dp.isDynamic()) {
@@ -271,10 +277,10 @@ public class XSLTMediator extends AbstractMediator {
             if (reCreate || cachedTemplates == null) {
                 try {
                     cachedTemplates = transFact.newTemplates(
-                        Util.getStreamSource(msgCtx.getEntry(xsltKey)));
+                        Util.getStreamSource(synCtx.getEntry(xsltKey)));
 
                 } catch (TransformerConfigurationException e) {
-                    handleException("Error creating XSLT transformer using : " + xsltKey, e);
+                    handleException("Error creating XSLT transformer using : " + xsltKey, e, synCtx);
                 }
             }
         }
@@ -291,57 +297,75 @@ public class XSLTMediator extends AbstractMediator {
                             transformer.setParameter(prop.getName(), prop.getValue());
                         } else {
                             transformer.setParameter(prop.getName(),
-                                Axis2MessageContext.getStringValue(prop.getExpression(), msgCtx));
+                                Axis2MessageContext.getStringValue(prop.getExpression(), synCtx));
                         }
                     }
                 }
             }
 
             transformer.transform(transformSrc, transformTgt);
-            debugLogAndTrace("Transformation completed. Processing result", shouldTrace);
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Transformation completed - processing result");
+            }
 
             // get the result OMElement
             OMElement result = null;
             if (transformTgt instanceof DOMResult) {
                 Node node = ((DOMResult) transformTgt).getNode();
                 if (node == null) {
-                    debugLogAndTrace("Transformation result was null", shouldTrace);
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, ("Transformation result (DOMResult) was null"));
+                    }
                     return;
                 }
                 Node resultNode = node.getFirstChild();
                 if (resultNode == null) {
-                    debugLogAndTrace("Transformation result was empty", shouldTrace);
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, ("Transformation result (DOMResult) was empty"));
+                    }
                     return;
                 }
 
-                result = ElementHelper.importOMElement((OMElement) resultNode,
-                        OMAbstractFactory.getOMFactory());
+                result = ElementHelper.importOMElement(
+                    (OMElement) resultNode, OMAbstractFactory.getOMFactory());
 
             } else {
+
                 try {
                     StAXOMBuilder builder = new StAXOMBuilder(
                         new ByteArrayInputStream(baosForTarget.toByteArray()));
                     result = builder.getDocumentElement();
+
                 } catch (XMLStreamException e) {
-                    handleException("Error building result from XSLT transformation", e);
+                    handleException(
+                        "Error building result element from XSLT transformation", e, synCtx);
+
                 } catch (Exception e) {
-                    result = handleNonXMLResult(baosForTarget.toString(), shouldTrace);
+                    result = handleNonXMLResult(baosForTarget.toString(), traceOrDebugOn, traceOn);
                 }
             }
 
             if (result == null) {
-                debugLogAndTrace("Transformation result is null", shouldTrace);
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Transformation result was null");
+                }
                 return;
+            } else {
+                if (traceOn && trace.isTraceEnabled()) {
+                    trace.trace("Transformation result : " + result.toString());
+                }
             }
 
-            debugLogAndTrace("Transformation result : " + result.toString(), shouldTrace);
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Replace source node with result");
+            }
 
             // replace the sourceNode with the result.
             sourceNode.insertSiblingAfter(result);
             sourceNode.detach();
 
         } catch (TransformerException e) {
-            handleException("Error performing XSLT transformation " + xsltKey, e);
+            handleException("Error performing XSLT transformation using : " + xsltKey, e, synCtx);
         }
     }
 
@@ -362,22 +386,12 @@ public class XSLTMediator extends AbstractMediator {
                 return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
             } else {
                 handleException("The evaluation of the XPath expression "
-                        + source + " must result in an OMNode");
+                        + source + " did not result in an OMNode", synCtx);
             }
         } catch (JaxenException e) {
-            handleException("Error evaluating XPath " + source + " on message");
+            handleException("Error evaluating XPath expression : " + source, e, synCtx);
         }
         return null;
-    }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public AXIOMXPath getSource() {
@@ -416,31 +430,41 @@ public class XSLTMediator extends AbstractMediator {
                 mp.setValue("false");
             }
             explicitFeatures.add(mp);
-            if (FEATURE.equals(featureName)) {
-                isDOMRequired = isFeatureEnable;
+            if (USE_DOM_SOURCE_AND_RESULTS.equals(featureName)) {
+                useDOMSourceAndResults = isFeatureEnable;
             } else {
                 transFact.setFeature(featureName, isFeatureEnable);
             }
         } catch (TransformerConfigurationException e) {
-            handleException("Error occured when setting features to the TransformerFactory",e);
+            String msg = "Error occured when setting features to the TransformerFactory";
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
         }
     }
 
-    private OMElement handleNonXMLResult(String textPayload, boolean shouldTrace) {
+    /**
+     * If the transformation results in a non-XML payload, use standard wrapper elements
+     * to wrap the text payload so that other mediators could still process the result
+     * @param textPayload the text payload to wrap
+     * @param traceOrDebugOn is tracing on debug logging on?
+     * @param traceOn is tracing on?
+     * @return an OMElement wrapping the text payload
+     */
+    private OMElement handleNonXMLResult(String textPayload, boolean traceOrDebugOn, boolean traceOn) {
 
         OMFactory fac = OMAbstractFactory.getOMFactory();
-        QName wrapperQName = null;
         OMElement wrapper = null;
 
-        debugLogAndTrace("Processing non SOAP/XML transformation result", shouldTrace);
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
+        }
+        if (traceOn && trace.isTraceEnabled()) {
+            trace.trace("Wrapping text transformation result : " + textPayload);
+        }
 
         if (textPayload != null) {
             OMTextImpl textData = (OMTextImpl) fac.createOMText(textPayload);
-
-            if (wrapperQName == null) {
-                wrapperQName = BaseConstants.DEFAULT_TEXT_WRAPPER;
-            }
-            wrapper = fac.createOMElement(wrapperQName, null);
+            wrapper = fac.createOMElement(BaseConstants.DEFAULT_TEXT_WRAPPER, null);
             wrapper.addChild(textData);
         }
 
@@ -465,15 +489,6 @@ public class XSLTMediator extends AbstractMediator {
 
     public void setSourceXPathString(String sourceXPathString) {
         this.sourceXPathString = sourceXPathString;
-    }
-
-    private void debugLogAndTrace(String msg, boolean shouldTrace) {
-        if (log.isDebugEnabled()) {
-            log.debug(msg);
-        }
-        if (shouldTrace) {
-            trace.trace(msg);
-        }
     }
 }
 

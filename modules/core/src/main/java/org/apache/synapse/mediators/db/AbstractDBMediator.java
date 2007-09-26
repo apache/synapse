@@ -79,8 +79,25 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @return true, always
      */
     public boolean mediate(MessageContext synCtx) {
+
+        String name = (this instanceof DBLookupMediator ? "DBLookup" : "DBReport");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : " + name + " mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
+        }
+
         for (Iterator iter = statementList.iterator(); iter.hasNext(); ) {
             processStatement((Statement) iter.next(), synCtx);
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : " + name + " mediator");
         }
         return true;
     }
@@ -138,11 +155,13 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      */
     protected PreparedStatement getPreparedStatement(Statement stmnt, MessageContext msgCtx) throws SQLException {
 
-        boolean shouldTrace = shouldTrace(msgCtx.getTracingState());
+        boolean traceOn = isTraceOn(msgCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
         Log serviceLog = msgCtx.getServiceLog();
 
-        if (shouldTrace) {
-            trace.info("Getting a connection from DataSource " + getDSName() +
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Getting a connection from DataSource " + getDSName() +
                 " and preparing statement : " + stmnt.getRawStatement());
         }
         Connection con = getDataSource().getConnection();
@@ -159,8 +178,8 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                 (String) msgCtx.getProperty(param.getPropertyName()) :
                 Axis2MessageContext.getStringValue(param.getXpath(), msgCtx));
 
-            if (shouldTrace) {
-                trace.debug("Setting as parameter : " + column + " value : " + value +
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Setting as parameter : " + column + " value : " + value +
                     " as JDBC Type : " + param.getType() + "(see java.sql.Types for valid types)");
             }
 
@@ -228,25 +247,13 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                         " against column : " + column + " and statement : " + stmnt.getRawStatement() +
                         " used by a DB mediator against DataSource : " + getDSName() +
                         " (see java.sql.Types for valid type values)";
-
-                    log.error(msg);
-                    if (serviceLog != null) {
-                        msgCtx.getServiceLog().error(msg);
-                    }
-                    if (shouldTrace) {
-                        trace.error(msg);
-                    }
-                    throw new SynapseException(msg);
+                    handleException(msg, msgCtx);
                 }
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully prepared statement : " + stmnt.getRawStatement() +
-                "against DataSource : " + getDSName());
-        }
-        if (serviceLog != null && serviceLog.isDebugEnabled()) {
-            serviceLog.debug("Successfully prepared statement : " + stmnt.getRawStatement() +
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Successfully prepared statement : " + stmnt.getRawStatement() +
                 "against DataSource : " + getDSName());
         }
         return ps;

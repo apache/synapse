@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.builtin.RMSequenceMediator;
 
 /**
@@ -33,8 +32,6 @@ import org.apache.synapse.mediators.builtin.RMSequenceMediator;
  */
 public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(RMSequenceMediatorSerializer.class);
-
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof RMSequenceMediator)) {
@@ -43,7 +40,7 @@ public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
 
         RMSequenceMediator mediator = (RMSequenceMediator) m;
         OMElement sequence = fac.createOMElement("RMSequence", synNS);
-        finalizeSerialization(sequence, mediator);
+        saveTracingState(sequence, mediator);
         
         if(mediator.isSingle() && mediator.getCorrelation() != null) {
             handleException("Invalid RMSequence mediator. A RMSequence can't have both a " 
@@ -84,10 +81,4 @@ public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
     public String getMediatorClassName() {
         return RMSequenceMediator.class.getName();
     }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }

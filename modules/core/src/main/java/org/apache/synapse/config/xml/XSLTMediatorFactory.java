@@ -22,9 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.OMElementUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
@@ -47,11 +44,7 @@ import java.util.Iterator;
  */
 public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "xslt");
-    public static final QName ATT_NAME_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
-    public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
-
 
     public QName getTagQName() {
         return TAG_NAME;
@@ -61,8 +54,8 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
         XSLTMediator transformMediator = new XSLTMediator();
 
-        OMAttribute attXslt   = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
-        OMAttribute attSource = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "source"));
+        OMAttribute attXslt   = elem.getAttribute(ATT_KEY);
+        OMAttribute attSource = elem.getAttribute(ATT_SOURCE);
 
         if (attXslt != null) {
             transformMediator.setXsltKey(attXslt.getAttributeValue());
@@ -84,13 +77,13 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(transformMediator, elem);
+        processTraceState(transformMediator, elem);
         // set the features 
-        Iterator iter = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature"));
+        Iterator iter = elem.getChildrenWithName(FEATURE_Q);
         while (iter.hasNext()) {
             OMElement featureElem = (OMElement) iter.next();
-            OMAttribute attName = featureElem.getAttribute(ATT_NAME_Q);
-            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE_Q);
+            OMAttribute attName = featureElem.getAttribute(ATT_NAME);
+            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE);
             if (attName != null && attValue != null) {
                 String name = attName.getAttributeValue();
                 String value = attValue.getAttributeValue();
@@ -116,15 +109,4 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
         return transformMediator;
     }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }

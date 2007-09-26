@@ -40,19 +40,19 @@ import org.jaxen.JaxenException;
  */
 public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
-
     private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "RMSequence");
+    private static final QName ATT_CORR = new QName("correlation");
+    private static final QName ATT_LASTMSG = new QName("last-message");
+    private static final QName ATT_VERSION = new QName("version");
+    private static final QName ATT_SINGLE = new QName("single");
 
     public Mediator createMediator(OMElement elem) {
 
         RMSequenceMediator sequenceMediator = new RMSequenceMediator();
-        OMAttribute correlation =
-            elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "correlation"));
-        OMAttribute lastMessage =
-            elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "last-message"));
-        OMAttribute single = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "single"));
-        OMAttribute version = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "version"));
+        OMAttribute correlation = elem.getAttribute(ATT_CORR);
+        OMAttribute lastMessage = elem.getAttribute(ATT_LASTMSG);
+        OMAttribute single = elem.getAttribute(ATT_SINGLE);
+        OMAttribute version = elem.getAttribute(ATT_VERSION);
 
         if (single == null && correlation == null) {
             String msg = "The 'single' attribute value of true or a 'correlation' attribute is " +
@@ -140,7 +140,7 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(sequenceMediator, elem);
+        processTraceState(sequenceMediator, elem);
 
         return sequenceMediator;
     }

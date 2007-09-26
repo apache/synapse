@@ -41,7 +41,7 @@ public class DropMediatorFactory extends AbstractMediatorFactory  {
         Mediator dropMediator = new DropMediator();
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(dropMediator,el);
+        processTraceState(dropMediator,el);
 
         return dropMediator;
     }

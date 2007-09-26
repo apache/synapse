@@ -73,23 +73,17 @@ import java.util.Iterator;
  */
 public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(AbstractDBMediatorFactory.class);
-
+    public static final QName URL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "url");
     static final QName DRIVER_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "driver");
-    public static final QName URL_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "url");
     static final QName USER_Q     = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "user");
     static final QName PASS_Q     = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "password");
-    static final QName PROP_Q     = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
 
     static final QName STMNT_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "statement");
     static final QName SQL_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sql");
     static final QName PARAM_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
     static final QName RESULT_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "result");
 
-    static final QName ATT_NAME   = new QName("name");
-    static final QName ATT_VALUE  = new QName("value");
     static final QName ATT_COLUMN = new QName("column");
-    static final QName ATT_EXPRN  = new QName("expression");
     static final QName ATT_TYPE   = new QName("type");
 
     protected void buildDataSource(OMElement elem, AbstractDBMediator mediator) {
@@ -252,16 +246,6 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
             return a.getAttributeValue();
         }
         return null;
-    }
-
-    protected void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }
 

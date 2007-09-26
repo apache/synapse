@@ -44,6 +44,77 @@ public class PropertyHelper {
     private static final Log log = LogFactory.getLog(PropertyHelper.class);
 
     /**
+     * Find and invoke the setter method with the name of form setXXX passing in the value given
+     * on the POJO object
+     * @param name name of the setter field
+     * @param val value to be set
+     * @param obj POJO instance
+     */
+    public static void setInstanceProperty(String name, Object val, Object obj) {
+
+        String mName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        Method method = null;
+
+        try {
+            Method[] methods = obj.getClass().getMethods();
+            boolean invoked = false;
+
+            for (int i=0; i<methods.length; i++) {
+                if (mName.equals(methods[i].getName())) {
+                    Class[] params = methods[i].getParameterTypes();
+                    if (params.length != 1) {
+                        handleException("Did not find a setter method named : " + mName +
+                            "() that takes a single String, int, long, float, double " +
+                            "or boolean parameter");
+                    } else if (val instanceof String) {
+                        String value = (String) val;
+                        if (params[0].equals(String.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{String.class});
+                            method.invoke(obj, new String[]{value});
+                        } else if (params[0].equals(int.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{int.class});
+                            method.invoke(obj, new Integer[]{new Integer(value)});
+                        } else if (params[0].equals(long.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{long.class});
+                            method.invoke(obj, new Long[]{new Long(value)});
+                        } else if (params[0].equals(float.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{float.class});
+                            method.invoke(obj, new Float[]{new Float(value)});
+                        } else if (params[0].equals(double.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{double.class});
+                            method.invoke(obj, new Double[]{new Double(value)});
+                        } else if (params[0].equals(boolean.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{boolean.class});
+                            method.invoke(obj, new Boolean[]{new Boolean(value)});
+                        } else {
+                            handleException("Did not find a setter method named : " + mName +
+                                "() that takes a single String, int, long, float, double " +
+                                "or boolean parameter");
+                        }
+                    } else {
+                        if (params[0].equals(OMElement.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{OMElement.class});
+                            method.invoke(obj, new OMElement[]{(OMElement) val});
+                        }
+                    }
+                    invoked = true;
+                }
+            }
+
+            if (!invoked) {
+                handleException("Did not find a setter method named : " + mName +
+                    "() that takes a single String, int, long, float, double " +
+                    "or boolean parameter");
+            }
+
+        } catch (Exception e) {
+            handleException("Error invoking setter method named : " + mName +
+                "() that takes a single String, int, long, float, double " +
+                "or boolean parameter", e);
+        }
+    }
+
+    /**
      * This method will set the static property discribed in the OMElement to the specified object.
      * This Object should have the setter method for the specified property name
      * 
@@ -103,84 +174,23 @@ public class PropertyHelper {
     }
 
     /**
-     * This method will be called in the mediation time to set the dynamic properties specified by
-     * XPATH functions over the message context to the specified object. In this case the setter
-     * method should be present for the specified property name
-     * 
-     * @param property - OMElement specifying the property to get the XPATH expression
-     * @param o - Object to which the executed XPATH function value over the MC will be set
-     * @param synCtx - MessageContext containg the message over which the XPATH function will
-     *                 be executed
-     */
-    public static void setDynamicProperty(OMElement property, Object o, MessageContext synCtx) {
-
-        if (property.getLocalName().toLowerCase().equals("property")) {
-
-            String propertyName = property.getAttributeValue(new QName("name"));
-            String mName = "set"
-                    + Character.toUpperCase(propertyName.charAt(0))
-                    + propertyName.substring(1);
-
-            // try to set String value first
-            if (property.getAttributeValue(new QName("expression")) != null) {
-                String expression = property.getAttributeValue(new QName("expression"));
-
-                try {
-                    Method method = o.getClass().getMethod(mName, new Class[]{String.class});
-
-                    AXIOMXPath xp = new AXIOMXPath(expression);
-                    OMElementUtils.addNameSpaces(xp, property, log);
-                    String value = Axis2MessageContext.getStringValue(xp, synCtx);
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Setting property :: invoking method "
-                                + mName + "(" + expression + ")");
-                    }
-
-                    method.invoke(o, new Object[]{value});
-
-                } catch(NoSuchMethodException e) {
-                    handleException("Unable to set the dynamic property value to the class. " +
-                            "No setter method for the property " + propertyName + " in class "
-                            + o.getClass().getName(), e);
-                } catch (JaxenException e) {
-                    handleException("Unable to evaluate the XPATH " + expression
-                            + " to set the property " + propertyName, e);
-                } catch (IllegalAccessException e) {
-                    handleException("Unable to set the dynamic property using the method "
-                            + mName + " of the class " + o.getClass().getName(), e);
-                } catch (InvocationTargetException e) {
-                    handleException("Unable to set the dynamic property using the method "
-                            + mName + " of the class " + o.getClass().getName(), e);
-                }
-            }
-        }
-    }
-
-    /**
      * This method will check the given OMElement represent either a static property or not
      * 
      * @param property - OMElement to be checked for the static property
      * @return boolean true if the elemet represents a static property element false otherwise
      */
     public static boolean isStaticProperty(OMElement property) {
-
         return "property".equals(property.getLocalName().toLowerCase())
-                && (property.getAttributeValue(new QName("expression")) == null);
-
+            && (property.getAttributeValue(new QName("expression")) == null);
     }
 
     private static void handleException(String message, Throwable e) {
-        if(log.isDebugEnabled()) {
-            log.debug(message + e.getMessage());
-        }
+        log.error(message + e.getMessage());
         throw new SynapseException(message, e);
     }
 
     private static void handleException(String message) {
-        if(log.isDebugEnabled()) {
-            log.debug(message);
-        }
+        log.error(message);
         throw new SynapseException(message);
-    }
+    }    
 }

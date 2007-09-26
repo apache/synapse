@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.jaxen.JaxenException;
+import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -126,14 +127,16 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                 String name = attName.getAttributeValue();
                 String value = attValue.getAttributeValue();
                 if (name != null && value != null) {
-                    if ("true".equals(value.trim())) {
-                        validateMediator.addFeature(name.trim(),
-                                true);
-                    } else if ("false".equals(value.trim())) {
-                        validateMediator.addFeature(name.trim(),
-                                false);
-                    } else {
-                        handleException("The feature must have value true or false");
+                    try {
+                        if ("true".equals(value.trim())) {
+                            validateMediator.addFeature(name.trim(), true);
+                        } else if ("false".equals(value.trim())) {
+                            validateMediator.addFeature(name.trim(), false);
+                        } else {
+                            handleException("The feature must have value true or false");
+                        }
+                    } catch (SAXException e) {
+                        handleException("Error setting validation feature : " + name + " to : " + value, e);
                     }
                 } else {
                     handleException("The valid values for both of the name and value are need");

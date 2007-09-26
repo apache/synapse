@@ -21,11 +21,13 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
+import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -48,6 +50,10 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName POJO_COMMAND_Q =
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
+
+    private static final QName ATT_NAME  = new QName("name");
+    private static final QName ATT_VALUE = new QName("value");
+    private static final QName ATT_EXPRN = new QName("expression");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -76,7 +82,33 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
         for (Iterator it = elem.getChildElements(); it.hasNext();) {
             OMElement child = (OMElement) it.next();
             if("property".equals(child.getLocalName())) {
-                pojoMediator.addProperty(child);
+
+                String propName = child.getAttribute(ATT_NAME).getAttributeValue();
+                if (propName == null) {
+                    handleException(
+                        "A POJO command mediator property must specify the name attribute");
+                } else {
+                    if (child.getAttribute(ATT_EXPRN) != null) {
+                        AXIOMXPath xpath = null;
+                        try {
+                            xpath = new AXIOMXPath(
+                                child.getAttribute(ATT_EXPRN).getAttributeValue());
+                            OMElementUtils.addNameSpaces(xpath, child, log);
+                            pojoMediator.addDynamicProperty(propName, xpath);
+                        } catch (JaxenException e) {
+                            handleException("Error instantiating XPath expression : " +
+                                child.getAttribute(ATT_EXPRN), e);
+                        }
+                    } else {
+                        if (child.getAttribute(ATT_VALUE) != null) {
+                            pojoMediator.addStaticProperty(propName,
+                                child.getAttribute(ATT_VALUE).getAttributeValue());
+                        } else {
+                            handleException("A POJO mediator property must specify either " +
+                                "name and expression attributes, or name and value attributes");
+                        }
+                    }
+                }
             }
         }
 
@@ -87,8 +119,15 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
         return POJO_COMMAND_Q;
     }
 
-    private void handleException(String message, Throwable e) {
-        log.error(message + e.getMessage());
+    private void handleException(String message, Exception e) {
+        log.error(message, e);
         throw new SynapseException(message, e);
     }
+
+    private void handleException(String message) {
+        log.error(message);
+        throw new SynapseException(message);
+    }
+
 }
+

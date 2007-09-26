@@ -66,30 +66,29 @@ public class HeaderMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Header mediator <" + (action == ACTION_SET ? "Set" : "Remove") + "> :: mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Header mediator, action = " +
-                    (action == ACTION_SET ? "set" : "remove"));
-        }
-        if (qName == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Hadear Name is null");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Header mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
             }
-            return true;
         }
+
         if (action == ACTION_SET) {
+
             String value = (getValue() != null ? getValue() :
                     Axis2MessageContext.getStringValue(expression, synCtx));
-            if (log.isDebugEnabled()) {
-                log.debug("Setting header : " + qName + " to : " + value);
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Set SOAP header : " + qName + " to : " + value);
             }
-            if (shouldTrace) {
-                trace.trace("Set Header : " + qName + " to : " + value);
-            }
+
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
+
+                // is this a "well known" Synapse header?
                 if (SynapseConstants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(new EndpointReference(value));
                 } else if (SynapseConstants.HEADER_FROM.equals(qName.getLocalPart())) {
@@ -108,15 +107,18 @@ public class HeaderMediator extends AbstractMediator {
             }
 
         } else {
+
             if (log.isDebugEnabled()) {
                 log.debug("Removing header : " + qName + " from current message");
             }
 
-            if (shouldTrace) {
-                trace.trace("Remove Header : " + qName);
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Removing SOAP Header : " + qName);
             }
 
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
+
+                // is this a "well known" Synapse header?
                 if (SynapseConstants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(null);
                 } else if (SynapseConstants.HEADER_FROM.equals(qName.getLocalPart())) {
@@ -133,23 +135,25 @@ public class HeaderMediator extends AbstractMediator {
                         SOAPHeader header = envelope.getHeader();
                         if (header != null) {
                             removeFromHeaderList(header.
-                                    getHeaderBlocksWithNSURI(""));
+                                getHeaderBlocksWithNSURI(""));
                         }
                     }
                 }
+
             } else {
                 SOAPEnvelope envelope = synCtx.getEnvelope();
                 if (envelope != null) {
                     SOAPHeader header = envelope.getHeader();
                     if (header != null) {
                         removeFromHeaderList(header.
-                                getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
+                            getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
                     }
                 }
             }
         }
-        if (shouldTrace) {
-            trace.trace("End : Header mediator");
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Header mediator");
         }
         return true;
     }

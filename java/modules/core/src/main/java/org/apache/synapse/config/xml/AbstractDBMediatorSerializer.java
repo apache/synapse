@@ -43,7 +43,7 @@ import java.sql.Types;
  *   </connection>
  *   <statement>
  *     <sql>insert into table values (?, ?, ..)</sql>
- *     <parameter [value="" | expression=""] type="int|string"/>*
+ *     <parameter [value="" | expression=""] type="INTEGER|VARCHAR"/>*
  *     <result name="string" column="int|string"/>*
  *   </statement>+
  * </dbreport | dblookup | .. etc>

@@ -114,7 +114,7 @@ public abstract class FaultHandler {
      * @param aThrowable
      * @return the stack trace as a string
      */
-    private static String getStackTrace(Throwable aThrowable) {
+    public static String getStackTrace(Throwable aThrowable) {
         final Writer result = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(result);
         aThrowable.printStackTrace(printWriter);

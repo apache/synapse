@@ -35,14 +35,10 @@ import java.util.regex.Pattern;
 
 public class SwitchCase {
 
-    private static final Log log = LogFactory.getLog(SwitchCase.class);
     /** The regular expression pattern to be used */
     private Pattern regex = null;
     /** The list mediator for which responsible message mediation  */
     private AnonymousListMediator caseMediator;
-
-    public SwitchCase() {
-    }
 
     /**
      * To delegate message mediation to list mediator
@@ -100,23 +96,11 @@ public class SwitchCase {
      * @return boolean value
      */
     public boolean matches(String value) {
-        if (regex == null) {
-            String msg = "The 'regex' is required for a switch case definition";
-            handleException(msg);
-        }
         Matcher matcher = regex.matcher(value);
         if(matcher == null){
             return false;
         }
         boolean retVal = matcher.matches();
-        if (log.isDebugEnabled()) {
-            log.debug("Case : " + regex.pattern() + " evaluated to : " + retVal);
-        }
         return retVal;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

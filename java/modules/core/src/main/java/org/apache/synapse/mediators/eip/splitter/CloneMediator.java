@@ -25,6 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.mediators.eip.Target;
+import org.apache.axis2.AxisFault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,12 @@ public class CloneMediator extends AbstractMediator {
     private MessageContext getClonedMessageContext(MessageContext synCtx,
         int messageSequence, int messageCount) {
 
-        MessageContext newCtx = EIPUtils.createNewMessageContext(synCtx, synCtx.getEnvelope());
+        MessageContext newCtx = null;
+        try {
+            newCtx = EIPUtils.createNewMessageContext(synCtx, synCtx.getEnvelope());
+        } catch (AxisFault axisFault) {
+            handleException("Error creating a new message context", axisFault, synCtx);
+        }
 
         // Sets the property MESSAGE_SEQUENCE to the MC for aggragation purposes 
         newCtx.setProperty(EIPUtils.MESSAGE_SEQUENCE, String.valueOf(messageSequence)

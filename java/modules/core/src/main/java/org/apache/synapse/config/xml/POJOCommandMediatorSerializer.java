@@ -20,12 +20,14 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
 
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
@@ -43,6 +45,7 @@ import java.util.Iterator;
 public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(POJOCommandMediatorSerializer.class);
+    private static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
         
@@ -62,14 +65,24 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Invalid POJO Command mediator. The command class name is required");
         }
 
-        Iterator itr = mediator.getProperties().iterator();
-        while(itr.hasNext()) {
-            Object property = itr.next();
-            if (property instanceof OMElement) {
-                pojoCommand.addChild((OMElement) property);
-            } else {
-                handleException("POJOCommandMediator property can not be serialized");
-            }
+        for (Iterator itr = mediator.getStaticProps().keySet().iterator(); itr.hasNext(); ) {
+            String propName = (String) itr.next();
+            String value = (String) mediator.getStaticProps().get(propName);
+            OMElement prop = fac.createOMElement(PROP_Q);
+            prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
+            prop.addAttribute(fac.createOMAttribute("value", nullNS, value));
+            pojoCommand.addChild(prop);
+        }
+
+        for (Iterator itr = mediator.getDynamicProps().keySet().iterator(); itr.hasNext(); ) {
+            String propName = (String) itr.next();
+            AXIOMXPath exprn = (AXIOMXPath) mediator.getDynamicProps().get(propName);
+            OMElement prop = fac.createOMElement(PROP_Q);
+            prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
+            prop.addAttribute(fac.createOMAttribute("expression", nullNS,
+                exprn.toString()));
+            serializeNamespaces(prop, exprn);
+            pojoCommand.addChild(prop);
         }
 
         if (parent != null) {

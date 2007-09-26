@@ -62,49 +62,50 @@ public class PropertyMediator extends AbstractMediator {
      * or into Transports Header
      * And Removes above properties from the corresspounding locations
      *
-     * @param smc the message context
+     * @param synCtx the message context
      * @return true always
      */
-    public boolean mediate(MessageContext smc) {
-        if (log.isDebugEnabled()) {
-            log.debug("Property mediator :: mediate()");
+    public boolean mediate(MessageContext synCtx) {
+
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Property mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
-        boolean shouldTrace = shouldTrace(smc.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Property mediator");
-        }
+
         if (action == ACTION_SET) {
-            String resultValue = (this.value != null ? this.value :
-                    Axis2MessageContext.getStringValue(expression, smc));
-            if (log.isDebugEnabled()) {
-                log.debug("Setting : " + name +
-                            " property (scope:" + (scope == null ? "default" : scope) + ") = " +
-                                   resultValue);
+
+            String resultValue = (value != null ? value :
+                Axis2MessageContext.getStringValue(expression, synCtx));
+
+            if (traceOrDebugOn) {
+                trace.trace("Setting property : " + name + " at scope:" +
+                    (scope == null ? "default" : scope) + " to : " + resultValue + "(i.e. " +
+                    (value != null ? "constant : " + value :
+                          " result of expression : " + expression) + ")");
             }
-            if (shouldTrace) {
-                trace.trace("Property Name : " + name +
-                              " (scope:" + (scope == null ? "default" : scope) + ") set to " +
-                                  (value != null ? " resultValue = " + value :
-                                      " result of expression " + expression + " = " + resultValue));
-            }
-            if (scope == null) {
+
+            if (scope == null || XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
                 //Setting property into the  Synapse Context
-                smc.setProperty(name, resultValue);
-            } else if (XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
-                //Setting property into the  Synapse Context
-                smc.setProperty(name, resultValue);
+                synCtx.setProperty(name, resultValue);
+
             } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
-                    && smc instanceof Axis2MessageContext) {
+                    && synCtx instanceof Axis2MessageContext) {
                 //Setting property into the  Axis2 Message Context
-                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
                 axis2MessageCtx.getOptions().setProperty(name, resultValue);
 
             } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
-                    && smc instanceof Axis2MessageContext) {
+                    && synCtx instanceof Axis2MessageContext) {
                 //Setting Transport Headers
-                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
                 Object headers = axis2MessageCtx.getProperty(
@@ -121,48 +122,33 @@ public class PropertyMediator extends AbstractMediator {
                             org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
                             headersMap);
                 }
-            } else {
-                String msg = "Unsupported scope : " + scope + " for property mediator";
-                if(shouldTrace){
-                    trace.trace(msg);
-                }
-                handleException(msg);
             }
+
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Removing : " + name +
-                        " property (scope:" + (scope == null ? "default" : scope) + ") ");
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Removing property : " + name +
+                    " (scope:" + (scope == null ? "default" : scope) + ")");
             }
-            if (shouldTrace) {
-                trace.trace("Remove - Property Name : " + name +
-                        " (scope:" + (scope == null ? "default" : scope) + ")");
-            }
-            if (scope == null) {
+
+            if (scope == null || XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
                 //Removing property from the  Synapse Context
-                Set pros = smc.getPropertyKeySet();
+                Set pros = synCtx.getPropertyKeySet();
                 if (pros != null) {
                     pros.remove(name);
                 }
-            } else if (XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
-                //Removing property from the  Synapse Context
-                Set pros = smc.getPropertyKeySet();
-                if (pros != null) {
-                    pros.remove(name);
-                }
+
             } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
-                    && smc instanceof Axis2MessageContext) {
+                    && synCtx instanceof Axis2MessageContext) {
                 //Removing property from the        Axis2 Message Context
-                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
-                Map pros = axis2MessageCtx.getProperties();
-                if (pros != null) {
-                    pros.remove(name);
-                }
+                axis2MessageCtx.removeProperty(name);
+
             } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
-                    && smc instanceof Axis2MessageContext) {
+                    && synCtx instanceof Axis2MessageContext) {
                 // Removing transport headers
-                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
                 Object headers = axis2MessageCtx.getProperty(
@@ -170,28 +156,17 @@ public class PropertyMediator extends AbstractMediator {
                 if (headers != null && headers instanceof Map) {
                     Map headersMap = (HashMap) headers;
                     headersMap.remove(name);
+                } else {
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "No transport headers found for the message");
+                    }
                 }
-                if (headers == null) {
-                    log.info("No Headers found ");
-                }
-
-            } else {
-                String msg = "Unsupported scope : " + scope + " for property mediator";
-                if (shouldTrace) {
-                    trace.trace(msg);
-                }
-                handleException(msg);
             }
         }
-        if (shouldTrace) {
-            trace.trace("End : Property mediator");
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Property mediator");
         }
         return true;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public String getName() {

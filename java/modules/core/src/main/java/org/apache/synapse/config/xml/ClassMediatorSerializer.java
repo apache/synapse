@@ -20,12 +20,14 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.ClassMediator;
 
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
@@ -38,6 +40,7 @@ import java.util.Iterator;
 public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
 
     private static final Log log = LogFactory.getLog(ClassMediatorSerializer.class);
+    private static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
@@ -55,14 +58,19 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
             handleException("Invalid class mediator. The class name is required");
         }
 
-        Iterator itr = mediator.getProperties().iterator();
+        Iterator itr = mediator.getProperties().keySet().iterator();
         while(itr.hasNext()) {
-            Object property = itr.next();
-            if (property instanceof OMElement) {
-                clazz.addChild((OMElement) property);
+            String propName = (String) itr.next();
+            Object o = mediator.getProperties().get(propName);
+            OMElement prop = fac.createOMElement(PROP_Q);
+            prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
+
+            if (o instanceof String) {
+                prop.addAttribute(fac.createOMAttribute("value", nullNS, (String) o));
             } else {
-                handleException("ClassMediator property can not be serialized");
+                prop.addChild((OMNode) o);
             }
+            clazz.addChild(prop);
         }
 
         if (parent != null) {

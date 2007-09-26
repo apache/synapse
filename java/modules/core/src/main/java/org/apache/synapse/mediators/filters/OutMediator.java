@@ -41,30 +41,35 @@ public class OutMediator extends AbstractListMediator implements org.apache.syna
      */
     public boolean mediate(MessageContext synCtx) {
         
-        if (log.isDebugEnabled()) {
-            log.debug("Out mediator mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        try {
-            if (shouldTrace) {
-                trace.trace("Start : Out mediator");
-            }
-            if (test(synCtx)) {
-                if(log.isDebugEnabled()) {
-                    log.debug("Current message is outgoing.. executing child mediators");
-                }
-                return super.mediate(synCtx);
-            } else {
-                if(log.isDebugEnabled()) {
-                    log.debug("Current message is not outgoing.. skipping child mediators");
-                }
-                return true;
-            }
-        } finally {
-            if (shouldTrace) {
-                trace.trace("End : Out mediator");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Out mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
             }
         }
+
+        boolean result = true;
+        if (test(synCtx)) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Current message is outgoing - executing child mediators");
+            }
+            result = super.mediate(synCtx);
+
+        } else {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Current message is a request - skipping child mediators");
+            }
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Out mediator");
+        }
+
+        return result;
     }
 
     /**

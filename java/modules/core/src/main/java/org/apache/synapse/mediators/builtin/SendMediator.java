@@ -49,51 +49,56 @@ public class SendMediator extends AbstractMediator {
      * @return false always as this is a leaf mediator
      */
     public boolean mediate(MessageContext synCtx) {
-        if (log.isDebugEnabled()) {
-            log.debug("Send mediator :: mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        try {
-            if (shouldTrace) {
-                trace.trace("Start : Send mediator");
-                trace.trace("Sending Message :: " + synCtx.getEnvelope());
-            }
-            // if no endpoints are defined, send where implicitly stated
-            if (endpoint == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Sending message using implicit message properties..");
-                    log.debug("Sending To: " + (synCtx.getTo() != null ?
-                            synCtx.getTo().getAddress() : "null"));
-                    log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
-                            synCtx.getWSAAction() : "null"));
-                    log.debug("Body : \n" + synCtx.getEnvelope());
-                }
 
-                if (synCtx.isResponse()) {
-                    Axis2MessageContext axis2MsgCtx = (Axis2MessageContext) synCtx;
-                    OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
-                    Object o = opCtx.getProperty("endpointList");
-                    if (o != null) {
-                        // we are in the response of the first message of a server initiated session.
-                        // so update all session maps.
-                        List endpointList = (List) o;
-                        Object e = endpointList.remove(0);
-                        if (e != null && e instanceof SALoadbalanceEndpoint) {
-                            SALoadbalanceEndpoint saLoadbalanceEndpoint = (SALoadbalanceEndpoint) e;
-                            saLoadbalanceEndpoint.updateSession(synCtx, endpointList);
-                        }
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Send mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
+        }
+
+        // if no endpoints are defined, send where implicitly stated
+        if (endpoint == null) {
+
+            if (traceOrDebugOn) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("Sending " + (synCtx.isResponse() ? "response" : "request")
+                    + " message using implicit message properties..");
+                sb.append("Sending To: " + (synCtx.getTo() != null ?
+                        synCtx.getTo().getAddress() : "null"));
+                sb.append("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                        synCtx.getWSAAction() : "null"));
+                sb.append("Body : \n" + synCtx.getEnvelope());
+                traceOrDebug(traceOn, sb.toString());
+            }
+
+            if (synCtx.isResponse()) {
+                Axis2MessageContext axis2MsgCtx = (Axis2MessageContext) synCtx;
+                OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
+                Object o = opCtx.getProperty("endpointList");
+                if (o != null && o instanceof List) {
+                    // we are in the response of the first message of a server initiated session
+                    // so update all session maps
+                    List endpointList = (List) o;
+                    Object e = endpointList.remove(0);
+                    if (e != null && e instanceof SALoadbalanceEndpoint) {
+                        SALoadbalanceEndpoint saLoadbalanceEndpoint = (SALoadbalanceEndpoint) e;
+                        saLoadbalanceEndpoint.updateSession(synCtx, endpointList);
                     }
                 }
-                synCtx.getEnvironment().send(null, synCtx);
-
-            } else {
-                endpoint.send(synCtx);
             }
+            synCtx.getEnvironment().send(null, synCtx);
 
-        } finally {
-            if (shouldTrace) {
-                trace.trace("End : Send mediator");
-            }
+        } else {
+            endpoint.send(synCtx);
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Send mediator");
         }
         return true;
     }

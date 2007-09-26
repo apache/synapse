@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -44,9 +45,11 @@ import java.util.Iterator;
 public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(ClassMediatorFactory.class);
+    private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "class");
+    private static final QName PROPERTY_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+    private static final QName ATT_NAME = new QName("name");
+    private static final QName ATT_VALUE = new QName("value");
 
-    private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "class");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -71,11 +74,28 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
             throw new SynapseException(msg, e);
         }
 
-        for (Iterator it = elem.getChildElements(); it.hasNext();) {
+        for (Iterator it = elem.getChildrenWithName(PROPERTY_Q); it.hasNext();) {
             OMElement child = (OMElement) it.next();
-            if(PropertyHelper.isStaticProperty(child)) {
-                classMediator.addProperty(child);
-                PropertyHelper.setStaticProperty(child, m);
+
+            String propName = child.getAttribute(ATT_NAME).getAttributeValue();
+            if (propName == null) {
+                handleException(
+                    "A Class mediator property must specify the name attribute");
+            } else {
+                if (child.getAttribute(ATT_VALUE) != null) {
+                    String value = child.getAttribute(ATT_VALUE).getAttributeValue();
+                    classMediator.addProperty(propName, value);
+                    PropertyHelper.setInstanceProperty(propName, value, m);
+                } else {
+                    OMNode omNode = child.getFirstOMChild();
+                    if (omNode != null) {
+                        classMediator.addProperty(propName, omNode);
+                        PropertyHelper.setInstanceProperty(propName, omNode, m);
+                    } else {
+                        handleException("A Class mediator property must specify " +
+                            "name and value attributes, or a name and a child XML fragment");
+                    }
+                }
             }
         }
 
@@ -89,5 +109,10 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return CLASS_Q;
+    }
+
+    private void handleException(String message) {
+        log.error(message);
+        throw new SynapseException(message);
     }
 }

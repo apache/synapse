@@ -206,14 +206,26 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
             while (paramIter.hasNext()) {
 
                 OMElement paramElt = (OMElement) paramIter.next();
-                try {
+                String xpath = getAttribute(paramElt, ATT_EXPRN);
+                String value = getAttribute(paramElt, ATT_VALUE);
+
+                if (xpath != null || value != null) {
+                    
+                    AXIOMXPath xp = null;
+                    if (xpath != null) {
+                        try {
+                            xp = new AXIOMXPath(xpath);
+                            OMElementUtils.addNameSpaces(xp, paramElt, log);
+
+                        } catch (JaxenException e) {
+                            handleException("Invalid XPath specified for the source attribute : " +
+                                    xpath);
+                        }
+                    }
                     statement.addParameter(
-                        getAttribute(paramElt, ATT_VALUE),
-                        getAttribute(paramElt, ATT_EXPRN),
-                        getAttribute(paramElt, ATT_TYPE));
-                } catch (JaxenException e) {
-                    handleException("Invalid XPath expression for query : "
-                        + getAttribute(paramElt, ATT_EXPRN));
+                            value,
+                            xp,
+                            getAttribute(paramElt, ATT_TYPE));
                 }
             }
 

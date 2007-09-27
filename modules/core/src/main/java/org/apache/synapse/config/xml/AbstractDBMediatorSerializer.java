@@ -126,11 +126,11 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
 
                 switch (param.getType()) {
                     case Types.VARCHAR: {
-                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "string"));
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "VARCHAR"));
                         break;
                     }
                     case Types.INTEGER: {
-                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "int"));
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "INTEGER"));
                         break;
                     }
                     default:

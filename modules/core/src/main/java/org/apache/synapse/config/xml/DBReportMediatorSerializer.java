@@ -50,7 +50,7 @@ public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
         }
 
         DBReportMediator mediator = (DBReportMediator) m;
-        OMElement dbReport = fac.createOMElement("dbReport", synNS);
+        OMElement dbReport = fac.createOMElement("dbreport", synNS);
         saveTracingState(dbReport,mediator);
         serializeDBInformation(mediator, dbReport);
 

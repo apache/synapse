@@ -47,7 +47,7 @@ public class Statement {
         return rawStatement;
     }
 
-    public void addParameter(String propertyName, String xpath, String type) throws JaxenException {
+    public void addParameter(String propertyName, AXIOMXPath xpath, String type){
         parameters.add(new Parameter(propertyName, xpath, type));
     }
 
@@ -68,17 +68,12 @@ public class Statement {
         AXIOMXPath xpath = null;
         int type = 0;
 
-        Parameter(String value, String xpath, String type) throws JaxenException {
+        Parameter(String value, AXIOMXPath xpath, String type) {
 
             this.propertyName = value;
-            if (xpath != null) {
-                this.xpath = new AXIOMXPath(xpath);
-            }
-
+            this.xpath = xpath; 
             if ("CHAR".equals(type)) {
                 this.type = Types.CHAR;
-            } else if ("VARCHAR".equals(type)) {
-                this.type = Types.VARCHAR;
             } else if ("VARCHAR".equals(type)) {
                 this.type = Types.VARCHAR;
             } else if ("LONGVARCHAR".equals(type)) {

@@ -327,6 +327,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 				// We only match up requests and replies when we are doing sync interactions
+				if (log.isDebugEnabled()) log.debug("MEP OUT_IN");
 				EndpointReference replyTo = msgContext.getReplyTo();
 				if(replyTo == null || replyTo.hasAnonymousAddress()) {
 					long expectedReplies = rmsBean.getExpectedReplies();
@@ -337,6 +338,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				//(do should be done only for WSRM 1.1)
 				
 				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmMsgCtx.getRMSpecVersion())) {
+					if (log.isDebugEnabled()) log.debug("SPEC_1_1");
 					String oldAddress = (replyTo == null) ? null : replyTo.getAddress();
 					EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext
 							.getReplyTo(), configContext);
@@ -354,6 +356,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				}
 			}
 		}
+		if (log.isDebugEnabled()) log.debug("App msg using replyTo EPR as " + msgContext.getReplyTo());
 		
 		RelatesTo relatesTo = msgContext.getRelatesTo();
 		if(relatesTo != null) {

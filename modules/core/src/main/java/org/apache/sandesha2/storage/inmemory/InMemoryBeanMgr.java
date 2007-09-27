@@ -21,6 +21,8 @@ abstract class InMemoryBeanMgr {
 	protected InMemoryStorageManager mgr;
 
 	protected InMemoryBeanMgr(InMemoryStorageManager mgr, AbstractContext context, String key) {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " <innit> " + mgr + ", " 
+				+ context + ", " + key);
 		this.mgr = mgr;
 		Object obj = context.getProperty(key);
 		if (obj != null) {
@@ -29,17 +31,21 @@ abstract class InMemoryBeanMgr {
 			table = new Hashtable();
 			context.setProperty(key, table);
 		}
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " <init> " + this);
 	}
 	
 	protected boolean insert(Object key, RMBean bean) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " insert " + key + ", " + bean);
 		mgr.enlistBean(bean);
 		synchronized (table) {
 			table.put(key, bean);
 		}
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " insert " + true);
 		return true;
 	}
 
 	protected boolean delete(Object key) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " delete " + key);
 		RMBean bean = null;
 		synchronized (table) {
 			bean = (RMBean) table.get(key);
@@ -50,10 +56,12 @@ abstract class InMemoryBeanMgr {
 				bean = (RMBean) table.remove(key);
 			}
 		}
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " delete " + bean);
 		return bean != null;
 	}
 
 	protected RMBean retrieve(Object key) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " retrieve " + key);
 		RMBean bean = null;
 		synchronized (table) {
 			bean = (RMBean) table.get(key);
@@ -64,10 +72,12 @@ abstract class InMemoryBeanMgr {
 				bean = (RMBean) table.get(key);
 			}
 		}
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " retrieve " + bean);
 		return bean;
 	}
 
 	protected boolean update(Object key, RMBean bean) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " update " + key + ", " + bean);
 		mgr.enlistBean(bean);
 		RMBean oldBean = null;
 		synchronized (table) {
@@ -77,10 +87,12 @@ abstract class InMemoryBeanMgr {
 		if(oldBean == null) return false;
 		
 		mgr.enlistBean(oldBean);
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " update " + true);
 		return true;
 	}
 
 	protected List find(RMBean matchInfo) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
 		ArrayList beans = new ArrayList();
 		synchronized (table) {
 			if(matchInfo == null) {
@@ -110,11 +122,12 @@ abstract class InMemoryBeanMgr {
 				}
 			}
 		}
-
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " find " + beans);
 		return beans;
 	}
 
 	protected RMBean findUnique (RMBean matchInfo) throws SandeshaException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " findUnique " + matchInfo);
 		RMBean result = null;
 		synchronized (table) {
 			Iterator i = table.values().iterator();
@@ -145,6 +158,7 @@ abstract class InMemoryBeanMgr {
 			}
 		}
 		
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " findUnique " + result);
 		return result;
 	}
 

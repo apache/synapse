@@ -63,13 +63,13 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * Destroys the mediator. If we are using our custom DataSource, then shut down the connections
      */
     public void destroy() {
-        try {
-            if (getDataSource() instanceof BasicDataSource) {
+        if (getDataSource() instanceof BasicDataSource) {
+            try {
                 ((BasicDataSource) getDataSource()).close();
+                log.info("Successfully shut down DB connection pool for URL : " + getDSName());
+            } catch (SQLException e) {
+                log.warn("Error shutting down DB connection pool for URL : " + getDSName());
             }
-            log.info("Successfully shut down DB connection pool for URL : " + getDSName());
-        } catch (SQLException e) {
-            log.warn("Error shutting down DB connection pool for URL : " + getDSName());
         }
     }
 
@@ -175,7 +175,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
 
             Statement.Parameter param = (Statement.Parameter) pi.next();
             String value = (param.getPropertyName() != null ?
-                (String) msgCtx.getProperty(param.getPropertyName()) :
+                param.getPropertyName() :
                 Axis2MessageContext.getStringValue(param.getXpath(), msgCtx));
 
             if (traceOrDebugOn) {
@@ -254,7 +254,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Successfully prepared statement : " + stmnt.getRawStatement() +
-                "against DataSource : " + getDSName());
+                " against DataSource : " + getDSName());
         }
         return ps;
     }

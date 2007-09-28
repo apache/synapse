@@ -337,7 +337,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				// If we support the RM anonymous URI then rewrite the ws-a anon to use the RM equivalent.
 				//(do should be done only for WSRM 1.1)
 				
-				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmMsgCtx.getRMSpecVersion())) {
+				String specVersion = SequenceManager.getSpecVersion(rmMsgCtx.getMessageContext(), storageManager);
+				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) {
 					if (log.isDebugEnabled()) log.debug("SPEC_1_1");
 					String oldAddress = (replyTo == null) ? null : replyTo.getAddress();
 					EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext

@@ -543,6 +543,12 @@
             <version>${xmlunit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>${derby.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>backport-util-concurrent</groupId>
@@ -949,6 +955,7 @@
         <junit.version>3.8.2</junit.version>
         <log4j.version>1.2.13</log4j.version>
         <xmlunit.version>1.1</xmlunit.version>
+        <derby.version>10.1.1.0</derby.version>
         <wrapper.version>3.2.3</wrapper.version>
 
         <!-- dependencies of Synapse extensions module -->

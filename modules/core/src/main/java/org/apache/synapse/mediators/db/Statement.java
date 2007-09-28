@@ -94,6 +94,8 @@ public class Statement {
                 this.type = Types.BIGINT;
             } else if ("REAL".equals(type)) {
                 this.type = Types.REAL;
+            } else if ("FLOAT".equals(type)) {
+                this.type = Types.FLOAT;
             } else if ("DOUBLE".equals(type)) {
                 this.type = Types.DOUBLE;
             } else if ("DATE".equals(type)) {

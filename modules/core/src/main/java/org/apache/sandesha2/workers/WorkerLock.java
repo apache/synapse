@@ -18,30 +18,45 @@ package org.apache.sandesha2.workers;
 
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class WorkerLock {
 
+  static final Log log = LogFactory.getLog(WorkerLock.class);
   private HashMap locks = new HashMap();
 	
-	public WorkerLock () {
-
-	}
+  public WorkerLock () {
+  }
 	
   public synchronized boolean addWork (String work, Object owner) {
-    if(locks.containsKey(work)) return false;
+	if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::addWork " + work + ", " + owner);
+    if(locks.containsKey(work)){
+    	if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::addWork " + false);
+    	return false;
+    }
     locks.put(work, owner);
+    if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::addWork " + true);
 	return true;
   }
 	
 	public synchronized void removeWork (String work) {
-    locks.remove(work);
+		if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::removeWork " + work);
+		locks.remove(work);
+		if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::removeWork");
 	}
 	
 	public synchronized boolean isWorkPresent (String work) {
-    return locks.containsKey(work);
+	  if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::isWorkPresent " + work);
+	  boolean value = locks.containsKey(work);
+	  if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::isWorkPresent " + value);
+	  return value;
 	}
 	
 	 public synchronized boolean ownsLock(String work, Object owner) {
+		if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::ownsLock " + work + " ," + owner);
 	    Object realOwner = locks.get(work);
+	    if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::ownsLock " + Boolean.valueOf(realOwner == owner));
 	    return realOwner == owner;
 	  }
 

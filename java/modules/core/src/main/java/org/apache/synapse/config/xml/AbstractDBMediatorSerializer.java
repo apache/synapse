@@ -34,17 +34,25 @@ import java.sql.Types;
  * <dbreport | dblookup | .. etc>
  *   <connection>
  *     <pool>
+ *     (
  *       <driver/>
  *       <url/>
  *       <user/>
  *       <password/>
+ *     |
+ *       <dsName/>
+ *       <icClass/>
+ *       <url/>
+ *       <user/>
+ *       <password/>
+ *     )
  *       <property name="name" value="value"/>*
  *     </pool>
  *   </connection>
  *   <statement>
- *     <sql>insert into table values (?, ?, ..)</sql>
- *     <parameter [value="" | expression=""] type="INTEGER|VARCHAR"/>*
- *     <result name="string" column="int|string"/>*
+ *     <sql>insert into table values (?, ?, ..) OR select target from destinations where src = ?</sql>
+ *     <parameter (value="const" | expression="xpath") type="INTEGER|VARCHAR|..."/>*
+ *     <result name="propName" column="target | number"/>*
  *   </statement>+
  * </dbreport | dblookup | .. etc>
  *
@@ -82,12 +90,13 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
 
             if (o instanceof QName) {
                 QName name = (QName) o;
-                OMElement elt = fac.createOMElement(name);
+                OMElement elt = fac.createOMElement(name.getLocalPart(), synNS);
                 elt.setText(value);
                 poolElt.addChild(elt);
 
             } else if (o instanceof String) {
-                OMElement elt = fac.createOMElement(AbstractDBMediatorFactory.PROP_Q);
+                OMElement elt = fac.createOMElement(
+                    AbstractDBMediatorFactory.PROP_Q.getLocalPart(), synNS);
                 elt.addAttribute(fac.createOMAttribute("name", nullNS, (String) o));
                 elt.addAttribute(fac.createOMAttribute("value", nullNS, value));
                 poolElt.addChild(elt);
@@ -102,9 +111,11 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
         while (statementIter.hasNext()) {
 
             Statement statement = (Statement) statementIter.next();
-            OMElement stmntElt = fac.createOMElement(AbstractDBMediatorFactory.STMNT_Q);
+            OMElement stmntElt = fac.createOMElement(
+                AbstractDBMediatorFactory.STMNT_Q.getLocalPart(), synNS);
 
-            OMElement sqlElt = fac.createOMElement(AbstractDBMediatorFactory.SQL_Q);
+            OMElement sqlElt = fac.createOMElement(
+                AbstractDBMediatorFactory.SQL_Q.getLocalPart(), synNS);
             sqlElt.setText(statement.getRawStatement());
             stmntElt.addChild(sqlElt);
 
@@ -112,7 +123,8 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
             for (Iterator it = statement.getParameters().iterator(); it.hasNext(); ) {
 
                 Statement.Parameter param = (Statement.Parameter) it.next();
-                OMElement paramElt = fac.createOMElement(AbstractDBMediatorFactory.PARAM_Q);
+                OMElement paramElt = fac.createOMElement(
+                    AbstractDBMediatorFactory.PARAM_Q.getLocalPart(), synNS);
 
                 if (param.getPropertyName() != null) {
                     paramElt.addAttribute(
@@ -125,16 +137,74 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
                 }
 
                 switch (param.getType()) {
+                    case Types.CHAR: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "CHAR"));
+                        break;
+                    }
                     case Types.VARCHAR: {
                         paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "VARCHAR"));
+                        break;
+                    }
+                    case Types.LONGVARCHAR: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "LONGVARCHAR"));
+                        break;
+                    }
+                    case Types.NUMERIC: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "NUMERIC"));
+                        break;
+                    }
+                    case Types.DECIMAL: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "DECIMAL"));
+                        break;
+                    }
+                    case Types.BIT: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "BIT"));
+                        break;
+                    }
+                    case Types.TINYINT: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "TINYINT"));
+                        break;
+                    }
+                    case Types.SMALLINT: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "SMALLINT"));
                         break;
                     }
                     case Types.INTEGER: {
                         paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "INTEGER"));
                         break;
                     }
-                    default:
-                        // TODO handle
+                    case Types.BIGINT: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "BIGINT"));
+                        break;
+                    }
+                    case Types.REAL: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "REAL"));
+                        break;
+                    }
+                    case Types.FLOAT: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "FLOAT"));
+                        break;
+                    }
+                    case Types.DOUBLE: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "DOUBLE"));
+                        break;
+                    }
+                    case Types.DATE: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "DATE"));
+                        break;
+                    }
+                    case Types.TIME: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "TIME"));
+                        break;
+                    }
+                    case Types.TIMESTAMP: {
+                        paramElt.addAttribute(fac.createOMAttribute("type", nullNS, "TIMESTAMP"));
+                        break;
+                    }
+                    default: {
+                        throw new SynapseException("Unknown or unsupported JDBC type : " +
+                            param.getType());                            
+                    }
                 }
 
                 stmntElt.addChild(paramElt);
@@ -146,10 +216,11 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
                 String name = (String) it.next();
                 String columnStr = (String) statement.getResultsMap().get(name);
 
-                OMElement resultElt = fac.createOMElement(AbstractDBMediatorFactory.RESULT_Q);
+                OMElement resultElt = fac.createOMElement(
+                    AbstractDBMediatorFactory.RESULT_Q.getLocalPart(), synNS);
 
                 resultElt.addAttribute(
-                    fac.createOMAttribute("name", nullNS, columnStr));
+                    fac.createOMAttribute("name", nullNS, name));
                 resultElt.addAttribute(
                     fac.createOMAttribute("column", nullNS, columnStr));
 

@@ -19,6 +19,8 @@ package org.apache.sandesha2;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.addressing.AddressingConstants;
 
 /**
@@ -36,6 +38,7 @@ public interface Sandesha2Constants {
 	public interface SPEC_2005_02 {
 		
 		String NS_URI = "http://schemas.xmlsoap.org/ws/2005/02/rm";
+		OMNamespace OM_NS_URI = OMAbstractFactory.getOMFactory().createOMNamespace(NS_URI, "wsrm");
 		
 		String SEC_NS_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 		
@@ -96,6 +99,8 @@ public interface Sandesha2Constants {
 	public interface SPEC_2007_02 {
 		
 		String NS_URI               = "http://docs.oasis-open.org/ws-rx/wsrm/200702";
+		OMNamespace OM_NS_URI = OMAbstractFactory.getOMFactory().createOMNamespace(NS_URI, "wsrm");
+
 		String MC_NS_URI            = "http://docs.oasis-open.org/ws-rx/wsmc/200702";
 		String ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsmc/200702/anonymous?id=";
 		String SEC_NS_URI           = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";

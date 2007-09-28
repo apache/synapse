@@ -89,7 +89,7 @@ public class CloseSequence implements IOMRMPart {
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement closeSequenceElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNamespace);
 		
-		identifier.toOMElement(closeSequenceElement);
+		identifier.toOMElement(closeSequenceElement, rmNamespace);
 		body.addChild(closeSequenceElement);
 
 		return body;

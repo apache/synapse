@@ -32,7 +32,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
-public class Identifier implements Sandesha2Constants, IOMRMElement {
+public class Identifier {
 
 	private String identifier = null;
 	
@@ -55,10 +55,6 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		return identifier;
 	}
 
-	public String getNamespaceValue() throws OMException {
-		return namespaceValue;
-	}
-
 	public Object fromOMElement(OMElement element) throws OMException {
 		
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
@@ -78,7 +74,7 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement element) throws OMException {
+	public OMElement toOMElement(OMElement element, OMNamespace wsrmNamespace) throws OMException {
 
 		if (identifier == null || identifier == "") {
 			throw new OMException(SandeshaMessageHelper.getMessage(
@@ -87,8 +83,6 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		}
 		
 		OMFactory factory = element.getOMFactory();
-			
-		OMNamespace wsrmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER, wsrmNamespace);
 
 		identifierElement.setText(identifier);

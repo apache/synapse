@@ -89,7 +89,7 @@ public class TerminateSequence implements IOMRMPart {
 		OMElement terminateSequenceElement = factory.createOMElement(
 				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNamespace);
 		
-		identifier.toOMElement(terminateSequenceElement);
+		identifier.toOMElement(terminateSequenceElement, rmNamespace);
 		body.addChild(terminateSequenceElement);
 
 		return body;

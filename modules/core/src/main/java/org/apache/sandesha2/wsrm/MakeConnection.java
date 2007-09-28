@@ -113,7 +113,7 @@ public class MakeConnection implements IOMRMPart {
 		OMElement makeConnectionElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION,rmNamespace);
 		
 		if (identifier!=null)
-			identifier.toOMElement(makeConnectionElement);
+			identifier.toOMElement(makeConnectionElement, Sandesha2Constants.SPEC_2007_02.OM_NS_URI);
 		if (address!=null)
 			address.toOMElement(makeConnectionElement);
 

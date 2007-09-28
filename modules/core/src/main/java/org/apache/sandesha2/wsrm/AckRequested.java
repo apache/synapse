@@ -105,7 +105,7 @@ public class AckRequested implements IOMRMPart {
 		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
 		ackReqHdrBlock.setMustUnderstand(isMustUnderstand());
 
-		identifier.toOMElement(ackReqHdrBlock);
+		identifier.toOMElement(ackReqHdrBlock, rmNamespace);
 
 		return header;
 	}

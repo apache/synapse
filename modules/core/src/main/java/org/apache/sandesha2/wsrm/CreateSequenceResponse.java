@@ -117,7 +117,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE,
 				rmNamespace);
 		
-		identifier.toOMElement(createSequenceResponseElement);
+		identifier.toOMElement(createSequenceResponseElement, rmNamespace);
 
 		if (expires != null) {
 			expires.toOMElement(createSequenceResponseElement);

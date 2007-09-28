@@ -23,6 +23,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -284,12 +285,11 @@ public class FaultManager {
 		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckFault));
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
-
-		OMElement seqAckElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,
-				rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMNamespace rmNamespace = factory.createOMNamespace(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement seqAckElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
 	
 		// Set the sequence Id
-		sequenceAcknowledgement.getIdentifier().toOMElement(seqAckElement);
+		sequenceAcknowledgement.getIdentifier().toOMElement(seqAckElement, rmNamespace);
 
 		// Set the Ack Range
 		acknowledgementRange.toOMElement(seqAckElement);

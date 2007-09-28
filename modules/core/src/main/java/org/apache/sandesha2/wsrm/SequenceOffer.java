@@ -99,7 +99,7 @@ public class SequenceOffer implements IOMRMElement {
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement sequenceOfferElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
 		
-		identifier.toOMElement(sequenceOfferElement);
+		identifier.toOMElement(sequenceOfferElement, rmNamespace);
 
 		if (endpoint!=null) {
 			endpoint.toOMElement(sequenceOfferElement);

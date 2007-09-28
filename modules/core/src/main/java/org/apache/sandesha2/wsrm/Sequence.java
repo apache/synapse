@@ -21,7 +21,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -43,6 +42,7 @@ public class Sequence implements IOMRMPart {
 	private MessageNumber messageNumber;
 	private LastMessage lastMessage = null;
 	private String namespaceValue = null;
+	private OMNamespace omNamespace = null;
 	
 	public Sequence(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -106,17 +106,13 @@ public class Sequence implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.seqPartIsNull));
 
-		OMFactory factory = headerElement.getOMFactory();
-
-		OMNamespace rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, omNamespace);
 		
     // Always set the MustUnderstand to true for Sequence messages 
 		sequenceHeaderBlock.setMustUnderstand(true);
-		identifier.toOMElement(sequenceHeaderBlock);
-		messageNumber.toOMElement(sequenceHeaderBlock);
+		identifier.toOMElement(sequenceHeaderBlock, omNamespace);
+		messageNumber.toOMElement(sequenceHeaderBlock, omNamespace);
 		if (lastMessage != null)
 			lastMessage.toOMElement(sequenceHeaderBlock);
 
@@ -165,11 +161,15 @@ public class Sequence implements IOMRMPart {
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName)) {
+			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
 			return true;
+		}
 		
-		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName)) {
+			omNamespace = Sandesha2Constants.SPEC_2007_02.OM_NS_URI;
 			return true;
+		}
 		
 		return false;
 	}

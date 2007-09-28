@@ -32,7 +32,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
  * Represents an MessageNumber element.
  */
 
-public class MessageNumber implements IOMRMElement {
+public class MessageNumber {
 	
 	private long messageNumber;
 	
@@ -67,7 +67,7 @@ public class MessageNumber implements IOMRMElement {
 		return this;
 	}
 	
-	public OMElement toOMElement(OMElement element) throws OMException {
+	public OMElement toOMElement(OMElement element, OMNamespace rmNamespace) throws OMException {
 		if (messageNumber <= 0 ){
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.setAValidMsgNumber,
@@ -76,7 +76,6 @@ public class MessageNumber implements IOMRMElement {
 		
 		OMFactory factory = element.getOMFactory();
 		
-		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER,rmNamespace);
 		messageNoElement.setText(Long.toString(messageNumber));
 		element.addChild(messageNoElement);

@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -47,6 +46,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private ArrayList acknowledgementRangeList;
 	private ArrayList nackList;
 	private String namespaceValue = null;
+	private OMNamespace omNamespace = null;
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
 	
@@ -121,10 +121,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		if (header == null || !(header instanceof SOAPHeader))
 			throw new OMException();
 
-		OMFactory factory = header.getOMFactory();
-		
-		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		
 		//If there already is an ack for this sequence it will be removed. 
 		//We do not allow to send two sequenceAcknowledgements for the same sequence in the same message.
 		Iterator oldAckIter = header.getChildrenWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
@@ -143,7 +139,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		
 		SOAPHeader SOAPHeader = (SOAPHeader) header;
 		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = SOAPHeader.addHeaderBlock(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,omNamespace);
 		
 		if (sequenceAcknowledgementHeaderBlock == null)
 			throw new OMException("Cant set sequence acknowledgement since the element is null");
@@ -156,7 +152,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
     // SequenceACK messages should always have the MustUnderstand flag set to true
 		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
-		identifier.toOMElement(sequenceAcknowledgementHeaderBlock);
+		identifier.toOMElement(sequenceAcknowledgementHeaderBlock, omNamespace);
 
 		Iterator ackRangeIt = acknowledgementRangeList.iterator();
 		while (ackRangeIt.hasNext()) {
@@ -258,11 +254,14 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	}
 
 	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName)) {
+			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
 			return true;
-		
-		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
+		}		
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName)) {
+			omNamespace = Sandesha2Constants.SPEC_2007_02.OM_NS_URI;
 			return true;
+		}		
 		
 		return false;
 	}

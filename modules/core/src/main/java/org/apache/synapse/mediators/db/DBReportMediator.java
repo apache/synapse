@@ -51,7 +51,7 @@ public class DBReportMediator extends AbstractDBMediator {
             }
         } catch (SQLException e) {
             handleException("Error execuring insert statement : " + stmnt.getRawStatement() +
-                "against DataSource : " + getDSName(), e, msgCtx);
+                " against DataSource : " + getDSName(), e, msgCtx);
         }
     }
 }

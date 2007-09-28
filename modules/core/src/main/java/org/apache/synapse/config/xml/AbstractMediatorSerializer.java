@@ -44,7 +44,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
             = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
     protected static final OMNamespace nullNS
             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
-    protected static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+    protected static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property", "syn");
 
     /**
      * A constructor that makes subclasses pick up the correct logger

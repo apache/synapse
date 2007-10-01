@@ -200,20 +200,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				return;
 			}
 			
-			boolean continueSending = updateMessage(rmMsgCtx,senderBean,storageManager);
-
-			if (!continueSending) { 
-				if (log.isDebugEnabled())
-					log.debug("Exit: SenderWorker::run, !continueSending");
-				
-				if(transaction != null && transaction.isActive()) {
-					transaction.commit();
-					transaction = null;
-				}
-				
-				return;
-			}
-
 			int messageType = senderBean.getMessageType();
 			
 			if (isAckPiggybackableMsgType(messageType)) {
@@ -225,17 +211,33 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				transaction = AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager, transaction);
 			}
 
-			// sending the message
-			boolean successfullySent = false;
+			
+			if (transaction != null && transaction.isActive()) 
+				transaction.commit();			
+			
+			transaction = storageManager.getTransaction();
+			
+			senderBean = updateMessage(rmMsgCtx,senderBean,storageManager);
+
+			if (senderBean == null) { 
+				if (log.isDebugEnabled())
+					log.debug("Exit: SenderWorker::run, !continueSending");
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.rollback();
+					transaction = null;
+				}
+				
+				return;
+			}
 
 			// Although not actually sent yet, update the send count to indicate an attempt
 			if (senderBean.isReSend()) {
-				SenderBean bean2 = senderBeanMgr.retrieve(senderBean.getMessageID());
-				if (bean2 != null) {
-					bean2.setSentCount(senderBean.getSentCount());
-					senderBeanMgr.update(bean2);
-				}
+				senderBeanMgr.update(senderBean);
 			}
+
+			// sending the message
+			boolean successfullySent = false;
 			
 			//try to redecorate the EPR if necessary
 			if (log.isDebugEnabled())
@@ -401,20 +403,20 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	 * for the message. If the message is an application message then we ensure that we have added
 	 * the Sequence header.
 	 */
-	private boolean updateMessage(RMMsgContext rmMsgContext, SenderBean senderBean, StorageManager storageManager) throws AxisFault {
+	private SenderBean updateMessage(RMMsgContext rmMsgContext, SenderBean senderBean, StorageManager storageManager) throws AxisFault {
 		
 		// Lock the message to enable retransmission update
 		senderBean = storageManager.getSenderBeanMgr().retrieve(senderBean.getMessageID());
 		
 		// Only continue if we find a SenderBean
 		if (senderBean == null)
-			return false;
+			return senderBean;
 
 		int messageType = senderBean.getMessageType();
 
 		boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(
 				rmMsgContext, senderBean, rmMsgContext.getConfigurationContext(), storageManager);
-		if(!continueSending) return false;
+		if(!continueSending) return null;
 		
 		Identifier id = null;
 
@@ -497,7 +499,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 		}
 		
-		return true;
+		return senderBean;
 	}
 	
 	private boolean isAckPiggybackableMsgType(int messageType) {

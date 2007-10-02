@@ -200,11 +200,12 @@ public final class SynapseConstants {
     //- Endpoints processing constants -
     /** Property name to store the last endpoint through which the message has flowed */
     public static final String PROCESSED_ENDPOINT = "processed_endpoint";
+    
     /** A name to use for anonymous endpoints */
-    public static final String ANONYMOUS_ENDPOINTS = "AnonymousEndpoints";
+    public static final String ANONYMOUS_ENDPOINT = "AnonymousEndpoint";
 
     /** A name to use for anonymous sequences in the sequence stack */
-    public static final String ANONYMOUS_SEQUENCES = "AnonymousSequences";
+    public static final String ANONYMOUS_SEQUENCE = "AnonymousSequence";
     
     /** Message format values in EndpointDefinition. Used by address, wsdl endpoints */
     public static final String FORMAT_POX = "pox";

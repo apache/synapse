@@ -143,19 +143,22 @@ public class ScriptMediator extends AbstractMediator {
      * @return the boolean result from the script invocation
      */
     public boolean mediate(MessageContext synCtx) {
-        if (log.isDebugEnabled()) {
-            log.debug("Script Mediator - mediate() # Language : " + language +
-                    (key == null ? " inline script" : " script with key : " + key) +
-                    " function : " + function);
+
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Script mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
 
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-
-        if (shouldTrace) {
-            trace.trace("Start : Script mediator # Language : " + language +
-                    (key == null ? " inline script" : " script with key : " + key) +
-                    " function : " + function);
-            trace.trace("Invoking inline script for current message : " + synCtx.getEnvelope());
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Scripting language : " + language + " source " +
+                (key == null ? ": specified inline " : " loaded with key : " + key) +
+                (function != null ? " function : " + function : ""));
         }
 
         boolean returnValue;
@@ -168,9 +171,12 @@ public class ScriptMediator extends AbstractMediator {
             }
         }
 
-        if (shouldTrace) {
+        if (traceOn && trace.isTraceEnabled()) {
             trace.trace("Result message after execution of script : " + synCtx.getEnvelope());
-            trace.trace("End : Script mediator " + returnValue);
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Script mediator " + returnValue);
         }
 
         return returnValue;
@@ -193,9 +199,10 @@ public class ScriptMediator extends AbstractMediator {
             }
 
         } catch (ScriptException e) {
-            handleException("The Script engine returned an error executing the " +
-                (key == null ? "inline " : "external ") + language + " script" +
-                (key != null? " : " + key : ""), e);
+            handleException("The script engine returned an error executing the " +
+                (key == null ? "inlined " : "external ") + language + " script" +
+                (key != null? " : " + key : "") +
+                (function != null ? " function " + function : ""), e, synCtx);
             returnValue = false;
         }
         return returnValue;
@@ -244,14 +251,20 @@ public class ScriptMediator extends AbstractMediator {
      */
     protected void initInlineScript() {
         try {
-
             initScriptEngine();
 
             if (scriptEngine instanceof Compilable) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Script engine supports Compilable interface, compiling script code..");
+                }
                 compiledScript = ((Compilable)scriptEngine).compile(scriptSourceCode);
             } else {
                 // do nothing. If the script enging doesn't support Compilable then
                 // the inline script will be evaluated on each invocation
+                if (log.isDebugEnabled()) {
+                    log.debug("Script engine does not support the Compilable interface, " +
+                        "inlined script would be evaluated on each invocation..");
+                }
             }
 
         } catch (ScriptException e) {
@@ -307,14 +320,20 @@ public class ScriptMediator extends AbstractMediator {
     }
 
     protected void initScriptEngine() {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing script mediator for language : " + language);
+        }
+
         ScriptEngineManager manager = new ScriptEngineManager();
         this.scriptEngine = manager.getEngineByExtension(language);
         if (scriptEngine == null) {
-            throw new SynapseException("No script engine found for language: " + language);
+            handleException("No script engine found for language: " + language);
         }
         xmlHelper = XMLHelper.getArgHelper(scriptEngine);
 
         this.multiThreadedEngine = scriptEngine.getFactory().getParameter("THREADING") != null;
+        log.debug("Script mediator for language : " + language +
+            " supports multithreading? : " + multiThreadedEngine);
     }
 
     public String getLanguage() {
@@ -333,9 +352,8 @@ public class ScriptMediator extends AbstractMediator {
         return scriptSourceCode;
     }
 
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
-
 }

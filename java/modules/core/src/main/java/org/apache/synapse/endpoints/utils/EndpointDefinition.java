@@ -66,7 +66,10 @@ public class EndpointDefinition {
     private int timeoutAction = SynapseConstants.NONE;
 
     /** To decide to whether statistics should have collected or not */
-    private int statisticsEnable = SynapseConstants.STATISTICS_UNSET;
+    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
+
+    /** The variable that indicate tracing on or off for the current mediator */
+    private int traceState = SynapseConstants.TRACING_UNSET;
 
     /**
      * This should return the absolute EPR address referenced by the named endpoint. This may be possibly computed.
@@ -232,16 +235,24 @@ public class EndpointDefinition {
      *
      * @return Returns the int value that indicate statistics is enabled or not.
      */
-    public int getStatisticsEnable() {
-        return statisticsEnable;
+    public int getStatisticsState() {
+        return statisticsState;
     }
 
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsEnable
+     * @param statisticsState
      */
-    public void setStatisticsEnable(int statisticsEnable) {
-        this.statisticsEnable = statisticsEnable;
+    public void setStatisticsState(int statisticsState) {
+        this.statisticsState = statisticsState;
+    }
+
+    public int getTraceState() {
+        return traceState;
+    }
+
+    public void setTraceState(int traceState) {
+        this.traceState = traceState;
     }
 }

@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
 /**
  * Creates AddressEndpoint using a XML configuration.
  *
- * <endpoint [name="name"]>
+ * <endpoint [name="name"] [trace="enable|disable"]>
  *   <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
  *   <address uri="url" [format="soap|pox"] [optimize="mtom|swa"]>
  *      .. extensibility ..
@@ -55,6 +55,15 @@ public class AddressEndpointFactory implements EndpointFactory {
     private static Log log = LogFactory.getLog(AddressEndpointFactory.class);
 
     private static AddressEndpointFactory instance = new AddressEndpointFactory();
+
+    /**
+     * To decide to whether statistics should have collected or not
+     */
+    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
+    /**
+     * The variable that indicate tracing on or off for the current mediator
+     */
+    protected int traceState = SynapseConstants.TRACING_UNSET;
 
     private AddressEndpointFactory() {}
 
@@ -141,10 +150,10 @@ public class AddressEndpointFactory implements EndpointFactory {
             if (statisticsValue != null) {
                 if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE.equals(
                         statisticsValue)) {
-                    endpoint.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE.equals(
                         statisticsValue)) {
-                    endpoint.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }

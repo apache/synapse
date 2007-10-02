@@ -37,6 +37,7 @@ import java.util.Stack;
 public class AddressEndpoint extends FaultHandler implements Endpoint {
 
     private static final Log log = LogFactory.getLog(AddressEndpoint.class);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
@@ -95,7 +96,6 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
      * suspendOnFailDuration has elapsed, it will be set to active.
      *
      * @param synMessageContext MessageContext of the current message. This is not used here.
-     *
      * @return true if endpoint is active. false otherwise.
      */
     public boolean isActive(MessageContext synMessageContext) {
@@ -114,8 +114,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
      * Sets if endpoint active or not. if endpoint is set as failed (active = false), the recover on
      * time is calculated so that it will be activated after the recover on time.
      *
-     * @param active true if active. false otherwise.
-     *
+     * @param active            true if active. false otherwise.
      * @param synMessageContext MessageContext of the current message. This is not used here.
      */
     public synchronized void setActive(boolean active, MessageContext synMessageContext) {
@@ -145,40 +144,54 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
      */
     public void send(MessageContext synCtx) {
 
-        String endPointName = this.getName();
-        if(endPointName == null) {
-            endPointName = SynapseConstants.ANONYMOUS_ENDPOINTS;
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Address Endpoint");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
+
+        String endPointName = this.getName();
+        if (endPointName == null) {
+            endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+        }
+
         // Setting Required property to collect the End Point statistics
-        boolean statisticsEnable =
-                (org.apache.synapse.SynapseConstants.STATISTICS_ON == endpoint.getStatisticsEnable());
+        boolean statisticsEnable = (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
         if (statisticsEnable) {
             EndPointStatisticsStack endPointStatisticsStack = null;
             Object statisticsStackObj =
-                    synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
+                synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
             if (statisticsStackObj == null) {
                 endPointStatisticsStack = new EndPointStatisticsStack();
                 synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
-                        endPointStatisticsStack);
+                    endPointStatisticsStack);
             } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
                 endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
             }
             if (endPointStatisticsStack != null) {
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                 endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
-                        !synCtx.isResponse(), statisticsEnable, isFault);
+                    !synCtx.isResponse(), statisticsEnable, isFault);
             }
         }
 
         if (endpoint.getAddress() != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Sending message to endpoint :: name = " +
-                        endPointName + " resolved address = " + endpoint.getAddress());
-                log.debug("SOAPAction: " + (synCtx.getSoapAction() != null ?
-                        synCtx.getSoapAction() : "null"));
-                log.debug("WSA-Action: " + (synCtx.getWSAAction() != null ?
-                        synCtx.getWSAAction() : "null"));
-                log.debug("Body : \n" + synCtx.getEnvelope());
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Sending message to endpoint : " +
+                    endPointName + " resolves to address = " + endpoint.getAddress());
+                traceOrDebug(traceOn, "SOAPAction: " + (synCtx.getSoapAction() != null ?
+                    synCtx.getSoapAction() : "null"));
+                traceOrDebug(traceOn, "WSA-Action: " + (synCtx.getWSAAction() != null ?
+                    synCtx.getWSAAction() : "null"));
+
+                if (traceOn && trace.isTraceEnabled()) {
+                    trace.trace("Envelope : \n" + synCtx.getEnvelope());
+                }
             }
         }
 
@@ -220,6 +233,42 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             if (!faultStack.isEmpty()) {
                 ((FaultHandler) faultStack.pop()).handleFault(synCtx);
             }
+        }
+    }
+
+    /**
+     * Should this mediator perform tracing? True if its explicitly asked to
+     * trace, or its parent has been asked to trace and it does not reject it
+     * @param msgCtx the current message
+     * @return true if tracing should be performed
+     */
+    protected boolean isTraceOn(MessageContext msgCtx) {
+        return
+            (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
+            (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
+    }
+
+    /**
+     * Is tracing or debug logging on?
+     * @param isTraceOn is tracing known to be on?
+     * @return true, if either tracing or debug logging is on
+     */
+    protected boolean isTraceOrDebugOn(boolean isTraceOn) {
+        return isTraceOn || log.isDebugEnabled();
+    }
+
+    /**
+     * Perform Trace and Debug logging of a message @INFO (trace) and DEBUG (log)
+     * @param traceOn is runtime trace on for this message?
+     * @param msg the message to log/trace
+     */
+    protected void traceOrDebug(boolean traceOn, String msg) {
+        if (traceOn) {
+            trace.info(msg);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(msg);
         }
     }
 }

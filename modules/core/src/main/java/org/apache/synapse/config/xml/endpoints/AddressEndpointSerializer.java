@@ -135,7 +135,7 @@ public class AddressEndpointSerializer implements EndpointSerializer {
 //            handleException("Invalid Endpoint. Address is required");
         }
 
-        int isEnableStatistics = endpt.getStatisticsEnable();
+        int isEnableStatistics = endpt.getStatisticsState();
         String statisticsValue = null;
         if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
             statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE;

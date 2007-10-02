@@ -58,21 +58,28 @@ public class SpringMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Spring mediator");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Spring mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
+
         Entry entry = synCtx.getConfiguration().getEntryDefinition(configKey);
 
         // if the configKey refers to a dynamic property
         if (entry != null && entry.isDynamic()) {
             if (!entry.isCached() || entry.isExpired()) {
-                buildAppContext(synCtx);
+                buildAppContext(synCtx, traceOrDebugOn, traceOn);
             }
         // if the property is not a DynamicProperty, we will create an ApplicationContext only once
         } else {
             if (appContext == null) {
-                buildAppContext(synCtx);
+                buildAppContext(synCtx, traceOrDebugOn, traceOn);
             }
         }
 
@@ -81,44 +88,45 @@ public class SpringMediator extends AbstractMediator {
             Object o = appContext.getBean(beanName);    
             if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
                 Mediator m = (Mediator) o;
-                if (shouldTrace) {
-                    trace.trace("Loaded mediator from bean : " + beanName + " executing...");
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Loaded mediator from bean : " + beanName + " executing...");
                 }
                 return m.mediate(synCtx);
 
             } else {
-                if (shouldTrace) {
-                    trace.trace("Unable to load mediator from bean : " + beanName);
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Unable to load mediator from bean : " + beanName);
                 }
                 handleException("Could not load bean named : " + beanName +
-                    " from the Spring configuration with key : " + configKey);
+                    " from the Spring configuration with key : " + configKey, synCtx);
             }
         } else {
-            handleException("Cannot reference Spring application context with key : " + configKey);
+            handleException("Cannot reference application context with key : " + configKey, synCtx);
         }
-        if (shouldTrace) {
-            trace.trace("End : Spring mediator");
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Spring mediator");
         }
         return true;
     }
 
-    private synchronized void buildAppContext(MessageContext synCtx) {
-        if (log.isDebugEnabled()) {
-            log.debug("Creating Spring ApplicationContext from property key : " + configKey);
+    private synchronized void buildAppContext(MessageContext synCtx,
+        boolean traceOrDebugOn, boolean traceOn) {
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Creating Spring ApplicationContext from key : " + configKey);
         }
         GenericApplicationContext appContext = new GenericApplicationContext();
         XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
         xbdr.setValidating(false);
-        xbdr.loadBeanDefinitions(new InputStreamResource(
-            Util.getStreamSource(
-                    synCtx.getEntry(configKey)).getInputStream()));
+        xbdr.loadBeanDefinitions(
+            new InputStreamResource(
+                Util.getStreamSource(synCtx.getEntry(configKey)).getInputStream()));
         appContext.refresh();
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Spring ApplicationContext from key : " + configKey + " created");
+        }
         this.appContext = appContext;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public void setBeanName(String beanName) {

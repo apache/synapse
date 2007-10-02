@@ -47,7 +47,7 @@ public class AnonymousServiceFactory {
     private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
     private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
 
-    public static final String OUT_IN_OPERATION = "__OUT_IN_OPERATION__";
+    public static final String OUT_IN_OPERATION   = "__OUT_IN_OPERATION__";
     public static final String OUT_ONLY_OPERATION = "__OUT_ONLY_OPERATION__";
 
     private static SynapseCallbackReceiver synapseCallbackReceiver = null;
@@ -165,12 +165,17 @@ public class AnonymousServiceFactory {
         return null;
     }
 
-    private static SynapseCallbackReceiver getCallbackReceiver(SynapseConfiguration synCfg) {
+    /**
+     * Create a single callback receiver if required, and return its reference
+     * @param synCfg the Synapse configuration
+     * @return the callback receiver thats created or now exists
+     */
+    private static synchronized SynapseCallbackReceiver getCallbackReceiver(
+        SynapseConfiguration synCfg) {
+
         if (synapseCallbackReceiver == null) {
             synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg);
         }
-
         return synapseCallbackReceiver;
     }
-
 }

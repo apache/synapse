@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
 /**
  * Creates a ProxyService instance using the XML fragment specification
  * <p/>
- * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
+ * <proxy-service name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
  *    <description>..</description>?
  *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
@@ -81,9 +81,9 @@ public class ProxyServiceFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    proxy.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    proxy.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    proxy.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    proxy.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }

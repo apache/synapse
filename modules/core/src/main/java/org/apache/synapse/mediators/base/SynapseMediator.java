@@ -19,8 +19,6 @@
 
 package org.apache.synapse.mediators.base;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.statistics.StatisticsStack;
@@ -66,10 +64,10 @@ public class SynapseMediator extends AbstractListMediator {
 
         //put the required property for the collecttng statistics for the message mediation
         StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
-                SynapseConstants.SEQUENCE_STATISTICS_STACK);
+                SynapseConstants.SEQUENCE_STATS);
         if (sequenceStack == null) {
             sequenceStack = new SequenceStatisticsStack();
-            synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK,sequenceStack);
+            synCtx.setProperty(SynapseConstants.SEQUENCE_STATS,sequenceStack);
         }
         String seqName = "MainSequence";
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();

@@ -205,7 +205,7 @@ public class ProxyServiceSerializer {
             proxy.addChild(fac.createOMElement("enableSec", synNS));
         }
 
-        int isEnableStatistics = service.getStatisticsEnable();
+        int isEnableStatistics = service.getStatisticsState();
         String statisticsValue = null;
         if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
             statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;

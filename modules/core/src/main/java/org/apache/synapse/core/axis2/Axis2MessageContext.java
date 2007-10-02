@@ -82,6 +82,9 @@ public class Axis2MessageContext implements MessageContext {
     /** Attribute of MC stating the tracing state of the message */
     private int tracingState = SynapseConstants.TRACING_UNSET;
 
+    /** The service log for this message */
+    private Log serviceLog = null;
+
     public SynapseConfiguration getConfiguration() {
         return synCfg;
     }
@@ -342,12 +345,27 @@ public class Axis2MessageContext implements MessageContext {
      * @return the service level Log for the message
      */
     public Log getServiceLog() {
-        String serviceName = (String) getProperty(SynapseConstants.PROXY_SERVICE);
-        if (serviceName != null && synCfg.getProxyService(serviceName) != null) {
-            return LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
+
+        if (serviceLog != null) {
+            return serviceLog;
         } else {
-            return LogFactory.getLog(Axis2MessageContext.class);
+            String serviceName = (String) getProperty(SynapseConstants.PROXY_SERVICE);
+            if (serviceName != null && synCfg.getProxyService(serviceName) != null) {
+                serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
+                return serviceLog;
+            } else {
+                serviceLog = LogFactory.getLog(Axis2MessageContext.class);
+                return serviceLog;
+            }
         }
+    }
+
+    /**
+     * Set the service log
+     * @param serviceLog
+     */
+    public void setServiceLog(Log serviceLog) {
+        this.serviceLog = serviceLog;
     }
 
     public org.apache.axis2.context.MessageContext getAxis2MessageContext() {
@@ -491,4 +509,6 @@ public class Axis2MessageContext implements MessageContext {
 
         return sb.toString();
     }
+
+
 }

@@ -68,12 +68,11 @@ public class Axis2FlexibleMEPClient {
      * the Axis2 message context for the response.
      *
      * Here Synapse works as a Client to the service. It would expect 200 ok, 202 ok and
-     * 500 internal server error as possible responses. Currently the code expects
-     * Synchronus operation
+     * 500 internal server error as possible responses.
      *
-     * @param endpoint
-     * @param synapseOutMessageContext
-     * @return The Axis2 reponse message context
+     * @param endpoint the endpoint being sent to, maybe null
+     * @param synapseOutMessageContext the outgoing synapse message
+     * @throws AxisFault on errors
      */
     public static void send(
 
@@ -98,7 +97,7 @@ public class Axis2FlexibleMEPClient {
 
         if (log.isDebugEnabled()) {
             log.debug(
-                "sending [add = " + wsAddressingEnabled +
+                "Sending [add = " + wsAddressingEnabled +
                 "] [sec = " + wsSecurityEnabled +
                 "] [rm = " + wsRMEnabled +
                 (endpoint != null ?
@@ -122,6 +121,7 @@ public class Axis2FlexibleMEPClient {
 
             if (endpoint.isForcePOX()) {
                 axisOutMsgCtx.setDoingREST(true);
+
             } else if (endpoint.isForceSOAP()) {
                 axisOutMsgCtx.setDoingREST(false);
                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
@@ -194,9 +194,6 @@ public class Axis2FlexibleMEPClient {
                     getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
             copyRMOptions(originalInMsgCtx, clientOptions);
-
-            // always send each and every message in a new sequence and terminate sequence
-            //clientOptions.setProperty("Sandesha2LastMessage", "true");
         }
 
         // if security is enabled,
@@ -297,19 +294,19 @@ public class Axis2FlexibleMEPClient {
 
     private static void copyRMOptions(MessageContext oriContext, Options targetOptions) {
         Options oriOptions = oriContext.getOptions();
-        if(oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE) != null) {
+        if (oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE) != null) {
             targetOptions.setProperty(SynapseConstants.SANDESHA_LAST_MESSAGE,
                     oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE));
         }
-        if(oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION) != null) {
+        if (oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION) != null) {
             targetOptions.setProperty(SynapseConstants.SANDESHA_SPEC_VERSION,
                     oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION));
         }
-        if(oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY) != null) {
+        if (oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY) != null) {
             targetOptions.setProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY,
                     oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY));
         }
-        if(oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
+        if (oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
             targetOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,
                     oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID));
         }
@@ -326,7 +323,7 @@ public class Axis2FlexibleMEPClient {
         if (property != null && property instanceof OMElement) {
             return PolicyEngine.getPolicy((OMElement) property);
         } else {
-            handleException("Cannot locate Policy from the property : " + propertyKey);
+            handleException("Cannot locate policy from the property : " + propertyKey);
         }
         return null;
     }

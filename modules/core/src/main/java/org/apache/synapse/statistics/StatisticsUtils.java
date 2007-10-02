@@ -43,12 +43,12 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         ProxyServiceStatisticsStack proxyServiceStatisticsStack = (ProxyServiceStatisticsStack)
-                synCtx.getProperty(SynapseConstants.PROXYSERVICE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.PROXY_STATS);
         if (proxyServiceStatisticsStack != null) {
             proxyServiceStatisticsStack.reportToStatisticsCollector(statisticsCollector,isFault);
         }
         ProxyServiceStatisticsStack synapseServiceStatisticsStack = (ProxyServiceStatisticsStack)
-                synCtx.getProperty(SynapseConstants.SYNAPSESERVICE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.SERVICE_STATS);
         if (synapseServiceStatisticsStack != null) {
             synapseServiceStatisticsStack.reportToStatisticsCollector(statisticsCollector,isFault);
         }
@@ -63,7 +63,7 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         EndPointStatisticsStack endPointStatisticsStack = (EndPointStatisticsStack)
-                synCtx.getProperty(SynapseConstants.ENDPOINT_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.ENDPOINT_STATS);
         if (endPointStatisticsStack != null) {
             Object endpointObj = synCtx.getProperty(SynapseConstants.PROCESSED_ENDPOINT);
             if (endpointObj instanceof Endpoint) {
@@ -90,7 +90,7 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         SequenceStatisticsStack sequenceStatisticsStack = (SequenceStatisticsStack)
-                synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.SEQUENCE_STATS);
         if (sequenceStatisticsStack != null) {
             sequenceStatisticsStack.reportToStatisticsCollector(statisticsCollector,isFault);
         }
@@ -105,7 +105,7 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         SequenceStatisticsStack sequenceStatisticsStack = (SequenceStatisticsStack)
-                synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.SEQUENCE_STATS);
         if (sequenceStatisticsStack != null) {
             sequenceStatisticsStack.reportAllToStatisticsCollector(statisticsCollector,isFault);
         }

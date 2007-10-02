@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.transport.nhttp.NhttpConstants;
 import org.apache.axis2.context.MessageContext;
@@ -42,32 +43,39 @@ public class Axis2Sender {
 
     private static final Log log = LogFactory.getLog(Axis2Sender.class);
 
-    public static void sendOn(
-            EndpointDefinition endpoint,
-            org.apache.synapse.MessageContext synapseInMessageContext) {
+    /**
+     * Send a message out from the Synapse engine to an external service
+     * @param endpoint the endpoint definition where the message should be sent
+     * @param synapseInMessageContext the Synapse message context
+     */
+    public static void sendOn(EndpointDefinition endpoint,
+        org.apache.synapse.MessageContext synapseInMessageContext) {
 
         try {
-                Axis2FlexibleMEPClient.send(
-                    // The endpoint where we are sending to
-                    endpoint,
-
-                    // The Axis2 Message context of the Synapse MC
-                    synapseInMessageContext);
+            Axis2FlexibleMEPClient.send(
+                // The endpoint where we are sending to
+                endpoint,
+                // The Axis2 Message context of the Synapse MC
+                synapseInMessageContext);
 
         } catch (Exception e) {
-            handleException("Unexpected error during Sending message onwards", e);
+            handleException("Unexpected error during sending message out", e);
         }
     }
 
+    /**
+     * Send a response back to a client of Synapse
+     * @param smc the Synapse message context sent as the response
+     */
     public static void sendBack(org.apache.synapse.MessageContext smc) {
 
         MessageContext messageContext = ((Axis2MessageContext) smc).getAxis2MessageContext();
 
         // if this is a dummy 202 Accepted message meant only for the http/s transports
         // prevent it from going into any other transport sender
-        if (Utils.isExplicitlyTrue(messageContext, NhttpConstants.SC_ACCEPTED) &&
+        if (messageContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED) &&
             messageContext.getTransportOut() != null &&
-            !messageContext.getTransportOut().getName().startsWith("http")) {
+            !messageContext.getTransportOut().getName().startsWith(Constants.TRANSPORT_HTTP)) {
                 return;
         }
 
@@ -96,7 +104,7 @@ public class Axis2Sender {
             ae.send(messageContext);
 
         } catch (AxisFault e) {
-            handleException("Unexpected error during Sending message back", e);
+            handleException("Unexpected error sending message back", e);
         }
     }
 

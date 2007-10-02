@@ -106,11 +106,23 @@ public class AddressEndpointSerializer implements EndpointSerializer {
 
         OMElement address = fac.createOMElement("address", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
-        if (endpt.isForcePOX()) {
+        if (SynapseConstants.FORMAT_POX.equals(endpt.getFormat())) {
+        	address.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        	
+        } else if (SynapseConstants.FORMAT_SOAP11.equals(endpt.getFormat())) {
+            address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        	
+        } else if (SynapseConstants.FORMAT_SOAP12.equals(endpt.getFormat())) {
+            address.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        
+        	// following two kept for backward compatibility
+        } else if (endpt.isForcePOX()) {
             address.addAttribute(fac.createOMAttribute("format", null, "pox"));
+            
         } else if (endpt.isForceSOAP()) {
-            address.addAttribute(fac.createOMAttribute("format", null, "soap"));
+            address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         }
+        
         if (endpt.isUseSwa()) {
             address.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
         } else if (endpt.isUseMTOM()) {

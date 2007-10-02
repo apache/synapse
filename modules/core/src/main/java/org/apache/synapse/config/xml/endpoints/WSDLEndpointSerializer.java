@@ -108,12 +108,23 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
     public void serializeQOSInformation
             (EndpointDefinition endpointDefinition, OMElement wsdlElement) {
 
-        if (endpointDefinition.isForcePOX()) {
+        if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
+            
+        } else if (SynapseConstants.FORMAT_SOAP11.equals(endpointDefinition.getFormat())) {
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+            
+        } else if (SynapseConstants.FORMAT_SOAP12.equals(endpointDefinition.getFormat())) {
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        
+            // following two kept for backward compatibility
+        } else if (endpointDefinition.isForcePOX()) {
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
+            
         } else if (endpointDefinition.isForceSOAP()) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap"));
-        }
-
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        }        
+        
         int isEnableStatistics = endpointDefinition.getStatisticsEnable();
         String statisticsValue = null;
         if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {

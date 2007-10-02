@@ -39,6 +39,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.eip.EIPUtils;
 
 import java.util.*;
 
@@ -143,9 +144,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      * @param synapseOutMsgCtx the corresponding (outgoing) Synapse MessageContext for the above
      *                         Axis2 MC, that holds Synapse specific information such as the error
      *                         handler stack and local properties etc.
+     * @throws AxisFault 
      */
     private void handleMessage(MessageContext response,
-                               org.apache.synapse.MessageContext synapseOutMsgCtx) {
+                               org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
 
         Object o = response.getProperty(NhttpConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
@@ -231,6 +233,16 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 response.setProperty(
                         org.apache.axis2.Constants.Configuration.ENABLE_SWA,
                         org.apache.axis2.Constants.VALUE_TRUE);
+            }
+            
+            // compare original received message (axisOutMsgCtx) soap version with the response
+            // if they are different change to original version 
+            if(axisOutMsgCtx.isSOAP11() != response.isSOAP11()) {
+            	if(axisOutMsgCtx.isSOAP11()) {
+            		SOAPUtils.convertSoapVersion(response, org.apache.axis2.namespace.Constants.URI_SOAP11_ENV);
+            	} else {
+            		SOAPUtils.convertSoapVersion(response, org.apache.axis2.namespace.Constants.URI_SOAP12_ENV);
+            	}
             }
 
             if (axisOutMsgCtx.getMessageID() != null) {

@@ -20,6 +20,7 @@
 package org.apache.synapse.config.xml.endpoints.utils;
 
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
@@ -124,6 +125,9 @@ public class WSDL11EndpointBuilder {
 
 
         String serviceURL = null;
+        // get soap version from wsdl port and update endpoint definition below
+        // so that correct soap version is used when endpoint is called
+        String format = null; 
         String tns = definition.getTargetNamespace();
         Service service = definition.getService(new QName(tns, serviceName));
         if (service != null) {
@@ -135,10 +139,12 @@ public class WSDL11EndpointBuilder {
                     if (o instanceof SOAPAddress) {
                         SOAPAddress address = (SOAPAddress) o;
                         serviceURL = address.getLocationURI();
+                        format = SynapseConstants.FORMAT_SOAP11;
                         break;
                     } else if (o instanceof SOAP12Address) {
                         SOAP12Address address = (SOAP12Address) o;
                         serviceURL = address.getLocationURI();
+                        format = SynapseConstants.FORMAT_SOAP12;
                         break;
                     }
                 }
@@ -148,7 +154,8 @@ public class WSDL11EndpointBuilder {
         if (serviceURL != null) {
             EndpointDefinition endpointDefinition = new EndpointDefinition();
             endpointDefinition.setAddress(serviceURL);
-
+            endpointDefinition.setFormat(format);
+            
             // todo: determine this using wsdl and policy                                    
 
             return endpointDefinition;

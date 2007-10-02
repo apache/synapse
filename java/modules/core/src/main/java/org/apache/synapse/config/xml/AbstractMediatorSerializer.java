@@ -44,7 +44,8 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
             = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
     protected static final OMNamespace nullNS
             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
-    protected static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property", "syn");
+    protected static final QName PROP_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property", "syn");
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -116,13 +117,13 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
         }
     }
 
-    protected static void handleException(String msg) {
-        log.error(msg);
+    protected void handleException(String msg) {
+        LogFactory.getLog(this.getClass()).error(msg);
         throw new SynapseException(msg);
     }
 
-    protected static void handleException(String msg, Exception e) {
-        log.error(msg, e);
+    protected void handleException(String msg, Exception e) {
+        LogFactory.getLog(this.getClass()).error(msg, e);
         throw new SynapseException(msg, e);
     }
 }

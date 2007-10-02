@@ -94,7 +94,7 @@ public class SequenceMediator extends AbstractListMediator {
                     sequenceStack = new SequenceStatisticsStack();
                     synCtx.setProperty(SynapseConstants.SEQUENCE_STATS, sequenceStack);
                 }
-                String seqName = (name == null ? SynapseConstants.ANONYMOUS_SEQUENCES : name);
+                String seqName = (name == null ? SynapseConstants.ANONYMOUS_SEQUENCE : name);
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                 sequenceStack.put(seqName, System.currentTimeMillis(),
                         !synCtx.isResponse(), statsOn, isFault);

@@ -39,7 +39,7 @@ import java.net.URL;
 /**
  * Creates an WSDL based endpoint from a XML configuration.
  *
- * <endpoint [name="name"]>
+ * <endpoint [name="name"] [trace="enable|disable"]>
  *    <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
  *    <wsdl uri="wsdl uri" service="service name" port="port name">
  *       .. extensibility ..
@@ -175,14 +175,14 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     if (statisticsValue != null) {
                         if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE.equals(
                                 statisticsValue)) {
-                            endpoint.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                            endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
                         } else if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE.equals(
                                 statisticsValue)) {
-                            endpoint.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                            endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                         }
                     }
                 }
-                wsdlEndpoint.setEndpointDefinition(endpoint);
+                wsdlEndpoint.setEndpoint(endpoint);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");
             }

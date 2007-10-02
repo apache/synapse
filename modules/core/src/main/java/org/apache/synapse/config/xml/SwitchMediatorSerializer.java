@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 
 import java.util.Iterator;
@@ -72,7 +73,7 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
             }
             AnonymousListMediator caseMediator = aCase.getCaseMediator();
             if (caseMediator != null) {
-                AnonymousListMediatorSerializer.serializeAnonymousListMediator(
+                new AnonymousListMediatorSerializer().serializeMediator(
                         caseElem, caseMediator);
                 switchMed.addChild(caseElem);
             }
@@ -82,7 +83,7 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
             OMElement caseDefaultElem = fac.createOMElement("default", synNS);
             AnonymousListMediator caseDefaultMediator = defaultCase.getCaseMediator();
             if (caseDefaultMediator != null) {
-                AnonymousListMediatorSerializer.serializeAnonymousListMediator(
+                new AnonymousListMediatorSerializer().serializeMediator(
                         caseDefaultElem, caseDefaultMediator);
                 switchMed.addChild(caseDefaultElem);
             }

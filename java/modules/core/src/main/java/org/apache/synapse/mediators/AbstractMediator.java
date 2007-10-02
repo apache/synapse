@@ -161,7 +161,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext the message context
      */
     protected void auditLog(String msg, MessageContext msgContext) {
-        log.info(msg);
+        LogFactory.getLog(this.getClass()).info(msg);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().info(msg);
         }
@@ -177,7 +177,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext the message context
      */
     protected void handleException(String msg, MessageContext msgContext) {
-        log.error(msg);
+        LogFactory.getLog(this.getClass()).error(msg);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().error(msg);
         }
@@ -193,7 +193,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext message context
      */
     protected void auditWarn(String msg, MessageContext msgContext) {
-        log.warn(msg);
+        LogFactory.getLog(this.getClass()).warn(msg);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().warn(msg);
         }
@@ -210,7 +210,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext the message context
      */
     protected void handleException(String msg, Exception e, MessageContext msgContext) {
-        log.error(msg, e);
+        LogFactory.getLog(this.getClass()).error(msg, e);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().error(msg, e);
         }

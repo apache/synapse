@@ -34,7 +34,7 @@ import org.apache.synapse.core.SynapseEnvironment;
  */
 public class MessageContextCreatorForAxis2 {
 
-    private static Log log = LogFactory.getLog(MessageContextCreatorForAxis2.class);
+    private static final Log log = LogFactory.getLog(MessageContextCreatorForAxis2.class);
 
     private static SynapseConfiguration synCfg = null;
     private static SynapseEnvironment   synEnv = null;

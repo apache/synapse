@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 
@@ -37,47 +39,86 @@ import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 public class SynapseMessageReceiver implements MessageReceiver {
 
     private static final Log log = LogFactory.getLog(SynapseMessageReceiver.class);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Synapse received a new message for message mediation...");
-            log.debug("Received To: " + (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
-            log.debug("SOAPAction: " + (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
-            log.debug("WSA-Action: " + (mc.getWSAAction() != null ? mc.getWSAAction() : "null"));
-            String[] cids = mc.getAttachmentMap().getAllContentIDs();
-            if (cids != null && cids.length > 0) {
-                for (int i=0; i<cids.length; i++) {
-                    log.debug("Attachment : " + cids[i]);
+        MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
+
+        boolean traceOn = synCtx.getMainSequence().getTraceState() == SynapseConstants.TRACING_ON;
+        boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Synapse received a new message for message mediation...");
+            traceOrDebug(traceOn, "Received To: " +
+                (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
+            traceOrDebug(traceOn, "SOAPAction: " +
+                (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
+            traceOrDebug(traceOn, "WSA-Action: " +
+                (mc.getWSAAction() != null ? mc.getWSAAction() : "null"));
+
+            if (traceOn && trace.isTraceEnabled()) {
+                String[] cids = mc.getAttachmentMap().getAllContentIDs();
+                if (cids != null && cids.length > 0) {
+                    for (int i=0; i<cids.length; i++) {
+                        trace.trace("Attachment : " + cids[i]);
+                    }
                 }
+                trace.trace("Envelope : " + mc.getEnvelope());
             }
-            log.debug("Body : \n" + mc.getEnvelope());
         }
 
-        MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
-        try {
-            StatisticsStack synapseServiceStack =
-                    (StatisticsStack) synCtx.getProperty(
-                            org.apache.synapse.SynapseConstants.SYNAPSESERVICE_STATISTICS_STACK);
-            if (synapseServiceStack == null) {
-                synapseServiceStack = new ProxyServiceStatisticsStack();
-                synCtx.setProperty(org.apache.synapse.SynapseConstants.SYNAPSESERVICE_STATISTICS_STACK,
-                        synapseServiceStack);
-            }
-            String name = "SynapseService";
-            boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-            synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(),
-                    true, isFault);
+        // get service log for this message and attach to the message context
+        Log serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX +
+            SynapseConstants.SYNAPSE_SERVICE_NAME);
+        ((Axis2MessageContext) synCtx).setServiceLog(serviceLog);
 
-            // invoke synapse message mediation
+        try {
+            // set the statistics collection stack for this message
+            StatisticsStack synapseServiceStack = new ProxyServiceStatisticsStack();
+            boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+            synapseServiceStack.put(SynapseConstants.SYNAPSE_SERVICE_NAME,
+                System.currentTimeMillis(), !synCtx.isResponse(), true, isFault);
+            synCtx.setProperty(SynapseConstants.SERVICE_STATS, synapseServiceStack);
+
+            // set default fault handler
+            synCtx.pushFaultHandler(new MediatorFaultHandler(
+                        synCtx.getSequence(SynapseConstants.FAULT_SEQUENCE_KEY)));
+
+            // invoke synapse message mediation through the main sequence
             synCtx.getEnvironment().injectMessage(synCtx);
+
         } catch (SynapseException syne) {
+
             if (!synCtx.getFaultStack().isEmpty()) {
+                warn(traceOn, "Executing fault handler due to exception encountered", synCtx);
                 ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx, syne);
+
             } else {
-                log.error("Synapse encountered an exception, " +
-                        "No error handlers found - [Message Dropped]\n" + syne.getMessage());
+                warn(traceOn, "Exception encountered but no fault handler found - " +
+                    "message dropped", synCtx);
             }
+        }
+    }
+
+    private void traceOrDebug(boolean traceOn, String msg) {
+        if (traceOn) {
+            trace.info(msg);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(msg);
+        }
+    }
+
+    private void warn(boolean traceOn, String msg, MessageContext msgContext) {
+        if (traceOn) {
+            trace.warn(msg);
+        }
+        if (log.isDebugEnabled()) {
+            log.warn(msg);
+        }
+        if (msgContext.getServiceLog() != null) {
+            msgContext.getServiceLog().warn(msg);
         }
     }
 }

@@ -22,6 +22,8 @@ package org.apache.synapse.core.axis2;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.TimerTask;
 import java.util.Map;
@@ -42,14 +44,27 @@ import java.util.Stack;
  */
 public class TimeoutHandler extends TimerTask {
 
+    private static final Log log = LogFactory.getLog(TimeoutHandler.class);
+
     /** The callback map - already a Collections.synchronized() hash map */
     private Map callbackStore = null;
     /** a lock to prevent concurrent execution while ensuring least overhead */
     private Object lock = new Object();
     private boolean alreadyExecuting = false;
+    /**
+     * this is the timeout for otherwise non-expiring callbacks
+     * to ensure system stability over time
+     */
+    private long globalTimeout = SynapseConstants.DEFAULT_GLOBAL_TIMEOUT;
 
     public TimeoutHandler(Map callbacks) {
         this.callbackStore = callbacks;
+        try {
+            globalTimeout = Long.parseLong(
+                System.getProperty(SynapseConstants.GLOBAL_TIMEOUT_INTERVAL));
+        } catch (Exception ignore) {}
+        log.info("This engine will expire all callbacks after : " + (globalTimeout /1000) +
+            " seconds, irrespective of the timeout action, after the specified or optional timeout");
     }
 
     /**
@@ -80,10 +95,10 @@ public class TimeoutHandler extends TimerTask {
             if (callbackStore.size() > 0) {
 
                 long currentTime = currentTime();
-
                 Iterator i = callbackStore.keySet().iterator();
 
                 while (i.hasNext()) {
+
                     Object key = i.next();
                     AsyncCallback callback = (AsyncCallback) callbackStore.get(key);
 
@@ -95,7 +110,6 @@ public class TimeoutHandler extends TimerTask {
                             if (callback.getTimeOutAction() == SynapseConstants.DISCARD_AND_FAULT) {
 
                                 // actiavte the fault sequence of the current sequence mediator
-
                                 MessageContext msgContext = callback.getSynapseOutMsgCtx();
 
                                 // add an error code to the message context, so that error sequences
@@ -113,6 +127,11 @@ public class TimeoutHandler extends TimerTask {
 
                             }
                         }
+
+                    } else if (currentTime > globalTimeout + callback.getTimeOutOn()) {
+                        log.warn("Expiring message ID : " + key + "; dropping message after " +
+                            "global timeout of : " + (globalTimeout/1000) + " seconds");
+                        callbackStore.remove(key);
                     }
                 }
             }

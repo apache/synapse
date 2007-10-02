@@ -52,6 +52,7 @@ public class MediatorSerializerFinder {
         XSLTMediatorSerializer.class,
         POJOCommandMediatorSerializer.class,
         CloneMediatorSerializer.class,
+        IterateMediatorSerializer.class,
         DBLookupMediatorSerializer.class,
         DBReportMediatorSerializer.class
     };

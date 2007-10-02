@@ -43,10 +43,11 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
 
     /**
      * This method will implement the serializeMediator method of the MediatorSerializer interface
+     * and implements the serialization of CloneMediator to its configuration
      *
-     * @param parent - OMElement describing the parent element to which the newlly generated
-     *  clone element should be attached as a child, if provided
-     * @param m - Mediator of the type CloneMediator which is subjected to the serialization
+     * @param parent OMElement describing the parent element to which the newlly generated
+     *          clone element should be attached as a child, if provided
+     * @param m Mediator of the type CloneMediator which is subjected to the serialization
      * @return OMElement serialized in to xml from the given parameters
      */
     public OMElement serializeMediator(OMElement parent, Mediator m) {
@@ -78,8 +79,7 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
      * This method will implement the getMediatorClassName method of the
      * MediatorSerializer interface
      * 
-     * @return String representing the full class name of the Mediator
-     *  which is serialized by this Serializer
+     * @return full class name of the Mediator which is serialized by this Serializer
      */
     public String getMediatorClassName() {
         return CloneMediator.class.getName();

@@ -40,9 +40,14 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     protected static final QName ATT_KEY     = new QName("key");
     protected static final QName ATT_SOURCE  = new QName("source");    
     protected static final QName ATT_ONERROR = new QName("onError");
-    protected static final QName ATT_STATS   = new QName(XMLConfigConstants.STATISTICS_ATTRIB_NAME);
-    protected static final QName PROP_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
-    protected static final QName FEATURE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature");
+    protected static final QName ATT_STATS
+        = new QName(XMLConfigConstants.STATISTICS_ATTRIB_NAME);
+    protected static final QName PROP_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+    protected static final QName FEATURE_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature");
+    protected static final QName TARGET_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -74,13 +79,13 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
         }
     }
 
-    protected static void handleException(String message, Exception e) {
-        log.error(message, e);
+    protected void handleException(String message, Exception e) {
+        LogFactory.getLog(this.getClass()).error(message, e);
         throw new SynapseException(message, e);
     }
 
-    protected static void handleException(String message) {
-        log.error(message);
+    protected void handleException(String message) {
+        LogFactory.getLog(this.getClass()).error(message);
         throw new SynapseException(message);
     }
 }

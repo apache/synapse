@@ -27,10 +27,10 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.transport.nhttp.NhttpConstants;
-import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -42,32 +42,70 @@ import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.*;
 
+/**
+ * This is the message receiver that receives the responses for outgoing messages sent out
+ * by Synapse. It holds a callbackStore that maps the [unique] messageID of each message to
+ * a callback object that gets executed on timeout or when a response is recived (before timeout)
+ *
+ * The AnonymousServiceFactory uses this MessageReceiver for all Anonymous services created by it.
+ * This however - effectively - is a singleton class
+ */
 public class SynapseCallbackReceiver implements MessageReceiver {
 
     private static final Log log = LogFactory.getLog(SynapseCallbackReceiver.class);
 
+    /** This is the synchronized callbackStore that maps outgoing messageID's to callback objects */
     private Map callbackStore;  // this will be made thread safe within the constructor
 
+    /**
+     * Create the *single* instance of this class that would be used by all anonymous services
+     * used for outgoing messaging.
+     * @param synCfg the Synapse configuration
+     */
     public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
+
         callbackStore = Collections.synchronizedMap(new HashMap());
 
-        // create the Timer object and a TimeoutHandler task. Schedule it to run every 10 seconds from here
+        // create the Timer object and a TimeoutHandler task
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
         
         Timer timeOutTimer = synCfg.getSynapseTimer();
-        timeOutTimer.schedule(timeoutHandler, 0, SynapseConstants.TIMEOUT_HANDLER_INTERVAL);
+        long timeoutHandlerInterval = SynapseConstants.DEFAULT_TIMEOUT_HANDLER_INTERVAL;
+        try {
+            timeoutHandlerInterval = Long.parseLong(
+                System.getProperty(SynapseConstants.TIMEOUT_HANDLER_INTERVAL));
+        } catch (Exception ignore) {}
+
+        // schedule timeout handler to run every n seconds (n : specified or defaults to 15s)
+        timeOutTimer.schedule(timeoutHandler, 0, timeoutHandlerInterval);
     }
+
 
     public void addCallback(String MsgID, Callback callback) {
         callbackStore.put(MsgID, callback);
     }
 
+    /**
+     * Everytime a response message is received this method gets invoked. It will then select
+     * the outgoing *Synapse* message context for the reply we received, and determine what action
+     * to take at the Synapse level
+     *
+     * @param messageCtx the Axis2 message context of the reply received
+     * @throws AxisFault
+     */
     public void receive(MessageContext messageCtx) throws AxisFault {
 
         String messageID = null;
 
         if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
-            messageID = messageCtx.getOptions().getRelatesTo().getValue();
+            // never take a chance with a NPE at this stage.. so check at each level :-)
+            Options options = messageCtx.getOptions();
+            if (options != null) {
+                RelatesTo relatesTo = options.getRelatesTo();
+                if (relatesTo != null) {
+                    messageID = relatesTo.getValue();
+                }
+            }
         } else if (messageCtx.getProperty(SandeshaClientConstants.SEQUENCE_KEY) == null) {
             messageID = (String) messageCtx.getProperty(SynapseConstants.RELATES_TO_FOR_POX);
         }
@@ -85,13 +123,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             
             if (callback != null) {
                 handleMessage(messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());
+                
             } else {
                 // TODO invoke a generic synapse error handler for this message
                 log.warn("Synapse received a response for the request with message Id : " +
                         messageID + " But a callback has not been registered to process this response");
             }
 
-        } else if (!Utils.isExplicitlyTrue(messageCtx, NhttpConstants.SC_ACCEPTED)){
+        } else if (!messageCtx.isPropertyTrue(NhttpConstants.SC_ACCEPTED)){
             // TODO invoke a generic synapse error handler for this message
             log.warn("Synapse received a response message without a message Id");
         }
@@ -209,6 +248,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             synapseInMessageContext.setResponse(true);
             synapseInMessageContext.setTo(
                 new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+            synapseInMessageContext.setTracingState(synapseOutMsgCtx.getTracingState());
 
             // set the properties of the original MC to the new MC
             Iterator iter = synapseOutMsgCtx.getPropertyKeySet().iterator();
@@ -235,6 +275,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         }
     }
 
+    /**
+     * It is possible for us (Synapse) to cause the creation of a duplicate relatesTo as we
+     * try to hold onto the outgoing message ID even for POX messages using the relates to
+     * Now once we get a response, make sure we remove any trace of this before we proceed any
+     * further
+     * @param mc the message context from which a possibly duplicated relatesTo should be removed
+     * @param relates the existing relatedTo array of the message
+     */
     private void removeDuplicateRelatesTo(MessageContext mc, RelatesTo[] relates) {
 
         int insertPos = 0;

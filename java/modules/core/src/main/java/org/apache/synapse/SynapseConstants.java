@@ -22,6 +22,8 @@ package org.apache.synapse;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNamespace;
 
+import javax.xml.namespace.QName;
+
 /**
  * Global constants for the Apache Synapse project
  */
@@ -37,6 +39,11 @@ public final class SynapseConstants {
     public static final String MAIN_SEQUENCE_KEY  = "main";
     /** The name of the fault sequence to execute on failures during mediation */
     public static final String FAULT_SEQUENCE_KEY = "fault";
+
+    /** The name of the Synapse service (used for message mediation) */
+    public static final String SYNAPSE_SERVICE_NAME ="SynapseService";
+    /** The operation name used by the Synapse service (for message mediation) */
+    public static final QName SYNAPSE_OPERATION_NAME = new QName("mediate");
 
     //- names of modules to be engaged at runtime -
     /** The Name of the WS-RM Sandesha module */
@@ -126,16 +133,16 @@ public final class SynapseConstants {
         public static final int STATISTICS_UNSET=2;
 
         /** key for lookup sequence statistics stack */
-        public static final String SEQUENCE_STATISTICS_STACK ="sequence_statistics_stack";
+        public static final String SEQUENCE_STATS ="synapse.sequence.stats";
 
         /** key for lookup Proxy Service statistics stack */
-        public static final String PROXYSERVICE_STATISTICS_STACK ="proxyservice_statistics_stack";
+        public static final String PROXY_STATS ="synapse.proxy.stats";
 
         /** key for lookup Proxy Service statistics stack */
-        public static final String SYNAPSESERVICE_STATISTICS_STACK ="synapseservice_statistics_stack";
+        public static final String SERVICE_STATS ="synapse.service.stats";
 
         /** key for lookup Endpoint statistics stack */
-        public static final String ENDPOINT_STATISTICS_STACK ="endpoint_statistics_stack";
+        public static final String ENDPOINT_STATS ="synapse.endpoint.stats";
 
         /** Sequence statistics category*/
         public static final int  SEQUENCE_STATISTICS = 0;
@@ -147,12 +154,27 @@ public final class SynapseConstants {
         public static final int ENDPOINT_STATISTICS = 2;
 
     //- handling of timed out events from the callbacks -
+        /** The System property that states the duration at which the timeout handler runs */
+        public static final String TIMEOUT_HANDLER_INTERVAL = "synapse.timeout_handler_interval";
+
         /**
          * Interval for activating the timeout handler for cleaning up expired requests. Note that
          * there can be an error as large as the value of the interval. But for smaller intervals
          * and larger timeouts this error is negligable.
          */
-        public static final long TIMEOUT_HANDLER_INTERVAL = 1000;
+        public static final long DEFAULT_TIMEOUT_HANDLER_INTERVAL = 15000;
+
+        /**
+         * This is a system wide interval for handling otherwise non-expiring callbacks to
+         * ensure system stability over a period of time 
+         */
+        public static final String GLOBAL_TIMEOUT_INTERVAL = "synapse.global_timeout_interval";
+
+        /**
+         * this is the timeout for otherwise non-expiring callbacks
+         * to ensure system stability over time
+         */
+        public static final long DEFAULT_GLOBAL_TIMEOUT = 24 * 60 * 60 * 1000;
 
         /**
          * don't do anything for response timeouts. this means infinite timeout. this is the default

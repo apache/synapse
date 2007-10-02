@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -34,12 +35,12 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 
-import javax.xml.namespace.QName;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * This is the Synapse Module implementation class, which would initialize Synapse when it is
@@ -48,14 +49,12 @@ import java.util.ArrayList;
 public class SynapseInitializationModule implements Module {
 
     private static final Log log = LogFactory.getLog(SynapseInitializationModule.class);
-
-    private static final String SYNAPSE_SERVICE_NAME = "synapse";
-    private static final QName MEDIATE_OPERATION_Q_NAME = new QName("mediate");
     private SynapseConfiguration synCfg;
 
     public void init(ConfigurationContext configurationContext,
         AxisModule axisModule) throws AxisFault {
 
+        log.info("Initializing Synapse at : " + new Date());
         try {
             InetAddress addr = InetAddress.getLocalHost();
             if (addr != null) {
@@ -73,10 +72,11 @@ public class SynapseInitializationModule implements Module {
                 MDC.put("host", hostname);
             }
         } catch (UnknownHostException e) {
-            log.warn("Unable to report hostname or IP address for tracing", e);
+            log.warn("Unable to determine hostname or IP address of the server for logging", e);
         }
 
         // this will deploy the mediators in the mediator extensions folder
+        log.info("Loading mediator extensions...");
         configurationContext.getAxisConfiguration().getConfigurator().loadServices();
 
         // Initializing the SynapseEnvironment and SynapseConfiguration
@@ -86,13 +86,13 @@ public class SynapseInitializationModule implements Module {
         log.info("Deploying the Synapse service..");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();
-        AxisService synapseService = new AxisService(SYNAPSE_SERVICE_NAME);
-        AxisOperation mediateOperation = new InOutAxisOperation(MEDIATE_OPERATION_Q_NAME);
+        AxisService synapseService = new AxisService(SynapseConstants.SYNAPSE_SERVICE_NAME);
+        AxisOperation mediateOperation = new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
         mediateOperation.setMessageReceiver(new SynapseMessageReceiver());
         synapseService.addOperation(mediateOperation);
         List transports = new ArrayList();
-        transports.add(org.apache.axis2.Constants.TRANSPORT_HTTP);
-        transports.add("https");
+        transports.add(Constants.TRANSPORT_HTTP);
+        transports.add(Constants.TRANSPORT_HTTPS);
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
 
@@ -109,9 +109,7 @@ public class SynapseInitializationModule implements Module {
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
             proxy.buildAxisService(synCfg, axisCfg);
-            if (log.isDebugEnabled()) {
-                log.debug("Deployed Proxy service : " + proxy.getName());
-            }
+            log.info("Deployed Proxy service : " + proxy.getName());
             if (!proxy.isStartOnLoad()) {
                 proxy.stop(synCfg);
             }
@@ -132,7 +130,7 @@ public class SynapseInitializationModule implements Module {
         if (config != null) {
             if (log.isDebugEnabled()) {
                 log.debug("System property '" + SynapseConstants.SYNAPSE_XML +
-                        "' specifies synapse configuration as " + config);
+                        "' specifies Synapse configuration as " + config);
             }
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
@@ -169,7 +167,6 @@ public class SynapseInitializationModule implements Module {
         // now initialize SynapseConfig
         
         synapseConfiguration.init(synEnv);
-        
         return synapseConfiguration;
     }
 
@@ -189,6 +186,5 @@ public class SynapseInitializationModule implements Module {
         throws AxisFault {
         // ignore
     	synCfg.destroy();
-    	
     }
 }

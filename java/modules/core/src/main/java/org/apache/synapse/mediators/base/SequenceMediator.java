@@ -68,7 +68,7 @@ public class SequenceMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean statsOn = isStatsOn(synCtx);
+        boolean statsOn = SynapseConstants.STATISTICS_ON == statisticsState;
         boolean traceOn = isTraceOn(synCtx);
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
 
@@ -89,10 +89,10 @@ public class SequenceMediator extends AbstractListMediator {
             // Setting Required property to collect the sequence statistics
             if (statsOn) {
                 StatisticsStack sequenceStack = (StatisticsStack)
-                    synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
+                    synCtx.getProperty(SynapseConstants.SEQUENCE_STATS);
                 if (sequenceStack == null) {
                     sequenceStack = new SequenceStatisticsStack();
-                    synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK, sequenceStack);
+                    synCtx.setProperty(SynapseConstants.SEQUENCE_STATS, sequenceStack);
                 }
                 String seqName = (name == null ? SynapseConstants.ANONYMOUS_SEQUENCES : name);
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
@@ -177,10 +177,6 @@ public class SequenceMediator extends AbstractListMediator {
         }
 
         return false;
-    }
-
-    private boolean isStatsOn(MessageContext synCtx) {
-        return SynapseConstants.STATISTICS_ON == statisticsState;
     }
 
     /**

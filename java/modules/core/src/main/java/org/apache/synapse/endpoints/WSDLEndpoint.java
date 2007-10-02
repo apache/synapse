@@ -90,10 +90,10 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             if (statisticsEnable) {
                 EndPointStatisticsStack endPointStatisticsStack = null;
                 Object statisticsStackObj =
-                        synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATISTICS_STACK);
+                        synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
                 if (statisticsStackObj == null) {
                     endPointStatisticsStack = new EndPointStatisticsStack();
-                    synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATISTICS_STACK,
+                    synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
                             endPointStatisticsStack);
                 } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
                     endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;

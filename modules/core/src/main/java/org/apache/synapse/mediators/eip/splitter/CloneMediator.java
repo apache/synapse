@@ -19,26 +19,25 @@
 
 package org.apache.synapse.mediators.eip.splitter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.mediators.eip.Target;
+import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.axis2.AxisFault;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This mediator will clone the message in to different messages and mediated as specified in
- * the target elements.
+ * This mediator will clone the message in to different messages and mediated as specified in the
+ * target elements.
  */
 public class CloneMediator extends AbstractMediator {
 
     /**
-     * This variable specifies whether to continue the parent message
-     * (i.e. message which is sbjuected to cloning) or not
+     * This variable specifies whether to continue the parent message (i.e. message which is
+     * sbjuected to cloning) or not
      */
     private boolean continueParent = false;
 
@@ -52,14 +51,29 @@ public class CloneMediator extends AbstractMediator {
      * functionality of cloning message in to the specified targets and mediation
      *
      * @param synCtx - MessageContext which is subjected to the cloning
-     * @return boolean true if this needs to be further mediated (continueParent=true)
-     *         false otherwise
+     * @return boolean true if this needs to be further mediated (continueParent=true) false
+     *         otherwise
      */
     public boolean mediate(MessageContext synCtx) {
 
+        // tracing and debuggin related mediation initiation
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Clone mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
+        }
+
+        // get the targets list, clone the message for the number of targets and then
+        // mediate the cloned messages using the targets
         if (targets.size() != 0) {
 
             for (int i = 0; i < targets.size(); i++) {
+                // clone message context for this target
                 MessageContext newContext = getClonedMessageContext(synCtx, i, targets.size());
                 Object o = targets.get(i);
 
@@ -70,6 +84,13 @@ public class CloneMediator extends AbstractMediator {
             }
         }
 
+        // finalize tracing and debugging
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Clone mediator");
+        }
+
+        // if continue parent is true mediators after the clone will be called for the further
+        // mediation of the message which is subjected for clonning (parent message)
         return continueParent;
     }
 
@@ -81,19 +102,20 @@ public class CloneMediator extends AbstractMediator {
      * @param messageCount    - int complete count of cloned messages
      * @return MessageContext which is cloned from the given parameters
      */
-    private MessageContext getClonedMessageContext(MessageContext synCtx,
-        int messageSequence, int messageCount) {
+    private MessageContext getClonedMessageContext(MessageContext synCtx, int messageSequence,
+        int messageCount) {
 
         MessageContext newCtx = null;
         try {
-            newCtx = EIPUtils.createNewMessageContext(synCtx, synCtx.getEnvelope());
+            // clones the message context
+            newCtx = MessageHelper.cloneMessageContext(synCtx);
         } catch (AxisFault axisFault) {
             handleException("Error creating a new message context", axisFault, synCtx);
         }
 
         // Sets the property MESSAGE_SEQUENCE to the MC for aggragation purposes 
-        newCtx.setProperty(EIPUtils.MESSAGE_SEQUENCE, String.valueOf(messageSequence)
-            + EIPUtils.MESSAGE_SEQUENCE_DELEMITER + messageCount);
+        newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
+            String.valueOf(messageSequence) + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + messageCount);
 
         return newCtx;
     }

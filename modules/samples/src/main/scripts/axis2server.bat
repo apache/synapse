@@ -90,6 +90,7 @@ rem set the classes by looping through the libs
 setlocal EnableDelayedExpansion
 set AXIS2_CLASS_PATH=%AXIS2_HOME%/../../lib;%AXIS2_HOME%/../../repository/conf
 FOR %%c in ("%AXIS2_HOME%\..\..\webapp\WEB-INF\lib\synapse-*.jar") DO set AXIS2_CLASS_PATH=!AXIS2_CLASS_PATH!;%%c
+FOR %%c in ("%AXIS2_HOME%\..\..\lib\synapse-*.jar") DO set AXIS2_CLASS_PATH=!AXIS2_CLASS_PATH!;%%c
 FOR %%c in ("%AXIS2_HOME%\..\..\lib\*.jar") DO set AXIS2_CLASS_PATH=!AXIS2_CLASS_PATH!;%%c
 
 rem use proper bouncy castle version for the JDK

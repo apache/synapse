@@ -362,9 +362,22 @@
                         <configuration>
                             <forkMode>pertest</forkMode>
                             <includes>
-                                <!--<include>**/*TestSuite.java</include>-->
                                 <include>**/*Integration.java</include>
                             </includes>
+                            <excludes>
+                                <exclude>**/SynapseSample_57_Integration.java</exclude>
+                                <exclude>**/SynapseSample_103_Integration.java</exclude>
+                                <exclude>**/SynapseSample_102_Integration.java</exclude>
+                                <exclude>**/SynapseSample_56_Integration.java</exclude>
+                                <exclude>**/SynapseSample_500_Integration.java</exclude>
+                                <exclude>**/SynapseSample_501_Integration.java</exclude>
+                                <exclude>**/SynapseSample_52_Integration.java</exclude>
+                                <exclude>**/SynapseSample_53_Integration.java</exclude>
+                                <exclude>**/SynapseSample_51_Integration.java</exclude>
+                                <exclude>**/SynapseSample_104_Integration.java</exclude>
+                                <exclude>**/SynapseSample_55_Integration.java</exclude>
+                                <exclude>**/SynapseSample_5_Integration.java</exclude>
+                            </excludes>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <workingDirectory>../..</workingDirectory>
                             <childDelegation>false</childDelegation>

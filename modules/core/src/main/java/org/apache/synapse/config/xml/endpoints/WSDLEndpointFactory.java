@@ -211,10 +211,18 @@ public class WSDLEndpointFactory implements EndpointFactory {
         if (format != null)
         {
             String forceValue = format.getAttributeValue().trim().toLowerCase();
-            if (forceValue.equals("pox")) {
+            if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
                 endpointDefinition.setForcePOX(true);
-            } else if (forceValue.equals("soap")) {
+                endpointDefinition.setFormat(SynapseConstants.FORMAT_POX);
+
+            } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
                 endpointDefinition.setForceSOAP(true);
+                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP11);
+                
+            } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
+                endpointDefinition.setForceSOAP(true);
+                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP12);
+                
             } else {
                 handleException("force value -\""+forceValue+"\" not yet implemented");
             }

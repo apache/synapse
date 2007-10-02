@@ -51,6 +51,8 @@ public class EndpointDefinition {
     private boolean useMTOM = false;
     /** use SWA **/
     private boolean useSwa = false;
+    /** Endpoint message format. pox/soap11/soap12 */
+    private String format = null;
 
     /**
      * timeout duration for waiting for a response. if the user has set some timeout action and
@@ -216,8 +218,16 @@ public class EndpointDefinition {
     public void setTimeoutAction(int timeoutAction) {
         this.timeoutAction = timeoutAction;
     }
+    
+    public String getFormat() {
+        return format;
+	}
 
-    /**
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	/**
      * To check whether statistics should have collected or not
      *
      * @return Returns the int value that indicate statistics is enabled or not.

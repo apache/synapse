@@ -68,12 +68,15 @@ public class SendMediator extends AbstractMediator {
                 StringBuffer sb = new StringBuffer();
                 sb.append("Sending " + (synCtx.isResponse() ? "response" : "request")
                     + " message using implicit message properties..");
-                sb.append("Sending To: " + (synCtx.getTo() != null ?
+                sb.append("\nSending To: " + (synCtx.getTo() != null ?
                         synCtx.getTo().getAddress() : "null"));
-                sb.append("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                sb.append("\nSOAPAction: " + (synCtx.getWSAAction() != null ?
                         synCtx.getWSAAction() : "null"));
-                sb.append("Body : \n" + synCtx.getEnvelope());
                 traceOrDebug(traceOn, sb.toString());
+            }
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Envelope : " + synCtx.getEnvelope());
             }
 
             if (synCtx.isResponse()) {

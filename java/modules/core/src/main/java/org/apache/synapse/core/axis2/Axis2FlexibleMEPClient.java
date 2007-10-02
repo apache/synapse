@@ -103,6 +103,7 @@ public class Axis2FlexibleMEPClient {
                 (endpoint != null ?
                     "] [ mtom = " + endpoint.isUseMTOM() +
                     "] [ swa = " + endpoint.isUseSwa() +
+                    "] [ format = " + endpoint.getFormat() +                    
                     "] [ force soap=" + endpoint.isForceSOAP() +
                     "; pox=" + endpoint.isForcePOX() : "") +
                 "] [ to " + synapseOutMessageContext.getTo() + "]");
@@ -119,14 +120,27 @@ public class Axis2FlexibleMEPClient {
         // so that we can use the original message context for resending through different endpoints
         if (endpoint != null) {
 
-            if (endpoint.isForcePOX()) {
+            if (SynapseConstants.FORMAT_POX.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(true);
-
-            } else if (endpoint.isForceSOAP()) {
+                
+            } else if (SynapseConstants.FORMAT_SOAP11.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(false);
                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }
+                if(axisOutMsgCtx.isSOAP11() != true) {
+                    SOAPUtils.convertSoapVersion(axisOutMsgCtx, org.apache.axis2.namespace.Constants.URI_SOAP11_ENV);
+                }
+                
+            } else if (SynapseConstants.FORMAT_SOAP12.equals(endpoint.getFormat())) {
+                axisOutMsgCtx.setDoingREST(false);
+                if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
+                    axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
+                }
+                if(axisOutMsgCtx.isSOAP11() == true) {
+                    SOAPUtils.convertSoapVersion(axisOutMsgCtx, org.apache.axis2.namespace.Constants.URI_SOAP12_ENV);
+                }                
+                
             }
 
             if (endpoint.isUseMTOM()) {

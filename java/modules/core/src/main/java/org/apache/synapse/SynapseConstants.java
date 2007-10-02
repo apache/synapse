@@ -205,4 +205,9 @@ public final class SynapseConstants {
 
     /** A name to use for anonymous sequences in the sequence stack */
     public static final String ANONYMOUS_SEQUENCES = "AnonymousSequences";
+    
+    /** Message format values in EndpointDefinition. Used by address, wsdl endpoints */
+    public static final String FORMAT_POX = "pox";
+    public static final String FORMAT_SOAP11 = "soap11";
+    public static final String FORMAT_SOAP12 = "soap12";    
 }

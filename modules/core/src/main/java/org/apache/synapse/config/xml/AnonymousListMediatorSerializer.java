@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * This is Serializer  for serialization of an anonymous list mediator(an unnamed list of mediators )
  */
 
-public abstract class AnonymousListMediatorSerializer extends AbstractListMediatorSerializer {
+public class AnonymousListMediatorSerializer extends AbstractListMediatorSerializer {
 
     /**
      * To serialize an  anonymous list mediator
@@ -37,14 +37,16 @@ public abstract class AnonymousListMediatorSerializer extends AbstractListMediat
      * @param m
      * @return OMElement
      */
-    public static OMElement serializeAnonymousListMediator(OMElement parent, Mediator m) {
+    public OMElement serializeMediator(OMElement parent, Mediator m) {
         if (!(m instanceof AnonymousListMediator)) {
-            String msg = "Unsupported mediator passed in for serialization : " + m.getType();
-            LogFactory.getLog(AbstractListMediatorSerializer.class).error(msg);
-            throw new SynapseException(msg);
+            handleException("Unsupported mediator passed in for serialization : " + m.getType());
         }
         AnonymousListMediator mediator = (AnonymousListMediator) m;
         serializeChildren(parent, mediator.getList());
         return parent;
+    }
+
+    public String getMediatorClassName() {
+        return AnonymousListMediator.class.getName();
     }
 }

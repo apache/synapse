@@ -604,9 +604,15 @@
             <version>${jms.spec.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-vfs</groupId>
+            <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs</artifactId>
             <version>${commons.vfs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.schlichtherle.io</groupId>
+            <artifactId>truezip</artifactId>
+            <version>${truezip.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
@@ -912,7 +918,8 @@
         <jms.spec.version>1.0</jms.spec.version>
         <commons.dbcp.version>1.2.2</commons.dbcp.version>
         <commons.pool.version>1.3</commons.pool.version>
-        <commons.vfs.version>1.0</commons.vfs.version>
+        <commons.vfs.version>1.1-SNAPSHOT</commons.vfs.version>
+        <truezip.version>6.6</truezip.version>
         <commons.net.version>1.4.1</commons.net.version>
         <jsch.version>0.1.31</jsch.version>
         <oro.version>2.0.8</oro.version>

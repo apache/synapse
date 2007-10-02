@@ -42,20 +42,19 @@ import org.apache.synapse.statistics.StatisticsUtils;
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
-    private int threadPoolSize = 10;
+
     private SynapseConfiguration synapseConfig;
     private ConfigurationContext configContext;
-    /**
-     * The StatisticsCollector object
-     */
+
+    /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector;
 
-    public Axis2SynapseEnvironment() {
-    }
+    public Axis2SynapseEnvironment() {}
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
-                                   SynapseConfiguration synapseConfig) {
-    	this.configContext = cfgCtx;
+        SynapseConfiguration synapseConfig) {
+
+        this.configContext = cfgCtx;
         this.synapseConfig = synapseConfig;
     }
 

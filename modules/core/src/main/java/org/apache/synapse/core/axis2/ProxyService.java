@@ -45,7 +45,7 @@ import java.util.*;
 import java.net.*;
 
 /**
- * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
+ * <proxy-service name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
  *    <description>..</description>?
  *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
@@ -157,7 +157,7 @@ public class ProxyService {
     /**
      * To decide to whether statistics should have collected or not
      */
-    private int statisticsEnable = SynapseConstants.STATISTICS_UNSET;
+    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
@@ -222,7 +222,7 @@ public class ProxyService {
             // serialize and create an inputstream to read WSDL
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
-                if (trace()) trace.info("Serializing wsdlElement found to build Axis service");
+                if (trace()) trace.info("Serializing wsdlElement found to build an Axis2 service");
                 wsdlElement.serialize(baos);
                 wsdlInputStream = new ByteArrayInputStream(baos.toByteArray());
             } catch (XMLStreamException e) {
@@ -233,7 +233,7 @@ public class ProxyService {
 
                 try {
                     // detect version of the WSDL 1.1 or 2.0
-                    if (trace()) trace.info("WSDL Namespace is : " + wsdlNamespace);
+                    if (trace()) trace.info("WSDL Namespace is : " + wsdlNamespace.getNamespaceURI());
 
                     if (wsdlNamespace != null) {
                         boolean isWSDL11 = false;
@@ -260,7 +260,7 @@ public class ProxyService {
                         }
 
                         if (trace()) {
-                            trace.info("Populating Axis service using WSDL");
+                            trace.info("Populating Axis2 service using WSDL");
                             if (trace.isTraceEnabled()) {
                                 trace.trace("WSDL : " + wsdlElement.toString());
                             }
@@ -343,7 +343,7 @@ public class ProxyService {
             }
         }
 
-        if (trace()) trace.info("Seeting service level policies : " + serviceLevelPolicies);
+        if (trace()) trace.info("Setting service level policies : " + serviceLevelPolicies);
         // if service level policies are specified, apply them
 
         if (!serviceLevelPolicies.isEmpty()) {
@@ -378,6 +378,7 @@ public class ProxyService {
         // create a custom message receiver for this proxy service 
         ProxyServiceMessageReceiver msgRcvr = new ProxyServiceMessageReceiver();
         msgRcvr.setName(name);
+        msgRcvr.setProxy(this);
 
         iter = proxyService.getOperations();
         while (iter.hasNext()) {
@@ -386,7 +387,7 @@ public class ProxyService {
         }
 
         try {
-            auditInfo("Adding service " + name + "to the Axis2 configuration");
+            auditInfo("Adding service " + name + " to the Axis2 configuration");
             axisCfg.addService(proxyService);
             this.setRunning(true);
         } catch (AxisFault axisFault) {
@@ -618,17 +619,17 @@ public class ProxyService {
      *
      * @return Returns the int value that indicate statistics is enabled or not.
      */
-    public int getStatisticsEnable() {
-        return statisticsEnable;
+    public int getStatisticsState() {
+        return statisticsState;
     }
 
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsEnable
+     * @param statisticsState
      */
-    public void setStatisticsEnable(int statisticsEnable) {
-        this.statisticsEnable = statisticsEnable;
+    public void setStatisticsState(int statisticsState) {
+        this.statisticsState = statisticsState;
     }
 
     /**

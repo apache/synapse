@@ -26,8 +26,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AbstractDispatcher;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 
 import javax.xml.namespace.QName;
 
@@ -37,14 +36,6 @@ import javax.xml.namespace.QName;
  */
 public class SynapseDispatcher extends AbstractDispatcher {
 
-    private static final Log log = LogFactory.getLog(SynapseDispatcher.class);
-
-    private static final long serialVersionUID = -6970206989111592645L;
-
-    private static final String SYNAPSE_SERVICE_NAME = "synapse";
-
-    private static final QName MEDIATE_OPERATION_NAME = new QName("mediate");
-
     public void initDispatcher() {
         QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");
         HandlerDescription hd = new HandlerDescription(qn.getLocalPart());
@@ -53,12 +44,12 @@ public class SynapseDispatcher extends AbstractDispatcher {
 
     public AxisService findService(MessageContext mc) throws AxisFault {
         AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
-        AxisService as = ac.getService(SYNAPSE_SERVICE_NAME);
+        AxisService as = ac.getService(SynapseConstants.SYNAPSE_SERVICE_NAME);
         return as;
     }
 
     public AxisOperation findOperation(AxisService svc, MessageContext mc) throws AxisFault {
-        AxisOperation ao = svc.getOperation(MEDIATE_OPERATION_NAME);
+        AxisOperation ao = svc.getOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
         return ao;
     }
 }

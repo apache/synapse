@@ -21,8 +21,8 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.client.async.AsyncResult;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.MessageContext;
 
 /**
  * This class only "holds" the Synapse out message context for the Synapse callback message
@@ -30,20 +30,16 @@ import org.apache.synapse.SynapseConstants;
  */
 public class AsyncCallback extends Callback {
 
+    /** The corresponding Synapse outgoing message context this instance is holding onto */
     MessageContext synapseOutMsgCtx = null;
 
-    /**
-     * Time to timeout this callback.
-     */
+    /** Time to timeout this callback */
     private long timeOutOn;
 
-    /**
-     * Action to perform when timeout occurs.
-     */
+    /** Action to perform when timeout occurs */
     private int timeOutAction = SynapseConstants.NONE;
 
-
-    public AsyncCallback(org.apache.synapse.MessageContext synapseOutMsgCtx) {
+    public AsyncCallback(MessageContext synapseOutMsgCtx) {
         this.synapseOutMsgCtx = synapseOutMsgCtx;
     }
 
@@ -51,11 +47,7 @@ public class AsyncCallback extends Callback {
 
     public void onError(Exception e) {}
 
-    public void setSynapseOutMshCtx(MessageContext synapseOutMsgCtx) {
-        this.synapseOutMsgCtx = synapseOutMsgCtx;
-    }
-
-    public MessageContext getSynapseOutMsgCtx() {
+    public org.apache.synapse.MessageContext getSynapseOutMsgCtx() {
         return synapseOutMsgCtx;
     }
 

@@ -30,7 +30,7 @@ import java.util.List;
 
 public abstract class AbstractListMediatorSerializer extends AbstractMediatorSerializer {
 
-    protected static void serializeChildren(OMElement parent, List list) {
+    protected void serializeChildren(OMElement parent, List list) {
         Iterator iter = list.iterator();
         while (iter.hasNext()) {
             Mediator child = (Mediator) iter.next();
@@ -38,9 +38,7 @@ public abstract class AbstractListMediatorSerializer extends AbstractMediatorSer
             if (medSer != null) {
                 medSer.serializeMediator(parent, child);
             } else {
-                String msg = "Unable to find a serializer for mediator : " + child.getType();
-                LogFactory.getLog(AbstractListMediatorSerializer.class).error(msg);
-                throw new SynapseException(msg);
+                handleException("Unable to find a serializer for mediator : " + child.getType());
             }
         }
     }

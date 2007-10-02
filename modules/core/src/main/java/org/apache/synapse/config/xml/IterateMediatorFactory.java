@@ -37,7 +37,7 @@ import javax.xml.namespace.QName;
  * <p/>
  * <pre>
  *  &lt;iterate continueParent=(true | false) preservePayload=(true | false)
- *                                                      expression="XPATH expression"&gt;
+ *                          (attachPath="XPATH expression")? expression="XPATH expression"&gt;
  *   &lt;target to="TO address" [soapAction="urn:Action"] sequence="sequence ref"
  *                                                         endpoint="endpoint ref"&gt;
  *    &lt;sequence&gt; (mediator +) &lt;/sequence&gt;

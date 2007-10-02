@@ -97,7 +97,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         // currently, we have to get QOS information from the endpoint definition and set them as
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.
-        EndpointDefinition epAddress = wsdlEndpoint.getEndpointDefinition();
+        EndpointDefinition epAddress = wsdlEndpoint.getEndpoint();
         serializeQOSInformation(epAddress, wsdlElement);
 
         endpointElement.addChild(wsdlElement);
@@ -125,7 +125,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         }        
         
-        int isEnableStatistics = endpointDefinition.getStatisticsEnable();
+        int isEnableStatistics = endpointDefinition.getStatisticsState();
         String statisticsValue = null;
         if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
             statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE;

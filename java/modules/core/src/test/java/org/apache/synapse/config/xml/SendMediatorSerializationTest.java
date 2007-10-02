@@ -30,7 +30,6 @@ import org.apache.synapse.endpoints.WSDLEndpoint;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
 import java.util.List;
 import java.io.StringReader;
 
@@ -114,8 +113,8 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         assertEquals(
                 "Addressing information is not serialized properly",
-                ep1.getEndpointDefinition().isAddressingOn(),
-                ep2.getEndpointDefinition().isAddressingOn());
+                ep1.getEndpoint().isAddressingOn(),
+                ep2.getEndpoint().isAddressingOn());
     }
 
     public void testSimpleLoadbalanceSendSerialization() {

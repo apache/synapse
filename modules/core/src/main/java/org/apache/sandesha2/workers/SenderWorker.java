@@ -667,8 +667,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noValidSyncResponse);
-			if (log.isWarnEnabled())
-				log.warn(message, e);
+			if (log.isDebugEnabled())
+				log.debug(message, e);
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: SenderWorker::checkForSyncResponses");

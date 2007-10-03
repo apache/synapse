@@ -23,6 +23,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.axis2.addressing.EndpointReference;
 
 /**
  * This class will be a bean which carries the target information for most of the EIP mediators
@@ -67,6 +68,18 @@ public class Target {
      * @return boolean true if the sequence does not drop the message, false if it does
      */
     public boolean mediate(MessageContext synCtx) {
+
+        if (soapAction != null) {
+            synCtx.setSoapAction(soapAction);
+        }
+
+        if (to != null) {
+            if (synCtx.getTo() != null) {
+                synCtx.getTo().setAddress(to);
+            } else {
+                synCtx.setTo(new EndpointReference(to));
+            }
+        }
 
         if (sequence != null) {
             return sequence.mediate(synCtx);

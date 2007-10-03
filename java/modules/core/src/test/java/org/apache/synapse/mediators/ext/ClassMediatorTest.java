@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.ext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.config.xml.AbstractTestCase;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
@@ -30,9 +31,9 @@ import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
  * Tests the class mediator instantiation and setting of literal and
  * XPath parameters at runtime.
  */
-public class ClassMediatorTest extends AbstractTestCase {
+public class ClassMediatorTest extends AbstractMediatorTestCase {
 
-    public void testCreationWithoutProperties() throws Exception {
+    public void testMediationWithoutProperties() throws Exception {
         Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
                         "xmlns='http://ws.apache.org/ns/synapse'/>"));
@@ -40,7 +41,7 @@ public class ClassMediatorTest extends AbstractTestCase {
         assertTrue(ClassMediatorTestMediator.invoked);
     }
 
-    public void testCreationWithLiteralProperties() throws Exception {
+    public void testMediationWithLiteralProperties() throws Exception {
         Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
                         "xmlns='http://ws.apache.org/ns/synapse'><property name='testProp' value='testValue'/></class>"));
@@ -49,7 +50,7 @@ public class ClassMediatorTest extends AbstractTestCase {
         assertTrue(ClassMediatorTestMediator.testProp.equals("testValue"));
     }
 
-    public void testInitialization() throws Exception {
+    public void testInitializationAndMedition() throws Exception {
         Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
                         "xmlns='http://ws.apache.org/ns/synapse'/>"));

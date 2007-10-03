@@ -46,9 +46,13 @@ public class TestMessageContext implements MessageContext {
 
     private SynapseConfiguration synCfg = null;
 
+    private SynapseEnvironment synEnv = null;
+
     SOAPEnvelope envelope = null;
 
     private EndpointReference to = null;
+
+    private String soapAction = null;
    
     public SynapseConfiguration getConfiguration() {
         return synCfg;
@@ -59,10 +63,11 @@ public class TestMessageContext implements MessageContext {
     }
 
     public SynapseEnvironment getEnvironment() {
-        return null;
+        return synEnv;
     }
 
     public void setEnvironment(SynapseEnvironment se) {
+        synEnv = se;
     }
 
     public Object getProperty(String key) {
@@ -195,10 +200,11 @@ public class TestMessageContext implements MessageContext {
     }
 
     public String getSoapAction() {
-        return null;
+        return soapAction;
     }
 
     public void setSoapAction(String string) {
+        soapAction = string;
     }
 
     public void setWSAMessageID(String messageID) {

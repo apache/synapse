@@ -19,16 +19,16 @@
 
 package org.apache.synapse.mediators.ext;
 
-import org.apache.synapse.config.xml.AbstractTestCase;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.mediators.AbstractMediatorTestCase;
 
 /**
  * Tests the pojo command mediator instantiation and setting of literal and
  * XPath parameters at runtime.
  */
-public class POJOCommandMediatorTest extends AbstractTestCase {
+public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
 
     public void testPojoWithoutPropertiesNotCommandImpl() throws Exception {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(

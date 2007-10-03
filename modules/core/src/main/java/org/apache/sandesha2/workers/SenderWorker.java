@@ -542,6 +542,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					responseMessageContext = new MessageContext();
 
 				OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
+				//copy any necessary properties
+				SandeshaUtil.copyConfiguredProperties(msgCtx, responseMessageContext);
+				// If the request operation context is Out-In then it's reasonable to assume
+				// that the response is related to the request.
+				int mep = requestMsgOpCtx.getAxisOperation().getAxisSpecificMEPConstant();
+				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+					responseMessageContext.setOperationContext(requestMsgOpCtx);
+				}
 				responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, requestMsgOpCtx
 								.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));
 				responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx

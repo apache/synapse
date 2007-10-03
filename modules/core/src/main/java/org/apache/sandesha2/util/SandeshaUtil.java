@@ -453,7 +453,7 @@ public class SandeshaUtil {
 	}
 	
 
-	private static void copyConfiguredProperties (MessageContext fromMessage, MessageContext toMessage) throws AxisFault {
+	public static void copyConfiguredProperties (MessageContext fromMessage, MessageContext toMessage) throws AxisFault {
 
 //		copying properties as configured in the module.xml properties. Module xml has several
 		//properties which gives comma seperated lists of property names that have to be copited

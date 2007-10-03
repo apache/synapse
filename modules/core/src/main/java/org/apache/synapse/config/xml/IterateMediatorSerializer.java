@@ -66,6 +66,15 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
             itrElem.addAttribute("continueParent", Boolean.toString(true), nullNS);
         }
 
+        if (itrMed.isPreservePayload()) {
+            itrElem.addAttribute("preservePayload", Boolean.toString(true), nullNS);
+        }
+
+        if (itrMed.getAttachPath() != null && !".".equals(itrMed.getAttachPath().toString())) {
+            itrElem.addAttribute("attachPath", itrMed.getAttachPath().toString(), nullNS);
+            serializeNamespaces(itrElem, itrMed.getAttachPath());
+        }
+        
         if (itrMed.getExpression() != null) {
             itrElem.addAttribute("expression", itrMed.getExpression().toString(), nullNS);
             serializeNamespaces(itrElem, itrMed.getExpression());

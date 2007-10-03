@@ -30,7 +30,8 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import javax.xml.namespace.QName;
 
 /**
- * Builds an instance of a Sequence mediator through the Synapse configuration. It follows the following
+ * Builds an instance of a Sequence mediator through the Synapse configuration.
+ * It follows the following configuration;
  *
  * <pre>
  * &lt;sequence name="string" [onError="string"]&gt;
@@ -46,7 +47,8 @@ import javax.xml.namespace.QName;
  */
 public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
-    private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
+    private static final QName SEQUENCE_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
 
     public QName getTagQName() {
         return SEQUENCE_Q;
@@ -65,9 +67,11 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    seqMediator.setStatisticsState(
+                        org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    seqMediator.setStatisticsState(
+                        org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }
@@ -93,13 +97,14 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             if (n != null) {
                 seqMediator.setKey(n.getAttributeValue());
                 if (e != null) {
-                    String msg = "A sequence mediator swhich a reference to another sequence can not have 'ErrorHandler'";
+                    String msg = "A sequence mediator with a reference to another " +
+                        "sequence can not have 'ErrorHandler'";
                     log.error(msg);
                     throw new SynapseException(msg);
                 }
             } else {
-                String msg = "A sequence mediator should be a named sequence or a reference to another sequence " +
-                    "(i.e. a name attribute or key attribute is required.";
+                String msg = "A sequence mediator should be a named sequence or a reference " +
+                    "to another sequence (i.e. a name attribute or key attribute is required)";
                 log.error(msg);
                 throw new SynapseException(msg);
             }
@@ -110,9 +115,11 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    seqMediator.setStatisticsState(
+                        org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    seqMediator.setStatisticsState(
+                        org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }

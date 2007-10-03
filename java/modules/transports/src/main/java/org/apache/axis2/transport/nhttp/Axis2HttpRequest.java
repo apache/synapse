@@ -100,8 +100,7 @@ public class Axis2HttpRequest {
     public HttpRequest getRequest() throws IOException {
 
         HttpEntityEnclosingRequest httpRequest = null;
-        if(!Utils.isExplicitlyTrue(msgContext, NhttpConstants.FORCE_HTTP_1_0))
-        {
+        if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
             httpRequest = new BasicHttpEntityEnclosingRequest(
                 "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

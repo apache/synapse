@@ -404,6 +404,8 @@ public class Axis2MessageContext implements MessageContext {
      */
     public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx) {
 
+        synchronized(xpath) {
+
         if (xpath != null) {
             try {
                 // create an instance of a synapse:get-property() function and set it to the xpath
@@ -461,6 +463,7 @@ public class Axis2MessageContext implements MessageContext {
             handleException("Invalid (null) XPath expression");
         }
         return null;
+        }
     }
 
     private static void handleException(String msg, Exception e) {

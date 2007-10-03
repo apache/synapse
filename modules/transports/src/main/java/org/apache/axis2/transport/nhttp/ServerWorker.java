@@ -20,6 +20,7 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.context.ConfigurationContext;
@@ -123,10 +124,10 @@ public class ServerWorker implements Runnable {
         msgContext.setConfigurationContext(cfgCtx);
         if (isHttps) {
             msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
-                .getTransportOut("https"));
+                .getTransportOut(Constants.TRANSPORT_HTTPS));
             msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
-                .getTransportIn("https"));
-            msgContext.setIncomingTransportName("https");
+                .getTransportIn(Constants.TRANSPORT_HTTPS));
+            msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTPS);
         } else {
             msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
                 .getTransportOut(Constants.TRANSPORT_HTTP));

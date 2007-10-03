@@ -41,6 +41,7 @@ public abstract class SandeshaThread extends Thread{
 	private boolean hasStoppedRunning = false;
 	private boolean hasPausedRunning = false;
 	private boolean pauseRequired = false;
+	private boolean stopRequested = false;
 	
 	private int sleepTime;
   private WorkerLock lock = null;
@@ -88,8 +89,8 @@ public abstract class SandeshaThread extends Thread{
 			}
 		}
 		
-	  //we can now request a pause - the next pause will be ours
-	  pauseRequired = true;
+		//we can now request a pause - the next pause will be our
+		pauseRequired = true;
 				
 		if(hasStoppedRunning() || !isThreadStarted()){
 			throw new IllegalStateException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotPauseThread));
@@ -121,6 +122,7 @@ public abstract class SandeshaThread extends Thread{
 		if (isThreadStarted()) {
 			// the invoker is started so stop it
 			runThread = false;
+			stopRequested = true;
 			// wait for it to finish
 			while (!hasStoppedRunning()) {
 				try {
@@ -129,12 +131,14 @@ public abstract class SandeshaThread extends Thread{
 					//ignore
 				}
 			}
+			
+			stopRequested = false;
 		}
 		
-	    // In a unit test, tracing 'this' once the thread was stopped caused
-	    // an exception, so we just trace exit.
-	    if (log.isDebugEnabled())
-	      log.debug("Exit: SandeshaThread::stopRunning");
+    // In a unit test, tracing 'this' once the thread was stopped caused
+    // an exception, so we just trace exit.
+    if (log.isDebugEnabled())
+      log.debug("Exit: SandeshaThread::stopRunning");
 	}
 	
 	public synchronized boolean isThreadStarted() {
@@ -158,7 +162,7 @@ public abstract class SandeshaThread extends Thread{
 		SequenceEntry entry = new SequenceEntry(sequenceID, rmSource);
 		if (!workingSequences.contains(entry)) workingSequences.add(entry);
 		
-		if (!isThreadStarted()) {
+		if (!isThreadStarted() && !stopRequested) {
 			if(log.isDebugEnabled()) log.debug("Starting thread");
 
 			this.context = context;
@@ -183,7 +187,9 @@ public abstract class SandeshaThread extends Thread{
 				log.error(e);
 				throw new RuntimeException(e);
 			}
-		} else {
+
+			
+		} else if (!stopRequested){
 			if(log.isDebugEnabled()) log.debug("Waking thread");
 			wakeThread();
 		}

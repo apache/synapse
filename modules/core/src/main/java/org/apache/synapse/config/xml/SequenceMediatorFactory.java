@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
  * It follows the following configuration;
  *
  * <pre>
- * &lt;sequence name="string" [onError="string"]&gt;
+ * &lt;sequence name="string" [onError="string"] [trace="enable|disable"]&gt;
  *   mediator+
  * &lt;/sequence&gt;
  * </pre>

@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractMediator implements Mediator {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
-    protected static Log log;
+    protected Log log;
     /** The runtime trace log for mediators */
     protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
@@ -161,7 +161,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext the message context
      */
     protected void auditLog(String msg, MessageContext msgContext) {
-        LogFactory.getLog(this.getClass()).info(msg);
+        log.info(msg);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().info(msg);
         }
@@ -177,7 +177,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext the message context
      */
     protected void handleException(String msg, MessageContext msgContext) {
-        LogFactory.getLog(this.getClass()).error(msg);
+        log.error(msg);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().error(msg);
         }
@@ -193,7 +193,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext message context
      */
     protected void auditWarn(String msg, MessageContext msgContext) {
-        LogFactory.getLog(this.getClass()).warn(msg);
+        log.warn(msg);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().warn(msg);
         }
@@ -210,7 +210,7 @@ public abstract class AbstractMediator implements Mediator {
      * @param msgContext the message context
      */
     protected void handleException(String msg, Exception e, MessageContext msgContext) {
-        LogFactory.getLog(this.getClass()).error(msg, e);
+        log.error(msg, e);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().error(msg, e);
         }

@@ -88,7 +88,9 @@ public class Target {
             if (refSequence != null) {
                 return refSequence.mediate(synCtx);
             }
-        } else if (endpoint != null) {
+        }
+
+        if (endpoint != null) {
             endpoint.send(synCtx);
         } else if (endpointRef != null) {
             Endpoint epr = synCtx.getConfiguration().getEndpoint(endpointRef);

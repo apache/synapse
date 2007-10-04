@@ -68,7 +68,10 @@ public class TerminateSequence implements IOMRMPart {
 					body.toString()));
 
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(terminateSeqPart);
+		OMElement identifierPart = terminateSeqPart.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 
 		return this;
 	}

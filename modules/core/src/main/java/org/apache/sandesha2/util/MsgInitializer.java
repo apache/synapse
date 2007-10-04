@@ -63,7 +63,6 @@ public class MsgInitializer {
 		RMMsgContext rmMsgCtx = new RMMsgContext(ctx);
 
 		populateRMMsgContext(ctx, rmMsgCtx);
-		validateMessage(rmMsgCtx);
 		return rmMsgCtx;
 	}
 
@@ -169,89 +168,68 @@ public class MsgInitializer {
 
 		if (rmNamespace!=null)
 			rmMsgContext.setRMNamespaceValue(rmNamespace);
+			
+				String sequenceID = null;
 
-	}
+		CreateSequence createSequence = elements.getCreateSequence();
+		CreateSequenceResponse createSequenceResponse = elements.getCreateSequenceResponse();
+		TerminateSequence terminateSequence = elements.getTerminateSequence();
+		TerminateSequenceResponse terminateSequenceResponse = elements.getTerminateSequenceResponse();
+		Iterator sequenceAcknowledgementsIter = elements.getSequenceAcknowledgements();
+		Sequence sequence = (Sequence) elements.getSequence();
+		Iterator ackRequestedIter = elements.getAckRequests();
+		CloseSequence closeSequence = elements.getCloseSequence();
+		CloseSequenceResponse closeSequenceResponse = elements.getCloseSequenceResponse();
+		MakeConnection makeConnection = elements.getMakeConnection();
 
-	/**
-	 * This is used to validate the message. Also set an Message type. Possible
-	 * types are given in the Sandesha2Constants.MessageTypes interface.
-	 * 
-	 * @param rmMsgCtx
-	 * @return
-	 * @throws SandeshaException
-	 */
-	private static boolean validateMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-
-		String sequenceID = null;
-
-		CreateSequence createSequence = (CreateSequence) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.CREATE_SEQ);
-		CreateSequenceResponse createSequenceResponse = (CreateSequenceResponse) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
-		TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.TERMINATE_SEQ);
-		TerminateSequenceResponse terminateSequenceResponse = (TerminateSequenceResponse) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
-		Iterator sequenceAcknowledgementsIter = rmMsgCtx.getMessageParts(
-				Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.SEQUENCE);
-		Iterator ackRequestedIter = rmMsgCtx.getMessageParts(
-				Sandesha2Constants.MessageParts.ACK_REQUEST);
-		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
-		CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE);
-		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(
-				Sandesha2Constants.MessageParts.MAKE_CONNECTION);
 
 		// Setting message type.
 		if (createSequence != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
 		} else if (createSequenceResponse != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE);
 			sequenceID = createSequenceResponse.getIdentifier().getIdentifier();
 		} else if (terminateSequence != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
 			sequenceID = terminateSequence.getIdentifier().getIdentifier();
 		} else if (terminateSequenceResponse != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE);
 			sequenceID = terminateSequenceResponse.getIdentifier().getIdentifier();
-		} else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null) {
+		} else if (sequence != null) {
 			
-			Sequence seq = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			Sequence seq = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			LastMessage lastMessage = seq.getLastMessage();
-			SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
+			SOAPEnvelope envelope = rmMsgContext.getSOAPEnvelope();
 			
 			if (lastMessage!=null && envelope.getBody().getFirstOMChild()==null) {
 				//the message is an empty body last message
-				rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.LAST_MESSAGE);
+				rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.LAST_MESSAGE);
 			}else
-				rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+				rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 			
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (sequenceAcknowledgementsIter.hasNext()) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAcknowledgementsIter.next();
 			
 			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
 			if (!sequenceAcknowledgementsIter.hasNext())
 				sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (ackRequestedIter.hasNext()) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
 			AckRequested ackRequest = (AckRequested) ackRequestedIter.next();
 
 			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
 			if (!ackRequestedIter.hasNext())
 				sequenceID = ackRequest.getIdentifier().getIdentifier();
 		} else if (closeSequence != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE);
 			sequenceID = closeSequence.getIdentifier().getIdentifier();
 		} else if (closeSequenceResponse != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE);
 			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier(); 
 		} else if (makeConnection != null){
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
 			if (makeConnection.getIdentifier()!=null) {
 				sequenceID = makeConnection.getIdentifier().getIdentifier();
 			} else if (makeConnection.getAddress()!=null){
@@ -261,12 +239,12 @@ public class MsgInitializer {
 						"Invalid MakeConnection message. Either Address or Identifier must be present");
 			}
 		} else
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 		
 		if (sequenceID!=null)
-			rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceID);
+			rmMsgContext.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceID);
 
-		return true;
 	}
+
 
 }

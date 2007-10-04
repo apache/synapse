@@ -19,11 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -70,23 +66,11 @@ public class AcknowledgementProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeaders");
 
-		SOAPEnvelope envelope = message.getMessageContext().getEnvelope();
-		SOAPHeader header = envelope.getHeader();
-		if(header!=null)
-		{
-			for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
-				QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
-				
-				Iterator acks = header.getChildrenWithName(headerName);
-				while(acks.hasNext()) {
-					OMElement ack = (OMElement) acks.next();
-					SequenceAcknowledgement seqAck = new SequenceAcknowledgement(headerName.getNamespaceURI());
-					seqAck.fromOMElement(ack);
-					processAckHeader(message, ack, seqAck);
-				}
-			}			
+		Iterator iter = message.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		while(iter.hasNext()){
+			SequenceAcknowledgement sa = (SequenceAcknowledgement)iter.next();
+			processAckHeader(message, sa.getOriginalSequenceAckElement(), sa);
 		}
-
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementProcessor::processAckHeaders");

@@ -74,7 +74,10 @@ public class CreateSequenceResponse implements IOMRMPart {
 					bodyElement.toString()));
 
 		identifier = new Identifier(rmNamespaceValue);
-		identifier.fromOMElement(createSeqResponsePart);
+		OMElement identifierPart = createSeqResponsePart.getFirstChildWithName(new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 
 		OMElement expiresPart = createSeqResponsePart.getFirstChildWithName(
 					new QName(rmNamespaceValue,

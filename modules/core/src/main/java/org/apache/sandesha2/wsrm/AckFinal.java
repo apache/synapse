@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.wsrm;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
@@ -48,14 +46,12 @@ public class AckFinal implements IOMRMElement {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException {
+	public Object fromOMElement(OMElement finalPart) throws OMException {
 		
-		OMElement finalPart = element.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.FINAL));
 		if (finalPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noFinalPartInElement,
-					element.toString()));
+					finalPart.toString()));
 
 		return this;
 	}

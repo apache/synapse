@@ -20,12 +20,9 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -71,26 +68,15 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
-		SOAPEnvelope envelope = message.getMessageContext().getEnvelope();
-		SOAPHeader header = envelope.getHeader();
 		boolean msgCtxPaused = false;
-		if(header!=null)
-		{
-			for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
-				QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED);
-				
-				Iterator acks = header.getChildrenWithName(headerName);
-				while(acks.hasNext()) {
-					OMElement ack = (OMElement) acks.next();
-					AckRequested ackReq = new AckRequested(headerName.getNamespaceURI());
-					ackReq.fromOMElement(ack);
-					boolean paused = processAckRequestedHeader(message, ack, ackReq);
-					//if nto already paused we might be now
-					if(!msgCtxPaused){
-						msgCtxPaused = paused;
-					}
-				}
-			}			
+		Iterator ackRequests = message.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		while(ackRequests.hasNext()){
+			AckRequested ackReq = (AckRequested)ackRequests.next();
+			boolean paused = processAckRequestedHeader(message, ackReq.getOriginalAckRequestedElement(), ackReq);
+			//if not already paused we might be now
+			if(!msgCtxPaused){
+				msgCtxPaused = paused;
+			}
 		}
 
 		if (log.isDebugEnabled())

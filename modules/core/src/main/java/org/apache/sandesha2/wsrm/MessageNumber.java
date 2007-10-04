@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.wsrm;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
@@ -54,13 +52,11 @@ public class MessageNumber {
 		this.messageNumber = messageNumber;
 	}
 	
-	public Object fromOMElement(OMElement sequenceElement) throws OMException {
-		OMElement msgNumberPart = sequenceElement.getFirstChildWithName( 
-				new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
+	public Object fromOMElement(OMElement msgNumberPart) throws OMException {
 		if (msgNumberPart==null)
 			throw new OMException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noMessageNumberPartInElement,
-					sequenceElement.toString()));
+					msgNumberPart.toString()));
 		
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);

@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.wsrm;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
@@ -49,13 +47,11 @@ public class LastMessage implements IOMRMElement {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException {
-		OMElement lastMessagePart = element.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.LAST_MSG));
+	public Object fromOMElement(OMElement lastMessagePart) throws OMException {
 		if (lastMessagePart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noLastMessagePartInElement,
-					element.toString()));
+					lastMessagePart.toString()));
 
 		return this;
 	}

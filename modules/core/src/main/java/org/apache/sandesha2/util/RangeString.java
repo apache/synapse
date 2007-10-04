@@ -18,13 +18,13 @@
 package org.apache.sandesha2.util;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,11 +39,7 @@ import java.util.regex.Pattern;
 public class RangeString implements Serializable{
 
 	private static final long serialVersionUID = -3487094584241136861L;
-	/**
-	 * Each entry in this map is a range
-	 * The key to each range entry is range.lowerValue
-	 */
-	private final Map rangeMap;
+	private final SortedMap rangeMap;
 	
 	/**
 	 * Creates an empty range string
@@ -59,7 +55,7 @@ public class RangeString implements Serializable{
 	 */
 	public RangeString(String s){
 
-		rangeMap = Collections.synchronizedMap(new HashMap());
+		rangeMap = new TreeMap();
 
 		if(s!=null && !s.equals("")){
 			//Walk the string building range objects as we go, and
@@ -85,7 +81,7 @@ public class RangeString implements Serializable{
 		else{
 			//start at the specified index and work down the list of ranges
 			//utill we find one
-			Iterator iterator = getSortedKeyList().iterator();
+			Iterator iterator = rangeMap.keySet().iterator();
 			
 			while (iterator.hasNext()) {
 				long key = ((Long)iterator.next()).longValue();
@@ -208,15 +204,15 @@ public class RangeString implements Serializable{
 		return false;
 	}
 	
-	/**
-	 * Returns a String representation of the ranges contained in this object
-	 * @return a String of the form [x1,y1][x2,y2]...[xn,yn]
-	 */
 	public String toString(){
-		List sortedList = getSortedKeyList();
+//		List sortedList = getSortedKeyList();
 		String returnString = "";
-		for(int i=0; i<sortedList.size(); i++){
-			returnString = returnString + (rangeMap.get(sortedList.get(i))).toString();
+//		for(int i=0; i<sortedList.size(); i++){
+//			returnString = returnString + (rangeMap.get(sortedList.get(i))).toString();
+//		}
+		for(Iterator iter = rangeMap.entrySet().iterator();iter.hasNext();){
+			Entry e = (Entry)iter.next();
+			returnString = returnString + e.getValue();
 		}
 		
 		return returnString;
@@ -226,23 +222,16 @@ public class RangeString implements Serializable{
 	 * @return ordered array of each range object in the string 
 	 */
 	public Range[] getRanges(){
-		List sortedKeyList = getSortedKeyList();
-		Range[] ranges = new Range[sortedKeyList.size()];
-		for(int i=0; i<ranges.length; i++){
-			ranges[i] = (Range)rangeMap.get(sortedKeyList.get(i));
+		Set entrySet = rangeMap.entrySet();
+		Range[] ranges = new Range[entrySet.size()];
+		int i=0;
+		for(Iterator iter = entrySet.iterator();iter.hasNext();){
+			ranges[i] = (Range)((Entry)iter.next()).getValue();
+			i++;
 		}
 		return ranges;
 	}
-	
-	
-	private List getSortedKeyList(){
-		Set keySet = rangeMap.keySet();
-		//sort the set
-		List sortedList = new LinkedList(keySet);
-		Collections.sort(sortedList);
-		return sortedList;
-	}
-	
+		
 	/**
 	 * Returns a List of the form
 	 * [x1,x2,x3....xn] listing each discrete number contained in all of the ranges

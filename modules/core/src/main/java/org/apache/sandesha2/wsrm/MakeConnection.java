@@ -74,7 +74,7 @@ public class MakeConnection implements IOMRMPart {
 		
 		if (identifierElement!=null) {
 			identifier = new Identifier (identifierElement.getNamespace().getNamespaceURI());
-			identifier.fromOMElement(makeConnectionElement);
+			identifier.fromOMElement(identifierElement);
 		}
 		
 		if (addressElement!=null) {

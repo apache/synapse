@@ -21,8 +21,6 @@ package org.apache.sandesha2.wsrm;
  * Represents an Identifier element.
  */
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
@@ -55,25 +53,22 @@ public class Identifier {
 		return identifier;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException {
-		
-		OMElement identifierPart = element.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+	public Object fromOMElement(OMElement identifierPart) throws OMException {
 		if (identifierPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidIdentifier,
-					element.toString()));
+					identifierPart.toString()));
 		
 		String identifierText = identifierPart.getText();
 		if (identifierText == null || identifierText == "")
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidIdentifier,
-					element.toString()));
+					identifierPart.toString()));
 
 		identifier = identifierText;
 		return this;
 	}
-
+	
 	public OMElement toOMElement(OMElement element, OMNamespace wsrmNamespace) throws OMException {
 
 		if (identifier == null || identifier == "") {

@@ -70,7 +70,10 @@ public class TerminateSequenceResponse implements IOMRMPart {
 							body.toString()));
 
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(terminateSeqResponsePart);
+		OMElement identifierPart = terminateSeqResponsePart.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 
 		return this;
 	}

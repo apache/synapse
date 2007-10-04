@@ -47,6 +47,8 @@ public class AckRequested implements IOMRMPart {
 	private String namespaceValue = null;
 	private boolean mustUnderstand = false;
 	
+	private OMElement originalAckRequestedElement;
+	
 	public AckRequested(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -61,9 +63,13 @@ public class AckRequested implements IOMRMPart {
 	}
 
 	public Object fromOMElement(OMElement ackReqElement) throws OMException,SandeshaException {
-
+		originalAckRequestedElement = ackReqElement;
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(ackReqElement);
+		OMElement identifierPart = ackReqElement.getFirstChildWithName(new QName(
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 
 		// Indicate that we have processed this SOAPHeaderBlock
 		((SOAPHeaderBlock)ackReqElement).setProcessed();
@@ -145,6 +151,10 @@ public class AckRequested implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public OMElement getOriginalAckRequestedElement() {
+		return originalAckRequestedElement;
 	}
 	
 }

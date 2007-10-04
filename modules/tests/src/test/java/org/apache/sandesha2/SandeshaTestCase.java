@@ -71,7 +71,7 @@ public class SandeshaTestCase extends TestCase {
 
 	protected SimpleHTTPServer httpServer = null;
 	protected int serverPort = DEFAULT_SERVER_TEST_PORT;
-	protected int waitTime = 60000; // Each test will wait up to 60 seconds, unless we override it here
+	protected int waitTime = 70000; // Each test will wait up to 70 seconds, unless we override it here
 	protected int tickTime = 1000;  // Each wait will check the test assertions each second
 	protected String pingAction = "urn:wsrm:Ping";
 	protected String echoAction = "urn:wsrm:EchoString";

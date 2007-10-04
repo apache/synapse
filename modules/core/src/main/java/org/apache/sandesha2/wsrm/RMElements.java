@@ -24,14 +24,16 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.Sandesha2Constants.SPEC_2005_02;
+import org.apache.sandesha2.Sandesha2Constants.SPEC_2007_02;
+import org.apache.sandesha2.Sandesha2Constants.WSRM_COMMON;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
  * All RM model classes should implement this.
@@ -73,142 +75,137 @@ public class RMElements {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.nullPassedElement));
 
-		SOAPFactory factory;
-
-		//Yep, I know. Could hv done it directly :D (just to make it consistent)
-		if (envelope.getNamespace().getNamespaceURI().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
-			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
-		else
-			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_2);
-		
 		// Check for RM defined elements, using either spec version
 		OMElement header = envelope.getHeader();
-		OMElement body = envelope.getBody();
+		SOAPBody body = envelope.getBody();
 
-		// The sequence header
-		OMElement element = null;
-		if(header!=null)
-		{
-			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.Sequence);
-			if(element == null) {
-				element = envelope.getHeader().getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence);
-			}
-			if (element != null) {
-				sequence = new Sequence(element.getNamespace().getNamespaceURI());
-				sequence.fromOMElement(envelope.getHeader());
-			}			
+		if(header != null){
+			processHeaders(envelope);
 		}
-
-
+		if(body != null){
+			processBody(body);
+		}
+	}
+	
+	private void processBody(SOAPBody body) throws AxisFault{
 		// The body messages
 		OMElement firstBodyElement = body.getFirstElement();
 		if(firstBodyElement != null) {
 			QName firstBodyQName = firstBodyElement.getQName();
-			
-			if(Sandesha2Constants.SPEC_2007_02.QNames.CreateSequence.equals(firstBodyQName)) {
-				createSequence = new CreateSequence(firstBodyQName.getNamespaceURI());
-				createSequence.fromOMElement(body);
-			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CreateSequence.equals(firstBodyQName)) {
-				createSequence = new CreateSequence(firstBodyQName.getNamespaceURI());
-				createSequence.fromOMElement(body);
+			String namespace = firstBodyQName.getNamespaceURI();
+			String localName = firstBodyQName.getLocalPart();
 
-			} else if(Sandesha2Constants.SPEC_2007_02.QNames.CreateSequenceResponse.equals(firstBodyQName)) {
-				createSequenceResponse = new CreateSequenceResponse(firstBodyQName.getNamespaceURI());
-				createSequenceResponse.fromOMElement(body);
-			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CreateSequenceResponse.equals(firstBodyQName)) {
-				createSequenceResponse = new CreateSequenceResponse(firstBodyQName.getNamespaceURI());
-				createSequenceResponse.fromOMElement(body);
+			boolean isSPEC2007_02 = SPEC_2007_02.NS_URI.equals(namespace);
+			boolean isSPEC2005_02 = false;
+			if(!isSPEC2007_02){
+				isSPEC2005_02 = SPEC_2005_02.NS_URI.equals(namespace);
+			}
 
-			} else if(Sandesha2Constants.SPEC_2007_02.QNames.CloseSequence.equals(firstBodyQName)) {
-				closeSequence = new CloseSequence(firstBodyQName.getNamespaceURI());
-				closeSequence.fromOMElement(body);
-			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CloseSequence.equals(firstBodyQName)) {
-				closeSequence = new CloseSequence(firstBodyQName.getNamespaceURI());
-				closeSequence.fromOMElement(body);
-
-			} else if(Sandesha2Constants.SPEC_2007_02.QNames.CloseSequenceResponse.equals(firstBodyQName)) {
-				closeSequenceResponse = new CloseSequenceResponse(firstBodyQName.getNamespaceURI());
-				closeSequenceResponse.fromOMElement(body);
-			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CloseSequenceResponse.equals(firstBodyQName)) {
-				closeSequenceResponse = new CloseSequenceResponse(firstBodyQName.getNamespaceURI());
-				closeSequenceResponse.fromOMElement(body);
-
-			} else if(Sandesha2Constants.SPEC_2007_02.QNames.TerminateSequence.equals(firstBodyQName)) {
-				terminateSequence = new TerminateSequence(firstBodyQName.getNamespaceURI());
-				terminateSequence.fromOMElement(body);
-			} else if(Sandesha2Constants.SPEC_2005_02.QNames.TerminateSequence.equals(firstBodyQName)) {
-				terminateSequence = new TerminateSequence(firstBodyQName.getNamespaceURI());
-				terminateSequence.fromOMElement(body);
-
-			} else if(Sandesha2Constants.SPEC_2007_02.QNames.TerminateSequenceResponse.equals(firstBodyQName)) {
-				terminateSequenceResponse = new TerminateSequenceResponse(firstBodyQName.getNamespaceURI());
-				terminateSequenceResponse.fromOMElement(body);
-			} else if(Sandesha2Constants.SPEC_2005_02.QNames.TerminateSequenceResponse.equals(firstBodyQName)) {
-				terminateSequenceResponse = new TerminateSequenceResponse(firstBodyQName.getNamespaceURI());
-				terminateSequenceResponse.fromOMElement(body);
-
-			} else if(Sandesha2Constants.SPEC_2007_02.QNames.MakeConnection.equals(firstBodyQName)) {
-				makeConnection = new MakeConnection(firstBodyQName.getNamespaceURI());
+			if(isSPEC2005_02 || isSPEC2007_02){
+				if(Sandesha2Constants.SPEC_2007_02.QNames.CreateSequence.equals(firstBodyQName)) {
+					createSequence = new CreateSequence(namespace);
+					createSequence.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2005_02.QNames.CreateSequence.equals(firstBodyQName)) {
+					createSequence = new CreateSequence(namespace);
+					createSequence.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2007_02.QNames.CreateSequenceResponse.equals(firstBodyQName)) {
+					createSequenceResponse = new CreateSequenceResponse(namespace);
+					createSequenceResponse.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2005_02.QNames.CreateSequenceResponse.equals(firstBodyQName)) {
+					createSequenceResponse = new CreateSequenceResponse(namespace);
+					createSequenceResponse.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2007_02.QNames.CloseSequence.equals(firstBodyQName)) {
+					closeSequence = new CloseSequence(namespace);
+					closeSequence.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2005_02.QNames.CloseSequence.equals(firstBodyQName)) {
+					closeSequence = new CloseSequence(namespace);
+					closeSequence.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2007_02.QNames.CloseSequenceResponse.equals(firstBodyQName)) {
+					closeSequenceResponse = new CloseSequenceResponse(namespace);
+					closeSequenceResponse.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2005_02.QNames.CloseSequenceResponse.equals(firstBodyQName)) {
+					closeSequenceResponse = new CloseSequenceResponse(namespace);
+					closeSequenceResponse.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2007_02.QNames.TerminateSequence.equals(firstBodyQName)) {
+					terminateSequence = new TerminateSequence(namespace);
+					terminateSequence.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2005_02.QNames.TerminateSequence.equals(firstBodyQName)) {
+					terminateSequence = new TerminateSequence(namespace);
+					terminateSequence.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2007_02.QNames.TerminateSequenceResponse.equals(firstBodyQName)) {
+					terminateSequenceResponse = new TerminateSequenceResponse(namespace);
+					terminateSequenceResponse.fromOMElement(body);
+				} else if(Sandesha2Constants.SPEC_2005_02.QNames.TerminateSequenceResponse.equals(firstBodyQName)) {
+					terminateSequenceResponse = new TerminateSequenceResponse(namespace);
+					terminateSequenceResponse.fromOMElement(body);
+				}
+			}else if(Sandesha2Constants.SPEC_2007_02.QNames.MakeConnection.equals(firstBodyQName)) {
+				makeConnection = new MakeConnection(namespace);
 				makeConnection.fromOMElement(firstBodyElement);
 			}
 		}
-		
-		// The other headers
+	}
+	
+	private void processHeaders(SOAPEnvelope envelope) throws AxisFault {
+
+		if (envelope == null)
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullPassedElement));
+
+		SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
+		OMElement header = envelope.getHeader();
+
 		if(header!=null)
 		{
-			Iterator headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceAck);
-			while (headers.hasNext()) {
-				OMElement sequenceAckElement = (OMElement) headers.next();
-				SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2007_02.NS_URI);
-				sequenceAcknowledgement.fromOMElement(sequenceAckElement);
-				sequenceAcknowledgements.add(sequenceAcknowledgement);
-			}
-			headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceAck);
-			while (headers.hasNext()) {
-				OMElement sequenceAckElement = (OMElement) headers.next();
-				SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2005_02.NS_URI);
-				sequenceAcknowledgement.fromOMElement(sequenceAckElement);
-				sequenceAcknowledgements.add(sequenceAcknowledgement);
-			}
-
-			headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.AckRequest);
-			while (headers.hasNext()) {
-				OMElement ackRequestElement = (OMElement) headers.next();
-				AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2007_02.NS_URI);
-				ackRequest.fromOMElement(ackRequestElement);
-				ackRequests.add(ackRequest);
-			}
-			headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.AckRequest);
-			while (headers.hasNext()) {
-				OMElement ackRequestElement = (OMElement) headers.next();
-				AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2005_02.NS_URI);
-				ackRequest.fromOMElement(ackRequestElement);
-				ackRequests.add(ackRequest);
-			}
-			
-			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.UsesSequenceSTR);
-			if (element != null) {
-				usesSequenceSTR = new UsesSequenceSTR(factory, Sandesha2Constants.SPEC_2007_02.NS_URI);
-				usesSequenceSTR.fromOMElement(element);
-			}
-			
-			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.MessagePending);
-			if (element != null) {
-				messagePending = new MessagePending(Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
-				messagePending.fromOMElement(element);
-			}
-			
-			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceFault);
-			if(element == null) {
-				element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceFault);
-			}
-			if (element !=null) {
-				sequenceFault = new SequenceFault(element.getNamespace().getNamespaceURI());
-				sequenceFault.fromOMElement(element);
+			Iterator headers = header.getChildElements();
+			while(headers.hasNext()){
+				OMElement element = (OMElement)headers.next();
+				QName elementName = element.getQName();
+				String namespace = elementName.getNamespaceURI();
+				String localName = elementName.getLocalPart();
+				
+				boolean isSPEC2007_02 = SPEC_2007_02.NS_URI.equals(namespace);
+				boolean isSPEC2005_02 = false;
+				if(!isSPEC2007_02){
+					isSPEC2005_02 = SPEC_2005_02.NS_URI.equals(namespace);
+				}
+				
+				if(isSPEC2005_02 || isSPEC2007_02){
+					boolean isProcessed = false;
+					if(isSPEC2007_02){
+						if(WSRM_COMMON.USES_SEQUENCE_STR.equals(localName)){
+							usesSequenceSTR = new UsesSequenceSTR(factory, namespace);
+							usesSequenceSTR.fromOMElement(element);
+							isProcessed = true;
+						}else if(WSRM_COMMON.MESSAGE_PENDING.equals(localName)){
+							messagePending = new MessagePending(namespace);
+							messagePending.fromOMElement(element);
+							isProcessed = true;
+						}
+					}
+					
+					if(!isProcessed){
+						if(WSRM_COMMON.SEQUENCE.equals(localName)){
+							sequence = new Sequence(namespace);
+							sequence.fromOMElement(element);
+						}else if(WSRM_COMMON.SEQUENCE_ACK.equals(localName)){
+							SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(namespace);
+							sequenceAcknowledgement.fromOMElement(element);
+							sequenceAcknowledgements.add(sequenceAcknowledgement);
+						}else if(WSRM_COMMON.ACK_REQUESTED.equals(localName)){
+							AckRequested ackRequest = new AckRequested(namespace);
+							ackRequest.fromOMElement(element);
+							ackRequests.add(ackRequest);
+						}else if(WSRM_COMMON.SEQUENCE_FAULT.equals(localName)){
+							sequenceFault = new SequenceFault(namespace);
+							sequenceFault.fromOMElement(element);
+						}	
+					}
+				}
 			}
 		}
 	}
-
+	
 	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws AxisFault  {
 		if (sequence != null) {
 			sequence.toOMElement(envelope.getHeader());

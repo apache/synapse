@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.wsrm;
 
+import java.util.Iterator;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -57,40 +58,48 @@ public class Sequence implements IOMRMPart {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement headerElement) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement ome) throws OMException,SandeshaException {
+		SOAPHeaderBlock shb = (SOAPHeaderBlock)ome;
 
-		SOAPHeader header = (SOAPHeader) headerElement;
-		if (header == null)
-			throw new OMException(
-					SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.seqElementCannotBeAddedToNonHeader));
-
-		OMElement sequencePart = headerElement.getFirstChildWithName(new QName(namespaceValue,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-		if (sequencePart == null)
+		if (shb == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noSequencePartInElement,
-					headerElement.toString()));
+					shb.toString()));
+		
+		OMElement identifierPart = null;
+		OMElement msgNumberPart = null;
+		OMElement lastMessageElement = null;
+		
+		Iterator iter = shb.getChildElements();
+		while(iter.hasNext()){
+			OMElement child = (OMElement)iter.next();
+			QName qn = child.getQName();
+			if(namespaceValue.equals(qn.getNamespaceURI())){
+				if(Sandesha2Constants.WSRM_COMMON.IDENTIFIER.equals(qn.getLocalPart())){
+					identifierPart = child;
+				}else if(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER.equals(qn.getLocalPart())){
+					msgNumberPart = child;
+				}else if(Sandesha2Constants.WSRM_COMMON.LAST_MSG.equals(qn.getLocalPart())){
+					lastMessageElement = child;
+				}
+			}
+		}
 		
 		identifier = new Identifier(namespaceValue);
+		identifier.fromOMElement(identifierPart);
 		messageNumber = new MessageNumber(namespaceValue);
-		identifier.fromOMElement(sequencePart);
-		messageNumber.fromOMElement(sequencePart);
-
-		OMElement lastMessageElement = sequencePart
-				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.LAST_MSG));
-
-		if (lastMessageElement != null) {
+		messageNumber.fromOMElement(msgNumberPart);
+		if(lastMessageElement != null){
 			lastMessage = new LastMessage(namespaceValue);
-			lastMessage.fromOMElement(sequencePart);
+			lastMessage.fromOMElement(lastMessageElement);
 		}
 
-    // Indicate that we have processed this part of the message.
-    ((SOAPHeaderBlock)sequencePart).setProcessed();
+		// Indicate that we have processed this part of the message.
+		shb.setProcessed();
     
 		return this;
 	}
-
+	
 	public OMElement toOMElement(OMElement headerElement) throws OMException {
 
 		if (headerElement == null || !(headerElement instanceof SOAPHeader))

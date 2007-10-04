@@ -68,7 +68,10 @@ public class SequenceOffer implements IOMRMElement {
 					createSequenceElement.toString()));
 
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(sequenceOfferPart);
+		OMElement identifierPart = sequenceOfferPart.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 
 		OMElement expiresPart = sequenceOfferPart
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.EXPIRES));

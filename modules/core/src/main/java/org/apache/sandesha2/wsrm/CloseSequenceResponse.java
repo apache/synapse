@@ -53,7 +53,6 @@ public class CloseSequenceResponse implements IOMRMPart {
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
-
 		if (!(body instanceof SOAPBody))
 			throw new OMException(
 					SandeshaMessageHelper.getMessage(
@@ -68,11 +67,14 @@ public class CloseSequenceResponse implements IOMRMPart {
 					body.toString()));
 
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(closeSeqResponsePart);
-
+		OMElement identifierPart = closeSeqResponsePart.getFirstChildWithName(new QName(
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 		return this;
 	}
-
+	
 	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody))

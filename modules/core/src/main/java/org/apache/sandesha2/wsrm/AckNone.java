@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.wsrm;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
@@ -49,14 +47,11 @@ public class AckNone implements IOMRMElement {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException {
-	    
-		OMElement nonePart = element.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NONE));
+	public Object fromOMElement(OMElement nonePart) throws OMException {
 		if (nonePart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noNonePartInElement,
-					element.toString()));
+					nonePart.toString()));
 
 		return this;
 	}

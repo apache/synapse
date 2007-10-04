@@ -50,6 +50,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
 	
+	private OMElement originalSequenceAckElement;
+	
 	public SequenceAcknowledgement(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -66,58 +68,51 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	}
 
 	public Object fromOMElement(OMElement sequenceAckElement) throws OMException,SandeshaException {
+		originalSequenceAckElement = sequenceAckElement;
+		OMElement identifierPart = null;
+		Iterator childElements = sequenceAckElement.getChildElements();
+		while(childElements.hasNext()){
+			OMElement element = (OMElement)childElements.next();
+			String elementNamespace = element.getQName().getNamespaceURI();
+			String elementLocalName = element.getQName().getLocalPart();
+			if(namespaceValue.equals(elementNamespace)){
+				if(Sandesha2Constants.WSRM_COMMON.ACK_RANGE.equals(elementLocalName)){
+					AcknowledgementRange ackRange = new AcknowledgementRange(namespaceValue);
+					ackRange.fromOMElement(element);
+					acknowledgementRangeList.add(ackRange);
+				}else if(Sandesha2Constants.WSRM_COMMON.NACK.equals(elementLocalName)){
+					Nack nack = new Nack(namespaceValue);
+					nack.fromOMElement(element);
+					nackList.add(nack);
+				}else if(Sandesha2Constants.WSRM_COMMON.IDENTIFIER.equals(elementLocalName)){
+					identifierPart = element;
+				}else {
+					String rmSpecVersion = SpecSpecificConstants.getSpecVersionString (namespaceValue);
+					if (SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
+						if(Sandesha2Constants.WSRM_COMMON.FINAL.equals(elementLocalName)){
+							ackFinal = new AckFinal (namespaceValue);
+							ackFinal.fromOMElement(element);
+						}
+					}
+					if (SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
+						if(Sandesha2Constants.WSRM_COMMON.NONE.equals(elementLocalName)){
+							ackNone = new AckNone (namespaceValue);
+							ackNone.fromOMElement(element);
+						}
+					}
+				}
+			}
+		}
 
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(sequenceAckElement);
+		identifier.fromOMElement(identifierPart);
 
-		Iterator ackRangeParts = sequenceAckElement.getChildrenWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_RANGE));
-
-		while (ackRangeParts.hasNext()) {
-			OMElement ackRangePart = (OMElement) ackRangeParts.next();
-
-			AcknowledgementRange ackRange = new AcknowledgementRange(namespaceValue);
-			ackRange.fromOMElement(ackRangePart);
-			acknowledgementRangeList.add(ackRange);
-		}
-
-		Iterator nackParts = sequenceAckElement.getChildrenWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NACK));
-
-		while (nackParts.hasNext()) {
-			OMElement nackPart = (OMElement) nackParts.next();
-			Nack nack = new Nack(namespaceValue);
-			nack.fromOMElement(nackPart);
-			nackList.add(nack);
-		}
-
-		String rmSpecVersion = SpecSpecificConstants.getSpecVersionString (namespaceValue);
-		
-		if (SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
-			OMElement ackFinalPart = sequenceAckElement.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.FINAL));
-			if (ackFinalPart!=null) {
-				ackFinal = new AckFinal (namespaceValue);
-				ackFinal.fromOMElement(sequenceAckElement);
-			}
-		}
-		
-		if (SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
-			OMElement ackNonePart = sequenceAckElement.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.NONE));
-			if (ackNonePart!=null) {
-				ackNone = new AckNone (namespaceValue);
-				ackNone.fromOMElement(sequenceAckElement);
-			}
-		}
-		
-    // Indicate that we have processed this part of the message.
-    ((SOAPHeaderBlock)sequenceAckElement).setProcessed();
-
-    
+		// Indicate that we have processed this part of the message.
+		((SOAPHeaderBlock)sequenceAckElement).setProcessed();
 		return this;
 	}
-
+	
 	public OMElement toOMElement(OMElement header) throws OMException,SandeshaException {
-
 		if (header == null || !(header instanceof SOAPHeader))
 			throw new OMException();
 
@@ -280,6 +275,10 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	public void setAckNone(AckNone ackNone) {
 		this.ackNone = ackNone;
+	}
+	
+	public OMElement getOriginalSequenceAckElement() {
+		return originalSequenceAckElement;
 	}
 	
 }

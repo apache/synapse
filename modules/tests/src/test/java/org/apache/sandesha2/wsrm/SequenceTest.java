@@ -39,7 +39,7 @@ public class SequenceTest extends SandeshaTestCase {
     public void testFromOMElement()  throws SandeshaException {
         SOAPEnvelope env = getSOAPEnvelope("", "Sequence.xml");
         Sequence sequence = new Sequence(rmNamespace);
-        sequence.fromOMElement(env.getHeader());
+        sequence.fromOMElement(env.getHeader().getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence));
 
         Identifier identifier = sequence.getIdentifier();
         assertEquals("uuid:879da420-1624-11da-bed9-84d13db13902", identifier.getIdentifier());

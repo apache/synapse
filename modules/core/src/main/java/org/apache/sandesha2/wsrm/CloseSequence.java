@@ -54,7 +54,6 @@ public class CloseSequence implements IOMRMPart {
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
-
 		if (!(body instanceof SOAPBody))
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.closeSeqCannotBeAddedToNonBody));
@@ -68,11 +67,14 @@ public class CloseSequence implements IOMRMPart {
 					body.toString()));
 
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(closeSeqPart);
-
+		OMElement identifierPart = closeSeqPart.getFirstChildWithName(new QName(
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		if(identifierPart != null){
+			identifier.fromOMElement(identifierPart);
+		}
 		return this;
 	}
-
+	
 	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody))

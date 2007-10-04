@@ -60,20 +60,20 @@ public class AcknowledgementRange implements IOMRMElement {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.nullPassedElement));
 
-		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName(
+		String lowerAttribValue = ackRangePart.getAttributeValue(new QName(
 				Sandesha2Constants.WSRM_COMMON.LOWER));
-		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName(
+		String upperAttribValue = ackRangePart.getAttributeValue(new QName(
 				Sandesha2Constants.WSRM_COMMON.UPPER));
 
-		if (lowerAttrib == null || upperAttrib == null)
+		if (lowerAttribValue == null || upperAttribValue == null)
 			throw new OMException(
 					SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.noUpperOrLowerAttributesInElement,
 							ackRangePart.toString()));
 
 		try {
-			long lower = Long.parseLong(lowerAttrib.getAttributeValue());
-			long upper = Long.parseLong(upperAttrib.getAttributeValue());
+			long lower = Long.parseLong(lowerAttribValue);
+			long upper = Long.parseLong(upperAttribValue);
 			upperValue = upper;
 			lowerValue = lower;
 		} catch (Exception ex) {
@@ -82,10 +82,9 @@ public class AcknowledgementRange implements IOMRMElement {
 							SandeshaMessageKeys.ackRandDoesNotHaveCorrectValues,
 							ackRangePart.toString()));
 		}
-
 		return this;
 	}
-
+	
 	public OMElement toOMElement(OMElement sequenceAckElement)
 			throws OMException {
 

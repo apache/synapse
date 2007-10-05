@@ -23,13 +23,11 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -152,7 +150,7 @@ public class ValidateMediator extends AbstractListMediator {
                 int i = 0;
                 for (Iterator iterator = schemaKeys.iterator(); iterator.hasNext();) {
                     String propName = (String) iterator.next();
-                    sources[i++] = Util.getStreamSource(synCtx.getEntry(propName));
+                    sources[i++] = SynapseConfigUtils.getStreamSource(synCtx.getEntry(propName));
                 }
 
                 try {

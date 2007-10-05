@@ -210,7 +210,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 		if (entry.getType() == Entry.URL_SRC) {
 			try {
-				entry.setValue(Util.getOMElementFromURL(entry.getSrc()
+				entry.setValue(SynapseConfigUtils.getOMElementFromURL(entry.getSrc()
 						.toString()));
 				localRegistry.put(key, entry);
 			} catch (IOException e) {

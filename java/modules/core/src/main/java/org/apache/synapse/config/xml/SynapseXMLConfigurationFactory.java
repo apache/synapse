@@ -104,8 +104,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
         }
 
+        // if there is no sequence named main defined locally look for the set of mediators in
+        // the root level before trying to look in the registry (hence config.getMainSequence
+        // can not be used here)
         if (!config.getLocalRegistry().containsKey(SynapseConstants.MAIN_SEQUENCE_KEY)) {
-            if (rootSequence.getList().isEmpty()) {
+            // if the root tag does not contain any mediators & registry does not have a
+            // entry with key main then use the defualt main sequence
+            if (rootSequence.getList().isEmpty() && config.getMainSequence() == null) {
                 setDefaultMainSequence(config);
             } else {
                 config.addSequence(rootSequence.getName(), rootSequence);

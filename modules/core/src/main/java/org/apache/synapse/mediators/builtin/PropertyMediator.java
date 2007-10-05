@@ -84,10 +84,10 @@ public class PropertyMediator extends AbstractMediator {
                 Axis2MessageContext.getStringValue(expression, synCtx));
 
             if (traceOrDebugOn) {
-                trace.trace("Setting property : " + name + " at scope:" +
-                    (scope == null ? "default" : scope) + " to : " + resultValue + "(i.e. " +
+                traceOrDebug(traceOn, "Setting property : " + name + " at scope : " +
+                    (scope == null ? "default" : scope) + " to : " + resultValue + " (i.e. " +
                     (value != null ? "constant : " + value :
-                          " result of expression : " + expression) + ")");
+                          "result of expression : " + expression) + ")");
             }
 
             if (scope == null || XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {

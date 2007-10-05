@@ -202,7 +202,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         // remove unwanted HTTP headers (if any from the current message)
         removeUnwantedHeaders(msgContext);
 
-        EndpointReference epr = Util.getDestinationEPR(msgContext);
+        EndpointReference epr = NhttpUtils.getDestinationEPR(msgContext);
         if (epr != null) {
             if (!AddressingConstants.Final.WSA_NONE_URI.equals(epr.getAddress())) {
                 sendAsyncRequest(epr, msgContext);
@@ -316,7 +316,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         ServerWorker worker = (ServerWorker) msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
         HttpResponse response = worker.getResponse();
 
-        OMOutputFormat format = Util.getOMOutputFormat(msgContext);
+        OMOutputFormat format = NhttpUtils.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
         response.setHeader(
             HTTP.CONTENT_TYPE,
@@ -370,7 +370,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     }
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {
-        OMOutputFormat format = Util.getOMOutputFormat(msgContext);
+        OMOutputFormat format = NhttpUtils.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
         OutputStream out = (OutputStream) msgContext.getProperty(MessageContext.TRANSPORT_OUT);
 

@@ -31,7 +31,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.SynapseConfigUtils;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
@@ -127,7 +127,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
 
                 try {
-                    String ns = Util.getOMElementFromURL(new URL(wsdlURI).toString())
+                    String ns = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI).toString())
                         .getNamespace().getNamespaceURI();
 
                     if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(ns)) {

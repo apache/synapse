@@ -57,7 +57,7 @@ public class EntryFactory implements XMLToObjectMapper {
                     entry.setSrc(new URL(src.trim()));
                     entry.setType(Entry.URL_SRC);
                     entry.setValue(
-                        org.apache.synapse.config.Util.getObject(entry.getSrc()));
+                        org.apache.synapse.config.SynapseConfigUtils.getObject(entry.getSrc()));
                 } catch (MalformedURLException e) {
                     handleException("The entry with key : " + key + " refers to an invalid URL");
                 }

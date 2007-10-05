@@ -21,7 +21,6 @@ package org.apache.axis2.transport.nhttp;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.util.Utils;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.MessageFormatter;
@@ -68,7 +67,7 @@ public class Axis2HttpRequest {
         this.epr = epr;
         this.httpHost = httpHost;
         this.msgContext = msgContext;
-        this.format = Util.getOMOutputFormat(msgContext);
+        this.format = NhttpUtils.getOMOutputFormat(msgContext);
         try {
             messageFormatter = TransportUtils.getMessageFormatter(msgContext);
         } catch (AxisFault axisFault) {

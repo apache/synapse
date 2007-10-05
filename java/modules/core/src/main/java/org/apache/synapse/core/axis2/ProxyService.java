@@ -33,7 +33,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.SynapseConfigUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -207,7 +207,7 @@ public class ProxyService {
         } else if (wsdlURI != null) {
             try {
                 URL url = wsdlURI.toURL();
-                wsdlElement = Util.getOMElementFromURL(url.toString());
+                wsdlElement = SynapseConfigUtils.getOMElementFromURL(url.toString());
             } catch (MalformedURLException e) {
                 handleException("Malformed URI for wsdl", e);
             } catch (IOException e) {
@@ -357,10 +357,10 @@ public class ProxyService {
                 if (policyProp != null) {
                     if (svcEffectivePolicy == null) {
                         svcEffectivePolicy = PolicyEngine.getPolicy(
-                            Util.getStreamSource(policyProp).getInputStream());
+                            SynapseConfigUtils.getStreamSource(policyProp).getInputStream());
                     } else {
                         svcEffectivePolicy = (Policy) svcEffectivePolicy.merge(
-                            PolicyEngine.getPolicy(Util.getStreamSource(policyProp).getInputStream()));
+                            PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(policyProp).getInputStream()));
                     }
                 }
             }

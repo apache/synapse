@@ -40,9 +40,9 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class Util {
+public class SynapseConfigUtils {
 
-    private static final Log log = LogFactory.getLog(Util.class);
+    private static final Log log = LogFactory.getLog(SynapseConfigUtils.class);
 
     /**
      * Return a StreamSource for the given Object
@@ -136,7 +136,7 @@ public class Util {
                                 log.debug("Faild to resolve an absolute path of the " +
                                           " URL using the synapse.home : " + synapseHome);
                             }
-                            log.error("IO Error reading from URL " + url.getPath() + e);
+                            log.warn("IO Error reading from URL " + url.getPath() + e);
                         }
                     }
                 }
@@ -213,12 +213,12 @@ public class Util {
     }
 
     private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
+        log.warn(msg, e);
         throw new SynapseException(msg, e);
     }
 
     private static void handleException(String msg) {
-        log.error(msg);
+        log.warn(msg);
         throw new SynapseException(msg);
     }
 
@@ -279,7 +279,7 @@ public class Util {
                                 log.debug("Faild to resolve an absolute path of the " +
                                           " URL using the synapse.home : " + synapseHome);
                             }
-                            log.error("IO Error reading from URL : " + url.getPath() + e);
+                            log.warn("IO Error reading from URL : " + url.getPath() + e);
                         }
                     }
                 }

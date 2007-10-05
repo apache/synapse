@@ -19,14 +19,10 @@
 
 package org.apache.synapse.mediators.spring;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.Entry;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
@@ -121,7 +117,7 @@ public class SpringMediator extends AbstractMediator {
         xbdr.setValidating(false);
         xbdr.loadBeanDefinitions(
             new InputStreamResource(
-                Util.getStreamSource(synCtx.getEntry(configKey)).getInputStream()));
+                SynapseConfigUtils.getStreamSource(synCtx.getEntry(configKey)).getInputStream()));
         appContext.refresh();
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Spring ApplicationContext from key : " + configKey + " created");

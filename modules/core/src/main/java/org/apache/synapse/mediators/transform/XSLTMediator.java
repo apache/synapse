@@ -35,7 +35,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axis2.transport.base.BaseConstants;
@@ -52,7 +52,6 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -277,7 +276,7 @@ public class XSLTMediator extends AbstractMediator {
             if (reCreate || cachedTemplates == null) {
                 try {
                     cachedTemplates = transFact.newTemplates(
-                        Util.getStreamSource(synCtx.getEntry(xsltKey)));
+                        SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
 
                 } catch (TransformerConfigurationException e) {
                     handleException("Error creating XSLT transformer using : " + xsltKey, e, synCtx);

@@ -27,7 +27,7 @@ import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axiom.om.OMOutputFormat;
 
-public class Util {
+public class NhttpUtils {
 
     /**
      * Get the EPR for the message passed in

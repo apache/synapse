@@ -31,9 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Startup;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
@@ -95,15 +96,15 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 rootSequence.getList().isEmpty() && config.getRegistry() != null) {
             OMNode remoteConfigNode = config.getRegistry().lookup("synapse.xml");
             try {
-                config = XMLConfigurationBuilder.getConfiguration(
-                        Util.getStreamSource(remoteConfigNode).getInputStream());
+                config = XMLConfigurationBuilder.getConfiguration(SynapseConfigUtils
+                    .getStreamSource(remoteConfigNode).getInputStream());
             } catch (XMLStreamException xse) {
                 throw new SynapseException("Problem loading remote synapse.xml ", xse);
             }
 
         }
 
-        if (config.getMainSequence() == null) {
+        if (!config.getLocalRegistry().containsKey(SynapseConstants.MAIN_SEQUENCE_KEY)) {
             if (rootSequence.getList().isEmpty()) {
                 setDefaultMainSequence(config);
             } else {
@@ -189,9 +190,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
      */
     private static void setDefaultMainSequence(SynapseConfiguration config) {
         SequenceMediator main = new SequenceMediator();
-        main.setName(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY);
+        main.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
         main.addChild(new SendMediator());
-        config.addSequence(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY, main);
+        config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, main);
     }
 
     /**

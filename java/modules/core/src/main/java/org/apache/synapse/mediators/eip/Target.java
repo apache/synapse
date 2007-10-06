@@ -63,11 +63,11 @@ public class Target {
     /**
      * This method will be called by the EIP mediators to mediated the target (may be to mediate
      * using the target sequence, send message to the target endpoint or both)
-     * 
+     *
      * @param synCtx - MessageContext to be mediated
      * @return boolean true if the sequence does not drop the message, false if it does
      */
-    public boolean mediate(MessageContext synCtx) {
+    public void mediate(MessageContext synCtx) {
 
         if (soapAction != null) {
             synCtx.setSoapAction(soapAction);
@@ -82,11 +82,11 @@ public class Target {
         }
 
         if (sequence != null) {
-            return sequence.mediate(synCtx);
+            synCtx.getEnvironment().injectAsync(synCtx, sequence);
         } else if (sequenceRef != null) {
-            Mediator refSequence = synCtx.getConfiguration().getSequence(sequenceRef);
+            SequenceMediator refSequence = (SequenceMediator) synCtx.getConfiguration().getSequence(sequenceRef);
             if (refSequence != null) {
-                return refSequence.mediate(synCtx);
+                synCtx.getEnvironment().injectAsync(synCtx, refSequence);
             }
         }
 
@@ -97,11 +97,8 @@ public class Target {
             if (epr != null) {
                 epr.send(synCtx);
             }
-        } else {
-            synCtx.getEnvironment().injectMessage(synCtx);
         }
 
-        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////

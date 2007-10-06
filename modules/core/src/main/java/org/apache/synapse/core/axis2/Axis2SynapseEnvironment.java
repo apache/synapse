@@ -123,7 +123,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public void injectAsync(final MessageContext synCtx, SequenceMediator seq) {
         if (log.isDebugEnabled()) {
             log.debug("Injecting MessageContext for asynchronous mediation using the "
-                + seq.getName() == null? "Anonymous" : seq.getName());
+                + (seq.getName() == null? "Anonymous" : seq.getName()) + " Sequence");
         }
         synCtx.setEnvironment(this);
         // todo: do we need to have this in here ? ruwan

@@ -20,6 +20,7 @@
 package org.apache.synapse.core;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsCollector;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
@@ -42,14 +43,28 @@ public interface SynapseEnvironment {
     public boolean injectMessage(MessageContext smc);
 
     /**
-     * This method allows a message to be sent through the underlying SOAP engine.
-     * <p/>
-     * This will send request messages on (forward), and send the response messages back to the client
+     * This method injects a new message into the synapse engine for the mediation
+     * by the specified sequence. This is used by custom mediation tasks like splitting message
+     * in EIP mediations. This method will do the mediation asynchronouslly using a separate
+     * thread from the environment thread pool
+     *
+     * @param smc - Synapse message context to be injected
+     * @param seq - Sequence to be used for mediation
+     */
+    public void injectAsync(MessageContext smc, SequenceMediator seq);
+
+    /**
+     * This method allows a message to be sent through the underlying SOAP engine. This will
+     * send request messages on (forward), and send the response messages back to the client
+     *
+     * @param endpoint  - Endpoint to be used for sending
+     * @param smc       - Synapse MessageContext to be sent
      */
     public void send(EndpointDefinition endpoint, MessageContext smc);
 
     /**
      * Creates a new Synapse <code>MessageContext</code> instance.
+     *
      * @return a MessageContext
      */
     public MessageContext createMessageContext();
@@ -62,12 +77,12 @@ public interface SynapseEnvironment {
     public StatisticsCollector getStatisticsCollector();
 
     /**
-     * To set the StatisticsCollector
+     * To set the StatisticsCollector to the environment
      *
-     * @param statisticsCollector
+     * @param statisticsCollector - StatisticsCollector to be set
      */
     public void setStatisticsCollector(StatisticsCollector statisticsCollector);
-    
+
     /**
      * This is used by anyone who needs access to a ThreadPool. It offers the ability to
      * start work. See the backport concurrent documentation

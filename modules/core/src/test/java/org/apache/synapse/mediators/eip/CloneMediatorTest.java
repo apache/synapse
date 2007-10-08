@@ -44,6 +44,7 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"));
         clone.mediate(testCtx);
+        Thread.sleep(1000);
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertEquals(mediatedCtx.getSoapAction(), "urn:clone");
         mediatedCtx = helperMediator.getMediatedContext(1);
@@ -57,6 +58,7 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"));
         assertTrue(clone.mediate(testCtx));
+        Thread.sleep(1000);        
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertTrue(mediatedCtx.getEnvelope().getBody().getFirstElement() == null);
         assertEquals(mediatedCtx.getSoapAction(), "urn:clone");

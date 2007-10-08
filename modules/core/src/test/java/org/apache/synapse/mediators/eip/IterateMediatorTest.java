@@ -51,6 +51,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
             "expression=\"//original/itr\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
             "<target soapAction=\"urn:iterate\" sequence=\"seqRef\"/></iterate>"));
         iterate.mediate(testCtx);
+        Thread.sleep(1000);        
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertEquals(mediatedCtx.getSoapAction(), "urn:iterate");
         mediatedCtx = helperMediator.getMediatedContext(1);
@@ -65,6 +66,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
             "xmlns=\"http://ws.apache.org/ns/synapse\"><target soapAction=\"urn:iterate\" " +
             "sequence=\"seqRef\"/></iterate>"));
         iterate.mediate(testCtx);
+        Thread.sleep(1000);        
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertEquals(mediatedCtx.getSoapAction(), "urn:iterate");
         mediatedCtx = helperMediator.getMediatedContext(1);

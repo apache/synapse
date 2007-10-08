@@ -28,6 +28,7 @@ public class AbstractSplitMediatorTestCase extends AbstractMediatorTestCase {
         AxisConfiguration config = new AxisConfiguration();
         testCtx = new Axis2MessageContext(new org.apache.axis2.context.MessageContext(),
             synCfg, new Axis2SynapseEnvironment(new ConfigurationContext(config), synCfg));
+        ((Axis2MessageContext)testCtx).getAxis2MessageContext().setConfigurationContext(new ConfigurationContext(config));
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         envelope.getBody().addChild(createOMElement("<original>test-split-context</original>"));
         testCtx.setEnvelope(envelope);

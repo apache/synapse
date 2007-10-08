@@ -65,7 +65,6 @@ public class Target {
      * using the target sequence, send message to the target endpoint or both)
      *
      * @param synCtx - MessageContext to be mediated
-     * @return boolean true if the sequence does not drop the message, false if it does
      */
     public void mediate(MessageContext synCtx) {
 

@@ -631,19 +631,19 @@ public class JMSUtils extends BaseUtils {
 
         if (message instanceof BytesMessage) {
             BytesMessage bytesMessage = (BytesMessage) message;
-            ByteBuffer msgBytes = ByteBuffer.allocate(1024);
-            try {
-                while (true) {
-                    byte[] temp = new byte[1024];
-                    int read = bytesMessage.readBytes(temp);
-                    if (read > 0) {
-                        msgBytes.put(temp, 0, read);
-                    } else {
-                        msgBytes.flip();
-                        return msgBytes.array();
-                    }
-                }
 
+            try {
+                bytesMessage.reset();
+
+                byte[] buffer = new byte[1024];
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                for (int bytesRead = bytesMessage.readBytes(buffer); bytesRead != -1;
+                     bytesRead = bytesMessage.readBytes(buffer)) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                return out.toByteArray();
+                
             } catch (JMSException e) {
                 handleException("Error reading JMS binary message payload", e);
             }

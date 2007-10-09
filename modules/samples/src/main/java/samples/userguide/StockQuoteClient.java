@@ -202,7 +202,12 @@ public class StockQuoteClient {
         }
 
         try {
-            configContext.terminate();
+            //configContext.terminate();
+            // the above statement was used on reccomendation by Chamikara as I remember, but
+            // since using Axis2 1.3 - this causes some unexpected classloading issue on the
+            // Axis2 server side - which cannot be described. This using the below as suggested
+            // by Deepal
+            serviceClient.cleanup();
         } catch (Exception ignore) {
         }
     }

@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
+import org.apache.http.ConnectionClosedException;
 import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
@@ -65,7 +66,16 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
     }
 
     public void exception(final NHttpServerConnection conn, final IOException ex) {
-        this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
+        if (ex instanceof ConnectionClosedException ||
+                ex.getMessage().contains("Connection reset by peer") ||
+                ex.getMessage().contains("forcibly closed")) {
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("HTTP connection " + conn + ": " + ex.getMessage() +
+                    " (Probably the keepalive connection was closed)");
+            }
+        } else {
+            this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
+        }
         this.handler.exception(conn, ex);
     }
 

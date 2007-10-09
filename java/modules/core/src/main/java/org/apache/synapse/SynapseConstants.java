@@ -41,7 +41,7 @@ public final class SynapseConstants {
     public static final String FAULT_SEQUENCE_KEY = "fault";
 
     /** The name of the Synapse service (used for message mediation) */
-    public static final String SYNAPSE_SERVICE_NAME ="SynapseService";
+    public static final String SYNAPSE_SERVICE_NAME ="__SynapseService";
     /** The operation name used by the Synapse service (for message mediation) */
     public static final QName SYNAPSE_OPERATION_NAME = new QName("mediate");
 

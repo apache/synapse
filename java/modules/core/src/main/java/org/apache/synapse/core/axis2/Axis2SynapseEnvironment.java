@@ -32,9 +32,13 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.util.UUIDGenerator;
+import org.apache.synapse.util.concurrent.SynapseThreadPool;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * This is the Axis2 implementation of the SynapseEnvironment
@@ -45,15 +49,18 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     private SynapseConfiguration synapseConfig;
     private ConfigurationContext configContext;
+    private ExecutorService executorService;
 
     /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector;
 
-    public Axis2SynapseEnvironment() {}
+    public Axis2SynapseEnvironment() {
+        this.executorService = new SynapseThreadPool();
+    }
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
         SynapseConfiguration synapseConfig) {
-
+        this();
         this.configContext = cfgCtx;
         this.synapseConfig = synapseConfig;
     }
@@ -134,8 +141,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             StatisticsUtils.processSequenceStatistics(synCtx);
         }
 
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-            .getConfigurationContext().getThreadPool().execute(new SynapseWorker(seq, synCtx));
+        executorService.execute(new MediatorWorker(seq, synCtx));
 
     }
 
@@ -218,46 +224,13 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     /**
-     * This inner class will be used as the executer for the injectAsync method for the
-     * sequence mediation
+     * This will give the access to the synapse thread pool for the
+     * advanced mediation tasks.
+     *
+     * @return an ExecutorService to execute the tasks in a new thread from the pool
      */
-    private class SynapseWorker implements Runnable {
-
-        /** Mediator to be executed */
-        private Mediator seq = null;
-
-        /** MessageContext to be mediated using the mediator */
-        private MessageContext synCtx = null;
-
-        /**
-         * Constructor of the SynapseWorker which sets the sequence and the message context
-         *
-         * @param seq    - Sequence Mediator to be set
-         * @param synCtx - Synapse MessageContext to be set
-         */
-        public SynapseWorker(Mediator seq, MessageContext synCtx) {
-            this.seq = seq;
-            this.synCtx = synCtx;
-        }
-
-        /**
-         * Constructor od the SynapseWorker which sets the provided message context and the
-         * main sequence as the sequence for mediation
-         *
-         * @param synCtx - Synapse MessageContext to be set
-         */
-        public SynapseWorker(MessageContext synCtx) {
-            this.synCtx = synCtx;
-            seq = synCtx.getMainSequence();
-        }
-
-        /**
-         * Execution method of the thread. This will just call the mediation of the specified
-         * Synapse MessageContext using the specified Sequence Mediator
-         */
-        public void run() {
-            seq.mediate(synCtx);
-        }
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
 }

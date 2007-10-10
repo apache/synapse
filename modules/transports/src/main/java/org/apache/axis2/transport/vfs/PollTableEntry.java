@@ -28,6 +28,7 @@ public class PollTableEntry {
     public static final int SUCCSESSFUL = 0;
     public static final int WITH_ERRORS = 1;
     public static final int FAILED      = 2;
+    public static final int NONE        = 3;
 
     // operation after scan
     public static final int DELETE = 0;

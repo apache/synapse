@@ -24,16 +24,17 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
-import org.apache.synapse.mediators.base.SynapseMediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.builtin.DropMediator;
+import org.apache.synapse.mediators.builtin.LogMediator;
 
-
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.File;
 
 /**
- * Builds a Synapse Configuration model with a given input (e.g. XML, programmatic creation, default etc)
+ * Builds a Synapse Configuration model with a given input
+ * (e.g. XML, programmatic creation, default etc)
  */
 public class SynapseConfigurationBuilder {
 
@@ -44,11 +45,17 @@ public class SynapseConfigurationBuilder {
      * @return the default configuration to be used
      */
     public static SynapseConfiguration getDefaultConfiguration() {
-        // programatically create an empty configuration which just sends messages to thier implicit destinations
+        // programatically create an empty configuration which just log and drop the messages 
         SynapseConfiguration config = new SynapseConfiguration();
-        SynapseMediator mainmediator = new SynapseMediator();
-        mainmediator.addChild(new SendMediator());
-        config.addSequence("main", mainmediator);
+        SequenceMediator mainmediator = new SequenceMediator();
+        mainmediator.addChild(new LogMediator());
+        mainmediator.addChild(new DropMediator());
+        config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, mainmediator);
+        SequenceMediator faultmediator = new SequenceMediator();
+        LogMediator fault = new LogMediator();
+        fault.setLogLevel(LogMediator.FULL);
+        faultmediator.addChild(fault);
+        config.addSequence(SynapseConstants.FAULT_SEQUENCE_KEY, faultmediator);
         return config;
     }
 
@@ -62,7 +69,8 @@ public class SynapseConfigurationBuilder {
 
         // build the Synapse configuration parsing the XML config file
         try {
-            SynapseConfiguration synCfg = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
+            SynapseConfiguration synCfg
+                = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
             log.info("Loaded Synapse configuration from : " + configFile);
             synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
             return synCfg;

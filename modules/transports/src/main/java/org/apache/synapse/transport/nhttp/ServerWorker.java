@@ -23,6 +23,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -365,7 +366,7 @@ public class ServerWorker implements Runnable {
             try {
                 response.addHeader(CONTENT_TYPE, TEXT_HTML);
                 serverHandler.commitResponse(conn, response);
-                os.write(HTTPTransportReceiver.getServicesHTML(cfgCtx).getBytes());
+                os.write(getServicesHTML().getBytes());
 
             } catch (IOException e) {
                 handleException("Error writing ? output to client", e);
@@ -511,5 +512,71 @@ public class ServerWorker implements Runnable {
 
     private static boolean isIP(String hostAddress) {
         return hostAddress.split("[.]").length == 4;
+    }
+
+    /**
+     * Returns the HTML text for the list of services deployed.
+     * This can be delegated to another Class as well
+     * where it will handle more options of GET messages.
+     *
+     * @return the HTML to be displayed as a String
+     */
+    public String getServicesHTML() {
+
+        Map services = cfgCtx.getAxisConfiguration().getServices();
+        Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
+        boolean servicesFound = false;
+
+        StringBuffer resultBuf = new StringBuffer();
+        resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
+
+        if ((services != null) && !services.isEmpty()) {
+
+            servicesFound = true;
+            Collection serviceCollection = services.values();
+            resultBuf.append("<h2>" + "Deployed services" + "</h2>");
+
+            for (Iterator it = serviceCollection.iterator(); it.hasNext();) {
+
+                AxisService axisService = (AxisService) it.next();
+                if (axisService.getName().startsWith("__")) {
+                    continue;    // skip private services
+                }
+
+                Iterator iterator = axisService.getOperations();
+                resultBuf.append("<h3><a href=\"" + axisService.getName() + "?wsdl\">" +
+                        axisService.getName() + "</a></h3>");
+
+                if (iterator.hasNext()) {
+                    resultBuf.append("Available operations <ul>");
+
+                    for (; iterator.hasNext();) {
+                        AxisOperation axisOperation = (AxisOperation) iterator.next();
+                        resultBuf.append("<li>" + axisOperation.getName().getLocalPart() + "</li>");
+                    }
+                    resultBuf.append("</ul>");
+                } else {
+                    resultBuf.append("No operations specified for this service");
+                }
+            }
+        }
+
+        if ((erroneousServices != null) && !erroneousServices.isEmpty()) {
+            servicesFound = true;
+            resultBuf.append("<hr><h2><font color=\"blue\">Faulty Services</font></h2>");
+            Enumeration faultyservices = erroneousServices.keys();
+
+            while (faultyservices.hasMoreElements()) {
+                String faultyserviceName = (String) faultyservices.nextElement();
+                resultBuf.append("<h3><font color=\"blue\">" + faultyserviceName + "</font></h3>");
+            }
+        }
+
+        if (!servicesFound) {
+            resultBuf.append("<h2>There are no services deployed</h2>");
+        }
+
+        resultBuf.append("</body></html>");
+        return resultBuf.toString();
     }
 }

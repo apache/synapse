@@ -140,13 +140,13 @@
     <!-- Transport Ins -->
     <!-- ================================================= -->
     <!-- the non blocking http transport based on HttpCore + NIO extensions -->
-    <transportReceiver name="http" class="org.apache.axis2.transport.nhttp.HttpCoreNIOListener">
+    <transportReceiver name="http" class="org.apache.synapse.transport.nhttp.HttpCoreNIOListener">
     	<parameter name="port">8080</parameter>
     	<parameter name="non-blocking">true</parameter>
     </transportReceiver>
 
     <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->
-    <transportReceiver name="https" class="org.apache.axis2.transport.nhttp.HttpCoreNIOSSLListener">
+    <transportReceiver name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLListener">
     	<parameter name="port" locked="false">8443</parameter>
     	<parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="keystore" locked="false">
@@ -169,7 +169,7 @@
     </transportReceiver>
 
     <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
-    <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
+    <transportReceiver name="jms" class="org.apache.synapse.transport.jms.JMSListener">
         <parameter name="myTopicConnectionFactory">
         	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
@@ -211,12 +211,12 @@
     <!-- Transport Outs -->
     <!-- ================================================= -->
 
-    <transportSender name="http"  class="org.apache.axis2.transport.nhttp.HttpCoreNIOSender">
+    <transportSender name="http"  class="org.apache.synapse.transport.nhttp.HttpCoreNIOSender">
         <parameter name="non-blocking" locked="false">true</parameter>
         <!-- If following is set to 'true', optional action part of the Content-Type will not be added to the SOAP 1.2 messages -->
         <!--  <parameter name="OmitSOAP12Action">true</parameter>  -->
     </transportSender>
-    <transportSender name="https" class="org.apache.axis2.transport.nhttp.HttpCoreNIOSSLSender">
+    <transportSender name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender">
         <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
@@ -237,7 +237,7 @@
             supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
     </transportSender>
     <transportSender name="jms"
-                     class="org.apache.axis2.transport.jms.JMSSender"/>
+                     class="org.apache.synapse.transport.jms.JMSSender"/>
 
     <!-- ================================================= -->
     <!-- Mail Transport Sender  -->

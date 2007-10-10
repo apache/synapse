@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.axis2.transport.jms;
+package org.apache.synapse.transport.jms;
 
 public class AxisJMSException extends RuntimeException {
 

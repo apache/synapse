@@ -30,7 +30,7 @@ import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
-import org.apache.axis2.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.SandeshaClientConstants;

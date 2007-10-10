@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.description.TransportOutDescription;
@@ -26,7 +26,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.transport.AbstractTransportTest;
+import org.apache.synapse.transport.AbstractTransportTest;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;

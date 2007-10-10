@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.nhttp.util;
+package org.apache.synapse.transport.nhttp.util;
 
 /**
  * Dynamically select util.concurrent implemenation

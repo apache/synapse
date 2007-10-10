@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.axis2.transport.nhttp;
+package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
 import java.net.SocketAddress;

@@ -22,7 +22,7 @@ package org.apache.synapse.core.axis2;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.util.Utils;
-import org.apache.axis2.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;

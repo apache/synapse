@@ -19,28 +19,27 @@
 
 package org.apache.synapse.config.xml;
 
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.util.Iterator;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     
@@ -196,7 +195,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     private static void setDefaultMainSequence(SynapseConfiguration config) {
         SequenceMediator main = new SequenceMediator();
         main.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
-        main.addChild(new SendMediator());
+        main.addChild(new LogMediator());
+        main.addChild(new DropMediator());
         config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, main);
     }
 

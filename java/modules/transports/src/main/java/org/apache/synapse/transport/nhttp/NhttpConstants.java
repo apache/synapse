@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.nhttp;
+package org.apache.synapse.transport.nhttp;
 
 public class NhttpConstants {
     public static final String SC_ACCEPTED = "SC_ACCEPTED";

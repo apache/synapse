@@ -13,15 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.axis2.transport.jms;
+package org.apache.synapse.transport.jms;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
-import org.apache.axis2.transport.base.AbstractTransportListener;
-import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.AbstractTransportListener;
+import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.commons.logging.LogFactory;
 
 import javax.jms.JMSException;

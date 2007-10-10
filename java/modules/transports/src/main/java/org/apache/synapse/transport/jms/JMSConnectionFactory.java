@@ -13,13 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.axis2.transport.jms;
+package org.apache.synapse.transport.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.BaseUtils;
 
 import javax.jms.*;
 import javax.naming.Context;

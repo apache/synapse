@@ -16,12 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.axis2.transport.nhttp;
+package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.transport.nhttp.util.PipeImpl;
+import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;

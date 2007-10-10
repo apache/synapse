@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport;
+package org.apache.synapse.transport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

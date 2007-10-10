@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
 /**
  * Holds information about an entry in the VFS transport poll table used by the

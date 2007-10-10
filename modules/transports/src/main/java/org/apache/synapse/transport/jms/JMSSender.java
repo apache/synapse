@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.axis2.transport.jms;
+package org.apache.synapse.transport.jms;
 
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
@@ -28,9 +28,9 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
-import org.apache.axis2.transport.base.AbstractTransportSender;
-import org.apache.axis2.transport.base.BaseUtils;
-import org.apache.axis2.transport.base.BaseConstants;
+import org.apache.synapse.transport.base.AbstractTransportSender;
+import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.LogFactory;
 

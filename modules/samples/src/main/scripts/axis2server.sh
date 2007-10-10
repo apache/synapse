@@ -81,10 +81,6 @@ fi
 
 # update classpath
 AXIS2_CLASSPATH="$AXIS2_HOME/../../lib"
-for f in "$AXIS2_HOME"/../../lib/synapse-*.jar
-do
-  AXIS2_CLASSPATH="$AXIS2_CLASSPATH":$f
-done
 for f in "$AXIS2_HOME"/../../lib/*.jar
 do
   AXIS2_CLASSPATH="$AXIS2_CLASSPATH":$f

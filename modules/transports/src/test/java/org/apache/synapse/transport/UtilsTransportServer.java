@@ -17,12 +17,12 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport;
+package org.apache.synapse.transport;
 
 import org.apache.axis2.description.*;
 import org.apache.axis2.Constants;
 import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.transport.vfs.VFSTransportListener;
+import org.apache.synapse.transport.vfs.VFSTransportListener;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.wsdl.WSDLConstants;

@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.axis2.transport.nhttp;
+package org.apache.synapse.transport.nhttp;
 
 import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.nio.NHttpClientConnection;
@@ -30,9 +30,9 @@ import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.protocol.*;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.nhttp.util.PipeImpl;
-import org.apache.axis2.transport.nhttp.util.WorkerPool;
-import org.apache.axis2.transport.nhttp.util.WorkerPoolFactory;
+import org.apache.synapse.transport.nhttp.util.PipeImpl;
+import org.apache.synapse.transport.nhttp.util.WorkerPool;
+import org.apache.synapse.transport.nhttp.util.WorkerPoolFactory;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.wsdl.WSDLConstants;

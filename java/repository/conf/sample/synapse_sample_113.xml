@@ -32,6 +32,7 @@
                 </m:order>
             </m:placeOrder>);
         ]]></script>
+        <property action="set" name="OUT_ONLY" value="true"/>
         <send>
             <endpoint>
                 <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
@@ -40,6 +41,7 @@
     </sequence>
 
     <sequence name="mtom_proxy">
+        <property action="set" name="OUT_ONLY" value="true"/>
         <header name="Action" value="urn:oneWayUploadUsingMTOM"/>
         <send>
             <endpoint>
@@ -49,6 +51,7 @@
     </sequence>
 
     <sequence name="pox_proxy">
+        <property action="set" name="OUT_ONLY" value="true"/>
         <header name="Action" value="urn:placeOrder"/>
         <send>
             <endpoint>

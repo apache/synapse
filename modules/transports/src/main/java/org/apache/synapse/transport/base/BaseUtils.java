@@ -50,6 +50,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.activation.DataHandler;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
 
@@ -107,6 +108,9 @@ public abstract class BaseUtils {
      */
     public static SOAPEnvelope getEnvelope(InputStream in, String namespace) throws XMLStreamException {
 
+        try {
+            in.reset();
+        } catch (IOException ignore) {}
         XMLStreamReader xmlreader =
             StAXUtils.createXMLStreamReader(in, MessageContext.DEFAULT_CHAR_SET_ENCODING);
         StAXBuilder builder = new StAXSOAPModelBuilder(xmlreader, namespace);

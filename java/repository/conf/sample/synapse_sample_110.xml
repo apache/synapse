@@ -21,6 +21,9 @@
 
     <proxy name="StockQuoteProxy" transports="jms">
         <target>
+            <inSequence>
+                <property action="set" name="OUT_ONLY" value="true"/>
+            </inSequence>
             <endpoint>
                 <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
             </endpoint>

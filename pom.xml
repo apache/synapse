@@ -851,6 +851,23 @@
             <version>${wrapper.version}</version>
         </dependency>
 
+        <!-- Saxon Dependency -->
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon</artifactId>
+            <version>${saxon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-dom</artifactId>
+            <version>${saxon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-xqj</artifactId>
+            <version>${saxon.version}</version>
+        </dependency>
+
     </dependencies>
 
     <reporting>
@@ -976,6 +993,7 @@
         <xmlunit.version>1.1</xmlunit.version>
         <derby.version>10.1.1.0</derby.version>
         <wrapper.version>3.2.3</wrapper.version>
+        <saxon.version>8.9</saxon.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

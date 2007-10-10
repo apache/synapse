@@ -1186,7 +1186,7 @@ Content-ID:
     &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap"/&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap11"/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
         &lt;drop/&gt;
@@ -2444,7 +2444,7 @@ Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
         &lt;header name="Action" value="urn:placeOrder"/&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap"/&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap11"/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
     &lt;/sequence&gt;

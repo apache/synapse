@@ -153,6 +153,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
         try {
             if (fileObject.exists() && fileObject.isReadable()) {
 
+                entry.setLastPollState(PollTableEntry.NONE);
                 FileObject[] children = null;
                 try {
                     children = fileObject.getChildren();
@@ -219,7 +220,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
      * @param entry the PollTableEntry for the file that has been processed
      * @param fileObject the FileObject representing the file to be moved or deleted
      */
-    private void moveOrDeleteAfterProcessing(PollTableEntry entry, FileObject fileObject) {
+    private void moveOrDeleteAfterProcessing(final PollTableEntry entry, FileObject fileObject) {
 
         String moveToDirectory = null;
         try {
@@ -241,6 +242,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                         moveToDirectory = entry.getMoveAfterFailure();
                     }
                     break;
+                case PollTableEntry.NONE:
+                    return;
             }
 
             if (moveToDirectory != null) {
@@ -258,7 +261,12 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                         if (fileObject.delete(new FileSelector() {
 
                             public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
-                                return true;
+                                if (entry.getFileNamePattern().equals(
+                                    fileSelectInfo.getFile().getName().getBaseName())) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
                             }
 
                             public boolean traverseDescendents(FileSelectInfo fileSelectInfo) throws Exception {

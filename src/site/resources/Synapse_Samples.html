@@ -2261,6 +2261,9 @@ to a secure service to be usefull.</p>
 
     &lt;proxy name="StockQuoteProxy" transports="jms"&gt;
         &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;/inSequence&gt;
             &lt;endpoint&gt;
                 &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
             &lt;/endpoint&gt;
@@ -2424,6 +2427,7 @@ Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
                 &lt;/m:order&gt;
             &lt;/m:placeOrder&gt;);
         ]]&gt;&lt;/script&gt;
+        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
                 &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
@@ -2432,6 +2436,7 @@ Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
     &lt;/sequence&gt;
 
     &lt;sequence name="mtom_proxy"&gt;
+        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
         &lt;header name="Action" value="urn:oneWayUploadUsingMTOM"/&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
@@ -2441,6 +2446,7 @@ Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
     &lt;/sequence&gt;
 
     &lt;sequence name="pox_proxy"&gt;
+        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
         &lt;header name="Action" value="urn:placeOrder"/&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
@@ -2603,6 +2609,9 @@ the message as:</p>
 
     &lt;proxy name="JMStoHTTPStockQuoteProxy" transports="jms"&gt;
         &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;/inSequence&gt;
             &lt;endpoint&gt;
                 &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
             &lt;/endpoint&gt;
@@ -2620,6 +2629,7 @@ the message as:</p>
                 &lt;property name="RESPONSE" value="true"/&gt;
                 &lt;header name="To" value="http://www.w3.org/2005/08/addressing/anonymous"/&gt;
                 &lt;property name="SC_ACCEPTED" value="true" scope="axis2"/&gt;
+                &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
                 &lt;send/&gt;
             &lt;/inSequence&gt;
             &lt;outSequence&gt;

@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.axis2.transport.base;
+package org.apache.synapse.transport.base;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;

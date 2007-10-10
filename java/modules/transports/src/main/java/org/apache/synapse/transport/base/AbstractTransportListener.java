@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.axis2.transport.base;
+package org.apache.synapse.transport.base;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.SessionContext;
@@ -24,8 +24,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.util.MessageContextBuilder;
-import org.apache.axis2.transport.base.threads.WorkerPool;
-import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
+import org.apache.synapse.transport.base.threads.WorkerPool;
+import org.apache.synapse.transport.base.threads.WorkerPoolFactory;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.AxisObserver;

@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.base;
+package org.apache.synapse.transport.base;
 
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.description.AxisService;
@@ -26,7 +26,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.axis2.transport.vfs.PollTableEntry;
+import org.apache.synapse.transport.vfs.PollTableEntry;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

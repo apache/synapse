@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.axis2.transport.nhttp;
+package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;

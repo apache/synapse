@@ -1,4 +1,4 @@
-package org.apache.axis2.transport.base.threads;
+package org.apache.synapse.transport.base.threads;
 
 /**
  * Dynamically select util.concurrent implemenation

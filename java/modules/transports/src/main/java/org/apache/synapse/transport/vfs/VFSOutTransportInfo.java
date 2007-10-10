@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.commons.logging.Log;

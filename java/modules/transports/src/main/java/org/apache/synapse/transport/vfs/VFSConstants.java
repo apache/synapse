@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
 public class VFSConstants {
     // vfs transport prefix (e.g. used in an out EPR etc)

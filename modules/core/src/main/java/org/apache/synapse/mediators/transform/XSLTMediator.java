@@ -38,7 +38,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.axis2.transport.base.BaseConstants;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

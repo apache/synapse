@@ -16,9 +16,9 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
-import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;

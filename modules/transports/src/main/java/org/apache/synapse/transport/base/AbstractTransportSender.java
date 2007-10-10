@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.axis2.transport.base;
+package org.apache.synapse.transport.base;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -28,7 +28,6 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.OutTransportInfo;
-import org.apache.axis2.transport.jms.JMSOutTransportInfo;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.WSDL2Constants;

@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.base;
+package org.apache.synapse.transport.base;
 
 public class BaseTransportException extends RuntimeException {
 

@@ -17,12 +17,12 @@
  *  under the License.
  */
 
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.transport.UtilsTransportServer;
+import org.apache.synapse.transport.UtilsTransportServer;
 
 import java.util.ArrayList;
 import java.util.List;

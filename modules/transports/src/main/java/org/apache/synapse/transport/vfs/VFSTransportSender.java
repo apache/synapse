@@ -16,11 +16,11 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.axis2.transport.vfs;
+package org.apache.synapse.transport.vfs;
 
-import org.apache.axis2.transport.base.AbstractTransportSender;
-import org.apache.axis2.transport.base.BaseUtils;
-import org.apache.axis2.transport.base.BaseTransportException;
+import org.apache.synapse.transport.base.AbstractTransportSender;
+import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.BaseTransportException;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;

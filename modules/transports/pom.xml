@@ -47,6 +47,7 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/VFSEchoRawXMLTest.java</exclude>
+                                <exclude>**/AbstractTransportTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>

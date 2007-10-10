@@ -39,7 +39,7 @@ import java.io.IOException;
 public class SynapseStartUpServlet extends HttpServlet {
 
     private static Log log = LogFactory.getLog(SynapseStartUpServlet.class);
-    private ServerManager serverManager;
+    private final ServerManager serverManager  = ServerManager.getInstance();
 
     public void init() throws ServletException {
         super.init();
@@ -88,7 +88,6 @@ public class SynapseStartUpServlet extends HttpServlet {
             log.fatal("Can not resolve synapse home  : startup failed");
             return;
         }
-        serverManager = ServerManager.getInstance();
         serverManager.start();
         servletContext.setAttribute("hasAlreadyInit", "true");
     }

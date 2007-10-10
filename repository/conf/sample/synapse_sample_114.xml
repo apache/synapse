@@ -22,7 +22,7 @@
     <proxy name="JMStoHTTPStockQuoteProxy" transports="jms">
         <target>
             <endpoint>
-                <address uri="http://localhost:9001/soap/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
             </endpoint>
             <outSequence>
                 <send/>

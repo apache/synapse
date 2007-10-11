@@ -229,7 +229,8 @@ public class TerminateManager {
 			StorageManager storageManager) throws SandeshaException {
 
 		// Indicate that the sequence is terminated
-		rmsBean.setTerminated(true);		
+		rmsBean.setTerminated(true);
+		rmsBean.setTerminateAdded(true);
 		storageManager.getRMSBeanMgr().update(rmsBean);
 		
 		cleanSendingSideData (rmsBean.getInternalSequenceID(), storageManager);

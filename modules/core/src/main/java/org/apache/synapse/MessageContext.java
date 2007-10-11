@@ -226,7 +226,7 @@ public interface MessageContext {
     public void setWSAMessageID(String messageID);
 
     /**
-     * Gets the message id
+     * Gets the message name
      * @return the WSA MessageID
      */
     public String getWSAMessageID();

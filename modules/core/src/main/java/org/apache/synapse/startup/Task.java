@@ -20,9 +20,9 @@
 package org.apache.synapse.startup;
 
 /**
- * Defines the Job for a SimpleQuarts Startup
+ * Defines the Task for a SimpleQuarts Startup
  */
-public interface Job {
+public interface Task {
 
     /**
      * Esecute method will be invoked by the SimpleQuartzStartup

@@ -36,7 +36,7 @@ import org.apache.synapse.SynapseException;
 /*
  * Namespace = synapse namespace
  * 
- *  &lt;job class="org.my.synapse.job">
+ *  &lt;task class="org.my.synapse.Task">
  *  &lt;property name="stringProp" value="String"/>
  *  &lt;property name="xmlProp">
  *  %lt;somexml>config</somexml>
@@ -44,14 +44,13 @@ import org.apache.synapse.SynapseException;
  *  &lt;simpletrigger forever="true" count="10" interval="1000"/> 
  *  &lt;!-- forever or count not both -->
  *  &lt;crontrigger expression="0 * 1 * * ?" />
- *  &lt;/job>
+ *  &lt;/task>
  * 
  */
 
 public class SimpleQuartzFactory implements StartupFactory {
 
-    public final static QName JOB
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "job");
+    public final static QName TASK = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "task");
 
     private final static QName SIMPLE
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "simpletrigger");
@@ -67,7 +66,7 @@ public class SimpleQuartzFactory implements StartupFactory {
     public Startup createStartup(OMElement el) {
         if (log.isDebugEnabled())
             log.debug("Creating SimpleQuartz startup");
-        if (el.getQName().equals(JOB)) {
+        if (el.getQName().equals(TASK)) {
             SimpleQuartz q = new SimpleQuartz();
             OMAttribute classAttr = el.getAttribute(new QName("class"));
             if (classAttr == null) {
@@ -75,18 +74,18 @@ public class SimpleQuartzFactory implements StartupFactory {
                 throw new SynapseException(
                         "Cannot create Quartz Startup - no class attribute");
             }
-            // test if we can create the job?
+            // test if we can create the task?
             String classname = classAttr.getAttributeValue();
 
-            // if no package specified then prepend "org.apache.synapse.startup.jobs"
+            // if no package specified then prepend "org.apache.synapse.startup.tasks"
             if (classname.indexOf('.') == -1) {
-                classname = "org.apache.synapse.startup.jobs." + classname;
+                classname = "org.apache.synapse.startup.tasks." + classname;
             }
             try {
                 getClass().getClassLoader().loadClass(classname).newInstance();
             }
             catch (Exception e) {
-                throw new SynapseException("Failed to load job class " + classname, e);
+                throw new SynapseException("Failed to load task class " + classname, e);
             }
             q.setJobClass(classname);
             // next sort out the property children
@@ -101,7 +100,7 @@ public class SimpleQuartzFactory implements StartupFactory {
 
                 } else {
                     throw new SynapseException(
-                            "job does not support dynamic properties");
+                            "Task does not support dynamic properties");
                 }
             }
 
@@ -183,7 +182,7 @@ public class SimpleQuartzFactory implements StartupFactory {
     }
 
     public QName getTagQName() {
-        return JOB;
+        return TASK;
     }
 
 }

@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.startup.jobs;
+package org.apache.synapse.startup.tasks;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.addressing.EndpointReference;
@@ -26,13 +26,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.startup.Job;
+import org.apache.synapse.startup.Task;
 import org.apache.synapse.util.PayloadHelper;
 
 /**
  * Injects a Message in to the Synapse environment
  */
-public class MessageInjector implements Job, ManagedLifecycle {
+public class MessageInjector implements Task, ManagedLifecycle {
 
     /**
      * Holds the logger for logging purposes
@@ -48,6 +48,8 @@ public class MessageInjector implements Job, ManagedLifecycle {
      * Holds the to address for the message to be injected
      */
     private String to = null;
+
+    private String soapAction = null;
 
     /**
      * Holds the SynapseEnv to which the message will be injected
@@ -85,6 +87,10 @@ public class MessageInjector implements Job, ManagedLifecycle {
 		to = url;
 	}
 
+    public void setSoapAction(String soapAction) {
+        this.soapAction = soapAction;
+    }
+
     /**
      * This will be invoked by the schedular to inject the message
      * in to the SynapseEnvironment
@@ -105,10 +111,13 @@ public class MessageInjector implements Job, ManagedLifecycle {
 			return;
 
 		}
-		MessageContext mc = synapseEnvironment.createMessageContext();
-		mc.setTo(new EndpointReference(to));
-		PayloadHelper.setXMLPayload(mc, message.cloneOMElement());
-		synapseEnvironment.injectMessage(mc);
+        MessageContext mc = synapseEnvironment.createMessageContext();
+        mc.setTo(new EndpointReference(to));
+        PayloadHelper.setXMLPayload(mc, message.cloneOMElement());
+        if (soapAction != null) {
+            mc.setSoapAction(soapAction);
+        }
+        synapseEnvironment.injectMessage(mc);
 
 	}
 

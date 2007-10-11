@@ -37,7 +37,7 @@ public class ThrottleMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testThrottleMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<throttle:throttle xmlns:throttle=\"http://ws.apache.org/ns/synapse/throttle\" xmlns=\"http://ws.apache.org/ns/synapse\" >" +
+        String inputXml = "<throttle:throttle id=\"A\" xmlns:throttle=\"http://ws.apache.org/ns/synapse/throttle\" xmlns=\"http://ws.apache.org/ns/synapse\" >" +
                 "<policy key=\"thottleKey\"/></throttle:throttle>";
         assertTrue(serialization(inputXml, throttleMediatorFactory, throttleMediatorSerializer));
         assertTrue(serialization(inputXml, throttleMediatorSerializer));

@@ -21,7 +21,9 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -31,8 +33,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.MediatorWorker;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.util.UUIDGenerator;
@@ -191,8 +193,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         org.apache.axis2.context.MessageContext axis2MC
                 = new org.apache.axis2.context.MessageContext();
         axis2MC.setConfigurationContext(this.configContext);
-        axis2MC.setServiceContext(new ServiceContext());
-//        axis2MC.setOperationContext(new OperationContext());
+
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MC.setServiceContext(svcCtx);
+        axis2MC.setOperationContext(opCtx);
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
         mc.setMessageID(UUIDGenerator.getUUID());
         try {

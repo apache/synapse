@@ -29,7 +29,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.startup.AbstractStartup;
 import org.quartz.CronTrigger;
@@ -68,7 +67,7 @@ public class SimpleQuartz extends AbstractStartup {
     Set xmlProperties = new HashSet();
 
     public QName getTagQName() {
-        return SimpleQuartzFactory.JOB;
+        return SimpleQuartzFactory.TASK;
     }
 
     public void destroy() {
@@ -103,7 +102,7 @@ public class SimpleQuartz extends AbstractStartup {
             trigger.setVolatility(true);
             JobDetail jobDetail = new JobDetail();
             // Give the job a random name
-            jobDetail.setName("Job" + String.valueOf((new Random()).nextLong()));
+            jobDetail.setName(name);
             jobDetail.setGroup("synapse.simple.quartz");
             jobDetail.setJobClass(SimpleQuartzJob.class);
             JobDataMap jdm = new JobDataMap();

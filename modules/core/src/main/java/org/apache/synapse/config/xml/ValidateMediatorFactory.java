@@ -37,7 +37,7 @@ import java.util.List;
  * <p/>
  * <validate [source="xpath"]>
  *   <schema key="string">+
- *   <property name="<validation-feature-id>" value="true|false"/> *
+ *   <property name="<validation-feature-name>" value="true|false"/>
  *   <on-fail>
  *     mediator+
  *   </on-fail>

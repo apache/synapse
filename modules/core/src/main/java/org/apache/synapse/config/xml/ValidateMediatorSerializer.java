@@ -20,8 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -32,7 +30,7 @@ import java.util.List;
 /**
  * <validate [source="xpath"]>
  *   <schema key="string">+
- *   <property name="<validation-feature-id>" value="true|false"/> *
+ *   <property name="<validation-feature-name>" value="true|false"/>
  *   <on-fail>
  *     mediator+
  *   </on-fail>

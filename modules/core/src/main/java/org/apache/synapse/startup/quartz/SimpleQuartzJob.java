@@ -14,36 +14,36 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class SimpleQuartzJob implements Job{
+public class SimpleQuartzJob implements Job {
 	public static final String SYNAPSEENVIRONMENT= "SynapseEnvironment", CLASSNAME="ClassName", PROPERTIES = "Properties";
 	private static final Log log = LogFactory.getLog(SimpleQuartzJob.class);
 	public void execute(JobExecutionContext ctx) throws JobExecutionException {
-		log.debug("executing job "+ctx.getJobDetail().getFullName());
+		log.debug("executing task "+ctx.getJobDetail().getFullName());
 		JobDataMap jdm = ctx.getMergedJobDataMap();
 		String jobClassName = (String)jdm.get(CLASSNAME);
 		if (jobClassName==null) {
 			throw new JobExecutionException("No "+CLASSNAME+" in JobDetails");
 		}
-		org.apache.synapse.startup.Job job =null;
+		org.apache.synapse.startup.Task task =null;
 		try {
-			job = (org.apache.synapse.startup.Job)getClass().getClassLoader().loadClass(jobClassName).newInstance();
+			task = (org.apache.synapse.startup.Task)getClass().getClassLoader().loadClass(jobClassName).newInstance();
 		} catch (Exception e) {
-			throw new JobExecutionException("Cannot instantiate job "+jobClassName, e);
+			throw new JobExecutionException("Cannot instantiate task "+jobClassName, e);
 		}
 		Set properties = (Set)jdm.get(PROPERTIES);
 		Iterator it = properties.iterator();
 		while (it.hasNext()) {
 			OMElement prop = (OMElement)it.next();
 			log.debug("found Property"+prop.toString());
-			PropertyHelper.setStaticProperty(prop, job);
+			PropertyHelper.setStaticProperty(prop, task);
 		}
 		SynapseEnvironment se = (SynapseEnvironment)jdm.get("SynapseEnvironment");
-		if (job instanceof ManagedLifecycle) {
+		if (task instanceof ManagedLifecycle) {
 			if (se!=null) {
-				((ManagedLifecycle)job).init(se); 
+				((ManagedLifecycle) task).init(se);
 			}
 		}
-		job.execute();
+		task.execute();
 		
 	}
 

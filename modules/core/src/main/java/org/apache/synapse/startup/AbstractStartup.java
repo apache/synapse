@@ -27,26 +27,26 @@ import org.apache.synapse.Startup;
 public abstract class AbstractStartup implements Startup {
 
     /**
-     * Holds the id of a Startup
+     * Holds the name of a Startup
      */
-    private String id = null;
+    protected String name = null;
 
     /**
-     * This will return the id of the startup
+     * This will return the name of the startup
      *
-     * @return String representing the id
+     * @return String representing the name
      */
-    public String getId() {
-        return this.id;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * This will set the id of a Startup
+     * This will set the name of a Startup
      *
-     * @param id
-     *          String id to be set to the startup
+     * @param name
+     *          String name to be set to the startup
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
     }
 }

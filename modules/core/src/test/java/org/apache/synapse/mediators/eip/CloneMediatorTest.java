@@ -46,10 +46,14 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
         clone.mediate(testCtx);
         Thread.sleep(1000);
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
-        assertEquals(mediatedCtx.getSoapAction(), "urn:clone");
+        String formerSAction = mediatedCtx.getSoapAction();
         mediatedCtx = helperMediator.getMediatedContext(1);
-        assertEquals(mediatedCtx.getSoapAction(), "urn:test");
-        assertEquals(mediatedCtx.getTo().getAddress(), "http://test");
+        if ("urn:clone".equals(formerSAction)) {
+            assertEquals(mediatedCtx.getSoapAction(), "urn:test");
+            assertEquals(mediatedCtx.getTo().getAddress(), "http://test");
+        } else {
+            assertEquals(mediatedCtx.getSoapAction(), "urn:clone");
+        }
     }
 
     public void testClonningWithContinueParent() throws Exception {
@@ -58,13 +62,17 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"));
         assertTrue(clone.mediate(testCtx));
-        Thread.sleep(1000);        
+        Thread.sleep(1000);
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertTrue(mediatedCtx.getEnvelope().getBody().getFirstElement() == null);
-        assertEquals(mediatedCtx.getSoapAction(), "urn:clone");
+        String formerSAction = mediatedCtx.getSoapAction();
         mediatedCtx = helperMediator.getMediatedContext(1);
-        assertEquals(mediatedCtx.getSoapAction(), "urn:test");
-        assertEquals(mediatedCtx.getTo().getAddress(), "http://test");
+        if ("urn:clone".equals(formerSAction)) {
+            assertEquals(mediatedCtx.getSoapAction(), "urn:test");
+            assertEquals(mediatedCtx.getTo().getAddress(), "http://test");
+        } else {
+            assertEquals(mediatedCtx.getSoapAction(), "urn:clone");
+        }
         assertEquals(testCtx.getSoapAction(), "urn:test");
         assertTrue(testCtx.getEnvelope().getBody().getFirstElement() != null);
         assertEquals(testCtx.getTo(), null);

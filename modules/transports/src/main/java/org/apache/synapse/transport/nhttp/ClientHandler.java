@@ -42,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -313,8 +315,11 @@ public class ClientHandler implements NHttpClientHandler {
                     responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
                     responseMsgCtx.setTo(null);
 
-                    responseMsgCtx.setEnvelope(
-                        ((SOAPFactory)outMsgCtx.getEnvelope().getOMFactory()).getDefaultEnvelope());
+                    if (!outMsgCtx.isDoingREST() && !outMsgCtx.isSOAP11()) {
+                        responseMsgCtx.setEnvelope(new SOAP12Factory().getDefaultEnvelope());
+                    } else {
+                        responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                    }
                     responseMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
                     responseMsgCtx.setProperty(NhttpConstants.SC_ACCEPTED, Boolean.TRUE);
                     mr.receive(responseMsgCtx);

@@ -28,12 +28,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.Queue;
-import javax.jms.Topic;
+import javax.jms.*;
 import javax.xml.namespace.QName;
 
 /**
@@ -86,6 +81,9 @@ public class JMSMessageReceiver implements MessageListener {
                 sb.append("\nCorrelation ID : " + message.getJMSCorrelationID());
                 sb.append("\nReplyTo ID : " + message.getJMSReplyTo());
                 log.debug(sb.toString());
+                if (log.isTraceEnabled() && message instanceof TextMessage) {
+                    log.trace("\nMessage : " + ((TextMessage) message).getText());    
+                }
             }
         } catch (JMSException e) {
             if (log.isDebugEnabled()) {
@@ -164,6 +162,7 @@ public class JMSMessageReceiver implements MessageListener {
                     AxisOperation operation = service.getOperation(operationQName);
                     if (operation != null) {
                         msgContext.setAxisOperation(operation);
+                        msgContext.setSoapAction("urn:" + operation.getName().getLocalPart());
                     }
                 }
 

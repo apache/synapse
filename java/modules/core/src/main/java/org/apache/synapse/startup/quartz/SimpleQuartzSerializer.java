@@ -45,7 +45,7 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         OMNamespace nullNS = fac.createOMNamespace("", "");
         OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
 
-        OMElement job = fac.createOMElement("job", synNS, parent);
+        OMElement job = fac.createOMElement("task", synNS, parent);
         job.addAttribute("class", sq.getJobClass(), nullNS);
 
         if (sq.isSimple()) {

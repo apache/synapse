@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.*;
 import org.apache.commons.logging.Log;
@@ -73,8 +72,7 @@ public class StartupFinder {
             try {
                 sf = (StartupFactory) b.newInstance();
             } catch (Exception e) {
-                throw new SynapseException("cannot instantiate " + b.getName(),
-                        e);
+                throw new SynapseException("cannot instantiate " + b.getName(), e);
 
             }
             factoryMap.put(sf.getTagQName(), b);
@@ -126,8 +124,8 @@ public class StartupFinder {
      */
     public Startup getStartup(OMElement element) {
 
-        String id = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "id"));
-        if (id == null) {
+        String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        if (name == null) {
             String msg = "Id for an startup is required, missing Id in the startup";
             if (log.isDebugEnabled()) {
                 log.debug(msg);
@@ -135,7 +133,7 @@ public class StartupFinder {
             throw new SynapseException(msg);
         }
 
-        QName qName = element.getFirstElement().getQName();
+        QName qName = element.getQName();
         if (log.isDebugEnabled()) {
             log.debug("getStartup(" + qName + ")");
         }
@@ -150,8 +148,8 @@ public class StartupFinder {
 
         try {
             StartupFactory sf = (StartupFactory) cls.newInstance();
-            Startup startup = sf.createStartup(element.getFirstElement());
-            startup.setId(id);
+            Startup startup = sf.createStartup(element);
+            startup.setName(name);
             return startup;
 
         } catch (InstantiationException e) {
@@ -191,7 +189,7 @@ public class StartupFinder {
             OMFactory fac = OMAbstractFactory.getOMFactory();
             OMElement startupElement = fac.createOMElement(
                     "startup", fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn"));
-            startupElement.addAttribute("id", startup.getId(), fac.createOMNamespace("", ""));
+            startupElement.addAttribute("name", startup.getName(), fac.createOMNamespace("", ""));
             StartupSerializer ss = (StartupSerializer) cls.newInstance();
             ss.serializeStartup(startupElement, startup);
             if (parent != null) {
@@ -233,7 +231,7 @@ public class StartupFinder {
      * @param om
      * @return
      */
-    public Object getObjectFromOMNode(OMNode om) {
+    public Startup getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
             return getStartup((OMElement) om);
         } else {

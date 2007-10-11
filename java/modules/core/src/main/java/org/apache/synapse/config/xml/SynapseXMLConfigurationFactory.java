@@ -82,7 +82,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineProxy(config, elt);
                 } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
                     defineRegistry(config, elt);
-                } else if (XMLConfigConstants.STARTUP_ELT.equals(elt.getQName())) {
+                } else if (XMLConfigConstants.TASK_ELT.equals(elt.getQName())) {
                     defineStartup(config, elt);
                 } else {
                     Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
@@ -136,8 +136,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     private static void defineStartup(SynapseConfiguration config, OMElement elem) {
         Startup startup = StartupFinder.getInstance().getStartup(elem);
-        if (config.getStartup(startup.getId()) != null) {
-            handleException("Duplicate startup with id : " + startup.getId());
+        if (config.getStartup(startup.getName()) != null) {
+            handleException("Duplicate startup with name : " + startup.getName());
         }
         config.addStartup(startup);
     }

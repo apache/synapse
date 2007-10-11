@@ -679,6 +679,22 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.caching</groupId>
+            <artifactId>wso2caching-core</artifactId>
+            <version>${wso2caching.version}</version>
+            <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.neethi</groupId>
+                    <artifactId>neethi</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- dependencies for Rampart -->
         <dependency>
@@ -997,6 +1013,7 @@
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>
+        <wso2caching.version>SNAPSHOT</wso2caching.version>
         <spring.version>1.2.6</spring.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta1</bsf.version>

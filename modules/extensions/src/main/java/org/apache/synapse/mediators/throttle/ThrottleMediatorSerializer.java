@@ -24,10 +24,10 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.SequenceMediatorSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
  * The Serializer for Throttle Mediator  saving throttle instance
@@ -60,6 +60,13 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
         saveTracingState(throttle, throttleMediator);
+
+        String id = throttleMediator.getID();
+        if(id != null){
+            throttle.addAttribute(fac.createOMAttribute(
+                    "id", nullNS, id));
+        }
+        
         String onReject = throttleMediator.getOnReject();
         if (onReject != null) {
             throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONREJECT, nullNS, onReject));

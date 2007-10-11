@@ -18,6 +18,7 @@
   -->
 <definitions xmlns="http://ws.apache.org/ns/synapse"
              xmlns:throttle="http://ws.apache.org/ns/synapse/throttle">
+    
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
         <parameter name="root">file:./../../repository/</parameter>
@@ -29,16 +30,6 @@
     <localEntry key="thottlePolicy"
                 src="file:./repository/conf/sample/resources/policy/throttle_policy.xml"/>
 
-    <sequence name="main">
-        <in>
-            <throttle:throttle onReject="onRejectSequence" onAccept="onAcceptSequence">
-                <policy key="thottlePolicy"/>
-            </throttle:throttle>
-        </in>
-        <out>
-            <send/>
-        </out>
-    </sequence>
     <sequence name="onAcceptSequence">
         <log level="custom">
             <property name="text" value="**Access Accept**"/>
@@ -49,7 +40,7 @@
             </endpoint>
         </send>
     </sequence>
-    <sequence name="onRejectSequence">
+    <sequence name="onRejectSequence" trace="enable">
         <log level="custom">
             <property name="text" value="**Access Denied**"/>
         </log>
@@ -59,8 +50,23 @@
             <reason value="**Access Denied**"/>
         </makefault>
         <property name="RESPONSE" value="true"/>
-        <header name="To" expression="get-property('ReplyTo')"/>
+        <header name="To" action="remove"/>
+        <throttle:throttle id="A"/>
         <send/>
         <drop/>
     </sequence>
+    <proxy name="StockQuoteProxy">
+        <target>
+             <inSequence>
+                <throttle:throttle onReject="onRejectSequence" onAccept="onAcceptSequence" id="A">
+                    <policy key="thottlePolicy"/>
+                </throttle:throttle>
+            </inSequence>
+            <outSequence>
+                <throttle:throttle id="A"/>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
 </definitions>

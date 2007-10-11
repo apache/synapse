@@ -21,11 +21,8 @@ package org.apache.synapse.endpoints.dispatch;
 
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMElement;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.AxisFault;
 
 import javax.xml.namespace.QName;
 import java.util.HashMap;

@@ -34,16 +34,16 @@ public interface Startup extends ManagedLifecycle {
     public abstract QName getTagQName();
 
     /**
-     * This will return the id of the startup
+     * This will return the name of the startup
      *
-     * @return String representing the id
+     * @return String representing the name
      */
-    public String getId();
+    public String getName();
 
     /**
-     * This will set the id of a Startup
+     * This will set the name of a Startup
      *
-     * @param id String id to be set to the startup
+     * @param id String name to be set to the startup
      */
-    public void setId(String id);
+    public void setName(String id);
 }

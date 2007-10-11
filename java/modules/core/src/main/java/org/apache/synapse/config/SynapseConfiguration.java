@@ -602,11 +602,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Get the Startup with the specified id
+     * Get the Startup with the specified name
      * 
      * @param id  
-     *          String id of the startup to be retrieved
-     * @return Startup object with the specified id or null
+     *          String name of the startup to be retrieved
+     * @return Startup object with the specified name or null
      */
     public Startup getStartup(String id) {
         return (Startup) startups.get(id);
@@ -619,7 +619,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *              Startup object to be added 
      */
     public void addStartup(Startup startup) {
-        startups.put(startup.getId(), startup);
+        startups.put(startup.getName(), startup);
     }
 
     /**

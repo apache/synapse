@@ -46,6 +46,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.util.UUIDGenerator;
+import org.apache.synapse.util.MessageHelper;
 import org.apache.axiom.attachments.Attachments;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -255,42 +256,9 @@ public class Axis2FlexibleMEPClient {
    }
 
     private static MessageContext cloneForSend(MessageContext ori) throws AxisFault {
-        MessageContext newMC = new MessageContext();
 
-        // do not copy options from the original
-        newMC.setConfigurationContext(ori.getConfigurationContext());
-        newMC.setMessageID(UUIDGenerator.getUUID());
-        newMC.setTo(ori.getTo());
-        newMC.setSoapAction(ori.getSoapAction());
+        MessageContext newMC = MessageHelper.clonePartially(ori);
 
-        newMC.setProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING,
-                ori.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING));
-        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
-                ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM));
-        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA,
-                ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
-
-        newMC.setDoingREST(ori.isDoingREST());
-        newMC.setDoingMTOM(ori.isDoingMTOM());
-        newMC.setDoingSwA(ori.isDoingSwA());
-
-        // if the original request carries any attachments, copy them to the clone
-        // as well, except for the soap part if any
-        Attachments attachments = ori.getAttachmentMap();
-        if (attachments != null && attachments.getAllContentIDs().length > 0) {
-            String[] cIDs = attachments.getAllContentIDs();
-            String soapPart = attachments.getSOAPPartContentID();
-            for (int i=0; i<cIDs.length; i++) {
-                if (!cIDs[i].equals(soapPart)) {
-                    newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
-                }
-            }
-        }
-
-        newMC.setServerSide(false);
-
-        // set SOAP envelope on the message context, removing WS-A headers
-        newMC.setEnvelope(ori.getEnvelope());
         removeAddressingHeaders(newMC);
 
         // pass any transport headers on the original request

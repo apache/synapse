@@ -87,11 +87,8 @@ public class MessageHelper {
     public static org.apache.axis2.context.MessageContext cloneAxis2MessageContext(
         org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
-        org.apache.axis2.context.MessageContext newMC =
-            new org.apache.axis2.context.MessageContext();
+        org.apache.axis2.context.MessageContext newMC = clonePartially(mc);
 
-        // do not copy options from the original todo: Y?
-        newMC.setConfigurationContext(mc.getConfigurationContext());
         newMC.setServiceContext(mc.getServiceContext());
         newMC.setOperationContext(mc.getOperationContext());
         newMC.setAxisMessage(mc.getAxisMessage());
@@ -99,40 +96,6 @@ public class MessageHelper {
             newMC.getAxisMessage().setParent(mc.getAxisOperation());
         }
         newMC.setAxisService(mc.getAxisService());
-        newMC.setMessageID(UUIDGenerator.getUUID());
-        newMC.setTo(mc.getTo());
-        newMC.setSoapAction(mc.getSoapAction());
-
-        // copying behavioral attributes from the original message
-        newMC.setProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING,
-            mc.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING));
-        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
-            mc.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM));
-        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA,
-            mc.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
-
-        // todo: isnt this duplicate with the above
-        newMC.setDoingREST(mc.isDoingREST());
-        newMC.setDoingMTOM(mc.isDoingMTOM());
-        newMC.setDoingSwA(mc.isDoingSwA());
-
-        // if the original request carries any attachments, copy them to the clone
-        // as well, except for the soap part if any
-        Attachments attachments = mc.getAttachmentMap();
-        if (attachments != null && attachments.getAllContentIDs().length > 0) {
-            String[] cIDs = attachments.getAllContentIDs();
-            String soapPart = attachments.getSOAPPartContentID();
-            for (int i = 0; i < cIDs.length; i++) {
-                if (!cIDs[i].equals(soapPart)) {
-                    newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
-                }
-            }
-        }
-
-        newMC.setServerSide(false);
-
-        // attaching the cloned envelope to the new message context
-        newMC.setEnvelope(cloneSOAPEnvelope(mc.getEnvelope()));
 
         // copying transport related parts from the original
         newMC.setTransportIn(mc.getTransportIn());
@@ -148,6 +111,50 @@ public class MessageHelper {
             String key = (String) iter.next();
             newMC.setProperty(key, mc.getProperty(key));
         }
+
+        return newMC;
+    }
+
+    public static org.apache.axis2.context.MessageContext clonePartially(
+        org.apache.axis2.context.MessageContext ori) throws AxisFault {
+
+        org.apache.axis2.context.MessageContext newMC
+            = new org.apache.axis2.context.MessageContext();
+        
+        // do not copy options from the original
+        newMC.setConfigurationContext(ori.getConfigurationContext());
+        newMC.setMessageID(UUIDGenerator.getUUID());
+        newMC.setTo(ori.getTo());
+        newMC.setSoapAction(ori.getSoapAction());
+
+        newMC.setProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING,
+                ori.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING));
+        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM));
+        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA,
+                ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
+
+        newMC.setDoingREST(ori.isDoingREST());
+        newMC.setDoingMTOM(ori.isDoingMTOM());
+        newMC.setDoingSwA(ori.isDoingSwA());
+
+        // if the original request carries any attachments, copy them to the clone
+        // as well, except for the soap part if any
+        Attachments attachments = ori.getAttachmentMap();
+        if (attachments != null && attachments.getAllContentIDs().length > 0) {
+            String[] cIDs = attachments.getAllContentIDs();
+            String soapPart = attachments.getSOAPPartContentID();
+            for (int i=0; i<cIDs.length; i++) {
+                if (!cIDs[i].equals(soapPart)) {
+                    newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
+                }
+            }
+        }
+
+        newMC.setServerSide(false);
+
+        // set SOAP envelope on the message context, removing WS-A headers
+        newMC.setEnvelope(cloneSOAPEnvelope(ori.getEnvelope()));
 
         return newMC;
     }

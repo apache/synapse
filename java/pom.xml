@@ -666,7 +666,7 @@
         <dependency>
             <groupId>org.wso2.throttle</groupId>
             <artifactId>wso2throttle</artifactId>
-            <version>${wso2commons.version}</version>
+            <version>SNAPSHOT</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>

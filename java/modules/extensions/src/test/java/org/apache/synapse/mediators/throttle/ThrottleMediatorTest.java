@@ -54,6 +54,7 @@ public class ThrottleMediatorTest extends TestCase {
     private static final String POLICY = " <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\"\n" +
             "                xmlns:throttle=\"http://www.wso2.org/products/wso2commons/throttle\">\n" +
             "        <throttle:ThrottleAssertion>\n" +
+            "            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\n" +           
             "            <wsp:All>\n" +
             "                <throttle:ID throttle:type=\"IP\">Other</throttle:ID>\n" +
             "                <wsp:ExactlyOne>\n" +
@@ -297,7 +298,7 @@ public class ThrottleMediatorTest extends TestCase {
 
             try {
                 throttle = ThrottlePolicyProcessor
-                        .processPoclicy(PolicyEngine.getPolicy(policyOmElement));
+                        .processPolicy(PolicyEngine.getPolicy(policyOmElement));
             }
             catch (ThrottleException e) {
 

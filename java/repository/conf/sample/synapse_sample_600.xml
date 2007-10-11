@@ -20,12 +20,13 @@
              xmlns:throttle="http://ws.apache.org/ns/synapse/throttle">
     <sequence name="main">
         <in>
-            <throttle:throttle>
+            <throttle:throttle id="A">
                 <policy>
                     <!-- define throttle policy -->
                     <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
                                 xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle">
                         <throttle:ThrottleAssertion>
+                            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>
                             <wsp:All>
                                 <throttle:ID throttle:type="IP">Other</throttle:ID>
                                 <wsp:ExactlyOne>
@@ -93,13 +94,15 @@
                         <reason value="**Access Denied**"/>
                     </makefault>
                     <property name="RESPONSE" value="true"/>
-                    <header name="To" expression="get-property('ReplyTo')"/>
+                    <header name="To" action="remove"/>
+                    <throttle:throttle id="A"/>
                     <send/>
                     <drop/>
                 </onReject>
             </throttle:throttle>
         </in>
         <out>
+            <throttle:throttle id="A"/>
             <send/>
         </out>
     </sequence>

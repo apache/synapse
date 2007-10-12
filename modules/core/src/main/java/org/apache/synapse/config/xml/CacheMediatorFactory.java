@@ -112,7 +112,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
             if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
                 cache.setOnCacheHitRef(sequenceAttr.getAttributeValue());
             } else {
-                cache.setOnCacheHit(
+                cache.setOnCacheHitSequence(
                     new SequenceMediatorFactory().createAnonymousSequence(onCacheHitElem));
             }
         }

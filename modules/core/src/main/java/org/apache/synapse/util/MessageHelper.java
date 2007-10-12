@@ -88,7 +88,8 @@ public class MessageHelper {
         org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         org.apache.axis2.context.MessageContext newMC = clonePartially(mc);
-
+        newMC.setEnvelope(cloneSOAPEnvelope(cloneSOAPEnvelope(mc.getEnvelope())));
+        
         newMC.setServiceContext(mc.getServiceContext());
         newMC.setOperationContext(mc.getOperationContext());
         newMC.setAxisMessage(mc.getAxisMessage());
@@ -152,9 +153,6 @@ public class MessageHelper {
         }
 
         newMC.setServerSide(false);
-
-        // set SOAP envelope on the message context, removing WS-A headers
-        newMC.setEnvelope(cloneSOAPEnvelope(ori.getEnvelope()));
 
         return newMC;
     }

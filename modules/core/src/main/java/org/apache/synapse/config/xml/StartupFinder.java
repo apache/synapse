@@ -126,7 +126,7 @@ public class StartupFinder {
 
         String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name == null) {
-            String msg = "Id for an startup is required, missing Id in the startup";
+            String msg = "Name for an startup is required, missing name in the startup";
             if (log.isDebugEnabled()) {
                 log.debug(msg);
             }

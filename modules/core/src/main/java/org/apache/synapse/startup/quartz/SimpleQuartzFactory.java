@@ -33,148 +33,109 @@ import org.apache.synapse.config.xml.StartupFactory;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
 
-/*
- * Namespace = synapse namespace
- * 
- *  &lt;task class="org.my.synapse.Task">
- *  &lt;property name="stringProp" value="String"/>
- *  &lt;property name="xmlProp">
- *  %lt;somexml>config</somexml>
- *  &lt;/property>
- *  &lt;simpletrigger forever="true" count="10" interval="1000"/> 
- *  &lt;!-- forever or count not both -->
- *  &lt;crontrigger expression="0 * 1 * * ?" />
- *  &lt;/task>
- * 
+/**
+ * &lt;task class="org.my.synapse.Task" name="string"&gt;
+ *  &lt;property name="stringProp" value="String"/&gt;
+ *  &lt;property name="xmlProp"&gt;
+ *   &lt;somexml&gt;config&lt;/somexml&gt;
+ *  &lt;/property&gt;
+ *  &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"])/&gt;
+ * &lt;/task&gt;
  */
-
 public class SimpleQuartzFactory implements StartupFactory {
 
-    public final static QName TASK = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "task");
+    public final static QName TASK
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "task");
 
-    private final static QName SIMPLE
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "simpletrigger");
-
-    private final static QName CRON
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "crontrigger");
+    private final static QName TRIGGER
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "trigger");
 
     private final static QName PROPERTY
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
 
     private final static Log log = LogFactory.getLog(SimpleQuartzFactory.class);
 
     public Startup createStartup(OMElement el) {
-        if (log.isDebugEnabled())
+        
+        if (log.isDebugEnabled()) {
             log.debug("Creating SimpleQuartz startup");
+        }
+        
         if (el.getQName().equals(TASK)) {
+            
             SimpleQuartz q = new SimpleQuartz();
+
+            // set the task class
             OMAttribute classAttr = el.getAttribute(new QName("class"));
-            if (classAttr == null) {
-                log.error("No class attribute on element. It is required");
-                throw new SynapseException(
-                        "Cannot create Quartz Startup - no class attribute");
+            if (classAttr != null && classAttr.getAttributeValue() != null) {
+                String classname = classAttr.getAttributeValue();
+                try {
+                    Class.forName(classname).newInstance();
+                } catch (Exception e) {
+                    handleException("Failed to load task class " + classname, e);
+                }
+                q.setJobClass(classname);
+            } else {
+                handleException("Syntax error in the Task : no task class specified");
             }
-            // test if we can create the task?
-            String classname = classAttr.getAttributeValue();
 
-            // if no package specified then prepend "org.apache.synapse.startup.tasks"
-            if (classname.indexOf('.') == -1) {
-                classname = "org.apache.synapse.startup.tasks." + classname;
-            }
-            try {
-                getClass().getClassLoader().loadClass(classname).newInstance();
-            }
-            catch (Exception e) {
-                throw new SynapseException("Failed to load task class " + classname, e);
-            }
-            q.setJobClass(classname);
             // next sort out the property children
-
             Iterator it = el.getChildrenWithName(PROPERTY);
             while (it.hasNext()) {
-                // simply store the properties for now -
-                // they will be loaded when the job is actually run
                 OMElement prop = (OMElement) it.next();
                 if (PropertyHelper.isStaticProperty(prop)) {
                     q.addProperty(prop);
-
                 } else {
-                    throw new SynapseException(
-                            "Task does not support dynamic properties");
+                    handleException("Tasks does not support dynamic properties");
                 }
             }
 
-            /* try to handle the simpletrigger approach */
-            OMElement trigger = el.getFirstChildWithName(SIMPLE);
+            // setting the trigger to the task
+            OMElement trigger = el.getFirstChildWithName(TRIGGER);
             if (trigger != null) {
-                q.setSimple(true);
-                OMAttribute repeatInterval = trigger.getAttribute(new QName(
-                        "interval"));
-                if (repeatInterval == null) {
-                    log.error("interval attribute must be specified");
-                    throw new SynapseException(
-                            "No interval attribute specified");
-                }
-                try {
-                    q.setInterval(Long.parseLong(repeatInterval
-                            .getAttributeValue()));
-                } catch (Exception e) {
-                    throw new SynapseException(
-                            "Failed to parse interval as long");
-                }
-                OMAttribute count = trigger.getAttribute(new QName("count"));
-                if (count == null) {
-                    // if no count set then forever must be set and set to true
-                    OMAttribute forever = trigger.getAttribute(new QName(
-                            "forever"));
 
-                    if (forever != null) {
-                        String fValue = forever.getAttributeValue();
-                        if (fValue.toLowerCase().charAt(0) == 't'
-                                || fValue.toLowerCase().charAt(0) == '1') {
-                            q.setCount(-1);
-                        } else {
-                            throw new SynapseException(
-                                    "count must be set or forever='true'");
-                        }
-                    } else {
-                        throw new SynapseException(
-                                "count must be set or forever='true'");
-                    }
-                } // else count is set
-                else {
+                OMAttribute count = trigger.getAttribute(new QName("count"));
+                if (count != null) {
                     try {
                         q.setCount(Integer.parseInt(count.getAttributeValue()));
                     } catch (Exception e) {
-                        throw new SynapseException(
-                                "Failed to parse count as integer");
+                        handleException("Failed to parse trigger count as an integer", e);
                     }
                 }
 
-            } else // should be cron trigger
-            {
-                trigger = el.getFirstChildWithName(CRON);
-                if (trigger == null) {
-                    log.error("neither cron nor simpletrigger are set");
-                    throw new SynapseException(
-                            "neither crontrigger nor simpletrigger child elements exist");
+                OMAttribute repeatInterval = trigger.getAttribute(new QName("interval"));
+                if (repeatInterval == null && q.getCount() > 0) {
+                    handleException("Trigger seems to be " +
+                        "a simple trigger, but no interval specified");
+                } else if (repeatInterval != null && repeatInterval.getAttributeValue() != null) {
+                    try {
+                        q.setInterval(Long.parseLong(repeatInterval.getAttributeValue()));
+                    } catch (Exception e) {
+                        handleException("Failed to parse trigger interval as a long value", e);
+                    }
                 }
-                q.setSimple(false); // cron trigger
-                OMAttribute expr = trigger.getAttribute(new QName("expression"));
-                if (expr == null) {
-                    log.error("crontrigger element must have expression attribute");
-                    throw new SynapseException(
-                            "crontrigger element must have expression attribute");
+
+                OMAttribute expr = trigger.getAttribute(new QName("cron"));
+                if (expr == null && q.getInterval() == 0) {
+                    handleException("Trigger syntax error : " +
+                        "trigger do not caontain simple nor cron trigger attributes");
+                } else if (expr != null && q.getInterval() > 0) {
+                    handleException("Trigger syntax error : " +
+                        "both cron and simple trigger attributes are present");
+                } else if (expr != null && expr.getAttributeValue() != null) {
+                    q.setCron(expr.getAttributeValue());
                 }
-                q.setCron(expr.getAttributeValue());
+
+            } else {
+                handleException("Trigger is missing for the task "
+                    + el.getAttributeValue(new QName("name")));
             }
 
             return q;
         } else {
-            log.error("wrong QName!");
+            handleException("Syntax error in the task : wrong QName for the task");
             return null;
         }
-
     }
 
     public Class getSerializerClass() {
@@ -183,6 +144,16 @@ public class SimpleQuartzFactory implements StartupFactory {
 
     public QName getTagQName() {
         return TASK;
+    }
+
+    private void handleException(String message, Exception e) {
+        log.error(message);
+        throw new SynapseException(message, e);
+    }
+
+    private void handleException(String message) {
+        log.error(message);
+        throw new SynapseException(message);
     }
 
 }

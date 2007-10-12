@@ -48,7 +48,7 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
             traceOrDebug(traceOn, "Start : In mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

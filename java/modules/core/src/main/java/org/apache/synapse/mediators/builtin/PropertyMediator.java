@@ -74,7 +74,7 @@ public class PropertyMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Property mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

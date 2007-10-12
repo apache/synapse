@@ -57,7 +57,7 @@ public class SendMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Send mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

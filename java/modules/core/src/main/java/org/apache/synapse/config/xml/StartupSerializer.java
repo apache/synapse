@@ -31,10 +31,9 @@ public interface StartupSerializer {
      * Serializes the Startup to an OMElement and
      * attaches as a child to the provided parent OMElement
      *
-     * @param parent
-     *              OMElement to which, serialized startup will be attached
-     * @param startup
-     *              Startup to be serialized
+     * @param parent  - OMElement to which, serialized startup will be attached
+     * @param startup - Startup to be serialized
+     * @return Serialized OMElement
      */
-    public void serializeStartup(OMElement parent, Startup startup);
+    public OMElement serializeStartup(OMElement parent, Startup startup);
 }

@@ -19,21 +19,28 @@
 
 package org.apache.synapse.startup.quartz;
 
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.config.xml.StartupSerializer;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.StartupSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+
+import javax.xml.namespace.QName;
 
 public class SimpleQuartzSerializer implements StartupSerializer {
 
-    public void serializeStartup(OMElement parent, Startup s) {
+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
+    protected static final OMNamespace synNS
+        = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS
+        = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+    protected static final QName PROP_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property", "syn");
+
+    public OMElement serializeStartup(OMElement parent, Startup s) {
 
         if (!(s instanceof SimpleQuartz)) {
             throw new SynapseException("called SimpleQuartzSerializer on some other " +
@@ -41,32 +48,30 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         }
 
         SimpleQuartz sq = (SimpleQuartz) s;
-        OMFactory fac = parent.getOMFactory();
-        OMNamespace nullNS = fac.createOMNamespace("", "");
-        OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
 
         OMElement job = fac.createOMElement("task", synNS, parent);
         job.addAttribute("class", sq.getJobClass(), nullNS);
 
-        if (sq.isSimple()) {
-            OMElement el = fac.createOMElement("simpletrigger", synNS, job);
-            if (sq.getCount() == -1) {
-                el.addAttribute("forever", "true", nullNS);
-            } else {
-                el.addAttribute("count", Integer.toString(sq.getCount()), nullNS);
-            }
+
+        OMElement el = fac.createOMElement("trigger", synNS, job);
+        if (sq.getCount() != -1) {
+            el.addAttribute("count", Integer.toString(sq.getCount()), nullNS);
+        }
+        
+        if (sq.getInterval() != 0) {
             el.addAttribute("interval", Long.toString(sq.getInterval()), nullNS);
-        } else {
-            OMElement el = fac.createOMElement("crontrigger", synNS, job);
-            el.addAttribute("expression", sq.getCron(), nullNS);
         }
 
-        Iterator it = sq.getProperties().iterator();
-        while (it.hasNext()) {
-            OMElement prop = (OMElement) it.next();
+        if (sq.getCron() != null) {
+            el.addAttribute("cron", sq.getCron(), nullNS);
+        }
+        
+        for (Object o : sq.getProperties()) {
+            OMElement prop = (OMElement) o;
             job.addChild(prop.cloneOMElement());
         }
 
+        return job;
     }
 
 }

@@ -61,13 +61,13 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
         }
         saveTracingState(throttle, throttleMediator);
 
-        String id = throttleMediator.getID();
+        String id = throttleMediator.getId();
         if(id != null){
             throttle.addAttribute(fac.createOMAttribute(
                     "id", nullNS, id));
         }
         
-        String onReject = throttleMediator.getOnReject();
+        String onReject = throttleMediator.getOnRejectSeqKey();
         if (onReject != null) {
             throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONREJECT, nullNS, onReject));
         } else {
@@ -80,7 +80,7 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
                 throttle.addChild(element);
             }
         }
-        String onAccept = throttleMediator.getOnAccept();
+        String onAccept = throttleMediator.getOnAcceptSeqKey();
         if (onAccept != null) {
             throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONACCEPT, nullNS, onAccept));
         } else {

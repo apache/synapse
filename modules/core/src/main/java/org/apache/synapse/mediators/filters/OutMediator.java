@@ -48,7 +48,7 @@ public class OutMediator extends AbstractListMediator implements org.apache.syna
             traceOrDebug(traceOn, "Start : Out mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

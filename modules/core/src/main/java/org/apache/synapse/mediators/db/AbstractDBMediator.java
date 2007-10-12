@@ -88,7 +88,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             traceOrDebug(traceOn, "Start : " + name + " mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

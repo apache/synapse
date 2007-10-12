@@ -84,7 +84,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             traceOrDebug(traceOn, "Start : Address Endpoint");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

@@ -169,7 +169,7 @@ public class XSLTMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : XSLT mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

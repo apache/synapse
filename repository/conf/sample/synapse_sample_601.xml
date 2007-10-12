@@ -18,55 +18,91 @@
   -->
 <definitions xmlns="http://ws.apache.org/ns/synapse"
              xmlns:throttle="http://ws.apache.org/ns/synapse/throttle">
-    
-    <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
-        <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
-        <parameter name="root">file:./../../repository/</parameter>
-        <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
-        <parameter name="cachableDuration">15000</parameter>
-    </registry>
-
-
-    <localEntry key="thottlePolicy"
-                src="file:./repository/conf/sample/resources/policy/throttle_policy.xml"/>
-
-    <sequence name="onAcceptSequence">
-        <log level="custom">
-            <property name="text" value="**Access Accept**"/>
-        </log>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
+    <sequence name="main">
+        <in>
+            <throttle:throttle id="A">
+                <policy>
+                    <!-- define throttle policy -->
+                    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle">
+                        <throttle:ThrottleAssertion>
+                            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>
+                            <wsp:All>
+                                <throttle:ID throttle:type="IP">Other</throttle:ID>
+                                <wsp:ExactlyOne>
+                                    <wsp:All>
+                                        <throttle:MaximumCount>4</throttle:MaximumCount>
+                                        <throttle:UnitTime>800000</throttle:UnitTime>
+                                        <throttle:ProhibitTimePeriod wsp:Optional="true">10000</throttle:ProhibitTimePeriod>
+                                    </wsp:All>
+                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                </wsp:ExactlyOne>
+                            </wsp:All>
+                            <wsp:All>
+                                <throttle:ID throttle:type="IP">192.168.8.200-192.168.8.222</throttle:ID>
+                                <wsp:ExactlyOne>
+                                    <wsp:All>
+                                        <throttle:MaximumCount>8</throttle:MaximumCount>
+                                        <throttle:UnitTime>800000</throttle:UnitTime>
+                                        <throttle:ProhibitTimePeriod wsp:Optional="true">10</throttle:ProhibitTimePeriod>
+                                    </wsp:All>
+                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                </wsp:ExactlyOne>
+                            </wsp:All>
+                            <wsp:All>
+                                <throttle:ID throttle:type="IP">192.168.8.201</throttle:ID>
+                                <wsp:ExactlyOne>
+                                    <wsp:All>
+                                        <throttle:MaximumCount>200</throttle:MaximumCount>
+                                        <throttle:UnitTime>600000</throttle:UnitTime>
+                                        <throttle:ProhibitTimePeriod wsp:Optional="true"></throttle:ProhibitTimePeriod>
+                                    </wsp:All>
+                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                </wsp:ExactlyOne>
+                            </wsp:All>
+                            <wsp:All>
+                                <throttle:ID throttle:type="IP">192.168.8.198</throttle:ID>
+                                <wsp:ExactlyOne>
+                                    <wsp:All>
+                                        <throttle:MaximumCount>50</throttle:MaximumCount>
+                                        <throttle:UnitTime>500000</throttle:UnitTime>
+                                        <throttle:ProhibitTimePeriod wsp:Optional="true"></throttle:ProhibitTimePeriod>
+                                    </wsp:All>
+                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                </wsp:ExactlyOne>
+                            </wsp:All>
+                        </throttle:ThrottleAssertion>
+                    </wsp:Policy>
+                </policy>
+                <onAccept>
+                    <log level="custom">
+                        <property name="text" value="**Access Accept**"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </onAccept>
+                <onReject>
+                    <log level="custom">
+                        <property name="text" value="**Access Denied**"/>
+                    </log>
+                    <makefault>
+                        <code value="tns:Receiver"
+                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+                        <reason value="**Access Denied**"/>
+                    </makefault>
+                    <property name="RESPONSE" value="true"/>
+                    <header name="To" action="remove"/>
+                    <send/>
+                    <drop/>
+                </onReject>
+            </throttle:throttle>
+        </in>
+        <out>
+            <throttle:throttle id="A"/>
+            <send/>
+        </out>
     </sequence>
-    <sequence name="onRejectSequence" trace="enable">
-        <log level="custom">
-            <property name="text" value="**Access Denied**"/>
-        </log>
-        <makefault>
-            <code value="tns:Receiver"
-                  xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-            <reason value="**Access Denied**"/>
-        </makefault>
-        <property name="RESPONSE" value="true"/>
-        <header name="To" action="remove"/>
-        <throttle:throttle id="A"/>
-        <send/>
-        <drop/>
-    </sequence>
-    <proxy name="StockQuoteProxy">
-        <target>
-             <inSequence>
-                <throttle:throttle onReject="onRejectSequence" onAccept="onAcceptSequence" id="A">
-                    <policy key="thottlePolicy"/>
-                </throttle:throttle>
-            </inSequence>
-            <outSequence>
-                <throttle:throttle id="A"/>
-                <send/>
-            </outSequence>
-        </target>
-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-    </proxy>
 </definitions>

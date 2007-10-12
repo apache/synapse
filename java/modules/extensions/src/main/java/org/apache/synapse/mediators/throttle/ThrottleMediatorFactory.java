@@ -71,7 +71,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
 
         String id = elem.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "id"));
         if (id != null) {
-            throttleMediator.setID(id.trim());
+            throttleMediator.setId(id.trim());
         }
 
         SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
@@ -80,7 +80,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
         if (onReject != null) {
             String onRejectValue = onReject.getAttributeValue();
             if (onRejectValue != null) {
-                throttleMediator.setOnReject(onRejectValue.trim());
+                throttleMediator.setOnRejectSeqKey(onRejectValue.trim());
             }
         } else {
             OMElement onRejectMediatorElement = elem.getFirstChildWithName(
@@ -95,7 +95,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
         if (onAccept != null) {
             String onAcceptValue = onAccept.getAttributeValue();
             if (onAcceptValue != null) {
-                throttleMediator.setOnAccept(onAcceptValue);
+                throttleMediator.setOnAcceptSeqKey(onAcceptValue);
             }
         } else {
             OMElement onAcceptMediatorElement = elem.getFirstChildWithName(

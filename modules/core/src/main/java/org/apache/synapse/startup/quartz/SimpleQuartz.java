@@ -54,11 +54,9 @@ public class SimpleQuartz extends AbstractStartup {
 
     private String cron;
 
-    private int repeatCount;
+    private int repeatCount = -1;
 
     private long repeatInterval;
-
-    private boolean simple; // true means use repeat, false means use cron
 
     private String className;
 
@@ -84,12 +82,10 @@ public class SimpleQuartz extends AbstractStartup {
     public void init(SynapseEnvironment synapseEnvironment) {
 
         try {
-            DirectSchedulerFactory.getInstance().createVolatileScheduler(
-                    THREADPOOLSIZE);
+            DirectSchedulerFactory.getInstance().createVolatileScheduler(THREADPOOLSIZE);
             sch = DirectSchedulerFactory.getInstance().getScheduler();
             Trigger trigger = null;
-            if (simple) {
-
+            if (cron == null) {
                 trigger = TriggerUtils.makeImmediateTrigger(repeatCount, repeatInterval);
             } else {
                 CronTrigger cronTrig = new CronTrigger();
@@ -101,7 +97,7 @@ public class SimpleQuartz extends AbstractStartup {
             trigger.setGroup("synapse.simple.quartz");
             trigger.setVolatility(true);
             JobDetail jobDetail = new JobDetail();
-            // Give the job a random name
+            // Give the job a name
             jobDetail.setName(name);
             jobDetail.setGroup("synapse.simple.quartz");
             jobDetail.setJobClass(SimpleQuartzJob.class);
@@ -127,14 +123,6 @@ public class SimpleQuartz extends AbstractStartup {
     public void setJobClass(String attributeValue) {
         className = attributeValue;
 
-    }
-
-    public void setSimple(boolean b) {
-        simple = b;
-    }
-
-    public boolean isSimple() {
-        return simple;
     }
 
     public void setInterval(long l) {

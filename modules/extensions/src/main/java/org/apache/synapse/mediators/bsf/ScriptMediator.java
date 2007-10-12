@@ -151,7 +151,7 @@ public class ScriptMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Script mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

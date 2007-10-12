@@ -56,7 +56,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
             traceOrDebug(traceOn, "Start : Filter mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

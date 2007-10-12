@@ -61,7 +61,7 @@ public class RMSequenceMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : RMSequence mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

@@ -61,7 +61,7 @@ public class CacheMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Cache mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

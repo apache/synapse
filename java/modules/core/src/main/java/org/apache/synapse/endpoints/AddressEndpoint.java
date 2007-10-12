@@ -151,7 +151,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             traceOrDebug(traceOn, "Start : Address Endpoint");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope().getEnvelope());
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

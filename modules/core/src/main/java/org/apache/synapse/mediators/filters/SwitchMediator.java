@@ -59,7 +59,7 @@ public class SwitchMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Switch mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

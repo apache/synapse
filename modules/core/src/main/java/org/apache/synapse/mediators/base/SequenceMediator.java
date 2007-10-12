@@ -76,7 +76,7 @@ public class SequenceMediator extends AbstractListMediator {
             traceOrDebug(traceOn, "Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -137,7 +137,7 @@ public class SequenceMediator extends AbstractListMediator {
 
                 if (traceOrDebugOn) {
                     if (traceOn && trace.isTraceEnabled()) {
-                        trace.trace("Message : " + synCtx);
+                        trace.trace("Message : " + synCtx.getEnvelope());
                     }
 
                     traceOrDebug(traceOn,

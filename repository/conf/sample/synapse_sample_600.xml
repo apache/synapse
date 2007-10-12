@@ -26,51 +26,7 @@
                     <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
                                 xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle">
                         <throttle:ThrottleAssertion>
-                            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>
-                            <wsp:All>
-                                <throttle:ID throttle:type="IP">Other</throttle:ID>
-                                <wsp:ExactlyOne>
-                                    <wsp:All>
-                                        <throttle:MaximumCount>4</throttle:MaximumCount>
-                                        <throttle:UnitTime>800000</throttle:UnitTime>
-                                        <throttle:ProhibitTimePeriod wsp:Optional="true">10000</throttle:ProhibitTimePeriod>
-                                    </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                </wsp:ExactlyOne>
-                            </wsp:All>
-                            <wsp:All>
-                                <throttle:ID throttle:type="IP">192.168.8.200-192.168.8.222</throttle:ID>
-                                <wsp:ExactlyOne>
-                                    <wsp:All>
-                                        <throttle:MaximumCount>8</throttle:MaximumCount>
-                                        <throttle:UnitTime>800000</throttle:UnitTime>
-                                        <throttle:ProhibitTimePeriod wsp:Optional="true">10</throttle:ProhibitTimePeriod>
-                                    </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                </wsp:ExactlyOne>
-                            </wsp:All>
-                            <wsp:All>
-                                <throttle:ID throttle:type="IP">192.168.8.201</throttle:ID>
-                                <wsp:ExactlyOne>
-                                    <wsp:All>
-                                        <throttle:MaximumCount>200</throttle:MaximumCount>
-                                        <throttle:UnitTime>600000</throttle:UnitTime>
-                                        <throttle:ProhibitTimePeriod wsp:Optional="true"></throttle:ProhibitTimePeriod>
-                                    </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                </wsp:ExactlyOne>
-                            </wsp:All>
-                            <wsp:All>
-                                <throttle:ID throttle:type="IP">192.168.8.198</throttle:ID>
-                                <wsp:ExactlyOne>
-                                    <wsp:All>
-                                        <throttle:MaximumCount>50</throttle:MaximumCount>
-                                        <throttle:UnitTime>500000</throttle:UnitTime>
-                                        <throttle:ProhibitTimePeriod wsp:Optional="true"></throttle:ProhibitTimePeriod>
-                                    </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                </wsp:ExactlyOne>
-                            </wsp:All>
+                            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>                            
                         </throttle:ThrottleAssertion>
                     </wsp:Policy>
                 </policy>
@@ -95,7 +51,6 @@
                     </makefault>
                     <property name="RESPONSE" value="true"/>
                     <header name="To" action="remove"/>
-                    <throttle:throttle id="A"/>
                     <send/>
                     <drop/>
                 </onReject>

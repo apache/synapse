@@ -66,7 +66,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
             traceOrDebug(traceOn, "Start : Class mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

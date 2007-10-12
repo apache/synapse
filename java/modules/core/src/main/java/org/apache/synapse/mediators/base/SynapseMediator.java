@@ -53,7 +53,7 @@ public class SynapseMediator extends AbstractListMediator {
                 "' sequence Message is a : " + (synCtx.isResponse() ? "response" : "request"));
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -77,7 +77,7 @@ public class SynapseMediator extends AbstractListMediator {
 
         if (traceOrDebugOn) {
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
             traceOrDebug(traceOn, "End : Mediation using '" +
                 SynapseConstants.MAIN_SEQUENCE_KEY + "' sequence");

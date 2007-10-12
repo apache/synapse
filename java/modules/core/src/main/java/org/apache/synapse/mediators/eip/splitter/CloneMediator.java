@@ -64,7 +64,7 @@ public class CloneMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Clone mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

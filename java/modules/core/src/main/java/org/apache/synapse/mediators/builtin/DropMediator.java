@@ -46,7 +46,7 @@ public class DropMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Start : Drop mediator");
 
             if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx);
+                trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 

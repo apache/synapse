@@ -67,10 +67,10 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
             onCacheHit.addAttribute(
                 fac.createOMAttribute("sequence", nullNS, mediator.getOnCacheHitRef()));
             cache.addChild(onCacheHit);
-        } else if (mediator.getOnCacheHit() != null) {
+        } else if (mediator.getOnCacheHitSequence() != null) {
             OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
             new SequenceMediatorSerializer().serializeChildren(
-                onCacheHit, mediator.getOnCacheHit().getList());
+                onCacheHit, mediator.getOnCacheHitSequence().getList());
             cache.addChild(onCacheHit);
         }
 

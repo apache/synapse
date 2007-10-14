@@ -90,6 +90,10 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
             cache.addChild(implElem);
         }
 
+        if (parent != null) {
+            parent.addChild(cache);
+        }
+
         return cache;
     }
 

@@ -130,7 +130,7 @@ public class Axis2FlexibleMEPClient {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }
                 if(axisOutMsgCtx.isSOAP11() != true) {
-                    SOAPUtils.convertSoapVersion(axisOutMsgCtx, org.apache.axis2.namespace.Constants.URI_SOAP11_ENV);
+                    SOAPUtils.convertSOAP12toSOAP11(axisOutMsgCtx);
                 }
                 
             } else if (SynapseConstants.FORMAT_SOAP12.equals(endpoint.getFormat())) {
@@ -139,7 +139,7 @@ public class Axis2FlexibleMEPClient {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }
                 if(axisOutMsgCtx.isSOAP11() == true) {
-                    SOAPUtils.convertSoapVersion(axisOutMsgCtx, org.apache.axis2.namespace.Constants.URI_SOAP12_ENV);
+                    SOAPUtils.convertSOAP11toSOAP12(axisOutMsgCtx);
                 }                
                 
             }

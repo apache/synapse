@@ -166,4 +166,8 @@ public class ServerManager {
             }
         }
     }
+
+    public ConfigurationContext getConfigurationContext() {
+        return configctx;
+    }
 }

@@ -39,14 +39,13 @@ import java.io.IOException;
 public class SynapseStartUpServlet extends HttpServlet {
 
     private static Log log = LogFactory.getLog(SynapseStartUpServlet.class);
-    private final ServerManager serverManager  = ServerManager.getInstance();
 
     public void init() throws ServletException {
         super.init();
     }
 
     public void init(ServletConfig servletConfig) throws ServletException {
-
+        ServerManager serverManager = ServerManager.getInstance();
         ServletContext servletContext = servletConfig.getServletContext();
         if ("true".equals(servletContext.getAttribute("hasAlreadyInit"))) {
             return;
@@ -62,26 +61,26 @@ public class SynapseStartUpServlet extends HttpServlet {
             String axis2Repo = System.getProperty(org.apache.axis2.Constants.AXIS2_REPO);
             if (axis2Repo == null) {
                 ServerManager.axis2Repolocation = synapseHome + "/WEB-INF" +
-                                                  File.separator + "repository";
+                    File.separator + "repository";
                 System.setProperty(org.apache.axis2.Constants.AXIS2_REPO,
-                                   synapseHome + "/WEB-INF" +
-                                   File.separator + "repository");
+                    synapseHome + "/WEB-INF" +
+                        File.separator + "repository");
             }
             //setting axis2 configuration location
             String axis2Xml = System.getProperty(org.apache.axis2.Constants.AXIS2_CONF);
             if (axis2Xml == null) {
                 System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
-                                   synapseHome + File.separator
-                                   + "WEB-INF/conf"
-                                   + File.separator + org.apache.axis2.Constants.AXIS2_CONF);
+                    synapseHome + File.separator
+                        + "WEB-INF/conf"
+                        + File.separator + org.apache.axis2.Constants.AXIS2_CONF);
             }
             //setting synapse configuration location
             String synapseXml = System.getProperty(org.apache.synapse.SynapseConstants.SYNAPSE_XML);
             if (synapseXml == null) {
                 System.setProperty(org.apache.synapse.SynapseConstants.SYNAPSE_XML,
-                                   synapseHome + File.separator
-                                   + "WEB-INF/conf"
-                                   + File.separator + org.apache.synapse.SynapseConstants.SYNAPSE_XML);
+                    synapseHome + File.separator
+                        + "WEB-INF/conf"
+                        + File.separator + org.apache.synapse.SynapseConstants.SYNAPSE_XML);
 
             }
         } else {
@@ -95,19 +94,18 @@ public class SynapseStartUpServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException,
-                                                              IOException {
+        IOException {
     }
 
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException,
-                                                               IOException {
+        IOException {
     }
 
     public void destroy() {
         try {
-            if (serverManager != null) {
-                serverManager.stop(); // will stop all started  listeners
-            }
+            ServerManager serverManager = ServerManager.getInstance();
+            serverManager.stop(); // will stop all started  listeners
         } catch (Exception ignored) {
         }
     }

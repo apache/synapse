@@ -52,18 +52,19 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         OMElement job = fac.createOMElement("task", synNS, parent);
         job.addAttribute("class", sq.getJobClass(), nullNS);
 
-
         OMElement el = fac.createOMElement("trigger", synNS, job);
-        if (sq.getCount() != -1) {
-            el.addAttribute("count", Integer.toString(sq.getCount()), nullNS);
-        }
-        
-        if (sq.getInterval() != 0) {
-            el.addAttribute("interval", Long.toString(sq.getInterval()), nullNS);
-        }
-
-        if (sq.getCron() != null) {
+        if (sq.getInterval() == 1 && sq.getCount() == 1) {
+            el.addAttribute("once", "true", nullNS);
+        } else if (sq.getCron() != null) {
             el.addAttribute("cron", sq.getCron(), nullNS);
+        } else {
+            if (sq.getCount() != -1) {
+                el.addAttribute("count", Integer.toString(sq.getCount()), nullNS);
+            }
+
+            if (sq.getInterval() != 0) {
+                el.addAttribute("interval", Long.toString(sq.getInterval()), nullNS);
+            }
         }
         
         for (Object o : sq.getProperties()) {

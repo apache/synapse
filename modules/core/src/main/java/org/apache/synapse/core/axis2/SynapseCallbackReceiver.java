@@ -128,7 +128,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             } else {
                 // TODO invoke a generic synapse error handler for this message
                 log.warn("Synapse received a response for the request with message Id : " +
-                        messageID + " But a callback has not been registered to process this response");
+                    messageID + " But a callback has not been registered to process this response");
             }
 
         } else if (!messageCtx.isPropertyTrue(NhttpConstants.SC_ACCEPTED)){
@@ -147,7 +147,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      * @throws AxisFault 
      */
     private void handleMessage(MessageContext response,
-                               org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
+        org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
 
         Object o = response.getProperty(NhttpConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
@@ -164,9 +164,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         if (e == null) {
                             e = new Exception(fault.toString());
                         }
-                        // set an error code to the message context, so that error sequences can filter
-                        // using that property to determine the cause of error
-                        synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.SENDING_FAULT);
+                        // set an error code to the message context, so that error sequences can
+                        // filter using that property to determine the cause of error
+                        synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_CODE,
+                            SynapseConstants.SENDING_FAULT);
                         SOAPFaultReason faultReason = fault.getReason();
                         if (faultReason != null) {
                             synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
@@ -182,7 +183,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             // there can always be only one instance of an Endpoint in the faultStack of a message
             // if the send was successful, so remove it before we proceed any further
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
-            if (faultStack !=null && !faultStack.isEmpty() && faultStack.peek() instanceof Endpoint) {
+            if (faultStack !=null && !faultStack.isEmpty()
+                && faultStack.peek() instanceof Endpoint) {
                 faultStack.pop();
             }
             if (log.isDebugEnabled()) {
@@ -243,9 +245,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             // if they are different change to original version 
             if(axisOutMsgCtx.isSOAP11() != response.isSOAP11()) {
             	if(axisOutMsgCtx.isSOAP11()) {
-            		SOAPUtils.convertSoapVersion(response, org.apache.axis2.namespace.Constants.URI_SOAP11_ENV);
+            		SOAPUtils.convertSOAP12toSOAP11(response);
             	} else {
-            		SOAPUtils.convertSoapVersion(response, org.apache.axis2.namespace.Constants.URI_SOAP12_ENV);
+            		SOAPUtils.convertSOAP11toSOAP12(response);
             	}
             }
 

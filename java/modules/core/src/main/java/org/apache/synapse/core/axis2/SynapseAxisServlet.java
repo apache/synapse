@@ -24,6 +24,7 @@ import org.apache.axis2.transport.http.AxisServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *Extends axis2 servlet functionality so that  avoid  starting listeners again
@@ -45,5 +46,9 @@ public class SynapseAxisServlet extends AxisServlet {
         servletContext.setAttribute(this.getClass().getName(), this);
         this.servletConfig = config;
         initParams();
+    }
+
+    public void initContextRoot(HttpServletRequest req) {
+        this.configContext.setContextRoot("/");
     }
 }

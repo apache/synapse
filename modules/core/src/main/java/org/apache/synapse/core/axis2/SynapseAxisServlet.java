@@ -20,6 +20,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.http.AxisServlet;
+import org.apache.synapse.ServerManager;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -27,7 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- *Extends axis2 servlet functionality so that  avoid  starting listeners again
+ * Extends axis2 servlet functionality so that  avoid  starting listeners again
  */
 
 public class SynapseAxisServlet extends AxisServlet {
@@ -35,13 +36,13 @@ public class SynapseAxisServlet extends AxisServlet {
 
     /**
      * Overrides init method so that avoid  starting listeners again
+     *
      * @param config
      * @throws ServletException
      */
     public void init(ServletConfig config) throws ServletException {
         ServletContext servletContext = config.getServletContext();
-        this.configContext =
-                (ConfigurationContext) servletContext.getAttribute(CONFIGURATION_CONTEXT);
+        this.configContext = ServerManager.getInstance().getConfigurationContext();
         this.axisConfiguration = this.configContext.getAxisConfiguration();
         servletContext.setAttribute(this.getClass().getName(), this);
         this.servletConfig = config;

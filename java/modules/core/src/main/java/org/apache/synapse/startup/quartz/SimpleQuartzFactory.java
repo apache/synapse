@@ -103,8 +103,14 @@ public class SimpleQuartzFactory implements StartupFactory {
                     }
                 }
 
+                OMAttribute once = trigger.getAttribute(new QName("once"));
+                if (once != null && Boolean.TRUE.toString().equals(once.getAttributeValue())) {
+                    q.setCount(1);
+                    q.setInterval(1);
+                }
+
                 OMAttribute repeatInterval = trigger.getAttribute(new QName("interval"));
-                if (repeatInterval == null && q.getCount() > 0) {
+                if (repeatInterval == null && q.getCount() > 1) {
                     handleException("Trigger seems to be " +
                         "a simple trigger, but no interval specified");
                 } else if (repeatInterval != null && repeatInterval.getAttributeValue() != null) {
@@ -117,8 +123,8 @@ public class SimpleQuartzFactory implements StartupFactory {
 
                 OMAttribute expr = trigger.getAttribute(new QName("cron"));
                 if (expr == null && q.getInterval() == 0) {
-                    handleException("Trigger syntax error : " +
-                        "trigger do not caontain simple nor cron trigger attributes");
+                    q.setCount(1);
+                    q.setInterval(1);
                 } else if (expr != null && q.getInterval() > 0) {
                     handleException("Trigger syntax error : " +
                         "both cron and simple trigger attributes are present");
@@ -127,8 +133,8 @@ public class SimpleQuartzFactory implements StartupFactory {
                 }
 
             } else {
-                handleException("Trigger is missing for the task "
-                    + el.getAttributeValue(new QName("name")));
+                q.setCount(1);
+                q.setInterval(1);
             }
 
             return q;

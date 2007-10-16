@@ -280,8 +280,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
                     o = registry.getResource(entry);
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("Will not  evaluate the value of the remote entry,  because" +
-                                " the registry is not available");
+                        log.debug("Will not  evaluate the value of the remote entry with a key "
+                            + key + ",  because the registry is not available");
                     }
                     return null; // otherwise will return an entry with a value null
                     // (method expects return  a value not an entry )

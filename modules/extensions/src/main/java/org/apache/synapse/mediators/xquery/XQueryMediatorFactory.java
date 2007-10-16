@@ -56,7 +56,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(XQueryMediatorFactory.class);
 
     private static final QName TAG_NAME
-        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE + "/xquery", "xquery");
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "xquery");
     public static final QName ATT_NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
     public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
     public static final QName ATT_EXPR_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");

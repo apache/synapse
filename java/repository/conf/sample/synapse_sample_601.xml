@@ -16,11 +16,10 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<definitions xmlns="http://ws.apache.org/ns/synapse"
-             xmlns:throttle="http://ws.apache.org/ns/synapse/throttle">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
     <sequence name="main">
         <in>
-            <throttle:throttle id="A">
+            <throttle id="A">
                 <policy>
                     <!-- define throttle policy -->
                     <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
@@ -98,10 +97,10 @@
                     <send/>
                     <drop/>
                 </onReject>
-            </throttle:throttle>
+            </throttle>
         </in>
         <out>
-            <throttle:throttle id="A"/>
+            <throttle id="A"/>
             <send/>
         </out>
     </sequence>

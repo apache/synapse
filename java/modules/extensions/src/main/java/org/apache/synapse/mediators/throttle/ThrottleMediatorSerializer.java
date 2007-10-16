@@ -38,14 +38,14 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
     private static final Log log = LogFactory.getLog(ThrottleMediatorSerializer.class);
 
     private static final OMNamespace throttleNS
-            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE + "/throttle", "throttle");
+            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "throttle");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
         if (!(m instanceof ThrottleMediator)) {
             handleException("Invalid Mediator has passed to serializer");
         }
         ThrottleMediator throttleMediator = (ThrottleMediator) m;
-        OMElement throttle = fac.createOMElement("throttle", throttleNS);
+        OMElement throttle = fac.createOMElement("throttle", synNS);
         OMElement policy = fac.createOMElement("policy", synNS);
         String key = throttleMediator.getPolicyKey();
         if (key != null) {

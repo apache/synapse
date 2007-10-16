@@ -190,7 +190,7 @@ public class XQueryMediator extends AbstractMediator {
                     || (cachedConnection != null && cachedConnection.isClosed())) {
                     //get the Connection to XML DataBase
                     if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Creating a connection from XQDataSource ");
+                        traceOrDebug(traceOn, "Creating a connection from the XQDataSource ");
                     }
                     cachedConnection = cachedXQDataSource.getConnection();
                 }
@@ -229,7 +229,7 @@ public class XQueryMediator extends AbstractMediator {
                         //if the value has changed or need binding because the expression has recreated
                         if (hasValueChanged || needBind) {
                             //Binds the external variable to the DynamicContext
-                            bindVariable(cachedPreparedExpression, variable);
+                            bindVariable(cachedPreparedExpression, variable,traceOrDebugOn, traceOn);
                         }
                     }
                 }
@@ -321,13 +321,24 @@ public class XQueryMediator extends AbstractMediator {
      * @param xqDynamicContext The Dynamic Context  to which the variable will be binded
      * @param variable         The variable which contains the name and vaule for binding
      * @throws XQException throws if any error occurs when binding the variable
+     * @param traceOrDebugOn is tracing or debbug on
+     * @param traceOn        indicate whether trace is ON or OF
      */
-    private void bindVariable(XQDynamicContext xqDynamicContext, MediatorVariable variable) throws XQException {
+    private void bindVariable(XQDynamicContext xqDynamicContext, MediatorVariable variable, boolean traceOrDebugOn, boolean traceOn) throws XQException {
+
         if (variable != null) {
+
             QName name = variable.getName();
             int type = variable.getType();
             Object value = variable.getValue();
+
             if (value != null && type != -1) {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Binding a variable to the DynamicContext with a name : "
+                        + name + " and a value : " + value);
+                }
+
                 switch (type) {
                     //Binding the basic type As-Is and XML element as an InputSource
                     case(XQItemType.XQBASETYPE_BOOLEAN): {

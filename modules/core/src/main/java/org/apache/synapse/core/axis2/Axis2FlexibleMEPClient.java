@@ -242,6 +242,8 @@ public class Axis2FlexibleMEPClient {
                 // can detect timed out callbacks and take approprite action.
                 callback.setTimeOutOn(System.currentTimeMillis() + endpoint.getTimeoutDuration());
                 callback.setTimeOutAction(endpoint.getTimeoutAction());
+            } else {
+                callback.setTimeOutOn(System.currentTimeMillis());
             }
             mepClient.setCallback(callback);
         }

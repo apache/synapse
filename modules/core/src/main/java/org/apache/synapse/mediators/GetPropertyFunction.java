@@ -164,12 +164,7 @@ public class GetPropertyFunction implements Function {
                     return messageID;
                 }
             } else {
-                Object result = synCtx.getProperty(key);
-                if (result != null) {
-                    return result;
-                } else {
-                    return synCtx.getEntry(key);
-                }
+                return synCtx.getProperty(key);
             }
 
         } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)

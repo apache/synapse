@@ -22,6 +22,7 @@ package org.apache.synapse.startup.quartz;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.Date;
 
 import javax.xml.namespace.QName;
 
@@ -30,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.startup.AbstractStartup;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -86,7 +88,11 @@ public class SimpleQuartz extends AbstractStartup {
             sch = DirectSchedulerFactory.getInstance().getScheduler();
             Trigger trigger = null;
             if (cron == null) {
-                trigger = TriggerUtils.makeImmediateTrigger(repeatCount, repeatInterval);
+                if (repeatCount >= 0) {
+                    trigger = TriggerUtils.makeImmediateTrigger(repeatCount - 1, repeatInterval);
+                } else {
+                    trigger = TriggerUtils.makeImmediateTrigger(-1, repeatInterval);
+                }
             } else {
                 CronTrigger cronTrig = new CronTrigger();
                 cronTrig.setCronExpression(cron);

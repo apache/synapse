@@ -195,10 +195,10 @@ public class XQueryMediator extends AbstractMediator {
                                     queryKey);
                     }
                     if (log.isDebugEnabled()) {
-                        log.debug("Prepare an expression for the query " + querySource);
+                        log.debug("Prepare an expression for the query ");
                     }
                     if (shouldTrace) {
-                        trace.trace("Prepare an expression for the query " + querySource);
+                        trace.trace("Prepare an expression for the query ");
                     }
                     //create an XQPreparedExpression using the query source
                     cachedPreparedExpression = cachedConnection.prepareExpression(querySource);

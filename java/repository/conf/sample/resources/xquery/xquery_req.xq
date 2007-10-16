@@ -1,5 +1,5 @@
 <x><![CDATA[
-  declare namespace m0="http://www.apache-synapse.org/test";
+  declare namespace m0="http://services.samples/xsd";
   declare variable $payload as document-node() external;
   <m:getQuote xmlns:m="http://services.samples/xsd">
     <m:request>

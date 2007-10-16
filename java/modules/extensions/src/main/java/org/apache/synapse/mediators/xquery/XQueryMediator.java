@@ -108,28 +108,37 @@ public class XQueryMediator extends AbstractMediator {
 
     /**
      * Performs the query and attached the result to the target Node
-     * @param synCtx  The current message
-     * @return  true always
+     *
+     * @param synCtx The current message
+     * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
+
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("XQuery mediator mediate()");
+
+            boolean traceOn = isTraceOn(synCtx);
+            boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Start : XQuery mediator");
+
+                if (traceOn && trace.isTraceEnabled()) {
+                    trace.trace("Message : " + synCtx.getEnvelope());
+                }
+                traceOrDebug(traceOn, "Performing XQuery using query resource with key : " + queryKey);
             }
-            boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-            if (shouldTrace) {
-                trace.trace("Start : XQuery mediator");
+
+            // perform the xquery
+            performQuery(synCtx, traceOrDebugOn, traceOn);
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "End : XQuery mediator");
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Performing XQuery using query resource with key : " + queryKey);
-            }
-            performQuery(synCtx, shouldTrace);
-            if (shouldTrace) {
-                trace.trace("Start : XQuery mediator");
-            }
+
             return true;
+
         } catch (Exception e) {
-            handleException("Unable to do the query ", e);
+            handleException("Unable to execute the query " + querySource, e);
         }
         return false;
     }
@@ -137,13 +146,16 @@ public class XQueryMediator extends AbstractMediator {
     /**
      * Perform the quering and get the result and attached to the target node
      *
-     * @param synCtx      The current MessageContext
-     * @param shouldTrace is need to trace ?
+     * @param synCtx         The current MessageContext
+     * @param traceOrDebugOn is tracing or debbug on
+     * @param traceOn        indicate whether trace is ON or OFF
      */
-    private void performQuery(MessageContext synCtx, boolean shouldTrace) {
+    private void performQuery(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+
         boolean reLoad = false;
         boolean needBind = false;
-        XQResultSequence resultSequence ;
+        XQResultSequence resultSequence;
+
         Entry dp = synCtx.getConfiguration().getEntryDefinition(queryKey);
         // if the queryKey refers to a dynamic resource
         if (dp != null && dp.isDynamic()) {
@@ -151,15 +163,18 @@ public class XQueryMediator extends AbstractMediator {
                 reLoad = true;
             }
         }
+
         try {
             synchronized (resourceLock) {
+
+                //creating data source
                 if (cachedXQDataSource == null) {
                     // A factory for XQConnection  objects
                     cachedXQDataSource = new SaxonXQDataSource();
                     //setting up the properties to the XQDataSource
                     if (dataSourceProperties != null && !dataSourceProperties.isEmpty()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Setting up properties to the XQDataSource");
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Setting up properties to the XQDataSource");
                         }
                         for (int i = 0; i < dataSourceProperties.size(); i++) {
                             MediatorProperty prop = (MediatorProperty) dataSourceProperties.get(i);
@@ -169,14 +184,18 @@ public class XQueryMediator extends AbstractMediator {
                         }
                     }
                 }
+
+                //creating connection
                 if (cachedConnection == null
                     || (cachedConnection != null && cachedConnection.isClosed())) {
                     //get the Connection to XML DataBase
-                    if (log.isDebugEnabled()) {
-                        log.debug("Creating a connection ");
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Creating a connection from XQDataSource ");
                     }
                     cachedConnection = cachedXQDataSource.getConnection();
                 }
+
+                // prepare the expression to execute query
                 if (reLoad || querySource == null || cachedPreparedExpression == null
                     || (cachedPreparedExpression != null && cachedPreparedExpression.isClosed())) {
 
@@ -186,20 +205,13 @@ public class XQueryMediator extends AbstractMediator {
                     } else if (o instanceof String) {
                         querySource = (String) o;
                     }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Picked up the xquery source " + querySource + "from the key " +
-                                  queryKey);
+
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Picked up the xquery source " + querySource + "from the key " +
+                            queryKey);
+                        traceOrDebug(traceOn, "Prepare an expression for the query ");
                     }
-                    if (shouldTrace) {
-                        trace.trace("Picked up the xquery source " + querySource + "from the key " +
-                                    queryKey);
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Prepare an expression for the query ");
-                    }
-                    if (shouldTrace) {
-                        trace.trace("Prepare an expression for the query ");
-                    }
+
                     //create an XQPreparedExpression using the query source
                     cachedPreparedExpression = cachedConnection.prepareExpression(querySource);
                     // need binding because the expression just has recreated
@@ -208,8 +220,8 @@ public class XQueryMediator extends AbstractMediator {
 
                 //Bind the external variables to the DynamicContext
                 if (variables != null & !variables.isEmpty()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Binding  external variables to the DynamicContext");
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Binding  external variables to the DynamicContext");
                     }
                     for (int i = 0; i < variables.size(); i++) {
                         MediatorVariable variable = (MediatorVariable) variables.get(i);
@@ -221,16 +233,22 @@ public class XQueryMediator extends AbstractMediator {
                         }
                     }
                 }
+
                 //executing the query
                 resultSequence = cachedPreparedExpression.executeQuery();
+
             }
+
             if (resultSequence == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Result Sequence is null");
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Result Sequence is null");
                 }
                 return;
             }
+
+            //processing the result 
             while (resultSequence.next()) {
+
                 XQItem xqItem = resultSequence.getItem();
                 if (xqItem == null) {
                     return;
@@ -241,28 +259,24 @@ public class XQueryMediator extends AbstractMediator {
                 }
                 int itemKind = itemType.getItemKind();
                 int baseType = itemType.getBaseType();
-                if (log.isDebugEnabled()) {
-                    log.debug("The XQuery Result " + xqItem.getItemAsString());
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "The XQuery Result " + xqItem.getItemAsString());
                 }
-                if (shouldTrace) {
-                    trace.trace("The XQuery Result " + xqItem.getItemAsString());
-                }
+
                 //The target node that is going to modify
                 OMNode destination = getTargetNode(synCtx);
                 if (destination != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("The target node " + destination);
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "The target node " + destination);
                     }
-                    if (shouldTrace) {
-                        trace.trace("The target node " + destination);
-                    }
+
                     //If the result is XML
                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||
                         XQItemType.XQITEMKIND_ELEMENT == itemKind ||
                         XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
                         StAXOMBuilder builder = new StAXOMBuilder(
-                                XMLInputFactory.newInstance().createXMLStreamReader(
-                                        new StringReader(xqItem.getItemAsString())));
+                            XMLInputFactory.newInstance().createXMLStreamReader(
+                                new StringReader(xqItem.getItemAsString())));
                         OMElement resultOM = builder.getDocumentElement();
                         if (resultOM != null) {
                             //replace the target node from the result
@@ -270,7 +284,7 @@ public class XQueryMediator extends AbstractMediator {
                             destination.detach();
                         }
                     } else if (XQItemType.XQBASETYPE_INTEGER == baseType ||
-                               XQItemType.XQBASETYPE_INT == baseType) {
+                        XQItemType.XQBASETYPE_INT == baseType) {
                         //replace the text value of the target node by the result ,If the result is
                         // a basic type
                         ((OMElement) destination).setText(String.valueOf(xqItem.getInt()));
@@ -297,7 +311,7 @@ public class XQueryMediator extends AbstractMediator {
             handleException("Error during the querying " + e.getMessage(), e);
         } catch (XMLStreamException e) {
             handleException("Error during retrieving  the Doument Node as  the result "
-                            + e.getMessage(), e);
+                + e.getMessage(), e);
         }
     }
 
@@ -424,15 +438,15 @@ public class XQueryMediator extends AbstractMediator {
                         if (value instanceof OMNode) {
                             if (isDOMRequired) {
                                 xqDynamicContext.
-                                        bindObject(name,
-                                                new DOMSource(((Element) ElementHelper.
-                                                        importOMElement((OMElement) value,
-                                                                DOOMAbstractFactory.getOMFactory())).
-                                                        getOwnerDocument()), null);
+                                    bindObject(name,
+                                        new DOMSource(((Element) ElementHelper.
+                                            importOMElement((OMElement) value,
+                                                DOOMAbstractFactory.getOMFactory())).
+                                            getOwnerDocument()), null);
                             } else {
                                 xqDynamicContext.bindDocument(name,
-                                                              new InputSource(SynapseConfigUtils.getInputStream(
-                                                                      value)));
+                                    new InputSource(SynapseConfigUtils.getInputStream(
+                                        value)));
                             }
                         }
                         break;
@@ -441,15 +455,15 @@ public class XQueryMediator extends AbstractMediator {
                         if (value instanceof OMNode) {
                             if (isDOMRequired) {
                                 xqDynamicContext.
-                                        bindObject(name,
-                                                new DOMSource(((Element) ElementHelper.
-                                                        importOMElement((OMElement) value,
-                                                                DOOMAbstractFactory.getOMFactory())).
-                                                        getOwnerDocument()), null);
+                                    bindObject(name,
+                                        new DOMSource(((Element) ElementHelper.
+                                            importOMElement((OMElement) value,
+                                                DOOMAbstractFactory.getOMFactory())).
+                                            getOwnerDocument()), null);
                             } else {
                                 xqDynamicContext.bindDocument(name,
-                                                              new InputSource(
-                                                                  SynapseConfigUtils.getInputStream(value)));
+                                    new InputSource(
+                                        SynapseConfigUtils.getInputStream(value)));
                             }
                         }
                         break;
@@ -458,22 +472,22 @@ public class XQueryMediator extends AbstractMediator {
                         if (value instanceof OMNode) {
                             if (isDOMRequired) {
                                 xqDynamicContext.
-                                        bindObject(name,
-                                                new DOMSource(((Element) ElementHelper.
-                                                        importOMElement((OMElement) value,
-                                                                DOOMAbstractFactory.getOMFactory())).
-                                                        getOwnerDocument()), null);
+                                    bindObject(name,
+                                        new DOMSource(((Element) ElementHelper.
+                                            importOMElement((OMElement) value,
+                                                DOOMAbstractFactory.getOMFactory())).
+                                            getOwnerDocument()), null);
                             } else {
                                 xqDynamicContext.bindDocument(name,
-                                                              new InputSource(SynapseConfigUtils.getInputStream(
-                                                                      value)));
+                                    new InputSource(SynapseConfigUtils.getInputStream(
+                                        value)));
                             }
                         }
                         break;
                     }
                     default: {
                         handleException("Unsupported  type for the binding type" + type +
-                                        " in the variable name " + name);
+                            " in the variable name " + name);
                         break;
                     }
                 }
@@ -500,11 +514,11 @@ public class XQueryMediator extends AbstractMediator {
                     return (OMNode) nodeObject;
                 } else {
                     handleException("The evaluation of the XPath expression "
-                                    + target + " must target in an OMNode");
+                        + target + " must target in an OMNode");
                 }
             } else {
                 handleException("The evaluation of the XPath expression "
-                                + target + " must target in an OMNode");
+                    + target + " must target in an OMNode");
             }
         } catch (JaxenException e) {
             handleException("Error evaluating XPath " + target + " on message");

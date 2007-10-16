@@ -189,6 +189,8 @@
         </parameter>
     </transportReceiver>-->
 
+    <transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
+
     <!-- ================================================= -->
     <!-- Mail Transport Listener  -->
     <!-- This is a sample configuration. It assumes a mail server running in localhost.
@@ -238,6 +240,7 @@
     </transportSender>
     <transportSender name="jms"
                      class="org.apache.synapse.transport.jms.JMSSender"/>
+    <transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
 
     <!-- ================================================= -->
     <!-- Mail Transport Sender  -->

@@ -233,6 +233,10 @@ public abstract class AbstractTransportListener implements TransportListener {
 
         public void serviceUpdate(AxisEvent event, AxisService service) {
 
+            if (service.getName().startsWith("__")) {
+                return; // these are "private" services
+            }
+
             if (BaseUtils.isUsingTransport(service, transportName)) {
                 switch (event.getEventType()) {
                     case AxisEvent.SERVICE_DEPLOY :

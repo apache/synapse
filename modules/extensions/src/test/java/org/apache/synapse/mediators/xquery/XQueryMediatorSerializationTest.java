@@ -34,7 +34,7 @@ public class XQueryMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testXQueryMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<xquery:xquery xmlns:xquery=\"http://ws.apache.org/ns/synapse/xquery\" xmlns=\"http://ws.apache.org/ns/synapse\" key=\"querykey\" target=\"target\">" +
+        String inputXml = "<xquery xmlns=\"http://ws.apache.org/ns/synapse\" key=\"querykey\" target=\"target\">" +
                           "<dataSource>" +
                           "<property name=\"username\" value=\"valueone\" />" +
                           "</dataSource>" +
@@ -49,7 +49,7 @@ public class XQueryMediatorSerializationTest extends AbstractTestCase {
                           "<variable name=\"b1\" key=\"xmlkey\" type=\"DOCUMENT\" />" +
                           "<variable name=\"b1\" key=\"xmlkey\" type=\"DOCUMENT_ELEMENT\" />" +
                           "<variable name=\"b1\" key=\"xmlkey\" type=\"ELEMENT\" />" +
-                          "</xquery:xquery>";
+                          "</xquery>";
         assertTrue(serialization(inputXml, factory, serializer));
 
     }

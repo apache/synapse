@@ -81,7 +81,7 @@ public class SynapseInitializationModule implements Module {
 
         // Initializing the SynapseEnvironment and SynapseConfiguration
         log.info("Initializing the Synapse configuration ...");
-        synCfg = initializeSynapse(configurationContext);
+        synCfg = getConfiguration(configurationContext);
 
         log.info("Deploying the Synapse service..");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
@@ -118,8 +118,7 @@ public class SynapseInitializationModule implements Module {
         log.info("Synapse initialized successfully...!");
     }
 
-    private static SynapseConfiguration initializeSynapse(
-        ConfigurationContext cfgCtx) {
+    private static SynapseConfiguration getConfiguration(ConfigurationContext cfgCtx) {
 
         cfgCtx.setProperty("addressing.validateAction", Boolean.FALSE);
         AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
@@ -164,9 +163,7 @@ public class SynapseInitializationModule implements Module {
             log.fatal(msg, e);
             throw new SynapseException(msg, e);
         }
-        // now initialize SynapseConfig
         
-        synapseConfiguration.init(synEnv);
         return synapseConfiguration;
     }
 

@@ -53,7 +53,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
     private static final Log log = LogFactory.getLog(XQueryMediatorSerializer.class);
 
     private static final OMNamespace XQUERY_NS
-        = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE + "/xquery", "xquery");
+        = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "xquery");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
@@ -62,7 +62,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
         }
         XQueryMediator queryMediator = (XQueryMediator) m;
 
-        OMElement xquery = fac.createOMElement("xquery", XQUERY_NS);
+        OMElement xquery = fac.createOMElement("xquery", synNS);
         String key = queryMediator.getQueryKey();
         if (key != null) {
             xquery.addAttribute(fac.createOMAttribute(

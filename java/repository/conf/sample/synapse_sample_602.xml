@@ -16,8 +16,7 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<definitions xmlns="http://ws.apache.org/ns/synapse"
-             xmlns:throttle="http://ws.apache.org/ns/synapse/throttle">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
@@ -57,12 +56,12 @@
     <proxy name="StockQuoteProxy">
         <target>
              <inSequence>
-                <throttle:throttle onReject="onRejectSequence" onAccept="onAcceptSequence" id="A">
+                <throttle onReject="onRejectSequence" onAccept="onAcceptSequence" id="A">
                     <policy key="thottlePolicy"/>
-                </throttle:throttle>
+                </throttle>
             </inSequence>
             <outSequence>
-                <throttle:throttle id="A"/>
+                <throttle id="A"/>
                 <send/>
             </outSequence>
         </target>

@@ -17,8 +17,7 @@
   ~  under the License.
   -->
         <!-- introduction to URL source properties, registry based properties and the XSLT mediator -->
-<definitions xmlns="http://ws.apache.org/ns/synapse"
-             xmlns:xquery="http://ws.apache.org/ns/synapse/xquery">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
@@ -33,10 +32,10 @@
     <proxy name="StockQuoteProxy">
         <target>
             <inSequence>
-                <xquery:xquery key="xquery-key-req">
+                <xquery key="xquery-key-req">
                     <variable name="payload" type="ELEMENT"/>
 
-                </xquery:xquery>
+                </xquery>
                 <send>
                     <endpoint>
                         <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
@@ -45,9 +44,9 @@
             </inSequence>
             <outSequence>
                 <out>
-                     <xquery:xquery key="xquery/xquery_res.xq">
+                     <xquery key="xquery/xquery_res.xq">
                         <variable name="payload" type="ELEMENT"/>
-                    </xquery:xquery>
+                    </xquery>
                      <send/>
                 </out>
 

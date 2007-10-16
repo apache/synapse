@@ -42,7 +42,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
      * The Tag Name for throttle
      */
     private static final QName TAG_NAME
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE + "/throttle", "throttle");
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "throttle");
 
     public Mediator createMediator(OMElement elem) {
 

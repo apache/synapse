@@ -21,9 +21,12 @@ package org.apache.synapse;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.config.SynapseConfiguration;
 
 import java.io.File;
 import java.net.ServerSocket;
@@ -89,6 +92,27 @@ public class ServerManager {
                 }
                 System.out.println(msg);
             }
+
+            // now initialize SynapseConfig
+            Parameter synEnv
+                = configctx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
+            Parameter synCfg
+                = configctx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
+            String message = "Unable to initialize the Synapse Configuration : Can not find the ";
+            if (synCfg == null || synCfg.getValue() == null
+                || !(synCfg.getValue() instanceof SynapseConfiguration)) {
+                log.fatal(message + "Synapse Configuration");
+                throw new SynapseException(message + "Synapse Configuration");
+            }
+
+            if (synEnv == null || synEnv.getValue() == null
+                || !(synEnv.getValue() instanceof SynapseEnvironment)) {
+                log.fatal(message + "Synapse Environment");
+                throw new SynapseException(message + "Synapse Environment");
+            }
+
+            ((SynapseConfiguration) synCfg.getValue()).init((SynapseEnvironment) synEnv.getValue());
+
             System.out.println("[SynapseServer] Ready");
 
         } catch (Throwable t) {

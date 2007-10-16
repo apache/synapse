@@ -23,11 +23,15 @@ import org.apache.axis2.modules.Module;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.AxisDescription;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.AxisFault;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.SynapseInitializationModule;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,6 +73,26 @@ public class SynapseModule implements Module {
         if (new File(System.getProperty(SynapseConstants.SYNAPSE_XML)).exists()) {
             initializationModule = new org.apache.synapse.core.axis2.SynapseInitializationModule();
             initializationModule.init(configurationContext, axisModule);
+
+            // now initialize SynapseConfig
+            Parameter synEnv = configurationContext
+                .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
+            Parameter synCfg = configurationContext
+                .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
+            String message = "Unable to initialize the Synapse Configuration : Can not find the ";
+            if (synCfg == null || synCfg.getValue() == null
+                || !(synCfg.getValue() instanceof SynapseConfiguration)) {
+                log.fatal(message + "Synapse Configuration");
+                throw new SynapseException(message + "Synapse Configuration");
+            }
+
+            if (synEnv == null || synEnv.getValue() == null
+                || !(synEnv.getValue() instanceof SynapseEnvironment)) {
+                log.fatal(message + "Synapse Environment");
+                throw new SynapseException(message + "Synapse Environment");
+            }
+
+            ((SynapseConfiguration) synCfg.getValue()).init((SynapseEnvironment) synEnv.getValue());
         } else {
             handleException("Unable to initialize the Synapse initializationModule. Couldn't " +
                     "find the configuration file in the location "

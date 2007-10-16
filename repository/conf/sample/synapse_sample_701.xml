@@ -17,8 +17,7 @@
   ~  under the License.
   -->
         <!-- introduction to URL source properties, registry based properties and the XSLT mediator -->
-<definitions xmlns="http://ws.apache.org/ns/synapse"
-             xmlns:xquery="http://ws.apache.org/ns/synapse/xquery">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
@@ -39,11 +38,11 @@
             </inSequence>
             <outSequence>
                 <out>
-                    <xquery:xquery key="xquery/xquery_commisson.xq">
+                    <xquery key="xquery/xquery_commisson.xq">
                         <variable name="payload" type="ELEMENT"></variable>
                             <variable name="commission" type="ELEMENT"
                                     key="misc/commission.xml"></variable>                          
-                    </xquery:xquery>
+                    </xquery>
                     <send/>
                 </out>
 

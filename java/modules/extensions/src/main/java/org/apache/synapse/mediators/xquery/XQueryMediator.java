@@ -206,16 +206,27 @@ public class XQueryMediator extends AbstractMediator {
                         querySource = (String) o;
                     }
 
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Picked up the xquery source " + querySource
-                            + "from the key " + queryKey);
-                        traceOrDebug(traceOn, "Prepare an expression for the query ");
-                    }
+                    if (querySource != null) {
 
-                    //create an XQPreparedExpression using the query source
-                    cachedPreparedExpression = cachedConnection.prepareExpression(querySource);
-                    // need binding because the expression just has recreated
-                    needBind = true;
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Picked up the xquery source " + querySource
+                                + "from the key " + queryKey);
+                            traceOrDebug(traceOn, "Prepare an expression for the query ");
+                        }
+
+                        //create an XQPreparedExpression using the query source
+                        cachedPreparedExpression = cachedConnection.prepareExpression(querySource);
+                        // need binding because the expression just has recreated
+                        needBind = true;
+
+                    } else {
+
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Couldn't find the xquery source with a key "
+                                + queryKey);
+                        }
+                        return;
+                    }
                 }
 
                 //Bind the external variables to the DynamicContext

@@ -237,7 +237,7 @@
         <parameter name="Transfer-Encoding">chunked</parameter>
     </transportSender>
     <transportSender name="jms"
-                     class="org.apache.axis2.transport.jms.JMSSender"/>
+                     class="org.apache.synapse.transport.jms.JMSSender"/>
 
     <!-- ================================================= -->
     <!-- Mail Transport Sender  -->

@@ -56,13 +56,39 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector;
 
-    public Axis2SynapseEnvironment() {
-        this.executorService = new SynapseThreadPool();
+    public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
+        
+        int coreThreads = SynapseThreadPool.SYNAPSE_CORE_THREADS;
+        int maxThreads  = SynapseThreadPool.SYNAPSE_MAX_THREADS;
+        long keepAlive  = SynapseThreadPool.SYNAPSE_KEEP_ALIVE;
+        int qlength     = SynapseThreadPool.SYNAPSE_THREAD_QLEN;
+        
+        try {
+            qlength = Integer.parseInt(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_QLEN));
+        } catch (Exception ignore) {}
+
+        try {
+            coreThreads = Integer.parseInt(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_CORE));
+        } catch (Exception ignore) {}
+
+        try {
+            maxThreads = Integer.parseInt(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_MAX));
+        } catch (Exception ignore) {}
+
+        try {
+            keepAlive = Long.parseLong(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_ALIVE));
+        } catch (Exception ignore) {}
+        
+        this.executorService = new SynapseThreadPool(coreThreads, maxThreads, keepAlive, qlength,
+            synCfg.getProperty(SynapseThreadPool.SYN_THREAD_GROUP,
+                SynapseThreadPool.SYNAPSE_THREAD_GROUP),
+            synCfg.getProperty(SynapseThreadPool.SYN_THREAD_IDPREFIX,
+                SynapseThreadPool.SYNAPSE_THREAD_ID_PREFIX));
     }
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
         SynapseConfiguration synapseConfig) {
-        this();
+        this(synapseConfig);
         this.configContext = cfgCtx;
         this.synapseConfig = synapseConfig;
     }

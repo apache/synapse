@@ -122,7 +122,7 @@ public class XSLTMediator extends AbstractMediator {
     /**
      *  Is it need to use DOMSource and DOMResult?
      */
-    private boolean useDOMSourceAndResults = true;
+    private boolean useDOMSourceAndResults = false;
 
     // todo - this is a hack to get the handler module case working - ruwan
     //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +

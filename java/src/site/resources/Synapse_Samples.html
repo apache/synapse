@@ -213,10 +213,20 @@
         mediation in Java</a></li>
     </ul>
   </li>
-  <li><a href="#AdvancedMediations">Advanced Mediations</a> 
+  <li><a href="#AdvancedMediations">Advanced Mediations</a>
     <ul>
-      <li><a href="#Sample600">Sample 600: Throttle mediator - Restricting
-        requests based on policies</a></li>
+      <li>Sample 601:Throttle mediator - Concurrency throttling </li>
+    </ul>
+    <ul>
+      <li>Sample 602:Throttle mediator - Restricting requests based on
+        policies</li>
+    </ul>
+    <ul>
+      <li><a name="L1723" id="L1723">Sample 701:</a> XQuery mediator -
+        Transformation using XQuery</li>
+    </ul>
+    <ul>
+      <li>Sample 702: XQuery mediator - Using External XML documents </li>
     </ul>
   </li>
 </ul>
@@ -231,8 +241,7 @@
 
     &lt;!-- Send the messageto implicit destination --&gt;
     &lt;send/&gt;
-&lt;/definitions&gt;
-</pre>
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Introduction to Synapse. Shows how a message could be
 made to pass through Synapse </strong><strong>and logged before it is
@@ -3158,10 +3167,9 @@ Discounted price: 138.77458254967408</pre>
 
 &lt;/out&gt;
     &lt;/sequence&gt;
-&lt;/definitions&gt;                                                             finitions&gt;
-</pre>
+&lt;/definitions&gt;                                                             finitions&gt;</pre>
 
-<p> <b>Objective: Demonstrate the use of throttle mediator for concurrency
+<p><b>Objective: Demonstrate the use of throttle mediator for concurrency
 throttling </b></p>
 
 <p><strong>Pre-Requisites:</strong></p>
@@ -3274,8 +3282,7 @@ concurrently ,then approximately half of those will success..</p>
             &lt;send/&gt;
         &lt;/out&gt;
     &lt;/sequence&gt;
-&lt;/definitions&gt;
-</pre>
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Demonstrate the use of throttle mediator for
 restricting request counts</strong> </p>
@@ -3317,7 +3324,7 @@ can verify this by looking at the Synapse console.</p>
 [HttpServerWorker-2] INFO  LogMediator - text = **Access Accept**
 [HttpServerWorker-3] INFO  LogMediator - text = **Access Accept**
 [HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
-[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied**  </pre>
+[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied** </pre>
 
 <h2>Sample 700</h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -3353,7 +3360,7 @@ can verify this by looking at the Synapse console.</p>
                 &lt;/out&gt;
             &lt;/outSequence&gt;
         &lt;/target&gt;
-        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;&lt;/proxy&gt;&lt;/definitions&gt;        </pre>
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;&lt;/proxy&gt;&lt;/definitions&gt; </pre>
 
 <p></p>
 
@@ -3432,13 +3439,6 @@ commission.xml document will be added and give as a new prize .</p>
 <p></p>
 
 <p>Invoke the client as bellow </p>
-<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy
-</pre>
-
-<p></p>
-
-<p></p>
-
-<p></p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
 </body>
 </html>

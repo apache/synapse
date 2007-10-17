@@ -174,17 +174,8 @@ public class StartupFinder {
         }
 
         try {
-            OMFactory fac = OMAbstractFactory.getOMFactory();
-            OMElement startupElement = fac.createOMElement(
-                    "startup", fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn"));
-            startupElement.addAttribute("name", startup.getName(), fac.createOMNamespace("", ""));
             StartupSerializer ss = (StartupSerializer) cls.newInstance();
-            ss.serializeStartup(startupElement, startup);
-            if (parent != null) {
-                parent.addChild(startupElement);
-            }
-
-            return startupElement;
+            return ss.serializeStartup(parent, startup);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing startup serializer: " + cls;

@@ -151,7 +151,7 @@ public class TestUtils {
         org.apache.axis2.context.MessageContext mc =
                 new org.apache.axis2.context.MessageContext();
         SynapseConfiguration config = new SynapseConfiguration();
-        SynapseEnvironment env = new Axis2SynapseEnvironment();
+        SynapseEnvironment env = new Axis2SynapseEnvironment(config);
         MessageContext synMc = new Axis2MessageContext(mc, config, env);
         SOAPEnvelope envelope =
                 OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();

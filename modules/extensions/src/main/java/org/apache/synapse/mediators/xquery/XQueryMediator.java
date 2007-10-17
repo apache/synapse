@@ -207,8 +207,8 @@ public class XQueryMediator extends AbstractMediator {
                     }
 
                     if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Picked up the xquery source " + querySource + "from the key " +
-                            queryKey);
+                        traceOrDebug(traceOn, "Picked up the xquery source " + querySource
+                            + "from the key " + queryKey);
                         traceOrDebug(traceOn, "Prepare an expression for the query ");
                     }
 
@@ -324,7 +324,8 @@ public class XQueryMediator extends AbstractMediator {
      * @param traceOrDebugOn is tracing or debbug on
      * @param traceOn        indicate whether trace is ON or OF
      */
-    private void bindVariable(XQDynamicContext xqDynamicContext, MediatorVariable variable, boolean traceOrDebugOn, boolean traceOn) throws XQException {
+    private void bindVariable(XQDynamicContext xqDynamicContext, MediatorVariable variable,
+                              boolean traceOrDebugOn, boolean traceOn) throws XQException {
 
         if (variable != null) {
 

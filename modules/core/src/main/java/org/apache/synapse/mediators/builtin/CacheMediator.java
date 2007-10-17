@@ -151,10 +151,12 @@ public class CacheMediator extends AbstractMediator {
                 cachedObj.setResponseEnvelope(
                     MessageHelper.cloneSOAPEnvelope(synCtx.getEnvelope()));
 
-                // todo: there seems to be a problem with the digest generation of the response
-                // this is not required for the moment
-                // cachedObj.setResponseHash(digestGenerator.getDigest(
-                //     ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
+                // this is not required yet can commented this for perf improvements
+                // in the future there can be a situation where user sends the request with the
+                // response hash (if client side caching is on) in which case we can compare that
+                // response hash with the given response hash and respond with not-modified http header
+                cachedObj.setResponseHash(digestGenerator.getDigest(
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
 
                 cachedObj.setExpireTime(
                     System.currentTimeMillis() + cachedObj.getTimeout());

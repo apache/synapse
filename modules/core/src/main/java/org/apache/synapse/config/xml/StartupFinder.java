@@ -124,33 +124,21 @@ public class StartupFinder {
      */
     public Startup getStartup(OMElement element) {
 
-        String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
-        if (name == null) {
-            String msg = "Name for an startup is required, missing name in the startup";
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            throw new SynapseException(msg);
-        }
-
         QName qName = element.getQName();
         if (log.isDebugEnabled()) {
-            log.debug("getStartup(" + qName + ")");
+            log.debug("Creating the Startup for : " + qName);
         }
 
         Class cls = (Class) factoryMap.get(qName);
         if (cls == null) {
-            String msg = "Unknown Startup type referenced by startup element : "
-                    + qName;
+            String msg = "Unknown Startup type referenced by startup element : " + qName;
             log.error(msg);
             throw new SynapseException(msg);
         }
 
         try {
             StartupFactory sf = (StartupFactory) cls.newInstance();
-            Startup startup = sf.createStartup(element);
-            startup.setName(name);
-            return startup;
+            return sf.createStartup(element);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing configuration factory : " + cls;

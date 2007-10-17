@@ -232,7 +232,7 @@
     &lt;!-- Send the messageto implicit destination --&gt;
     &lt;send/&gt;
 &lt;/definitions&gt;
- </pre>
+</pre>
 
 <p><strong>Objective: Introduction to Synapse. Shows how a message could be
 made to pass through Synapse </strong><strong>and logged before it is
@@ -2217,8 +2217,8 @@ perform a similar function to the messages discussed in sample 53.</p>
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
 
-<p><strong>Objective: Routing the messages arrived to a proxy service without processing
-the MustUnderstand headers (Security header)</strong></p>
+<p><strong>Objective: Routing the messages arrived to a proxy service without
+processing the MustUnderstand headers (Security header)</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
 You may also need to download and install the unlimited strength policy files
@@ -2231,28 +2231,30 @@ done</p>
 
 <p></p>
 
-<p>The proxy service will recieve secure messages with security headers which are MustUnderstand.
-But hence element 'engageSec' is not present in the proxy configuration synapse
-will not engage that Apache Rampart on this proxy service. It is expected that an MustUnderstand
-failure exception on the AxisEngine would occur before the message arrives Synapse. But Synapse
-handles this message and gets it in by setting all the headers which are MustUnderstand and not
-processed to processed state. This will enable synapse to route the messages without reading the
-Security headers (just routing the messages from client to service, both of which are secure). To
-execute the client, send a stock quote request to the proxy service, and sign
-and encrypt the request by specifying the client side security policy as
-follows:</p>
+<p>The proxy service will recieve secure messages with security headers which
+are MustUnderstand. But hence element 'engageSec' is not present in the proxy
+configuration synapse will not engage that Apache Rampart on this proxy
+service. It is expected that an MustUnderstand failure exception on the
+AxisEngine would occur before the message arrives Synapse. But Synapse
+handles this message and gets it in by setting all the headers which are
+MustUnderstand and not processed to processed state. This will enable synapse
+to route the messages without reading the Security headers (just routing the
+messages from client to service, both of which are secure). To execute the
+client, send a stock quote request to the proxy service, and sign and encrypt
+the request by specifying the client side security policy as follows:</p>
 <pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
 
 <p>By following through the debug logs or TCPMon output, you could see that
 the request received by the proxy service was signed and encrypted. Also,
-looking up the WSDL of the proxy service by requesting the
-URL http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
-policy attachments are not there and security is not engaged. When sending the message to the
-backend service, you could verify that the security headers were there as in the original
-message to synapse from client, and that the response received does use WS-Security,
-and forwarded back to the client without any modification. You should note that this wont be a
-security hole because the message inside synapse is signed and encrypted and can only be forwarded
-to a secure service to be usefull.</p>
+looking up the WSDL of the proxy service by requesting the URL
+http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security policy
+attachments are not there and security is not engaged. When sending the
+message to the backend service, you could verify that the security headers
+were there as in the original message to synapse from client, and that the
+response received does use WS-Security, and forwarded back to the client
+without any modification. You should note that this wont be a security hole
+because the message inside synapse is signed and encrypted and can only be
+forwarded to a secure service to be usefull.</p>
 
 <h1><a name="Transport">Transports</a></h1>
 
@@ -3103,17 +3105,97 @@ Discounted price: 138.77458254967408</pre>
 
 <h1><a name="AdvancedMediations">Advanced mediations</a></h1>
 
-<h2><a name="Sample600">Sample 600</a></h2>
-<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"
-             xmlns:throttle="http://ws.apache.org/ns/synapse/throttle"&gt;
+<h2>Sample 600</h2>
+
+<p></p>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;sequence name="main"&gt;
         &lt;in&gt;
-            &lt;throttle:throttle&gt;
+            &lt;throttle id="A"&gt;
                 &lt;policy&gt;
                     &lt;!-- define throttle policy --&gt;
                     &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
                                 xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
                         &lt;throttle:ThrottleAssertion&gt;
+                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;                            
+                        &lt;/throttle:ThrottleAssertion&gt;
+                    &lt;/wsp:Policy&gt;
+                &lt;/policy&gt;
+                &lt;onAccept&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Accept**"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/onAccept&gt;
+                &lt;onReject&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Denied**"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault&gt;
+                        &lt;code value="tns:Receiver"
+                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                        &lt;reason value="**Access Denied**"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;property name="RESPONSE" value="true"/&gt;
+                    &lt;header name="To" action="remove"/&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/onReject&gt;
+            &lt;/throttle&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;throttle id="A"/&gt;
+            &lt;send/&gt;   
+
+
+
+
+
+
+&lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;                                                             finitions&gt;
+</pre>
+
+<p> <b>Objective: Demonstrate the use of throttle mediator for concurrency
+throttling </b></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on
+port 9000.</p>
+
+<p>Start Synapse with the sample configuration 600 (i.e. synapse -sample
+600).</p>
+
+<p></p>
+
+<p>Above configuration specifies a throttle mediator inside the in mediator.
+Therefore, all request messages directed to the main sequence will be
+subjected to throttling. Throttle mediator has policy, onAccept and onReject
+tags at top level. Policy tag specifies the throttling policy to be applied
+for messages. In this sample policy contains only component called
+"MaximumConcurrentAccess" .This indicates the maximum number of concurrent
+request that may have passed through the synapse on a single unit of time. To
+test concurrency throttling ,it is required to send concurrent request to
+synapse. For synapse with above configuration ,if client send 20 request
+concurrently ,then approximately half of those will success..</p>
+
+<h2><a name="Sample600">Sample 601</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;throttle id="A"&gt;
+                &lt;policy&gt;
+                    &lt;!-- define throttle policy --&gt;
+                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
+                        &lt;throttle:ThrottleAssertion&gt;
+                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;
                             &lt;wsp:All&gt;
                                 &lt;throttle:ID throttle:type="IP"&gt;Other&lt;/throttle:ID&gt;
                                 &lt;wsp:ExactlyOne&gt;
@@ -3181,19 +3263,22 @@ Discounted price: 138.77458254967408</pre>
                         &lt;reason value="**Access Denied**"/&gt;
                     &lt;/makefault&gt;
                     &lt;property name="RESPONSE" value="true"/&gt;
-                    &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+                    &lt;header name="To" action="remove"/&gt;
                     &lt;send/&gt;
                     &lt;drop/&gt;
                 &lt;/onReject&gt;
-            &lt;/throttle:throttle&gt;
+            &lt;/throttle&gt;
         &lt;/in&gt;
         &lt;out&gt;
+            &lt;throttle id="A"/&gt;
             &lt;send/&gt;
         &lt;/out&gt;
     &lt;/sequence&gt;
-&lt;/definitions&gt;</pre>
-<strong>Objective: Demonstrate the use of throttle mediator for restricting
-request counts</strong>
+&lt;/definitions&gt;
+</pre>
+
+<p><strong>Objective: Demonstrate the use of throttle mediator for
+restricting request counts</strong> </p>
 
 <p><strong>Pre-Requisites:</strong></p>
 
@@ -3232,6 +3317,128 @@ can verify this by looking at the Synapse console.</p>
 [HttpServerWorker-2] INFO  LogMediator - text = **Access Accept**
 [HttpServerWorker-3] INFO  LogMediator - text = **Access Accept**
 [HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
-[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied**</pre>
+[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied**  </pre>
+
+<h2>Sample 700</h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name="root"&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;localEntry key="xquery-key-req"
+                src="file:repository/conf/sample/resources/xquery/xquery_req.xq"/&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;xquery key="xquery-key-req"&gt;
+                    &lt;variable name="payload" type="ELEMENT"/&gt;
+                &lt;/xquery&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;out&gt;
+                     &lt;xquery key="xquery/xquery_res.xq"&gt;
+                        &lt;variable name="payload" type="ELEMENT"/&gt;
+                    &lt;/xquery&gt;
+                     &lt;send/&gt;
+                &lt;/out&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;&lt;/proxy&gt;&lt;/definitions&gt;        </pre>
+
+<p></p>
+
+<p><b>Objective: Introduction transformation using XQuery mediator</b></p>
+
+<p><b>Pre-Requisites</b>:Start the Synapse configuration numbered 700: i.e.
+synapse -sample 700 </p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done.</p>
+
+<p></p>
+
+<p>This example uses the XQuery mediator to perform transformations. This
+sample behave same as sample number 8 and only different here is use of
+XQuery instead of XSLT for transformations.</p>
+
+<p></p>
+
+<p>Execute the custom quote client as 'ant stockquote -Dmode=customquote ..'
+</p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy
+ -Dmode=customquote </pre>
+
+<p></p>
+
+<h2>Sample 701</h2>
+
+<p></p>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name="root"&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;out&gt;
+                    &lt;xquery key="xquery/xquery_commisson.xq"&gt;
+                        &lt;variable name="payload" type="ELEMENT"&gt;&lt;/variable&gt;
+                            &lt;variable name="commission" type="ELEMENT" key="misc/commission.xml"&gt;&lt;/variable&gt;
+                    &lt;/xquery&gt;
+                    &lt;send/&gt;
+                &lt;/out&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;&lt;/proxy&gt;&lt;/definitions&gt;   ns&gt;</pre>
+
+<p><b></b></p>
+
+<p><b><strong>Objective: Demonstrate the use of XQuery mediator to import
+external XML documents to the xquery engine</strong></b></p>
+
+<p><strong>Pre-Requisites:</strong>Deploy the SimpleStockQuoteService in
+sample Axis2 server and start it on port 9000.</p>
+
+<p>Start Synapse with the sample configuration 701 (i.e. synapse -sample
+701).</p>
+
+<p>In this sample , data from commission.xml document use inside XQUERY
+document. The stock quote prize from the response and commission from the
+commission.xml document will be added and give as a new prize .</p>
+
+<p></p>
+
+<p>Invoke the client as bellow </p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy
+</pre>
+
+<p></p>
+
+<p></p>
+
+<p></p>
 </body>
 </html>

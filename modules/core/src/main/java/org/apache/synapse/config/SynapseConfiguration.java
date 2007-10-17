@@ -72,6 +72,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 */
 	private Map localRegistry = new HashMap();
 
+    /** Holds the synapse properties */
+    private Properties properties = new Properties();
+
     /**
      * This will provide the timer deamon object for the sheduled tasks.
      */
@@ -620,6 +623,44 @@ public class SynapseConfiguration implements ManagedLifecycle {
      */
     public void addStartup(Startup startup) {
         startups.put(startup.getName(), startup);
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
+    public String getProperty(String propKey, String def) {
+        String val = System.getProperty(propKey);
+        if (val == null) {
+            val = properties.getProperty(propKey);
+        }
+
+        if (val != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using synapse tuning parameter : " + propKey + " = " + val);
+            }
+            return val;
+        }
+        return def;
+    }
+
+    public String getProperty(String propKey) {
+        String val = System.getProperty(propKey);
+        if (val == null) {
+            val = properties.getProperty(propKey);
+        }
+
+        if (val != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using synapse tuning parameter : " + propKey + " = " + val);
+            }
+            return val;
+        }
+        return null;
     }
 
     /**

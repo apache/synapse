@@ -95,7 +95,7 @@ for f in $SYNAPSE_HOME/lib/*.jar
 do
   SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f
 done
-SYNAPSE_CLASSPATH=$JAVA_HOME/lib/tools.jar:$SYNAPSE_CLASSPATH:$CLASSPATH
+SYNAPSE_CLASSPATH=$SYNAPSE_HOME/repository/conf:$JAVA_HOME/lib/tools.jar:$SYNAPSE_CLASSPATH:$CLASSPATH
 
 # use proper bouncy castle version for the JDK
 jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`

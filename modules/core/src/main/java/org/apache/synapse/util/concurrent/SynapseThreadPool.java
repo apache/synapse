@@ -19,6 +19,8 @@
 
 package org.apache.synapse.util.concurrent;
 
+import org.apache.synapse.config.SynapseConfiguration;
+
 import java.util.concurrent.*;
 
 /**
@@ -27,18 +29,20 @@ import java.util.concurrent.*;
 public class SynapseThreadPool extends ThreadPoolExecutor {
 
     // default values
-    private static final int SYNAPSE_CORE_THREADS  = 20;
-    private static final int SYNAPSE_MAX_THREADS   = 100;
-    private static final int SYNAPSE_KEEP_ALIVE     = 5;
-    private static final int BLOCKING_QUEUE_LENGTH = -1;
-    private static final String SYNAPSE_THREAD_GROUP = "synapse-thread-group";
-    private static final String SYNAPSE_THREAD_ID_PREFIX = "SynapseWorker";
+    public static final int SYNAPSE_CORE_THREADS  = 20;
+    public static final int SYNAPSE_MAX_THREADS   = 100;
+    public static final int SYNAPSE_KEEP_ALIVE    = 5;
+    public static final int SYNAPSE_THREAD_QLEN   = 10;
+    public static final String SYNAPSE_THREAD_GROUP     = "synapse-thread-group";
+    public static final String SYNAPSE_THREAD_ID_PREFIX = "SynapseWorker";
 
     // property keys
-    private static final String SYN_THREAD_CORE     = "syn_t_core";
-    private static final String SYN_THREAD_MAX      = "syn_t_max";
-    private static final String SYN_THREAD_ALIVE    = "syn_alive_sec";
-    private static final String SYN_THREAD_QLEN     = "syn_qlen";
+    public static final String SYN_THREAD_CORE     = "synapse.threads.core";
+    public static final String SYN_THREAD_MAX      = "synapse.threads.max";
+    public static final String SYN_THREAD_ALIVE    = "synapse.threads.keepalive";
+    public static final String SYN_THREAD_QLEN     = "synapse.threads.qlen";
+    public static final String SYN_THREAD_GROUP    = "synapse.threads.group";
+    public static final String SYN_THREAD_IDPREFIX = "synapse.threads.idprefix";
 
     /**
      * Constructor for the Synapse thread poll
@@ -63,5 +67,23 @@ public class SynapseThreadPool extends ThreadPoolExecutor {
     public SynapseThreadPool() {
         this(SYNAPSE_CORE_THREADS, SYNAPSE_MAX_THREADS, SYNAPSE_KEEP_ALIVE,
             TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    }
+
+    /**
+     * Constructor for the SynapseThreadPool
+     * 
+     * @param corePoolSize  - number of threads to keep in the pool, even if they are idle
+     * @param maxPoolSize   - the maximum number of threads to allow in the pool
+     * @param keepAliveTime - this is the maximum time that excess idle threads will wait
+     *  for new tasks before terminating.
+     * @param qlen          - Thread Blocking Queue length
+     * @param threadGroup    - ThreadGroup name
+     * @param threadIdPrefix - Thread id prefix
+     */
+    public SynapseThreadPool(int corePoolSize, int maxPoolSize, long keepAliveTime, int qlen,
+        String threadGroup, String threadIdPrefix) {
+        super(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(qlen),
+            new SynapseThreadFactory(new ThreadGroup(threadGroup), threadIdPrefix));
     }
 }

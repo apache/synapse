@@ -71,8 +71,10 @@ public class XQueryMediator extends AbstractMediator {
     private String querySource;
 
     /** The default xpath to get the first child of the SOAPBody*/
-    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
+//    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+//                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
+    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
+        "s12:Body/child::*[position()=1]";
 
     /** The (optional) XPath expression which yeilds the target element to attached the result  */
     private AXIOMXPath target = null;

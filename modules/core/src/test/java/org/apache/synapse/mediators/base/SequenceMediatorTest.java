@@ -120,7 +120,7 @@ public class SequenceMediatorTest extends TestCase {
         synConfig.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, seq);
 
         MessageContextCreatorForAxis2.setSynConfig(synConfig);
-        MessageContextCreatorForAxis2.setSynEnv(new Axis2SynapseEnvironment());
+        MessageContextCreatorForAxis2.setSynEnv(new Axis2SynapseEnvironment(synConfig));
         org.apache.axis2.context.MessageContext mc =
             new org.apache.axis2.context.MessageContext();
         mc.setEnvelope(TestUtils.getTestContext("<empty/>").getEnvelope());

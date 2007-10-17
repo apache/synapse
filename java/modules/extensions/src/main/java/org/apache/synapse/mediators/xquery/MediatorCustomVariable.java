@@ -48,9 +48,11 @@ public class MediatorCustomVariable extends MediatorVariable {
     private String regKey;
 
     /** The default XPath which yeilds the first child of the SOAP Envelop */
-    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
-
+//    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+//                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
+    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
+        "s12:Body/child::*[position()=1]";
+    
     /** Lock used to ensure thread-safe lookup of the object from the registry */
     private final Object resourceLock = new Object();
 

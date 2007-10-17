@@ -58,12 +58,20 @@ public class SimpleQuartzFactory implements StartupFactory {
     public Startup createStartup(OMElement el) {
         
         if (log.isDebugEnabled()) {
-            log.debug("Creating SimpleQuartz startup");
+            log.debug("Creating SimpleQuartz Task");
         }
         
         if (el.getQName().equals(TASK)) {
             
             SimpleQuartz q = new SimpleQuartz();
+
+            String name = el.getAttributeValue(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+            if (name != null) {
+                q.setName(name);
+            } else {
+                handleException("Name for a task is required, missing name in the task");
+            }
 
             // set the task class
             OMAttribute classAttr = el.getAttribute(new QName("class"));

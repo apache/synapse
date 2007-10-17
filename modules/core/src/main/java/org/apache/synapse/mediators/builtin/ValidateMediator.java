@@ -93,9 +93,12 @@ public class ValidateMediator extends AbstractListMediator {
      */
     private  SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-    private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-        "//s12:Envelope/s12:Body/child::*[position()=1]";
+//    private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+//        "//s12:Envelope/s12:Body/child::*[position()=1]";
 
+    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
+        "s12:Body/child::*[position()=1]";
+    
     public ValidateMediator() {
         // create the default XPath
         try {

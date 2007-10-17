@@ -31,6 +31,7 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Builds a Synapse Configuration model with a given input
@@ -73,6 +74,7 @@ public class SynapseConfigurationBuilder {
                 = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
             log.info("Loaded Synapse configuration from : " + configFile);
             synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
+            loadSynapseProperties(synCfg);
             return synCfg;
 
         } catch (FileNotFoundException fnf) {
@@ -81,6 +83,20 @@ public class SynapseConfigurationBuilder {
             handleException("Could not initialize Synapse : " + e.getMessage(), e);
         }
         return null;
+    }
+
+    private static void loadSynapseProperties(SynapseConfiguration synCfg) {
+        String props = System.getProperty(SynapseConstants.SYNAPSE_PROPERTIES);
+        if (props == null) {
+            props = SynapseConstants.DEFAULT_PROP_PATH;
+        }
+        try {
+            synCfg.getProperties().load(Thread.currentThread().getContextClassLoader().getResourceAsStream(props));
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to load synapse properties", e);
+            }
+        }
     }
 
     private static void handleException(String msg, Exception e) {

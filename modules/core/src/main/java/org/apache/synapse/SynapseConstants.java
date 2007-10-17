@@ -79,8 +79,12 @@ public final class SynapseConstants {
 
     /** The name of the system property that will hold the Synapse home directory */
     public static final String SYNAPSE_HOME = "synapse.home";
+    /** The default synapse.properties file path */
+    public static final String DEFAULT_PROP_PATH = "synapse.properties";
     /** The name of the system property used to specify/override the synapse config XML location */
     public static final String SYNAPSE_XML = "synapse.xml";
+    /** The name of the system property used to specify/override the synapse properties location */
+    public static final String SYNAPSE_PROPERTIES = "synapse.properties";
 
     //- Synapse Message Context Properties -
         /** The Synapse MC property name that holds the name of the Proxy service thats handling it */

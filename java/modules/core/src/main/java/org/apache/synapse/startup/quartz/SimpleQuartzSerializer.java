@@ -43,16 +43,17 @@ public class SimpleQuartzSerializer implements StartupSerializer {
     public OMElement serializeStartup(OMElement parent, Startup s) {
 
         if (!(s instanceof SimpleQuartz)) {
-            throw new SynapseException("called SimpleQuartzSerializer on some other " +
+            throw new SynapseException("called TaskSerializer on some other " +
                     "kind of startup" + s.getClass().getName());
         }
 
         SimpleQuartz sq = (SimpleQuartz) s;
 
-        OMElement job = fac.createOMElement("task", synNS, parent);
-        job.addAttribute("class", sq.getJobClass(), nullNS);
+        OMElement task = fac.createOMElement("task", synNS, parent);
+        task.addAttribute("name", sq.getName(), nullNS);
+        task.addAttribute("class", sq.getJobClass(), nullNS);
 
-        OMElement el = fac.createOMElement("trigger", synNS, job);
+        OMElement el = fac.createOMElement("trigger", synNS, task);
         if (sq.getInterval() == 1 && sq.getCount() == 1) {
             el.addAttribute("once", "true", nullNS);
         } else if (sq.getCron() != null) {
@@ -69,10 +70,10 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         
         for (Object o : sq.getProperties()) {
             OMElement prop = (OMElement) o;
-            job.addChild(prop.cloneOMElement());
+            task.addChild(prop.cloneOMElement());
         }
 
-        return job;
+        return task;
     }
 
 }

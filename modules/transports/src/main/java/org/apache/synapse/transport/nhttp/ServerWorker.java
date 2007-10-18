@@ -18,35 +18,42 @@
  */
 package org.apache.synapse.transport.nhttp;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.axis2.transport.http.HTTPTransportReceiver;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
-import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axis2.transport.http.HTTPTransportReceiver;
+import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpInetConnection;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.ws.commons.schema.XmlSchema;
-
-import javax.xml.namespace.QName;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.*;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.InetAddress;
 
 /**
  * Processes an incoming request through Axis2. An instance of this class would be created to
@@ -323,9 +330,6 @@ public class ServerWorker implements Runnable {
                     } catch (AxisFault axisFault) {
                         handleException("Error writing ?xsd output to client", axisFault);
                         return;
-                    } catch (IOException e) {
-                        handleException("Error writing ?xsd output to client", e);
-                        return;
                     }
                 }
 
@@ -393,7 +397,7 @@ public class ServerWorker implements Runnable {
 
             } else {
                 try {
-                    serverHandler.commitResponse(conn, response);
+
                     HTTPTransportUtils.processHTTPGetRequest(
                             msgContext, os,
                             (request.getFirstHeader(SOAPACTION) != null ?
@@ -401,7 +405,7 @@ public class ServerWorker implements Runnable {
                             request.getRequestLine().getUri(),
                             cfgCtx,
                             parameters);
-
+                    
                 } catch (AxisFault axisFault) {
                     handleException("Error processing GET request for: " +
                             request.getRequestLine().getUri(), axisFault);
@@ -430,9 +434,9 @@ public class ServerWorker implements Runnable {
         }
 
         try {
-            AxisEngine engine = new AxisEngine(cfgCtx);
-            MessageContext faultContext = engine.createFaultMessageContext(msgContext, e);
-            engine.sendFault(faultContext);
+            MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(
+                    msgContext, e);
+            AxisEngine.sendFault(faultContext);
 
         } catch (Exception ex) {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);

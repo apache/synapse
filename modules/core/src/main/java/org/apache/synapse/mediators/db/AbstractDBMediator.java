@@ -19,24 +19,21 @@
 
 package org.apache.synapse.mediators.db;
 
-import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.apache.synapse.mediators.AbstractMediator;
 
-import javax.xml.namespace.QName;
 import javax.sql.DataSource;
+import javax.xml.namespace.QName;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
-import java.math.BigDecimal;
 
 /**
  * This abstract DB mediator will perform common DB connection pooling etc. for all DB mediators

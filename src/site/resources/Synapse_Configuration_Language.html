@@ -662,42 +662,50 @@ database table. The &lt;driver&gt;,&lt;url&gt;,&lt;user/&gt; and
 &lt;password/&gt; are used to create a new custom DataSource and
 &lt;property&gt; defines the properties for the DataSource. Supported
 properties for custom DataSources</p>
-
-<p>* autocommit = true | false</p>
-
-<p>* isolation = Connection.TRANSACTION_NONE</p>
-
-<p>* | Connection.TRANSACTION_READ_COMMITTED</p>
-
-<p>* | Connection.TRANSACTION_READ_UNCOMMITTED</p>
-
-<p>* | Connection.TRANSACTION_REPEATABLE_READ</p>
-
-<p>* | Connection.TRANSACTION_SERIALIZABLE</p>
-
-<p>* initialsize = int</p>
-
-<p>* maxactive = int</p>
-
-<p>* maxidle = int</p>
-
-<p>* maxopenstatements = int</p>
-
-<p>* maxwait = long</p>
-
-<p>* minidle = int</p>
-
-<p>* poolstatements = true | false</p>
-
-<p>* testonborrow = true | false</p>
-
-<p>* testonreturn = true | false</p>
-
-<p>* testwhileidle = true | false</p>
-
-<p>* validationquery = String</p>
-
-<p></p>
+<ul>
+  <li>autocommit = true | false</li>
+</ul>
+<ul>
+  <li>isolation = Connection.TRANSACTION_NONE 
+    <p>| Connection.TRANSACTION_READ_COMMITTED</p>
+    <p>I Connection.TRANSACTION_READ_UNCOMMITTED</p>
+    <p>| Connection.TRANSACTION_REPEATABLE_READ</p>
+    <p>|Connection.TRANSACTION_SERIALIZABLE</p>
+  </li>
+</ul>
+<ul>
+  <li>initialsize = int</li>
+</ul>
+<ul>
+  <li>maxactive = int</li>
+</ul>
+<ul>
+  <li>maxidle = int</li>
+</ul>
+<ul>
+  <li>maxopenstatements = int</li>
+</ul>
+<ul>
+  <li>maxwait = long</li>
+</ul>
+<ul>
+  <li>minidle = int</li>
+</ul>
+<ul>
+  <li>poolstatements = true | false</li>
+</ul>
+<ul>
+  <li>testonborrow = true | false</li>
+</ul>
+<ul>
+  <li>testonreturn = true | false</li>
+</ul>
+<ul>
+  <li>testwhileidle = true | false</li>
+</ul>
+<ul>
+  <li>validationquery = String</li>
+</ul>
 
 <p>The &lt;dsName&gt;&lt;icClass/&gt;,&lt;url&gt;,&lt;user/&gt; and
 &lt;password/&gt; are used to Lookup the DataSource on JNDI using the
@@ -909,15 +917,51 @@ define a variable that must be binded to the dynamic context of the XQuery
 engine in order to access those variables through the XQuery script . The
 name of the variable correspond to the name of variable declaration in the
 XQuery script. The 'type' of the variable must be a valid type defined by the
-JSR-000225 (XQJ API). The 'expression' attribute is a XPath expression for
-which extract the value of a variable from a XML document or from the current
-SOAP envelope. If the 'key' attribute is present ,then the expression will be
-evaluated against a XML document that will be loaded from the
-registry,otherwise the expression will be evaluated against the current SOAP
-envelope.</p>
+JSR-000225 (XQJ API). In configuration those type are defined as bellow. only
+supported types are shown.</p>
 
 <p></p>
+<ul>
+  <li>XQItemType.XQBASETYPE_INT -&gt; INT</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_BYTE - &gt; BYTE</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_SHORT -&gt; SHORT</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_LONG -&gt; LONG</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT</li>
+</ul>
+<ul>
+  <li>XQItemType.XQBASETYPE_STRING -&gt; STRING</li>
+</ul>
+<ul>
+  <li>XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT</li>
+</ul>
+<ul>
+  <li>XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT</li>
+</ul>
+<ul>
+  <li>XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT</li>
+</ul>
 
-<p></p>
+<p>The 'expression' attribute is a XPath expression for which extract the
+value of a variable from a XML document or from the current SOAP envelope. If
+the 'key' attribute is present ,then the expression will be evaluated against
+a XML document that will be loaded from the registry,otherwise the expression
+will be evaluated against the current SOAP envelope.</p>
 </body>
 </html>

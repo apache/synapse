@@ -66,6 +66,8 @@ public final class SynapseConstants {
     public static final String HEADER_REPLY_TO = "ReplyTo";
     /** Refers to the MessageID header */
     public static final String HEADER_MESSAGE_ID = "MessageID";
+    /** Message format: pox, soap11, soap12 */
+    public static final String PROPERTY_MESSAGE_FORMAT = "MESSAGE_FORMAT";
 
     /** The Axis2 client options property name for the Rampart policy */
     public static final String RAMPART_POLICY = "rampartPolicy";

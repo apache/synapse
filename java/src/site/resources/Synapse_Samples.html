@@ -198,7 +198,17 @@
         and replying with a 202 Accepted response</a></li>
     </ul>
   </li>
-  <li><a href="#ExtensionMediators">Extension Mediators</a> 
+  <li><ul>
+      <li>Database Mediators</li>
+      <li>Setting up Database Mediators</li>
+      <li>Sample 200:Introducing the dblookup mediator</li>
+      <li>Sample 201:Introducing the dbreport mediator</li>
+      <li>Sample 202:Use of both the dbreport and the dblookup mediator</li>
+    </ul>
+  </li>
+  <li><ul>
+      <li><a href="#ExtensionMediators">Extension Mediators</a> </li>
+    </ul>
     <ul>
       <li><a href="Synapse_Samples_Setup.html#ScriptSetup">Setting up Script
         Mediators</a> </li>
@@ -213,7 +223,7 @@
         mediation in Java</a></li>
     </ul>
   </li>
-  <li><a href="#AdvancedMediations">Advanced Mediations</a>
+  <li><a href="#AdvancedMediations">Advanced Mediations</a> 
     <ul>
       <li>Sample 601:Throttle mediator - Concurrency throttling </li>
     </ul>
@@ -2690,6 +2700,377 @@ Server: Synapse-HttpComponents-NIO
 Transfer-Encoding: chunked
 
 0</pre>
+
+<div>
+<h1>Database Mediators </h1>
+
+<h3>Setting up Database mediators </h3>
+</div>
+
+<p></p>
+
+<p>Following Database mediators uses the derby within a client/server
+configuration by using the Network Server. Therefore, to proceed with the
+following sample s,it is need have derby binary distribution and user have to
+follow the following steps before going through samples.</p>
+<ol>
+  <li>set up and start the Derby Network Server</li>
+  <li>create and open a connection to the database using the derby client
+    driver 
+    <p>CONNECT
+    'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</p>
+  </li>
+  <li>create a table using the following query 
+    <p>create table company(name varchar(10), id varchar(10), prize
+    double);</p>
+  </li>
+  <li>inserts some data using following queries 
+    <p>insert into company values ('IBM','c1',0.0);</p>
+    <p>insert into company values ('SUN','c2',0.0);</p>
+    <p>insert into company values ('MSFT','c3',0.0);</p>
+  </li>
+</ol>
+
+<p>If user have not familiar with derby,then user can used any other
+databases,But in case of that ,user will have to edit properly following
+samples before running.</p>
+
+<p>In addition to that, it is need to have derby.jar,derbyclient.jar and
+derbynet.jar in the classpath. Simply this can be done putting above three
+jars in the synapse lib. For testing these samples derby 10.1.1.0 binary
+distribution was used.</p>
+
+<p></p>
+
+<h2>Sample 200</h2>
+
+<p></p>
+<pre> &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="myFaultHandler"&gt;
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
+        &lt;/makefault&gt;
+
+        &lt;property name="RESPONSE" value="true"/&gt;
+        &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+        &lt;send/&gt;
+        &lt;drop/&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="main" onError="myFaultHandler"&gt;
+        &lt;in&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text"
+                          value="** Looking up from the Database **"/&gt;
+            &lt;/log&gt;
+            &lt;dblookup xmlns="http://ws.apache.org/ns/synapse"&gt;
+                &lt;connection&gt;
+                    &lt;pool&gt;
+                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
+                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
+                        &lt;user&gt;synapse&lt;/user&gt;
+                        &lt;password&gt;synapse&lt;/password&gt;
+                    &lt;/pool&gt;
+                &lt;/connection&gt;
+                &lt;statement&gt;
+                    &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
+                    &lt;parameter expression="//m0:getQuote/m0:request/m0:symbol"
+                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                    &lt;result name="company_id" column="id"/&gt;
+                &lt;/statement&gt;
+            &lt;/dblookup&gt;
+
+            &lt;switch source="get-property('company_id')"&gt;
+                &lt;case regex="c1"&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="c2"&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="c3"&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;default&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault&gt;
+                        &lt;code value="tns:Receiver"
+                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                        &lt;reason value="** Unrecognized Company ID **"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;property name="RESPONSE" value="true"/&gt;
+                    &lt;header name="To" action="remove"/&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/default&gt;
+            &lt;/switch&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p></p>
+
+<p></p>
+
+<p><strong>Objective:</strong> I<strong>ntroduction to the dblookup
+mediator</strong></p>
+
+<p><strong>Pre-Requisites:</strong> Setting up derby database as above.</p>
+
+<p>Start the Synapse configuration numbered 200: i.e. synapse -sample 200</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
+
+<p></p>
+
+<p>This sample demonstrate simple Database read operation through synapse.
+when a meeagse arrive to the dblookup mediator ,it open a connection to the
+database and execute the SQL query. The SQL query use '?' character for
+attribute that will filed at run time. The parameters define how calculate
+the value of those attributes at runtime. In this sample ,a dblookup mediator
+use for extract 'id' of the company from company database using symbol which
+has evaluated from a xpath again SOPA envelope. Then 'id' base switching will
+be done by a switch mediator.</p>
+
+<p></p>
+
+<p>When the IBM stock quote is requested.</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+
+<p>synapse console show</p>
+<pre>INFO LogMediator text = ** Looking up from the Database **INFO LogMediator text = Company ID &#x2013; c1<br></pre>
+
+<p></p>
+
+<p>For</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+
+<p></p>
+
+<p>show</p>
+<pre>INFO LogMediator text = ** Looking up from the Database **INFO LogMediator text = Company ID &#x2013; c2<br></pre>
+
+<p>and For</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre>INFO LogMediator text = ** Looking up from the Database **<br>INFO LogMediator text = Company ID &#x2013; c2</pre>
+
+<p>For any other symbols. synapse console show</p>
+<pre>INFO LogMediator text = ** Unrecognized Company ID **</pre>
+
+<p></p>
+
+<p>and client get a response which has following message.</p>
+<pre>** Unrecognized Company ID **</pre>
+
+<div>
+</div>
+
+<h2>Sample 201</h2>
+
+<p></p>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text"
+                          value="** Reporting to the Database **"/&gt;
+            &lt;/log&gt;
+            &lt;dbreport xmlns="http://ws.apache.org/ns/synapse"&gt;
+                &lt;connection&gt;
+                    &lt;pool&gt;
+                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
+                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
+                        &lt;user&gt;synapse&lt;/user&gt;
+                        &lt;password&gt;synapse&lt;/password&gt;
+                    &lt;/pool&gt;
+                &lt;/connection&gt;
+                &lt;statement&gt;
+                    &lt;sql&gt;update company set prize=? where name =?&lt;/sql&gt;
+                    &lt;parameter expression="//m0:return/m0:last/child::text()"
+                               xmlns:m0="http://services.samples/xsd" type="DOUBLE"/&gt;
+                    &lt;parameter expression="//m0:return/m0:symbol/child::text()"
+                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                &lt;/statement&gt;
+            &lt;/dbreport&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<div>
+<p><strong>Objective: I<strong>ntroduction to the dbreport
+mediator</strong></strong></p>
+
+<p><strong>Pre-Requisites:</strong> Setting up derby database as above.</p>
+
+<p>Start the Synapse configuration numbered 201: i.e. synapse -sample 201</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
+</div>
+
+<p>This sample demonstrate simple database write operation. The dbreport
+mediator writes (i.e. inserts one row) to a table using message information.
+It works same as the dblookup mediator. In this sample , dbreport mediator is
+used for updating the stock prize of the company using the last quote value
+with is calculated by evaluating a xpath against the response message. after
+running this sample , user can check the company table using derby client
+tool, then it will show the inserted value by dbreport mediator.</p>
+
+<p></p>
+
+<p>run the client using</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+
+<p>and then execute the following query using database client tool against
+synapsedb</p>
+<pre>select prize from company where name='IBM';</pre>
+
+<p>It will show some value as bellow </p>
+<pre>96.39535981018865</pre>
+
+<div>
+</div>
+
+<h2>Sample 202</h2>
+
+<p></p>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text"
+                          value="** Reporting to the Database **"/&gt;
+            &lt;/log&gt;
+
+            &lt;dbreport xmlns="http://ws.apache.org/ns/synapse"&gt;
+                &lt;connection&gt;
+                    &lt;pool&gt;
+                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
+                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
+                        &lt;user&gt;synapse&lt;/user&gt;
+                        &lt;password&gt;synapse&lt;/password&gt;
+                    &lt;/pool&gt;
+                &lt;/connection&gt;
+                &lt;statement&gt;
+                    &lt;sql&gt;update company set prize=? where name =?&lt;/sql&gt;
+                    &lt;parameter expression="//m0:return/m0:last/child::text()"
+                               xmlns:m0="http://services.samples/xsd" type="DOUBLE"/&gt;
+                    &lt;parameter expression="//m0:return/m0:symbol/child::text()"
+                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                &lt;/statement&gt;
+            &lt;/dbreport&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text"
+                          value="** Looking up from the Database **"/&gt;
+            &lt;/log&gt;
+            &lt;dblookup xmlns="http://ws.apache.org/ns/synapse"&gt;
+                &lt;connection&gt;
+                    &lt;pool&gt;
+                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
+                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
+                        &lt;user&gt;synapse&lt;/user&gt;
+                        &lt;password&gt;synapse&lt;/password&gt;
+                    &lt;/pool&gt;
+                &lt;/connection&gt;
+                &lt;statement&gt;
+                    &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
+                    &lt;parameter expression="//m0:return/m0:symbol/child::text()"
+                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                    &lt;result name="stock_prize" column="prize"/&gt;
+                &lt;/statement&gt;
+            &lt;/dblookup&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text"
+                          expression="fn:concat('Stock Prize - ',get-property('stock_prize'))"/&gt;
+            &lt;/log&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<div>
+</div>
+
+<p><strong>Objective: Demonstrate use of dbreport and dblookup
+mediators</strong></p>
+
+<p><strong>Pre-Requisites:</strong> Setting up derby database as above.</p>
+
+<p>Start the Synapse configuration numbered 202: i.e. synapse -sample 202</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
+
+<p></p>
+
+<p>In this sample ,the dbreport mediator works same as above sample. It
+updates the prize for company using response messages content. Then ,the
+dblookup mediator read the last updated value from the company database and
+log it.</p>
+
+<p>when run client</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+
+<p>synapse console show messages as bellow</p>
+<pre>INFO LogMediator text = ** Reporting to the Database **<br><br>...<br><br>INFO LogMediator text = ** Looking up from the Database **<br><br>...<br><br>INFO LogMediator text = Stock Prize - 153.47886496064808</pre>
+
+<p></p>
 
 <h1><a name="ExtensionMediators">Extension mediators</a></h1>
 

@@ -92,7 +92,7 @@
             <directory>src/main/bin</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>wrapper.dll</include>
+                <include>wrapper-windows-x86-32.dll</include>
                 <include>libwrapper-linux-x86-32.so</include>
                 <include>libwrapper-linux-x86-64.so</include>
                 <include>libwrapper-solaris-sparc-32.so</include>

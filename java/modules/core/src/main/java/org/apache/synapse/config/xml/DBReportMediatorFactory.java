@@ -19,10 +19,10 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.db.DBReportMediator;
-import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
@@ -30,10 +30,18 @@ import javax.xml.namespace.QName;
  * <dbreport>
  *   <connection>
  *     <pool>
+ *       (
  *       <driver/>
  *       <url/>
  *       <user/>
  *       <password/>
+ *     |
+ *       <dsName/>
+ *       <icClass/>
+ *       <url/>
+ *       <user/>
+ *       <password/>
+ *     )
  *       <property name="name" value="value"/>*
  *     </pool>
  *   </connection>

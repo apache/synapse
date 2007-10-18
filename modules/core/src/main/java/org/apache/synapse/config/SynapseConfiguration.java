@@ -607,8 +607,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
     /**
      * Get the Startup with the specified name
      * 
-     * @param id  
-     *          String name of the startup to be retrieved
+     * @param id - String name of the startup to be retrieved
      * @return Startup object with the specified name or null
      */
     public Startup getStartup(String id) {
@@ -618,21 +617,47 @@ public class SynapseConfiguration implements ManagedLifecycle {
     /**
      * Add a startup to the startups map in the configuration
      *
-     * @param startup
-     *              Startup object to be added 
+     * @param startup - Startup object to be added 
      */
     public void addStartup(Startup startup) {
         startups.put(startup.getName(), startup);
     }
 
+    /**
+     * Removes the startup specified by the name
+     * 
+     * @param name - name of the startup that needs to be removed
+     */
+    public void removeStartup(String name) {
+        startups.remove(name);
+    }
+
+    /**
+     * Gets the properties to configure the synapse enviorenment
+     * 
+     * @return set of properties as Properties
+     */
     public Properties getProperties() {
         return properties;
     }
 
+    /**
+     * Sets the properties to configure the synapse enviorenment
+     *
+     * @param properties - Properties which needs to be set
+     */
     public void setProperties(Properties properties) {
         this.properties = properties;
     }
 
+    /**
+     * Gets the String representation of the property value if there is a property for the
+     * given propKey or returns the default value passed
+     * 
+     * @param propKey - key for the property lookup
+     * @param def     - default value
+     * @return String representation of the property value with the given key or the def value
+     */
     public String getProperty(String propKey, String def) {
         String val = System.getProperty(propKey);
         if (val == null) {
@@ -648,6 +673,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
         return def;
     }
 
+    /**
+     * Gets the propety value if the property specified by the propKey is there or null else
+     *
+     * @param propKey - key for the property lookup
+     * @return String representation of the property value if found or null else
+     */
     public String getProperty(String propKey) {
         String val = System.getProperty(propKey);
         if (val == null) {

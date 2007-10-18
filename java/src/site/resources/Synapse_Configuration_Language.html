@@ -373,7 +373,7 @@ be updated accordingly.</p>
 <h2><a name="mediator">Mediators</a></h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#class">class</a> | <a href="#validate">validate</a> | <a href="#property">property</a> | <a href="#sequence">sequence ref</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#rmsequence">RMSequence</a></pre>
+<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#class">class</a> | <a href="#validate">validate</a> | <a href="#property">property</a> | <a href="#sequence">sequence ref</a> | <a href="#in">in</a> | <a href="#out">out</a> | RMSequence | Throttle | XQuery</pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -528,12 +528,19 @@ original message.</p>
 <h4><a name="xslt">XSLT</a></h4>
 <pre> &lt;xslt key="string" [source="xpath"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+<br>&lt;feature name="string" value="true| false" /&gt;
  &lt;/xslt&gt;</pre>
 
 <p>The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
 given element. If the source element is not specified, it defaults to the
 first child of the soap body. Optionally parameters (XSLT) could be passed
-into the transformations through the &lt;property&gt; elements.</p>
+into the transformations through the &lt;property&gt; elements.The
+&lt;feature&gt; defines a any feature which should be set to the
+TransformerFactory by explicitly. There is a XSLT mediator specific feature
+called 'http://ws.apache.org/ns/synapse/transform/feature/dom' and This
+feature for which deciding switching between DOM and Stream during the
+transformation process. If this feature is set to 'true',then transformation
+process will use DOM.</p>
 
 <p></p>
 
@@ -691,9 +698,9 @@ body contains an element named 'symbol' which has a value of 'IBM' would
 be:</p>
 <pre> &lt;script language="js"&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script/&gt;</pre>
 
-<p>Synapse uses the Apache <a href="http://jakarta.apache.org/bsf/">Bean Scripting Framework</a> for the
-scripting language support, any script language supported by BSF may be used
-to implement a Synapse Mediator. 
+<p>Synapse uses the Apache <a href="http://jakarta.apache.org/bsf/">Bean
+Scripting Framework</a> for the scripting language support, any script
+language supported by BSF may be used to implement a Synapse Mediator. </p>
 
 <p>Implementing a Mediator with a script language can have advantages over
 using the built in Synapse Mediator types or implementing a custom Java class
@@ -709,6 +716,65 @@ has additional methods over the standard Synapse MessageContext to enable
 working with the XML in a way natural to the scripting language. For example
 when using JavaScript getPayloadXML and setPayloadXML, E4X XML objects, and
 when using Ruby, REXML documents.</p>
+
+<div>
+<h3>Throttle Mediator</h3>
+
+<div>
+
+<div>
+<p></p>
+<pre>&lt;throttle [onReject="string"] [onAccept="string"] [id="string"]&gt;
+    &lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;
+    &lt;onReject&gt;..&lt;/onReject&gt;
+    &lt;onAccept&gt;..&lt;/onAccept&gt;
+&lt;/throttle&gt;</pre>
+</div>
+</div>
+</div>
+
+<p></p>
+
+<p>Throttle mediator can use for both of controlling access rate and
+concurrency access. Throttling can be configured using policy and that is the
+mandatory for throttle mediator. It can be defined by in-line or as a
+registry key. The 'id' attribute identify the group of throttle mediators.
+Throttle mediator in the OUT path only need this attribute and if there is a
+policy ,it will not affect. For throttle mediator in the IN path,the throttle
+policy will affect and only if 'id' attribute is present ,the concurrency
+throttling will occur .The 'onRejct' mediators sequence will invoke if the
+throttle mediator deny access ,otherwise the 'OnAccept' mediators sequence
+will take message mediation.</p>
+
+<div>
+
+<div>
+<h3>XQuery Mediator</h3>
+
+<div>
+<p></p>
+<pre>&lt;xquery [key="string"] [target="xpath"]&gt;
+    &lt;variable name="string" type="string" [key="string"] [expression="xpath"]/&gt;?
+&lt;/xquery&gt; </pre>
+</div>
+</div>
+</div>
+
+<p></p>
+
+<p>The XQuery mediator can be used to perform XQuery. The 'variable' elements
+define a variable that must be binded to the dynamic context of the XQuery
+engine in order to access those variables through the XQuery script . The
+name of the variable correspond to the name of variable declaration in the
+XQuery script. The 'type' of the variable must be a valid type defined by the
+JSR-000225 (XQJ API). The 'expression' attribute is a XPath expression for
+which extract the value of a variable from a XML document or from the current
+SOAP envelope. If the 'key' attribute is present ,then the expression will be
+evaluated against a XML document that will be loaded from the
+registry,otherwise the expression will be evaluated against the current SOAP
+envelope.</p>
+
+<p></p>
 
 <p></p>
 </body>

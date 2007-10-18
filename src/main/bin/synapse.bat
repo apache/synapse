@@ -97,7 +97,7 @@ FOR %%C in ("%SYNAPSE_HOME%\lib\patches\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAP
 
 set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%SYNAPSE_HOME%\lib"
 FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";"%SYNAPSE_HOME%\repository\conf";%SYNAPSE_CLASS_PATH%
 
 rem use proper bouncy castle version for the JDK
 

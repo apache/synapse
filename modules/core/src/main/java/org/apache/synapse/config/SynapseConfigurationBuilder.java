@@ -94,7 +94,7 @@ public class SynapseConfigurationBuilder {
             synCfg.getProperties().load(Thread.currentThread().getContextClassLoader().getResourceAsStream(props));
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to load synapse properties", e);
+                log.debug("Unable to load synapse properties : Using the default tunning parameters for Synapse");
             }
         }
     }

@@ -21,7 +21,6 @@ package org.apache.synapse.mediators.db;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.SynapseException;
-import org.jaxen.JaxenException;
 
 import java.sql.Types;
 import java.util.ArrayList;

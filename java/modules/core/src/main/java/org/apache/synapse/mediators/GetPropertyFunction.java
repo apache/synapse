@@ -163,6 +163,13 @@ public class GetPropertyFunction implements Function {
                 if (messageID != null) {
                     return messageID;
                 }
+            } else if (SynapseConstants.PROPERTY_MESSAGE_FORMAT.equals(key)) {
+                if(synCtx.isDoingPOX())
+                    return SynapseConstants.FORMAT_POX;
+                else  if (synCtx.isSOAP11())
+                    return SynapseConstants.FORMAT_SOAP11;
+                else
+                    return SynapseConstants.FORMAT_SOAP12;
             } else {
                 return synCtx.getProperty(key);
             }

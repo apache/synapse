@@ -19,13 +19,13 @@
 
 package org.apache.synapse.mediators.dblookup;
 
-import org.jaxen.JaxenException;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.jaxen.JaxenException;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.sql.PreparedStatement;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Query {
     String rawStatement = null;

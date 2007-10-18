@@ -19,10 +19,10 @@
 
 package org.apache.synapse.mediators.db;
 
-import org.apache.synapse.mediators.db.Statement;
 import org.apache.synapse.MessageContext;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * A mediator that writes (i.e. inserts one row) to a table using message information

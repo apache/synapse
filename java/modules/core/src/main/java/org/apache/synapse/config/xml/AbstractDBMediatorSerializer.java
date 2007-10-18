@@ -19,16 +19,14 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.mediators.db.Statement;
-import org.apache.synapse.mediators.db.AbstractDBMediator;
-import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.db.AbstractDBMediator;
+import org.apache.synapse.mediators.db.Statement;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.sql.Types;
+import java.util.Iterator;
 
 /**
  * <dbreport | dblookup | .. etc>

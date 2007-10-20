@@ -22,6 +22,8 @@ package org.apache.synapse.endpoints;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class IndirectEndpoint implements Endpoint {
 
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     private static final Log log = LogFactory.getLog(IndirectEndpoint.class);
 
     private String name = null;
@@ -56,13 +59,19 @@ public class IndirectEndpoint implements Endpoint {
 
         if (endpoint.isActive(synMessageContext)) {
             endpoint.send(synMessageContext);
-        } else {
 
+        } else {
             // if this is a child of some other endpoint, inform parent about the failure.
             // if not, inform to the next fault handler.
             if (parentEndpoint != null) {
+                auditWarn("Endpoint : " + endpoint.getName() + " is currently inactive" +
+                    " - invoking parent endpoint", synMessageContext);
                 parentEndpoint.onChildEndpointFail(this, synMessageContext);
+
             } else {
+                auditWarn("Endpoint : " + endpoint.getName() + " is currently inactive" +
+                    " - invoking fault handler / assuming failure", synMessageContext);
+
                 Object o = synMessageContext.getFaultStack().pop();
                 if (o != null) {
                     ((FaultHandler) o).handleFault(synMessageContext);
@@ -143,4 +152,34 @@ public class IndirectEndpoint implements Endpoint {
         log.error(msg);
         throw new SynapseException(msg);
     }
+
+    protected void auditWarn(String msg, MessageContext msgContext) {
+        log.warn(msg);
+        if (msgContext.getServiceLog() != null) {
+            msgContext.getServiceLog().warn(msg);
+        }
+        if (shouldTrace(msgContext)) {
+            trace.warn(msg);
+        }
+    }
+
+    public boolean shouldTrace(MessageContext synCtx){
+        Endpoint endpoint = synCtx.getEndpoint(key);
+        EndpointDefinition endptDefn = null;
+        if (endpoint instanceof AddressEndpoint) {
+            AddressEndpoint addEndpt = (AddressEndpoint) endpoint;
+            endptDefn = addEndpt.getEndpoint();
+        } else if (endpoint instanceof WSDLEndpoint) {
+            WSDLEndpoint wsdlEndpt = (WSDLEndpoint) endpoint;
+            endptDefn = wsdlEndpt.getEndpoint();
+        }
+
+        if (endptDefn != null) {
+            return (endptDefn.getTraceState() == SynapseConstants.TRACING_ON) ||
+                   (endptDefn.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                        synCtx.getTracingState() == SynapseConstants.TRACING_ON);
+        }
+        return false;
+    }
+
 }

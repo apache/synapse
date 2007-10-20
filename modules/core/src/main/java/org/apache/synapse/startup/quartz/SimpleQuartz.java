@@ -55,15 +55,10 @@ public class SimpleQuartz extends AbstractStartup {
     private static final int THREADPOOLSIZE = 5;
 
     private String cron;
-
     private int repeatCount = -1;
-
     private long repeatInterval;
-
     private String className;
-
     private Scheduler sch;
-
     Set xmlProperties = new HashSet();
 
     public QName getTagQName() {
@@ -75,10 +70,10 @@ public class SimpleQuartz extends AbstractStartup {
             try {
                 sch.shutdown();
             } catch (SchedulerException e) {
-                throw new SynapseException(e);
+                log.warn("Error shutting down scheduler", e);
+                throw new SynapseException("Error shutting down scheduler", e);
             }
         }
-
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {
@@ -86,6 +81,7 @@ public class SimpleQuartz extends AbstractStartup {
         try {
             DirectSchedulerFactory.getInstance().createVolatileScheduler(THREADPOOLSIZE);
             sch = DirectSchedulerFactory.getInstance().getScheduler();
+
             Trigger trigger = null;
             if (cron == null) {
                 if (repeatCount >= 0) {
@@ -93,16 +89,19 @@ public class SimpleQuartz extends AbstractStartup {
                 } else {
                     trigger = TriggerUtils.makeImmediateTrigger(-1, repeatInterval);
                 }
+
             } else {
                 CronTrigger cronTrig = new CronTrigger();
                 cronTrig.setCronExpression(cron);
                 trigger = cronTrig;
             }
+
             // give the trigger a random name
             trigger.setName("Trigger" + String.valueOf((new Random()).nextLong()));
             trigger.setGroup("synapse.simple.quartz");
             trigger.setVolatility(true);
             JobDetail jobDetail = new JobDetail();
+
             // Give the job a name
             jobDetail.setName(name);
             jobDetail.setGroup("synapse.simple.quartz");
@@ -112,12 +111,14 @@ public class SimpleQuartz extends AbstractStartup {
             jdm.put(SimpleQuartzJob.CLASSNAME, className);
             jdm.put(SimpleQuartzJob.PROPERTIES, xmlProperties);
             jobDetail.setJobDataMap(jdm);
+
             sch.scheduleJob(jobDetail, trigger);
             sch.start();
             log.info("Scheduled job " + jobDetail.getFullName() + " for class " + className);
 
         } catch (Exception e) {
-            throw new SynapseException("Problem with startup of Scheduler ", e);
+            log.fatal("Error starting up Scheduler", e);
+            throw new SynapseException("Error starting up Scheduler", e);
         }
 
     }

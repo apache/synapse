@@ -354,7 +354,9 @@ public class Axis2MessageContext implements MessageContext {
                 serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
                 return serviceLog;
             } else {
-                serviceLog = LogFactory.getLog(Axis2MessageContext.class);
+                serviceLog = LogFactory.getLog(
+                    SynapseConstants.SERVICE_LOGGER_PREFIX.substring(0,
+                    SynapseConstants.SERVICE_LOGGER_PREFIX.length()-1));
                 return serviceLog;
             }
         }

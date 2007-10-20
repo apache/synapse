@@ -111,7 +111,7 @@ public class ServerManager {
                 throw new SynapseException(message + "Synapse Environment");
             }
 
-            ((SynapseConfiguration) synCfg.getValue()).init((SynapseEnvironment) synEnv.getValue());
+            //((SynapseConfiguration) synCfg.getValue()).init((SynapseEnvironment) synEnv.getValue());
 
             System.out.println("[SynapseServer] Ready");
 

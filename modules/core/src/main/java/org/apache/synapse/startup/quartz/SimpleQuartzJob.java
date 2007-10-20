@@ -7,6 +7,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.startup.Task;
 import org.apache.synapse.config.xml.PropertyHelper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.quartz.Job;
@@ -15,36 +16,51 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 public class SimpleQuartzJob implements Job {
-	public static final String SYNAPSEENVIRONMENT= "SynapseEnvironment", CLASSNAME="ClassName", PROPERTIES = "Properties";
-	private static final Log log = LogFactory.getLog(SimpleQuartzJob.class);
-	public void execute(JobExecutionContext ctx) throws JobExecutionException {
-		log.debug("executing task "+ctx.getJobDetail().getFullName());
-		JobDataMap jdm = ctx.getMergedJobDataMap();
-		String jobClassName = (String)jdm.get(CLASSNAME);
-		if (jobClassName==null) {
-			throw new JobExecutionException("No "+CLASSNAME+" in JobDetails");
-		}
-		org.apache.synapse.startup.Task task =null;
-		try {
-			task = (org.apache.synapse.startup.Task)getClass().getClassLoader().loadClass(jobClassName).newInstance();
-		} catch (Exception e) {
-			throw new JobExecutionException("Cannot instantiate task "+jobClassName, e);
-		}
-		Set properties = (Set)jdm.get(PROPERTIES);
-		Iterator it = properties.iterator();
-		while (it.hasNext()) {
-			OMElement prop = (OMElement)it.next();
-			log.debug("found Property"+prop.toString());
-			PropertyHelper.setStaticProperty(prop, task);
-		}
-		SynapseEnvironment se = (SynapseEnvironment)jdm.get("SynapseEnvironment");
-		if (task instanceof ManagedLifecycle) {
-			if (se!=null) {
-				((ManagedLifecycle) task).init(se);
-			}
-		}
-		task.execute();
-		
-	}
+    public static final String SYNAPSEENVIRONMENT = "SynapseEnvironment",
+        CLASSNAME = "ClassName", PROPERTIES = "Properties";
+    private static final Log log = LogFactory.getLog(SimpleQuartzJob.class);
+
+    public void execute(JobExecutionContext ctx) throws JobExecutionException {
+
+        log.debug("Executing task : " + ctx.getJobDetail().getFullName());
+        JobDataMap jdm = ctx.getMergedJobDataMap();
+        String jobClassName = (String) jdm.get(CLASSNAME);
+        if (jobClassName == null) {
+            handleException("No " + CLASSNAME + " in JobDetails");
+        }
+
+        Task task = null;
+        try {
+            task = (Task) getClass().getClassLoader().loadClass(jobClassName).newInstance();
+        } catch (Exception e) {
+            handleException("Cannot instantiate task : " + jobClassName, e);
+        }
+
+        Set properties = (Set) jdm.get(PROPERTIES);
+        Iterator it = properties.iterator();
+        while (it.hasNext()) {
+            OMElement prop = (OMElement) it.next();
+            log.debug("Found Property : " + prop.toString());
+            PropertyHelper.setStaticProperty(prop, task);
+        }
+
+        SynapseEnvironment se = (SynapseEnvironment) jdm.get("SynapseEnvironment");
+        if (task instanceof ManagedLifecycle) {
+            if (se != null) {
+                ((ManagedLifecycle) task).init(se);
+            }
+        }
+        task.execute();
+    }
+
+    private void handleException(String msg) throws JobExecutionException {
+        log.error(msg);
+        throw new JobExecutionException(msg);
+    }
+
+    private void handleException(String msg, Exception e) throws JobExecutionException {
+        log.error(msg, e);
+        throw new JobExecutionException(msg, e);
+    }
 
 }

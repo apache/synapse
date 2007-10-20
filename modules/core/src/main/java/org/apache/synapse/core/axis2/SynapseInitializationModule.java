@@ -163,6 +163,7 @@ public class SynapseInitializationModule implements Module {
             log.fatal(msg, e);
             throw new SynapseException(msg, e);
         }
+        synapseConfiguration.init(synEnv);
         
         return synapseConfiguration;
     }

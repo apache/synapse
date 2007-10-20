@@ -21,6 +21,7 @@ package org.apache.synapse.transport.vfs;
 import org.apache.synapse.transport.base.AbstractTransportSender;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.BaseTransportException;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
@@ -31,8 +32,14 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.vfs.*;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMText;
 
+import javax.activation.DataHandler;
 import java.io.OutputStream;
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 public class VFSTransportSender extends AbstractTransportSender {
 
@@ -118,6 +125,62 @@ public class VFSTransportSender extends AbstractTransportSender {
 
     private void populateResponseFile(FileObject responseFile, MessageContext msgContext) throws AxisFault {
 
+        // check the first element of the SOAP body, do we have content wrapped using the
+        // default wrapper elements for binary (BaseConstants.DEFAULT_BINARY_WRAPPER) or
+        // text (BaseConstants.DEFAULT_TEXT_WRAPPER) ? If so, do not create SOAP messages
+        // within the files but just get the payload in its native format
+
+        OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
+        if (firstChild != null) {
+            if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
+                try {
+                    OutputStream os = responseFile.getContent().getOutputStream();
+                    OMNode omNode = firstChild.getFirstOMChild();
+                    if (omNode != null && omNode instanceof OMText) {
+                        Object dh = ((OMText) omNode).getDataHandler();
+                        if (dh != null && dh instanceof DataHandler) {
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            try {
+                                ((DataHandler) dh).writeTo(baos);
+                            } catch (IOException e) {
+                                handleException("Error serializing binary content of element : " +
+                                    BaseConstants.DEFAULT_BINARY_WRAPPER, e);
+                            }
+                            os.write(baos.toByteArray());
+                        }
+                    }
+                } catch (FileSystemException e) {
+                    handleException("Error getting an output stream to file : " +
+                        responseFile.getName().getBaseName(), e);
+                } catch (IOException e) {
+                    handleException("Error getting binary content of message", e);
+                }
+
+            } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
+                try {
+                    OutputStream os = responseFile.getContent().getOutputStream();
+                    os.write(firstChild.getText().getBytes());
+                } catch (FileSystemException e) {
+                    handleException("Error getting an output stream to file : " +
+                        responseFile.getName().getBaseName(), e);
+                } catch (IOException e) {
+                    handleException("Error getting text content of message as bytes", e);
+                }
+            } else {
+                populateSOAPFile(responseFile, msgContext);
+            }
+        } else {
+            populateSOAPFile(responseFile, msgContext);
+        }
+    }
+
+    /**
+     * Populate file with a SOAP formatted message
+     * @param responseFile the response file created
+     * @param msgContext the message context that holds the message to be written
+     * @throws AxisFault on error
+     */
+    private void populateSOAPFile(FileObject responseFile, MessageContext msgContext) throws AxisFault {
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter = null;
         try {

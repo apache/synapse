@@ -90,8 +90,9 @@ public class VFSTransportSender extends AbstractTransportSender {
         }
 
         if (vfsOutInfo != null) {
+            FileObject replyFile = null;
             try {
-                FileObject replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
+                replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
                 if (replyFile.exists()) {
 
                     if (replyFile.getType() == FileType.FOLDER) {
@@ -117,6 +118,12 @@ public class VFSTransportSender extends AbstractTransportSender {
             } catch (FileSystemException e) {
                 handleException("Error resolving reply file : " +
                     vfsOutInfo.getOutFileURI(), e);
+            } finally {
+                if (replyFile != null) {
+                    try {
+                        replyFile.close();
+                    } catch (FileSystemException ignore) {}
+                }
             }
         } else {
             handleException("Unable to determine out transport information to send message");

@@ -41,6 +41,10 @@ import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 
+/**
+ * axis2.xml - transport definition
+ *  <transportSender name="file" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
+ */
 public class VFSTransportSender extends AbstractTransportSender {
 
     public static final String TRANSPORT_NAME = "vfs";

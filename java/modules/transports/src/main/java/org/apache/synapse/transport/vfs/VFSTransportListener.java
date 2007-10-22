@@ -58,12 +58,12 @@ import java.util.*;
  * http://somehost:8080/downloads/somefile.jar
  * http://myusername@somehost/index.html
  * webdav://somehost:8080/dist
- * ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz
+ * ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?passive=true]
  * sftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz
  * smb://somehost/home
  *
  * axis2.xml - transport definition
- *  <transportReceiver name="file" class="org.apache.axis2.transport.file.FileTransportListener"/>
+ *  <transportReceiver name="file" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
  *
  * services.xml - service attachment
  *  required parameters
@@ -80,6 +80,10 @@ import java.util.*;
  *
  *  <parameter name="transport.vfs.ReplyFileURI" >..</parameter>
  *  <parameter name="transport.vfs.ReplyFileName">..</parameter>
+ *
+ * FTP testing URIs
+ * ftp://ftpuser:password@asankha/somefile.csv?passive=true
+ * ftp://vfs:apache@vfs.netfirms.com/somepath/somefile.xml?passive=true
  */
 public class VFSTransportListener extends AbstractPollingTransportListener {
 

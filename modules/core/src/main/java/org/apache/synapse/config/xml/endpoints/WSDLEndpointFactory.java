@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.description.WSDL2Constants;
@@ -124,23 +125,27 @@ public class WSDLEndpointFactory implements EndpointFactory {
             wsdlEndpoint.setPortName(portName);
 
             if (wsdlURI != null) {
+
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
-
                 try {
-                    String ns = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI).toString())
-                        .getNamespace().getNamespaceURI();
+                    OMElement wsdlOM = SynapseConfigUtils.getOMElementFromURL(
+                        new URL(wsdlURI).toString());
+                    if (wsdlOM != null) {
+                        OMNamespace ns = wsdlOM.getNamespace();
+                        if (ns != null) {
+                            String nsUri = wsdlOM.getNamespace().getNamespaceURI();
+                            if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
+                                endpoint = new WSDL11EndpointBuilder().
+                                    createEndpointDefinitionFromWSDL(wsdlOM, serviceName, portName);
 
-                    if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(ns)) {
-                        endpoint = new WSDL11EndpointBuilder().
-                                createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
+                            } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
+                                //endpoint = new WSDL20EndpointBuilder().
+                                //        createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
 
-                    } else if (WSDL2Constants.WSDL_NAMESPACE.equals(ns)) {
-                        //endpoint = new WSDL20EndpointBuilder().
-                        //        createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
-
-                        handleException("WSDL 2.0 Endpoints are currently not supported");
+                                handleException("WSDL 2.0 Endpoints are currently not supported");
+                            }
+                        }
                     }
-
                 } catch (Exception e) {
                     handleException("Couldn't create endpoint from the given WSDL URI : "
                         + e.getMessage(), e);

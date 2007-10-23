@@ -119,8 +119,10 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         } else if (endpt.isForcePOX()) {
             address.addAttribute(fac.createOMAttribute("format", null, "pox"));
             
-        } else if (endpt.isForceSOAP()) {
+        } else if (endpt.isForceSOAP11()) {
             address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        } else if (endpt.isForceSOAP12()) {
+            address.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         }
         
         if (endpt.isUseSwa()) {

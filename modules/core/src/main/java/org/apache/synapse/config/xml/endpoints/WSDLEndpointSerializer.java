@@ -121,9 +121,11 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         } else if (endpointDefinition.isForcePOX()) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
             
-        } else if (endpointDefinition.isForceSOAP()) {
+        } else if (endpointDefinition.isForceSOAP11()) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
-        }        
+        } else if (endpointDefinition.isForceSOAP12()) {
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        }
         
         int isEnableStatistics = endpointDefinition.getStatisticsState();
         String statisticsValue = null;

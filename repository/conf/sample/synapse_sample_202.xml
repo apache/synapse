@@ -34,7 +34,7 @@
                           value="** Reporting to the Database **"/>
             </log>
 
-            <dbreport xmlns="http://ws.apache.org/ns/synapse">
+            <dbreport>
                 <connection>
                     <pool>
                         <driver>org.apache.derby.jdbc.ClientDriver</driver>
@@ -55,7 +55,7 @@
                 <property name="text"
                           value="** Looking up from the Database **"/>
             </log>
-            <dblookup xmlns="http://ws.apache.org/ns/synapse">
+            <dblookup>
                 <connection>
                     <pool>
                         <driver>org.apache.derby.jdbc.ClientDriver</driver>

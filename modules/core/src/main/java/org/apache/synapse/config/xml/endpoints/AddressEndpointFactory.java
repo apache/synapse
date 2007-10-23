@@ -171,11 +171,11 @@ public class AddressEndpointFactory implements EndpointFactory {
                 endpoint.setFormat(SynapseConstants.FORMAT_POX);
                 
             } else if (forceValue.equals(SynapseConstants.FORMAT_SOAP11)) {
-            	endpoint.setForceSOAP(true);
+            	endpoint.setForceSOAP11(true);
             	endpoint.setFormat(SynapseConstants.FORMAT_SOAP11);
                 
             } else if (forceValue.equals(SynapseConstants.FORMAT_SOAP12)) {
-            	endpoint.setForceSOAP(true);
+            	endpoint.setForceSOAP12(true);
                 endpoint.setFormat(SynapseConstants.FORMAT_SOAP12);
                 
             } else {

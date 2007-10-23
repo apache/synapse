@@ -216,11 +216,11 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 endpointDefinition.setFormat(SynapseConstants.FORMAT_POX);
 
             } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
-                endpointDefinition.setForceSOAP(true);
+                endpointDefinition.setForceSOAP11(true);
                 endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP11);
                 
             } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
-                endpointDefinition.setForceSOAP(true);
+                endpointDefinition.setForceSOAP12(true);
                 endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP12);
                 
             } else {

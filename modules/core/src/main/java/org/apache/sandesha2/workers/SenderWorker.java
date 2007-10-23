@@ -314,8 +314,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.sendMsgError, e.toString());
 				
-				if (log.isErrorEnabled())
-				  log.error(message, e);
+				if (log.isDebugEnabled())
+				  log.debug(message, e);
 				
 				recordError(e, rmMsgCtx, storageManager);
 				
@@ -598,10 +598,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					}
 				} catch (AxisFault e) {
 					//Cannot find a valid SOAP envelope.
-					if (log.isErrorEnabled() ) {
-						log.error (SandeshaMessageHelper
+					if (log.isDebugEnabled() ) {
+						log.debug (SandeshaMessageHelper
 								.getMessage(SandeshaMessageKeys.soapEnvNotSet));
-					log.error ("Caught exception", e);
+					log.debug ("Caught exception", e);
 					}
 				
 					return;

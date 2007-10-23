@@ -131,8 +131,6 @@ public abstract class SandeshaThread extends Thread{
 					//ignore
 				}
 			}
-			
-			stopRequested = false;
 		}
 		
     // In a unit test, tracing 'this' once the thread was stopped caused
@@ -192,6 +190,8 @@ public abstract class SandeshaThread extends Thread{
 		} else if (!stopRequested){
 			if(log.isDebugEnabled()) log.debug("Waking thread");
 			wakeThread();
+		} else if (stopRequested) {
+			if(log.isDebugEnabled()) log.debug("Can't start thread as it has been stopped");
 		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaThread::runThreadForSequence");

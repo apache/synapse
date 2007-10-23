@@ -45,9 +45,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.MessageHelper;
-import org.apache.axiom.attachments.Attachments;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -105,7 +103,8 @@ public class Axis2FlexibleMEPClient {
                     "] [ mtom = " + endpoint.isUseMTOM() +
                     "] [ swa = " + endpoint.isUseSwa() +
                     "] [ format = " + endpoint.getFormat() +                    
-                    "] [ force soap=" + endpoint.isForceSOAP() +
+                    "] [ force soap11=" + endpoint.isForceSOAP11() +
+                    "] [ force soap12=" + endpoint.isForceSOAP12() +
                     "; pox=" + endpoint.isForcePOX() : "") +
                 "] [ to " + synapseOutMessageContext.getTo() + "]");
         }

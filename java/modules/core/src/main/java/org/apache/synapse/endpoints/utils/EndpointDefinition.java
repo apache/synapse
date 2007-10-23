@@ -45,8 +45,10 @@ public class EndpointDefinition {
 	private boolean useSeparateListener = false;
 	/** force REST on **/
 	private boolean forcePOX = false;
-	/** force SOAP on **/
-	private boolean forceSOAP = false;
+	/** force SOAP11 on **/
+	private boolean forceSOAP11 = false;
+    /** force SOAP11 on **/
+	private boolean forceSOAP12 = false;
     /** use MTOM **/
     private boolean useMTOM = false;
     /** use SWA **/
@@ -182,12 +184,20 @@ public class EndpointDefinition {
 		return forcePOX;
 	}
 
-	public void setForceSOAP(boolean forceSOAP) {
-		this.forceSOAP = forceSOAP;
+	public void setForceSOAP11(boolean forceSOAP11) {
+		this.forceSOAP11 = forceSOAP11;
 	}
 
-	public boolean isForceSOAP() {
-		return forceSOAP;
+	public boolean isForceSOAP11() {
+		return forceSOAP11;
+	}
+
+    public void setForceSOAP12(boolean forceSOAP12) {
+		this.forceSOAP12 = forceSOAP12;
+	}
+
+	public boolean isForceSOAP12() {
+		return forceSOAP12;
 	}
 
     public boolean isUseMTOM() {

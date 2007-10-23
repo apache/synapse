@@ -20,7 +20,6 @@
 <project default="build-services">
 
     <property name="synapse.home" value="../../../.."/>
-    <property name="lib" value="${synapse.home}/lib"/>
     <property name="temp.dir" value="temp"/>
     <property name="services" value="../../repository/services"/>
     <property name="classes" value="${temp.dir}/classes"/>
@@ -30,6 +29,7 @@
         <pathelement path="${java.class.path}"/>
         <fileset dir="${synapse.home}">
             <include name="lib/*.jar"/>
+            <include name="webapp/WEB-INF/lib/*.jar"/>
         </fileset>
     </path>
 

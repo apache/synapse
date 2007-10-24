@@ -86,7 +86,7 @@ public class XQueryMediator extends AbstractMediator {
     private final Object resourceLock = new Object();
 
     /** Is it need to use DOMSource and DOMResult?   */
-    private boolean isDOMRequired = true;
+    private boolean useDOMSource = true;
 
     /** The DataSource which use to create a connection to XML database */
     private XQDataSource cachedXQDataSource = null;
@@ -461,7 +461,7 @@ public class XQueryMediator extends AbstractMediator {
                     }
                     case(XQItemType.XQITEMKIND_DOCUMENT): {
                         if (value instanceof OMNode) {
-                            if (isDOMRequired) {
+                            if (useDOMSource) {
                                 xqDynamicContext.
                                     bindObject(name,
                                         new DOMSource(((Element) ElementHelper.
@@ -478,7 +478,7 @@ public class XQueryMediator extends AbstractMediator {
                     }
                     case(XQItemType.XQITEMKIND_ELEMENT): {
                         if (value instanceof OMNode) {
-                            if (isDOMRequired) {
+                            if (useDOMSource) {
                                 xqDynamicContext.
                                     bindObject(name,
                                         new DOMSource(((Element) ElementHelper.
@@ -495,7 +495,7 @@ public class XQueryMediator extends AbstractMediator {
                     }
                     case(XQItemType.XQITEMKIND_DOCUMENT_ELEMENT): {
                         if (value instanceof OMNode) {
-                            if (isDOMRequired) {
+                            if (useDOMSource) {
                                 xqDynamicContext.
                                     bindObject(name,
                                         new DOMSource(((Element) ElementHelper.
@@ -605,11 +605,11 @@ public class XQueryMediator extends AbstractMediator {
         this.dataSourceProperties.addAll(list);
     }
 
-    public boolean isDOMRequired() {
-        return isDOMRequired;
+    public boolean isUseDOMSource() {
+        return useDOMSource;
     }
 
-    public void setDOMRequired(boolean DOMRequired) {
-        isDOMRequired = DOMRequired;
+    public void setUseDOMSource(boolean useDOMSource) {
+        this.useDOMSource = useDOMSource;
     }
 }

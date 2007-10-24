@@ -73,7 +73,8 @@ public class SequenceMediator extends AbstractListMediator {
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
 
         if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
+            traceOrDebug(traceOn, "Start : Sequence <"
+                + (name == null ? (key == null ? "anonymous" : key) : name) + ">");
 
             if (traceOn && trace.isTraceEnabled()) {
                 trace.trace("Message : " + synCtx.getEnvelope());
@@ -170,7 +171,7 @@ public class SequenceMediator extends AbstractListMediator {
                 boolean result = m.mediate(synCtx);
 
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
+                    traceOrDebug(traceOn, "End : Sequence <" + key + ">");
                 }
                 return result;
             }

@@ -125,7 +125,7 @@ public class FaultMediator extends AbstractMediator {
         boolean traceOrDebugOn, boolean traceOn) {
 
         if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Creating a SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2") + "fault");
+            traceOrDebug(traceOn, "Creating a SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2") + " fault");
         }
 
         // get the correct SOAP factory to be used
@@ -271,6 +271,10 @@ public class FaultMediator extends AbstractMediator {
             SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
             soapFaultDetail.setText(faultDetail);
             fault.setDetail(soapFaultDetail);
+        } else if (fault.getDetail() != null) {
+            // work around for a rampart issue in the following thread
+            // http://www.nabble.com/Access-to-validation-error-message-tf4498668.html#a13284520
+            fault.getDetail().detach();
         }
     }
 

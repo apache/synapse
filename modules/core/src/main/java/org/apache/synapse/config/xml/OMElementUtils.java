@@ -21,6 +21,8 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMContainer;
+import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +30,8 @@ import org.apache.synapse.SynapseException;
 import org.jaxen.JaxenException;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Holds Axiom utility methods used by Synapse
@@ -59,23 +63,42 @@ public class OMElementUtils {
     }
 
     /**
-     * Add xmlns NS declarations of element 'elem' into XPath expression
-     * @param xpath
+     * Add all applicable xmlns NS declarations of element 'elem' into XPath expression
+     * @param xpath                                       xmlns:m0="http://services.samples/xsd"
      * @param elem
      * @param log
      */
     public static void addNameSpaces(AXIOMXPath xpath, OMElement elem, Log log) {
-        try {
-            Iterator it = elem.getAllDeclaredNamespaces();
+
+        OMElement currentElem = elem;
+
+        while (currentElem != null) {              
+            Iterator it = currentElem.getAllDeclaredNamespaces();
             while (it.hasNext()) {
+
                 OMNamespace n = (OMNamespace) it.next();
-                xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
+                if (n != null) {
+
+                    try {
+                        xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
+                    } catch (JaxenException je) {
+                        String msg = "Error adding declared name space with prefix : "
+                            + n.getPrefix() + "and uri : " + n.getNamespaceURI()
+                            + " to the XPath : " + xpath;
+                        log.error(msg);
+                        throw new SynapseException(msg, je);
+                    }
+                }
             }
-        } catch (JaxenException je) {
-            String msg = "Error adding declared name spaces of " + elem + " to the XPath : " + xpath;
-            log.error(msg);
-            throw new SynapseException(msg, je);
+
+            OMContainer parent = currentElem.getParent();
+            //if the parent is a document element or parent is null ,then return
+            if (parent == null || parent instanceof OMDocument) {
+                return;
+            }
+            if (parent instanceof OMElement) {
+                currentElem = (OMElement) parent;
+            }
         }
     }
-
 }

@@ -117,6 +117,8 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
         OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);
         if (targetElement != null) {
             mediator.setTarget(TargetFactory.createTarget(targetElement));
+        } else {
+            handleException("Target for an iterate mediator is required :: missing target");
         }
 
         return mediator;

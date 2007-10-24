@@ -189,7 +189,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
         try {
             int bytesRead = source.read(outbuf);
-            if (bytesRead == -1) {
+            if (bytesRead == -1 && outbuf.position() == 0) {
                 encoder.complete();
             } else {
                 outbuf.flip();

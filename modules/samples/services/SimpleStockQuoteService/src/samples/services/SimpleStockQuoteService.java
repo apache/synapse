@@ -28,6 +28,13 @@ public class SimpleStockQuoteService {
         return new GetQuoteResponse(request.getSymbol());
     }
 
+    // for REST style invocation
+    public GetQuoteResponse getSimpleQuote(String symbol) {
+        System.out.println(new Date() + " " + this.getClass().getName() +
+            " :: Generating quote for : " + symbol);
+        return new GetQuoteResponse(symbol);
+    }
+
     // in-out large response
     public GetFullQuoteResponse getFullQuote(GetFullQuote request) {
         System.out.println(new Date() + " " + this.getClass().getName() +

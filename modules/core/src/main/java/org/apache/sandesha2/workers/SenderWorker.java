@@ -548,7 +548,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				// that the response is related to the request.
 				int mep = requestMsgOpCtx.getAxisOperation().getAxisSpecificMEPConstant();
 				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
-					responseMessageContext.setOperationContext(requestMsgOpCtx);
+					//this line causes issues in addressing
+					//responseMessageContext.setOperationContext(requestMsgOpCtx);
 				}
 				responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, requestMsgOpCtx
 								.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));

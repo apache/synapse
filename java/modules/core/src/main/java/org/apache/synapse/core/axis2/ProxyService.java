@@ -266,6 +266,14 @@ public class ProxyService {
                             }
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
+                        List schemaList = proxyService.getSchema();
+                        if (schemaList != null && schemaList.size() > 0) {
+                            // just pick the first schema's target namespace as Axis2's
+                            // HTTPTransportUtils code already contains a bug where it uses the
+                            // services' schema target NS for each operation
+                            proxyService.setSchemaTargetNamespace(
+                                proxyService.getSchema(0).getTargetNamespace());
+                        }
                         proxyService.setWsdlFound(true);
 
                         if (isWSDL11) {

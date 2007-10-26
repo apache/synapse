@@ -28,6 +28,7 @@ import org.apache.axis2.description.*;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.vfs.*;
+import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
@@ -112,7 +113,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
         setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, trpInDesc);
         try {
-            fsManager = VFS.getManager();
+            StandardFileSystemManager fsm = new StandardFileSystemManager();
+            fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));
+            fsm.init();
+            fsManager = fsm;
         } catch (FileSystemException e) {
             handleException("Error initializing the file transport : " + e.getMessage(), e);
         }

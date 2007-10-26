@@ -39,7 +39,7 @@ import org.apache.synapse.SynapseException;
  *  &lt;property name="xmlProp"&gt;
  *   &lt;somexml&gt;config&lt;/somexml&gt;
  *  &lt;/property&gt;
- *  &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"])/&gt;
+ *  &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"] | [once=(true | false)])/&gt;
  * &lt;/task&gt;
  */
 public class SimpleQuartzFactory implements StartupFactory {

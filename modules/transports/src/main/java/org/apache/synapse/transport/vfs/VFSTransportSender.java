@@ -30,6 +30,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.vfs.*;
+import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
@@ -69,7 +70,10 @@ public class VFSTransportSender extends AbstractTransportSender {
         setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, transportOut);
         try {
-            fsManager = VFS.getManager();
+            StandardFileSystemManager fsm = new StandardFileSystemManager();
+            fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));
+            fsm.init();
+            fsManager = fsm;
         } catch (FileSystemException e) {
             handleException("Error initializing the file transport : " + e.getMessage(), e);
         }

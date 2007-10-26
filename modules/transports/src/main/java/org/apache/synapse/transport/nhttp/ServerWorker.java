@@ -405,6 +405,9 @@ public class ServerWorker implements Runnable {
                             request.getRequestLine().getUri(),
                             cfgCtx,
                             parameters);
+                    // do not let the output stream close (as by default below) since
+                    // we are serving this GET request through the Synapse engine
+                    return;
                     
                 } catch (AxisFault axisFault) {
                     handleException("Error processing GET request for: " +

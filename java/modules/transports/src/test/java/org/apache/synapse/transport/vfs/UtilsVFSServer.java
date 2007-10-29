@@ -60,7 +60,7 @@ public class UtilsVFSServer extends UtilsTransportServer {
         parameters.add(new Parameter("transport.vfs.ReplyFileURI",
             "vfs:file://" + new File(".").getAbsolutePath() + File.separator + "target/vfs1/res"));
         parameters.add(new Parameter("transport.vfs.ContentType", "text/xml"));
-        parameters.add(new Parameter("transport.PollInterval", "2000"));
+        parameters.add(new Parameter("transport.PollInterval", "2"));
 
         parameters.add(new Parameter("transport.vfs.ActionAfterProcess", "DELETE"));
         deployEchoService("Service1", parameters);
@@ -74,7 +74,7 @@ public class UtilsVFSServer extends UtilsTransportServer {
         parameters.add(new Parameter("transport.vfs.ReplyFileURI",
             "vfs:file://" + new File(".").getAbsolutePath() + File.separator + "target/vfs2/res"));
         parameters.add(new Parameter("transport.vfs.ContentType", "text/xml"));
-        parameters.add(new Parameter("transport.PollInterval", "2000"));
+        parameters.add(new Parameter("transport.PollInterval", "2"));
 
         parameters.add(new Parameter("transport.vfs.ActionAfterProcess", "DELETE"));
         deployEchoService("Service2", parameters);

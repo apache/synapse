@@ -16,8 +16,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 public class SimpleQuartzJob implements Job {
-    public static final String SYNAPSEENVIRONMENT = "SynapseEnvironment",
-        CLASSNAME = "ClassName", PROPERTIES = "Properties";
+    public static final String
+        SYNAPSE_ENVIRONMENT = "SynapseEnvironment",
+        CLASSNAME = "ClassName",
+        PROPERTIES = "Properties";
     private static final Log log = LogFactory.getLog(SimpleQuartzJob.class);
 
     public void execute(JobExecutionContext ctx) throws JobExecutionException {
@@ -50,7 +52,10 @@ public class SimpleQuartzJob implements Job {
                 ((ManagedLifecycle) task).init(se);
             }
         }
-        task.execute();
+
+        if (se.isInitialized()) {
+            task.execute();
+        }
     }
 
     private void handleException(String msg) throws JobExecutionException {

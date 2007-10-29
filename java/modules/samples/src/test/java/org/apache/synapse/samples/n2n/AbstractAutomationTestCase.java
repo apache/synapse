@@ -52,7 +52,7 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
         System.setProperty("org.apache.xerces.xni.parser.XMLParserConfiguration",
                 "org.apache.xerces.parsers.XMLGrammarCachingConfiguration");
         System.setProperty("axis2.xml", "modules/samples/target/test_repos/synapse/conf/axis2.xml");
-        ServerManager.axis2Repolocation = SYNAPSE_REPO;
+        ServerManager.getInstance().setAxis2Repolocation(SYNAPSE_REPO);
         ServerManager.getInstance().start();
     }
 

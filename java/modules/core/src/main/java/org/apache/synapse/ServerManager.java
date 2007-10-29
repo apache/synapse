@@ -40,8 +40,8 @@ import java.util.Iterator;
 public class ServerManager {
 
     private static ServerManager instance;
-    private static Log log = LogFactory.getLog(ServerManager.class);
-    public static String axis2Repolocation;
+    private static final Log log = LogFactory.getLog(ServerManager.class);
+    private String axis2Repolocation;
     private ListenerManager listenerManager;
     private ConfigurationContext configctx;
 
@@ -54,6 +54,10 @@ public class ServerManager {
             instance = new ServerManager();
         }
         return instance;
+    }
+
+    public void setAxis2Repolocation(String axis2Repolocation) {
+        this.axis2Repolocation = axis2Repolocation;
     }
 
     /**
@@ -109,10 +113,9 @@ public class ServerManager {
                 || !(synEnv.getValue() instanceof SynapseEnvironment)) {
                 log.fatal(message + "Synapse Environment");
                 throw new SynapseException(message + "Synapse Environment");
+            } else {
+                ((SynapseEnvironment) synEnv.getValue()).setInitialized(true);
             }
-
-            //((SynapseConfiguration) synCfg.getValue()).init((SynapseEnvironment) synEnv.getValue());
-
             System.out.println("[SynapseServer] Ready");
 
         } catch (Throwable t) {

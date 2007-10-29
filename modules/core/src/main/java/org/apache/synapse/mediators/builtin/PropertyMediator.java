@@ -100,6 +100,14 @@ public class PropertyMediator extends AbstractMediator {
                 Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
+                axis2MessageCtx.setProperty(name, resultValue);
+
+            } else if (XMLConfigConstants.SCOPE_CLIENT.equals(scope)
+                    && synCtx instanceof Axis2MessageContext) {
+                //Setting property into the  Axis2 Message Context client options
+                Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+                org.apache.axis2.context.MessageContext axis2MessageCtx =
+                        axis2smc.getAxis2MessageContext();
                 axis2MessageCtx.getOptions().setProperty(name, resultValue);
 
             } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
@@ -137,9 +145,11 @@ public class PropertyMediator extends AbstractMediator {
                     pros.remove(name);
                 }
 
-            } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
-                    && synCtx instanceof Axis2MessageContext) {
-                //Removing property from the        Axis2 Message Context
+            } else if ((XMLConfigConstants.SCOPE_AXIS2.equals(scope) ||
+                XMLConfigConstants.SCOPE_CLIENT.equals(scope))
+                && synCtx instanceof Axis2MessageContext) {
+                
+                //Removing property from the Axis2 Message Context
                 Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();

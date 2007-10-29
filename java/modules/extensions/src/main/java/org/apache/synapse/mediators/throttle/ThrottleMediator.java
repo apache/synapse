@@ -111,7 +111,7 @@ public class ThrottleMediator extends AbstractMediator {
      * Current Implementaion only support IP Based Throttling
      *
      * @param synContext Current Message Context
-     * @param traceOn indicate whether trace is eanabled or not
+     * @param traceOn    indicate whether trace is eanabled or not
      * @return boolean which indicate whether this caller can or not access
      */
     private boolean canAccess(MessageContext synContext, boolean traceOrDebugOn, boolean traceOn) {
@@ -160,21 +160,23 @@ public class ThrottleMediator extends AbstractMediator {
 
     /**
      * Doing concurrency throttlling
-     * @param isResponse indicate whether message flow is OUT or IN
+     *
+     * @param isResponse     indicate whether message flow is OUT or IN
      * @param traceOrDebugOn is tracing or debbug on
-     * @param traceOn indicate whether trace is ON or OFF
+     * @param traceOn        indicate whether trace is ON or OFF
      * @return True if message can continue ,otherwise false
      */
     private boolean throttleByConcurrency(boolean isResponse, boolean traceOrDebugOn, boolean traceOn) {
 
-        int available = 0;
         if (concurrentAccessController != null) {
+            int available = 0;
             if (!isResponse) {
                 available = concurrentAccessController.getAndDecrement();
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Access " + (available > 0 ? "allowed" : "denied") +
                         " :: " + available + " of available of " + concurrentLimit + " connections");
                 }
+                return available > 0;
             } else {
                 available = concurrentAccessController.incrementAndGet();
                 if (traceOrDebugOn) {
@@ -183,16 +185,18 @@ public class ThrottleMediator extends AbstractMediator {
                 }
                 return true;
             }
+        } else {
+            return true;
         }
-        return available > 0;
     }
 
     /**
      * Processing throughh IP based throttle
-     * @param synContext Current Message
+     *
+     * @param synContext     Current Message
      * @param traceOrDebugOn
-     * @param traceOn Indicates whether trace is ON or OFF
-     * @return  True if message can continue ,otherwise false
+     * @param traceOn        Indicates whether trace is ON or OFF
+     * @return True if message can continue ,otherwise false
      */
     private boolean throttleByRate(MessageContext synContext, boolean traceOrDebugOn, boolean traceOn) {
 
@@ -233,7 +237,7 @@ public class ThrottleMediator extends AbstractMediator {
                 boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Access " + (canAccess ? "allowed" : "denied")
-                        +" for IP : " + remoteIP);
+                        + " for IP : " + remoteIP);
                 }
                 return canAccess;
 
@@ -251,9 +255,9 @@ public class ThrottleMediator extends AbstractMediator {
      * If the policy is defined as a Inline XML ,then only one time policy will process and any runtime
      * changes to the policy will not reflect
      *
-     * @param synCtx Current Message
+     * @param synCtx         Current Message
      * @param traceOrDebugOn is tracing or debug on?
-     * @param traceOn is tracing on?
+     * @param traceOn        is tracing on?
      */
     protected void initThrottle(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
 
@@ -263,7 +267,7 @@ public class ThrottleMediator extends AbstractMediator {
                 if (traceOn && trace.isTraceEnabled()) {
                     trace.trace("Initializing using static throttling policy : " + inLinePolicy);
                 }
-                createThrottleMetaData(inLinePolicy, synCtx, traceOrDebugOn, traceOn);
+                createThrottleMetaData(inLinePolicy, synCtx, traceOrDebugOn, traceOn, false);
             }
 
         } else if (policyKey != null) {
@@ -274,7 +278,49 @@ public class ThrottleMediator extends AbstractMediator {
                 handleException("Cannot find throttling policy using key : " + policyKey, synCtx);
 
             } else {
-                Object entryValue = entry.getValue();
+
+                boolean reCreate = false;
+
+                // if the key refers to a dynamic resource
+                if (entry.isDynamic()) {
+                    if (!entry.isCached() || entry.isExpired()) {
+                        reCreate = true;
+                    }
+                }
+                createThrottleMetaData(
+                    null, synCtx, traceOrDebugOn, traceOn, reCreate);
+            }
+        }
+    }
+
+    /**
+     * Create the throttling policy and the "Throttle" object applicable. If this is a
+     * concurrent throttling instance, set the throttling access controller to the shared
+     * map
+     *
+     * @param policy         throttling policy
+     * @param synCtx         incoming message
+     * @param traceOrDebugOn is tracing or debug on?
+     * @param traceOn        is tracing on?
+     * @param reCreate       is it need to reCreate the throttle
+     */
+    private synchronized void createThrottleMetaData(OMElement policy,
+                                                     MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn, boolean reCreate) {
+
+        if (!reCreate && throttle != null) {
+            // this uses a static policy, and one thread has already created the "Throttle"
+            // object, just return...
+            return;
+        }
+        try {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Creating a new throttle configuration by parsing the Policy");
+            }
+            if (policy != null) {
+                throttle = ThrottlePolicyProcessor.processPolicy(
+                    PolicyEngine.getPolicy(policy));
+            } else {
+                Object entryValue = synCtx.getEntry(policyKey);
                 if (entryValue == null) {
                     handleException(
                         "Null throttling policy returned by Entry : " + policyKey, synCtx);
@@ -285,45 +331,11 @@ public class ThrottleMediator extends AbstractMediator {
                             " is not an OMElement", synCtx);
 
                     } else {
-                        // if entry is dynamic, need to check wheather expired or not
-                        if ((!entry.isCached() || entry.isExpired())) {
-                            if (traceOn && trace.isTraceEnabled()) {
-                                trace.trace("Re/initializing using dynamic throttling policy : " +
-                                    entryValue);
-                            }
-                            createThrottleMetaData(
-                                (OMElement) entryValue, synCtx, traceOrDebugOn, traceOn);
-                        }
+                        throttle = ThrottlePolicyProcessor.processPolicy(
+                            PolicyEngine.getPolicy((OMElement) entryValue));
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Create the throttling policy and the "Throttle" object applicable. If this is a
-     * concurrent throttling instance, set the throttling access controller to the shared
-     * map
-     * @param policyOmElement throttling policy
-     * @param synCtx incoming message
-     * @param traceOrDebugOn is tracing or debug on?
-     * @param traceOn is tracing on?
-     */
-    private synchronized void createThrottleMetaData(OMElement policyOmElement,
-        MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
-
-        if (inLinePolicy != null && throttle != null) {
-            // this uses a static policy, and one thread has already created the "Throttle"
-            // object, just return...
-            return;
-        }
-
-        try {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Creating a new throttle configuration by parsing the Policy");
-            }
-            throttle = ThrottlePolicyProcessor.processPolicy(
-                PolicyEngine.getPolicy(policyOmElement));
 
             includesIPThrottling = (
                 throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY) != null);

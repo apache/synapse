@@ -19,16 +19,16 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 
-import java.util.TimerTask;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
+import java.util.TimerTask;
 
 /**
  * An object of this class is registered to be invoked in some predefined time intervals. This
@@ -120,8 +120,8 @@ public class TimeoutHandler extends TimerTask {
 
                                 for (int j = 0; j < faultStack.size(); j++) {
                                     Object o = faultStack.pop();
-                                    if (o instanceof MediatorFaultHandler) {
-                                        ((MediatorFaultHandler) o).handleFault(msgContext);
+                                    if (o instanceof FaultHandler) {
+                                        ((FaultHandler) o).handleFault(msgContext);
                                     }
                                 }
 

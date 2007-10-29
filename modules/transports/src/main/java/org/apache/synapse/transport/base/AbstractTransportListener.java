@@ -92,6 +92,16 @@ public abstract class AbstractTransportListener implements TransportListener {
 
         // register to receive updates on services for lifetime management
         cfgCtx.getAxisConfiguration().addObservers(axisObserver);
+
+        // iterate through deployed services and start
+        Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();
+
+        while (services.hasNext()) {
+            AxisService service = (AxisService) services.next();
+            if (BaseUtils.isUsingTransport(service, transportName)) {
+                startListeningForService(service);
+            }
+        }
     }
 
     public void destroy() {

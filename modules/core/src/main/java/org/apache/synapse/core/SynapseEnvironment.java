@@ -91,4 +91,16 @@ public interface SynapseEnvironment {
      * @return Returns the ExecutorService
      */
      public ExecutorService getExecutorService();
+
+    /**
+     * Has the Synapse Environment properly initialized?
+     * @return true if the environment is ready for processing
+     */
+    public boolean isInitialized();
+
+    /**
+     * Set the environment as ready for message processing
+     * @param state true means ready for processing
+     */
+    public void setInitialized(boolean state);
 }

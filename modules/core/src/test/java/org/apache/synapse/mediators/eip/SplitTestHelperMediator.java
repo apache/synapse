@@ -19,18 +19,26 @@ public class SplitTestHelperMediator extends AbstractMediator implements Managed
 
     private List mediatedContext = new ArrayList();
     int msgcount;
+    String checkString;
 
     public boolean mediate(MessageContext synCtx) {
-        if (msgcount == 0) {
-            SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
-            try {
-                synCtx.setEnvelope(envelope);
-            } catch (AxisFault ignore) {
+        synchronized(this) {
+            if (msgcount == 0) {
+                SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+                try {
+                    synCtx.setEnvelope(envelope);
+                } catch (AxisFault ignore) {
+                }
+            } else {
+                checkString = synCtx.getEnvelope().getBody().getFirstElement().getText();
+                if ("".equals(checkString)) {
+                    checkString = synCtx.getEnvelope().getBody().getFirstElement().getFirstElement().getText();                    
+                }
             }
+            mediatedContext.add(synCtx);
+            msgcount++;
+            return false;
         }
-        mediatedContext.add(synCtx);
-        msgcount++;
-        return false;
     }
 
     public MessageContext getMediatedContext(int position) {
@@ -43,6 +51,11 @@ public class SplitTestHelperMediator extends AbstractMediator implements Managed
 
     public void clearMediatedContexts() {
         mediatedContext.clear();
+        msgcount = 0;
+    }
+
+    public String getCheckString() {
+        return checkString;
     }
 
     public void init(SynapseEnvironment se) {

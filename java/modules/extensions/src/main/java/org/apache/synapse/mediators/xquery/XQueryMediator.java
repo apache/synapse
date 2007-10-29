@@ -86,7 +86,7 @@ public class XQueryMediator extends AbstractMediator {
     private final Object resourceLock = new Object();
 
     /** Is it need to use DOMSource and DOMResult?   */
-    private boolean useDOMSource = true;
+    private boolean useDOMSource = false;
 
     /** The DataSource which use to create a connection to XML database */
     private XQDataSource cachedXQDataSource = null;

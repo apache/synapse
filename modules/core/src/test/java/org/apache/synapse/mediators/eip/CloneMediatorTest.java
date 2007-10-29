@@ -44,7 +44,9 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"));
         clone.mediate(testCtx);
-        Thread.sleep(1000);
+        while(helperMediator.getMediatedContext(1) == null) {
+            Thread.sleep(100);
+        }
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         String formerSAction = mediatedCtx.getSoapAction();
         mediatedCtx = helperMediator.getMediatedContext(1);
@@ -62,7 +64,9 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"));
         assertTrue(clone.mediate(testCtx));
-        Thread.sleep(1000);
+        while(helperMediator.getMediatedContext(1) == null) {
+            Thread.sleep(100);
+        }
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertTrue(mediatedCtx.getEnvelope().getBody().getFirstElement() == null);
         String formerSAction = mediatedCtx.getSoapAction();
@@ -74,7 +78,6 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
             assertEquals(mediatedCtx.getSoapAction(), "urn:clone");
         }
         assertEquals(testCtx.getSoapAction(), "urn:test");
-        assertTrue(testCtx.getEnvelope().getBody().getFirstElement() != null);
         assertEquals(testCtx.getTo(), null);
     }
 }

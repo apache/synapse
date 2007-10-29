@@ -50,8 +50,11 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
         Mediator iterate = fac.createMediator(createOMElement("<iterate " +
             "expression=\"//original/itr\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
             "<target soapAction=\"urn:iterate\" sequence=\"seqRef\"/></iterate>"));
+        helperMediator.clearMediatedContexts();
         iterate.mediate(testCtx);
-        Thread.sleep(2000);
+        while(helperMediator.getMediatedContext(1) == null) {
+            Thread.sleep(100);
+        }
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertEquals(mediatedCtx.getSoapAction(), "urn:iterate");
         OMElement formerBody = mediatedCtx.getEnvelope().getBody().getFirstElement();
@@ -59,7 +62,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
         assertEquals(mediatedCtx.getSoapAction(), "urn:iterate");
         if (formerBody == null) {
             assertEquals(mediatedCtx.getEnvelope()
-                .getBody().getFirstElement().getText(), "test-split-context-itr2-body");
+                .getBody().getFirstElement().getText(), helperMediator.getCheckString());
         }
     }
 
@@ -69,7 +72,9 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
             "xmlns=\"http://ws.apache.org/ns/synapse\"><target soapAction=\"urn:iterate\" " +
             "sequence=\"seqRef\"/></iterate>"));
         iterate.mediate(testCtx);
-        Thread.sleep(2000);
+        while(helperMediator.getMediatedContext(1) == null) {
+            Thread.sleep(100);
+        }
         MessageContext mediatedCtx = helperMediator.getMediatedContext(0);
         assertEquals(mediatedCtx.getSoapAction(), "urn:iterate");
         OMElement formerBody = mediatedCtx.getEnvelope().getBody().getFirstElement();
@@ -77,7 +82,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
         assertEquals(mediatedCtx.getSoapAction(), "urn:iterate");
         if (formerBody == null) {
             assertEquals(mediatedCtx.getEnvelope().getBody()
-                .getFirstElement().getFirstElement().getText(), "test-split-context-itr2-body");
+                .getFirstElement().getFirstElement().getText(), helperMediator.getCheckString());
         }
     }
 }

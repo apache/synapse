@@ -36,6 +36,8 @@ public class XMLConfigConstants {
     public static final String SCOPE_DEFAULT = "default";
     /** The scope name for axis2 message context properties */
     public static final String SCOPE_AXIS2 = "axis2";
+    /** The scope name for axis2 message context client options properties */
+    public static final String SCOPE_CLIENT = "client";
     /** The scope name for transport header properties */
     public static final String SCOPE_TRANSPORT = "transport";
 

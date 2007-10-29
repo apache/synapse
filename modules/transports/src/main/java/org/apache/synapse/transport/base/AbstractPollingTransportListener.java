@@ -31,7 +31,7 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
     /** the parameter in the services.xml that specifies the poll interval for a service */
     public static final String TRANSPORT_POLL_INTERVAL = "transport.PollInterval";
     /** the default poll interval */
-    public static final int DEFAULT_POLL_INTERVAL = 5 * 60 * 1000; // 5 mins by default
+    public static final int DEFAULT_POLL_INTERVAL = 5 * 60; // 5 mins by default
 
     /** default interval in ms before polls */
     protected int pollInterval = DEFAULT_POLL_INTERVAL;
@@ -47,9 +47,11 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
     /**
      * Schedule a repeated poll at the specified interval for the given service
      * @param service the service to be polled
-     * @param pollInterval the interval between successive polls
+     * @param pollInterval the interval between successive polls in seconds
      */
     public void schedulePoll(AxisService service, long pollInterval) {
+        pollInterval *= 1000; // convert to millisecs
+        
         TimerTask task = (TimerTask) serviceToTimerTaskMap.get(service);
 
         // if a timer task exists, cancel it first and create a new one

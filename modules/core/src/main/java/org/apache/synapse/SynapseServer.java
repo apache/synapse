@@ -43,8 +43,9 @@ public class SynapseServer {
         if (args.length != 1 || !new File(args[0]).exists()) {
             printUsage();
         }
-        ServerManager.axis2Repolocation = args[0];
+
         ServerManager serverManager = ServerManager.getInstance();
+        serverManager.setAxis2Repolocation(args[0]);
         serverManager.start();
         addShutdownHook();
 

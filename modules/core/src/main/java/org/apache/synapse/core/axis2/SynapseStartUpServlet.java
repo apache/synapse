@@ -60,8 +60,8 @@ public class SynapseStartUpServlet extends HttpServlet {
             //setting axis2 repository location
             String axis2Repo = System.getProperty(org.apache.axis2.Constants.AXIS2_REPO);
             if (axis2Repo == null) {
-                ServerManager.axis2Repolocation = synapseHome + "/WEB-INF" +
-                    File.separator + "repository";
+                ServerManager.getInstance().setAxis2Repolocation(synapseHome + "/WEB-INF" +
+                    File.separator + "repository");
                 System.setProperty(org.apache.axis2.Constants.AXIS2_REPO,
                     synapseHome + "/WEB-INF" +
                         File.separator + "repository");

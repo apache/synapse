@@ -22,7 +22,6 @@ package org.apache.synapse.startup.quartz;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.Date;
 
 import javax.xml.namespace.QName;
 
@@ -31,7 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.startup.AbstractStartup;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -107,7 +105,7 @@ public class SimpleQuartz extends AbstractStartup {
             jobDetail.setGroup("synapse.simple.quartz");
             jobDetail.setJobClass(SimpleQuartzJob.class);
             JobDataMap jdm = new JobDataMap();
-            jdm.put(SimpleQuartzJob.SYNAPSEENVIRONMENT, synapseEnvironment);
+            jdm.put(SimpleQuartzJob.SYNAPSE_ENVIRONMENT, synapseEnvironment);
             jdm.put(SimpleQuartzJob.CLASSNAME, className);
             jdm.put(SimpleQuartzJob.PROPERTIES, xmlProperties);
             jobDetail.setJobDataMap(jdm);

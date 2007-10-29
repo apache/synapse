@@ -52,6 +52,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private SynapseConfiguration synapseConfig;
     private ConfigurationContext configContext;
     private ExecutorService executorService;
+    private boolean initialized = false;
 
     /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector;
@@ -262,6 +263,22 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      */
     public ExecutorService getExecutorService() {
         return executorService;
+    }
+
+    /**
+     * Has this environment properly initialized?
+     * @return true if ready for processing
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    /**
+     * Mark this environment as ready for processing
+     * @param state true means ready for processing
+     */
+    public void setInitialized(boolean state) {
+        this.initialized = state;
     }
 
 }

@@ -103,15 +103,6 @@ public class MessageHelper {
         newMC.setTransportOut(mc.getTransportOut());
         newMC.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
             mc.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-        newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
-            mc.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
-
-        // Copying properties in the original message
-        Iterator iter = mc.getProperties().keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            newMC.setProperty(key, mc.getProperty(key));
-        }
 
         return newMC;
     }
@@ -139,6 +130,9 @@ public class MessageHelper {
         newMC.setDoingMTOM(ori.isDoingMTOM());
         newMC.setDoingSwA(ori.isDoingSwA());
 
+        newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+            ori.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
+
         // if the original request carries any attachments, copy them to the clone
         // as well, except for the soap part if any
         Attachments attachments = ori.getAttachmentMap();
@@ -150,6 +144,18 @@ public class MessageHelper {
                     newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
                 }
             }
+        }
+
+        Iterator iter = ori.getOptions().getProperties().keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            newMC.getOptions().setProperty(key, ori.getOptions().getProperty(key));
+        }
+
+        Iterator iter2 = ori.getProperties().keySet().iterator();
+        while (iter2.hasNext()) {
+            String key = (String) iter2.next();
+            newMC.setProperty(key, ori.getProperty(key));
         }
 
         newMC.setServerSide(false);

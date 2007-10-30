@@ -25,13 +25,18 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.Mediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import java.util.Iterator;
+import java.io.StringReader;
 
 import net.sf.saxon.javax.xml.xquery.XQItemType;
 
@@ -43,10 +48,7 @@ import net.sf.saxon.javax.xml.xquery.XQItemType;
  *   <dataSource>*
  *      <property name="string" value="literal"/>*
  *   </dataSource>
- *   <variables>*
- *      <basic name="string"  type="int" value="literal">*
- *      <custom name="string" type ="int" [key="string"] [expression=XPath] />*
- *   <variables>
+ *   <variable name="string"  type="int" value="literal" [key="string"] [expression=XPath] />*
  * </xquery>
  * </pre>
  */
@@ -123,7 +125,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                         if (key != null) {
                             ((MediatorCustomVariable) variable).setRegKey(key.trim());
                         }
-                        if (expr != null) {
+                        if (expr != null && !"".equals(expr)) {
                             try {
                                 AXIOMXPath xp = new AXIOMXPath(expr.trim());
                                 OMElementUtils.addNameSpaces(xp, variableOM, log);

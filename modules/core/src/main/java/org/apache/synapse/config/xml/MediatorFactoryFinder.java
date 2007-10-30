@@ -65,6 +65,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         POJOCommandMediatorFactory.class,
         CloneMediatorFactory.class,
         IterateMediatorFactory.class,
+        AggregateMediatorFactory.class,
         DBReportMediatorFactory.class,
         DBLookupMediatorFactory.class,
         CacheMediatorFactory.class

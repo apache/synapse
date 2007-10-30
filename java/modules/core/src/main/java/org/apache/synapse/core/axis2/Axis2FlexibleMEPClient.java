@@ -19,20 +19,14 @@
 
 package org.apache.synapse.core.axis2;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
@@ -45,15 +39,19 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.util.MessageHelper;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.synapse.util.MessageHelper;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -110,7 +108,8 @@ public class Axis2FlexibleMEPClient {
         }
 
         // save the original message context wihout altering it, so we can tie the response
-        MessageContext originalInMsgCtx = ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
+        MessageContext originalInMsgCtx
+            = ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
 
         // create a new MessageContext to be sent out as this should not corrupt the original
         // we need to create the response to the original message later on
@@ -128,7 +127,7 @@ public class Axis2FlexibleMEPClient {
                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }
-                if(axisOutMsgCtx.isSOAP11() != true) {
+                if(!axisOutMsgCtx.isSOAP11()) {
                     SOAPUtils.convertSOAP12toSOAP11(axisOutMsgCtx);
                 }
                 
@@ -137,7 +136,7 @@ public class Axis2FlexibleMEPClient {
                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }
-                if(axisOutMsgCtx.isSOAP11() == true) {
+                if(axisOutMsgCtx.isSOAP11()) {
                     SOAPUtils.convertSOAP11toSOAP12(axisOutMsgCtx);
                 }                
                 
@@ -234,11 +233,12 @@ public class Axis2FlexibleMEPClient {
         if (!outOnlyMessage) {
             // always set a callback as we decide if the send it blocking or non blocking within
             // the MEP client. This does not cause an overhead, as we simply create a 'holder'
-            // object with a reference to the outgoing synapse message context synapseOutMessageContext
+            // object with a reference to the outgoing synapse message context
+            // synapseOutMessageContext
             AsyncCallback callback = new AsyncCallback(synapseOutMessageContext);
             if (endpoint != null) {
-                // set the timeout time and the timeout action to the callback, so that the TimeoutHandler
-                // can detect timed out callbacks and take approprite action.
+                // set the timeout time and the timeout action to the callback, so that the
+                // TimeoutHandler can detect timed out callbacks and take approprite action.
                 callback.setTimeOutOn(System.currentTimeMillis() + endpoint.getTimeoutDuration());
                 callback.setTimeOutAction(endpoint.getTimeoutAction());
             } else {
@@ -262,6 +262,9 @@ public class Axis2FlexibleMEPClient {
 
         newMC.setEnvelope(ori.getEnvelope());        
         removeAddressingHeaders(newMC);
+
+        newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+            ori.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
 
         return newMC;
     }
@@ -342,22 +345,20 @@ public class Axis2FlexibleMEPClient {
      * @param headerInformation headers to be removed
      */
     private static void detachAddressingInformation(ArrayList headerInformation) {
-       Iterator iterator = headerInformation.iterator();
-       while (iterator.hasNext()) {
-           Object o = iterator.next();
-           if (o instanceof SOAPHeaderBlock) {
-               SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
-               headerBlock.detach();
-           } else if (o instanceof OMElement) {
-               // work around for a known addressing bug which sends non SOAPHeaderBlock objects
-               OMElement om = (OMElement) o;
-               OMNamespace ns = om.getNamespace();
-               if (ns != null &&
-                       (AddressingConstants.Submission.WSA_NAMESPACE.equals(ns.getNamespaceURI())
-                       || AddressingConstants.Final.WSA_NAMESPACE.equals(ns.getNamespaceURI()))) {
-                   om.detach();
-               }
-           }
-       }
-   }
+        for (Object o : headerInformation) {
+            if (o instanceof SOAPHeaderBlock) {
+                SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
+                headerBlock.detach();
+            } else if (o instanceof OMElement) {
+                // work around for a known addressing bug which sends non SOAPHeaderBlock objects
+                OMElement om = (OMElement) o;
+                OMNamespace ns = om.getNamespace();
+                if (ns != null && (
+                    AddressingConstants.Submission.WSA_NAMESPACE.equals(ns.getNamespaceURI()) ||
+                        AddressingConstants.Final.WSA_NAMESPACE.equals(ns.getNamespaceURI()))) {
+                    om.detach();
+                }
+            }
+        }
+    }
 }

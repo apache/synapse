@@ -41,10 +41,7 @@ import javax.xml.namespace.QName;
  *   <dataSource>*
  *      <property name="string" value="literal"/>*
  *   </dataSource>
- *   <variables>*
- *      <basic name="string"  type="int" value="literal">*
- *      <custom name="string" type ="int" [key="string"] [expression=XPath] />*
- *   <variables>
+ *   <variable name="string"  type="int" value="literal" [key="string"] [expression=XPath] />*
  * </xquery>
  * </pre>
  */
@@ -121,6 +118,12 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                             type = "FLOAT";
                         } else if (XQItemType.XQBASETYPE_STRING == varibelType) {
                             type = "STRING";
+                        } else if (XQItemType.XQITEMKIND_DOCUMENT == varibelType) {
+                            type = "DOCUMENT";
+                        } else if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == varibelType) {
+                            type = "DOCUMENT_ELEMENT";
+                        } else if (XQItemType.XQITEMKIND_ELEMENT == varibelType) {
+                            type = "ELEMENT";
                         } else {
                             handleException("Unknown Type " + varibelType);
                         }

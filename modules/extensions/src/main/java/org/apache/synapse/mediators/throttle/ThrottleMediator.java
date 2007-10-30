@@ -25,6 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.throttle.*;
 import org.wso2.throttle.factory.AccessControllerFactory;
 
@@ -41,8 +42,7 @@ import java.util.Map;
 
 public class ThrottleMediator extends AbstractMediator {
 
-    /** static map to share all concurrent access controllers */
-    public final static Map CONCURRENT_ACCESS_CONTROLLERS = Collections.synchronizedMap(new HashMap());
+    private static final String  KEY ="keyOfConcurrentAcessControllers";
     /** The key for getting the throttling policy - key refers to a/an [registry] entry  */
     private String policyKey = null;
     /** InLine policy object - XML */
@@ -87,12 +87,27 @@ public class ThrottleMediator extends AbstractMediator {
             // for response messages, load the concurrent access controller object
             // do this ONLY ONCE - the first time when our iniial reference is null
             if (concurrentAccessController == null && id != null) {
-                concurrentAccessController =
-                    (ConcurrentAccessController) CONCURRENT_ACCESS_CONTROLLERS.get(id);
-                concurrentLimit = concurrentAccessController.getLimit();
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Concurrent access controller for ID : " + id +
-                        " allows : " + concurrentLimit + " concurrent accesses");
+
+                org.apache.axis2.context.MessageContext axis2MessageContext
+                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+                ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
+
+                Map accessContollers = (Map) configctx.getProperty(KEY);
+
+                if (accessContollers != null) {
+
+                    concurrentAccessController =
+                        (ConcurrentAccessController) accessContollers.get(id);
+
+                    if (concurrentAccessController != null) {
+
+                        concurrentLimit = concurrentAccessController.getLimit();
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Concurrent access controller for ID : " + id +
+                                " allows : " + concurrentLimit + " concurrent accesses");
+                        }
+                    }
                 }
             }
         }
@@ -349,10 +364,20 @@ public class ThrottleMediator extends AbstractMediator {
                         "Initiating ConcurrentAccessControler for throttle group id : " + id
                             + " limit : " + concurrentLimit);
                 }
+                
+                org.apache.axis2.context.MessageContext axis2MessageContext
+                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
+                Map accessContollers = (Map) configctx.getProperty(KEY);
+
+                if(accessContollers == null){
+                    accessContollers = new HashMap();
+                    configctx.setProperty(KEY,accessContollers);
+                }
                 if (concurrentAccessController == null) {
-                    CONCURRENT_ACCESS_CONTROLLERS.remove(id);
+                    accessContollers.remove(id);
                 } else {
-                    CONCURRENT_ACCESS_CONTROLLERS.put(id, concurrentAccessController);
+                    accessContollers.put(id, concurrentAccessController);
                 }
             }
         }

@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import java.util.*;
+import java.io.File;
 
 /**
  * The "vfs" transport is a polling based transport - i.e. it gets kicked off at
@@ -174,25 +175,44 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                         try {
                             processFile(entry, fileObject);
                             entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+                            
                         } catch (AxisFault e) {
                             entry.setLastPollState(PollTableEntry.FAILED);
                         }
+
+                        moveOrDeleteAfterProcessing(entry, fileObject);
                     }
 
                 } else {
                     int failCount = 0;
                     int successCount = 0;
 
+                    if (log.isDebugEnabled()) {
+                        log.debug("File name pattern :" + entry.getFileNamePattern());
+                    }
                     for (int i = 0; i < children.length; i++) {
-                        if (children[i].getName().getBaseName().matches(
-                            entry.getFileNamePattern())) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Matching file :" + children[i].getName().getBaseName());
+                        }
+                        if ( (entry.getFileNamePattern() != null)
+                                && (children[i].getName().getBaseName().matches(entry.getFileNamePattern()))) {
                             try {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Processing file :" + children[i]);
+                                }
                                 processFile(entry, children[i]);
                                 successCount++;
+                                // tell moveOrDeleteAfterProcessing() file was success
+                                entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+
                             } catch (Exception e) {
-                                logException("Error processing File URI : " + entry.getFileURI(), e);
+                                logException("Error processing File URI : " + children[i].getName(), e);
                                 failCount++;
-                            }
+                                // tell moveOrDeleteAfterProcessing() file failed
+                                entry.setLastPollState(PollTableEntry.FAILED);
+                             }
+
+                            moveOrDeleteAfterProcessing(entry, children[i]);
                         }
                     }
 
@@ -209,7 +229,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                 long now = System.currentTimeMillis();
                 entry.setLastPollTime(now);
                 entry.setNextPollTime(now + entry.getPollInterval());
-                moveOrDeleteAfterProcessing(entry, fileObject);
 
             } else {
                 if (log.isDebugEnabled()) {
@@ -255,8 +274,11 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
             }
 
             if (moveToDirectory != null) {
-                FileObject dest = fsManager.resolveFile(moveToDirectory);
-                dest = dest.getChild(fileObject.getName().getBaseName());
+                String destName = moveToDirectory + File.separator + fileObject.getName().getBaseName();
+                if (log.isDebugEnabled()) {
+                    log.debug("Moving to file :" + destName);
+                }
+                FileObject dest = fsManager.resolveFile(destName);
                 try {
                     fileObject.moveTo(dest);
                 } catch (FileSystemException e) {
@@ -264,29 +286,12 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                 }
             } else {
                 try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Deleting file :" + fileObject);
+                    }
                     fileObject.close();
-                    if (fileObject.getChildren().length > 0) {
-                        if (fileObject.delete(new FileSelector() {
-
-                            public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
-                                if (entry.getFileNamePattern().equals(
-                                    fileSelectInfo.getFile().getName().getBaseName())) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-
-                            public boolean traverseDescendents(FileSelectInfo fileSelectInfo) throws Exception {
-                                return true;
-                            }
-                        }) == 0) {
-                            log.error("Error deleting file : " + fileObject);
-                        }
-                    } else {
-                        if (!fileObject.delete()) {
-                            log.error("Error deleting file : " + fileObject);
-                        }
+                    if (!fileObject.delete()) {
+                        log.error("Cannot delete file : " + fileObject);
                     }
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
@@ -468,6 +473,16 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
             entry.setActionAfterFailure(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
+
+            String moveDirectoryAfterProcess = BaseUtils.getOptionalServiceParam(
+                service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+            entry.setMoveAfterProcess(moveDirectoryAfterProcess);
+            String moveDirectoryAfterErrors = BaseUtils.getOptionalServiceParam(
+                service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
+            entry.setMoveAfterErrors(moveDirectoryAfterErrors);
+            String moveDirectoryAfterFailure = BaseUtils.getOptionalServiceParam(
+                service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
+            entry.setMoveAfterFailure(moveDirectoryAfterFailure);
 
             entry.setServiceName(service.getName());
             schedulePoll(service, pollInterval);            

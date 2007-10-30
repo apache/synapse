@@ -183,7 +183,7 @@ public class IterateMediator extends AbstractMediator {
         // property to SKIP to skip the blank http response 
         OperationContext opCtx
             = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getOperationContext();
-        if (continueParent && opCtx != null) {
+        if (!continueParent && opCtx != null) {
             opCtx.setProperty(Constants.RESPONSE_WRITTEN,"SKIP");
         }
 

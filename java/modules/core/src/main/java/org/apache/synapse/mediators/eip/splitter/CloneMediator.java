@@ -20,11 +20,14 @@
 package org.apache.synapse.mediators.eip.splitter;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.context.OperationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +90,14 @@ public class CloneMediator extends AbstractMediator {
         // finalize tracing and debugging
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Clone mediator");
+        }
+
+        // if the continuation of the parent message is stopped from here set the RESPONSE_WRITTEN
+        // property to SKIP to skip the blank http response 
+        OperationContext opCtx
+            = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getOperationContext();
+        if (continueParent && opCtx != null) {
+            opCtx.setProperty(Constants.RESPONSE_WRITTEN,"SKIP");
         }
 
         // if continue parent is true mediators after the clone will be called for the further

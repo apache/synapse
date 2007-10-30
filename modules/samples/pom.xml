@@ -110,6 +110,8 @@
                                         <mkdir dir="${SSQ.dir}/META-INF"/>
                                         <copy file="${src}/../conf/services.xml"
                                               tofile="${SSQ.dir}/META-INF/services.xml"/>
+                                        <copy file="${src}/../wsdl/SimpleStockQuoteService.wsdl"
+                                              tofile="${SSQ.dir}/META-INF/service.wsdl"/>
                                         <copy toDir="${SSQ.dir}">
                                             <fileset dir="${classes}">
                                                 <include name="**/*.class"/>
@@ -135,6 +137,8 @@
                                         <mkdir dir="${SSQ2.dir}/META-INF"/>
                                         <copy file="${src2}/../conf/services.xml"
                                               tofile="${SSQ2.dir}/META-INF/services.xml"/>
+                                        <copy file="${src2}/../wsdl/SimpleStockQuoteService.wsdl"
+                                              tofile="${SSQ2.dir}/META-INF/service.wsdl"/>
                                         <copy file="${src2}/../store.jks"
                                               tofile="${SSQ2.dir}/store.jks"/>
                                         <copy toDir="${SSQ2.dir}">
@@ -186,6 +190,8 @@
                                         <mkdir dir="${RSQ.dir}/META-INF"/>
                                         <copy file="${src4}/../conf/services.xml"
                                               tofile="${RSQ.dir}/META-INF/services.xml"/>
+                                        <copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl"
+                                              tofile="${RSQ.dir}/META-INF/service.wsdl"/>
                                         <copy toDir="${RSQ.dir}">
                                             <fileset dir="${classes}">
                                                 <include name="**/*.class"/>

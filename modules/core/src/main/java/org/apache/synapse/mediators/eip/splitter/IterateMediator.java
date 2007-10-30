@@ -24,12 +24,15 @@ import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.context.OperationContext;
 import org.jaxen.JaxenException;
 
 import java.util.List;
@@ -112,9 +115,8 @@ public class IterateMediator extends AbstractMediator {
                 }
 
                 // iterate through the list
-                for (Iterator itr = splitElements.iterator(); itr.hasNext();) {
+                for (Object o : splitElements) {
 
-                    Object o = itr.next();
                     // clone the message for the mediation in iteration
                     MessageContext newCtx = MessageHelper.cloneMessageContext(synCtx);
                     // set the messageSequence property for possibal aggreagtions
@@ -147,7 +149,7 @@ public class IterateMediator extends AbstractMediator {
                                 "Unable to get the attach path specified by the expression " +
                                 attachPath, synCtx);
                         }
-                    // if not preserve payload then attach the iteration element to the body
+                        // if not preserve payload then attach the iteration element to the body
                     } else if (o instanceof OMNode && newEnvelope.getBody() != null) {
                         newEnvelope.getBody().addChild((OMNode) o);
                     }
@@ -175,6 +177,14 @@ public class IterateMediator extends AbstractMediator {
         // finalizing the tracing and logging on the iterate mediator
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Iterate mediator");
+        }
+
+        // if the continuation of the parent message is stopped from here set the RESPONSE_WRITTEN
+        // property to SKIP to skip the blank http response 
+        OperationContext opCtx
+            = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getOperationContext();
+        if (continueParent && opCtx != null) {
+            opCtx.setProperty(Constants.RESPONSE_WRITTEN,"SKIP");
         }
 
         // whether to continue mediation on the original message

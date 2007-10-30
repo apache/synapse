@@ -26,20 +26,19 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.eip.EIPUtils;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.util.*;
 
@@ -82,7 +81,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     }
 
 
-    public void addCallback(String MsgID, Callback callback) {
+    public void addCallback(String MsgID, AxisCallback callback) {
         callbackStore.put(MsgID, callback);
     }
 
@@ -112,7 +111,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         }
 
         if (messageID != null) {
-            Callback callback = (Callback) callbackStore.remove(messageID);
+            AxisCallback callback = (AxisCallback) callbackStore.remove(messageID);
 
             RelatesTo[] relates = messageCtx.getRelationships();
             if (relates != null && relates.length > 1) {

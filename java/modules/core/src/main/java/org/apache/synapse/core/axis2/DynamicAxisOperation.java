@@ -172,7 +172,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 
                 SynapseCallbackReceiver callbackReceiver =
                     (SynapseCallbackReceiver) axisOp.getMessageReceiver();
-                callbackReceiver.addCallback(outMsgCtx.getMessageID(), callback);
+                callbackReceiver.addCallback(outMsgCtx.getMessageID(), axisCallback);
                 send(outMsgCtx);
 			}
 		}

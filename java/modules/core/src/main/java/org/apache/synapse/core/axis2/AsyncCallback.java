@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.client.async.AsyncResult;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 
@@ -28,7 +29,7 @@ import org.apache.synapse.MessageContext;
  * This class only "holds" the Synapse out message context for the Synapse callback message
  * receiver when a response is received or error is encountered
  */
-public class AsyncCallback extends Callback {
+public class AsyncCallback implements AxisCallback {
 
     /** The corresponding Synapse outgoing message context this instance is holding onto */
     MessageContext synapseOutMsgCtx = null;
@@ -43,9 +44,13 @@ public class AsyncCallback extends Callback {
         this.synapseOutMsgCtx = synapseOutMsgCtx;
     }
 
-    public void onComplete(AsyncResult result) {}
+    public void onMessage(org.apache.axis2.context.MessageContext messageContext) {}
+
+    public void onFault(org.apache.axis2.context.MessageContext messageContext) {}
 
     public void onError(Exception e) {}
+
+    public void onComplete() {}
 
     public org.apache.synapse.MessageContext getSynapseOutMsgCtx() {
         return synapseOutMsgCtx;

@@ -56,6 +56,7 @@
 
         <mkdir dir="${SSQ.dir}/META-INF"/>
         <copy file="conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml"/>
+        <copy file="wsdl/SimpleStockQuoteService.wsdl" tofile="${SSQ.dir}/META-INF/service.wsdl"/>        
         <copy file="store.jks" tofile="${SSQ.dir}/store.jks"/>
         <copy toDir="${SSQ.dir}">
             <fileset dir="${classes}">

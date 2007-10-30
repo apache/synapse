@@ -17,6 +17,8 @@ import org.apache.axis2.AxisFault;
 
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -57,9 +59,7 @@ public class MessageHelper {
         newCtx.setWSAAction(synCtx.getWSAAction());
 
         // copy all the synapse level properties to the newCtx
-        Iterator propItr = synCtx.getPropertyKeySet().iterator();
-        while (propItr.hasNext()) {
-            Object o = propItr.next();
+        for (Object o : synCtx.getPropertyKeySet()) {
             // If there are non String keyed properties neglect them rathern than trow exception
             if (o instanceof String) {
                 newCtx.setProperty((String) o, synCtx.getProperty((String) o));
@@ -104,7 +104,26 @@ public class MessageHelper {
         newMC.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
             mc.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
 
+        newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+            getClonedTransportHeaders(mc));
+
         return newMC;
+    }
+
+    public static Map getClonedTransportHeaders(org.apache.axis2.context.MessageContext msgCtx) {
+        
+        Map headers = (Map) msgCtx.
+            getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        Map clonedHeaders = new HashMap();
+
+        if (headers != null && headers.isEmpty()) {
+            for (Object o : headers.keySet()) {
+                String headerName = (String) o;
+                clonedHeaders.put(headerName, headers.get(headerName));
+            }
+        }
+
+        return clonedHeaders;
     }
 
     public static org.apache.axis2.context.MessageContext clonePartially(
@@ -130,31 +149,26 @@ public class MessageHelper {
         newMC.setDoingMTOM(ori.isDoingMTOM());
         newMC.setDoingSwA(ori.isDoingSwA());
 
-        newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
-            ori.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
-
         // if the original request carries any attachments, copy them to the clone
         // as well, except for the soap part if any
         Attachments attachments = ori.getAttachmentMap();
         if (attachments != null && attachments.getAllContentIDs().length > 0) {
             String[] cIDs = attachments.getAllContentIDs();
             String soapPart = attachments.getSOAPPartContentID();
-            for (int i=0; i<cIDs.length; i++) {
-                if (!cIDs[i].equals(soapPart)) {
-                    newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
+            for (String cID : cIDs) {
+                if (!cID.equals(soapPart)) {
+                    newMC.addAttachment(cID, attachments.getDataHandler(cID));
                 }
             }
         }
 
-        Iterator iter = ori.getOptions().getProperties().keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
+        for (Object o : ori.getOptions().getProperties().keySet()) {
+            String key = (String) o;
             newMC.getOptions().setProperty(key, ori.getOptions().getProperty(key));
         }
 
-        Iterator iter2 = ori.getProperties().keySet().iterator();
-        while (iter2.hasNext()) {
-            String key = (String) iter2.next();
+        for (Object o1 : ori.getProperties().keySet()) {
+            String key = (String) o1;
             newMC.setProperty(key, ori.getProperty(key));
         }
 
@@ -234,9 +248,7 @@ public class MessageHelper {
      * @param headerInformation headers to be removed
      */
     private static void detachAddressingInformation(ArrayList headerInformation) {
-        Iterator iterator = headerInformation.iterator();
-        while (iterator.hasNext()) {
-            Object o = iterator.next();
+        for (Object o : headerInformation) {
             if (o instanceof SOAPHeaderBlock) {
                 SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
                 headerBlock.detach();

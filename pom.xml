@@ -760,7 +760,7 @@
         <dependency>
             <groupId>org.wso2.throttle</groupId>
             <artifactId>wso2throttle</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${wso2throttle.version}</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>
@@ -1076,7 +1076,7 @@
         <!-- addressing, rampart, sandesha, neethi -->
         <addressing.version>1.3</addressing.version>
         <rampart.version>1.3</rampart.version>
-        <sandesha2.version>1.3-SNAPSHOT</sandesha2.version>
+        <sandesha2.version>1.3</sandesha2.version>
         <neethi.version>2.0.2</neethi.version>
         <wss4j.version>1.5.3</wss4j.version>
         <opensaml.version>1.1</opensaml.version>
@@ -1107,7 +1107,8 @@
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>
-        <wso2caching.version>SNAPSHOT</wso2caching.version>
+        <wso2caching.version>0.1</wso2caching.version>
+        <wso2throttle.version>r9300</wso2throttle.version>
         <spring.version>1.2.6</spring.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta1</bsf.version>

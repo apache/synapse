@@ -53,6 +53,7 @@ public class MediatorSerializerFinder {
         POJOCommandMediatorSerializer.class,
         CloneMediatorSerializer.class,
         IterateMediatorSerializer.class,
+        AggregateMediatorSerializer.class,
         DBLookupMediatorSerializer.class,
         DBReportMediatorSerializer.class,
         CacheMediatorSerializer.class

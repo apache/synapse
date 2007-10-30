@@ -491,7 +491,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
         } catch (AxisFault axisFault) {
             String msg = "Error configuring the File/VFS transport for Service : " +
                 service.getName() + " :: " + axisFault.getMessage();
-            log.warn(msg, axisFault);
+            log.warn(msg);
             //cfgCtx.getAxisConfiguration().getFaultyServices().put(service.getName(), msg);
         }
     }

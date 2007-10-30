@@ -26,6 +26,11 @@ public class VFSConstants {
     public static final String TRANSPORT_FILE_ACTION_AFTER_PROCESS = "transport.vfs.ActionAfterProcess";
     public static final String TRANSPORT_FILE_ACTION_AFTER_ERRORS = "transport.vfs.ActionAfterErrors";
     public static final String TRANSPORT_FILE_ACTION_AFTER_FAILURE = "transport.vfs.ActionAfterFailure";
+
+    public static final String TRANSPORT_FILE_MOVE_AFTER_PROCESS = "transport.vfs.MoveAfterProcess";
+    public static final String TRANSPORT_FILE_MOVE_AFTER_ERRORS = "transport.vfs.MoveAfterErrors";
+    public static final String TRANSPORT_FILE_MOVE_AFTER_FAILURE = "transport.vfs.MoveAfterFailure";
+
     public static final String TRANSPORT_FILE_FILE_URI = "transport.vfs.FileURI";
     public static final String TRANSPORT_FILE_FILE_NAME_PATTERN = "transport.vfs.FileNamePattern";
     public static final String TRANSPORT_FILE_CONTENT_TYPE = "transport.vfs.ContentType";

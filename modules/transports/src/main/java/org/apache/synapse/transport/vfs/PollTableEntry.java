@@ -163,7 +163,15 @@ public class PollTableEntry {
     }
 
     public void setMoveAfterProcess(String moveAfterProcess) {
-        this.moveAfterProcess = moveAfterProcess;
+        if (moveAfterProcess == null) {
+            this.moveAfterProcess = null;
+        } else if (moveAfterProcess.startsWith(VFSConstants.VFS_PREFIX)) {
+            // to recover a good directory location if user entered with the vfs: prefix
+            // because transport uris are given like that
+            this.moveAfterProcess = moveAfterProcess.substring(VFSConstants.VFS_PREFIX.length());
+        } else {
+            this.moveAfterProcess = moveAfterProcess;
+        }
     }
 
     public String getMoveAfterErrors() {
@@ -171,7 +179,13 @@ public class PollTableEntry {
     }
 
     public void setMoveAfterErrors(String moveAfterErrors) {
-        this.moveAfterErrors = moveAfterErrors;
+        if (moveAfterErrors == null) {
+            this.moveAfterErrors = null;
+        } else if (moveAfterErrors.startsWith(VFSConstants.VFS_PREFIX)) {
+            this.moveAfterErrors = moveAfterErrors.substring(VFSConstants.VFS_PREFIX.length());
+        } else {
+            this.moveAfterErrors = moveAfterErrors;
+        }  
     }
 
     public String getMoveAfterFailure() {
@@ -179,6 +193,12 @@ public class PollTableEntry {
     }
 
     public void setMoveAfterFailure(String moveAfterFailure) {
-        this.moveAfterFailure = moveAfterFailure;
+        if (moveAfterFailure == null) {
+            this.moveAfterFailure = null;
+        } else if (moveAfterFailure.startsWith(VFSConstants.VFS_PREFIX)) {
+            this.moveAfterFailure = moveAfterFailure.substring(VFSConstants.VFS_PREFIX.length());
+        } else {
+            this.moveAfterFailure = moveAfterFailure;
+        }
     }
 }

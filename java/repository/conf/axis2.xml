@@ -21,7 +21,7 @@
     <!-- ================================================= -->
     <!-- Parameters -->
     <!-- ================================================= -->
-    <parameter name="hotdeployment">true</parameter>
+    <parameter name="hotdeployment">false</parameter>
     <parameter name="hotupdate">false</parameter>
     <parameter name="enableMTOM">false</parameter>
     <parameter name="enableSwA">false</parameter>

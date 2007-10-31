@@ -136,6 +136,7 @@ mechanism for mediators (see below for details).</p>
    &lt;<a href="#sequence">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
    &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
    &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
+   &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
    <a href="#mediator">mediator</a>*
  &lt;/definitions&gt;</pre>
 
@@ -364,16 +365,47 @@ passed into the proxy services' AxisService instance (e.g. the JMS
 destination etc). If the proxy service should enable WS-Reliable Messaging or
 Security, the appropriate modules could be engaged.</p>
 
-<p>A Dynamic Proxy may be defined by specifying a proxy with the key as its
-definition. As the remote registry entry changes, the proxy will dynamically
-be updated accordingly.</p>
+<p>A Dynamic Proxy may be defined by specifying the properties of the proxy as dynamic entries
+by refering them with the key. (For example one could specify the inSequence or endpoint with
+the remote key, without defining it in the local configuration) As the remote registry entry
+changes, the properties of the proxy will dynamically be updated accordingly. (Note: proxy it
+self can not be specified as dynamic; i.e &lt;proxy key="string"/&gt; is wrong)</p>
+
+<p></p>
+
+<h2><a name="task">Tasks</a></h2>
+
+<p>A &lt;task&gt; element is used to define a Synapse Startup Task.</p>
+<pre> &lt;task class="org.my.synapse.Task" name="string"&gt;
+   &lt;property name="stringProp" value="String"/&gt;
+   &lt;property name="xmlProp"&gt;
+     &lt;somexml&gt;config&lt;/somexml&gt;
+   &lt;/property&gt;
+   &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"] | [once=(true | false)])/&gt;
+ &lt;/task&gt;</pre>
+
+<p>A task is created and scheduled to run on the specified time intervals or as specified by the
+cron expression. Task class specifies the actual task implementation class to be run in the
+specified interval (which must implement org.apache.synapse.startup.Task interface), and name
+specifies the identity of the scheduled task. Fields in the task class can be set using the
+properties as string litterals or as xml nodes. (For example; if the task implementation class
+has a field named "version" then there should be the conventional setVersion setter method
+implemented as public. In the configuration value which will be assigned to this field before
+running the task can be specified using the property with the name version)</p>
+
+<p>There are three different trigger mechanisms to schedule tasks. First of which is the simple
+trigger and specified using the count and the interval in the trigger configuration, implying that
+the task will run count times in specified intervals. Second trigger type is a cron trigger and
+specified using the cron expression. These cron triggers will trigger the task to run as per the
+cron expression. The attribute once in a trigger could be specified as true in which case this task
+will be executed only once just after the initialization of synapse</p>
 
 <p></p>
 
 <h2><a name="mediator">Mediators</a></h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch </a> | class | dblookup | dbreport | <a href="#validate">validate</a> | <a href="#property">property</a> | <a href="#sequence">sequence ref</a> | <a href="#in">in</a> | <a href="#out">out</a>| RMSequence | Throttle | XQuery </pre>
+<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a> | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#RMSequence">RMSequence</a> | <a href="#throttle">throttle</a> | <a href="#xquery">xquery</a> | <a href="#class">class</a> | <a href="#script">script</a> | <a href="#spring">spring</a> </pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -479,7 +511,7 @@ context property. Using the property element with action specified as
 
 <p></p>
 
-<h4><a name="sequence">Sequence</a></h4>
+<h4><a name="sequence_ref">Sequence</a></h4>
 <pre> &lt;sequence key="name"/&gt;</pre>
 
 <p>A sequence ref token refers to a &lt;sequence&gt; element which is used to
@@ -506,7 +538,7 @@ http://xerces.apache.org/xerces2-j/features.html)</p>
 
 <p></p>
 
-<h3>Message Transformations</h3>
+<h3>Transformation Mediators</h3>
 
 <h4><a name="makefault">Makefault</a></h4>
 <pre> &lt;makefault [version="soap11|soap12"]&gt;
@@ -557,7 +589,7 @@ omitted, it defaults to a set-header.</p>
 
 <p></p>
 
-<h3>Selection</h3>
+<h3>Selection Mediators</h3>
 
 <h4><a name="filter">Filter</a></h4>
 <pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
@@ -604,32 +636,10 @@ versa.</p>
 
 <p></p>
 
-<h3>WS-Reliable Messaging</h3>
-
-<h4><a name="rmsequence">RMSequence</a></h4>
-<pre> &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</pre>
-
-<p>The &lt;RMSequence&gt; mediator can be used to create a sequence of
-messages to communicate via WS-Reliable Messaging with an WS-RM enabled
-endpoint (&lt;enableRM&gt;). The simple use case of this mediator is to
-specify a single="true" property, because this means that only one message is
-involved in the same sequence. However if multiple messages should be sent in
-the same sequence, the correlation property should be used with a XPath
-expression that selects an unique element value from the incoming message.
-With the result of the XPath expression, Synapse can group messages together
-that belong to the same sequence. To close the sequence neatly, for the last
-message of the sequence also an XPath expression should be specified. With
-the version attribute the WS-RM specification version to be used can be
-specified, 1.0 or 1.1. </p>
-
-<p></p>
-
 <h3>Database Mediators </h3>
 
-<div>
-<h4>DB-lookup mediator </h4>
+<h4><a name="dblookup">DB-lookup</a></h4>
 
-<div>
 <pre>&lt;dblookup&gt;
    &lt;connection&gt;
      &lt;pool&gt;
@@ -653,7 +663,6 @@ specified, 1.0 or 1.1. </p>
      &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
      &lt;result name="string" column="int|string"/&gt;*
    &lt;/statement&gt;+&lt;/dblookup&gt;   &gt;</pre>
-</div>
 
 <p></p>
 
@@ -664,46 +673,17 @@ database table. The &lt;driver&gt;,&lt;url&gt;,&lt;user/&gt; and
 properties for custom DataSources</p>
 <ul>
   <li>autocommit = true | false</li>
-</ul>
-<ul>
-  <li>isolation = Connection.TRANSACTION_NONE 
-    <p>| Connection.TRANSACTION_READ_COMMITTED</p>
-    <p>I Connection.TRANSACTION_READ_UNCOMMITTED</p>
-    <p>| Connection.TRANSACTION_REPEATABLE_READ</p>
-    <p>|Connection.TRANSACTION_SERIALIZABLE</p>
-  </li>
-</ul>
-<ul>
+  <li>isolation = Connection.TRANSACTION_NONE | Connection.TRANSACTION_READ_COMMITTED | Connection.TRANSACTION_READ_UNCOMMITTED | Connection.TRANSACTION_REPEATABLE_READ | Connection.TRANSACTION_SERIALIZABLE</li>
   <li>initialsize = int</li>
-</ul>
-<ul>
   <li>maxactive = int</li>
-</ul>
-<ul>
   <li>maxidle = int</li>
-</ul>
-<ul>
   <li>maxopenstatements = int</li>
-</ul>
-<ul>
   <li>maxwait = long</li>
-</ul>
-<ul>
   <li>minidle = int</li>
-</ul>
-<ul>
   <li>poolstatements = true | false</li>
-</ul>
-<ul>
   <li>testonborrow = true | false</li>
-</ul>
-<ul>
   <li>testonreturn = true | false</li>
-</ul>
-<ul>
   <li>testwhileidle = true | false</li>
-</ul>
-<ul>
   <li>validationquery = String</li>
 </ul>
 
@@ -726,12 +706,8 @@ will set to MessageContext as a key-value fair and the key will be 'name'
 attribute and the value will be the value at the column number or the column
 name .</p>
 
-<div>
+<h4><a name="dbreport">DB-report</a></h4>
 
-<div>
-<h4>DB-report mediator</h4>
-
-<div>
 <pre>&lt;dbreport&gt;
    &lt;connection&gt;
      &lt;pool&gt;
@@ -755,26 +731,98 @@ name .</p>
      &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
     &lt;/statement&gt;+&lt;/dblreport&gt;   &gt;</pre>
 
-<div>
 <p></p>
 
 <p>The dbreport mediator has designed for writes (i.e. inserts one row) to a
 table using message information.. The information about this mediator is same
 as dblookup mediator. Only one difference here is ,there are no
 &lt;result&gt; elements.</p>
-</div>
-</div>
 
 <p></p>
 
+<h3>Advanced Mediators</h3>
+
+<h4><a name="RMSequence">RMSequence</a></h4>
+
+<pre> &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</pre>
+
+<p>The &lt;RMSequence&gt; mediator can be used to create a sequence of
+messages to communicate via WS-Reliable Messaging with an WS-RM enabled
+endpoint (&lt;enableRM&gt;). The simple use case of this mediator is to
+specify a single="true" property, because this means that only one message is
+involved in the same sequence. However if multiple messages should be sent in
+the same sequence, the correlation property should be used with a XPath
+expression that selects an unique element value from the incoming message.
+With the result of the XPath expression, Synapse can group messages together
+that belong to the same sequence. To close the sequence neatly, for the last
+message of the sequence also an XPath expression should be specified. With
+the version attribute the WS-RM specification version to be used can be
+specified, 1.0 or 1.1. </p>
+
 <p></p>
-</div>
-</div>
-</div>
 
-<h3>Extension mediator</h3>
+<h4><a name="throttle">Throttle</a></h4>
 
-<h4><a name="class">Class Mediator</a></h4>
+<pre>&lt;throttle [onReject="string"] [onAccept="string"] [id="string"]&gt;
+    &lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;
+    &lt;onReject&gt;..&lt;/onReject&gt;
+    &lt;onAccept&gt;..&lt;/onAccept&gt;
+&lt;/throttle&gt;</pre>
+
+<p></p>
+
+<p>Throttle mediator can use for both of controlling access rate and
+concurrency access. Throttling can be configured using policy and that is the
+mandatory for throttle mediator. It can be defined by in-line or as a
+registry key. The 'id' attribute identify the group of throttle mediators.
+Throttle mediator in the OUT path only need this attribute and if there is a
+policy ,it will not affect. For throttle mediator in the IN path,the throttle
+policy will affect and only if 'id' attribute is present ,the concurrency
+throttling will occur .The 'onRejct' mediators sequence will invoke if the
+throttle mediator deny access ,otherwise the 'OnAccept' mediators sequence
+will take message mediation.</p>
+
+<h4><a name="xquery">XQuery</a></h4>
+
+<pre>&lt;xquery [key="string"] [target="xpath"]&gt;
+    &lt;variable name="string" type="string" [key="string"] [expression="xpath"]/&gt;?
+&lt;/xquery&gt; </pre>
+
+<p></p>
+
+<p>The XQuery mediator can be used to perform XQuery. The 'variable' elements
+define a variable that must be binded to the dynamic context of the XQuery
+engine in order to access those variables through the XQuery script . The
+name of the variable correspond to the name of variable declaration in the
+XQuery script. The 'type' of the variable must be a valid type defined by the
+JSR-000225 (XQJ API). In configuration those type are defined as bellow. only
+supported types are shown.</p>
+
+<p></p>
+<ul>
+  <li>XQItemType.XQBASETYPE_INT -&gt; INT</li>
+  <li>XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER</li>
+  <li>XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN</li>
+  <li>XQItemType.XQBASETYPE_BYTE - &gt; BYTE</li>
+  <li>XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE</li>
+  <li>XQItemType.XQBASETYPE_SHORT -&gt; SHORT</li>
+  <li>XQItemType.XQBASETYPE_LONG -&gt; LONG</li>
+  <li>XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT</li>
+  <li>XQItemType.XQBASETYPE_STRING -&gt; STRING</li>
+  <li>XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT</li>
+  <li>XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT</li>
+  <li>XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT</li>
+</ul>
+
+<p>The 'expression' attribute is a XPath expression for which extract the
+value of a variable from a XML document or from the current SOAP envelope. If
+the 'key' attribute is present ,then the expression will be evaluated against
+a XML document that will be loaded from the registry,otherwise the expression
+will be evaluated against the current SOAP envelope.</p>
+
+<h3>Extension mediators</h3>
+
+<h4><a name="class">Class</a></h4>
 <pre> &lt;class name="class-name"&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/class&gt; </pre>
@@ -787,37 +835,7 @@ properties.</p>
 
 <p></p>
 
-<h3>Extensibility of Synapse</h3>
-
-<p>The Synapse configuration language could be easily extended, with
-configuration extensions as well as mediation extensions. The Spring mediator
-is such an example.</p>
-
-<h4>Spring Configuration</h4>
-
-<p>A Spring configuration could be created as a localEntry or remote registry
-entry providing a URL or a key reference to a Registry. The configuration is
-then created on first use or as necessary (as per registry lookup semantics)
-by the mediators which reference this configuration.</p>
-<pre> &lt;localEntry key="string"/&gt;
- &lt;localEntry key="string" src="url"/&gt;</pre>
-
-<p>The name attribute specifies a unique name for the configuration, and the
-src, key or inlined XML references to the Spring configuration</p>
-
-<p></p>
-
-<h4>Spring mediator</h4>
-<pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;</pre>
-
-<p>The &lt;spring&gt; element creates an instance of a mediator, which is
-managed by Spring. This Spring bean must implement the Mediator interface for
-it to act as a Mediator. The key will reference the Spring
-ApplicationContext/Configuration used for the bean</p>
-
-<p></p>
-
-<h3>Scripting language mediators</h3>
+<h3><a name="script">Scripting language mediators</a></h3>
 
 <p></p>
 
@@ -867,101 +885,32 @@ working with the XML in a way natural to the scripting language. For example
 when using JavaScript getPayloadXML and setPayloadXML, E4X XML objects, and
 when using Ruby, REXML documents.</p>
 
-<div>
-<h3>Throttle Mediator</h3>
+<h3>Extensibility of Synapse</h3>
 
-<div>
+<p>The Synapse configuration language could be easily extended, with
+configuration extensions as well as mediation extensions. The Spring mediator
+is such an example.</p>
 
-<div>
-<p></p>
-<pre>&lt;throttle [onReject="string"] [onAccept="string"] [id="string"]&gt;
-    &lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;
-    &lt;onReject&gt;..&lt;/onReject&gt;
-    &lt;onAccept&gt;..&lt;/onAccept&gt;
-&lt;/throttle&gt;</pre>
-</div>
-</div>
-</div>
+<h4>Spring Configuration</h4>
 
-<p></p>
+<p>A Spring configuration could be created as a localEntry or remote registry
+entry providing a URL or a key reference to a Registry. The configuration is
+then created on first use or as necessary (as per registry lookup semantics)
+by the mediators which reference this configuration.</p>
+<pre> &lt;localEntry key="string"/&gt;
+ &lt;localEntry key="string" src="url"/&gt;</pre>
 
-<p>Throttle mediator can use for both of controlling access rate and
-concurrency access. Throttling can be configured using policy and that is the
-mandatory for throttle mediator. It can be defined by in-line or as a
-registry key. The 'id' attribute identify the group of throttle mediators.
-Throttle mediator in the OUT path only need this attribute and if there is a
-policy ,it will not affect. For throttle mediator in the IN path,the throttle
-policy will affect and only if 'id' attribute is present ,the concurrency
-throttling will occur .The 'onRejct' mediators sequence will invoke if the
-throttle mediator deny access ,otherwise the 'OnAccept' mediators sequence
-will take message mediation.</p>
-
-<div>
-
-<div>
-<h3>XQuery Mediator</h3>
-
-<div>
-<p></p>
-<pre>&lt;xquery [key="string"] [target="xpath"]&gt;
-    &lt;variable name="string" type="string" [key="string"] [expression="xpath"]/&gt;?
-&lt;/xquery&gt; </pre>
-</div>
-</div>
-</div>
+<p>The name attribute specifies a unique name for the configuration, and the
+src, key or inlined XML references to the Spring configuration</p>
 
 <p></p>
 
-<p>The XQuery mediator can be used to perform XQuery. The 'variable' elements
-define a variable that must be binded to the dynamic context of the XQuery
-engine in order to access those variables through the XQuery script . The
-name of the variable correspond to the name of variable declaration in the
-XQuery script. The 'type' of the variable must be a valid type defined by the
-JSR-000225 (XQJ API). In configuration those type are defined as bellow. only
-supported types are shown.</p>
+<h4><a name="spring">Spring mediator</a></h4>
+<pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;</pre>
 
-<p></p>
-<ul>
-  <li>XQItemType.XQBASETYPE_INT -&gt; INT</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_BYTE - &gt; BYTE</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_SHORT -&gt; SHORT</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_LONG -&gt; LONG</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT</li>
-</ul>
-<ul>
-  <li>XQItemType.XQBASETYPE_STRING -&gt; STRING</li>
-</ul>
-<ul>
-  <li>XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT</li>
-</ul>
-<ul>
-  <li>XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT</li>
-</ul>
-<ul>
-  <li>XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT</li>
-</ul>
-
-<p>The 'expression' attribute is a XPath expression for which extract the
-value of a variable from a XML document or from the current SOAP envelope. If
-the 'key' attribute is present ,then the expression will be evaluated against
-a XML document that will be loaded from the registry,otherwise the expression
-will be evaluated against the current SOAP envelope.</p>
+<p>The &lt;spring&gt; element creates an instance of a mediator, which is
+managed by Spring. This Spring bean must implement the Mediator interface for
+it to act as a Mediator. The key will reference the Spring
+ApplicationContext/Configuration used for the bean</p>
 </body>
 </html>

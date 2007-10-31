@@ -59,11 +59,6 @@ public class JMSListener extends AbstractTransportListener {
     /** A Map of service name to the JMS EPR addresses */
     private Map serviceNameToEPRMap = new HashMap();
 
-    // setup the logging for the transport
-    static {
-        log = LogFactory.getLog(JMSListener.class);
-    }
-
     /**
      * This is the TransportListener initialization method invoked by Axis2
      *
@@ -73,7 +68,7 @@ public class JMSListener extends AbstractTransportListener {
     public void init(ConfigurationContext cfgCtx,
                      TransportInDescription trpInDesc) throws AxisFault {
         setTransportName(TRANSPORT_NAME);
-        super.init(cfgCtx, trpInDesc);        
+        super.init(cfgCtx, trpInDesc);
 
         // read the connection factory definitions and create them
         loadConnectionFactoryDefinitions(trpInDesc);
@@ -82,20 +77,6 @@ public class JMSListener extends AbstractTransportListener {
         if (connectionFactories.isEmpty()) {
             log.warn("No JMS connection factories are defined. Cannot listen for JMS");
             return;
-        }
-
-        // iterate through deployed services and validate connection factory
-        // names, and mark services as faulty where appropriate
-        Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();
-
-        // start connection factories
-        start();
-
-        while (services.hasNext()) {
-            AxisService service = (AxisService) services.next();
-            if (BaseUtils.isUsingTransport(service, transportName)) {
-                startListeningForService(service);
-            }
         }
 
         log.info("JMS Transport Receiver/Listener initialized...");
@@ -122,6 +103,8 @@ public class JMSListener extends AbstractTransportListener {
                 handleException("Error starting connection factory : " + conFac.getName(), e);
             }
         }
+
+        super.start();
     }
 
     /**

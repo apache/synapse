@@ -33,6 +33,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEvent;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axiom.om.OMElement;
 
@@ -41,7 +42,7 @@ import java.util.*;
 public abstract class AbstractTransportListener implements TransportListener {
 
     /** the reference to the actual commons logger to be used for log messages */
-    protected static Log log = null;
+    protected Log log = null;
 
     /** the name of the transport */
     protected String transportName = null;
@@ -65,6 +66,13 @@ public abstract class AbstractTransportListener implements TransportListener {
     protected WorkerPool workerPool = null;
     /** use the thread pool available in the axis2 configuration context */
     protected boolean useAxis2ThreadPool = false;
+
+    /**
+     * A constructor that makes subclasses pick up the correct logger
+     */
+    protected AbstractTransportListener() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     /**
      * Initialize the generic transport. Sets up the transport and the thread pool to be used
@@ -92,16 +100,6 @@ public abstract class AbstractTransportListener implements TransportListener {
 
         // register to receive updates on services for lifetime management
         cfgCtx.getAxisConfiguration().addObservers(axisObserver);
-
-        // iterate through deployed services and start
-        Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();
-
-        while (services.hasNext()) {
-            AxisService service = (AxisService) services.next();
-            if (BaseUtils.isUsingTransport(service, transportName)) {
-                startListeningForService(service);
-            }
-        }
     }
 
     public void destroy() {
@@ -131,6 +129,16 @@ public abstract class AbstractTransportListener implements TransportListener {
             started = true;
             // register to receive updates on services for lifetime management
             cfgCtx.getAxisConfiguration().addObservers(axisObserver);
+        }
+
+        // iterate through deployed services and start
+        Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();
+
+        while (services.hasNext()) {
+            AxisService service = (AxisService) services.next();
+            if (BaseUtils.isUsingTransport(service, transportName)) {
+                startListeningForService(service);
+            }
         }
     }
 

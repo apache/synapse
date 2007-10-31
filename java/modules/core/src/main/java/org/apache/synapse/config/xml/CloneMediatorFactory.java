@@ -38,7 +38,7 @@ import java.util.Iterator;
  *    &lt;sequence&gt; (mediator +) &lt;/sequence&gt;
  *    &lt;endpoint&gt; endpoint &lt;/endpoint&gt;
  *   &lt;/target&gt;
- *  &lt;/iterate&gt;
+ *  &lt;/clone&gt;
  * </pre>
  */
 public class CloneMediatorFactory extends AbstractMediatorFactory {

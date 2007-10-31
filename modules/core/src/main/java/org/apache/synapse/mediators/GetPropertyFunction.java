@@ -44,6 +44,8 @@ public class GetPropertyFunction implements Function {
     private static final Log log = LogFactory.getLog(GetPropertyFunction.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
+    public static final String NULL_STRING = "";
+
     /** Synapse Message context*/
     private MessageContext synCtx = null;
 
@@ -137,31 +139,43 @@ public class GetPropertyFunction implements Function {
                 EndpointReference toEPR = synCtx.getTo();
                 if (toEPR != null) {
                     return toEPR.getAddress();
+                } else {
+                    return NULL_STRING;
                 }
             } else if (SynapseConstants.HEADER_FROM.equals(key)) {
                 EndpointReference fromEPR = synCtx.getFrom();
                 if (fromEPR != null) {
                     return fromEPR.getAddress();
+                } else {
+                    return NULL_STRING;
                 }
             } else if (SynapseConstants.HEADER_ACTION.equals(key)) {
                 String wsaAction = synCtx.getWSAAction();
                 if (wsaAction != null) {
                     return wsaAction;
+                } else {
+                    return NULL_STRING;
                 }
             } else if (SynapseConstants.HEADER_FAULT.equals(key)) {
                 EndpointReference faultEPR = synCtx.getFaultTo();
                 if (faultEPR != null) {
                     return faultEPR.getAddress();
+                } else {
+                    return NULL_STRING;
                 }
             } else if (SynapseConstants.HEADER_REPLY_TO.equals(key)) {
                 EndpointReference replyToEPR = synCtx.getReplyTo();
                 if (replyToEPR != null) {
                     return replyToEPR.getAddress();
+                } else {
+                    return NULL_STRING;
                 }
             } else if (SynapseConstants.HEADER_MESSAGE_ID.equals(key)) {
                 String messageID = synCtx.getMessageID();
                 if (messageID != null) {
                     return messageID;
+                } else {
+                    return NULL_STRING;
                 }
             } else if (SynapseConstants.PROPERTY_MESSAGE_FORMAT.equals(key)) {
                 if(synCtx.isDoingPOX())
@@ -171,7 +185,12 @@ public class GetPropertyFunction implements Function {
                 else
                     return SynapseConstants.FORMAT_SOAP12;
             } else {
-                return synCtx.getProperty(key);
+                Object result = synCtx.getProperty(key);
+                if (result != null) {
+                    return result;
+                } else {
+                    return synCtx.getEntry(key);
+                }
             }
 
         } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
@@ -200,7 +219,7 @@ public class GetPropertyFunction implements Function {
                     "synapse:get-property(scope,prop-name) XPath function");
             }
         }
-        return null;
+        return NULL_STRING;
     }
 
     private void traceOrDebug(boolean traceOn, String msg) {

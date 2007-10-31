@@ -422,6 +422,28 @@ samples/axis2Server/repository/conf/axis2.xml file must be updated.</p>
 
 <p></p>
 
+
+<h2 id="mailsender">Setting up mail transport sender</h2>
+
+<p>To enable the mail transport, you need to uncomment the mail transport
+sender configuration in the repository/conf/axis2.xml.  Change the mail.smtp.host parameter value
+to a working SMTP host.</p>
+
+<pre>
+    &lt;!-- ================================================= --&gt;
+    &lt;!-- Mail Transport Sender  --&gt;
+    &lt;!--Only need to uncomment the sender. Configuration is achieved with every client.
+        At any instant mail host should be given. Sample configuration has been given.
+        http://people.apache.org/~pzf/SMTPBase64Binding-0.2.html--&gt;
+    &lt;!-- ================================================= --&gt;
+    &lt;transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender"&gt;
+        &lt;parameter name="mail.smtp.host"&gt;localhost&lt;/parameter&gt;
+    &lt;/transportSender&gt;
+</pre>
+
+<p></p>
+
+
 <h2 id="script">Configuring Synapse for Script Mediator support</h2>
 
 <p></p>

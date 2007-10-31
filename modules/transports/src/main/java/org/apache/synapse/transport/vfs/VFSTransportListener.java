@@ -99,10 +99,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
 
-    static {
-        log = LogFactory.getLog(VFSTransportListener.class);
-    }
-
     /**
      * Initializes the VFS transport by getting the VFS File System manager
      * @param cfgCtx the Axsi2 configuration context

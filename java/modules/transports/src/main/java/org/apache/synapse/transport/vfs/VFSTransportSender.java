@@ -36,8 +36,10 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 
 import javax.activation.DataHandler;
+import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
@@ -174,12 +176,19 @@ public class VFSTransportSender extends AbstractTransportSender {
             } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
                 try {
                     OutputStream os = responseFile.getContent().getOutputStream();
-                    os.write(firstChild.getText().getBytes());
+
+                    if (firstChild instanceof OMSourcedElementImpl) {
+                        firstChild.serializeAndConsume(os);
+                    } else {
+                        os.write(firstChild.getText().getBytes());
+                    }
                 } catch (FileSystemException e) {
                     handleException("Error getting an output stream to file : " +
                         responseFile.getName().getBaseName(), e);
                 } catch (IOException e) {
                     handleException("Error getting text content of message as bytes", e);
+                } catch (XMLStreamException e) {
+                    handleException("Error serializing OMSourcedElement content", e);
                 }
             } else {
                 populateSOAPFile(responseFile, msgContext);

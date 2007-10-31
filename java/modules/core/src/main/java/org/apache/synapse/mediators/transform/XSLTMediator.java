@@ -27,12 +27,15 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.FixedByteArrayOutputStream;
+import org.apache.synapse.util.TextFileDataSource;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -52,8 +55,10 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import javax.xml.namespace.QName;
+import javax.activation.FileDataSource;
+import javax.activation.DataHandler;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -69,9 +74,15 @@ import java.util.Properties;
  * "http://ws.apache.org/ns/synapse/transform/feature/dom" for the Transformer Factory, which
  * is used to decide between using DOM and Streams during the transformation process. By default
  * this is turned on as an optimization, but should be set to false if issues are detected
+ *
+ *  Note: Set the TransformerFactory system property to generate and use translets
+ *  -Djavax.xml.transform.TransformerFactory=org.apache.xalan.xsltc.trax.TransformerFactoryImpl
+ * 
  */
 public class XSLTMediator extends AbstractMediator {
 
+    /** Maximum size of a byte array stream attempted in-memory before file serialization is used */
+    private static final int BYTE_ARRAY_SIZE = 8192;
     /**
      * The feature for which deciding swiching between DOM and Stream during the
      * transformation process
@@ -130,16 +141,6 @@ public class XSLTMediator extends AbstractMediator {
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
             "s12:Body/child::*[position()=1]";
 
-    static {
-        // Set the TransformerFactory system property to generate and use translets.
-        // Note: To make this sample more flexible, need to load properties from a properties file.
-        String key = "javax.xml.transform.TransformerFactory";
-        String value = "org.apache.xalan.xsltc.trax.TransformerFactoryImpl";
-        Properties props = System.getProperties();
-        props.put(key, value);
-        System.setProperties(props);
-    }
-
     public XSLTMediator() {
         // create the default XPath
         try {
@@ -175,7 +176,6 @@ public class XSLTMediator extends AbstractMediator {
 
         try {
             performXLST(synCtx, traceOrDebugOn, traceOn);
-            return true;
 
         } catch (Exception e) {
             handleException("Unable to perform XSLT transformation using : " + xsltKey +
@@ -189,7 +189,7 @@ public class XSLTMediator extends AbstractMediator {
             traceOrDebug(traceOn, "End : XSLT mediator");
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -202,7 +202,11 @@ public class XSLTMediator extends AbstractMediator {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
-        ByteArrayOutputStream baosForTarget = null;
+        OutputStream osForTarget = null;
+        InputStream  isForSource = null;
+        ByteArrayOutputStream baosForTarget = new FixedByteArrayOutputStream(BYTE_ARRAY_SIZE);
+        File tempTargetFile = null;
+        File tempSourceFile = null;
 
         if (traceOrDebugOn) {
             trace.trace("Transformation source : " + sourceNode.toString());
@@ -236,22 +240,53 @@ public class XSLTMediator extends AbstractMediator {
                 traceOrDebug(traceOn, "Using byte array serialization for transformation");
             }
 
-            baosForTarget = new ByteArrayOutputStream();
             try {
                 // create a byte array output stream and serialize the source node into it
-                ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
+                ByteArrayOutputStream baosForSource = new FixedByteArrayOutputStream(BYTE_ARRAY_SIZE);
                 XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().
                     createXMLStreamWriter(baosForSource);
 
                 sourceNode.serialize(xsWriterForSource);
-                transformSrc = new StreamSource(
-                    new ByteArrayInputStream(baosForSource.toByteArray()));
-
-                // create a new Stream result over a new BAOS..
+                isForSource = new ByteArrayInputStream(baosForSource.toByteArray());
+                transformSrc = new StreamSource(isForSource);
                 transformTgt = new StreamResult(baosForTarget);
 
             } catch (XMLStreamException e) {
                 handleException("Error creating a StreamResult for the transformation", e, synCtx);
+
+            } catch (SynapseException x) {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Error creating a StreamResult using a byte array" +
+                        " - attempting using temporary files for serialization");
+                }
+
+                OutputStream osForSource = null;
+
+                try {
+                    // create a output stream and serialize the source node into it
+                    tempSourceFile = File.createTempFile("xs_", ".xml");
+                    tempTargetFile = File.createTempFile("xt_", ".xml");
+
+                    osForSource = new FileOutputStream(tempSourceFile);
+                    osForTarget = new FileOutputStream(tempTargetFile);
+
+                    XMLStreamWriter xsWriterForSource =
+                        XMLOutputFactory.newInstance().createXMLStreamWriter(osForSource);
+
+                    sourceNode.serialize(xsWriterForSource);
+                    transformSrc = new StreamSource(tempSourceFile);
+                    transformTgt = new StreamResult(osForTarget);
+
+                } catch (XMLStreamException e) {
+                    handleException("Error creating a StreamResult for the transformation", e, synCtx);
+                } catch (IOException e) {
+                    handleException("Error using a temporary file/s for the transformation", e, synCtx);
+                } finally {
+                    try {
+                        osForSource.close();
+                    } catch (IOException ignore) {}
+                }
             }
         }
 
@@ -302,9 +337,35 @@ public class XSLTMediator extends AbstractMediator {
                 }
             }
 
-            transformer.transform(transformSrc, transformTgt);
+            try {
+                transformer.transform(transformSrc, transformTgt);
+
+            } catch (TransformerException x) {
+                // did we exceed the in-memory BYTE_ARRAY_SIZE? if so, use a file for output
+                try {
+                    tempTargetFile = File.createTempFile("xt_", ".xml");
+                    osForTarget  = new FileOutputStream(tempTargetFile);
+                    transformTgt = new StreamResult(osForTarget);
+
+                    // retry transformation again
+                    isForSource.reset();
+                    transformer.reset();
+                    transformer.transform(transformSrc, transformTgt);
+
+                } catch (IOException e) {
+                    handleException("Error using a temporary file/s for the transformation", e, synCtx);
+                }
+            }
+
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Transformation completed - processing result");
+            }
+
+            if (tempSourceFile != null) {
+                boolean deleted = tempSourceFile.delete();
+                if (!deleted) {
+                    tempSourceFile.deleteOnExit();
+                }
             }
 
             // get the result OMElement
@@ -330,17 +391,40 @@ public class XSLTMediator extends AbstractMediator {
 
             } else {
 
-                try {
-                    StAXOMBuilder builder = new StAXOMBuilder(
-                        new ByteArrayInputStream(baosForTarget.toByteArray()));
-                    result = builder.getDocumentElement();
+                // if we used a temporary file for the output of the transformation, read from it
+                if (tempTargetFile != null) {
+                    try {
+                        StAXOMBuilder builder = new StAXOMBuilder(new FileInputStream(tempTargetFile));
+                        result = builder.getDocumentElement();
 
-                } catch (XMLStreamException e) {
-                    handleException(
-                        "Error building result element from XSLT transformation", e, synCtx);
+                    } catch (XMLStreamException e) {
+                        handleException(
+                            "Error building result element from XSLT transformation", e, synCtx);
 
-                } catch (Exception e) {
-                    result = handleNonXMLResult(baosForTarget.toString(), traceOrDebugOn, traceOn);
+                    } catch (Exception e) {
+                        result = handleNonXMLResult(tempTargetFile, traceOrDebugOn, traceOn);
+
+                    } finally {
+                        boolean deleted = tempTargetFile.delete();
+                        if (!deleted) {
+                            tempTargetFile.deleteOnExit();
+                        }
+                    }
+
+                } else {
+                    // read the Fixed byte array stream
+                    try {
+                        StAXOMBuilder builder = new StAXOMBuilder(
+                            new ByteArrayInputStream(baosForTarget.toByteArray()));
+                        result = builder.getDocumentElement();
+
+                    } catch (XMLStreamException e) {
+                        handleException(
+                            "Error building result element from XSLT transformation", e, synCtx);
+
+                    } catch (Exception e) {
+                        result = handleNonXMLResult(baosForTarget.toString(), traceOrDebugOn, traceOn);
+                    }
                 }
             }
 
@@ -439,6 +523,34 @@ public class XSLTMediator extends AbstractMediator {
             log.error(msg, e);
             throw new SynapseException(msg, e);
         }
+    }
+
+    /**
+     * If the transformation results in a non-XML payload, use standard wrapper elements
+     * to wrap the text payload so that other mediators could still process the result
+     * @param file the text payload file
+     * @param traceOrDebugOn is tracing on debug logging on?
+     * @param traceOn is tracing on?
+     * @return an OMElement wrapping the text payload
+     */
+    private OMElement handleNonXMLResult(File file, boolean traceOrDebugOn, boolean traceOn) {
+
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMElement wrapper = null;
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
+        }
+        if (traceOn && trace.isTraceEnabled()) {
+            trace.trace("Wrapping text transformation result from : " + file);
+        }
+
+        if (file != null) {
+            TextFileDataSource txtFileDS = new TextFileDataSource(new FileDataSource(file));
+            wrapper = new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
+        }
+
+        return wrapper;
     }
 
     /**

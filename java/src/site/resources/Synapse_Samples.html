@@ -196,6 +196,10 @@
         support with JMS</a></li>
       <li><a href="#Sample114">Sample 114: One way bridging from JMS to http
         and replying with a 202 Accepted response</a></li>
+      <li><a href="#Sample115">Sample 115: Using the  file system as transport 
+        medium using VFS transport listener and sender</a></li>
+      <li><a href="#Sample116">Sample 116: Switching from ftp transport listener
+        to mail transport sender</a></li>
     </ul>
   </li>
   <li><ul>
@@ -2700,6 +2704,140 @@ Server: Synapse-HttpComponents-NIO
 Transfer-Encoding: chunked
 
 0</pre>
+
+
+
+<h2><a name="Sample115">Sample 115:</a></h2>
+
+<pre>
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+	&lt;proxy name="StockQuoteProxy" transports="vfs"&gt;
+		&lt;parameter name="transport.vfs.FileURI"&gt;file:///home/user/test/in&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+		&lt;parameter name="transport.vfs.ContentType"&gt;text/xml&lt;/parameter&gt;
+		&lt;parameter name="transport.vfs.FileNamePattern"&gt;.*\.xml&lt;/parameter&gt;
+		&lt;parameter name="transport.PollInterval"&gt;15&lt;/parameter&gt;
+		&lt;parameter name="transport.vfs.MoveAfterProcess"&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+		&lt;parameter name="transport.vfs.MoveAfterFailure"&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+		&lt;parameter name="transport.vfs.ActionAfterProcess"&gt;MOVE&lt;/parameter&gt;
+		&lt;parameter name="transport.vfs.ActionAfterFailure"&gt;MOVE&lt;/parameter&gt;
+
+		&lt;target&gt;
+			&lt;endpoint&gt;
+				&lt;address format="soap12" uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+		        &lt;/endpoint&gt;
+			&lt;outSequence&gt;
+				&lt;property name="transport.vfs.ReplyFileName"
+					  expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')" scope="transport"/&gt;
+				&lt;send&gt;
+					&lt;endpoint&gt;
+						&lt;address uri="vfs:file:///home/user/test/out"/&gt; &lt;!--CHANGE--&gt;
+					&lt;/endpoint&gt;					
+				&lt;/send&gt;
+			&lt;/outSequence&gt;
+		&lt;/target&gt;
+		&lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+	&lt;/proxy&gt;
+&lt;/definitions&gt; 
+</pre>
+
+<p><strong>Objective: Using the  file system as transport medium using VFS 
+transport listener and sender</strong></p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p>Create three new directories in a test directory. e.g. in, out, original in /home/user/test.
+Open SYNAPSE_HOME/repository/conf/sample/synapse_sample_115.xml and edit
+the following values.  Change transport.vfs.FileURI, transport.vfs.MoveAfterProcess, 
+transport.vfs.MoveAfterFailure parameter values to the above in, original, original directories 
+respectively. Change outSequence endpoint address uri to out directory with the prefeix <em>vfs:</em>.
+Values you have to change are marked with &lt;!--CHANGE--&gt;.
+</p>
+
+<p>Start the Synapse configuration numbered 115: i.e. synapse -sample 115</p>
+
+<p>Copy SYNAPSE_HOME/repository/conf/sample/resources/vfs/test.xml to the directory
+given in transport.vfs.FileURI above.</p>
+
+<p>test.xml file content is as follows</p>
+
+<pre>
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+	&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing"&gt;
+	&lt;soapenv:Body&gt;
+		&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;
+			&lt;m0:request&gt;
+				&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+			&lt;/m0:request&gt;
+		&lt;/m0:getQuote&gt;
+	&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</pre>
+
+<p>VFS transport listener will pick the file from <em>in</em> directory and send it
+to the Axis2 service. The request XML file will be moved to <em>original</em> directory. 
+The response from the Axis2 server will be saved to <em>out</em> directory.</p>
+
+
+
+<h2><a name="Sample116">Sample 116:</a></h2>
+<pre>
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+	&lt;proxy name="StockQuoteProxy" transports="vfs"&gt;
+		&lt;parameter name="transport.vfs.FileURI"&gt;vfs:ftp://guest:guest@localhost/test?vfs.passive=true&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+		&lt;parameter name="transport.vfs.ContentType"&gt;text/xml&lt;/parameter&gt;
+		&lt;parameter name="transport.vfs.FileNamePattern"&gt;.*\.xml&lt;/parameter&gt;
+		&lt;parameter name="transport.PollInterval"&gt;15&lt;/parameter&gt;
+
+		&lt;target&gt;
+			&lt;inSequence&gt;
+				&lt;header name="Action" value="urn:getQuote"/&gt;
+			&lt;/inSequence&gt;			
+			&lt;endpoint&gt;
+				&lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+		        &lt;/endpoint&gt;
+			&lt;outSequence&gt;
+				&lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+				&lt;send&gt;
+					&lt;endpoint&gt;
+						&lt;address uri="mailto:user@host"/&gt; &lt;!--CHANGE--&gt;
+					&lt;/endpoint&gt;					
+				&lt;/send&gt;
+			&lt;/outSequence&gt;
+		&lt;/target&gt;
+		&lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+	&lt;/proxy&gt;
+&lt;/definitions&gt; 
+</pre>
+
+<p><strong>Objective: Switching from ftp transport listener to mail transport 
+sender</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+You will need access to an FTP server and an SMTP server to try this sample.</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p>Enable mail transport sender in the Synapse axis2.xml. See <a href="Synapse_Samples_Setup.html#mailsender">
+Setting up mail transport sender</a> 
+</p>
+
+<p>Create a new test directory in the FTP server. Open SYNAPSE_HOME/repository/conf/sample/synapse_sample_116.xml 
+and edit the following values. Change transport.vfs.FileURI parameter value point to 
+the test directory at the FTP server. Change outSequence endpoint address uri email address 
+to a working email address. Values you have to change are marked with &lt;!--CHANGE--&gt;.</p>
+
+<p>Start the Synapse configuration numbered 116: i.e. synapse -sample 116</p>
+
+<p>Copy SYNAPSE_HOME/repository/conf/sample/resources/vfs/test.xml to the ftp directory
+given in transport.vfs.FileURI above.</p>
+
+<p>VFS transport listener will pick the file from the directory in the ftp server and 
+send it to the Axis2 service. The file in the ftp directory will be deleted. 
+The response will be sent to the given email address.</p>
+
+
 
 <div>
 <h1>Database Mediators </h1>

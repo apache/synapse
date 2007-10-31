@@ -20,9 +20,10 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.OMContainer;
-import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.transform.XSLTMediator;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.net.URL;
+import java.io.FileOutputStream;
 
 public class XSLTMediatorTest extends TestCase {
 
@@ -134,6 +136,76 @@ public class XSLTMediatorTest extends TestCase {
             assertTrue("String".equals(symbolElem.getText()));
         } else {
             fail("Unexpected element found in SOAP body");
+        }
+    }
+
+    public void testTransformXSLTLargeMessagesCSV() throws Exception {
+
+        // create a new switch mediator
+        transformMediator = new XSLTMediator();
+        // set XSLT transformation URL
+        transformMediator.setXsltKey("xslt-key");
+
+        for (int i=0; i<2; i++) {
+            Map props = new HashMap();
+            Entry prop = new Entry();
+            prop.setType(Entry.URL_SRC);
+            prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load.xml"));
+            props.put("xslt-key", prop);
+
+            // invoke transformation, with static enveope
+            MessageContext synCtx = TestUtils.getTestContextForXSLTMediatorUsingFile("./../../repository/conf/sample/resources/transform/message.xml", props);
+            //MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
+            transformMediator.mediate(synCtx);
+//            synCtx.getEnvelope().serializeAndConsume(new FileOutputStream("/tmp/out.xml"));
+//            System.gc();
+//            System.out.println("done : " + i + " :: " + Runtime.getRuntime().freeMemory());
+        }
+    }
+
+    public void testTransformXSLTLargeMessagesXML() throws Exception {
+
+        // create a new switch mediator
+        transformMediator = new XSLTMediator();
+        // set XSLT transformation URL
+        transformMediator.setXsltKey("xslt-key");
+
+        for (int i=0; i<2; i++) {
+            Map props = new HashMap();
+            Entry prop = new Entry();
+            prop.setType(Entry.URL_SRC);
+            prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load_3.xml"));
+            props.put("xslt-key", prop);
+
+            // invoke transformation, with static enveope
+            MessageContext synCtx = TestUtils.getTestContextForXSLTMediatorUsingFile("./../../repository/conf/sample/resources/transform/message.xml", props);
+            //MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
+            transformMediator.mediate(synCtx);
+//            System.gc();
+//            System.out.println("done : " + i + " :: " + Runtime.getRuntime().freeMemory());
+        }
+    }
+
+
+    public void testTransformXSLTSmallMessages() throws Exception {
+
+        // create a new switch mediator
+        transformMediator = new XSLTMediator();
+        // set XSLT transformation URL
+        transformMediator.setXsltKey("xslt-key");
+
+        for (int i=0; i<5; i++) {
+            Map props = new HashMap();
+            Entry prop = new Entry();
+            prop.setType(Entry.URL_SRC);
+            prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load_2.xml"));
+            props.put("xslt-key", prop);
+
+            // invoke transformation, with static enveope
+            MessageContext synCtx = TestUtils.getTestContextForXSLTMediatorUsingFile("./../../repository/conf/sample/resources/transform/small_message.xml", props);
+            //MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
+            transformMediator.mediate(synCtx);
+            //System.out.println("done : " + i + " :: " + Runtime.getRuntime().freeMemory());
         }
     }
 

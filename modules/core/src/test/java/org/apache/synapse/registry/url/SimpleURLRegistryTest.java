@@ -64,8 +64,8 @@ public class SimpleURLRegistryTest extends TestCase {
         // still cached content should be available and valid
         assertEquals(TEXT_1, reg.getResource(prop).toString());
 
-        // now sleep 1 sec, still cache should be valid
-        Thread.sleep(1000);
+        // now sleep ~1 sec, still cache should be valid
+        Thread.sleep(800);
         assertEquals(TEXT_1, reg.getResource(prop).toString());
 
         // sleep another 1 sec.. cache should expire and new content should be loaded

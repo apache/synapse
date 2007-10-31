@@ -405,7 +405,7 @@ will be executed only once just after the initialization of synapse</p>
 <h2><a name="mediator">Mediators</a></h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a> | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#RMSequence">RMSequence</a> | <a href="#throttle">throttle</a> | <a href="#xquery">xquery</a> | <a href="#class">class</a> | <a href="#script">script</a> | <a href="#spring">spring</a> </pre>
+<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a> | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#RMSequence">RMSequence</a> | <a href="#throttle">throttle</a> | <a href="#xquery">xquery</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#script">script</a> | <a href="#spring">spring</a> </pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -819,6 +819,88 @@ value of a variable from a XML document or from the current SOAP envelope. If
 the 'key' attribute is present ,then the expression will be evaluated against
 a XML document that will be loaded from the registry,otherwise the expression
 will be evaluated against the current SOAP envelope.</p>
+
+<h4><a name="cache">Cache</a></h4>
+<pre> &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="mili-seconds"&gt;
+   &lt;onCacheHit (sequence="key")?&gt;
+     (mediator)+
+   &lt;/onCacheHit&gt;
+   &lt;implementation type=(memory | disk) maxSize="int"/&gt;
+ &lt;/cache&gt;</pre>
+
+<p>The &lt;cache&gt; mediator will evaluate the hash value of the incoming message as described
+in the hash generator implementation (which should be a class implementing the
+org.wso2.caching.digest.DigestGenerator interface) and looks in the cache for a matching response.
+If the generated hash value has been found in the cache then the cache mediator will execute the
+onCacheHit sequence which can be inlined as well as refered. Cache can be configured on the
+per-mediator or per-host basis and also configuration provides the timeout management through
+the timeout attribute. For the moment this is just an in-memory cache which will be extended to
+a disk-based and hierachical in the future.</p>
+
+<h4><a name="clone">Clone</a></h4>
+<pre> &lt;clone continueParent=(true | false)&gt;
+   &lt;target to="uri" [soapAction="qname"] sequence="sequence_ref" endpoint="endpoint_ref"&gt;
+     &lt;sequence&gt;
+       (mediator)+
+     &lt;/sequence&gt;
+     &lt;endpoint&gt;
+       endpoint
+     &lt;/endpoint&gt;
+   &lt;/target&gt;
+ &lt;/clone&gt;</pre>
+
+<p>The &lt;clone&gt; mediator implements a part of the Message Splitter EIP and will
+split the message in to number of identical messages all of which are identical with
+the clonning message and processed parallely using either the specified sequence or
+endpoint or both. Clonning message (parent) can be continued or dropped depending on
+the boolean value of the continueParent attribute which defaults to false and drops
+the parent when false. This drop is not a general drop, rather stop the message processing
+but does not closes the transport channel, leaving the ability of one or a set of cloned message
+responses to be sent back to the caller</p>
+
+<h4><a name="iterate">Iterate</a></h4>
+<pre> &lt;iterate continueParent=(true | false) preservePayload=(true | false) (attachPath="xpath")? expression="xpath"&gt;
+   &lt;target to="uri" [soapAction="qname"] sequence="sequence_ref" endpoint="endpoint_ref"&gt;
+     &lt;sequence&gt;
+       (mediator)+
+     &lt;/sequence&gt;
+     &lt;endpoint&gt;
+       endpoint
+     &lt;/endpoint&gt;
+   &lt;/target&gt;
+ &lt;/iterate&gt;</pre>
+
+<p>The &lt;iterate&gt; mediator implements another part of the Message Splitter EIP and will
+split the message in to number of different messages derived from the parent message by
+finding the matching elements of the XPATH expression specified in the configuration.
+New messages will be created for each and every matching element and processed parallely
+using either the specified sequence or endpoint or both. Parent message can be continued
+or dropped in the same way as in the clone mediator. Iterate parent drop also is a channel
+blocking drop as per in the clone mediator.</p>
+
+<h4><a name="aggregate">Aggregate</a></h4>
+<pre> &lt;aggregate&gt;
+   &lt;corelateOn expression="xpath"/&gt;
+   &lt;completeCondition timeout="time-in-seconds"&gt;
+     &lt;messageCount min="int-min" max="int-max"/&gt;
+   &lt;/completeCondition&gt;
+   &lt;onComplete expression="xpath" sequence="sequence-ref"&gt;
+     (mediator +)?
+   &lt;/onComplete&gt;
+   &lt;invalidate sequence="sequence-ref" timeout="time-in-seconds"&gt;
+     (mediator +)?
+   &lt;/invalidate&gt;
+ &lt;/aggregate&gt;</pre>
+
+<p>The &lt;aggregate&gt; mediator implements the Message Aggregator EIP and will
+aggregate the messages splitted using either the clone or iterate mediators.
+At the same time it can aggregate messages on the presence of matching elements specified
+by the corelateOn XPATH expression. Aggregate will collect the messages coming in to that
+until the messages on the aggregation satisfies the complete condition. On completion of
+the aggregation it will execute the aggregated message using the onComplete sequence. Aggregated
+message will be created by combining the messages participating in the aggregation using the
+onComplete XPATH expression. If a particular aggregation fails to complete in a pre configured
+time, then that particular aggregation will be invalidated using the invalidate sequence.</p>
 
 <h3>Extension mediators</h3>
 

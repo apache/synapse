@@ -91,7 +91,7 @@ public class ServerManager {
                 TransportInDescription trsIn = (TransportInDescription)
                         configctx.getAxisConfiguration().getTransportsIn().get(trp);
                 listenerManager.addListener(trsIn, false);
-                String msg = "[SynapseServer] Starting transport " + trsIn.getName();
+                String msg = "Starting transport " + trsIn.getName();
                 if (trsIn.getParameter("port") != null) {
                     msg += " on port " + trsIn.getParameter("port").getValue();
                 }
@@ -130,7 +130,7 @@ public class ServerManager {
 
         } catch (Throwable t) {
             t.printStackTrace();
-            log.fatal("[SynapseServer] Startup failed...");
+            log.fatal("Startup failed...");
         }
     }
 
@@ -186,7 +186,7 @@ public class ServerManager {
                     trsIn.getParameter("port").setValue(Integer.toString(port));
                     break;
                 } catch (Exception e) {
-                    log.warn("[SynapseServer] Port " + port + " already in use. Trying alternate");
+                    log.warn("Port " + port + " already in use. Trying alternate");
                     if (port == 8080) {
                         port = 8008;
                     } else {

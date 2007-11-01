@@ -176,7 +176,7 @@ public class ScriptMediator extends AbstractMediator {
         }
 
         if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Script mediator " + returnValue);
+            traceOrDebug(traceOn, "End : Script mediator return value : " + returnValue);
         }
 
         return returnValue;

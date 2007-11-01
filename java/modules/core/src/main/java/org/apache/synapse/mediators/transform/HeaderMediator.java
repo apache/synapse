@@ -108,11 +108,7 @@ public class HeaderMediator extends AbstractMediator {
 
         } else {
 
-            if (log.isDebugEnabled()) {
-                log.debug("Removing header : " + qName + " from current message");
-            }
-
-            if (traceOrDebugOn) {
+             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Removing SOAP Header : " + qName);
             }
 

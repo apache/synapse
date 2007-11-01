@@ -405,7 +405,7 @@ will be executed only once just after the initialization of synapse</p>
 <h2><a name="mediator">Mediators</a></h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a> | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#RMSequence">RMSequence</a> | <a href="#throttle">throttle</a> | <a href="#xquery">xquery</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#script">script</a> | <a href="#spring">spring</a> </pre>
+<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a> | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#RMSequence">RMSequence</a> | <a href="#throttle">throttle</a> | <a href="#xquery">xquery</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#script">script</a> | <a href="#spring">spring</a> </pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -905,17 +905,34 @@ time, then that particular aggregation will be invalidated using the invalidate 
 <h3>Extension mediators</h3>
 
 <h4><a name="class">Class</a></h4>
-<pre> &lt;class name="class-name"&gt;
-   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+<pre> &lt;class name=&quot;class-name&quot;&gt;
+   &lt;property name=&quot;string&quot; value=&quot;literal&quot;&gt;
+     (either literal or XML child)
+   &lt;/property&gt;
  &lt;/class&gt; </pre>
 
-<p>The class mediator creates an instance of the specified class and sets it
+<p>The &lt;class&gt; mediator creates an instance of the specified class and sets it
 as a mediator. The class must implement the org.apache.synapse.api.Mediator
 interface. If any properties are specified, the corresponding setter methods
-are invoked on the class. However, Synapse currently supports only String
-properties.</p>
+are invoked on the class.</p>
 
 <p></p>
+
+<h4><a name="pojoCommand">POJOCommand</a></h4>
+<pre> &lt;pojoCommand name=&quot;class-name&quot;&gt;
+   &lt;property name=&quot;string&quot; value=&quot;literal&quot;&gt;
+     (either literal or XML child)
+   &lt;/property&gt;
+   &lt;property name=&quot;string&quot; expression=&quot;xpath&quot;/&gt;
+ &lt;/pojoCommand&gt; </pre>
+
+<p>The &lt;pojoCommand&gt; mediator creates an instance of the specified command class
+(which may implement the org.apache.synapse.Command interface or should have a public void
+method named "execute"). If any properties are specified, the corresponding setter methods
+are invoked on the class and called the execute method of the command</p>
+
+<p></p>
+
 
 <h3><a name="script">Scripting language mediators</a></h3>
 

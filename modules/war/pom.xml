@@ -116,7 +116,7 @@
                         <!--</resource>-->
                         <resource>
                             <directory>modules/core/src/main/resources</directory>
-                            <targetPath>WEB-INF/classes/conf</targetPath>
+                            <targetPath>WEB-INF/classes</targetPath>
                             <includes>
                                 <include>log4j.properties</include>
                                 <include>identity.jks</include>

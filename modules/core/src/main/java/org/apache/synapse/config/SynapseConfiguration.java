@@ -780,17 +780,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 m.init(se);
             }
         }
-
-        // initialize the startups
-        if (startups != null) {
-            for (Iterator it = startups.values().iterator(); it.hasNext();) {
-                Object o = it.next();
-                if (o instanceof ManagedLifecycle) {
-                    ManagedLifecycle m = (ManagedLifecycle) o;
-                    m.init(se);
-                }
-            }
-        }
     }
 
     private void handleException(String msg) {

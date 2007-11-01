@@ -104,14 +104,23 @@ public class InMemoryTransaction implements Transaction {
 							other = other.waitingForTran;
 						}
 					}
-
+					
+					boolean warn = false;
 					try {
 						if(log.isDebugEnabled()) log.debug("This " + this + " waiting for " + waitingForTran);
-						bean.wait();
+						long pre = System.currentTimeMillis();
+						bean.wait(5000); 
+						long post = System.currentTimeMillis();
+						if ((post - pre) > 50000)
+							warn = true;
 					} catch(InterruptedException e) {
 						// Do nothing
 					}
 					other = (InMemoryTransaction) bean.getTransaction();
+					if (other != null && warn) {
+						//we have been waiting for a long time - this might imply a three way deadlock so error condition
+						if(log.isDebugEnabled()) log.debug("possible deadlock :" + this.toString() + " : " + bean.toString());
+					}
 				}
 				
 				waitingForTran = null;

@@ -31,6 +31,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import java.io.File;
 import java.net.ServerSocket;
 import java.util.Iterator;
+import java.util.Collection;
 
 /**
  * To manage the Synapse Server  instances. This class is responsible for
@@ -66,10 +67,10 @@ public class ServerManager {
     public void start() {
 
         if (axis2Repolocation == null) {
-            System.out.println("The Axis2 Repository must be provided");
+            log.fatal("The Axis2 Repository must be provided");
             return;
         }
-        System.out.println("[SynapseServer] Using the Axis2 Repository "
+        log.info("Using the Axis2 Repository "
                            + new File(axis2Repolocation).getAbsolutePath());
         try {
             configctx = ConfigurationContextFactory.
@@ -94,7 +95,7 @@ public class ServerManager {
                 if (trsIn.getParameter("port") != null) {
                     msg += " on port " + trsIn.getParameter("port").getValue();
                 }
-                System.out.println(msg);
+                log.info(msg);
             }
 
             // now initialize SynapseConfig
@@ -115,12 +116,21 @@ public class ServerManager {
                 throw new SynapseException(message + "Synapse Environment");
             } else {
                 ((SynapseEnvironment) synEnv.getValue()).setInitialized(true);
+                // initialize the startups
+                Collection startups = ((SynapseConfiguration) synCfg.getValue()).getStartups();
+                for (Iterator it = startups.iterator(); it.hasNext();) {
+                    Object o = it.next();
+                    if (o instanceof ManagedLifecycle) {
+                        ManagedLifecycle m = (ManagedLifecycle) o;
+                        m.init((SynapseEnvironment) synEnv.getValue());
+                    }
+                }
             }
-            System.out.println("[SynapseServer] Ready");
+            log.info("Ready for processing");
 
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("[SynapseServer] Startup failed...");
+            log.fatal("[SynapseServer] Startup failed...");
         }
     }
 
@@ -176,7 +186,7 @@ public class ServerManager {
                     trsIn.getParameter("port").setValue(Integer.toString(port));
                     break;
                 } catch (Exception e) {
-                    System.out.println("[SynapseServer] Port " + port + " already in use. Trying alternate");
+                    log.warn("[SynapseServer] Port " + port + " already in use. Trying alternate");
                     if (port == 8080) {
                         port = 8008;
                     } else {

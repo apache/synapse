@@ -97,7 +97,7 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
-                                <!--<descriptor>src/main/assembly/src.xml</descriptor>-->
+                                <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
                             <finalName>synapse-${synapse.version}</finalName>
                         </configuration>
@@ -228,6 +228,12 @@
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-kernel</artifactId>
                 <version>${axis2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-jms_1.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.axis2</groupId>
@@ -248,7 +254,19 @@
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
                         <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                    </exclusion>                    
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xom</groupId>
+                        <artifactId>xom</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>dom4j</groupId>
+                        <artifactId>dom4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>jdom</groupId>
+                        <artifactId>jdom</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -262,16 +280,34 @@
                 <groupId>org.apache.rampart</groupId>
                 <artifactId>rampart-policy</artifactId>
                 <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>jaxen</groupId>
+                        <artifactId>jaxen</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.rampart</groupId>
                 <artifactId>rampart-trust</artifactId>
                 <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>jaxen</groupId>
+                        <artifactId>jaxen</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.rampart</groupId>
                 <artifactId>rampart-core</artifactId>
                 <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>jaxen</groupId>
+                        <artifactId>jaxen</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -428,6 +464,12 @@
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
             <version>${rampart.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jaxen</groupId>
+                    <artifactId>jaxen</artifactId>
+                </exclusion>
+            </exclusions>
             <type>mar</type>
         </dependency>
 
@@ -676,11 +718,19 @@
                 </exclusion>
                 <exclusion>
                     <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ant</groupId>
                     <artifactId>ant-junit</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>ant</groupId>
                     <artifactId>ant-launcher</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>mockobjects</groupId>
+                    <artifactId>mockobjects-core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>junit</groupId>
@@ -758,6 +808,10 @@
                     <groupId>com.tonicsystems</groupId>
                     <artifactId>jarjar</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>jsp-api</artifactId>
+                </exclusion>
             </exclusions>           
         </dependency>
         <dependency>
@@ -789,6 +843,14 @@
                 <exclusion>
                     <groupId>org.apache.neethi</groupId>
                     <artifactId>neethi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant-nodeps</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -836,128 +898,14 @@
             <artifactId>quartz</artifactId>
             <version>${quartz.version}</version>
         </dependency>
-        
-         <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>catalina</artifactId>
-            <version>${tomcat.version}</version>
-             <scope>provided</scope>
-        </dependency>
 
         <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>catalina-optional</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>jasper-compiler</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>jasper-compiler-jdt</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>jasper-runtime</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-          <dependency>
-                <groupId>tomcat</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>${tomcat.version}</version>
-               <scope>provided</scope>
-            </dependency>
-        <!--<dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>${tomcat.version}</version>
-        </dependency>-->
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>naming-factory</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>naming-resources</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--<dependency>
             <groupId>tomcat</groupId>
             <artifactId>servlet-api</artifactId>
             <version>${tomcat.version}</version>
-        </dependency>-->
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>servlets-default</artifactId>
-            <version>${tomcat.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>tomcat-coyote</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>tomcat-http</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>tomcat-util</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>naming-factory-dbcp</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j</artifactId>
-            <version>${mx4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-tools</artifactId>
-            <version>${mx4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-jmx</artifactId>
-            <version>${mx4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-          <!-- Wrapper jars -->
+        <!-- Wrapper jars -->
         <dependency>
             <groupId>wrapper</groupId>
             <artifactId>wrapper</artifactId>
@@ -1192,8 +1140,13 @@
             <organization>WSO2</organization>
         </developer>
         <developer>
+            <name>Kasun Samarasinghe</name>
+            <email>kasun2010@gmail.com</email>
+            <organization>University of Colombo</organization>
+        </developer>
+        <developer>
             <name>Tijs Rademakers</name>
-		<id>tijs</id>
+		    <id>tijs</id>
             <email>t.rademakers@chello.nl</email>
             <organization>Atos Origin</organization>
         </developer>
@@ -1211,7 +1164,7 @@
             <name>Oleg Kalnichevski</name>
         </contributor>
         <contributor>
-            <name>Kasun Samarasinghe</name>
+            <name>Upul Godage</name>
         </contributor>
         <contributor>
             <name>Hadrian Zbarcea</name>

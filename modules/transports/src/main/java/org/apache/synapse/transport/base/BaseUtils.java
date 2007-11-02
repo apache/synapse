@@ -30,10 +30,7 @@ import org.apache.synapse.transport.vfs.PollTableEntry;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.*;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.om.util.StAXUtils;
@@ -43,6 +40,7 @@ import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 
 import javax.xml.namespace.QName;
@@ -182,7 +180,13 @@ public abstract class BaseUtils {
                     envelope = (SOAPEnvelope) builder.getDocumentElement();
                 }
             }
-        } catch (XMLStreamException ignore) {}
+        } catch (Exception ignore) {
+            try {
+                in.close();
+            } catch (IOException e) {}
+            in = getInputStream(message);
+        }
+
 
         // handle SOAP when content type is missing, or any other POX, binary or text payload
         if (builder == null) {
@@ -190,7 +194,7 @@ public abstract class BaseUtils {
             SOAPFactory soapFactory = new SOAP11Factory();
             try {
                 builder = new StAXOMBuilder(StAXUtils.createXMLStreamReader(in, charSetEnc));
-                builder.setOMBuilderFactory(soapFactory);
+                builder.setOMBuilderFactory(OMAbstractFactory.getOMFactory());
                 String ns = builder.getDocumentElement().getNamespace().getNamespaceURI();
 
                 if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(ns)) {

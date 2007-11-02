@@ -29,7 +29,6 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -244,6 +243,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		String outSequenceID = null;
 
+		// Work out if there is a user transaction involved before updating any store state
+		// to give any storage manager interface a chance to setup any transactional state
+		boolean hasUserTransaction = storageManager.hasUserTransaction(msgContext);
+		
 		if (rmsBean == null) { 
 			// SENDING THE CREATE SEQUENCE.
 			synchronized (RMSBeanMgr.class) {
@@ -414,7 +417,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		// processing the response if not an dummy.
 		if (!dummyMessage)
-			processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager, tran);
+			processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager, tran, hasUserTransaction);
 		
 		//Users wont be able to get reliable response msgs in the back channel in the back channel of a 
 		//reliable message. If he doesn't have a endpoint he should use polling mechanisms.
@@ -506,7 +509,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg, RMSBean rmsBean, String internalSequenceId, String outSequenceID, long messageNumber,
-		    String storageKey, StorageManager storageManager, Transaction tran) throws AxisFault {
+		    String storageKey, StorageManager storageManager, Transaction tran, boolean hasUserTransaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId + ", " + outSequenceID);
 
@@ -531,7 +534,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		boolean sendingNow = false;
-		if(outSequenceID != null && !storageManager.hasUserTransaction(msg)) {
+		if(outSequenceID != null && !hasUserTransaction) {
 		  sendingNow = true;
 		}
 		

@@ -652,6 +652,24 @@ public class JMSUtils extends BaseUtils {
     }
 
     // ----------- JMS 1.0.2b compatibility methods -------------
+    public static Connection createConnection(
+        ConnectionFactory conFactory, String user, String pass) throws JMSException {
+
+        if (conFactory instanceof QueueConnectionFactory) {
+            if (user != null && pass != null) {
+                return ((QueueConnectionFactory) conFactory).createQueueConnection(user, pass);
+            } else {
+                return ((QueueConnectionFactory) conFactory).createQueueConnection();
+            }
+        } else {
+            if (user != null && pass != null) {
+                return ((TopicConnectionFactory) conFactory).createTopicConnection(user, pass);
+            } else {
+                return ((TopicConnectionFactory) conFactory).createTopicConnection();
+            }
+        }
+    }
+
     public static Session createSession(Connection con,
         boolean transacted, int acknowledgeMode) throws JMSException {
 

@@ -19,6 +19,8 @@
 
 package samples.userguide;
 
+import org.apache.synapse.transport.jms.JMSUtils;
+
 import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -67,25 +69,23 @@ public class GenericJMSClient {
     private void sendBytesMessage(String destName, byte[] payload) throws Exception {
         InitialContext ic = getInitialContext();
         ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = confac.createConnection();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageProducer producer = session.createProducer((Destination) ic.lookup(destName));
+        Connection connection = JMSUtils.createConnection(confac, null, null);
+        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE);
 
         BytesMessage bm = session.createBytesMessage();
         bm.writeBytes(payload);
-        producer.send(bm);
+        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName), bm);
         connection.close();
     }
 
     private void sendTextMessage(String destName, String payload) throws Exception {
         InitialContext ic = getInitialContext();
         ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = confac.createConnection();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageProducer producer = session.createProducer((Destination) ic.lookup(destName));
+        Connection connection = JMSUtils.createConnection(confac, null, null);
+        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE);
 
         TextMessage tm = session.createTextMessage(payload);
-        producer.send(tm);
+        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName), tm);
         connection.close();
     }
 

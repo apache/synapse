@@ -227,7 +227,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisMessage());
+			SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
 
 			long ackInterval = propertyBean.getAcknowledgementInterval();
 

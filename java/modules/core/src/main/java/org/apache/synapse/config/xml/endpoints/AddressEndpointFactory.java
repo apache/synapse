@@ -37,16 +37,18 @@ import javax.xml.namespace.QName;
  *
  * <endpoint [name="name"] [trace="enable|disable"]>
  *   <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
- *   <address uri="url" [format="soap|pox"] [optimize="mtom|swa"]>
+ *   <address uri="url" [format="soap11|soap12|pox"] [optimize="mtom|swa"]>
  *      .. extensibility ..
  *
  *      <timeout>
  *          <duration>duration in milliseconds</duration>
  *          <action>discard | fault</action>
- *      </timeout>
+ *      </timeout>?
  *
- *      <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
- *      separateListener="true|false"/>+
+ *      <enableRM [policy="key"]/>?
+ *      <enableSec [policy="key"]/>?
+ *      <enableAddressing/>?
+ *      <suspendDurationOnFailure>suspend-duration</suspendDurationOnFailure>?
  *   </address>
  * </endpoint>
  */

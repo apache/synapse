@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
- <!-- dbreport mediator and dblookup mediator -->
+    
+ <!-- Action of dbreport and dblookup mediators together -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">

@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- introduction to Synapse proxy services -->
+<!-- Introduction to proxy services -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <proxy name="StockQuoteProxy">
         <target>

@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- MTOM and SwA and message properties to correlate requests and responses -->
+    
+<!-- MTOM and SwA optimizations and request/response correlation -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <in>
         <filter source="get-property('Action')" regex="urn:uploadFileUsingMTOM">

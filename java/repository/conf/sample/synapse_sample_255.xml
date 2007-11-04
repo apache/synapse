@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- introduction to Synapse proxy services -->
+<!-- Switching from ftp transport listener to mail transport sender -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <proxy name="StockQuoteProxy">
         <target>

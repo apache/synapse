@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- introduction to Tasks with simple trigger -->
+
+<!-- Introduction to Tasks with simple trigger -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice">

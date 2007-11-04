@@ -40,12 +40,18 @@ import java.net.URL;
 /**
  * Creates an WSDL based endpoint from a XML configuration.
  *
- * <endpoint [name="name"] [trace="enable|disable"]>
- *    <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
- *    <wsdl uri="wsdl uri" service="service name" port="port name">
- *       .. extensibility ..
- *    </wsdl>
- * </endpoint>
+ * <wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname">
+ *   <wsdl:definition>...</wsdl:definition>?
+ *   <wsdl20:description>...</wsdl20:description>?
+ *   <enableRM [policy="key"]/>?
+ *   <enableSec [policy="key"]/>?
+ *   <enableAddressing/>?
+ *   <suspendDurationOnFailure>suspend-duration</suspendDurationOnFailure>?
+ *   <timeout>
+ *     <duration>timeout-duration</duration>
+ *     <action>discard|fault</action>
+ *   </timeout>?
+ * </wsdl>
  */
 public class WSDLEndpointFactory implements EndpointFactory {
 

@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- illustration of header, in (out) mediators -->
+<!-- Manipulating SOAP headers, and filtering incoming and outgoing messages -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <in>
         <header name="To" value="http://localhost:9000/soap/SimpleStockQuoteService"/>

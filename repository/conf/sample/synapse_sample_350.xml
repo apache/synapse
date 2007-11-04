@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- Introduction to the script mediator -->
+    
+<!-- Introduction to the script mediator using js scripts -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/>
 

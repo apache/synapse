@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- switching from https to REST/POX -->
+    
+<!-- Switching transports and message format from SOAP to REST/POX -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <proxy name="StockQuoteProxy" transports="https">
         <target>

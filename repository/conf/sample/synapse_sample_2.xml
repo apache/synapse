@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- switch-case mediator and setting and reading of local properties on a message -->
+<!-- CBR with the Switch-case mediator, using message properties -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd">
         <case regex="IBM">

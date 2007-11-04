@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- simple content based routing of messages -->
+<!-- Simple content based routing (CBR) of messages -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <!-- filtering of messages with XPath and regex matches -->
     <filter source="get-property('To')" regex=".*/StockQuote.*">

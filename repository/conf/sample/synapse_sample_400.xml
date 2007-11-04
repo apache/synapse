@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-    <!-- Advanced message splitting and aggregating the responses -->
+
+<!-- Message splitting and aggregating the responses -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="SplitAggregateProxy">

@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- Demonstrate the use of class mediator -->
+<!-- Writting your own custom mediation in Java -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="fault">

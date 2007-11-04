@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- a full registry based configuration -->
+    
+<!-- A full registry based configuration, and sharing a configuration between multiple instances -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <parameter name="root">file:./repository/conf/sample/resources/</parameter>

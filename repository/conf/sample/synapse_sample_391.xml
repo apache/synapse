@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-        <!-- introduction to URL source properties, registry based properties and the XQuery mediator -->
+
+<!-- TODO: Find the topic -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->

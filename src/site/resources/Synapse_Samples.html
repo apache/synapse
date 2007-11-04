@@ -183,7 +183,7 @@
             proxy service without processing the security headers</a></li>
     </ul>
   </li>
-  <li><a href="ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a>
+  <li><a href="#ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a>
     <ul>
         <li><a href="#Sample200">Sample 200: Using WS-Security with policy
             attachments for proxy services</a></li>
@@ -201,7 +201,7 @@
         support with JMS</a></li>
       <li><a href="#Sample253">Sample 253: One way bridging from JMS to http
         and replying with a 202 Accepted response</a></li>
-      <li><a href="#Sample254">Sample 254: Using the  file system as transport 
+      <li><a href="#Sample254">Sample 254: Using the  file system as transport
         medium using VFS transport listener and sender</a></li>
       <li><a href="#Sample255">Sample 255: Switching from ftp transport listener
         to mail transport sender</a></li>
@@ -209,7 +209,7 @@
   </li>
   <li><a href="#Task">Introduction to synapse tasks</a>
     <ul>
-      <li><a href="#Sample300">Introduction to tasks with simple trigger</a></li>
+      <li><a href="#Sample300">Sample 300: Introduction to tasks with simple trigger</a></li>
     </ul>
   </li>
   <li><a href="#AdvancedMediation">Advanced mediations with advanced mediators</a>
@@ -268,7 +268,7 @@
 
 <h1><a name="MediationSamples">Message Mediation Samples</a></h1>
 
-<h2><a name="Sample0">Sample 0:</a></h2>
+<h2><a name="Sample0">Sample 0: Introduction to Synapse</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;!-- log all attributes of messages passing through --&gt;
     &lt;log level="full"/&gt;
@@ -328,9 +328,8 @@ sends the message to the WS-Addressing 'To' address
 http://localhost:9000/soap/SimpleStockQuoteService, but the transport
 specifies Synapse as the http proxy. </p>
 
-<h2><a name="Sample1" id="Sample1">Sample 1:</a></h2>
-<pre>&lt;!-- simple content based routing of messages --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample1">Sample 1: Simple content based routing (CBR) of messages</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;!-- filtering of messages with XPath and regex matches --&gt;
     &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
         &lt;send&gt;
@@ -368,9 +367,8 @@ message in a configuration. During response processing, the filter condition
 fails, and thus the implicit 'send' mediator forwards the reply back to the
 client.</p>
 
-<h2><a name="Sample2">Sample 2:</a></h2>
-<pre>&lt;!-- switch-case mediator and setting and reading of local properties on a message --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample2">Sample 2: CBR with the Switch-case mediator, using message properties</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd"&gt;
         &lt;case regex="IBM"&gt;
             &lt;!-- the property mediator sets a local property on the *current* message --&gt;
@@ -423,9 +421,9 @@ extension function.</p>
 -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</p>
 <pre>INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
 
-<h2><a name="Sample3" id="Sample3">Sample 3:</a></h2>
-<pre>&lt;!-- illustration of local registry entry definitions, and reusable endpoints and sequences --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample3">Sample 3: Local Registry entry definitions,
+    reusable endpoints and sequences</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;!-- define a string resource entry to the local registry --&gt;
     &lt;localEntry key="version"&gt;0.1&lt;/localEntry&gt;
     &lt;!-- define a reuseable endpoint definition --&gt;
@@ -490,9 +488,8 @@ to all messages that passes through Synapse.</p>
 [HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
 [HttpServerWorker-1] DEBUG AddressEndpoint - Sending To: http://localhost:9000/soap/SimpleStockQuoteService </pre>
 
-<h2><a name="Sample4">Sample 4:</a></h2>
-<pre>&lt;!-- introduction to error handling --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample4">Sample 4: Introduction to error handling</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the default fault handling sequence used by Synapse - named 'fault' --&gt;
     &lt;sequence name="fault"&gt;
@@ -590,7 +587,8 @@ custom error message as follows:</p>
 [HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate()
 [HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured for stock SUN, message = Reference to non-existent endpoint for key : sunPort</pre>
 
-<h2><a name="Sample5">Sample 5:</a></h2>
+<h2><a name="Sample5">Sample 5: Creating SOAP fault messages and
+        changing the direction of a message</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="myFaultHandler"&gt;
@@ -654,7 +652,8 @@ SOAP fault in this example.</p>
 <pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;
     &lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
 
-<h2><a name="Sample6">Sample 6:</a></h2>
+<h2><a name="Sample6">Sample 6: Manipulating SOAP headers, and
+        filtering incoming and outgoing messages</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
         &lt;header name="To" value="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
@@ -676,9 +675,9 @@ the stock quote service on the sample Axis2 server. Thus it is now possible
 to request for a stock quote as follows:</p>
 <pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/SimpleStockQuoteService</pre>
 
-<h2><a name="Sample7">Sample 7:</a></h2>
-<pre>&lt;!-- introduction of static inline XML properties and the validation mediator --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample7">Sample 7: Introduction to local Registry entries
+        and using Schema validation</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;localEntry key="validate_schema"&gt;
         &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -747,9 +746,9 @@ slightly different message than what is created by the stock quote client.
 symbol)</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
 
-<h2><a name="Sample8">Sample 8:</a></h2>
-<pre>&lt;!-- introduction to static and dynamic registry resources and the XSLT mediator --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample8">Sample 8: Introduction to static and dynamic
+        registry resources, and using XSLT transformations</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
@@ -858,9 +857,9 @@ this can be seen by the following debug log messages</p>
 detected so that changes could be reloaded without restarting the Synapse
 instance.</p>
 
-<h2><a name="Sample9">Sample 9:</a></h2>
-<pre>&lt;!-- introduction dynamic sequences --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample9">Sample 9: Introduction to dynamic sequences with
+        the Registry</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
         &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
@@ -916,9 +915,9 @@ following log messages:</p>
 <p>The cache timeout could be tuned appropriately by configuring the URL
 registry to suite the environment and the needs.</p>
 
-<h2><a name="Sample10">Sample 10:</a></h2>
-<pre>&lt;!-- introduction dynamic endpoints --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample10">Sample 10: Introduction to dynamic endpoints
+        with the Registry</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;parameter name="root"&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
@@ -961,9 +960,9 @@ expires, the Registry loads the new definition of the endpoint, and then the
 messages can be seen being routed to the second sample Axis2 server on http
 port 9001.</p>
 
-<h2><a name="Sample11">Sample 11:</a></h2>
-<pre>&lt;!-- a full registry based configuration --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample11">Sample 11: A full registry based configuration,
+        and sharing a configuration between multiple instances</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
         &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
@@ -979,10 +978,13 @@ done</p>
 
 <p>This example shows a full registry based Synapse configuration. Thus it is
 possible to start a remote configuration from multiple instances of Synapse
-in a clustered environment easily, and allow the configuration to be reloaded
-as well. The Synapse configuration held on a node hosting Synapse simply
+in a clustered environment easily. The Synapse configuration held on a node hosting Synapse simply
 points to the registry and looks up the actual configuration by requesting
-the key ''synapse.xml'. </p>
+the key 'synapse.xml'. </p>
+
+<p>(Note: Full registry based configuration is not dynamic atleast for the moment. i.e. it is
+not reloading it self)
+</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
 <pre>[HttpServerWorker-1] INFO LogMediator - message = This is a dynamic Synapse configuration</pre>
 
@@ -997,106 +999,53 @@ the key ''synapse.xml'. </p>
 
 <p></p>
 
-<h1><a name="Endpoints">Endpoints</a></h1>
+<h1><a name="Endpoints">Advanced mediations with endpoints</a></h1>
 
-<h2><a name="Sample50">Sample 50:</a></h2>
-<pre>&lt;!-- Connecting to endpoints with WS-Security for outgoing messages --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
-
-    &lt;in&gt;
+<h2><a name="Sample50">Sample 50: POX to SOAP conversion</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;!-- filtering of messages with XPath and regex matches --&gt;
+    &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
         &lt;send&gt;
-            &lt;endpoint name="secure"&gt;
-                &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"&gt;
-                    &lt;enableSec policy="sec_policy"/&gt;
-                    &lt;enableAddressing/&gt;
-                &lt;/address&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap11"/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
-    &lt;/in&gt;
-    &lt;out&gt;
-        &lt;header name="wsse:Security" action="remove"
-                xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
-        &lt;send/&gt;
-    &lt;/out&gt;
-&lt;/definitions&gt;</pre>
+        &lt;drop/&gt;
+    &lt;/filter&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt; </pre>
 
-<p><strong>Objective: Connecting to endpoints with WS-Security for outgoing
-messages</strong></p>
+<p><strong>Objective: POX to SOAP conversion</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-</p>
+Start the Synapse configuration numbered 52: i.e. synapse -sample 52\</p>
 
-<p>You may also need to download and install the unlimited strength policy
-files for your JDK before using Apache Rampart (e.g. see
-http://java.sun.com/javase/downloads/index_jdk5.jsp)</p>
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
 
-<p>Start the Synapse configuration numbered 50: i.e. synapse -sample 50<br>
-Start the Axis2 server and deploy the SecureStockQuoteService if not already
-done</p>
+<p>Execute the 'ant stockquote' specifying that the request should be a REST
+request as follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8081/soap/StockQuote -Drest=true</pre>
 
-<p></p>
-
-<p>Use the stock quote client to send a request without WS-Security. Synapse
-is configured to enable WS-Security as per the policy specified by
-'policy_3.xml' for the outgoing messages to the SecureStockQuoteService
-endpoint hosted on the Axis2 instance. The debug log messages on Synapse
-shows the encrypted message flowing to the service and the encrypted response
-being received by Synapse. The wsse:Security header is then removed from the
-decrypted message and the response is delivered back to the client, as
-expected. You may execute the client as follows:</p>
-<pre>ant stockquote -Dtrpurl=http://localhost:8080/</pre>
-
-<p>The message sent by Synapse to the secure service can be seen as follows,
-when TCPMon is used.</p>
-<pre>POST http://localhost:9001/soap/SecureStockQuoteService HTTP/1.1
-Host: 127.0.0.1
+<p>This example shows a http REST request (as shown below) being transformed
+into a SOAP request and forwarded to the stock quote service. </p>
+<pre>POST /soap/StockQuote HTTP/1.1
+Content-Type: application/xml; charset=UTF-8;action="urn:getQuote";
 SOAPAction: urn:getQuote
-Content-Type: text/xml; charset=UTF-8
+User-Agent: Axis2
+Host: 127.0.0.1
 Transfer-Encoding: chunked
-Connection: Keep-Alive
-User-Agent: Synapse-HttpComponents-NIO
 
-800
-&lt;?xml version='1.0' encoding='UTF-8'?&gt;
-   &lt;soapenv:Envelope xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:wsa="http://www.w3.org/2005/08/addressing" ..&gt;
-      &lt;soapenv:Header&gt;
-         &lt;wsse:Security ..&gt;
-            &lt;wsu:Timestamp ..&gt;
-               ...
-            &lt;/wsu:Timestamp&gt;
-            &lt;xenc:EncryptedKey..&gt;
-               ...
-            &lt;/xenc:EncryptedKey&gt;
-            &lt;wsse:BinarySecurityToken ...&gt;
-               &lt;ds:SignedInfo&gt;
-               ...
-               &lt;/ds:SignedInfo&gt;
-               &lt;ds:SignatureValue&gt;
-               ...
-               &lt;/ds:SignatureValue&gt;
-               &lt;ds:KeyInfo Id="KeyId-29551621"&gt;
-                  ...
-               &lt;/ds:KeyInfo&gt;
-            &lt;/ds:Signature&gt;
-         &lt;/wsse:Security&gt;
-         &lt;wsa:To&gt;http://localhost:9001/soap/SecureStockQuoteService&lt;/wsa:To&gt;
-         &lt;wsa:MessageID&gt;urn:uuid:1C4CE88B8A1A9C09D91177500753443&lt;/wsa:MessageID&gt;
-         &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
-      &lt;/soapenv:Header&gt;
-      &lt;soapenv:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-3789605"&gt;
-         &lt;xenc:EncryptedData Id="EncDataId-3789605" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
-            &lt;xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" /&gt;
-            &lt;xenc:CipherData&gt;
-                &lt;xenc:CipherValue&gt;Layg0xQcnH....6UKm5nKU6Qqr&lt;/xenc:CipherValue&gt;
-            &lt;/xenc:CipherData&gt;
-         &lt;/xenc:EncryptedData&gt;
-      &lt;/soapenv:Body&gt;
-   &lt;/soapenv:Envelope&gt;0</pre>
+75
+&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;
+   &lt;m0:request&gt;
+      &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+   &lt;/m0:request&gt;
+&lt;/m0:getQuote&gt;0</pre>
 
-<h2><a name="Sample51">Sample 51:</a></h2>
-<pre>&lt;!-- MTOM and SwA and message properties to correlate requests and responses --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample51">Sample 51: MTOM and SwA optimizations and
+            request/response correlation</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
         &lt;filter source="get-property('Action')" regex="urn:uploadFileUsingMTOM"&gt;
             &lt;property name="example" value="mtom"/&gt;
@@ -1222,52 +1171,593 @@ Content-Transfer-Encoding: binary
 Content-ID:
          &lt;urn:uuid:15FD2DA2584A32BF7C1177414169826&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
 
-<h2><a name="Sample52">Sample 52:</a></h2>
-<pre>&lt;!-- POX to SOAP conversion --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;!-- filtering of messages with XPath and regex matches --&gt;
-    &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+<h2><a name="Sample52">Sample 52: Session less load balancing between 3 endpoints</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the simple load balancing among set of
+endpoints</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 54. (i.e. synapse -sample 54)</p>
+
+<p>Deploy the LoadbalanceFailoverService by switching to &lt;synapse
+installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService
+directory and running ant.</p>
+
+<p>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and
+9003 and give some unique names to each server.</p>
+
+<p>Example commands to run sample Axis2 servers from the &lt;synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below:</p>
+<pre>./axis2server.sh -http 9001 -https 9005 -name MyServer1
+./axis2server.sh -http 9002 -https 9006 -name MyServer2
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</pre>
+
+<p>Now we are done with setting up the environment for load balance sample.
+Start the load balance and failover client using the following command:</p>
+<pre>ant loadbalancefailover -Di=100</pre>
+
+<p>This client sends 100 requests to the LoadbalanceFailoverService through
+Synapse. Synapse will distribute the load among the three endpoints mentioned
+in the configuration in round robin manner. LoadbalanceFailoverService
+appends the name of the server to the response, so that client can determine
+which server has processed the message. If you examine the console output of
+the client, you can see that requests are processed by three servers as
+follows:</p>
+<pre>[java] Request: 1 ==&gt; Response from server: MyServer1
+[java] Request: 2 ==&gt; Response from server: MyServer2
+[java] Request: 3 ==&gt; Response from server: MyServer3
+[java] Request: 4 ==&gt; Response from server: MyServer1
+[java] Request: 5 ==&gt; Response from server: MyServer2
+[java] Request: 6 ==&gt; Response from server: MyServer3
+[java] Request: 7 ==&gt; Response from server: MyServer1
+...</pre>
+
+<p>Now run the client without the -Di=100 parameter to send infinite
+requests. While running the client shutdown the server named MyServer1. You
+can observe that requests are only distributed among MyServer2 and MyServer3
+after shutting down MyServer1. Console output before and after shutting down
+MyServer1 is listed below (MyServer1 was shutdown after request 63):</p>
+<pre>...
+[java] Request: 61 ==&gt; Response from server: MyServer1
+[java] Request: 62 ==&gt; Response from server: MyServer2
+[java] Request: 63 ==&gt; Response from server: MyServer3
+[java] Request: 64 ==&gt; Response from server: MyServer2
+[java] Request: 65 ==&gt; Response from server: MyServer3
+[java] Request: 66 ==&gt; Response from server: MyServer2
+[java] Request: 67 ==&gt; Response from server: MyServer3
+...</pre>
+
+<p>Now restart MyServer1. You can observe that requets will be again sent to
+all three servers roughly after 60 seconds. This is because we have specified
+&lt;suspendDurationOnFailure&gt; as 60 seconds in the configuration.
+Therefore, load balance endpoint will suspend any failed child endpoint only
+for 60 seconds after detecting the failure. </p>
+
+<h2><a name="Sample53">Sample 53: Failover sending among 3 endpoints</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;failover&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/failover&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the failover sending</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 55 (i.e. synapse -sample 55)</p>
+
+<p>Deploy the LoadbalanceFailoverService and start three instances of sample
+Axis2 server as mentioned in sample 54.</p>
+
+<p></p>
+
+<p>Above configuration sends messages with the failover behavior. Initially
+the server at port 9001 is treated as primary and other two are treated as
+back ups. Messages are always directed only to the primary server. If the
+primary server has failed, next listed server is selected as the primary.
+Thus, messages are sent successfully as long as there is at least one active
+server. To test this, run the loadbalancefailover client to send infinite
+requests as follows:</p>
+<pre>ant loadbalancefailover</pre>
+
+<p>You can see that all requests are processed by MyServer1. Now shutdown
+MyServer1 and inspect the console output of the client. You will observe that
+all subsequent requests are processed by MyServer2.</p>
+
+<p>The console output with MyServer1 shutdown after request 127 is listed
+below:</p>
+<pre>...
+[java] Request: 125 ==&gt; Response from server: MyServer1
+[java] Request: 126 ==&gt; Response from server: MyServer1
+[java] Request: 127 ==&gt; Response from server: MyServer1
+[java] Request: 128 ==&gt; Response from server: MyServer2
+[java] Request: 129 ==&gt; Response from server: MyServer2
+[java] Request: 130 ==&gt; Response from server: MyServer2
+...</pre>
+
+<p>You can keep on shutting down servers like this. Client will get a
+response till you shutdown all listed servers. Once all servers are shutdown,
+the error sequence is activated and a fault message is sent to the client as
+follows:</p>
+<pre>[java] COULDN'T SEND THE MESSAGE TO THE SERVER.</pre>
+
+<p>Once a server is detected as failed, it will be added to the active
+servers list again after 60 seconds (specified in
+&lt;suspendDurationOnFailure&gt; in the configuration). Therefore, if you
+have restarted any of the stopped servers and shutdown all other servers,
+messages will be directed to the newly started server.</p>
+
+<h2><a name="Sample54">Sample 54: Session affinity load balancing between 3 endpoints</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;!-- specify the session as the simple client session provided by Synapse for
+                    testing purpose --&gt;
+                    <strong>&lt;session type="simpleClientSession"/&gt;</strong>
+
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the load balancing with session affinity
+using client initiated sessions</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 56 (i.e. synapse -sample 56).</p>
+
+<p>Deploy the LoadbalanceFailoverService and start three instances of the
+sample Axis2 server as in sample 54. </p>
+
+<p></p>
+
+<p>Above configuration is same as the load balancing configuration in sample
+54, except that the session type is specified as "simpleClientSession". This
+is a client initiated session, which means that the client generates the
+session identifier and send it to with each request. In this sample session
+type, client adds a SOAP header named ClientID containing the identifier of
+the client. Synapse binds this ID with a server on the first request and
+sends all seccessive requests containing that ID to the same server. Now
+switch to samples/axis2Client directory and run the client using the
+following command to check this in action.</p>
+<pre>ant loadbalancefailover -Dmode=session</pre>
+
+<p>In the session mode, client continuesly sends requests with three diferent
+client (session) IDs. One ID is selected among these three IDs for each
+request randomly. Then client prints the session ID with the responded server
+for each request. Client output for the first 10 requests are shown below.</p>
+<pre>[java] Request: 1 Session number: 1 Response from server: MyServer3
+[java] Request: 2 Session number: 2 Response from server: MyServer2
+[java] Request: 3 Session number: 0 Response from server: MyServer1
+[java] Request: 4 Session number: 2 Response from server: MyServer2
+[java] Request: 5 Session number: 1 Response from server: MyServer3
+[java] Request: 6 Session number: 2 Response from server: MyServer2
+[java] Request: 7 Session number: 2 Response from server: MyServer2
+[java] Request: 8 Session number: 1 Response from server: MyServer3
+[java] Request: 9 Session number: 0 Response from server: MyServer1
+[java] Request: 10 Session number: 0 Response from server: MyServer1
+... </pre>
+
+<p>You can see that session number 0 is always directed to the server named
+MyServer1. That means session number 1 is bound to MyServer3. Similarly
+session 1 and 2 are bound to MyServer3 and MyServer2 respectively. </p>
+
+<h2><a name="Sample55">Sample 55: Session affinity load balancing
+            between fail over endpoints</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;!-- specify the session as the simple client session provided by Synapse for
+                    testing purpose --&gt;
+                    <strong>&lt;session type="simpleClientSession"/&gt;</strong>
+
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;failover&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/failover&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;failover&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9004/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/failover&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the session affinity based load balancing
+with failover capability</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 57 (i.e. synapse -sample 57).</p>
+
+<p>Deploy the LoadbalanceFailoverService and start four sample Axis2 servers
+on http ports 9001, 9002, 9003 and 9004 respectively (make sure to specify
+unconflicting https ports).</p>
+
+<p></p>
+
+<p>This configuration also uses "simpleClientSession" to bind sessions as in
+the previous sample. But failover endpoints are specified as the child
+endpoints of the load balance endpoint. Therefore sessions are bound to the
+failover endpoints. Session information has to be replicated among the
+servers listed under each failover endpoint using some clustering mechanism.
+Therefore, if one endpoint bound to a session failed, successive requets for
+that session will be directed to the next endpoint in that failover group.
+Run the client using the following command to observe this behavoir.</p>
+<pre>ant loadbalancefailover -Dmode=session</pre>
+
+<p>You can see a client output as shown below.</p>
+<pre>...
+[java] Request: 222 Session number: 0 Response from server: MyServer1
+[java] Request: 223 Session number: 0 Response from server: MyServer1
+[java] Request: 224 Session number: 1 Response from server: MyServer1
+[java] Request: 225 Session number: 2 Response from server: MyServer3
+[java] Request: 226 Session number: 0 Response from server: MyServer1
+[java] Request: 227 Session number: 1 Response from server: MyServer1
+[java] Request: 228 Session number: 2 Response from server: MyServer3
+[java] Request: 229 Session number: 1 Response from server: MyServer1
+[java] Request: 230 Session number: 1 Response from server: MyServer1
+[java] Request: 231 Session number: 2 Response from server: MyServer3
+...</pre>
+
+<p>Note that session 0 is always directed to MyServer1 and session 1 is
+directed to MyServer3. No requests are directed to MyServer2 and MyServer4 as
+they are kept as backups by failover endpoints. Now shutdown the server named
+MyServer1 while running the sample. You will observer that all successive
+requests for session 0 is now directed to MyServer2, which is the backup
+server for MyServer1's group. This is shown below, where MyServer1 was
+shutdown after the request 534.</p>
+<pre>...
+[java] Request: 529 Session number: 2 Response from server: MyServer3
+[java] Request: 530 Session number: 1 Response from server: MyServer1
+[java] Request: 531 Session number: 0 Response from server: MyServer1
+[java] Request: 532 Session number: 1 Response from server: MyServer1
+[java] Request: 533 Session number: 1 Response from server: MyServer1
+[java] Request: 534 Session number: 1 Response from server: MyServer1
+[java] Request: 535 Session number: 0 Response from server: MyServer2
+[java] Request: 536 Session number: 0 Response from server: MyServer2
+[java] Request: 537 Session number: 0 Response from server: MyServer2
+[java] Request: 538 Session number: 2 Response from server: MyServer3
+[java] Request: 539 Session number: 0 Response from server: MyServer2
+...</pre>
+
+<h2><a name="Sample56">Sample 56: WSDL endpoint</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;!-- get epr from the given wsdl --&gt;
+                &lt;endpoint&gt;
+                    &lt;wsdl uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl" service="SimpleStockQuoteService" port="SimpleStockQuoteServiceSOAP11port_http"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the use of WSDL endpoints</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start the Synapse configuration numbered 60 (i.e. synapse -sample 60).</p>
+
+<p>Deploy the SimpleStockQuoteService and start the sample Axis2 server.</p>
+
+<p>This sample uses a WSDL endpoint inside the send mediator. WSDL endpoints
+can extract endpoint's address from the given WSDL. As WSDL documents can
+have many services and many ports inside each service, the service and port
+of the required endpoint has to be specified. As with address endpoints, QoS
+parameters for the endpoint can be specified inline in the configuration. An
+excerpt taken from the sample_proxy_1.wsdl containing the specified service
+and port is listed below.</p>
+<pre>&lt;wsdl:service name="SimpleStockQuoteService"&gt;
+    &lt;wsdl:port name="SimpleStockQuoteServiceSOAP11port_http"
+               binding="axis2:SimpleStockQuoteServiceSOAP11Binding"&gt;
+        &lt;soap:address location="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+    &lt;/wsdl:port&gt;
+    &lt;wsdl:port name="SimpleStockQuoteServiceSOAP12port_http"
+               binding="axis2:SimpleStockQuoteServiceSOAP12Binding"&gt;
+        &lt;soap12:address location="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+    &lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;</pre>
+
+<p>Specified service and port refers to the endpoint address
+"http://localhost:9000/soap/SimpleStockQuoteService" according to the above
+WSDL. Now run the client using the below command.</p>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+
+<p>Client will print the quote price for IBM received from the server running
+on port 9000. Observe the Axis2 console and the Synapse console to verify
+this behavoir.</p>
+
+<h1><a name="MessageMediationQoS">Quality of Service addition or
+      deduction samples in message mediation</a></h1>
+
+<h2><a name="Sample100">Sample 100: Using WS-Security for outgoing messages</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
+
+    &lt;in&gt;
         &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap11"/&gt;
+            &lt;endpoint name="secure"&gt;
+                &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"&gt;
+                    &lt;enableSec policy="sec_policy"/&gt;
+                    &lt;enableAddressing/&gt;
+                &lt;/address&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
-        &lt;drop/&gt;
-    &lt;/filter&gt;
-    &lt;send/&gt;
-&lt;/definitions&gt; </pre>
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;header name="wsse:Security" action="remove"
+                xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt;</pre>
 
-<p><strong>Objective: POX to SOAP conversion</strong></p>
+<p><strong>Objective: Connecting to endpoints with WS-Security for outgoing
+messages</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Start the Synapse configuration numbered 52: i.e. synapse -sample 52\</p>
+</p>
 
-<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
-already done</p>
+<p>You may also need to download and install the unlimited strength policy
+files for your JDK before using Apache Rampart (e.g. see
+http://java.sun.com/javase/downloads/index_jdk5.jsp)</p>
 
-<p>Execute the 'ant stockquote' specifying that the request should be a REST
-request as follows:</p>
-<pre>ant stockquote -Dtrpurl=http://localhost:8081/soap/StockQuote -Drest=true</pre>
+<p>Start the Synapse configuration numbered 50: i.e. synapse -sample 50<br>
+Start the Axis2 server and deploy the SecureStockQuoteService if not already
+done</p>
 
-<p>This example shows a http REST request (as shown below) being transformed
-into a SOAP request and forwarded to the stock quote service. </p>
-<pre>POST /soap/StockQuote HTTP/1.1
-Content-Type: application/xml; charset=UTF-8;action="urn:getQuote";
-SOAPAction: urn:getQuote
-User-Agent: Axis2
+<p></p>
+
+<p>Use the stock quote client to send a request without WS-Security. Synapse
+is configured to enable WS-Security as per the policy specified by
+'policy_3.xml' for the outgoing messages to the SecureStockQuoteService
+endpoint hosted on the Axis2 instance. The debug log messages on Synapse
+shows the encrypted message flowing to the service and the encrypted response
+being received by Synapse. The wsse:Security header is then removed from the
+decrypted message and the response is delivered back to the client, as
+expected. You may execute the client as follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+
+<p>The message sent by Synapse to the secure service can be seen as follows,
+when TCPMon is used.</p>
+<pre>POST http://localhost:9001/soap/SecureStockQuoteService HTTP/1.1
 Host: 127.0.0.1
+SOAPAction: urn:getQuote
+Content-Type: text/xml; charset=UTF-8
 Transfer-Encoding: chunked
+Connection: Keep-Alive
+User-Agent: Synapse-HttpComponents-NIO
 
-75
-&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;
-   &lt;m0:request&gt;
-      &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
-   &lt;/m0:request&gt;
-&lt;/m0:getQuote&gt;0</pre>
+800
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+   &lt;soapenv:Envelope xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:wsa="http://www.w3.org/2005/08/addressing" ..&gt;
+      &lt;soapenv:Header&gt;
+         &lt;wsse:Security ..&gt;
+            &lt;wsu:Timestamp ..&gt;
+               ...
+            &lt;/wsu:Timestamp&gt;
+            &lt;xenc:EncryptedKey..&gt;
+               ...
+            &lt;/xenc:EncryptedKey&gt;
+            &lt;wsse:BinarySecurityToken ...&gt;
+               &lt;ds:SignedInfo&gt;
+               ...
+               &lt;/ds:SignedInfo&gt;
+               &lt;ds:SignatureValue&gt;
+               ...
+               &lt;/ds:SignatureValue&gt;
+               &lt;ds:KeyInfo Id="KeyId-29551621"&gt;
+                  ...
+               &lt;/ds:KeyInfo&gt;
+            &lt;/ds:Signature&gt;
+         &lt;/wsse:Security&gt;
+         &lt;wsa:To&gt;http://localhost:9001/soap/SecureStockQuoteService&lt;/wsa:To&gt;
+         &lt;wsa:MessageID&gt;urn:uuid:1C4CE88B8A1A9C09D91177500753443&lt;/wsa:MessageID&gt;
+         &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+      &lt;/soapenv:Header&gt;
+      &lt;soapenv:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-3789605"&gt;
+         &lt;xenc:EncryptedData Id="EncDataId-3789605" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+            &lt;xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" /&gt;
+            &lt;xenc:CipherData&gt;
+                &lt;xenc:CipherValue&gt;Layg0xQcnH....6UKm5nKU6Qqr&lt;/xenc:CipherValue&gt;
+            &lt;/xenc:CipherData&gt;
+         &lt;/xenc:EncryptedData&gt;
+      &lt;/soapenv:Body&gt;
+   &lt;/soapenv:Envelope&gt;0</pre>
 
-<h2><a name="Sample53">Sample 53:</a></h2>
-<pre>&lt;!-- RMSequence example --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample101">Sample 101: Reliable message exchange between
+            Synapse and the back-end server using WS-ReliableMessaging</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;in&gt;
         &lt;RMSequence single="true" version="1.0"/&gt;
@@ -1451,504 +1941,10 @@ terminate the sequence as follows.</p>
 most cases they will be exchanged in a single socket connection as HTTP
 Keep-Alive header is used.</p>
 
-<h2><a name="Sample54">Sample 54:</a></h2>
-<pre>&lt;!-- demonstrates simple session less load balancing between 3 endpoints --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h1><a name="ProxyServices">Synapse Proxy service samples</a></h1>
 
-    &lt;sequence name="main" onError="errorHandler"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;loadbalance&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/loadbalance&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
-
-    &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
-            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
-        &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
-        &lt;send/&gt;
-    &lt;/sequence&gt;
-
-&lt;/definitions&gt;</pre>
-
-<p><strong>Objective: Demonstrate the simple load balancing among set of
-endpoints</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start Synapse with sample configuration 54. (i.e. synapse -sample 54)</p>
-
-<p>Deploy the LoadbalanceFailoverService by switching to &lt;synapse
-installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService
-directory and running ant.</p>
-
-<p>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and
-9003 and give some unique names to each server.</p>
-
-<p>Example commands to run sample Axis2 servers from the &lt;synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below:</p>
-<pre>./axis2server.sh -http 9001 -https 9005 -name MyServer1
-./axis2server.sh -http 9002 -https 9006 -name MyServer2
-./axis2server.sh -http 9003 -https 9007 -name MyServer3</pre>
-
-<p>Now we are done with setting up the environment for load balance sample.
-Start the load balance and failover client using the following command:</p>
-<pre>ant loadbalancefailover -Di=100</pre>
-
-<p>This client sends 100 requests to the LoadbalanceFailoverService through
-Synapse. Synapse will distribute the load among the three endpoints mentioned
-in the configuration in round robin manner. LoadbalanceFailoverService
-appends the name of the server to the response, so that client can determine
-which server has processed the message. If you examine the console output of
-the client, you can see that requests are processed by three servers as
-follows:</p>
-<pre>[java] Request: 1 ==&gt; Response from server: MyServer1
-[java] Request: 2 ==&gt; Response from server: MyServer2
-[java] Request: 3 ==&gt; Response from server: MyServer3
-[java] Request: 4 ==&gt; Response from server: MyServer1
-[java] Request: 5 ==&gt; Response from server: MyServer2
-[java] Request: 6 ==&gt; Response from server: MyServer3
-[java] Request: 7 ==&gt; Response from server: MyServer1
-...</pre>
-
-<p>Now run the client without the -Di=100 parameter to send infinite
-requests. While running the client shutdown the server named MyServer1. You
-can observe that requests are only distributed among MyServer2 and MyServer3
-after shutting down MyServer1. Console output before and after shutting down
-MyServer1 is listed below (MyServer1 was shutdown after request 63):</p>
-<pre>...
-[java] Request: 61 ==&gt; Response from server: MyServer1
-[java] Request: 62 ==&gt; Response from server: MyServer2
-[java] Request: 63 ==&gt; Response from server: MyServer3
-[java] Request: 64 ==&gt; Response from server: MyServer2
-[java] Request: 65 ==&gt; Response from server: MyServer3
-[java] Request: 66 ==&gt; Response from server: MyServer2
-[java] Request: 67 ==&gt; Response from server: MyServer3
-...</pre>
-
-<p>Now restart MyServer1. You can observe that requets will be again sent to
-all three servers roughly after 60 seconds. This is because we have specified
-&lt;suspendDurationOnFailure&gt; as 60 seconds in the configuration.
-Therefore, load balance endpoint will suspend any failed child endpoint only
-for 60 seconds after detecting the failure. </p>
-
-<h2><a name="Sample55">Sample 55:</a></h2>
-<pre>&lt;!-- Demontrates failover sending among 3 endpoints. --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;sequence name="main" onError="errorHandler"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;failover&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/failover&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
-
-    &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
-            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
-        &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
-        &lt;send/&gt;
-    &lt;/sequence&gt;
-
-&lt;/definitions&gt;</pre>
-
-<p><strong>Objective: Demonstrate the failover sending</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start Synapse with sample configuration 55 (i.e. synapse -sample 55)</p>
-
-<p>Deploy the LoadbalanceFailoverService and start three instances of sample
-Axis2 server as mentioned in sample 54.</p>
-
-<p></p>
-
-<p>Above configuration sends messages with the failover behavior. Initially
-the server at port 9001 is treated as primary and other two are treated as
-back ups. Messages are always directed only to the primary server. If the
-primary server has failed, next listed server is selected as the primary.
-Thus, messages are sent successfully as long as there is at least one active
-server. To test this, run the loadbalancefailover client to send infinite
-requests as follows:</p>
-<pre>ant loadbalancefailover</pre>
-
-<p>You can see that all requests are processed by MyServer1. Now shutdown
-MyServer1 and inspect the console output of the client. You will observe that
-all subsequent requests are processed by MyServer2.</p>
-
-<p>The console output with MyServer1 shutdown after request 127 is listed
-below:</p>
-<pre>...
-[java] Request: 125 ==&gt; Response from server: MyServer1
-[java] Request: 126 ==&gt; Response from server: MyServer1
-[java] Request: 127 ==&gt; Response from server: MyServer1
-[java] Request: 128 ==&gt; Response from server: MyServer2
-[java] Request: 129 ==&gt; Response from server: MyServer2
-[java] Request: 130 ==&gt; Response from server: MyServer2
-...</pre>
-
-<p>You can keep on shutting down servers like this. Client will get a
-response till you shutdown all listed servers. Once all servers are shutdown,
-the error sequence is activated and a fault message is sent to the client as
-follows:</p>
-<pre>[java] COULDN'T SEND THE MESSAGE TO THE SERVER.</pre>
-
-<p>Once a server is detected as failed, it will be added to the active
-servers list again after 60 seconds (specified in
-&lt;suspendDurationOnFailure&gt; in the configuration). Therefore, if you
-have restarted any of the stopped servers and shutdown all other servers,
-messages will be directed to the newly started server.</p>
-
-<h2><a name="Sample56">Sample 56:</a></h2>
-<pre>&lt;!-- Demontrates session affinity load balancing between 3 endpoints. We are using client
- initiated session for this sample. --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;sequence name="main" onError="errorHandler"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;!-- specify the session as the simple client session provided by Synapse for
-                    testing purpose --&gt;
-                    <strong>&lt;session type="simpleClientSession"/&gt;</strong>
-
-                    &lt;loadbalance&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
-                                &lt;enableAddressing/&gt;
-                            &lt;/address&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/loadbalance&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
-
-    &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
-            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
-        &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
-        &lt;send/&gt;
-    &lt;/sequence&gt;
-
-&lt;/definitions&gt;</pre>
-
-<p><strong>Objective: Demonstrate the load balancing with session affinity
-using client initiated sessions</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start Synapse with sample configuration 56 (i.e. synapse -sample 56).</p>
-
-<p>Deploy the LoadbalanceFailoverService and start three instances of the
-sample Axis2 server as in sample 54. </p>
-
-<p></p>
-
-<p>Above configuration is same as the load balancing configuration in sample
-54, except that the session type is specified as "simpleClientSession". This
-is a client initiated session, which means that the client generates the
-session identifier and send it to with each request. In this sample session
-type, client adds a SOAP header named ClientID containing the identifier of
-the client. Synapse binds this ID with a server on the first request and
-sends all seccessive requests containing that ID to the same server. Now
-switch to samples/axis2Client directory and run the client using the
-following command to check this in action.</p>
-<pre>ant loadbalancefailover -Dmode=session</pre>
-
-<p>In the session mode, client continuesly sends requests with three diferent
-client (session) IDs. One ID is selected among these three IDs for each
-request randomly. Then client prints the session ID with the responded server
-for each request. Client output for the first 10 requests are shown below.</p>
-<pre>[java] Request: 1 Session number: 1 Response from server: MyServer3
-[java] Request: 2 Session number: 2 Response from server: MyServer2
-[java] Request: 3 Session number: 0 Response from server: MyServer1
-[java] Request: 4 Session number: 2 Response from server: MyServer2
-[java] Request: 5 Session number: 1 Response from server: MyServer3
-[java] Request: 6 Session number: 2 Response from server: MyServer2
-[java] Request: 7 Session number: 2 Response from server: MyServer2
-[java] Request: 8 Session number: 1 Response from server: MyServer3
-[java] Request: 9 Session number: 0 Response from server: MyServer1
-[java] Request: 10 Session number: 0 Response from server: MyServer1
-... </pre>
-
-<p>You can see that session number 0 is always directed to the server named
-MyServer1. That means session number 1 is bound to MyServer3. Similarly
-session 1 and 2 are bound to MyServer3 and MyServer2 respectively. </p>
-
-<h2><a name="Sample57">Sample 57:</a></h2>
-<pre>&lt;!-- Demontrates the session affinity load balancing between fail over endpoints. If endpoint servers
-maintain session specific data, such data have to replicated among the failover endpoints. --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;sequence name="main" onError="errorHandler"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;!-- specify the session as the simple client session provided by Synapse for
-                    testing purpose --&gt;
-                    <strong>&lt;session type="simpleClientSession"/&gt;</strong>
-
-                    &lt;loadbalance&gt;
-                        &lt;endpoint&gt;
-                            &lt;failover&gt;
-                                &lt;endpoint&gt;
-                                    &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
-                                        &lt;enableAddressing/&gt;
-                                    &lt;/address&gt;
-                                &lt;/endpoint&gt;
-                                &lt;endpoint&gt;
-                                    &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
-                                        &lt;enableAddressing/&gt;
-                                    &lt;/address&gt;
-                                &lt;/endpoint&gt;
-                            &lt;/failover&gt;
-                        &lt;/endpoint&gt;
-                        &lt;endpoint&gt;
-                            &lt;failover&gt;
-                                &lt;endpoint&gt;
-                                    &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
-                                        &lt;enableAddressing/&gt;
-                                    &lt;/address&gt;
-                                &lt;/endpoint&gt;
-                                &lt;endpoint&gt;
-                                    &lt;address uri="http://localhost:9004/soap/LBService1"&gt;
-                                        &lt;enableAddressing/&gt;
-                                    &lt;/address&gt;
-                                &lt;/endpoint&gt;
-                            &lt;/failover&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/loadbalance&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
-
-    &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
-            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
-        &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
-        &lt;send/&gt;
-    &lt;/sequence&gt;
-
-&lt;/definitions&gt;</pre>
-
-<p><strong>Objective: Demonstrate the session affinity based load balancing
-with failover capability</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start Synapse with sample configuration 57 (i.e. synapse -sample 57).</p>
-
-<p>Deploy the LoadbalanceFailoverService and start four sample Axis2 servers
-on http ports 9001, 9002, 9003 and 9004 respectively (make sure to specify
-unconflicting https ports).</p>
-
-<p></p>
-
-<p>This configuration also uses "simpleClientSession" to bind sessions as in
-the previous sample. But failover endpoints are specified as the child
-endpoints of the load balance endpoint. Therefore sessions are bound to the
-failover endpoints. Session information has to be replicated among the
-servers listed under each failover endpoint using some clustering mechanism.
-Therefore, if one endpoint bound to a session failed, successive requets for
-that session will be directed to the next endpoint in that failover group.
-Run the client using the following command to observe this behavoir.</p>
-<pre>ant loadbalancefailover -Dmode=session</pre>
-
-<p>You can see a client output as shown below.</p>
-<pre>...
-[java] Request: 222 Session number: 0 Response from server: MyServer1
-[java] Request: 223 Session number: 0 Response from server: MyServer1
-[java] Request: 224 Session number: 1 Response from server: MyServer1
-[java] Request: 225 Session number: 2 Response from server: MyServer3
-[java] Request: 226 Session number: 0 Response from server: MyServer1
-[java] Request: 227 Session number: 1 Response from server: MyServer1
-[java] Request: 228 Session number: 2 Response from server: MyServer3
-[java] Request: 229 Session number: 1 Response from server: MyServer1
-[java] Request: 230 Session number: 1 Response from server: MyServer1
-[java] Request: 231 Session number: 2 Response from server: MyServer3
-...</pre>
-
-<p>Note that session 0 is always directed to MyServer1 and session 1 is
-directed to MyServer3. No requests are directed to MyServer2 and MyServer4 as
-they are kept as backups by failover endpoints. Now shutdown the server named
-MyServer1 while running the sample. You will observer that all successive
-requests for session 0 is now directed to MyServer2, which is the backup
-server for MyServer1's group. This is shown below, where MyServer1 was
-shutdown after the request 534.</p>
-<pre>...
-[java] Request: 529 Session number: 2 Response from server: MyServer3
-[java] Request: 530 Session number: 1 Response from server: MyServer1
-[java] Request: 531 Session number: 0 Response from server: MyServer1
-[java] Request: 532 Session number: 1 Response from server: MyServer1
-[java] Request: 533 Session number: 1 Response from server: MyServer1
-[java] Request: 534 Session number: 1 Response from server: MyServer1
-[java] Request: 535 Session number: 0 Response from server: MyServer2
-[java] Request: 536 Session number: 0 Response from server: MyServer2
-[java] Request: 537 Session number: 0 Response from server: MyServer2
-[java] Request: 538 Session number: 2 Response from server: MyServer3
-[java] Request: 539 Session number: 0 Response from server: MyServer2
-...</pre>
-
-<h2><a name="Sample60">Sample 60:</a></h2>
-<pre>&lt;!-- demonstrates wsdl endpoint --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;!-- get epr from the given wsdl --&gt;
-                &lt;endpoint&gt;
-                    &lt;wsdl uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl" service="SimpleStockQuoteService" port="SimpleStockQuoteServiceSOAP11port_http"/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
-
-&lt;/definitions&gt;</pre>
-
-<p><strong>Objective: Demonstrate the use of WSDL endpoints</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start the Synapse configuration numbered 60 (i.e. synapse -sample 60).</p>
-
-<p>Deploy the SimpleStockQuoteService and start the sample Axis2 server.</p>
-
-<p>This sample uses a WSDL endpoint inside the send mediator. WSDL endpoints
-can extract endpoint's address from the given WSDL. As WSDL documents can
-have many services and many ports inside each service, the service and port
-of the required endpoint has to be specified. As with address endpoints, QoS
-parameters for the endpoint can be specified inline in the configuration. An
-excerpt taken from the sample_proxy_1.wsdl containing the specified service
-and port is listed below.</p>
-<pre>&lt;wsdl:service name="SimpleStockQuoteService"&gt;
-    &lt;wsdl:port name="SimpleStockQuoteServiceSOAP11port_http"
-               binding="axis2:SimpleStockQuoteServiceSOAP11Binding"&gt;
-        &lt;soap:address location="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-    &lt;/wsdl:port&gt;
-    &lt;wsdl:port name="SimpleStockQuoteServiceSOAP12port_http"
-               binding="axis2:SimpleStockQuoteServiceSOAP12Binding"&gt;
-        &lt;soap12:address location="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-    &lt;/wsdl:port&gt;
-&lt;/wsdl:service&gt;</pre>
-
-<p>Specified service and port refers to the endpoint address
-"http://localhost:9000/soap/SimpleStockQuoteService" according to the above
-WSDL. Now run the client using the below command.</p>
-<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
-
-<p>Client will print the quote price for IBM received from the server running
-on port 9000. Observe the Axis2 console and the Synapse console to verify
-this behavoir.</p>
-
-<h1><a name="ProxyServices" id="ProxyServices">Proxy services</a></h1>
-
-<h2><a name="Sample100">Sample 100:</a></h2>
-<pre>&lt;!-- introduction to Synapse proxy services --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample150">Sample 150: Introduction to proxy services</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="StockQuoteProxy"&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -1989,9 +1985,9 @@ sent back to the client. By default, a proxy service is exposed over all
 transports configured for Synapse, unless these are specifically mentioned
 through the 'transports' attribute.</p>
 
-<h2><a name="Sample101">Sample 101:</a></h2>
-<pre>&lt;!-- using custom sequences for incoming and outgoing message mediation with proxy services --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample151">Sample 151: Custom sequences and endpoints
+          with proxy services</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="proxy_1"&gt;
         &lt;send&gt;
@@ -2039,9 +2035,9 @@ receive the reply generated by the actual service hosted on the Axis2
 instance. </p>
 <pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy1<br>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy2</pre>
 
-<h2><a name="Sample102">Sample 102:</a></h2>
-<pre>&lt;!-- switching from https to REST/POX --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample152">Sample 152: Switching transports and message
+        format from SOAP to REST/POX</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="StockQuoteProxy" transports="https"&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -2124,9 +2120,70 @@ Connection: Keep-Alive
 
 <p></p>
 
-<h2><a name="Sample103">Sample 103:</a></h2>
-<pre>&lt;!-- attaching service level WS-Security policies to proxy services --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample153">Sample 153: Routing the messages arrived to a
+            proxy service without processing the security headers</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Routing the messages arrived to a proxy service without
+processing the MustUnderstand headers (Security header)</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+You may also need to download and install the unlimited strength policy files
+for your JDK before using Apache Rampart (e.g. see
+http://java.sun.com/javase/downloads/index_jdk5.jsp)</p>
+
+<p>Start the Synapse configuration numbered 105: i.e. synapse -sample 105<br>
+Start the Axis2 server and deploy the SecureStockQuoteService if not already
+done</p>
+
+<p></p>
+
+<p>The proxy service will recieve secure messages with security headers which
+are MustUnderstand. But hence element 'engageSec' is not present in the proxy
+configuration synapse will not engage that Apache Rampart on this proxy
+service. It is expected that an MustUnderstand failure exception on the
+AxisEngine would occur before the message arrives Synapse. But Synapse
+handles this message and gets it in by setting all the headers which are
+MustUnderstand and not processed to processed state. This will enable synapse
+to route the messages without reading the Security headers (just routing the
+messages from client to service, both of which are secure). To execute the
+client, send a stock quote request to the proxy service, and sign and encrypt
+the request by specifying the client side security policy as follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
+
+<p>By following through the debug logs or TCPMon output, you could see that
+the request received by the proxy service was signed and encrypted. Also,
+looking up the WSDL of the proxy service by requesting the URL
+http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security policy
+attachments are not there and security is not engaged. When sending the
+message to the backend service, you could verify that the security headers
+were there as in the original message to synapse from client, and that the
+response received does use WS-Security, and forwarded back to the client
+without any modification. You should note that this wont be a security hole
+because the message inside synapse is signed and encrypted and can only be
+forwarded to a secure service to be usefull.</p>
+
+<h1><a name="ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a></h1>
+
+<h2><a name="Sample200">Sample 200: Using WS-Security with policy
+            attachments for proxy services</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
     &lt;proxy name="StockQuoteProxy"&gt;
         &lt;target&gt;
@@ -2187,9 +2244,9 @@ that the response received does not use WS-Security, but that the response
 being forwarded back to the client is signed and encrypted as expected by the
 client.</p>
 
-<h2><a name="Sample104">Sample 104:</a></h2>
-<pre>&lt;!-- attaching service level WS-RM policies to proxy services --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample201">Sample 201: Reliable message exchange between
+            the client and proxy services using WS-ReliableMessaging</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="StockQuoteProxy"&gt;
         &lt;target&gt;
             &lt;inSequence&gt;
@@ -2240,68 +2297,10 @@ perform a similar function to the messages discussed in sample 53.</p>
 
 <p></p>
 
-<h2><a name="Sample105">Sample 105:</a></h2>
-<pre>&lt;!-- routing messages without processing security headers --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;proxy name="StockQuoteProxy"&gt;
-        &lt;target&gt;
-            &lt;inSequence&gt;
-                &lt;send&gt;
-                    &lt;endpoint&gt;
-                        &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"/&gt;
-                    &lt;/endpoint&gt;
-                &lt;/send&gt;
-            &lt;/inSequence&gt;
-            &lt;outSequence&gt;
-                &lt;send/&gt;
-            &lt;/outSequence&gt;
-        &lt;/target&gt;
-        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-    &lt;/proxy&gt;
-&lt;/definitions&gt;</pre>
+<h1><a name="Transport">Transport samples and switching transports</a></h1>
 
-<p><strong>Objective: Routing the messages arrived to a proxy service without
-processing the MustUnderstand headers (Security header)</strong></p>
-
-<p><strong>Pre-Requisites:</strong><br>
-You may also need to download and install the unlimited strength policy files
-for your JDK before using Apache Rampart (e.g. see
-http://java.sun.com/javase/downloads/index_jdk5.jsp)</p>
-
-<p>Start the Synapse configuration numbered 105: i.e. synapse -sample 105<br>
-Start the Axis2 server and deploy the SecureStockQuoteService if not already
-done</p>
-
-<p></p>
-
-<p>The proxy service will recieve secure messages with security headers which
-are MustUnderstand. But hence element 'engageSec' is not present in the proxy
-configuration synapse will not engage that Apache Rampart on this proxy
-service. It is expected that an MustUnderstand failure exception on the
-AxisEngine would occur before the message arrives Synapse. But Synapse
-handles this message and gets it in by setting all the headers which are
-MustUnderstand and not processed to processed state. This will enable synapse
-to route the messages without reading the Security headers (just routing the
-messages from client to service, both of which are secure). To execute the
-client, send a stock quote request to the proxy service, and sign and encrypt
-the request by specifying the client side security policy as follows:</p>
-<pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
-
-<p>By following through the debug logs or TCPMon output, you could see that
-the request received by the proxy service was signed and encrypted. Also,
-looking up the WSDL of the proxy service by requesting the URL
-http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security policy
-attachments are not there and security is not engaged. When sending the
-message to the backend service, you could verify that the security headers
-were there as in the original message to synapse from client, and that the
-response received does use WS-Security, and forwarded back to the client
-without any modification. You should note that this wont be a security hole
-because the message inside synapse is signed and encrypted and can only be
-forwarded to a secure service to be usefull.</p>
-
-<h1><a name="Transport">Transports</a></h1>
-
-<h2><a name="Sample110">Sample 110:</a></h2>
+<h2><a name="Sample250">Sample 250: Introduction to switching
+        transports - JMS to http/s</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy" transports="jms"&gt;
@@ -2377,7 +2376,7 @@ and connection factory etc.</p>
 <p>e.g.</p>
 <pre>&lt;property name="transport.jms.Destination" value="dynamicTopics/something.TestTopic"/&gt;</pre>
 
-<h2><a name="Sample111">Sample 111:</a></h2>
+<h2><a name="Sample251">Sample 251: Switching from http/s to JMS</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy" transports="http"&gt;
@@ -2435,7 +2434,8 @@ order request to Synapse using HTTP as follows:</p>
 has accepted the order as follows:</p>
 <pre>Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</pre>
 
-<h2><a name="Sample112">Sample 112:</a></h2>
+<!--TODO: do we need to keep this as a seperate sample: no synapse activity in here-->
+<div style="color:red"><h2><a name="Sample112">Sample 112: One way messaging / fireAndForget()</a></h2>
 
 <p><strong>Objective: Demonstrate one way messaging /
 fireAndForget()</strong></p>
@@ -2456,11 +2456,11 @@ of the order as follows:</p>
 
 <p>If you send your client request through TCPmon, you will notice that the
 SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
-Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
+Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p></div>
 
-<h2><a name="Sample113">Sample 113:</a></h2>
-<pre>&lt;!-- demonstrate JMS pure text, binary and POX message support --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample252">Sample 252: Pure text/binary and POX message
+        support with JMS</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="text_proxy"&gt;
         &lt;header name="Action" value="urn:placeOrder"/&gt;
@@ -2651,9 +2651,9 @@ to the SimpleStockQuoteService after setting the SOAP action as
 the message as:</p>
 <pre>Wed Apr 25 20:24:50 LKT 2007 samples.services.SimpleStockQuoteService :: Accepted order for : 19211 stocks of MSFT at $ 172.39703010684752</pre>
 
-<h2><a name="Sample114">Sample 114:</a></h2>
-<pre>&lt;!-- one-way message bridging between JMS to HTTP and sending a 202 Accepted --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample253">Sample 253: One way bridging from JMS to http
+        and replying with a 202 Accepted response</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="JMStoHTTPStockQuoteProxy" transports="jms"&gt;
         &lt;target&gt;
@@ -2725,9 +2725,8 @@ Transfer-Encoding: chunked
 
 0</pre>
 
-
-
-<h2><a name="Sample115">Sample 115:</a></h2>
+<h2><a name="Sample254">Sample 254: Using the  file system as transport
+        medium using VFS transport listener and sender</a></h2>
 
 <pre>
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -2798,11 +2797,9 @@ given in transport.vfs.FileURI above.</p>
 to the Axis2 service. The request XML file will be moved to <em>original</em> directory. 
 The response from the Axis2 server will be saved to <em>out</em> directory.</p>
 
-
-
-<h2><a name="Sample116">Sample 116:</a></h2>
-<pre>
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample255">Sample 255: Switching from ftp transport listener
+        to mail transport sender</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 	&lt;proxy name="StockQuoteProxy" transports="vfs"&gt;
 		&lt;parameter name="transport.vfs.FileURI"&gt;vfs:ftp://guest:guest@localhost/test?vfs.passive=true&lt;/parameter&gt; &lt;!--CHANGE--&gt;
 		&lt;parameter name="transport.vfs.ContentType"&gt;text/xml&lt;/parameter&gt;
@@ -2857,16 +2854,244 @@ given in transport.vfs.FileURI above.</p>
 send it to the Axis2 service. The file in the ftp directory will be deleted. 
 The response will be sent to the given email address.</p>
 
+<h1><a name="Task">Introduction to synapse tasks</a></h1>
 
+<h2><a name="Sample300">Sample 300: Introduction to tasks with simple trigger</a></h2>
+<!--TODO: fill the sample-->
 
-<div>
-<h1>Database Mediators </h1>
+<h1><a name="AdvancedMediation">Advanced mediations with advanced mediators</a></h1>
 
-<h3>Setting up Database mediators </h3>
-</div>
+<h2><a name="ScriptMediator">Using scripts in mediation (Script Mediator)</a></h2>
+<p>The Synapse Script Mediator is a Synapse extension, and thus all
+pre-requisites are not bundled by default with the Synapse distribution.
+Before you use some script mediators you may need to manually add the
+required jar files to the Synapse lib directory, and optionally perform other
+installation tasks as may be required by the individual scripting language.
+This is detailed in the <a href="Synapse_Samples_Setup.html#script">Samples
+Setup guide</a>.</p>
+
+<h2><a name="Sample350">Sample 350: Introduction to the script mediator
+              using js scripts</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/&gt;
+
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
+        &lt;script language="js" key="stockquoteScript" function="transformRequest"/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+        &lt;script language="js" key="stockquoteScript" function="transformResponse"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
+
+<p></p>
+<pre>&lt;x&gt;&lt;![CDATA[
+  function transformRequest(mc) {
+     var symbol = mc.getPayloadXML()..*::Code.toString();
+     mc.setPayloadXML(
+        &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
+           &lt;m:request&gt;
+              &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+           &lt;/m:request&gt;
+        &lt;/m:getQuote&gt;);
+  }
+
+  function transformResponse(mc) {
+     var symbol = mc.getPayloadXML()..*::symbol.toString();
+     var price = mc.getPayloadXML()..*::last.toString();
+     mc.setPayloadXML(
+        &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
+   &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
+   &lt;m:Price&gt;{price}&lt;/m:Price&gt;
+        &lt;/m:CheckPriceResponse&gt;);
+  }
+]]&gt;&lt;/x&gt;</pre>
+
+<p><strong>Objective: Introduction to script mediators</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start the Synapse configuration numbered 500: i.e. synapse -sample 500<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
 <p></p>
 
+<p>This sample is similar to sample 8 but instead of using XSLT the
+transformation is done with JavaScript and E4X. Note that the script source
+loaded from a resource must be specified within a CDATA tag within an XML
+element. The script used in this example has two functions,
+'transformRequest' and 'transformResponse', and the Synapse configuration
+uses the function attribute to specify which function should be invoked. Use
+the stock quote client as follows to issue a custom quote client:</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+
+<p>Synapse uses the script mediator and the specified Javascript function to
+convert the custom request to a standard quote request. Subsequently the
+response received is transformed back and sent back to the client.</p>
+
+<h2><a name="Sample351">Sample 351: In-line script mediation with JavaScript</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
+        &lt;script language="js"&gt;&lt;![CDATA[
+               var symbol = mc.getPayloadXML()..*::Code.toString();
+               mc.setPayloadXML(
+                  &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
+                     &lt;m:request&gt;
+                        &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+                     &lt;/m:request&gt;
+                  &lt;/m:getQuote&gt;);
+        ]]&gt;&lt;/script&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+        &lt;script language="js"&gt;&lt;![CDATA[
+               var symbol = mc.getPayloadXML()..*::symbol.toString();
+               var price = mc.getPayloadXML()..*::last.toString();
+               mc.setPayloadXML(
+                  &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
+               &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
+               &lt;m:Price&gt;{price}&lt;/m:Price&gt;
+                  &lt;/m:CheckPriceResponse&gt;);
+            ]]&gt;&lt;/script&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Introduction to in-line script mediation</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start the Synapse configuration numbered 501: i.e. synapse -sample 501<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p></p>
+
+<p>This example is functionally equivalent to sample # 500 and sample # 8,
+and demonstrates in-line script mediation in Synapse. Use the stock quote
+client to send a custom quote as in example # 500 to test this example.</p>
+
+<p></p>
+
+<h2><a name="Sample352">Sample 352: Accessing Synapse message context API
+              methods using scripting language</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+       &lt;!-- change the MessageContext into a response and set a response payload --&gt;
+       &lt;script language="js"&gt;&lt;![CDATA[
+          mc.setTo(mc.getReplyTo());
+          mc.setProperty("RESPONSE", "true");
+          mc.setPayloadXML(
+             &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
+                &lt;ns:return&gt;
+                   &lt;ns:last&gt;99.9&lt;/ns:last&gt;
+                &lt;/ns:return&gt;
+             &lt;/ns:getQuoteResponse&gt;);
+       ]]&gt;&lt;/script&gt;
+    &lt;/in&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Accessing the Synapse APIs from scripting
+languages</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start the Synapse configuration numbered 502: i.e. bin/synapse -sample
+502<br>
+</p>
+
+<p></p>
+
+<p>This example shows how an inline Javascript mediator script could access
+the Synapse message context API to set its 'To' EPR and to set a custom
+property to mark it as a response. Execute the stock quote client, and you
+will receive the response "99.9" as the last sale price as per the above
+script.</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
+...
+stockquote:
+     [java] Standard :: Stock price = $99.9</pre>
+
+<h2><a name="Sample353">Sample 353: Using Ruby scripts for mediation</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/&gt;
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
+        &lt;script language="rb" key="stockquoteScript" function="transformRequest"/&gt;
+
+        &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
+        &lt;send&gt;
+            &lt;endpoint name="stockquote"&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+        &lt;script language="rb" key="stockquoteScript" function="transformResponse"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
+<pre>&lt;x&gt;&lt;![CDATA[
+require 'rexml/document'
+include REXML
+
+def transformRequest(mc)
+   newRequest= Document.new '&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;'&lt;&lt;
+      '&lt;m:request&gt;&lt;m:symbol&gt;&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;'
+   newRequest.root.elements[1].elements[1].text = mc.getPayloadXML().root.elements[1].get_text
+   mc.setPayloadXML(newRequest)
+end
+
+def transformResponse(mc)
+   newResponse = Document.new '&lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;&lt;m:Code&gt;' &lt;&lt;
+      '&lt;/m:Code&gt;&lt;m:Price&gt;&lt;/m:Price&gt;&lt;/m:CheckPriceResponse&gt;'
+   newResponse.root.elements[1].text = mc.getPayloadXML().root.elements[1].elements[1].get_text
+   newResponse.root.elements[2].text = mc.getPayloadXML().root.elements[1].elements[2].get_text
+   mc.setPayloadXML(newResponse)
+end
+]]&gt;&lt;/x&gt;</pre>
+
+<p><strong>Objective: Script mediators using Ruby</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>This sample uses Ruby so first setup support for this in Synapse as
+described at <a href="Synapse_Samples_Setup.html#script">Configuring JRuby</a>. </p>
+
+<p>Start the Synapse configuration numbered 503: i.e. bin/synapse -sample
+503<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p></p>
+
+<p>This sample is functionally equivalent to sample # 500 (#501 and #8) but
+instead uses a Ruby script using the JRuby interpreter. The script has two
+functions, 'transformRequest' and 'transformResponse', and the Synapse
+configuration specifies which function is to be invoked when used. Execute
+the stock quote client to send a custom stock quote as per example #500 and
+check the received stock quote response.</p>
+
+<h2><a name="DBMediators">Database interactions in mediation (DBLookup / DBReport)</a></h2>
+
+<!--TODO: These set up instructions should go to the Samples-Setup guide and there should be a link from here -->
 <p>Following Database mediators uses the derby within a client/server
 configuration by using the Network Server. Therefore, to proceed with the
 following sample s,it is need have derby binary distribution and user have to
@@ -2900,11 +3125,9 @@ distribution was used.</p>
 
 <p></p>
 
-<h2>Sample 200</h2>
-
-<p></p>
-<pre> &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
+<h2><a name="Sample360">Sample 360: Introduction to dblookp mediator</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    
     &lt;sequence name="myFaultHandler"&gt;
         &lt;makefault&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
@@ -3058,9 +3281,7 @@ be done by a switch mediator.</p>
 <div>
 </div>
 
-<h2>Sample 201</h2>
-
-<p></p>
+<h2><a name="Sample361">Sample 361: Introduction to dbreport mediator</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -3135,9 +3356,8 @@ synapsedb</p>
 <div>
 </div>
 
-<h2>Sample 202</h2>
-
-<p></p>
+<h2><a name="Sample362">Sample 362: Action of dbreport and
+              dblookup mediators together</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -3202,9 +3422,6 @@ synapsedb</p>
 
 &lt;/definitions&gt;</pre>
 
-<div>
-</div>
-
 <p><strong>Objective: Demonstrate use of dbreport and dblookup
 mediators</strong></p>
 
@@ -3230,7 +3447,7 @@ log it.</p>
 
 <p></p>
 
-<h1><a name="ExtensionMediators">Extension mediators</a></h1>
+<h2><a name="ClassMediator">Extension mediators</a></h2>
 
 <p>Synapse supports Mediators implemented in a variety of scripting languages
 such as JavaScript, Python or Ruby. Implementing a Mediator with a script
@@ -3244,237 +3461,9 @@ and elegant XML manipulation capabilities, for example JavaScript E4X or Ruby
 REXML, so this makes them well suited for use in the Synapse mediation
 environment.</p>
 
-<h2><a name="ScriptSetup">Configuring Synapse for Script Mediator
-support</a></h2>
 
-<p>The Synapse Script Mediator is a Synapse extension, and thus all
-pre-requisites are not bundled by default with the Synapse distribution.
-Before you use some script mediators you may need to manually add the
-required jar files to the Synapse lib directory, and optionally perform other
-installation tasks as may be required by the individual scripting language.
-This is detailed in the <a href="Synapse_Samples_Setup.html#script">Samples
-Setup guide</a>.</p>
 
-<h2><a name="Sample500">Sample 500:</a></h2>
-<pre>&lt;!-- Introduction to the script mediator --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/&gt;
 
-    &lt;in&gt;
-        &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
-        &lt;script language="js" key="stockquoteScript" function="transformRequest"/&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/in&gt;
-    &lt;out&gt;
-        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-        &lt;script language="js" key="stockquoteScript" function="transformResponse"/&gt;
-        &lt;send/&gt;
-    &lt;/out&gt;
-&lt;/definitions&gt; </pre>
-
-<p></p>
-<pre>&lt;x&gt;&lt;![CDATA[
-  function transformRequest(mc) {
-     var symbol = mc.getPayloadXML()..*::Code.toString();
-     mc.setPayloadXML(
-        &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
-           &lt;m:request&gt;
-              &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
-           &lt;/m:request&gt;
-        &lt;/m:getQuote&gt;);
-  }
-
-  function transformResponse(mc) {
-     var symbol = mc.getPayloadXML()..*::symbol.toString();
-     var price = mc.getPayloadXML()..*::last.toString();
-     mc.setPayloadXML(
-        &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
-   &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
-   &lt;m:Price&gt;{price}&lt;/m:Price&gt;
-        &lt;/m:CheckPriceResponse&gt;);
-  }
-]]&gt;&lt;/x&gt;</pre>
-
-<p><strong>Objective: Introduction to script mediators</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start the Synapse configuration numbered 500: i.e. synapse -sample 500<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService if not already
-done</p>
-
-<p></p>
-
-<p>This sample is similar to sample 8 but instead of using XSLT the
-transformation is done with JavaScript and E4X. Note that the script source
-loaded from a resource must be specified within a CDATA tag within an XML
-element. The script used in this example has two functions,
-'transformRequest' and 'transformResponse', and the Synapse configuration
-uses the function attribute to specify which function should be invoked. Use
-the stock quote client as follows to issue a custom quote client:</p>
-<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
-
-<p>Synapse uses the script mediator and the specified Javascript function to
-convert the custom request to a standard quote request. Subsequently the
-response received is transformed back and sent back to the client.</p>
-
-<h2><a name="Sample501">Sample 501:</a></h2>
-<pre>&lt;!-- introduction to inline script mediation --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;in&gt;
-        &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
-        &lt;script language="js"&gt;&lt;![CDATA[
-               var symbol = mc.getPayloadXML()..*::Code.toString();
-               mc.setPayloadXML(
-                  &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
-                     &lt;m:request&gt;
-                        &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
-                     &lt;/m:request&gt;
-                  &lt;/m:getQuote&gt;);
-        ]]&gt;&lt;/script&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/in&gt;
-    &lt;out&gt;
-        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-        &lt;script language="js"&gt;&lt;![CDATA[
-               var symbol = mc.getPayloadXML()..*::symbol.toString();
-               var price = mc.getPayloadXML()..*::last.toString();
-               mc.setPayloadXML(
-                  &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
-               &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
-               &lt;m:Price&gt;{price}&lt;/m:Price&gt;
-                  &lt;/m:CheckPriceResponse&gt;);
-            ]]&gt;&lt;/script&gt;
-        &lt;send/&gt;
-    &lt;/out&gt;
-&lt;/definitions&gt; </pre>
-
-<p><strong>Objective: Introduction to in-line script mediation</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start the Synapse configuration numbered 501: i.e. synapse -sample 501<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService if not already
-done</p>
-
-<p></p>
-
-<p>This example is functionally equivalent to sample # 500 and sample # 8,
-and demonstrates in-line script mediation in Synapse. Use the stock quote
-client to send a custom quote as in example # 500 to test this example.</p>
-
-<p></p>
-
-<h2><a name="Sample502">Sample 502</a></h2>
-<pre>&lt;!-- accessing the Synapse APIs from scripting languages --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;in&gt;
-       &lt;!-- change the MessageContext into a response and set a response payload --&gt;
-       &lt;script language="js"&gt;&lt;![CDATA[
-          mc.setTo(mc.getReplyTo());
-          mc.setProperty("RESPONSE", "true");
-          mc.setPayloadXML(
-             &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
-                &lt;ns:return&gt;
-                   &lt;ns:last&gt;99.9&lt;/ns:last&gt;
-                &lt;/ns:return&gt;
-             &lt;/ns:getQuoteResponse&gt;);
-       ]]&gt;&lt;/script&gt;
-    &lt;/in&gt;
-    &lt;send/&gt;
-&lt;/definitions&gt; </pre>
-
-<p><strong>Objective: Accessing the Synapse APIs from scripting
-languages</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>Start the Synapse configuration numbered 502: i.e. bin/synapse -sample
-502<br>
-</p>
-
-<p></p>
-
-<p>This example shows how an inline Javascript mediator script could access
-the Synapse message context API to set its 'To' EPR and to set a custom
-property to mark it as a response. Execute the stock quote client, and you
-will receive the response "99.9" as the last sale price as per the above
-script.</p>
-<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
-...
-stockquote:
-     [java] Standard :: Stock price = $99.9</pre>
-
-<h2><a name="Sample503">Sample 503:</a></h2>
-<pre>&lt;!-- Introduction to the script mediator with Ruby scripts--&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/&gt;
-    &lt;in&gt;
-        &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
-        &lt;script language="rb" key="stockquoteScript" function="transformRequest"/&gt;
-
-        &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
-        &lt;send&gt;
-            &lt;endpoint name="stockquote"&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/in&gt;
-    &lt;out&gt;
-        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-        &lt;script language="rb" key="stockquoteScript" function="transformResponse"/&gt;
-        &lt;send/&gt;
-    &lt;/out&gt;
-&lt;/definitions&gt; </pre>
-<pre>&lt;x&gt;&lt;![CDATA[
-require 'rexml/document'
-include REXML
-
-def transformRequest(mc)
-   newRequest= Document.new '&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;'&lt;&lt;
-      '&lt;m:request&gt;&lt;m:symbol&gt;&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;'
-   newRequest.root.elements[1].elements[1].text = mc.getPayloadXML().root.elements[1].get_text
-   mc.setPayloadXML(newRequest)
-end
-
-def transformResponse(mc)
-   newResponse = Document.new '&lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;&lt;m:Code&gt;' &lt;&lt;
-      '&lt;/m:Code&gt;&lt;m:Price&gt;&lt;/m:Price&gt;&lt;/m:CheckPriceResponse&gt;'
-   newResponse.root.elements[1].text = mc.getPayloadXML().root.elements[1].elements[1].get_text
-   newResponse.root.elements[2].text = mc.getPayloadXML().root.elements[1].elements[2].get_text
-   mc.setPayloadXML(newResponse)
-end
-]]&gt;&lt;/x&gt;</pre>
-
-<p><strong>Objective: Script mediators using Ruby</strong></p>
-
-<p><strong>Pre-Requisites:</strong></p>
-
-<p>This sample uses Ruby so first setup support for this in Synapse as
-described at <a href="#ScriptSetupRuby">Configuring JRuby</a>. </p>
-
-<p>Start the Synapse configuration numbered 503: i.e. bin/synapse -sample
-503<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService if not already
-done</p>
-
-<p></p>
-
-<p>This sample is functionally equivalent to sample # 500 (#501 and #8) but
-instead uses a Ruby script using the JRuby interpreter. The script has two
-functions, 'transformRequest' and 'transformResponse', and the Synapse
-configuration specifies which function is to be invoked when used. Execute
-the stock quote client to send a custom stock quote as per example #500 and
-check the received stock quote response.</p>
 
 <p></p>
 

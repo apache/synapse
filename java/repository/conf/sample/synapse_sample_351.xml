@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- introduction to inline script mediation -->
+    
+<!-- In-line script mediation with JavaScript -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <in>
         <!-- transform the custom quote request into a standard quote requst expected by the service -->

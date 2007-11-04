@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- attaching service level WS-Security policies to proxy services -->
+    
+<!-- Using WS-Security with policy attachments for proxy services -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
     <proxy name="StockQuoteProxy">

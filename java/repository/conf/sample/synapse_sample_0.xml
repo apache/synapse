@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
+    
+<!-- Introduction to Synapse -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <!-- log all attributes of messages passing through -->
     <log level="full"/>

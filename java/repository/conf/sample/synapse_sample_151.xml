@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- using custom sequences for incoming and outgoing message mediation with proxy services -->
+    
+<!-- Custom sequences and endpoints with proxy services -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="proxy_1">

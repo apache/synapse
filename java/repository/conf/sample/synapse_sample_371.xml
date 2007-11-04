@@ -16,6 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
+
+<!-- Restricting requests based on policies -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <sequence name="main">
         <in>

@@ -17,8 +17,8 @@
   ~  under the License.
   -->
 
-<!-- Demontrates session affinity load balancing between 3 endpoints. We are using client
- initiated session for this sample. -->
+<!-- Session affinity load balancing between 3 endpoints.
+        (We are using client initiated session for this sample) -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main" onError="errorHandler">

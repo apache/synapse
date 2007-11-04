@@ -1,4 +1,4 @@
-Apache Synapse 1.0 Release Notes
+Apache Synapse 1.1 Release Notes
 
 1. Overview
     The Synapse project is a robust, lightweight implementation of a highly scalable and distributed
@@ -7,13 +7,14 @@ Apache Synapse 1.0 Release Notes
     Apache Synapse graduated from the Apache Incubator on the 2nd of January 2007
     Please see http://ws.apache.org/synapse/ for more information
 
+    The first Synapse 1.0 was released on the 11th of June 2007
+
 2. Installation Prerequisites 
 
-    Apache Synapse requires a J2SE runtime of version 1.4.2 or later for runtime. However if the
-    https (SSL) transport is being used, Synapse requires JDK 1.5 as it uses a NIO based https
-    implementation, that is only possible with a JDK 1.5 or later (refer to the Quick start guide
-    for information on how to disable https). To build Synapse from source, you will need JDK 1.5
-    or and Apache Maven 2.0.6
+    Apache Synapse requires a J2SE runtime of version 1.5.x or later and Apache Ant to run the samples.
+    Synapse requires JDK 1.5.x at runtime as it uses a NIO based https implementation, that is only
+    possible with a JDK 1.5.x or later. To build Synapse from source, you will need JDK 1.5.x, and
+    Apache Maven 2.0.6
 
 3. Quick start
     Please see the docs/Synapse_Quickstart.html guide
@@ -25,26 +26,8 @@ Apache Synapse 1.0 Release Notes
     Please see the document docs/Synapse_Configuration_Language.html
 
 6. Known Issues and limitations
-  * http://issues.apache.org/jira/browse/SYNAPSE-99
-    When makefault version is set to soap12 the fault detail gets printed twice
-
-    This is caused by an underlying bug in the Axiom code that has already been fixed. However,
-    to include this into Synapse requires a new release of Axiom
-
-  * http://issues.apache.org/jira/browse/SYNAPSE-91
-    Address endpoint format soap11 and soap12 cannot be specified
-
-  * https://issues.apache.org/jira/browse/SYNAPSE-100
-    Synapse could be improved to support WS-RM 1.1
-
-  * The non-blocking https transport does not work with a JDK version below 1.5
 
 7. Frequently asked questions
-
-  * java.lang.UnsupportedClassVersionError: ... (Unsupported major.minor version 49.0)
-    This error would occur if you try to use the https transport (enabled by default) with a JDK
-    version earlier than 1.5. Refer the Quick start guide to find out how the https transport
-    could be disabled.
 
   * How can I change the default logging level of Synapse?
     Edit the lib/log4j.properties and set the line "log4j.category.org.apache.synapse=INFO" to
@@ -58,7 +41,6 @@ Apache Synapse 1.0 Release Notes
   * If you encounter issues with your JDK related to XML processing, try placing the Xerces jar
     files xercesImpl-2.8.0.jar and xml-apis-1.3.03.jar in your <JDK>/jre/lib/endorsed/ directory.
 
-
 8. Reporting Problems
 
     Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find.
@@ -67,6 +49,16 @@ Apache Synapse 1.0 Release Notes
         synapse-user mailing list by sending email to synapse-user-subscribe@ws.apache.org
 
 9. New features
+
+    The 1.1 release
+        * Apache VFS based file transport
+        * Scheduled Task support
+        * XQuery mediator
+        * POJO Command mediator
+        * DB Report and DB Lookup mediators
+        * Cache and Throttle mediators/enhancements
+        * Split/Clone/Aggregate mediators
+        * Improved logging and tracing support
 
     The 1.0 release
         * Non blocking HTTP and HTTPS transport based on Apache HttpCore/NIO
@@ -78,6 +70,7 @@ Apache Synapse 1.0 Release Notes
 
     The 0.91 release adds support for:
         * WS-Reliable Messaging Sequence management
+
     The 0.90 release adds support for:
         * WS-Security termination and initiation
         * WS-ReliableMessaging termination and initiation

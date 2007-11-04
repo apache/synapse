@@ -32,7 +32,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
-    <version>SNAPSHOT</version>
+    <version>1.1</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -1003,7 +1003,7 @@
 
     <properties>
         <!-- Synapse and related components -->
-        <synapse.version>SNAPSHOT</synapse.version>
+        <synapse.version>1.1</synapse.version>
         <httpcore.nio.version>4.0-alpha6</httpcore.nio.version>
         <jms.spec.version>1.0</jms.spec.version>
         <commons.dbcp.version>1.2.2</commons.dbcp.version>

@@ -1,4 +1,4 @@
-Apache Synapse 1.0 build  (May 2007) - http://ws.apache.org/synapse/
+Apache Synapse 1.1 build  (November 2007) - http://ws.apache.org/synapse/
 ------------------------------------------------------------------------------------------
 
 -------------------
@@ -11,20 +11,33 @@ structure.
 	synapse
 		/bin
 			synapse.sh
+			synapse-daemon.sh
 			synapse.bat
+			run-synapse-service.bat
+			install-synapse-service.bat
+			uninstall-synapse-service.bat
 		/docs
 			<documentation>
 		/lib
 			<libraries>
+			/patches
+			    <any patches to be applied>
+			/endorsed
+			    <any endorsed JARs>
+			trust.jks
+			identity.jks
 			log4j.properties
+			providers.xml
 		/repository
 			/conf
 				synapse.xml
 				axis2.xml
-			/sample
-				<sample configuration files>
-				/resources
-					<sample resources>
+				wrapper.conf
+			    /sample
+				    <sample configuration files>
+				    /resources
+					    <sample resources>
+			/modules
 		/samples
 			/axis2Client
 				<ant script to run sample clients>

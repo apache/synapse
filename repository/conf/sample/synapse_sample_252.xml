@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- demonstrate JMS pure text, binary and POX message support -->
+    
+<!-- Pure text/binary and POX message support with JMS -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="text_proxy">

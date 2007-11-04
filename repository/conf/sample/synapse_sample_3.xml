@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- illustration of local registry entry definitions, and reusable endpoints and sequences -->
+<!-- Local Registry entry definitions, reusable endpoints and sequences -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <!-- define a string resource entry to the local registry -->
     <localEntry key="version">0.1</localEntry>

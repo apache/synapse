@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- Connecting to endpoints with WS-Security for outgoing messages -->
+    
+<!-- Using WS-Security for outgoing messages -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 

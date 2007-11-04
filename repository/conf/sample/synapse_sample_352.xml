@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- An in-line JavaScript/E4X mediator sending a response to a service request -->
+
+<!-- Accessing Synapse message context API methods using scripting language -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <in>
        <!-- change the MessageContext into a response and set a response payload -->

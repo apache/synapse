@@ -16,6 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
+
+<!-- Using the  file system as transport medium using VFS transport listener and sender -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 	<proxy name="StockQuoteProxy" transports="vfs">
 		<parameter name="transport.vfs.FileURI">file:///home/user/test/in</parameter> <!--CHANGE-->

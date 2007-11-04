@@ -128,7 +128,7 @@
   <li><a href="#MediationSamples">Message mediation samples</a> 
     <ul>
       <li><a href="#Sample0">Sample 0: Introduction to Synapse</a></li>
-      <li><a href="#Sample1">Sample 1: Content based routing (CBR)</a></li>
+      <li><a href="#Sample1">Sample 1: Simple content based routing (CBR) of messages</a></li>
       <li><a href="#Sample2">Sample 2: CBR with the Switch-case mediator,
         using message properties</a></li>
       <li><a href="#Sample3">Sample 3: Local Registry entry definitions,
@@ -150,97 +150,117 @@
         and sharing a configuration between multiple instances</a></li>
     </ul>
   </li>
-  <li><a href="#Endpoints">Endpoints</a> 
+  <li><a href="#Endpoints">Advanced mediations with endpoints</a> 
     <ul>
-      <li><a href="#Sample50">Sample 50: Using WS-Security for outgoing
-        messages</a></li>
-      <li><a href="#Sample51">Sample 51: MTOM and SwA optimizations and
-        request/response correlation</a></li>
-      <li><a href="#Sample52">Sample 52: POX to SOAP conversion</a></li>
-      <li><a href="#Sample53">Sample 53: Reliable message exchange between
-        Synapse and the back-end server using WS-ReliableMessaging</a></li>
-      <li><a href="#Sample54">Sample 54: Load balancing</a></li>
-      <li><a href="#Sample55">Sample 55: Failover</a></li>
-      <li><a href="#Sample56">Sample 56: Load balancing with session
-        affinity</a></li>
-      <li><a href="#Sample57">Sample 57: Load balancing with session affinity
-        among failover groups</a></li>
-      <li><a href="#Sample60">Sample 60: WSDL endpoint</a></li>
+        <li><a href="#Sample50">Sample 50: POX to SOAP conversion</a></li>
+        <li><a href="#Sample51">Sample 51: MTOM and SwA optimizations and
+            request/response correlation</a></li>
+        <li><a href="#Sample52">Sample 52: Session less load balancing between 3 endpoints</a></li>
+        <li><a href="#Sample53">Sample 53: Failover sending among 3 endpoints</a></li>
+        <li><a href="#Sample54">Sample 54: Session affinity load balancing
+            between 3 endpoints</a></li>
+        <li><a href="#Sample55">Sample 55: Session affinity load balancing
+            between fail over endpoints</a></li>
+        <li><a href="#Sample56">Sample 56: WSDL endpoint</a></li>
+    </ul>
+  </li>
+  <li><a href="#MessageMediationQoS">Quality of Service addition or
+      deduction samples in message mediation</a>
+    <ul>
+        <li><a href="#Sample100">Sample 100: Using WS-Security for outgoing messages</a></li>
+        <li><a href="#Sample101">Sample 101: Reliable message exchange between
+            Synapse and the back-end server using WS-ReliableMessaging</a></li>
     </ul>
   </li>
   <li><a href="#ProxyServices">Synapse Proxy service samples</a> 
     <ul>
-      <li><a href="#Sample100">Sample 100: Introduction to proxy
-      services</a></li>
-      <li><a href="#Sample101">Sample 101: Custom sequences and endpoints
-        with proxy services</a></li>
-      <li><a href="#Sample102">Sample 102: Switching transports and message
+      <li><a href="#Sample150">Sample 150: Introduction to proxy services</a></li>
+      <li><a href="#Sample151">Sample 151: Custom sequences and endpoints
+          with proxy services</a></li>
+      <li><a href="#Sample152">Sample 152: Switching transports and message
         format from SOAP to REST/POX</a></li>
-      <li><a href="#Sample103">Sample 103: Using WS-Security with policy
-        attachments for proxy services</a></li>
-      <li><a href="#Sample104">Sample 104: Reliable message exchange between
-        the client and proxy services using WS-ReliableMessaging</a></li>
-      <li><a href="#Sample105">Sample 105: Routing the messages arrived to a
-        proxy service without processing the MustUnderstand headers</a></li>
+        <li><a href="#Sample153">Sample 153: Routing the messages arrived to a
+            proxy service without processing the security headers</a></li>
     </ul>
   </li>
-  <li><a href="#Transport">Transport samples</a> 
+  <li><a href="ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a>
     <ul>
-      <li><a href="#Sample110">Sample 110: Introduction to switching
+        <li><a href="#Sample200">Sample 200: Using WS-Security with policy
+            attachments for proxy services</a></li>
+        <li><a href="#Sample201">Sample 201: Reliable message exchange between
+            the client and proxy services using WS-ReliableMessaging</a></li>
+    </ul>
+  </li>
+  <li><a href="#Transport">Transport samples and switching transports</a>
+    <ul>
+      <li><a href="#Sample250">Sample 250: Introduction to switching
         transports - JMS to http/s</a></li>
-      <li><a href="#Sample111">Sample 111: Demonstrate switching from http/s
-        to JMS</a></li>
-      <li><a href="#Sample112">Sample 112: Demonstrate one way messaging /
-        fireAndForget()</a></li>
-      <li><a href="#Sample113">Sample 113: Pure text/binary and POX message
+      <li><a href="#Sample251">Sample 251: Switching from http/s to JMS</a></li>
+      <li><a href="#Sample112">Sample 112: One way messaging / fireAndForget()</a></li>
+      <li><a href="#Sample252">Sample 252: Pure text/binary and POX message
         support with JMS</a></li>
-      <li><a href="#Sample114">Sample 114: One way bridging from JMS to http
+      <li><a href="#Sample253">Sample 253: One way bridging from JMS to http
         and replying with a 202 Accepted response</a></li>
-      <li><a href="#Sample115">Sample 115: Using the  file system as transport 
+      <li><a href="#Sample254">Sample 254: Using the  file system as transport 
         medium using VFS transport listener and sender</a></li>
-      <li><a href="#Sample116">Sample 116: Switching from ftp transport listener
+      <li><a href="#Sample255">Sample 255: Switching from ftp transport listener
         to mail transport sender</a></li>
     </ul>
   </li>
-  <li><ul>
-      <li>Database Mediators</li>
-      <li>Setting up Database Mediators</li>
-      <li>Sample 200:Introducing the dblookup mediator</li>
-      <li>Sample 201:Introducing the dbreport mediator</li>
-      <li>Sample 202:Use of both the dbreport and the dblookup mediator</li>
+  <li><a href="#Task">Introduction to synapse tasks</a>
+    <ul>
+      <li><a href="#Sample300">Introduction to tasks with simple trigger</a></li>
     </ul>
   </li>
-  <li><ul>
-      <li><a href="#ExtensionMediators">Extension Mediators</a> </li>
-    </ul>
+  <li><a href="#AdvancedMediation">Advanced mediations with advanced mediators</a>
     <ul>
-      <li><a href="Synapse_Samples_Setup.html#ScriptSetup">Setting up Script
-        Mediators</a> </li>
-      <li><a href="#Sample500">Sample 500: Introduction to script
-        mediators</a></li>
-      <li><a href="#Sample501">Sample 501: In-line script mediation</a></li>
-      <li><a href="#Sample502">Sample 502: Accessing Synapse message context
-        API methods</a></li>
-      <li><a href="#Sample503">Sample 503: Using Ruby scripts for
-        mediation</a></li>
-      <li><a href="#Sample510">Sample 510: Class mediator - Writting your own
-        mediation in Java</a></li>
-    </ul>
-  </li>
-  <li><a href="#AdvancedMediations">Advanced Mediations</a> 
-    <ul>
-      <li>Sample 601:Throttle mediator - Concurrency throttling </li>
-    </ul>
-    <ul>
-      <li>Sample 602:Throttle mediator - Restricting requests based on
-        policies</li>
-    </ul>
-    <ul>
-      <li><a name="L1723" id="L1723">Sample 701:</a> XQuery mediator -
-        Transformation using XQuery</li>
-    </ul>
-    <ul>
-      <li>Sample 702: XQuery mediator - Using External XML documents </li>
+      <li><a href="#ScriptMediator">Using scripts in mediation (Script Mediator)</a>
+        <ul>
+          <li><a href="#Sample350">Sample 350: Introduction to the script mediator
+              using js scripts</a></li>
+          <li><a href="#Sample351">Sample 351: In-line script mediation with JavaScript</a></li>
+          <li><a href="#Sample352">Sample 352: Accessing Synapse message context API
+              methods using scripting language</a></li>
+          <li><a href="#Sample353">Sample 353: Using Ruby scripts for mediation</a></li>
+        </ul>
+      </li>
+      <li><a href="#DBMediators">Database interactions in mediation (DBLookup / DBReport)</a>
+        <ul>
+          <li><a href="#Sample360">Sample 360: Introduction to dblookp mediator</a></li>
+          <li><a href="#Sample361">Sample 361: Introduction to dbreport mediator</a></li>
+          <li><a href="#Sample362">Sample 362: Action of dbreport and
+              dblookup mediators together</a></li>
+        </ul>
+      </li>
+      <li><a href="#Throttle">Throtteling messages (Throttle Mediator)</a>
+        <ul>
+          <li><a href="#Sample370">Sample 370: Introduction to throttle mediator
+              and concurrency throttling</a></li>
+          <li><a href="#Sample371">Sample 371: Restricting requests based on policies </a></li>
+          <li><a href="#Sample372">Sample 372: TODO: Find the topic</a></li>
+        </ul>
+      </li>
+      <li><a href="#Class">Extending the mediation in java (Class Mediator)</a>
+        <ul>
+          <li><a href="#Sample380">Sample 380: Writting your own custom mediation in Java</a></li>
+        </ul>
+      </li>
+      <li><a href="#XQuery">Evaluating XQuery for mediation (XQuery Mediator)</a>
+        <ul>
+          <li><a href="#Sample390">Sample 390: Introduction to the XQuery mediator</a></li>
+          <li><a href="#Sample391">Sample 391: TODO: Find the topic</a></li>
+        </ul>
+      </li>
+      <li><a href="#Splitter">Splitting messages in to parts and process in parallel</a>
+        <ul>
+          <li><a href="#Sample400">Sample 400: Message splitting and aggregating the responses</a></li>
+        </ul>
+      </li>
+      <li><a href="#Aggregator">Aggregating messages and process in batch</a>
+        <ul>
+          <li><a href="#Sample410">Sample 410: Message splitting and aggregating the responses</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>

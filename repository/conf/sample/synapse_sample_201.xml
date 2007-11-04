@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- attaching service level WS-RM policies to proxy services -->
+    
+<!-- Reliable message exchange between the client and proxy services using WS-ReliableMessaging -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <proxy name="StockQuoteProxy">
         <target>

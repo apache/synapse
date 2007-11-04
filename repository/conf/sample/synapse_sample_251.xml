@@ -17,6 +17,7 @@
   ~  under the License.
   -->
 
+<!-- Switching from http/s to JMS -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="StockQuoteProxy" transports="http">

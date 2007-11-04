@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- introduction to dbreport mediator -->
+    
+<!-- Introduction to dbreport mediator -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">

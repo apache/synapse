@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- Demontrates failover sending among 3 endpoints. -->
+<!-- Failover sending among 3 endpoints. -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main" onError="errorHandler">

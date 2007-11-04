@@ -16,7 +16,8 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- routing messages without processing security headers -->
+    
+<!-- Routing the messages arrived to a proxy service without processing the security headers -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <proxy name="StockQuoteProxy">
         <target>

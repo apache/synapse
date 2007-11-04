@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- introduction to error handling -->
+<!-- Introduction to error handling -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- the default fault handling sequence used by Synapse - named 'fault' -->

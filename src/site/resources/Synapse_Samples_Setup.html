@@ -108,15 +108,15 @@
 <p>Synapse ships with a set of working examples that demonstrates some of the
 basic features and capabilities of Synapse. A set of sample clients and
 services are provided in addition to the sample configurations, and scripts
-are provided to execute the sample scenarions as explained below. </p>
+are provided to execute the sample scenarios as explained below. </p>
 
 <h4>Pre-requisites</h4>
 
-<p>You will need a Java development kit / JRE version 1.4 or later and Apache
-Ant 1.5 or later at a minimum to try out the samples. Ant can be downloaded
+<p>You will need a Java development kit version 1.5.x or later and Apache Ant
+1.6.5 or later at a minimum to try out the samples. Ant can be downloaded
 from http://ant.apache.org. The JMS examples could be executed against an
-ActiveMQ installation by default (or another JMS provider with configuration)
-and any https examples would require a JDK version 1.5 or later.</p>
+ActiveMQ installation by default (or another JMS provider with
+configuration).</p>
 
 <p></p>
 
@@ -129,7 +129,31 @@ file.</p>
 
 <h2>Understanding the samples</h2>
 
-<p></p>
+<table border="1" style="width: 100%">
+  <caption></caption>
+  <tbody>
+    <tr>
+      <td>Client</td>
+      <td>Synapse</td>
+      <td>Service</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ant stockquote</td>
+      <td>./synapse.sh -sample &lt;n&gt;</td>
+      <td>SimpleStockQuoteService</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>SecureStockQuoteService etc..</td>
+    </tr>
+  </tbody>
+</table>
 
 <p>The above diagram depicts the interactions between the clients, Synapse
 and services at a high level. The Clients are able to send SOAP/REST or POX
@@ -308,12 +332,12 @@ and handling of binary content using MTOM and SwA.</p>
 <p>The sample services can be found in the samples/axis2Server/src directory
 and could be built and deployed using ant from within each service
 directory</p>
-<pre>user@host:/tmp/synapse-1.0/samples/axis2Server/src/SimpleStockQuoteService$ ant
+<pre>user@host:/tmp/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService$ ant
 Buildfile: build.xml
 ...
 build-service:
    ....
-      [jar] Building jar: /tmp/synapse-1.0/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
+      [jar] Building jar: /tmp/synapse-1.1/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
 
 BUILD SUCCESSFUL
 Total time: 3 seconds</pre>
@@ -373,7 +397,7 @@ synapse.sh -sample &lt;n&gt;</pre>
 
 <p></p>
 
-<h2>Setting up JMS</h2>
+<h2>Setting up the JMS Listener</h2>
 
 <p></p>
 
@@ -382,15 +406,11 @@ synapse.sh -sample &lt;n&gt;</pre>
 need to copy the following client JAR files into the Synapse 'lib' folder to
 support ActiveMQ. These files are found in the 'lib' directory of the
 ActiveMQ installation.</p>
-
-<p></p>
 <ul>
   <li>activeio-core-3.0.0-incubator.jar</li>
   <li>activemq-core-4.1.0-incubator.jar</li>
   <li>geronimo-j2ee-management_1.0_spec-1.0.jar</li>
 </ul>
-
-<p></p>
 
 <p>To enable the JMS transport, you need to uncomment the JMS transport
 listener configuration. If you are using a JMS provider other than ActiveMQ
@@ -400,7 +420,7 @@ for synapse, the repository/conf/axis2.xml must be updated, while to enable
 JMS support for the sample Axis2 server the
 samples/axis2Server/repository/conf/axis2.xml file must be updated.</p>
 <pre>    &lt;!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)--&gt;
-    &lt;transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"&gt;
+    &lt;transportReceiver name="jms" class="org.apache.synapse.transport.jms.JMSListener"&gt;
         &lt;parameter name="myTopicConnectionFactory" locked="false"&gt;
                 &lt;parameter name="java.naming.factory.initial" locked="false"&gt;org.apache.activemq.jndi.ActiveMQInitialContextFactory&lt;/parameter&gt;
                 &lt;parameter name="java.naming.provider.url" locked="false"&gt;tcp://localhost:61616&lt;/parameter&gt;
@@ -422,15 +442,12 @@ samples/axis2Server/repository/conf/axis2.xml file must be updated.</p>
 
 <p></p>
 
-
-<h2 id="mailsender">Setting up mail transport sender</h2>
+<h2 id="mailsender">Setting up Mail transport sender</h2>
 
 <p>To enable the mail transport, you need to uncomment the mail transport
-sender configuration in the repository/conf/axis2.xml.  Change the mail.smtp.host parameter value
-to a working SMTP host.</p>
-
-<pre>
-    &lt;!-- ================================================= --&gt;
+sender configuration in the repository/conf/axis2.xml. Change the
+mail.smtp.host parameter value to a working SMTP host.</p>
+<pre>    &lt;!-- ================================================= --&gt;
     &lt;!-- Mail Transport Sender  --&gt;
     &lt;!--Only need to uncomment the sender. Configuration is achieved with every client.
         At any instant mail host should be given. Sample configuration has been given.
@@ -438,11 +455,9 @@ to a working SMTP host.</p>
     &lt;!-- ================================================= --&gt;
     &lt;transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender"&gt;
         &lt;parameter name="mail.smtp.host"&gt;localhost&lt;/parameter&gt;
-    &lt;/transportSender&gt;
-</pre>
+    &lt;/transportSender&gt;</pre>
 
 <p></p>
-
 
 <h2 id="script">Configuring Synapse for Script Mediator support</h2>
 
@@ -463,8 +478,8 @@ with the Synapse distribution.</p>
 <h4>Ruby support</h4>
 
 <p>For Ruby support you need to download the 'jruby-complete.jar' from the
-Maven repository for JRuby, and copy it into the 'lib' folder of Synapse . The
-JRuby JAR can be downloaded from <a
+Maven repository for JRuby, and copy it into the 'lib' folder of Synapse .
+The JRuby JAR can be downloaded from <a
 href="http://repo1.maven.org/maven2/org/jruby/jruby-complete/">here</a>.</p>
 
 <p></p>

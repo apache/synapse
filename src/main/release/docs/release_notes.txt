@@ -25,9 +25,12 @@ Apache Synapse 1.1 Release Notes
 5. Synapse configuration language
     Please see the document docs/Synapse_Configuration_Language.html
 
-6. Known Issues and limitations
+6. Extending Synapse
+    Please see the document docs/Synapse_Extending.html
+    
+7. Known Issues and limitations
 
-7. Frequently asked questions
+8. Frequently asked questions
 
   * How can I change the default logging level of Synapse?
     Edit the lib/log4j.properties and set the line "log4j.category.org.apache.synapse=INFO" to
@@ -41,14 +44,14 @@ Apache Synapse 1.1 Release Notes
   * If you encounter issues with your JDK related to XML processing, try placing the Xerces jar
     files xercesImpl-2.8.0.jar and xml-apis-1.3.03.jar in your <JDK>/jre/lib/endorsed/ directory.
 
-8. Reporting Problems
+9. Reporting Problems
 
     Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find.
     You may also join the:
         synapse-dev mailing  list by sending email to synapse-dev-subscribe@ws.apache.org
         synapse-user mailing list by sending email to synapse-user-subscribe@ws.apache.org
 
-9. New features
+10. New features
 
     The 1.1 release
         * Apache VFS based file transport

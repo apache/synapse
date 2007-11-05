@@ -352,32 +352,34 @@ public class ThrottleMediator extends AbstractMediator {
                 }
             }
 
-            includesIPThrottling = (
-                throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY) != null);
+            if (throttle != null) {
 
-            if (id != null) {
-                concurrentAccessController = throttle.getConcurrentAccessController();
-                concurrentLimit = concurrentAccessController.getLimit();
+                includesIPThrottling = (
+                    throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY) != null);
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
-                        "Initiating ConcurrentAccessControler for throttle group id : " + id
-                            + " limit : " + concurrentLimit);
-                }
-                
-                org.apache.axis2.context.MessageContext axis2MessageContext
-                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-                ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
-                Map accessContollers = (Map) configctx.getProperty(KEY);
+                if (id != null) {
+                    concurrentAccessController = throttle.getConcurrentAccessController();
 
-                if(accessContollers == null){
-                    accessContollers = new HashMap();
-                    configctx.setProperty(KEY,accessContollers);
-                }
-                if (concurrentAccessController == null) {
-                    accessContollers.remove(id);
-                } else {
-                    accessContollers.put(id, concurrentAccessController);
+                    org.apache.axis2.context.MessageContext axis2MessageContext
+                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
+                    Map accessContollers = (Map) configctx.getProperty(KEY);
+
+                    if (accessContollers == null) {
+                        accessContollers = new HashMap();
+                        configctx.setProperty(KEY, accessContollers);
+                    }
+                    if (concurrentAccessController == null) {
+                        accessContollers.remove(id);
+                    } else {
+                        concurrentLimit = concurrentAccessController.getLimit();
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn,
+                                "Initiating ConcurrentAccessControler for throttle group id : " + id
+                                    + " limit : " + concurrentLimit);
+                        }
+                        accessContollers.put(id, concurrentAccessController);
+                    }
                 }
             }
         }

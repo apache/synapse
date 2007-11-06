@@ -220,9 +220,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
             
         	boolean isDuplicate = true;
         	//still allow this msg if we have no corresponding invoker bean for it and we are inOrder
-        	boolean isInOrder = 
-        		SandeshaUtil.getDefaultPropertyBean(rmMsgCtx.getConfigurationContext().getAxisConfiguration()).isInOrder();
-        	if(isInOrder)
+        	if(SandeshaUtil.isInOrder(rmMsgCtx.getMessageContext()))
         	{
           	InvokerBean finderBean = new InvokerBean();
           	finderBean.setMsgNo(msgNo);

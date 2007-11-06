@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.context.ContextManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -30,21 +31,161 @@ import org.apache.sandesha2.wsrm.Sequence;
 
 public class InvokerWorker extends SandeshaWorker implements Runnable {
 
-	ConfigurationContext configurationContext = null;
-	String messageContextKey;
-	boolean ignoreNextMsg = false;
+	static final Log log = LogFactory.getLog(InvokerWorker.class);
+	static final WorkerLock lock = new WorkerLock();
 	
-	Log log = LogFactory.getLog(InvokerWorker.class);
+	private ConfigurationContext configurationContext;
+	private String  sequence;
+	private long    messageNumber;
+	private String  messageContextKey;
+	private boolean ignoreNextMsg;
+	private boolean pooledThread;
 	
-	public InvokerWorker (ConfigurationContext configurationContext, String messageContextKey, boolean ignoreNextMsg) {
+	public InvokerWorker (ConfigurationContext configurationContext, InvokerBean bean) {
+		// All invoker workers need to use the same lock, so we point to the static one here.
+		this.setLock(lock);
+		
 		this.configurationContext = configurationContext;
-		this.messageContextKey = messageContextKey;
-		this.ignoreNextMsg = ignoreNextMsg;
+		initializeFromBean(bean);
 	}
 	
-	public void run() {
-		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::run");
+	public void forceOutOfOrder() {
+		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::forceOutOfOrder");
+		ignoreNextMsg = true;
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::forceOutOfOrder");
+	}
+
+	public void setPooled() {
+		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::setPooled");
+		pooledThread = true;
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::setPooled");
+	}
+
+	private void initializeFromBean(InvokerBean bean) {
+		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::initializeFromBean " + bean);
 		
+		this.sequence = bean.getSequenceID();
+		this.messageNumber = bean.getMsgNo();
+		this.messageContextKey = bean.getMessageContextRefKey();
+		
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::initializeFromBean");
+	}
+		
+	/**
+	 * The run method invokes the message that this invoker has been primed with, but will
+	 * also attempt to invoke subsequent messages. If the invoker worker is running on the
+	 * application thread then we move on to a thread pool for the second message, but if
+	 * we are already on a pooled thread then we just continue.
+	 */
+	public void run() {
+		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::run, message " + messageNumber + ", sequence " + sequence);
+		
+		// If we are not the holder of the correct lock, then we have to stop
+		if(lock != null && !lock.ownsLock(workId, this)) {
+			if (log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run, another worker holds the lock");
+			return;
+		}
+		
+		Transaction tran = null;
+		try {
+			InvokerWorker nextWorker = null;
+			Runnable nextRunnable = null;
+
+			// Invoke the first message
+			invokeMessage(null);
+
+			// Look for the next message, so long as we are still processing normally
+			while(!ignoreNextMsg) {
+				InvokerBean finder = new InvokerBean();
+				finder.setSequenceID(sequence);
+				finder.setMsgNo(messageNumber + 1);
+
+				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
+				tran = storageManager.getTransaction();
+
+				InvokerBeanMgr mgr = storageManager.getInvokerBeanMgr();
+				InvokerBean nextBean = mgr.findUnique(finder);
+
+				if(nextBean != null) {
+					if(pooledThread) {
+						initializeFromBean(nextBean);
+						final Transaction theTran = tran;
+						Runnable work = new Runnable() {
+							public void run() {
+								invokeMessage(theTran);
+							}
+						};
+
+						// Wrap the work with the correct context, if needed.
+						ContextManager contextMgr = SandeshaUtil.getContextManager(configurationContext);
+						if(contextMgr != null) {
+							work = contextMgr.wrapWithContext(work, nextBean.getContext());
+						}
+
+						// Finally do the work
+						work.run();
+
+						tran = null;
+					} else {
+						nextWorker = new InvokerWorker(configurationContext, nextBean);
+						nextWorker.setPooled();
+						nextWorker.setWorkId(workId);
+
+						// Wrap the invoker worker with the correct context, if needed.
+						ContextManager contextMgr = SandeshaUtil.getContextManager(configurationContext);
+						if(contextMgr != null) {
+							nextRunnable = contextMgr.wrapWithContext(nextWorker, nextBean.getContext());
+						} else {
+							nextRunnable = nextWorker;
+						}
+					}
+				}
+		
+				// Clean up the tran, in case we didn't pass it into the invoke method
+				if(tran != null) tran.commit();
+				tran = null;
+						
+				if(nextBean == null || nextWorker != null) {
+					// We have run out of work, or the new worker has taken it on, so we can
+					// break out of the loop
+					break;
+				}
+			}
+					
+			if (workId !=null && lock!=null) {
+				lock.removeWork(workId);
+			}
+
+			// If we created another worker, set it running now that we have released the lock
+			if(nextWorker != null) {
+				lock.addWork(workId, nextWorker);
+				configurationContext.getThreadPool().execute(nextRunnable);
+			}
+
+		} catch(SandeshaException e) {
+			log.debug("Exception within InvokerWorker", e);
+
+			// Clean up the tran, if there is one left
+			if(tran != null) {
+				try {
+					tran.rollback();
+				} catch(SandeshaException e2) {
+					log.debug("Exception rolling back tran", e2);
+				}
+			}
+		} finally {
+			// Release the lock
+			if (workId !=null && lock!=null && lock.ownsLock(workId, this)) {
+				lock.removeWork(workId);
+			}
+		}
+				
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run");
+	}
+
+	private void invokeMessage(Transaction tran) {
+		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::invokeMessage");
+
 		Transaction transaction = null;
 		MessageContext msgToInvoke = null;
 		
@@ -54,7 +195,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
 			
 			//starting a transaction
-			transaction = storageManager.getTransaction();
+			if(tran == null) {
+				transaction = storageManager.getTransaction();
+			} else {
+				transaction = tran;
+			}
 			
 			InvokerBean invokerBean = invokerBeanMgr.retrieve(messageContextKey);
 
@@ -153,7 +298,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					TerminateManager.cleanReceivingSideAfterInvocation(invokerBean.getSequenceID(), storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
-					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");	
+					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage Last message return");	
 					if(transaction != null && transaction.isActive()) transaction.commit();
 					return;
 				}
@@ -181,10 +326,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			if (log.isErrorEnabled())
 				log.error(e.toString(), e);
 		} finally {
-			if (workId !=null && lock!=null) {
-				lock.removeWork(workId);
-			}
-
 			if (transaction!=null && transaction.isActive()) {
 				try {
 					transaction.rollback();
@@ -195,7 +336,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run");
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage");
 	}
 
 	private void makeMessageReadyForReinjection(MessageContext messageContext) {

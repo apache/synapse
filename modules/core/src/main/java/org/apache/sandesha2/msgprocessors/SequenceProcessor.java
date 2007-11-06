@@ -46,7 +46,6 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -59,7 +58,7 @@ import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
-import org.apache.sandesha2.workers.SandeshaThread;
+import org.apache.sandesha2.workers.InvokerWorker;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -135,7 +134,7 @@ public class SequenceProcessor {
 		}
 		
 		// setting acked msg no range
-		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
+		ConfigurationContext configCtx = msgCtx.getConfigurationContext();
 		if (configCtx == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
 			log.debug(message);
@@ -202,9 +201,9 @@ public class SequenceProcessor {
 		}
 		
 		String specVersion = rmMsgCtx.getRMSpecVersion();
-		if ((SandeshaUtil.isDuplicateInOnlyMessage(rmMsgCtx.getMessageContext())
+		if ((SandeshaUtil.isDuplicateInOnlyMessage(msgCtx)
 						||
-					SandeshaUtil.isDuplicateInOutMessage(rmMsgCtx.getMessageContext()))
+					SandeshaUtil.isDuplicateInOutMessage(msgCtx))
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			
 			// this is a duplicate message and the invocation type is EXACTLY_ONCE. We try to return
@@ -353,11 +352,11 @@ public class SequenceProcessor {
 			// If the MEP doesn't need the backchannel, and nor do we, we should signal it so that it
 			// can close off as soon as possible.
 			if (backchannelFree) {
+				TransportUtils.setResponseWritten(msgCtx, false);
+
 				RequestResponseTransport t = null;
 				t = (RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
-
 				if(t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus())) {
-					TransportUtils.setResponseWritten(msgCtx, false);
 					t.acknowledgeMessage(msgCtx);
 				}
 			}
@@ -377,33 +376,40 @@ public class SequenceProcessor {
 			}
 		}
 		
-		// If the storage manager has an invoker, then they may be implementing inOrder, or
-		// transactional delivery. Either way, if they have one we should use it.
-		SandeshaThread invoker = storageManager.getInvoker();
-		if (invoker != null) {
-			// Whatever the MEP, we stop processing here and the invoker will do the real work. We only
-			// SUSPEND if we need to keep the backchannel open for the response... we may as well ABORT
-			// to let other cases end more quickly.
-			if(backchannelFree && ackBackChannel) {
-				result = InvocationResponse.ABORT;
-			} else {
-				result = InvocationResponse.SUSPEND;
-			}
+		// If the storage manager is implementing inOrder, or using transactional delivery
+		// then we should hand the message over to the invoker thread. If not, we can invoke
+		// it directly ourselves.
+		InvokerWorker worker = null;
+		if (SandeshaUtil.isInOrder(msgCtx) || storageManager.hasUserTransaction(msgCtx)) {
 		    
-			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
-
 			InvokerBean invokerBean = new InvokerBean(key, msgNo, sequenceId);
-			
 			ContextManager contextMgr = SandeshaUtil.getContextManager(configCtx);
+
 			if(contextMgr != null) invokerBean.setContext(contextMgr.storeContext());
 
-			boolean wasAdded = storageMapMgr.insert(invokerBean);
+			boolean wasAdded = storageManager.getInvokerBeanMgr().insert(invokerBean);
 
 			// This will avoid performing application processing more than once.
 			rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 			
+			// Whatever the MEP, we stop processing here and the invoker will do the real work. As we
+			// are taking responsibility for the message we need to return SUSPEND
+			result = InvocationResponse.SUSPEND;
+            
 			if (wasAdded) {
-				storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());        
+				storageManager.storeMessageContext(key, msgCtx);
+				// We can invoke the message immediately, if this is the next message to invoke,
+				// and we don't have a user transaction in play.
+				if(bean.getNextMsgNoToProcess() == msgNo && !storageManager.hasUserTransaction(msgCtx)) {
+					String workId = sequenceId;
+					ConfigurationContext context = msgCtx.getConfigurationContext();
+					
+					worker = new InvokerWorker(context, invokerBean);
+					worker.setWorkId(workId);
+					
+					// Actually take the lock
+					worker.getLock().addWork(workId, worker);
+				}
 			} else {
 				// Abort this message immediately as this message has already been added
 				sendAck = false;
@@ -422,6 +428,14 @@ public class SequenceProcessor {
 		if (transaction != null && transaction.isActive()) 
 			transaction.commit();
 		
+		if(worker != null) {
+			try {
+				worker.run();
+			} catch(Exception e)  {
+				log.error("Caught exception running InvokerWorker", e);
+			}
+		}
+
 		if (sendAck) {
 			try {
 				transaction = storageManager.getTransaction();
@@ -429,6 +443,15 @@ public class SequenceProcessor {
 				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
 				AcknowledgementManager.sendAckNow(ackRMMsgContext);
 				TransportUtils.setResponseWritten(msgCtx, true);
+				RequestResponseTransport t = 
+					(RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+				
+				// Tell the transport that we have finished with the message as the response should have been
+				// written
+				if(t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus())) {
+					t.signalResponseReady();
+				}
+
 				if (transaction != null && transaction.isActive()) transaction.commit();
 				transaction = null;
 			

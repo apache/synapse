@@ -68,12 +68,13 @@ public class Invoker extends SandeshaThread {
 	 * Otherwise messages skipped over will be ignored
 	 * @throws SandeshaException
 	 */
-	public synchronized void forceInvokeOfAllMessagesCurrentlyOnSequence(ConfigurationContext ctx, 
+	public static synchronized void forceInvokeOfAllMessagesCurrentlyOnSequence(ConfigurationContext ctx, 
 			String sequenceID,
 			boolean allowLaterDeliveryOfMissingMessages)throws SandeshaException{
-		//first we block while we wait for the invoking thread to pause
-		blockForPause();
+//		//first we block while we wait for the invoking thread to pause
+//		blockForPause();
 		try{
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(ctx, ctx.getAxisConfiguration());
 			//get all invoker beans for the sequence
 			InvokerBeanMgr storageMapMgr = storageManager
 					.getInvokerBeanMgr();
@@ -102,33 +103,23 @@ public class Invoker extends SandeshaThread {
 						InvokerBean invoker = (InvokerBean)stMapIt.next();
 						
 						// start a new worker thread and let it do the invocation.
-						String workId = sequenceID + "::" + invoker.getMsgNo(); //creating a workId to uniquely identify the
-					   //piece of work that will be assigned to the Worker.
+						String workId = sequenceID;
 						
-						String messageContextKey = invoker.getMessageContextRefKey();
-						InvokerWorker worker = new InvokerWorker(context,
-								messageContextKey, 
-								true); //want to ignore the enxt msg number
-						
-						worker.setLock(getWorkerLock());
+						InvokerWorker worker = new InvokerWorker(ctx, invoker);
+						worker.forceOutOfOrder();
+						worker.setPooled();
 						worker.setWorkId(workId);
 						
 						// Wrap the invoker worker with the correct context, if needed.
 						Runnable work = worker;
-						ContextManager contextMgr = SandeshaUtil.getContextManager(context);
+						ContextManager contextMgr = SandeshaUtil.getContextManager(ctx);
 						if(contextMgr != null) {
 							work = contextMgr.wrapWithContext(work, invoker.getContext());
 						}
 						
-						try {
-							// Try and set the lock up before we start the thread, but roll it back
-							// if we hit any problems
-							if(worker.getLock().addWork(workId, worker)){
-								threadPool.execute(work);
-							}
-						} catch(Exception e) {
-							worker.getLock().removeWork(workId);
-						}
+						// Setup the lock for the new worker
+						worker.getLock().addWork(workId, worker);
+						ctx.getThreadPool().execute(work);
 
 						long msgNumber = invoker.getMsgNo();
 						//if necessary, update the "next message number" bean under this transaction
@@ -176,8 +167,8 @@ public class Invoker extends SandeshaThread {
 			}
 		}
 		finally{
-			//restart the invoker
-			finishPause();
+//			//restart the invoker
+//			finishPause();
 		}
 	}
 
@@ -311,9 +302,7 @@ public class Invoker extends SandeshaThread {
 				//see if this is an out of order msg
 				boolean beanIsOutOfOrderMsg = bean.getMsgNo()!=nextMsgno;
 				
-				String workId = sequenceId + "::" + bean.getMsgNo(); 
-																	//creating a workId to uniquely identify the
-															   //piece of work that will be assigned to the Worker.
+				String workId = sequenceId; 
 									
 				//check whether the bean is already assigned to a worker.
 				if (getWorkerLock().isWorkPresent(workId)) {
@@ -331,20 +320,15 @@ public class Invoker extends SandeshaThread {
 					return sleep;
 				}
 
-				String messageContextKey = bean.getMessageContextRefKey();
-				
 				if(transaction != null) {
 					transaction.commit();
 					transaction = null;
 				}
 
 				// start a new worker thread and let it do the invocation.
-				InvokerWorker worker = new InvokerWorker(context,
-						messageContextKey, 
-						beanIsOutOfOrderMsg); //only ignore nextMsgNumber if the bean is an
-																	//out of order message
-				
-				worker.setLock(getWorkerLock());
+				InvokerWorker worker = new InvokerWorker(context, bean);
+				if(beanIsOutOfOrderMsg) worker.forceOutOfOrder();
+				worker.setPooled();
 				worker.setWorkId(workId);
 				
 				// Wrap the invoker worker with the correct context, if needed.

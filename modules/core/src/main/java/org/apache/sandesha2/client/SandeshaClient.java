@@ -942,16 +942,8 @@ public class SandeshaClient {
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
 			reportTransaction = storageManager.getTransaction();
 
-			//only do this if we are running inOrder
-			if(SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration()).isInOrder()){
-				Invoker invoker = (Invoker)SandeshaUtil.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration()).getInvoker();
-				if (invoker==null){
-					throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.invokerNotFound, sequenceID));
-				}
-				
-				invoker.forceInvokeOfAllMessagesCurrentlyOnSequence(configContext, sequenceID, allowLaterDeliveryOfMissingMessages);			
-			}
+			// There will only be messages waiting if we are running in-order
+			Invoker.forceInvokeOfAllMessagesCurrentlyOnSequence(configContext, sequenceID, allowLaterDeliveryOfMissingMessages);			
 			
 			if(reportTransaction != null && reportTransaction.isActive()) reportTransaction.commit();
 			reportTransaction = null;

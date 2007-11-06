@@ -33,9 +33,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 	}
 
 	public boolean insert(InvokerBean bean) throws SandeshaStorageException {
-		boolean result = super.insert(bean.getMessageContextRefKey(), bean);
-		mgr.getInMemoryTransaction().setReceivedMessages(true);
-		return result;
+		return super.insert(bean.getMessageContextRefKey(), bean);
 	}
 
 	public boolean delete(String key) throws SandeshaStorageException {
@@ -51,9 +49,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 	}
 	
 	public boolean update(InvokerBean bean) throws SandeshaStorageException {
-		boolean result = super.update(bean.getMessageContextRefKey(), bean);
-		mgr.getInMemoryTransaction().setReceivedMessages(true);
-		return result;
+		return super.update(bean.getMessageContextRefKey(), bean);
 	}
 	
 	public InvokerBean findUnique(InvokerBean bean) throws SandeshaException {

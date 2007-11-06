@@ -1169,5 +1169,14 @@ public class SandeshaUtil {
 		return epr;
 	}
 
+	public static boolean isInOrder(MessageContext context) throws SandeshaException {
+		if (log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder");
+		
+		SandeshaPolicyBean policy = getPropertyBean(context.getAxisOperation());
+		boolean result = policy.isInOrder();
+		
+		if (log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder, " + result);
+		return result;
+	}
 
 }

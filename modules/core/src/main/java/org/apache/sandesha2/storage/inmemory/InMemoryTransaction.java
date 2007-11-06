@@ -28,7 +28,6 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMBean;
-import org.apache.sandesha2.workers.SandeshaThread;
 
 /**
  * This class does not really implement transactions, but it is a good
@@ -45,7 +44,6 @@ public class InMemoryTransaction implements Transaction {
 	private ArrayList enlistedBeans = new ArrayList();
 	private InMemoryTransaction waitingForTran = null;
 	private boolean sentMessages = false;
-	private boolean receivedMessages = false;
 	private boolean active = true;
 	
 	InMemoryTransaction(InMemoryStorageManager manager, String threadName, int id) {
@@ -59,10 +57,6 @@ public class InMemoryTransaction implements Transaction {
 	public void commit() {
 		releaseLocks();
 		if(sentMessages) manager.getSender().wakeThread();
-		if(receivedMessages) {
-			SandeshaThread invoker = manager.getInvoker();
-			if(invoker != null) invoker.wakeThread();
-		}
 		active = false;
 	}
 
@@ -164,14 +158,11 @@ public class InMemoryTransaction implements Transaction {
 		return result.toString();
 	}
 
-	public void setReceivedMessages(boolean receivedMessages) {
-		this.receivedMessages = receivedMessages;
-	}
-
 	public void setSentMessages(boolean sentMessages) {
 		this.sentMessages = sentMessages;
 	}
 }
+
 
 
 

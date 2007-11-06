@@ -253,7 +253,7 @@
           <li><a href="#Sample370">Sample 370: Introduction to throttle
             mediator and concurrency throttling</a></li>
           <li><a href="#Sample371">Sample 371: Restricting requests based on
-            policies </a></li>
+            policies</a></li>
           <li><a href="#Sample372">Sample 372: TODO: Find the topic</a></li>
         </ul>
       </li>
@@ -3489,27 +3489,224 @@ company database and logs it.</p>
 
 <p></p>
 
-<h2><a name="ClassMediator">Extension mediators</a></h2>
+<h2><a name="Throttle">Throtteling messages (Throttle Mediator)</a></h2>
+<!-- TODO: any text to go in here??? -->
 
-<p>Synapse supports Mediators implemented in a variety of scripting languages
-such as JavaScript, Python or Ruby. Implementing a Mediator with a script
-language can have advantages over using the built in Synapse Mediator types
-or implementing a custom Java class Mediator. Script Mediators have all the
-flexibility of a class Mediator with access to the Synapse MessageContext and
-SynapseEnvironment APIs, and the ease of use and dynamic nature of scripting
-languages allows rapid development and prototyping of custom mediators. An
-additional benefit of some scripting languages is that they have very simple
-and elegant XML manipulation capabilities, for example JavaScript E4X or Ruby
-REXML, so this makes them well suited for use in the Synapse mediation
-environment.</p>
+<h2><a name="Sample370">Sample 370: Introduction to throttle
+mediator and concurrency throttling</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;throttle id="A"&gt;
+                &lt;policy&gt;
+                    &lt;!-- define throttle policy --&gt;
+                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
+                        &lt;throttle:ThrottleAssertion&gt;
+                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;
+                        &lt;/throttle:ThrottleAssertion&gt;
+                    &lt;/wsp:Policy&gt;
+                &lt;/policy&gt;
+                &lt;onAccept&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Accept**"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/onAccept&gt;
+                &lt;onReject&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Denied**"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault&gt;
+                        &lt;code value="tns:Receiver"
+                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                        &lt;reason value="**Access Denied**"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;property name="RESPONSE" value="true"/&gt;
+                    &lt;header name="To" action="remove"/&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/onReject&gt;
+            &lt;/throttle&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;throttle id="A"/&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+
+<p><b>Objective: Demonstrate the use of throttle mediator for concurrency
+throttling </b></p>
+
+<p><strong>Prerequisites:</strong></p>
+
+<p>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on
+port 9000.</p>
+
+<p>Start Synapse with the sample configuration 600 (i.e. synapse -sample
+600).</p>
 
 <p></p>
 
-<h2><a name="Sample510">Sample 510</a></h2>
+<p>Above configuration specifies a throttle mediator inside the in mediator.
+Therefore, all request messages directed to the main sequence will be
+subjected to throttling. Throttle mediator has policy, onAccept and onReject
+tags at top level. Policy tag specifies the throttling policy to be applied
+for messages. In this sample policy contains only component called
+"MaximumConcurrentAccess" .This indicates the maximum number of concurrent
+request that may have passed through the synapse on a single unit of time. To
+test concurrency throttling ,it is required to send concurrent request to
+synapse. For synapse with above configuration ,if client send 20 request
+concurrently ,then approximately half of those will success..</p>
+
+<h2><a name="Sample371">Sample 371: Restricting requests based on policies </a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;throttle id="A"&gt;
+                &lt;policy&gt;
+                    &lt;!-- define throttle policy --&gt;
+                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
+                        &lt;throttle:ThrottleAssertion&gt;
+                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;Other&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;4&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;800000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;10000&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.200-192.168.8.222&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;8&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;800000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;10&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.201&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;200&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;600000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.198&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;50&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;500000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                        &lt;/throttle:ThrottleAssertion&gt;
+                    &lt;/wsp:Policy&gt;
+                &lt;/policy&gt;
+                &lt;onAccept&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Accept**"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/onAccept&gt;
+                &lt;onReject&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Denied**"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault&gt;
+                        &lt;code value="tns:Receiver"
+                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                        &lt;reason value="**Access Denied**"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;property name="RESPONSE" value="true"/&gt;
+                    &lt;header name="To" action="remove"/&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/onReject&gt;
+            &lt;/throttle&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;throttle id="A"/&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the use of throttle mediator for
+restricting request counts</strong> </p>
+
+<p><strong>Prerequisites:</strong></p>
+
+<p>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on
+port 9000.</p>
+
+<p>Start Synapse with the sample configuration 601 (i.e. synapse -sample
+601).</p>
 
 <p></p>
-<pre>&lt;!-- Demonstrate the use of class mediator --&gt;        
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+<p>Above configuration specifies a throttle mediator inside the in mediator.
+Therefore, all request messages directed to the main sequence will be
+subjected to throttling. Throttle mediator has policy, onAccept and onReject
+tags at the top level. Policy tag specifies the throttling policy to be
+applied for messages. It contains some IP address ranges and the maximum
+number of messages to be allowed for those ranges within a time period given
+in "UnitTime" tag. "ProhibitTimePeriod" tag specifies the time period to
+prohibit further requests after the received request count exceeds the
+specified time. Now run the client 5 times repetitively using the following
+command to see how throttling works.</p>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+
+<p>For the first four requests you will get the quote prices for IBM as
+follows.</p>
+<pre>[java] Standard :: Stock price = $177.20143371883802</pre>
+
+<p>You will receive the following response for the fifth request.</p>
+<pre>[java] org.apache.axis2.AxisFault: **Access Denied**</pre>
+
+<p>Maximum number of requests within 800000 milliseconds is specified as 4
+for any server (including localhost) other than the explicitly specified
+ones. Therefore, our fifth request is denied by the throttle mediator. You
+can verify this by looking at the Synapse console.</p>
+<pre>[HttpServerWorker-1] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-2] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-3] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied** </pre>
+
+<h2><a name="Sample372">Sample 372: TODO: Find the topic</a></h2>
+
+<!-- TODO: what goes here -->
+
+<h2><a name="Class">Extending the mediation in java (Class Mediator)</a></h2>
+
+<!-- TODO: Is there anything tpo go in here??? -->
+
+<h2><a name="Sample380">Sample 380: Writting your own custom mediation in Java</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="fault"&gt;
         &lt;makefault&gt;
@@ -3677,219 +3874,51 @@ the discounted value for the requested quote as follows.</p>
 Original price: 162.30945327447262
 Discounted price: 138.77458254967408</pre>
 
-<h1><a name="AdvancedMediations">Advanced mediations</a></h1>
-
-<h2>Sample 600</h2>
-
-<p></p>
-<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;throttle id="A"&gt;
-                &lt;policy&gt;
-                    &lt;!-- define throttle policy --&gt;
-                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
-                        &lt;throttle:ThrottleAssertion&gt;
-                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;                            
-                        &lt;/throttle:ThrottleAssertion&gt;
-                    &lt;/wsp:Policy&gt;
-                &lt;/policy&gt;
-                &lt;onAccept&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text" value="**Access Accept**"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/onAccept&gt;
-                &lt;onReject&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text" value="**Access Denied**"/&gt;
-                    &lt;/log&gt;
-                    &lt;makefault&gt;
-                        &lt;code value="tns:Receiver"
-                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-                        &lt;reason value="**Access Denied**"/&gt;
-                    &lt;/makefault&gt;
-                    &lt;property name="RESPONSE" value="true"/&gt;
-                    &lt;header name="To" action="remove"/&gt;
-                    &lt;send/&gt;
-                    &lt;drop/&gt;
-                &lt;/onReject&gt;
-            &lt;/throttle&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;throttle id="A"/&gt;
-            &lt;send/&gt;   
-
-
-
-
-
-
-&lt;/out&gt;
-    &lt;/sequence&gt;
-&lt;/definitions&gt;                                                             finitions&gt;</pre>
-
-<p><b>Objective: Demonstrate the use of throttle mediator for concurrency
-throttling </b></p>
-
-<p><strong>Prerequisites:</strong></p>
-
-<p>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on
-port 9000.</p>
-
-<p>Start Synapse with the sample configuration 600 (i.e. synapse -sample
-600).</p>
 
 <p></p>
 
-<p>Above configuration specifies a throttle mediator inside the in mediator.
-Therefore, all request messages directed to the main sequence will be
-subjected to throttling. Throttle mediator has policy, onAccept and onReject
-tags at top level. Policy tag specifies the throttling policy to be applied
-for messages. In this sample policy contains only component called
-"MaximumConcurrentAccess" .This indicates the maximum number of concurrent
-request that may have passed through the synapse on a single unit of time. To
-test concurrency throttling ,it is required to send concurrent request to
-synapse. For synapse with above configuration ,if client send 20 request
-concurrently ,then approximately half of those will success..</p>
 
-<h2><a name="Sample600">Sample 601</a></h2>
-<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;throttle id="A"&gt;
-                &lt;policy&gt;
-                    &lt;!-- define throttle policy --&gt;
-                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
-                        &lt;throttle:ThrottleAssertion&gt;
-                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;
-                            &lt;wsp:All&gt;
-                                &lt;throttle:ID throttle:type="IP"&gt;Other&lt;/throttle:ID&gt;
-                                &lt;wsp:ExactlyOne&gt;
-                                    &lt;wsp:All&gt;
-                                        &lt;throttle:MaximumCount&gt;4&lt;/throttle:MaximumCount&gt;
-                                        &lt;throttle:UnitTime&gt;800000&lt;/throttle:UnitTime&gt;
-                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;10000&lt;/throttle:ProhibitTimePeriod&gt;
-                                    &lt;/wsp:All&gt;
-                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
-                                &lt;/wsp:ExactlyOne&gt;
-                            &lt;/wsp:All&gt;
-                            &lt;wsp:All&gt;
-                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.200-192.168.8.222&lt;/throttle:ID&gt;
-                                &lt;wsp:ExactlyOne&gt;
-                                    &lt;wsp:All&gt;
-                                        &lt;throttle:MaximumCount&gt;8&lt;/throttle:MaximumCount&gt;
-                                        &lt;throttle:UnitTime&gt;800000&lt;/throttle:UnitTime&gt;
-                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;10&lt;/throttle:ProhibitTimePeriod&gt;
-                                    &lt;/wsp:All&gt;
-                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
-                                &lt;/wsp:ExactlyOne&gt;
-                            &lt;/wsp:All&gt;
-                            &lt;wsp:All&gt;
-                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.201&lt;/throttle:ID&gt;
-                                &lt;wsp:ExactlyOne&gt;
-                                    &lt;wsp:All&gt;
-                                        &lt;throttle:MaximumCount&gt;200&lt;/throttle:MaximumCount&gt;
-                                        &lt;throttle:UnitTime&gt;600000&lt;/throttle:UnitTime&gt;
-                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;&lt;/throttle:ProhibitTimePeriod&gt;
-                                    &lt;/wsp:All&gt;
-                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
-                                &lt;/wsp:ExactlyOne&gt;
-                            &lt;/wsp:All&gt;
-                            &lt;wsp:All&gt;
-                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.198&lt;/throttle:ID&gt;
-                                &lt;wsp:ExactlyOne&gt;
-                                    &lt;wsp:All&gt;
-                                        &lt;throttle:MaximumCount&gt;50&lt;/throttle:MaximumCount&gt;
-                                        &lt;throttle:UnitTime&gt;500000&lt;/throttle:UnitTime&gt;
-                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;&lt;/throttle:ProhibitTimePeriod&gt;
-                                    &lt;/wsp:All&gt;
-                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
-                                &lt;/wsp:ExactlyOne&gt;
-                            &lt;/wsp:All&gt;
-                        &lt;/throttle:ThrottleAssertion&gt;
-                    &lt;/wsp:Policy&gt;
-                &lt;/policy&gt;
-                &lt;onAccept&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text" value="**Access Accept**"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/onAccept&gt;
-                &lt;onReject&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text" value="**Access Denied**"/&gt;
-                    &lt;/log&gt;
-                    &lt;makefault&gt;
-                        &lt;code value="tns:Receiver"
-                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-                        &lt;reason value="**Access Denied**"/&gt;
-                    &lt;/makefault&gt;
-                    &lt;property name="RESPONSE" value="true"/&gt;
-                    &lt;header name="To" action="remove"/&gt;
-                    &lt;send/&gt;
-                    &lt;drop/&gt;
-                &lt;/onReject&gt;
-            &lt;/throttle&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;throttle id="A"/&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
-&lt;/definitions&gt;</pre>
 
-<p><strong>Objective: Demonstrate the use of throttle mediator for
-restricting request counts</strong> </p>
 
-<p><strong>Prerequisites:</strong></p>
 
-<p>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on
-port 9000.</p>
 
-<p>Start Synapse with the sample configuration 601 (i.e. synapse -sample
-601).</p>
 
-<p></p>
 
-<p>Above configuration specifies a throttle mediator inside the in mediator.
-Therefore, all request messages directed to the main sequence will be
-subjected to throttling. Throttle mediator has policy, onAccept and onReject
-tags at the top level. Policy tag specifies the throttling policy to be
-applied for messages. It contains some IP address ranges and the maximum
-number of messages to be allowed for those ranges within a time period given
-in "UnitTime" tag. "ProhibitTimePeriod" tag specifies the time period to
-prohibit further requests after the received request count exceeds the
-specified time. Now run the client 5 times repetitively using the following
-command to see how throttling works.</p>
-<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
 
-<p>For the first four requests you will get the quote prices for IBM as
-follows.</p>
-<pre>[java] Standard :: Stock price = $177.20143371883802</pre>
 
-<p>You will receive the following response for the fifth request.</p>
-<pre>[java] org.apache.axis2.AxisFault: **Access Denied**</pre>
 
-<p>Maximum number of requests within 800000 milliseconds is specified as 4
-for any server (including localhost) other than the explicitly specified
-ones. Therefore, our fifth request is denied by the throttle mediator. You
-can verify this by looking at the Synapse console.</p>
-<pre>[HttpServerWorker-1] INFO  LogMediator - text = **Access Accept**
-[HttpServerWorker-2] INFO  LogMediator - text = **Access Accept**
-[HttpServerWorker-3] INFO  LogMediator - text = **Access Accept**
-[HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
-[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied** </pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <h2>Sample 700</h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;

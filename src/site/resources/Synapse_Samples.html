@@ -273,7 +273,7 @@
         </ul>
       </li>
       <li><a href="#Splitter">Splitting messages in to parts and process in
-        parallel</a> 
+        parallel (Iterate / Clone)</a> 
         <ul>
           <li><a href="#Sample400">Sample 400: Message splitting and
             aggregating the responses</a></li>
@@ -3874,53 +3874,13 @@ the discounted value for the requested quote as follows.</p>
 Original price: 162.30945327447262
 Discounted price: 138.77458254967408</pre>
 
-
 <p></p>
 
+<h2><a name="XQuery">Evaluating XQuery for mediation (XQuery Mediator)</a></h2>
 
+<!-- TODO: what goes in herer -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h2>Sample 700</h2>
+<h2><a name="Sample390">Sample 390: Introduction to the XQuery mediator</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
@@ -3981,9 +3941,7 @@ this sample uses XQuery instead of XSLT for transformation.</p>
 
 <p></p>
 
-<h2>Sample 701</h2>
-
-<p></p>
+<h2><a name="Sample391">Sample 391: TODO: Find the topic</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
@@ -4030,9 +3988,20 @@ sample Axis2 server and start it on port 9000.</p>
 document. The stock quote price from the response and commission from the
 commission.xml document will be added and given as a new price .</p>
 
-<p></p>
-
 <p>Invoke the client as follows. </p>
 <pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+
+<h2><a name="Splitter">Splitting messages in to parts and process in
+parallel (Iterate / Clone)</a></h2>
+
+<!-- TODO: splitter declaration -->
+
+<h2><a name="Sample400">Sample 400: Message splitting and aggregating the responses</a></h2>
+
+<h2><a name="Aggregator">Aggregating messages and process in batch (Aggregate Mediator)</a></h2>
+
+<h2><a name="Sample410">Sample 410: Message splitting and
+            aggregating the responses</a></h2>
+
 </body>
 </html>

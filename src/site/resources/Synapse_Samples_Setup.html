@@ -353,9 +353,9 @@ transport from the repository/conf/axis2.xml</p>
 
 <p></p>
 
-<p>Sample services</p>
+<h3>Sample services</h3>
 
-<h3>1. SimpleStockQuoteService</h3>
+<h4>1. SimpleStockQuoteService</h4>
 
 <p>This service has four operations, getQuote (in-out), getFullQuote(in-out),
 getMarketActivity(in-out) and placeOrder (in-only). The getQuote operation
@@ -365,13 +365,13 @@ of days, and the getMarketActivity operation returns stock quotes for a list
 of given symbols. The placeOrder operation will accept a one way message for
 an order.</p>
 
-<h3>2. SecureStockQuoteService </h3>
+<h4>2. SecureStockQuoteService </h4>
 
 <p>This service is a clone of the SimpleStockQuoteService, but has
 WS-Security enabled and an attached security policy for signing and
 encryption of messages.</p>
 
-<h3>3. MTOMSwASampleService</h3>
+<h4>3. MTOMSwASampleService</h4>
 
 <p>This service has three operations uploadFileUsingMTOM(in-out),
 uploadFileUsingSwA(in-out) and oneWayUploadUsingMTOM(in-only) and
@@ -382,7 +382,7 @@ oneWayUploadUsingMTOM saves the request message to disk.</p>
 
 <p></p>
 
-<p>Starting sample Synapse configurations</p>
+<h3>Starting Sample Synapse Configurations</h3>
 
 <p>To start Synapse with the sample default configuration, execute the
 synapse.bat or synapse.sh script found in the /bin directory. This starts up
@@ -469,12 +469,12 @@ required jar files to the Synapse lib directory, and optionally perform other
 installation tasks as may be required by the individual scripting language.
 This is explained in the following sections.</p>
 
-<h4>JavaScript support</h4>
+<h4>JavaScript Support</h4>
 
 <p>The JavaScript/E4X support is enabled by default and comes ready-to-use
 with the Synapse distribution.</p>
 
-<h4>Ruby support</h4>
+<h4>Ruby Support</h4>
 
 <p>For Ruby support you need to download the 'jruby-complete.jar' from the
 Maven repository for JRuby, and copy it into the 'lib' folder of Synapse .

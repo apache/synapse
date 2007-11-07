@@ -184,6 +184,8 @@ public interface Sandesha2Constants {
 
 		String CLOSE_SEQUENCE = "CloseSequence";
 		
+		String LAST_MSG_NUMBER = "LastMsgNumber";
+		
 		String CLOSE_SEQUENCE_RESPONSE = "CloseSequenceResponse";
 		
 		String TERMINATE_SEQUENCE_RESPONSE = "TerminateSequenceResponse";

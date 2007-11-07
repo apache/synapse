@@ -37,7 +37,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 public class TerminateSequence implements IOMRMPart {
 
 	private Identifier identifier;
-	
+	private LastMessageNumber lastMessageNumber;
 	private String namespaceValue = null;
 	
 	public TerminateSequence(String namespaceValue) throws SandeshaException {
@@ -72,6 +72,12 @@ public class TerminateSequence implements IOMRMPart {
 		if(identifierPart != null){
 			identifier.fromOMElement(identifierPart);
 		}
+		
+		OMElement lastMessageNumberPart = terminateSeqPart.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.LAST_MSG_NUMBER));
+		if(lastMessageNumberPart != null){
+			lastMessageNumber = new LastMessageNumber(namespaceValue);
+			lastMessageNumber.fromOMElement(lastMessageNumberPart);
+		}
 
 		return this;
 	}
@@ -93,8 +99,12 @@ public class TerminateSequence implements IOMRMPart {
 				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNamespace);
 		
 		identifier.toOMElement(terminateSequenceElement, rmNamespace);
+		
+		if(lastMessageNumber!=null){
+			lastMessageNumber.toOMElement(terminateSequenceElement, rmNamespace);
+		}
+		
 		body.addChild(terminateSequenceElement);
-
 		return body;
 	}
 
@@ -104,6 +114,14 @@ public class TerminateSequence implements IOMRMPart {
 
 	public void setIdentifier(Identifier identifier) {
 		this.identifier = identifier;
+	}
+	
+	public void setLastMessageNumber(LastMessageNumber number){
+		this.lastMessageNumber = number;
+	}
+	
+	public LastMessageNumber getLastMessageNumber(){
+		return this.lastMessageNumber;
 	}
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
@@ -126,6 +144,14 @@ public class TerminateSequence implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public static boolean isLastMsgNumberRequired(String namespaceName){
+		
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
+			return true;
+		else
+			return false;		
 	}
 	
 }

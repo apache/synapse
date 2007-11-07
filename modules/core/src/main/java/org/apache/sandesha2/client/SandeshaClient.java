@@ -65,6 +65,7 @@ import org.apache.sandesha2.workers.Invoker;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.LastMessageNumber;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
@@ -984,11 +985,49 @@ public class SandeshaClient {
 		// Get a transaction for getting the sequence properties
 		Transaction transaction = null;
 		String sequenceID = null;
-		
+		SOAPEnvelope dummyEnvelope = null;
 		try
 		{
 			transaction = storageManager.getTransaction();
 			sequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceID, storageManager);
+			if (sequenceID == null)
+				sequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;	
+
+			String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+
+			if (rmSpecVersion == null)
+				rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
+
+			if (!SpecSpecificConstants.isSequenceClosingAllowed(rmSpecVersion))
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.closeSequenceSpecLevel, rmSpecVersion));
+			
+			SOAPFactory factory = null;
+			String soapNamespaceURI = options.getSoapVersionURI();
+			if (soapNamespaceURI == null) 
+				soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
+
+			if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
+				factory = new SOAP12Factory();
+				dummyEnvelope = factory.getDefaultEnvelope();
+			} else {
+				factory = new SOAP11Factory();
+				dummyEnvelope = factory.getDefaultEnvelope();
+			}
+
+			String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
+
+			CloseSequence closeSequence = new CloseSequence(rmNamespaceValue);
+			Identifier identifier = new Identifier(rmNamespaceValue);
+			identifier.setIndentifer(sequenceID);
+			closeSequence.setIdentifier(identifier);
+			if(closeSequence.isLastMsgNumberRequired(rmNamespaceValue)){
+				LastMessageNumber lastMsgNumber = new LastMessageNumber(rmNamespaceValue);
+				lastMsgNumber.setMessageNumber(SandeshaUtil.getLastMessageNumber(internalSequenceID, storageManager));
+				closeSequence.setLastMessageNumber(lastMsgNumber);
+			}
+			closeSequence.toSOAPEnvelope(dummyEnvelope);
+
 		}
 		finally
 		{
@@ -996,41 +1035,6 @@ public class SandeshaClient {
 			if(transaction != null) transaction.commit();
 		}
 		
-		if (sequenceID == null)
-			sequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;	
-
-		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
-
-		if (rmSpecVersion == null)
-			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
-
-		if (!SpecSpecificConstants.isSequenceClosingAllowed(rmSpecVersion))
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.closeSequenceSpecLevel, rmSpecVersion));
-
-		SOAPEnvelope dummyEnvelope = null;
-		SOAPFactory factory = null;
-		String soapNamespaceURI = options.getSoapVersionURI();
-		if (soapNamespaceURI == null) 
-			soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
-
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-			factory = new SOAP12Factory();
-			dummyEnvelope = factory.getDefaultEnvelope();
-		} else {
-			factory = new SOAP11Factory();
-			dummyEnvelope = factory.getDefaultEnvelope();
-		}
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
-
-		CloseSequence closeSequence = new CloseSequence(rmNamespaceValue);
-		Identifier identifier = new Identifier(rmNamespaceValue);
-		identifier.setIndentifer(sequenceID);
-		closeSequence.setIdentifier(identifier);
-
-		closeSequence.toSOAPEnvelope(dummyEnvelope);
-
 		return dummyEnvelope;
 	}
 
@@ -1172,6 +1176,20 @@ public class SandeshaClient {
 		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(sequenceID);
 		terminateSequence.setIdentifier(identifier);
+		if(TerminateSequence.isLastMsgNumberRequired(rmNamespaceValue)){
+			try
+			{
+				transaction = storageManager.getTransaction();
+				LastMessageNumber lastMessageNumber = new LastMessageNumber(rmNamespaceValue);
+				lastMessageNumber.setMessageNumber(SandeshaUtil.getLastMessageNumber(internalSequenceID, storageManager));
+				terminateSequence.setLastMessageNumber(lastMessageNumber);
+			}
+			finally
+			{
+				// Commit the tran whatever happened
+				if(transaction != null) transaction.commit();
+			}
+		}
 		terminateSequence.toSOAPEnvelope(dummyEnvelope);
 
 		return dummyEnvelope;

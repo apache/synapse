@@ -29,12 +29,14 @@ import javax.xml.namespace.QName;
 public class TerminateSequenceTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
-	String rmNamespace = Sandesha2Constants.SPEC_2005_02.NS_URI;
+	String rmNamespace = Sandesha2Constants.SPEC_2007_02.NS_URI;
 	
     public TerminateSequenceTest() {
         super("TerminateSequenceTest");
     }
 
+    
+    
     public void testFromOMElement() throws SandeshaException {
         TerminateSequence terminateSequence =  new TerminateSequence(rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "TerminateSequence.xml");
@@ -42,6 +44,7 @@ public class TerminateSequenceTest extends SandeshaTestCase {
 
         Identifier identifier = terminateSequence.getIdentifier();
         assertEquals("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06", identifier.getIdentifier());
+        assertEquals(1, terminateSequence.getLastMessageNumber().getMessageNumber());
     }
 
     public void testToSOAPEnvelope() throws SandeshaException {
@@ -50,6 +53,12 @@ public class TerminateSequenceTest extends SandeshaTestCase {
         identifier.setIndentifer("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06");
         terminateSequence.setIdentifier(identifier);
 
+        if(TerminateSequence.isLastMsgNumberRequired(Sandesha2Constants.SPEC_2007_02.NS_URI)){
+        	LastMessageNumber lastMessageNumber = new LastMessageNumber(Sandesha2Constants.SPEC_2007_02.NS_URI);
+        	lastMessageNumber.setMessageNumber(1);
+        	terminateSequence.setLastMessageNumber(lastMessageNumber);
+        }
+        
         SOAPEnvelope env = getEmptySOAPEnvelope();
         terminateSequence.toSOAPEnvelope(env);
 

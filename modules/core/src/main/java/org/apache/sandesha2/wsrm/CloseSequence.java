@@ -37,7 +37,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 public class CloseSequence implements IOMRMPart {
 
 	private Identifier identifier;
-	
+	private LastMessageNumber lastMessageNumber;
 	private String namespaceValue = null;
 	
 	public CloseSequence(String namespaceValue) throws SandeshaException {
@@ -72,6 +72,12 @@ public class CloseSequence implements IOMRMPart {
 		if(identifierPart != null){
 			identifier.fromOMElement(identifierPart);
 		}
+		
+		OMElement lastMessageNumberPart = closeSeqPart.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.LAST_MSG_NUMBER));
+		if(lastMessageNumberPart != null){
+			lastMessageNumber = new LastMessageNumber(namespaceValue);
+			lastMessageNumber.fromOMElement(lastMessageNumberPart);
+		}
 		return this;
 	}
 	
@@ -92,6 +98,10 @@ public class CloseSequence implements IOMRMPart {
 		OMElement closeSequenceElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNamespace);
 		
 		identifier.toOMElement(closeSequenceElement, rmNamespace);
+		if(lastMessageNumber!=null){
+			lastMessageNumber.toOMElement(closeSequenceElement, rmNamespace);
+		}
+		
 		body.addChild(closeSequenceElement);
 
 		return body;
@@ -125,6 +135,21 @@ public class CloseSequence implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public boolean isLastMsgNumberRequired(String namespaceName){
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
+			return true;
+		else 
+			return false;		
+	}
+	
+	public void setLastMessageNumber(LastMessageNumber number){
+		this.lastMessageNumber = number;
+	}
+	
+	public LastMessageNumber getLastMessageNumber(){
+		return this.lastMessageNumber;
 	}
 
 }

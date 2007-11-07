@@ -618,6 +618,16 @@ public class SandeshaUtil {
 
 		return bean;
   }
+	
+	public static long getLastMessageNumber(String internalSequenceID, StorageManager storageManager)throws SandeshaException {
+		
+		RMSBean rMSBean = getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
+		long lastMessageNumber = 0;
+		if(rMSBean!=null){
+			lastMessageNumber = rMSBean.getHighestOutMessageNumber();
+		}
+		return lastMessageNumber;
+	}
 
 	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
 			StorageManager storageManager) throws SandeshaException {

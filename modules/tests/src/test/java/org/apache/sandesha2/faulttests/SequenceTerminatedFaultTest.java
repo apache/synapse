@@ -51,6 +51,7 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.LastMessageNumber;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 
@@ -476,6 +477,9 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);
+		LastMessageNumber lastMsgNumber = new LastMessageNumber(rmNamespaceValue);
+		lastMsgNumber.setMessageNumber(1);
+		sequence.setLastMessageNumber(lastMsgNumber);
 		applicationRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE, sequence);
 		applicationRMMsg.addSOAPEnvelope();
 
@@ -547,5 +551,6 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	}
 
 }
+
 
 

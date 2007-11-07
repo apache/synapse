@@ -297,6 +297,8 @@ public class SequenceManager {
 	
 	public static void finalizeTimedOutSequence(String internalSequenceID, MessageContext messageContext,
 			StorageManager storageManager) throws SandeshaException {
+		if (log.isDebugEnabled()) log.debug("Enter: SequenceManager::finalizeTimedOutSequence:" + internalSequenceID);
+		
 		ConfigurationContext configurationContext = null;
 		if (messageContext == null)
 			configurationContext = storageManager.getContext();
@@ -309,8 +311,24 @@ public class SequenceManager {
 		// Notify any waiting clients that the sequence has timeed out.
 		FaultManager.notifyClientsOfFault(internalSequenceID, storageManager, configurationContext, fault);
 		
+		//try and send a terminate message
+		try{
+			RMSBean bean = new RMSBean();
+			bean.setInternalSequenceID(internalSequenceID);
+			storageManager.getRMSBeanMgr().findUnique(bean);
+			if(bean!=null){
+				TerminateManager.checkAndTerminate(configurationContext, storageManager, bean);
+			}			
+		}
+		catch(Exception e){
+			//log this error but continue to timeout sequence
+			if (log.isDebugEnabled()) log.debug("SequenceManager::finalizeTimedOutSequence:Error caught:" + e);
+		}
+
+		
 		// Already an active transaction, so don't want a new one
 		TerminateManager.timeOutSendingSideSequence(internalSequenceID, storageManager);
+		
 
 		if (messageContext != null) {
 			SandeshaListener listener = (SandeshaListener) messageContext
@@ -320,6 +338,7 @@ public class SequenceManager {
 				listener.onTimeOut(report);
 			}
 		}
+		if (log.isDebugEnabled()) log.debug("Exit: SequenceManager::finalizeTimedOutSequence");
 	}
 
 	public static String getSpecVersion(MessageContext applicationMessage, StorageManager storageManager)

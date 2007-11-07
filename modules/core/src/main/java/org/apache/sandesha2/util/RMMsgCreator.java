@@ -58,6 +58,7 @@ import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Endpoint;
 import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.LastMessageNumber;
 import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
@@ -291,6 +292,11 @@ public class RMMsgCreator {
 		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(rmsBean.getSequenceID());
 		terminateSequencePart.setIdentifier(identifier);
+		if(TerminateSequence.isLastMsgNumberRequired(rmNamespaceValue)){
+			LastMessageNumber lastMsgNumber = new LastMessageNumber(rmNamespaceValue);
+			lastMsgNumber.setMessageNumber(SandeshaUtil.getLastMessageNumber(rmsBean.getInternalSequenceID(), storageManager));
+			terminateSequencePart.setLastMessageNumber(lastMsgNumber);
+		}
 		terminateRMMessage.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ, terminateSequencePart);
 
 		// no need for an incoming transport for a terminate

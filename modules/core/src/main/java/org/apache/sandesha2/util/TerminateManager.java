@@ -233,7 +233,7 @@ public class TerminateManager {
 		rmsBean.setTerminateAdded(true);
 		storageManager.getRMSBeanMgr().update(rmsBean);
 		
-		cleanSendingSideData (rmsBean.getInternalSequenceID(), storageManager);
+		cleanSendingSideData (rmsBean.getInternalSequenceID(), storageManager, rmsBean);
 	}
 
 	public static void timeOutSendingSideSequence(String internalSequenceId,
@@ -244,10 +244,10 @@ public class TerminateManager {
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
-		cleanSendingSideData(internalSequenceId, storageManager);
+		cleanSendingSideData(internalSequenceId, storageManager, rmsBean);
 	}
 
-	private static void cleanSendingSideData(String internalSequenceId, StorageManager storageManager) throws SandeshaException {
+	private static void cleanSendingSideData(String internalSequenceId, StorageManager storageManager, RMSBean rmsBean) throws SandeshaException {
 
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
@@ -256,10 +256,13 @@ public class TerminateManager {
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SenderBean retransmitterBean = (SenderBean) iterator.next();
-			retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
+			if(retransmitterBean.getMessageType()!=Sandesha2Constants.MessageTypes.TERMINATE_SEQ || rmsBean.isTerminated()){
+				//remove all but terminate sequence messages
+				retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
 
-			String messageStoreKey = retransmitterBean.getMessageContextRefKey();
-			storageManager.removeMessageContext(messageStoreKey);
+				String messageStoreKey = retransmitterBean.getMessageContextRefKey();
+				storageManager.removeMessageContext(messageStoreKey);				
+			}
 		}
 	}
 

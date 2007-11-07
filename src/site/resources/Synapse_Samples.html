@@ -3997,6 +3997,58 @@ parallel (Iterate / Clone)</a></h2>
 <!-- TODO: splitter declaration -->
 
 <h2><a name="Sample400">Sample 400: Message splitting and aggregating the responses</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="SplitAggregateProxy"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;iterate expression="//m0:getQuote/m0:request" preservePayload="true"
+                         attachPath="//m0:getQuote"
+                         xmlns:m0="http://services.samples/xsd"&gt;
+                    &lt;target&gt;
+                        &lt;sequence&gt;
+                            &lt;send&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address
+                                        uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/send&gt;
+                        &lt;/sequence&gt;
+                    &lt;/target&gt;
+                &lt;/iterate&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;aggregate&gt;
+                    &lt;onComplete expression="//m0:getQuoteResponse"
+                                xmlns:m0="http://services.samples/xsd"&gt;
+                        &lt;send/&gt;
+                    &lt;/onComplete&gt;
+                    &lt;invalidate&gt;
+                        &lt;log level="full"/&gt;
+                        &lt;drop/&gt;
+                    &lt;/invalidate&gt;
+                &lt;/aggregate&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+
+<p><b><strong>Objective: Demonstrate the use of Iterate mediator to split the messages in to
+parts and process them asynchronously and then aggreagate the responses coming in to synapse</strong></b></p>
+
+<p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
+sample Axis2 server and start it on port 9000.</p>
+
+<p>Start Synapse with the sample configuration 400 (i.e. synapse -sample
+400).</p>
+
+<p>In this sample, the message sent to synapse has embeded with a number of elements of the same type
+in one message. When synapse received this message it will iterate through those elements and then sent
+to the specified endpoint. When all the responses appear in to synapse then those messages will be
+aggregated to form the resultant response and sent back to the client.</p>
+
+<p>Invoke the client as follows. </p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/SplitAggregateProxy -Ditr=4</pre>
 
 <h2><a name="Aggregator">Aggregating messages and process in batch (Aggregate Mediator)</a></h2>
 

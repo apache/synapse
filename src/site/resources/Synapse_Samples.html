@@ -285,6 +285,12 @@
             aggregating the responses</a></li>
         </ul>
       </li>
+      <li><a href="#Cache">Caching the responses over the requests</a>
+        <ul>
+          <li><a href="#Sample420">Sample 420: Simple cache implemented on
+              synapse for the actual service</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
@@ -4054,6 +4060,57 @@ aggregated to form the resultant response and sent back to the client.</p>
 
 <h2><a name="Sample410">Sample 410: Message splitting and
             aggregating the responses</a></h2>
+
+<h2><a name="Cache">Caching the responses over the requests (Cache Mediator)</a></h2>
+
+<p>Cached mediator can be used to utilize the network bandwidth, to protect the backend service from
+being loaded with the same type of requests like browser refresh and also to speed up the
+execution of the webservice. This mediator should be used with sence, because it is not applicable
+for each and every services (for example services with dynamic responses for a particular release)</p>
+
+<h2><a name="Sample420">Sample 420: Simple cache implemented on synapse for the actual service</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+        &lt;cache timeout="20000" scope="per-host"
+               hashGenerator="org.wso2.caching.digest.DOMHASHGenerator"&gt;
+            &lt;implementation type="memory" maxSize="100"/&gt;
+        &lt;/cache&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;cache/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt;</pre>
+
+<p><b><strong>Objective: Demonstrate the use of Cache mediator in order to cache the
+response and use that cached response as the response for an identical xml request</strong></b></p>
+
+<p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
+sample Axis2 server and start it on port 9000.</p>
+
+<p>Start Synapse with the sample configuration 420 (i.e. synapse -sample
+420).</p>
+
+<p>In this sample, the message sent to synapse is checked for an existing cached response by
+calculating the hash value of the request. If there is a cache hit in synapse then this request
+will not be forwarded to the actual service, rather synapse respond to the client with the
+cached response. In case of a cache miss that particular message will be forwarded to the actual
+service and cached that response in the out path for the use of consecutive requests of the
+same type.</p>
+
+<p>To observe this behaviour, invoke the client as follows. </p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+
+<p>You could notice that if you send more than one requests withing 20 seconds only the first request
+is forwarded to the actual service, and the rest of the requests will be served by the cache inside
+syanpse. You could observe this by looking at the priting line of the axis2 server, as well as by
+observing a constant rate as the response to the client instead of the random rate, which changes by
+each and every 20 seconds.</p>
 
 </body>
 </html>

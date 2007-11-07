@@ -2897,7 +2897,48 @@ be deleted. The response will be sent to the given email address.</p>
 
 <h2><a name="Sample300">Sample 300: Introduction to tasks with simple
 trigger</a></h2>
-<!--TODO: fill the sample-->
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice"&gt;
+        &lt;property name="to" value="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+        &lt;property name="soapAction" value="urn:getQuote"/&gt;
+        &lt;property name="message"&gt;
+            &lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;
+                &lt;m0:request&gt;
+                    &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+                &lt;/m0:request&gt;
+            &lt;/m0:getQuote&gt;
+        &lt;/property&gt;
+        &lt;trigger interval="5000"/&gt;
+    &lt;/task&gt;
+
+    &lt;in&gt;
+        &lt;send/&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;log level="custom"&gt;
+            &lt;property name="Stock Quote on" expression="//ns:return/ns:lastTradeTimestamp/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
+            &lt;property name="For the organization" expression="//ns:return/ns:name/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
+            &lt;property name="Last Value" expression="//ns:return/ns:last/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
+        &lt;/log&gt;
+    &lt;/out&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Introduce the concept of tasks and how simple trigger works</strong></p>
+
+<p><strong>Prerequisites:</strong><br>
+You will need access to build the SimpleStockQuoteService as mentioned in the above and start the
+sample axis2 server before staring synapse.</p>
+
+<p>When ever synapse gets started and initialized, this task will run periodically in 5 second
+intervals. You could limit the number of times that you want to run this task by adding a count
+attribute with an integer as the value, if the count is not present as in this sample this task will
+run forever.</p>
+
+<p>One can write his own task class implmenting the org.apache.synapse.startup.Task interface and
+implementing the execute method to do the task. For this particualr sample we have used the
+MessageInjector which just injects a message specified in to the synapse enviorenemnt.</p>
 
 <h1><a name="AdvancedMediation">Advanced mediations with advanced
 mediators</a></h1>

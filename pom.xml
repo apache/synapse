@@ -900,9 +900,9 @@
         </dependency>
 
         <dependency>
-            <groupId>tomcat</groupId>
+            <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Wrapper jars -->
@@ -1064,7 +1064,7 @@
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>
-        <tomcat.version>5.5.15</tomcat.version>
+        <servlet-api.version>2.3</servlet-api.version>
 
     </properties>
 

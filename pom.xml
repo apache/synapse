@@ -1065,7 +1065,6 @@
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>
         <tomcat.version>5.5.15</tomcat.version>
-        <mx4j.version>3.0.1</mx4j.version>
 
     </properties>
 

@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -29,7 +30,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.throttle.*;
 import org.wso2.throttle.factory.AccessControllerFactory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +65,19 @@ public class ThrottleMediator extends AbstractMediator {
     private boolean includesIPThrottling = false;
     /** The concurrent connection limit */
     private int concurrentLimit;
+    /** Access rate controller*/
+    private AccessController accessControler;
+
+    public ThrottleMediator() {
+        try {
+            this.accessControler =
+                AccessControllerFactory.createAccessControler(ThrottleConstants.IP_BASE);
+        } catch (ThrottleException e) {
+            String msg = "Error occurred when creating an accesscontroller";
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
+    }
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -136,7 +149,7 @@ public class ThrottleMediator extends AbstractMediator {
         boolean isAllowed = throttleByConcurrency(isResponse, traceOrDebugOn, traceOn);
 
         if (includesIPThrottling && isAllowed && !isResponse) {
-            // do the normal throttling 
+            // do the normal throttling
             isAllowed = throttleByRate(synContext, traceOrDebugOn, traceOn);
         }
 
@@ -247,8 +260,6 @@ public class ThrottleMediator extends AbstractMediator {
             }
 
             try {
-                AccessController accessControler = AccessControllerFactory.createAccessControler(
-                    ThrottleConstants.IP_BASE);
                 boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Access " + (canAccess ? "allowed" : "denied")
@@ -352,32 +363,34 @@ public class ThrottleMediator extends AbstractMediator {
                 }
             }
 
-            includesIPThrottling = (
-                throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY) != null);
+            if (throttle != null) {
 
-            if (id != null) {
-                concurrentAccessController = throttle.getConcurrentAccessController();
-                concurrentLimit = concurrentAccessController.getLimit();
+                includesIPThrottling = (
+                    throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY) != null);
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
-                        "Initiating ConcurrentAccessControler for throttle group id : " + id
-                            + " limit : " + concurrentLimit);
-                }
-                
-                org.apache.axis2.context.MessageContext axis2MessageContext
-                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-                ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
-                Map accessContollers = (Map) configctx.getProperty(KEY);
+                if (id != null) {
+                    concurrentAccessController = throttle.getConcurrentAccessController();
 
-                if(accessContollers == null){
-                    accessContollers = new HashMap();
-                    configctx.setProperty(KEY,accessContollers);
-                }
-                if (concurrentAccessController == null) {
-                    accessContollers.remove(id);
-                } else {
-                    accessContollers.put(id, concurrentAccessController);
+                    org.apache.axis2.context.MessageContext axis2MessageContext
+                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
+                    Map accessContollers = (Map) configctx.getProperty(KEY);
+
+                    if (accessContollers == null) {
+                        accessContollers = new HashMap();
+                        configctx.setProperty(KEY, accessContollers);
+                    }
+                    if (concurrentAccessController == null) {
+                        accessContollers.remove(id);
+                    } else {
+                        concurrentLimit = concurrentAccessController.getLimit();
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn,
+                                "Initiating ConcurrentAccessControler for throttle group id : " + id
+                                    + " limit : " + concurrentLimit);
+                        }
+                        accessContollers.put(id, concurrentAccessController);
+                    }
                 }
             }
         }

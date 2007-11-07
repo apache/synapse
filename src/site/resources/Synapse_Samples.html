@@ -254,7 +254,8 @@
             mediator and concurrency throttling</a></li>
           <li><a href="#Sample371">Sample 371: Restricting requests based on
             policies</a></li>
-          <li><a href="#Sample372">Sample 372: TODO: Find the topic</a></li>
+          <li><a href="#Sample372">Sample 372: Use of both concurrency
+            throttling and request rate based throttling </a></li>
         </ul>
       </li>
       <li><a href="#Class">Extending the mediation in java (Class
@@ -269,7 +270,8 @@
         <ul>
           <li><a href="#Sample390">Sample 390: Introduction to the XQuery
             mediator</a></li>
-          <li><a href="#Sample391">Sample 391: TODO: Find the topic</a></li>
+          <li><a href="#Sample391">Sample 391: How to use the data from an
+            external XML document with in XQuery </a></li>
         </ul>
       </li>
       <li><a href="#Splitter">Splitting messages in to parts and process in
@@ -285,10 +287,10 @@
             aggregating the responses</a></li>
         </ul>
       </li>
-      <li><a href="#Cache">Caching the responses over the requests</a>
+      <li><a href="#Cache">Caching the responses over the requests</a> 
         <ul>
           <li><a href="#Sample420">Sample 420: Simple cache implemented on
-              synapse for the actual service</a></li>
+            synapse for the actual service</a></li>
         </ul>
       </li>
     </ul>
@@ -2925,20 +2927,23 @@ trigger</a></h2>
 
 &lt;/definitions&gt;</pre>
 
-<p><strong>Objective: Introduce the concept of tasks and how simple trigger works</strong></p>
+<p><strong>Objective: Introduce the concept of tasks and how simple trigger
+works</strong></p>
 
 <p><strong>Prerequisites:</strong><br>
-You will need access to build the SimpleStockQuoteService as mentioned in the above and start the
-sample axis2 server before staring synapse.</p>
+You will need access to build the SimpleStockQuoteService as mentioned in the
+above and start the sample axis2 server before staring synapse.</p>
 
-<p>When ever synapse gets started and initialized, this task will run periodically in 5 second
-intervals. You could limit the number of times that you want to run this task by adding a count
-attribute with an integer as the value, if the count is not present as in this sample this task will
-run forever.</p>
+<p>When ever synapse gets started and initialized, this task will run
+periodically in 5 second intervals. You could limit the number of times that
+you want to run this task by adding a count attribute with an integer as the
+value, if the count is not present as in this sample this task will run
+forever.</p>
 
-<p>One can write his own task class implmenting the org.apache.synapse.startup.Task interface and
-implementing the execute method to do the task. For this particualr sample we have used the
-MessageInjector which just injects a message specified in to the synapse enviorenemnt.</p>
+<p>One can write his own task class implmenting the
+org.apache.synapse.startup.Task interface and implementing the execute method
+to do the task. For this particualr sample we have used the MessageInjector
+which just injects a message specified in to the synapse enviorenemnt.</p>
 
 <h1><a name="AdvancedMediation">Advanced mediations with advanced
 mediators</a></h1>
@@ -3194,7 +3199,7 @@ steps before going through the samples.</p>
     <p>create table company(name varchar(10), id varchar(10), price
     double);</p>
   </li>
-  <li>Inserts some data using following statements
+  <li>Inserts some data using following statements 
     <p>insert into company values ('IBM','c1',0.0);</p>
     <p>insert into company values ('SUN','c2',0.0);</p>
     <p>insert into company values ('MSFT','c3',0.0);</p>
@@ -3539,8 +3544,8 @@ company database and logs it.</p>
 <h2><a name="Throttle">Throtteling messages (Throttle Mediator)</a></h2>
 <!-- TODO: any text to go in here??? -->
 
-<h2><a name="Sample370">Sample 370: Introduction to throttle
-mediator and concurrency throttling</a></h2>
+<h2><a name="Sample370">Sample 370: Introduction to throttle mediator and
+concurrency throttling</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;sequence name="main"&gt;
         &lt;in&gt;
@@ -3611,7 +3616,8 @@ test concurrency throttling ,it is required to send concurrent request to
 synapse. For synapse with above configuration ,if client send 20 request
 concurrently ,then approximately half of those will success..</p>
 
-<h2><a name="Sample371">Sample 371: Restricting requests based on policies </a></h2>
+<h2><a name="Sample371">Sample 371: Restricting requests based on policies
+</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;sequence name="main"&gt;
         &lt;in&gt;
@@ -3620,9 +3626,7 @@ concurrently ,then approximately half of those will success..</p>
                     &lt;!-- define throttle policy --&gt;
                     &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
                                 xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
-                        &lt;throttle:ThrottleAssertion&gt;
-                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;
-                            &lt;wsp:All&gt;
+                        &lt;throttle:ThrottleAssertion&gt;   <br>                                   &lt;wsp:All&gt;
                                 &lt;throttle:ID throttle:type="IP"&gt;Other&lt;/throttle:ID&gt;
                                 &lt;wsp:ExactlyOne&gt;
                                     &lt;wsp:All&gt;
@@ -3744,15 +3748,97 @@ can verify this by looking at the Synapse console.</p>
 [HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
 [HttpServerWorker-5] INFO  LogMediator - text = **Access Denied** </pre>
 
-<h2><a name="Sample372">Sample 372: TODO: Find the topic</a></h2>
-
+<h2><a name="Sample372">Sample 372:Use of both concurrency throttling and
+request rate based throttling </a></h2>
 <!-- TODO: what goes here -->
 
-<h2><a name="Class">Extending the mediation in java (Class Mediator)</a></h2>
+<div>
+</div>
+<pre>&lt;!-- Use of both concurrency throttling and request rate based throttling --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name="root"&gt;file:repository/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name="cachableDuration"&gt;150000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;sequence name="onAcceptSequence"&gt;
+        &lt;log level="custom"&gt;
+            &lt;property name="text" value="**Access Accept**"/&gt;
+        &lt;/log&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+    &lt;sequence name="onRejectSequence" trace="enable"&gt;
+        &lt;log level="custom"&gt;
+            &lt;property name="text" value="**Access Denied**"/&gt;
+        &lt;/log&gt;
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver"
+                  xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="**Access Denied**"/&gt;
+        &lt;/makefault&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+        &lt;header name="To" action="remove"/&gt;
+        &lt;send/&gt;
+        &lt;drop/&gt;
+    &lt;/sequence&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+             &lt;inSequence&gt;
+                &lt;throttle onReject="onRejectSequence" onAccept="onAcceptSequence" id="A"&gt;
+                    &lt;policy key="conf/sample/resources/policy/throttle_policy.xml"/&gt;
+                &lt;/throttle&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;throttle id="A"/&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;
+</pre>
+
+<div>
+</div>
+
+<p><strong>Objective: Use of both concurrency throttling and request rate
+based throttling </strong></p>
+
+<p><strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in
+sample Axis2 server and start it on port 9000.</p>
+
+<p>Start Synapse with the sample configuration 372 (i.e. synapse -sample
+372).</p>
+
+<p></p>
+
+<p>Throttle policy is loaded from the &#x201c;throttle_policy. xml&#x201d;
+.That policy contains merging policy from sample 370 and 371. To check the
+functionality , it is need to run load test.The all enabled request from the
+concurrency throttling will be controlled by the access rate base throttling
+according to the policy.</p>
+
+<p>Run the client as follows </p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+
+<div>
+<p>You will get results same as sample 371.if you run the load test, results
+will be different due to affect of concurrency throttling.</p>
+</div>
+
+<h2><a name="Class">Extending the mediation in java (Class
+Mediator)</a></h2>
 <!-- TODO: Is there anything tpo go in here??? -->
 
-<h2><a name="Sample380">Sample 380: Writting your own custom mediation in Java</a></h2>
+<h2><a name="Sample380">Sample 380: Writting your own custom mediation in
+Java</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="fault"&gt;
@@ -3923,11 +4009,12 @@ Discounted price: 138.77458254967408</pre>
 
 <p></p>
 
-<h2><a name="XQuery">Evaluating XQuery for mediation (XQuery Mediator)</a></h2>
-
+<h2><a name="XQuery">Evaluating XQuery for mediation (XQuery
+Mediator)</a></h2>
 <!-- TODO: what goes in herer -->
 
-<h2><a name="Sample390">Sample 390: Introduction to the XQuery mediator</a></h2>
+<h2><a name="Sample390">Sample 390: Introduction to the XQuery
+mediator</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
@@ -3988,10 +4075,11 @@ this sample uses XQuery instead of XSLT for transformation.</p>
 
 <p></p>
 
-<h2><a name="Sample391">Sample 391: TODO: Find the topic</a></h2>
+<h2><a name="Sample391">Sample 391: How to use data from an external XML
+document with in XQuery </a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;!-- the SimpleURLRegistry allows access to  URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
         &lt;parameter name="root"&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
@@ -4038,12 +4126,12 @@ commission.xml document will be added and given as a new price .</p>
 <p>Invoke the client as follows. </p>
 <pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
 
-<h2><a name="Splitter">Splitting messages in to parts and process in
-parallel (Iterate / Clone)</a></h2>
-
+<h2><a name="Splitter">Splitting messages in to parts and process in parallel
+(Iterate / Clone)</a></h2>
 <!-- TODO: splitter declaration -->
 
-<h2><a name="Sample400">Sample 400: Message splitting and aggregating the responses</a></h2>
+<h2><a name="Sample400">Sample 400: Message splitting and aggregating the
+responses</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="SplitAggregateProxy"&gt;
@@ -4080,8 +4168,9 @@ parallel (Iterate / Clone)</a></h2>
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
 
-<p><b><strong>Objective: Demonstrate the use of Iterate mediator to split the messages in to
-parts and process them asynchronously and then aggreagate the responses coming in to synapse</strong></b></p>
+<p><b><strong>Objective: Demonstrate the use of Iterate mediator to split the
+messages in to parts and process them asynchronously and then aggreagate the
+responses coming in to synapse</strong></b></p>
 
 <p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
 sample Axis2 server and start it on port 9000.</p>
@@ -4089,26 +4178,34 @@ sample Axis2 server and start it on port 9000.</p>
 <p>Start Synapse with the sample configuration 400 (i.e. synapse -sample
 400).</p>
 
-<p>In this sample, the message sent to synapse has embeded with a number of elements of the same type
-in one message. When synapse received this message it will iterate through those elements and then sent
-to the specified endpoint. When all the responses appear in to synapse then those messages will be
-aggregated to form the resultant response and sent back to the client.</p>
+<p>In this sample, the message sent to synapse has embeded with a number of
+elements of the same type in one message. When synapse received this message
+it will iterate through those elements and then sent to the specified
+endpoint. When all the responses appear in to synapse then those messages
+will be aggregated to form the resultant response and sent back to the
+client.</p>
 
 <p>Invoke the client as follows. </p>
 <pre>ant stockquote -Daddurl=http://localhost:8080/soap/SplitAggregateProxy -Ditr=4</pre>
 
-<h2><a name="Aggregator">Aggregating messages and process in batch (Aggregate Mediator)</a></h2>
+<h2><a name="Aggregator">Aggregating messages and process in batch (Aggregate
+Mediator)</a></h2>
 
-<h2><a name="Sample410">Sample 410: Message aggregation for batch processing</a></h2>
+<h2><a name="Sample410">Sample 410: Message aggregation for batch
+processing</a></h2>
 
-<h2><a name="Cache">Caching the responses over the requests (Cache Mediator)</a></h2>
+<h2><a name="Cache">Caching the responses over the requests (Cache
+Mediator)</a></h2>
 
-<p>Cached mediator can be used to utilize the network bandwidth, to protect the backend service from
-being loaded with the same type of requests like browser refresh and also to speed up the
-execution of the webservice. This mediator should be used with sence, because it is not applicable
-for each and every services (for example services with dynamic responses for a particular release)</p>
+<p>Cached mediator can be used to utilize the network bandwidth, to protect
+the backend service from being loaded with the same type of requests like
+browser refresh and also to speed up the execution of the webservice. This
+mediator should be used with sence, because it is not applicable for each and
+every services (for example services with dynamic responses for a particular
+release)</p>
 
-<h2><a name="Sample420">Sample 420: Simple cache implemented on synapse for the actual service</a></h2>
+<h2><a name="Sample420">Sample 420: Simple cache implemented on synapse for
+the actual service</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
         &lt;cache timeout="20000" scope="per-host"
@@ -4127,8 +4224,9 @@ for each and every services (for example services with dynamic responses for a p
     &lt;/out&gt;
 &lt;/definitions&gt;</pre>
 
-<p><b><strong>Objective: Demonstrate the use of Cache mediator in order to cache the
-response and use that cached response as the response for an identical xml request</strong></b></p>
+<p><b><strong>Objective: Demonstrate the use of Cache mediator in order to
+cache the response and use that cached response as the response for an
+identical xml request</strong></b></p>
 
 <p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
 sample Axis2 server and start it on port 9000.</p>
@@ -4136,21 +4234,22 @@ sample Axis2 server and start it on port 9000.</p>
 <p>Start Synapse with the sample configuration 420 (i.e. synapse -sample
 420).</p>
 
-<p>In this sample, the message sent to synapse is checked for an existing cached response by
-calculating the hash value of the request. If there is a cache hit in synapse then this request
-will not be forwarded to the actual service, rather synapse respond to the client with the
-cached response. In case of a cache miss that particular message will be forwarded to the actual
-service and cached that response in the out path for the use of consecutive requests of the
-same type.</p>
+<p>In this sample, the message sent to synapse is checked for an existing
+cached response by calculating the hash value of the request. If there is a
+cache hit in synapse then this request will not be forwarded to the actual
+service, rather synapse respond to the client with the cached response. In
+case of a cache miss that particular message will be forwarded to the actual
+service and cached that response in the out path for the use of consecutive
+requests of the same type.</p>
 
 <p>To observe this behaviour, invoke the client as follows. </p>
 <pre>ant stockquote -Dtrpurl=http://localhost:8080/</pre>
 
-<p>You could notice that if you send more than one requests withing 20 seconds only the first request
-is forwarded to the actual service, and the rest of the requests will be served by the cache inside
-syanpse. You could observe this by looking at the priting line of the axis2 server, as well as by
-observing a constant rate as the response to the client instead of the random rate, which changes by
-each and every 20 seconds.</p>
-
+<p>You could notice that if you send more than one requests withing 20
+seconds only the first request is forwarded to the actual service, and the
+rest of the requests will be served by the cache inside syanpse. You could
+observe this by looking at the priting line of the axis2 server, as well as
+by observing a constant rate as the response to the client instead of the
+random rate, which changes by each and every 20 seconds.</p>
 </body>
 </html>

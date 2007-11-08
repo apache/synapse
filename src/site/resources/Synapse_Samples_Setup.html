@@ -246,7 +246,7 @@ transport URL for a message. Thus by specifying both of these properties, the
 client can operate in the 'smart client' mode, where the addressing EPR can
 specify the ultimate receiver, while the transport URL set to Synapse will
 ensure that any necessary mediation takes place before the message is
-delivered to the ultimate reciver. </p>
+delivered to the ultimate receiver. </p>
 <pre>e.g: ant stockquote -Daddurl=&lt;addressingEPR&gt; -Dtrpurl=&lt;synapse&gt;</pre>
 
 <h4>Gateway / Dumb Client Mode:</h4>
@@ -314,7 +314,7 @@ optimized message, and receive the same file again through the response and
 save it as a temporary file. The 'opt_mode' can specify 'mtom' or 'swa'
 respectively for the above mentioned optimizations. Optionally the path to a
 custom file can be specified through the 'opt_file' property, and the
-destination address canou be changed through the 'opt_url' property if
+destination address can be changed through the 'opt_url' property if
 required.</p>
 <pre>e.g. ant optimizeclient -Dopt_mode=[mtom | swa]</pre>
 

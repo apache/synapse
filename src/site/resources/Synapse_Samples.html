@@ -842,12 +842,8 @@ resource as
 caches its value for a period of 15000 ms.</p>
 
 <p>Execute the custom quote client as 'ant stockquote -Dmode=customquote ...'
-and analyze the the Synapse debug log output as shown below</p>
+and analyze the the Synapse debug log output</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
-<pre>[HttpServerWorker-1] DEBUG XSLTMediator - Performing XSLT transformation against property with key : xslt-key-req
-[HttpServerWorker-1] DEBUG XSLTMediator - Transformation source :
-    &lt;m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
-[HttpServerWorker-1] DEBUG XSLTMediator - Transformation result : &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;</pre>
 
 <p>The incoming message is now transformed into a standard stock quote
 request as expected by the SimpleStockQuoteService deployed on the local
@@ -1507,7 +1503,7 @@ sample Axis2 server as in sample 52. </p>
 <p></p>
 
 <p>Above configuration is same as the load balancing configuration in sample
-54, except that the session type is specified as "simpleClientSession". This
+52, except that the session type is specified as "simpleClientSession". This
 is a client initiated session, which means that the client generates the
 session identifier and send it to with each request. In this sample session
 type, client adds a SOAP header named ClientID containing the identifier of
@@ -1534,7 +1530,7 @@ for each request. Client output for the first 10 requests are shown below.</p>
 ... </pre>
 
 <p>You can see that session number 0 is always directed to the server named
-MyServer1. That means session number 1 is bound to MyServer3. Similarly
+MyServer1. That means session number 0 is bound to MyServer1. Similarly
 session 1 and 2 are bound to MyServer3 and MyServer2 respectively. </p>
 
 <h2><a name="Sample55">Sample 55: Session affinity load balancing between

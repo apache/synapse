@@ -2494,7 +2494,6 @@ order request to Synapse using HTTP as follows:</p>
 <p>The sample Axis2 server console will print a message indicating that it
 has accepted the order as follows:</p>
 <pre>Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</pre>
-<!--TODO: do we need to keep this as a seperate sample: no synapse activity in here-->
 
 <h2><a name="Sample252">Sample 252: Pure text/binary and POX message support
 with JMS</a></h2>
@@ -3722,12 +3721,8 @@ can verify this by looking at the Synapse console.</p>
 [HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
 [HttpServerWorker-5] INFO  LogMediator - text = **Access Denied** </pre>
 
-<h2><a name="Sample372">Sample 372:Use of both concurrency throttling and
+<h2><a name="Sample372">Sample 372: Use of both concurrency throttling and
 request rate based throttling </a></h2>
-<!-- TODO: what goes here -->
-
-<div>
-</div>
 <pre>&lt;!-- Use of both concurrency throttling and request rate based throttling --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -3807,7 +3802,11 @@ will be different due to affect of concurrency throttling.</p>
 </div>
 
 <h2><a name="Class">Extending the mediation in java (Class Mediator)</a></h2>
-<!-- TODO: Is there anything tpo go in here??? -->
+
+<p>Class mediator can be used to write your own custom mediation in java and you have the access to
+the SynapseMessageContext and all the synapse API in there. This is a good extending mechanism
+within synapse to extend it's functionality. This class can contain fields which can be fead by the
+configuration at runtime</p>
 
 <h2><a name="Sample380">Sample 380: Writting your own custom mediation in
 Java</a></h2>

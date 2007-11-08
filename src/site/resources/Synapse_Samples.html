@@ -261,7 +261,7 @@
       <li><a href="#Class">Extending the mediation in java (Class
         Mediator)</a> 
         <ul>
-          <li><a href="#Sample380">Sample 380: Writting your own custom
+          <li><a href="#Sample380">Sample 380: Writing your own custom
             mediation in Java</a></li>
         </ul>
       </li>
@@ -1140,7 +1140,7 @@ follows:</p>
 
 <p>The configuration now sets a local message context property, and forwards
 the message to 'http://localhost:9000/soap/MTOMSwASampleService' optimizing
-bindary content as MTOM. By sending this message through TCPMon you would be
+binary content as MTOM. By sending this message through TCPMon you would be
 able to see the actual message sent over the http transport if required. Thus
 during response processing, by checking the local message property Synapse
 could identify the past information about the current message context, and
@@ -1706,12 +1706,12 @@ and port is listed below.</p>
 
 <p>Specified service and port refers to the endpoint address
 "http://localhost:9000/soap/SimpleStockQuoteService" according to the above
-WSDL. Now run the client using the below command.</p>
+WSDL. Now run the client using the following command.</p>
 <pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
 
 <p>Client will print the quote price for IBM received from the server running
 on port 9000. Observe the Axis2 console and the Synapse console to verify
-this behavoir.</p>
+this behavior.</p>
 
 <h1><a name="MessageMediationQoS">Quality of Service addition or deduction
 samples in message mediation</a></h1>
@@ -2233,7 +2233,7 @@ were there as in the original message to synapse from client, and that the
 response received does use WS-Security, and forwarded back to the client
 without any modification. You should note that this wont be a security hole
 because the message inside synapse is signed and encrypted and can only be
-forwarded to a secure service to be usefull.</p>
+forwarded to a secure service to be useful.</p>
 
 <h1><a name="ProxyServiceQoS">QoS addition and deduction for service
 mediation (proxy) samples</a></h1>
@@ -2931,10 +2931,10 @@ you want to run this task by adding a count attribute with an integer as the
 value, if the count is not present as in this sample this task will run
 forever.</p>
 
-<p>One can write his own task class implmenting the
+<p>One can write his own task class implementing the
 org.apache.synapse.startup.Task interface and implementing the execute method
-to do the task. For this particualr sample we have used the MessageInjector
-which just injects a message specified in to the synapse enviorenemnt.</p>
+to do the task. For this particular sample we have used the MessageInjector
+which just injects a message specified in to the synapse environment.</p>
 
 <h1><a name="AdvancedMediation">Advanced mediations with advanced
 mediators</a></h1>
@@ -3098,7 +3098,7 @@ languages</strong></p>
 
 <p></p>
 
-<p>This example shows how an inline Javascript mediator script could access
+<p>This example shows how an inline JavaScript mediator script could access
 the Synapse message context API to set its 'To' EPR and to set a custom
 property to mark it as a response. Execute the stock quote client, and you
 will receive the response "99.9" as the last sale price as per the above
@@ -3799,12 +3799,13 @@ will be different due to affect of concurrency throttling.</p>
 
 <h2><a name="Class">Extending the mediation in java (Class Mediator)</a></h2>
 
-<p>Class mediator can be used to write your own custom mediation in java and you have the access to
-the SynapseMessageContext and all the synapse API in there. This is a good extending mechanism
-within synapse to extend it's functionality. This class can contain fields which can be fead by the
-configuration at runtime</p>
+<p>Class mediator can be used to write your own custom mediation in Java and
+you have access to the SynapseMessageContext and all the Synapse API in
+there. This is a useful extension mechanism within Synapse to extend its
+functionality. This class can contain fields for which you can assign values
+at runtime through the configuration.</p>
 
-<h2><a name="Sample380">Sample 380: Writting your own custom mediation in
+<h2><a name="Sample380">Sample 380: Writing your own custom mediation in
 Java</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -3955,8 +3956,8 @@ sequence, with the message context of the current message as the parameter.
 All the details of the message including the SOAP headers, SOAP body and
 properties of the context hierarchy can be accessed from the message context.
 In this sample, the body of the message is retrieved and the discount
-percentage is substracted from the quote price. If the quote request number
-is less than the number specified in the "bonusFor" property in the
+percentage is subtracted from the quote price. If the quote request number is
+less than the number specified in the "bonusFor" property in the
 configuration, a special discount is given.</p>
 
 <p></p>
@@ -4136,7 +4137,7 @@ responses</a></h2>
 &lt;/definitions&gt;</pre>
 
 <p><b><strong>Objective: Demonstrate the use of Iterate mediator to split the
-messages in to parts and process them asynchronously and then aggreagate the
+messages in to parts and process them asynchronously and then aggregate the
 responses coming in to synapse</strong></b></p>
 
 <p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
@@ -4145,7 +4146,7 @@ sample Axis2 server and start it on port 9000.</p>
 <p>Start Synapse with the sample configuration 400 (i.e. synapse -sample
 400).</p>
 
-<p>In this sample, the message sent to synapse has embeded with a number of
+<p>In this sample, the message sent to synapse has embedded with a number of
 elements of the same type in one message. When synapse received this message
 it will iterate through those elements and then sent to the specified
 endpoint. When all the responses appear in to synapse then those messages
@@ -4166,10 +4167,10 @@ Mediator)</a></h2>
 
 <p>Cached mediator can be used to utilize the network bandwidth, to protect
 the backend service from being loaded with the same type of requests like
-browser refresh and also to speed up the execution of the webservice. This
-mediator should be used with sence, because it is not applicable for each and
-every services (for example services with dynamic responses for a particular
-release)</p>
+browser refresh actions and also to speed up the execution of the web
+service. This mediator should be used with sence, because it is not
+applicable for each and every service (for example services with dynamic
+responses for a particular release)</p>
 
 <h2><a name="Sample420">Sample 420: Simple cache implemented on synapse for
 the actual service</a></h2>
@@ -4212,11 +4213,11 @@ requests of the same type.</p>
 <p>To observe this behaviour, invoke the client as follows. </p>
 <pre>ant stockquote -Dtrpurl=http://localhost:8080/</pre>
 
-<p>You could notice that if you send more than one requests withing 20
-seconds only the first request is forwarded to the actual service, and the
-rest of the requests will be served by the cache inside syanpse. You could
-observe this by looking at the priting line of the axis2 server, as well as
-by observing a constant rate as the response to the client instead of the
-random rate, which changes by each and every 20 seconds.</p>
+<p>You could notice that if you send more than one requests within 20 seconds
+only the first request is forwarded to the actual service, and the rest of
+the requests will be served by the cache inside Synapse. You could observe
+this by looking at the printed line of the axis2 server, as well as by
+observing a constant rate as the response to the client instead of the random
+rate, which changes by each and every 20 seconds.</p>
 </body>
 </html>

@@ -149,8 +149,8 @@
         with the Registry</a></li>
       <li><a href="#Sample11">Sample 11: A full registry based configuration,
         and sharing a configuration between multiple instances</a></li>
-      <li><a href="#Sample12">Sample 12: One way messaging / 
-        fireAndForget through synapse</a></li>
+      <li><a href="#Sample12">Sample 12: One way messaging / fireAndForget
+        through synapse</a></li>
     </ul>
   </li>
   <li><a href="#Endpoints">Advanced mediations with endpoints</a> 
@@ -203,7 +203,8 @@
     <ul>
       <li><a href="#Sample250">Sample 250: Introduction to switching
         transports - JMS to http/s</a></li>
-      <li><a href="#Sample251">Sample 251: Switching from http/s to JMS</a></li>
+      <li><a href="#Sample251">Sample 251: Switching from http/s to
+      JMS</a></li>
       <li><a href="#Sample252">Sample 252: Pure text/binary and POX message
         support with JMS</a></li>
       <li><a href="#Sample253">Sample 253: One way bridging from JMS to http
@@ -1029,9 +1030,11 @@ moment. i.e. it is not reloading itself) </p>
     &lt;send/&gt;
 &lt;/definitions&gt;</pre>
 
-<h2><a name="Sample12">Sample 12: One way messaging / fireAndForget through synapse</a></h2>
+<h2><a name="Sample12">Sample 12: One way messaging / fireAndForget through
+synapse</a></h2>
 
-<p><strong>Objective: Demonstrate one way messaging / fireAndForget through synapse</strong></p>
+<p><strong>Objective: Demonstrate one way messaging / fireAndForget through
+synapse</strong></p>
 
 <p><strong>Prerequisites:</strong><br>
 Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
@@ -3175,38 +3178,12 @@ check the received stock quote response.</p>
 
 <h2><a name="DBMediators">Database interactions in mediation (DBLookup /
 DBReport)</a></h2>
-<!--TODO: These set up instructions should go to the Samples-Setup guide and there should be a link from here -->
 
 <p>Following database mediators use Derby in a client/server configuration by
 using the network server. Therefore, to proceed with the following samples,
-you need a working Derby database server and you have to follow the following
-steps before going through the samples.</p>
-<ol>
-  <li>Set up and start the Derby network server</li>
-  <li>Create and open a connection to the database using the Derby client
-    driver 
-    <p>CONNECT
-    'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</p>
-  </li>
-  <li>Create a table using the following statement 
-    <p>create table company(name varchar(10), id varchar(10), price
-    double);</p>
-  </li>
-  <li>Inserts some data using following statements 
-    <p>insert into company values ('IBM','c1',0.0);</p>
-    <p>insert into company values ('SUN','c2',0.0);</p>
-    <p>insert into company values ('MSFT','c3',0.0);</p>
-  </li>
-</ol>
-
-<p>When using Derby, you need to add derby.jar, derbyclient.jar and
-derbynet.jar to the classpath. This can be done by putting the above three
-jars into the Synapse lib directory. For testing these samples Derby 10.1.1.0
-binary distribution was used.</p>
-
-<p>You can use any other database product instead of Derby. Then you have to
-change the database connection details accordingly. Also you have to copy the
-required database driver jars to the Synapse classpath.</p>
+you need a working Derby database server and you have to follow the steps in
+<a href="Synapse_Samples_Setup.html#derby">Sample Setup Guide</a> before going
+through the samples.</p>
 
 <p></p>
 
@@ -3795,8 +3772,7 @@ request rate based throttling </a></h2>
         &lt;/target&gt;
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
     &lt;/proxy&gt;
-&lt;/definitions&gt;
-</pre>
+&lt;/definitions&gt;</pre>
 
 <div>
 </div>
@@ -3826,8 +3802,7 @@ according to the policy.</p>
 will be different due to affect of concurrency throttling.</p>
 </div>
 
-<h2><a name="Class">Extending the mediation in java (Class
-Mediator)</a></h2>
+<h2><a name="Class">Extending the mediation in java (Class Mediator)</a></h2>
 <!-- TODO: Is there anything tpo go in here??? -->
 
 <h2><a name="Sample380">Sample 380: Writting your own custom mediation in
@@ -4180,13 +4155,13 @@ client.</p>
 
 <p>Invoke the client as follows. </p>
 <pre>ant stockquote -Daddurl=http://localhost:8080/soap/SplitAggregateProxy -Ditr=4</pre>
-
 <!--<h2><a name="Aggregator">Aggregating messages and process in batch (Aggregate-->
 <!--Mediator)</a></h2>-->
 <!---->
 <!--<h2><a name="Sample410">Sample 410: Message aggregation for batch-->
 <!--processing</a></h2>-->
 <!---->
+
 <h2><a name="Cache">Caching the responses over the requests (Cache
 Mediator)</a></h2>
 

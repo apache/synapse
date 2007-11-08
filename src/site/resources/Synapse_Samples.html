@@ -149,6 +149,8 @@
         with the Registry</a></li>
       <li><a href="#Sample11">Sample 11: A full registry based configuration,
         and sharing a configuration between multiple instances</a></li>
+      <li><a href="#Sample12">Sample 12: One way messaging / 
+        fireAndForget through synapse</a></li>
     </ul>
   </li>
   <li><a href="#Endpoints">Advanced mediations with endpoints</a> 
@@ -201,10 +203,7 @@
     <ul>
       <li><a href="#Sample250">Sample 250: Introduction to switching
         transports - JMS to http/s</a></li>
-      <li><a href="#Sample251">Sample 251: Switching from http/s to
-      JMS</a></li>
-      <li><a href="#Sample112">Sample 112: One way messaging /
-        fireAndForget()</a></li>
+      <li><a href="#Sample251">Sample 251: Switching from http/s to JMS</a></li>
       <li><a href="#Sample252">Sample 252: Pure text/binary and POX message
         support with JMS</a></li>
       <li><a href="#Sample253">Sample 253: One way bridging from JMS to http
@@ -1030,7 +1029,27 @@ moment. i.e. it is not reloading itself) </p>
     &lt;send/&gt;
 &lt;/definitions&gt;</pre>
 
-<p></p>
+<h2><a name="Sample12">Sample 12: One way messaging / fireAndForget through synapse</a></h2>
+
+<p><strong>Objective: Demonstrate one way messaging / fireAndForget through synapse</strong></p>
+
+<p><strong>Prerequisites:</strong><br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)<br>
+Start the Synapse configuration numbered 1: i.e. synapse -sample 1</p>
+
+<p>This example invokes the one-way 'placeOrder' operation on the
+SimpleStockQuoteService using the custom client which uses the Axis2
+ServiceClient.fireAndForget() API. To test this, use 'ant
+-Dmode=placeorder...' and you will notice the one way message flowing through
+Synapse into the sample Axis2 server instance, which reports the acceptance
+of the order as follows:</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=placeorder</pre>
+<pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
+
+<p>If you send your client request through TCPmon, you will notice that the
+SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
+Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
 
 <h1><a name="Endpoints">Advanced mediations with endpoints</a></h1>
 
@@ -2473,32 +2492,6 @@ order request to Synapse using HTTP as follows:</p>
 has accepted the order as follows:</p>
 <pre>Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</pre>
 <!--TODO: do we need to keep this as a seperate sample: no synapse activity in here-->
-
-<div style="color:red">
-<h2><a name="Sample112">Sample 112: One way messaging /
-fireAndForget()</a></h2>
-
-<p><strong>Objective: Demonstrate one way messaging /
-fireAndForget()</strong></p>
-
-<p><strong>Prerequisites:</strong><br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)<br>
-Start the Synapse configuration numbered 1: i.e. synapse -sample 1</p>
-
-<p>This example invokes the one-way 'placeOrder' operation on the
-SimpleStockQuoteService using the custom client which uses the Axis2
-ServiceClient.fireAndForget() API. To test this, use 'ant
--Dmode=placeorder...' and you will notice the one way message flowing through
-Synapse into the sample Axis2 server instance, which reports the acceptance
-of the order as follows:</p>
-<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dmode=placeorder</pre>
-<pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
-
-<p>If you send your client request through TCPmon, you will notice that the
-SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
-Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
-</div>
 
 <h2><a name="Sample252">Sample 252: Pure text/binary and POX message support
 with JMS</a></h2>

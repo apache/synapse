@@ -482,5 +482,38 @@ The JRuby JAR can be downloaded from <a
 href="http://repo1.maven.org/maven2/org/jruby/jruby-complete/">here</a>.</p>
 
 <p></p>
+
+<h2 id="derby">Setting up Derby database server</h2>
+
+<p>You can download Apache Derby distribution from <a
+href="http://db.apache.org/derby/">http://db.apache.org/derby/</a></p>
+<ol>
+  <li>Set up and start the Derby network server</li>
+  <li>Create and open a connection to the database using the Derby client
+    driver 
+    <p>CONNECT
+    'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</p>
+  </li>
+  <li>Create a table using the following statement 
+    <p>create table company(name varchar(10), id varchar(10), prize
+    double);</p>
+  </li>
+  <li>Inserts some data using following statements 
+    <p>insert into company values ('IBM','c1',0.0);</p>
+    <p>insert into company values ('SUN','c2',0.0);</p>
+    <p>insert into company values ('MSFT','c3',0.0);</p>
+  </li>
+</ol>
+
+<p>When using Derby, you need to add derby.jar, derbyclient.jar and
+derbynet.jar to the classpath. This can be done by putting the above three
+jars into the Synapse lib directory. For testing these samples Derby 10.1.1.0
+binary distribution was used.</p>
+
+<p>You can use any other database product instead of Derby. Then you have to
+change the database connection details accordingly. Also you have to copy the
+required database driver jars to the Synapse classpath.</p>
+
+<p></p>
 </body>
 </html>

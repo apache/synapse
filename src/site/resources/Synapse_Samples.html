@@ -3182,8 +3182,8 @@ DBReport)</a></h2>
 <p>Following database mediators use Derby in a client/server configuration by
 using the network server. Therefore, to proceed with the following samples,
 you need a working Derby database server and you have to follow the steps in
-<a href="Synapse_Samples_Setup.html#derby">Sample Setup Guide</a> before going
-through the samples.</p>
+<a href="Synapse_Samples_Setup.html#derby">Sample Setup Guide</a> before
+going through the samples.</p>
 
 <p></p>
 
@@ -3371,7 +3371,7 @@ envelope. Then 'id' base switching will be done by a switch mediator.</p>
                     &lt;/pool&gt;
                 &lt;/connection&gt;
                 &lt;statement&gt;
-                    &lt;sql&gt;update company set prize=? where name =?&lt;/sql&gt;
+                    &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt;
                     &lt;parameter expression="//m0:return/m0:last/child::text()"
                                xmlns:m0="http://services.samples/xsd" type="DOUBLE"/&gt;
                     &lt;parameter expression="//m0:return/m0:symbol/child::text()"
@@ -3412,7 +3412,7 @@ mediator.</p>
 
 <p>and then execute the following query using database client tool against
 synapsedb.</p>
-<pre>select prize from company where name='IBM';</pre>
+<pre>select price from company where name='IBM';</pre>
 
 <p>It will show some value as follows.</p>
 <pre>96.39535981018865</pre>
@@ -3449,7 +3449,7 @@ together</a></h2>
                     &lt;/pool&gt;
                 &lt;/connection&gt;
                 &lt;statement&gt;
-                    &lt;sql&gt;update company set prize=? where name =?&lt;/sql&gt;
+                    &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt;
                     &lt;parameter expression="//m0:return/m0:last/child::text()"
                                xmlns:m0="http://services.samples/xsd" type="DOUBLE"/&gt;
                     &lt;parameter expression="//m0:return/m0:symbol/child::text()"
@@ -3473,12 +3473,12 @@ together</a></h2>
                     &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
                     &lt;parameter expression="//m0:return/m0:symbol/child::text()"
                                xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
-                    &lt;result name="stock_prize" column="prize"/&gt;
+                    &lt;result name="stock_price" column="price"/&gt;
                 &lt;/statement&gt;
             &lt;/dblookup&gt;
             &lt;log level="custom"&gt;
                 &lt;property name="text"
-                          expression="fn:concat('Stock Prize - ',get-property('stock_prize'))"/&gt;
+                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/&gt;
             &lt;/log&gt;
             &lt;send/&gt;
         &lt;/out&gt;
@@ -3507,7 +3507,7 @@ company database and logs it.</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
 
 <p>Synapse console shows,</p>
-<pre>INFO LogMediator text = ** Reporting to the Database **<br><br>...<br><br>INFO LogMediator text = ** Looking up from the Database **<br><br>...<br><br>INFO LogMediator text = Stock Prize - 153.47886496064808</pre>
+<pre>INFO LogMediator text = ** Reporting to the Database **<br><br>...<br><br>INFO LogMediator text = ** Looking up from the Database **<br><br>...<br><br>INFO LogMediator text = Stock price - 153.47886496064808</pre>
 
 <p></p>
 
@@ -3584,7 +3584,11 @@ for messages. In this sample policy contains only component called
 request that may have passed through the synapse on a single unit of time. To
 test concurrency throttling ,it is required to send concurrent request to
 synapse. For synapse with above configuration ,if client send 20 request
-concurrently ,then approximately half of those will success..</p>
+concurrently ,then approximately half of those will success. The client
+command is as follows.</p>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/</pre>
+
+<p></p>
 
 <h2><a name="Sample371">Sample 371: Restricting requests based on policies
 </a></h2>
@@ -3699,7 +3703,7 @@ in "UnitTime" tag. "ProhibitTimePeriod" tag specifies the time period to
 prohibit further requests after the received request count exceeds the
 specified time. Now run the client 5 times repetitively using the following
 command to see how throttling works.</p>
-<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/</pre>
 
 <p>For the first four requests you will get the quote prices for IBM as
 follows.</p>

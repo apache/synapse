@@ -81,7 +81,7 @@ public class HttpCoreNIOListener implements TransportListener {
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
                 public boolean handle(IOException ioException) {
-                    log.warn(" may be unstable: IOReactor encountered a checked exception : " +
+                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
                         ioException.getMessage(), ioException);
                     return true;
                 }

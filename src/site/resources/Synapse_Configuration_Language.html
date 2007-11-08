@@ -177,7 +177,7 @@ then listens for messages over the selected transports by exposing a virtual
 service. A proxy service maybe a SOAP or POX service over http/s or SOAP, POX
 or Plain Text service for other transports such as JMS and VFS - e.g. CSV
 content being its payload. Thus Synapse is able to switch between these
-message formats and transports, as well as intrduce or terminate QoS aspects
+message formats and transports, as well as introduce or terminate QoS aspects
 such as WS-Security/RM through proxy services. </p>
 
 <p></p>
@@ -229,7 +229,7 @@ registry.</p>
    &lt;parameter name="string"&gt;text | xml&lt;/parameter&gt;*
  &lt;/registry&gt;</pre>
 
-<p>Registry entries loaded from a remote registry are cached within Synapase
+<p>Registry entries loaded from a remote registry are cached within Synapse
 as dictated by the registry, and reloaded after the cache periods expires.
 Hence it is possible to define configuration elements such as (dynamic)
 sequences and endpoints, as well as resources such as XSLT's or XSDs off the
@@ -250,7 +250,7 @@ function "synapse:get-property(prop-name)".</p>
 
 <p>An entry can be static text specified as inline text or static XML
 specified as an inline XML fragment or specified as a URL (using the src
-attribute). These local entries can overide any existing entries with the
+attribute). These local entries can override any existing entries with the
 same keys of the remote registry. </p>
 
 <p></p>
@@ -278,7 +278,7 @@ encounters an erroneous situation while processing a message through a
 sequence, it executes the defined error handling sequence for the current
 context - which may be specified as the 'onError' sequence for a sequence
 mediator. If a fault sequence is not specified or cannot be found through the
-registry, Synapse will create a defualt fault sequence that will perform a
+registry, Synapse will create a default fault sequence that will perform a
 default logging of the message at the log level 'full'.</p>
 
 <p>If an optional error handler sequence name is specified on any sequence
@@ -306,7 +306,7 @@ load balanced endpoint or a fail-over endpoint as follows:</p>
 &lt;/endpoint&gt; </pre>
 
 <p>All above endpoint types can have a name attribute. Such named endpoints
-can be reffered by other endpoints, which only contain the key attribute. For
+can be refered by other endpoints, which only contain the key attribute. For
 example if there is an endpoint named as "foo", following endpoint can be
 used in any place, where "foo" has to be used. A tracing enabled endpoint
 would generate trace information into the trace log for each message that
@@ -353,7 +353,7 @@ and responses will not be processed after that.</p>
 <h4><a name="wsdl-endpoint">WSDL Endpoint</a></h4>
 
 <p>WSDL endpoint is an endpoint based on a WSDL document. It can extract the
-target EPR from a given WSDL. The WSDL document can be specifed either as a
+target EPR from a given WSDL. The WSDL document can be specified either as a
 URI or as an inlined definition within the configuration. The service and
 port name containing the target EPR has to be specified in service and port
 attributes respectively. enableRM, enableSec, enableAddressing,
@@ -409,7 +409,7 @@ following failover behavior. At the start, first listed endpoint is selected
 as the primary and all other endpoints are treated as backups. Incoming
 messages are always sent only to the primary endpoint. If the primary
 endpoint fails, next active endpoint is selected as the primary and failed
-endpoint is marked as incative. Thus it sends messages successfully as long
+endpoint is marked as inactive. Thus it sends messages successfully as long
 as there is at least one active endpoint among the listed endpoints.</p>
 <pre>&lt;failover&gt;
   &lt;endpoint .../&gt;+
@@ -707,7 +707,7 @@ be logged.</p>
   <li>custom = Only properties specified to the Log mediator</li>
 </ul>
 
-<p>A separator if defined will be used to seperate the attributes being
+<p>A separator if defined will be used to separate the attributes being
 logged. The default separator is the ',' comma.</p>
 
 <p></p>
@@ -910,7 +910,7 @@ statement, and then set some resulting values as local message properties on
 the message context. The DB connection used maybe looked up from an external
 DataSource or specified in-line, in which case an Apache DBCP connection pool
 is established and used. Apache DBCP connection pools support the following
-propeties:</p>
+properties:</p>
 <ul>
   <li>autocommit = true | false</li>
   <li>isolation = Connection.TRANSACTION_NONE |
@@ -1002,12 +1002,12 @@ specified, 1.0 or 1.1. </p>
 <p></p>
 
 <p>The Throttle mediator can be used for rate limiting as well as concurrency
-based limiting. A WS-Policy dictates the throttling configuation and may be
-specified inline or loaded from the reistry. The Throttle mediator could be
+based limiting. A WS-Policy dictates the throttling configuration and may be
+specified inline or loaded from the registry. The Throttle mediator could be
 added in the request path for rate limiting and concurrent access limitation.
 When using for concurrent access limitation, the same throttle mediator ID
 must be triggered on the response flow so that completed responses are
-deducted from the available limit. The aceeptance or rejection sequence is
+deducted from the available limit. The acceptance or rejection sequence is
 executed depending on the evaluation of the throttling policy against the
 current message.</p>
 
@@ -1042,7 +1042,7 @@ type defined by the JSR-000225 (XQJ API). The supported types are:</p>
 <p>The expressions will be evaluated against the current SOAP envelope.</p>
 
 <h4><a name="cache">Cache</a></h4>
-<pre> &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="mili-seconds"&gt;
+<pre> &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="milliseconds"&gt;
    &lt;onCacheHit (sequence="key")?&gt;
      (mediator)+
    &lt;/onCacheHit&gt;
@@ -1070,8 +1070,8 @@ sequence which can be specified inline or refered to the registry. </p>
 
 <p>The &lt;clone&gt; mediator closely resembles the Message Splitter EIP and
 will split the message into number of identical messages all of which are
-identical with the clonning message and processed parallely using either the
-specified sequence or endpoint (or both). Clonning message (parent) can be
+identical with the cloning message and processed parallelly using either the
+specified sequence or endpoint (or both). Cloning message (parent) can be
 continued or dropped depending on the boolean value of the continueParent
 attribute which defaults to false and drops the parent when false. This drop
 is not a general drop, rather stop the message processing but does not closes
@@ -1094,7 +1094,7 @@ responses to be sent back to the caller</p>
 message in to number of different messages derived from the parent message by
 finding the matching elements of the XPATH expression specified in the
 configuration. New messages will be created for each and every matching
-element and processed parallely using either the specified sequence or
+element and processed parallelly using either the specified sequence or
 endpoint or both. Parent message can be continued or dropped in the same way
 as in the clone mediator. Iterate parent drop also is a channel blocking drop
 as per in the clone mediator.</p>

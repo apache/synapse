@@ -54,10 +54,7 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.reactor.ConnectingIOReactor;
-import org.apache.http.nio.reactor.IOEventDispatch;
-import org.apache.http.nio.reactor.SessionRequest;
-import org.apache.http.nio.reactor.SessionRequestCallback;
+import org.apache.http.nio.reactor.*;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -75,7 +72,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /** The Axis2 configuration context */
     private ConfigurationContext cfgCtx;
     /** The IOReactor */
-    private ConnectingIOReactor ioReactor = null;
+    private DefaultConnectingIOReactor ioReactor = null;
     /** The client handler */
     private NHttpClientHandler handler = null;
     /** The session request callback that calls back to the message receiver with errors */
@@ -117,6 +114,19 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         try {
             ioReactor = new DefaultConnectingIOReactor(
                 NHttpConfiguration.getInstance().getClientIOWorkers(), params);
+            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                public boolean handle(IOException ioException) {
+                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
+                        ioException.getMessage(), ioException);
+                    return true;
+                }
+
+                public boolean handle(RuntimeException runtimeException) {
+                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
+                        runtimeException.getMessage(), runtimeException);
+                    return true;
+                }
+            });
         } catch (IOException e) {
             log.error("Error starting the IOReactor", e);
         }

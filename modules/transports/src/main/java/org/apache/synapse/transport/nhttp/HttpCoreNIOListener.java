@@ -40,6 +40,7 @@ import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.ListeningIOReactor;
+import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -55,7 +56,7 @@ public class HttpCoreNIOListener implements TransportListener {
     /** The Axis2 configuration context */
     private ConfigurationContext cfgCtx;
     /** The IOReactor */
-    private ListeningIOReactor ioReactor = null;
+    private DefaultListeningIOReactor ioReactor = null;
 
     /** The EPR prefix for services available over this transport */
     private String serviceEPRPrefix;
@@ -77,6 +78,20 @@ public class HttpCoreNIOListener implements TransportListener {
         try {
             ioReactor = new DefaultListeningIOReactor(
                 NHttpConfiguration.getInstance().getServerIOWorkers(), params);
+
+            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                public boolean handle(IOException ioException) {
+                    log.warn(" may be unstable: IOReactor encountered a checked exception : " +
+                        ioException.getMessage(), ioException);
+                    return true;
+                }
+
+                public boolean handle(RuntimeException runtimeException) {
+                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
+                        runtimeException.getMessage(), runtimeException);
+                    return true;
+                }
+            });
         } catch (IOException e) {
             log.error("Error starting the IOReactor", e);
         }

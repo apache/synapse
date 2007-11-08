@@ -30,6 +30,23 @@ Apache Synapse 1.1 Release Notes
     
 7. Known Issues and limitations
 
+    SYNAPSE-174 - The non-blocking http/s transports cannot handle WS-RM requests
+        - Caused by the NIO http/s transport being out of sync with the latest Sandesh2 codebase
+
+    SYNAPSE-170 - VFS transport listener sample - In the response sent via email, all tags define the same namespace
+        - Caused by an Axis2 Mail transport limitation
+
+    SYNAPSE-161 - Can't persuade Rampart to send certificate serial + issuer - only either BinaryToken or Identity
+        - Issue related to Apache Rampart
+        
+    SYNAPSE-103 - WS-RM not returning response message
+        - related to SYNAPSE-174
+
+    The Synapse JMS implementation supports JMS 1.0.2b, however due to licensing issues we include
+    the JMS 1.1 spec JAR from Apache Geronimo (geronimo-jms_1.1_spec-1.1.jar) instead. If you have
+    any issues with JMS 1.0.x, please download the Sun JMS 1.0.2b JAR and replace supplied JAR from
+    Geronimo.
+
 8. Frequently asked questions
 
   * How can I change the default logging level of Synapse?

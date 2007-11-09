@@ -148,9 +148,8 @@ public class AcknowledgementProcessor {
 			return;
 		}
 		
-		String replyToAddress = rmsBean.getReplyToEPR();
-		EndpointReference replyTo = new EndpointReference (replyToAddress);
-		boolean anonReplyTo = replyTo.hasAnonymousAddress();
+		EndpointReference replyTo = rmsBean.getReplyToEndpointReference();
+		boolean anonReplyTo = replyTo==null || replyTo.hasAnonymousAddress();
 		
 		String rmVersion = rmMsgCtx.getRMSpecVersion();
 		
@@ -186,7 +185,7 @@ public class AcknowledgementProcessor {
 							// Check we haven't got an Ack for a message that hasn't been sent yet !
 							if (retransmitterBean.getSentCount() == 0) {
 								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
-										storageManager, piggybackedAck);
+										storageManager, piggybackedAck, null); //do not want to send the fault to acksTo in this case
 								if (log.isDebugEnabled())
 									log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack");
 								return;

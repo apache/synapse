@@ -79,9 +79,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			if (createSeqPart == null) {
 				if (log.isDebugEnabled())
 					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts));
-				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
-																										SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts), 
-																										new Exception());
+				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts), 
+																										new Exception(), null);
 				// Return false if an Exception hasn't been thrown.
 				if (log.isDebugEnabled())
 					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
@@ -114,7 +113,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			if (toEPR.hasAnonymousAddress()) {
 	
 				RMSBean findBean = new RMSBean ();
-				findBean.setReplyToEPR(toEPR.getAddress());
+				findBean.setReplyToEndpointReference(toEPR);
 				findBean.setTerminationPauserForCS(true);
 				
 				//TODO recheck
@@ -125,7 +124,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					if (requestSideRefMessage==null) {
 						FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
 								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getInternalSequenceID()),
-								new Exception());						
+								new Exception(), null);						
 						// Return false if an Exception hasn't been thrown.
 						if (log.isDebugEnabled())
 							log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
@@ -164,9 +163,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				if (accept == null) {
 					if (log.isDebugEnabled())
 						log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart));
-					FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
-																											SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart), 
-																											new Exception());
+					FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart), 
+																new Exception(),
+																null);
 					// Return false if an Exception hasn't been thrown.
 					if (log.isDebugEnabled())
 						log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
@@ -189,9 +188,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// this is a dummy value
 					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
 						
-					rMSBean.setToEPR(rmdBean.getToEPR());
-					rMSBean.setAcksToEPR(rmdBean.getToEPR());  // The acks need to flow back into this endpoint
-					rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
+					rMSBean.setToEndpointReference(rmdBean.getToEndpointReference());
+					rMSBean.setAcksToEndpointReference(rmdBean.getToEndpointReference());  // The acks need to flow back into this endpoint
+					rMSBean.setReplyToEndpointReference(rmdBean.getReplyToEndpointReference());
 					rMSBean.setLastActivatedTime(System.currentTimeMillis());
 					rMSBean.setRMVersion(rmdBean.getRMVersion());
 					rMSBean.setClientCompletedMessages(new RangeString());
@@ -216,9 +215,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// If this new sequence has anonymous acksTo, then we must poll for the acks
 					// If the inbound sequence is targetted at the WSRM anonymous URI, we need to start
 					// polling for this sequence.
-					String acksTo = rMSBean.getAcksToEPR();
-					EndpointReference reference = new EndpointReference(acksTo);
-					if ((acksTo == null || reference.hasAnonymousAddress()) &&
+					EndpointReference reference = rMSBean.getAcksToEndpointReference();
+					if ((reference == null || reference.hasAnonymousAddress()) &&
 						Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqRMMsg.getRMSpecVersion())) {
 						rMSBean.setPollingMode(true);
 					}
@@ -265,7 +263,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			catch(AxisFault e){
 				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
 						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCreateSeqResponse, 
-																						 SandeshaUtil.getStackTraceFromException(e)), e);
+													     SandeshaUtil.getStackTraceFromException(e)), 
+													     e,
+													     rmdBean.getAcksToEndpointReference());
 				// Return false if an Exception hasn't been thrown.
 				if (log.isDebugEnabled())
 					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
@@ -291,7 +291,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			if (createSeqRMMsg.getMessageContext().getProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME) == null && 
 					createSeqRMMsg.getMessageContext().getProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME) == null) {
 				// Add the fault details to the message
-				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, SandeshaUtil.getStackTraceFromException(e), e);				
+				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, SandeshaUtil.getStackTraceFromException(e), e, null);				
 				
 				// Return false if an Exception hasn't been thrown.
 				if (log.isDebugEnabled())

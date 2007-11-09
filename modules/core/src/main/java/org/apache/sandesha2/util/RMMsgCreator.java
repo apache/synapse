@@ -128,11 +128,8 @@ public class RMMsgCreator {
 		}
 		
 		// If acksTo has not been set, then default to anonymous, using the correct spec level
-		EndpointReference acksToEPR = null;
-		String acksToAddress = rmsBean.getAcksToEPR();
-		if(acksToAddress != null) {
-			acksToEPR = new EndpointReference(acksToAddress);
-		} else {
+		EndpointReference acksToEPR = rmsBean.getAcksToEndpointReference();
+		if(acksToEPR == null){
 			acksToEPR = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
 		}
 		
@@ -195,22 +192,17 @@ public class RMMsgCreator {
 				offerPart.setEndpoint(endpoint);
 			}
 		}
-		
-		String to = rmsBean.getToEPR();
-		String replyTo = rmsBean.getReplyToEPR();
 
-		if (to == null) {
+		EndpointReference toEPR = rmsBean.getToEndpointReference();
+		if (toEPR == null || toEPR.getAddress()==null) {
 			String message = SandeshaMessageHelper
 					.getMessage(SandeshaMessageKeys.toBeanNotSet);
 			throw new SandeshaException(message);
 		}
-
-		// TODO store and retrieve a full EPR instead of just the address.
-		EndpointReference toEPR = new EndpointReference(to);
 		createSeqRMMsg.setTo(toEPR);
 
-		if(replyTo != null) {
-			EndpointReference replyToEPR = new EndpointReference(replyTo);
+		EndpointReference replyToEPR = rmsBean.getReplyToEndpointReference();
+		if(replyToEPR != null) {
 			replyToEPR = SandeshaUtil.getEPRDecorator(createSeqRMMsg.getConfigurationContext()).decorateEndpointReference(replyToEPR);
 			createSeqRMMsg.setReplyTo(replyToEPR);
 		}
@@ -305,7 +297,7 @@ public class RMMsgCreator {
 		// message. If this is put, sender will look for an response.
 		terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null); 
 
-		terminateMessage.setTo(new EndpointReference (rmsBean.getToEPR()));
+		terminateMessage.setTo(rmsBean.getToEndpointReference());
 		
 		// Ensure the correct token is used to secure the terminate sequence
 		secureOutboundMessage(rmsBean, terminateMessage);

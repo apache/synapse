@@ -25,6 +25,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -86,9 +87,9 @@ public class SequenceClosedFaultTest extends SandeshaTestCase {
 		// Mockup an RMDBean
 		RMDBean rmdBean = new RMDBean();
 		rmdBean.setSequenceID(seqID);
-		rmdBean.setToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setAcksToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setReplyToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
+		rmdBean.setToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setAcksToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setReplyToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 		rmdBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmdBean.setServerCompletedMessages(new RangeString());
 		// Flag that the sequence is closed.
@@ -179,4 +180,5 @@ public class SequenceClosedFaultTest extends SandeshaTestCase {
 		return outputStream.toByteArray();
 	}
 }
+
 

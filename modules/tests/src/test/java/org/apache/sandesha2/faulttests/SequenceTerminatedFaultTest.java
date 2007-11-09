@@ -107,9 +107,9 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		// Mockup an RMDBean
 		RMDBean rmdBean = new RMDBean();
 		rmdBean.setSequenceID(seqID);
-		rmdBean.setToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setAcksToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setReplyToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
+		rmdBean.setToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setAcksToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setReplyToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 		rmdBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmdBean.setServerCompletedMessages(new RangeString());
 		// Flag that the sequence is terminated.
@@ -169,9 +169,9 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		// Mockup an RMDBean
 		RMDBean rmdBean = new RMDBean();
 		rmdBean.setSequenceID(seqID);
-		rmdBean.setToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setAcksToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setReplyToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
+		rmdBean.setToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setAcksToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setReplyToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 		rmdBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmdBean.setServerCompletedMessages(new RangeString());
 		// Flag that the sequence is terminated.
@@ -231,9 +231,9 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		// Mockup an RMDBean
 		RMDBean rmdBean = new RMDBean();
 		rmdBean.setSequenceID(seqID);
-		rmdBean.setToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setAcksToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmdBean.setReplyToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
+		rmdBean.setToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setAcksToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmdBean.setReplyToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 		rmdBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmdBean.setServerCompletedMessages(new RangeString());
 		// Flag that the sequence is terminated.
@@ -551,6 +551,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	}
 
 }
+
 
 
 

@@ -74,13 +74,13 @@ public class TerminateManager {
 			//If this is RM 1.1 and RMAnonURI scenario, dont do the termination unless the response side createSequence has been
 			//received (RMDBean has been created) through polling, in this case termination will happen in the create sequence response processor.
 			String rmVersion = rmsBean.getRMVersion();
-			String replyToAddress = rmsBean.getReplyToEPR();
+			EndpointReference replyTo = rmsBean.getReplyToEndpointReference();
 
 			if (complete &&
-					Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmVersion) && SandeshaUtil.isWSRMAnonymous(replyToAddress)) {
+					Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmVersion) && replyTo!=null && SandeshaUtil.isWSRMAnonymous(replyTo.getAddress())) {
 				RMDBean findBean = new RMDBean ();
 				findBean.setPollingMode(true);
-				findBean.setToAddress(replyToAddress);
+				findBean.setToEndpointReference(replyTo);
 
 				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 				List beans = rmdBeanMgr.find(findBean);
@@ -93,9 +93,8 @@ public class TerminateManager {
 			
 			// If we are doing sync 2-way over WSRM 1.0 then we may need to keep sending messages,
 			// so check to see if all the senders have been removed
-			EndpointReference replyTo = new EndpointReference (replyToAddress);
 			if (complete &&
-					Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && (replyToAddress==null || replyTo.hasAnonymousAddress())) {
+					Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && (replyTo==null || replyTo.hasAnonymousAddress())) {
 				SenderBean matcher = new SenderBean();
 				matcher.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 				matcher.setSequenceID(rmsBean.getSequenceID());
@@ -297,8 +296,8 @@ public class TerminateManager {
 		
 		if (toEPR==null) {
 
-			if (rmsBean.getToEPR()!=null) {
-				toEPR = new EndpointReference(rmsBean.getToEPR());
+			if (rmsBean.getToEndpointReference()!=null) {
+				toEPR = rmsBean.getToEndpointReference();
 				if (toEPR == null) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
 					throw new SandeshaException(message);
@@ -309,8 +308,8 @@ public class TerminateManager {
 		if (toEPR!=null)
 			terminateRMMessage.setTo(toEPR);
 		
-		if (rmsBean.getReplyToEPR()!=null) {
-			terminateRMMessage.setReplyTo(new EndpointReference (rmsBean.getReplyToEPR()));
+		if (rmsBean.getReplyToEndpointReference()!=null) {
+			terminateRMMessage.setReplyTo(rmsBean.getReplyToEndpointReference());
 		}
 		
 		String rmVersion = rmsBean.getRMVersion();

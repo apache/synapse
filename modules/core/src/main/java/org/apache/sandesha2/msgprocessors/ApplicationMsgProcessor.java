@@ -371,8 +371,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// setting async ack endpoint for the server side. (if present)
 		if (serverSide) {
-			if (rmsBean.getToEPR() != null) {
-				msgContext.setProperty(SandeshaClientConstants.AcksTo, rmsBean.getToEPR());
+			if (rmsBean.getToEndpointReference() != null) {
+				msgContext.setProperty(SandeshaClientConstants.AcksTo, rmsBean.getToEndpointReference().getAddress());
 			}
 		}
 

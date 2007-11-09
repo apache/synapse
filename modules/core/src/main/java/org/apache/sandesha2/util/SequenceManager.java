@@ -90,9 +90,9 @@ public class SequenceManager {
 		EndpointReference acksTo = createSequence.getAcksTo().getEPR();
 
 		if (acksTo == null) {
-			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence), new Exception());
+			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence), new Exception(), null);
 		} else if (acksTo.getAddress().equals(AddressingConstants.Final.WSA_NONE_URI)){
-			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, "AcksTo can not be " + AddressingConstants.Final.WSA_NONE_URI, new Exception());
+			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, "AcksTo can not be " + AddressingConstants.Final.WSA_NONE_URI, new Exception(), null);
 		}
 
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
@@ -107,12 +107,12 @@ public class SequenceManager {
 
 		rmdBean.setServerCompletedMessages(new RangeString());
 		
-		rmdBean.setReplyToEPR(to.getAddress());
-		rmdBean.setAcksToEPR(acksTo.getAddress());
+		rmdBean.setReplyToEndpointReference(to);
+		rmdBean.setAcksToEndpointReference(acksTo);
 
 		// If no replyTo value. Send responses as sync.
 		if (replyTo != null)
-			rmdBean.setToEPR(replyTo.getAddress());
+			rmdBean.setToEndpointReference(replyTo);
 
 		// Store the security token alongside the sequence
 		if(token != null) {
@@ -194,7 +194,7 @@ public class SequenceManager {
 			throw new SandeshaException(message);
 		}
 
-		rmsBean.setToEPR(toEPR.getAddress());
+		rmsBean.setToEndpointReference(toEPR);
 
 		// Discover the correct acksTo and replyTo EPR for this RMSBean
 		EndpointReference acksToEPR = null;
@@ -204,9 +204,9 @@ public class SequenceManager {
 			// Server side, we want the replyTo and AcksTo EPRs to point into this server.
 			// We can work that out by looking at the RMD bean that pulled the message in,
 			// and copying its 'ReplyTo' address.
-			if(inboundBean != null && inboundBean.getReplyToEPR() != null) {
-				acksToEPR = new EndpointReference(inboundBean.getReplyToEPR());
-				replyToEPR = new EndpointReference(inboundBean.getReplyToEPR());
+			if(inboundBean != null && inboundBean.getReplyToEndpointReference() != null) {
+				acksToEPR = inboundBean.getReplyToEndpointReference();
+				replyToEPR = inboundBean.getReplyToEndpointReference();
 			} else {
 				String beanInfo = (inboundBean == null) ? "null" : inboundBean.toString();
 				String message = SandeshaMessageHelper.getMessage(
@@ -250,8 +250,8 @@ public class SequenceManager {
 		}
 		
 		// Store both the acksTo and replyTo 
-		if(replyToEPR != null) rmsBean.setReplyToEPR(replyToEPR.getAddress());
-		if(acksToEPR  != null) rmsBean.setAcksToEPR(acksToEPR.getAddress());
+		if(replyToEPR != null) rmsBean.setReplyToEndpointReference(replyToEPR);
+		if(acksToEPR  != null) rmsBean.setAcksToEndpointReference(acksToEPR);
 		
 		// New up the client completed message ranges list
 		rmsBean.setClientCompletedMessages(new RangeString());

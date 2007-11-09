@@ -657,6 +657,16 @@ public class SandeshaUtil {
 
 		return executionChainStr;
 	}
+	
+	public static boolean hasReferenceParameters(EndpointReference epr){
+		Map refParams = epr.getAllReferenceParameters();
+		if(refParams!=null){
+			if(!refParams.isEmpty()){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String internalSequenceId,
 			StorageManager storageManager) throws SandeshaException {

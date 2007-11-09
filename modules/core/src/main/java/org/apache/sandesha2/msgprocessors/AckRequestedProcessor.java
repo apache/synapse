@@ -134,12 +134,11 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		}
 
 		// Setting the ack depending on AcksTo.
-		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
-		String acksToStr = acksTo.getAddress();
+		EndpointReference acksTo = rmdBean.getAcksToEndpointReference();
 
-		if (acksToStr == null)
+		if (acksTo == null || acksTo.getAddress()==null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
-
+		
 		//Getting the operation for ack messages.
 		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.ACK,

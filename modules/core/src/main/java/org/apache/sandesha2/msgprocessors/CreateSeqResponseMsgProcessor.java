@@ -151,9 +151,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
 			SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configCtx.getAxisConfiguration());
 			if(policy.isEnableMakeConnection()) {
-				String acksTo = rmsBean.getAcksToEPR();
-				EndpointReference reference = new EndpointReference(acksTo);
-				if(acksTo == null || reference.hasAnonymousAddress()) {
+				EndpointReference reference = rmsBean.getAcksToEndpointReference();
+				if(reference == null || reference.hasAnonymousAddress()) {
 					rmsBean.setPollingMode(true);
 				}
 			}
@@ -179,7 +178,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			RMDBean rMDBean = new RMDBean();
 			
 			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
-			rMDBean.setAcksToEPR(acksToEPR.getAddress());
+			rMDBean.setAcksToEndpointReference(acksToEPR);
 			rMDBean.setSequenceID(rmsBean.getOfferedSequence());
 			rMDBean.setNextMsgNoToProcess(1);
 			rMDBean.setOutboundInternalSequence(rmsBean.getInternalSequenceID());

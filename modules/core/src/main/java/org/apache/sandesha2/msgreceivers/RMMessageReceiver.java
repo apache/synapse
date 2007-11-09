@@ -77,7 +77,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 					if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.CREATE_SEQ)
 						FaultManager.makeCreateSequenceRefusedFault(rmMsgCtx, 
 								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, msgCtx.getAxisService().getName()), 
-								new Exception());
+								new Exception(), null);
 					else
 						throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, msgCtx.getAxisService().getName()));
 					

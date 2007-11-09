@@ -432,9 +432,8 @@ public class Sender extends SandeshaThread {
 						inbound = SandeshaUtil.getRMDBeanFromSequenceId(manager, inboundSeq);
 					
 					if(inbound != null) {
-						String acksTo = inbound.getAcksToEPR();
-						EndpointReference acksToEPR = new EndpointReference(acksTo);
-						if(acksTo == null || acksToEPR.hasAnonymousAddress())
+						EndpointReference acksToEPR = inbound.getAcksToEndpointReference();
+						if(acksToEPR!=null && acksToEPR.hasAnonymousAddress())
 							sendAck = true;
 					}
 					

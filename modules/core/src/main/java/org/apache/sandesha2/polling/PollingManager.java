@@ -212,17 +212,17 @@ public class PollingManager extends SandeshaThread {
 		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollForSequence, rmBean: " + rmBean);
 		
 		//create a MakeConnection message  
-		String replyTo = rmBean.getReplyToEPR();
+		EndpointReference replyTo = rmBean.getReplyToEndpointReference();
 		String wireSeqId = null;
 		String wireAddress = null;
 		if(anonUUID != null) {
 			// If we are polling on a RM anon URI then we don't want to include the sequence id
 			// in the MakeConnection message.
 			wireAddress = anonUUID;
-		} else if(SandeshaUtil.isWSRMAnonymous(replyTo)) {
+		} else if(replyTo!=null && SandeshaUtil.isWSRMAnonymous(replyTo.getAddress())) {
 			// If we are polling on a RM anon URI then we don't want to include the sequence id
 			// in the MakeConnection message.
-			wireAddress = replyTo;
+			wireAddress = replyTo.getAddress();
 		} else {
 			wireSeqId = rmBean.getSequenceID();
 		}

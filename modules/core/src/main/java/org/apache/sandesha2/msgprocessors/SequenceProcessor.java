@@ -164,7 +164,7 @@ public class SequenceProcessor {
 		}
 		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 		
-		if (FaultManager.checkForMessageRolledOver(rmMsgCtx, sequenceId, msgNo)) {
+		if (FaultManager.checkForMessageRolledOver(rmMsgCtx, sequenceId, msgNo, bean)) {
 			
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Message rolled over " + msgNo);
@@ -241,7 +241,7 @@ public class SequenceProcessor {
 			  }
 		  }
 			
-			EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
+			EndpointReference acksTo = bean.getAcksToEndpointReference();
 			
 			// Send an Ack if needed.
 			//We are not sending acks for duplicate messages in the RM 1.0 anon InOut case.
@@ -336,7 +336,7 @@ public class SequenceProcessor {
 		boolean ackBackChannel = SpecSpecificConstants.sendAckInBackChannel (rmMsgCtx.getMessageType());
 		// If we are processing an inOnly message we must ack the back channel otherwise the connection stays open
 		if (!ackBackChannel && mep == WSDLConstants.MEP_CONSTANT_IN_ONLY) ackBackChannel = true;
-		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
+		EndpointReference acksTo = bean.getAcksToEndpointReference();
 		if (acksTo.hasAnonymousAddress() && backchannelFree && ackBackChannel) {
 			boolean responseWritten = TransportUtils.isResponseWritten(msgCtx);
 			if (!responseWritten) {				

@@ -74,7 +74,7 @@ public class AcknowledgementManager {
 				// Search for any sequences that have an acksTo that matches this target, and add an ack
 				// for each of them.
 				RMDBean findBean = new RMDBean();
-				findBean.setAcksToEPR(target.getAddress());
+				findBean.setAcksToEndpointReference(target);
 				findBean.setTerminated(false);
 				Collection rmdBeans = storageManager.getRMDBeanMgr().find(findBean);
 				Iterator sequences = rmdBeans.iterator();
@@ -93,10 +93,9 @@ public class AcknowledgementManager {
 				if(inboundSequence != null) {
 					RMDBean inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
 					if(inboundBean != null && !inboundBean.isTerminated()) {
-						String acksTo = inboundBean.getAcksToEPR();
-						EndpointReference acksToEPR = new EndpointReference(acksTo);
+						EndpointReference acksToEPR = inboundBean.getAcksToEndpointReference();
 						
-						if(acksTo == null || acksToEPR.hasAnonymousAddress()) {
+						if(acksToEPR == null || acksToEPR.hasAnonymousAddress()) {
 							if(log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
 							RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean);
 						}
@@ -106,48 +105,63 @@ public class AcknowledgementManager {
 			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
 			return transaction;
 		}
-	    // From here on, we must be dealing with a real address. Piggyback all sequences that have an
-	    // acksTo that matches the To address, and that have an ackMessage queued up for sending. We
-	    // search for RMDBeans first, to avoid a deadlock.
-	    //
-	    // As a special case, if this is a terminate sequence message then add in ack messages for
-	    // any sequences that have an acksTo that matches the target address. This helps to ensure
-	    // that request-response sequence pairs end cleanly.
-	    RMDBean findRMDBean = new RMDBean();
-	    findRMDBean.setAcksToEPR(target.getAddress());
-	    findRMDBean.setTerminated(false);
-	    Collection rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
-	    Iterator sequences = rmdBeans.iterator();
-	    while(sequences.hasNext()) {
-	      RMDBean sequence = (RMDBean) sequences.next();
-	      String sequenceId = sequence.getSequenceID();
-	      
-	      // Look for the SenderBean that carries the ack, there should be at most one
-	      SenderBean findBean = new SenderBean();
-	      findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-	      findBean.setSend(true);
-	      findBean.setSequenceID(sequenceId);
-	      findBean.setToAddress(target.getAddress());
-	      
-	      SenderBean ackBean = retransmitterBeanMgr.findUnique(findBean);
-	      
-			// Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
-			long timeNow = System.currentTimeMillis();
-		    if (ackBean != null && ackBean.getTimeToSend() > timeNow) {
-				// Delete the beans that would have sent the ack
-				retransmitterBeanMgr.delete(ackBean.getMessageID());
-				storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
+		else{
+			//an addressable EPR
+			if(SandeshaUtil.hasReferenceParameters(target)){
+				//we should not proceed since we cannot properly compare ref params
+				if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
+				return transaction;
+			}
+			
+		    // From here on, we must be dealing with a real address. Piggyback all sequences that have an
+		    // acksTo that matches the To address, and that have an ackMessage queued up for sending. We
+		    // search for RMDBeans first, to avoid a deadlock.
+		    //
+		    // As a special case, if this is a terminate sequence message then add in ack messages for
+		    // any sequences that have an acksTo that matches the target address. This helps to ensure
+		    // that request-response sequence pairs end cleanly.
+		    RMDBean findRMDBean = new RMDBean();
+		    findRMDBean.setAcksToEndpointReference(target);
+		    findRMDBean.setTerminated(false);
+		    Collection rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
+		    Iterator sequences = rmdBeans.iterator();
+		    while(sequences.hasNext()) {
+		      RMDBean sequence = (RMDBean) sequences.next();
+		      if(SandeshaUtil.hasReferenceParameters(sequence.getAcksToEndpointReference())){
+		    	  //we should not piggy back if there are reference parameters in the acksTo EPR since we cannot compare them
+		    	  if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
+		    	  break;
+		      }
+					
+		      String sequenceId = sequence.getSequenceID();
+		      
+		      // Look for the SenderBean that carries the ack, there should be at most one
+		      SenderBean findBean = new SenderBean();
+		      findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+		      findBean.setSend(true);
+		      findBean.setSequenceID(sequenceId);
+		      findBean.setToAddress(target.getAddress());
+		      
+		      SenderBean ackBean = retransmitterBeanMgr.findUnique(findBean);
+		      
+				// Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
+				long timeNow = System.currentTimeMillis();
+			    if (ackBean != null && ackBean.getTimeToSend() > timeNow) {
+					// Delete the beans that would have sent the ack
+					retransmitterBeanMgr.delete(ackBean.getMessageID());
+					storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
 
-				if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
-		        RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
+					if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+			        RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
 
-		    } else if(rmMessageContext.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-		        if(log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
-		          
-		        if(sequence.getHighestInMessageNumber() > 0) {
-					  if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+			    } else if(rmMessageContext.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+			        if(log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
+			          
+			        if(sequence.getHighestInMessageNumber() > 0) {
+						  if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
 
-					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
+						RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
+					}
 				}
 			}
 		}
@@ -182,9 +196,9 @@ public class AcknowledgementManager {
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 
-		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
+		EndpointReference acksTo = rmdBean.getAcksToEndpointReference();
 
-		if (acksTo.getAddress() == null)
+		if (acksTo==null || acksTo.getAddress() == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
 
 		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(

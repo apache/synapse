@@ -19,6 +19,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import org.apache.axis2.addressing.EndpointReference;
+
 /**
  * This bean is used at the receiving side (of both server and client)
  * There is one entry for each sequence.
@@ -33,11 +35,23 @@ public class RMSequenceBean extends RMBean {
 	 */
 	private String sequenceID;
 	
+	/**
+	 * @deprecated use toEndpointReference instead
+	 */
 	private String toEPR;
+	private EndpointReference toEndpointReference;
 
+	/**
+	 * @deprecated use replyToEndpointReference instead
+	 */
 	private String replyToEPR;
+	private EndpointReference replyToEndpointReference;
 	
+	/**
+	 * @deprecated use acksToEndpointRef instead
+	 */
 	private String acksToEPR;
+	private EndpointReference acksToEndpointRef;
 	
 	private String RMVersion;
 	
@@ -89,15 +103,18 @@ public class RMSequenceBean extends RMBean {
 	 */
 	public RMSequenceBean(RMSequenceBean beanToCopy) {
 		acksToEPR = beanToCopy.getAcksToEPR();
+		acksToEndpointRef = beanToCopy.getAcksToEndpointReference();
 		closed = beanToCopy.isClosed();
 		lastActivatedTime = beanToCopy.getLastActivatedTime();
 		pollingMode = beanToCopy.isPollingMode();
 		replyToEPR = beanToCopy.getReplyToEPR();
+		replyToEndpointReference = beanToCopy.getReplyToEndpointReference();
 		RMVersion = beanToCopy.getRMVersion();
 		securityTokenData = beanToCopy.getSecurityTokenData();		
 		sequenceID = beanToCopy.getSequenceID();
 		terminated = beanToCopy.isTerminated();
-		toEPR = beanToCopy.getToEPR(); 		
+		toEPR = beanToCopy.getToEPR(); 	
+		toEndpointReference = beanToCopy.getToEndpointReference();
 		serviceName = beanToCopy.getServiceName();
 	}
 
@@ -120,30 +137,87 @@ public class RMSequenceBean extends RMBean {
 		this.sequenceID = sequenceID;
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public String getAcksToEPR() {
-  	return acksToEPR;
-  }
+		return acksToEPR;
+	}
+	
+	public EndpointReference getAcksToEndpointReference(){
+		if(acksToEndpointRef==null && acksToEPR!=null){
+			//this is for release to release compatability with serializaed data
+			acksToEndpointRef = new EndpointReference(acksToEPR);;
+		}
+		return acksToEndpointRef;
+	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setAcksToEPR(String acksToEPR) {
-  	this.acksToEPR = acksToEPR;
-  }
+		this.acksToEPR = acksToEPR;
+	}
+	
+	public void setAcksToEndpointReference(EndpointReference acksToEndpointRef){
+		this.acksToEndpointRef = acksToEndpointRef;
+		acksToEPR = acksToEndpointRef.getAddress();
+	}
 
+	/**
+	 * @deprecated
+	 */
 	public String getReplyToEPR() {
   	return replyToEPR;
   }
+	
+	public EndpointReference getReplyToEndpointReference(){
+		if(replyToEndpointReference==null && replyToEPR!=null){
+			//this is for release to release compatability with serializaed data
+			replyToEndpointReference = new EndpointReference(replyToEPR);;
+		}
+		return replyToEndpointReference;
+	}	
 
+	/**
+	 * @deprecated
+	 */
 	public void setReplyToEPR(String replyToEPR) {
   	this.replyToEPR = replyToEPR;
   }
+	
+	public void setReplyToEndpointReference(EndpointReference replyToEndpointRef){
+		this.replyToEndpointReference = replyToEndpointRef;
+		replyToEPR = replyToEndpointRef.getAddress();
+	}	
 
+	/**
+	 * @deprecated
+	 */
 	public String getToEPR() {
   	return toEPR;
   }
+	
+	public EndpointReference getToEndpointReference(){
+		if(toEndpointReference==null && toEPR!=null){
+			//this is for release to release compatability with serializaed data
+			toEndpointReference = new EndpointReference(toEPR);;
+		}
+		return toEndpointReference;
+	}		
 
+	/**
+	 * @deprecated
+	 */
 	public void setToEPR(String toEPR) {
   	this.toEPR = toEPR;
   }
-
+	
+	public void setToEndpointReference(EndpointReference toEndpointRef){
+		this.toEndpointReference = toEndpointRef;
+		toEPR = toEndpointReference.getAddress();
+	}
+	
 	public boolean isPollingMode() {
 		return pollingMode;
 	}
@@ -235,13 +309,16 @@ public class RMSequenceBean extends RMBean {
 		if(bean.getSequenceID() != null && !bean.getSequenceID().equals(this.getSequenceID()))
 			match = false;
 		
-		else if(bean.getToEPR() != null && !bean.getToEPR().equals(this.getToEPR()))
+		else if((bean.getToEndpointReference() != null && this.getToEndpointReference()!=null && !bean.getToEndpointReference().getAddress().equals(this.getToEndpointReference().getAddress())) ||
+				(bean.getToEPR() != null && !bean.getToEPR().equals(this.getToEPR())))
 			match = false;
 		
-		else if(bean.getReplyToEPR() != null && !bean.getReplyToEPR().equals(this.getReplyToEPR()))
+		else if((bean.getReplyToEndpointReference() != null && this.getReplyToEndpointReference()!=null && !bean.getReplyToEndpointReference().getAddress().equals(this.getReplyToEndpointReference().getAddress())) ||
+				(bean.getReplyToEPR() != null && !bean.getReplyToEPR().equals(this.getReplyToEPR())))
 			match = false;
 		
-		else if(bean.getAcksToEPR() != null && !bean.getAcksToEPR().equals(this.getAcksToEPR()))
+		else if((bean.getAcksToEndpointReference() != null && this.getAcksToEndpointReference()!=null && !bean.getAcksToEndpointReference().getAddress().equals(this.getAcksToEndpointReference().getAddress())) ||
+				(bean.getAcksToEPR() != null && !bean.getAcksToEPR().equals(this.getAcksToEPR())))
 			match = false;
 		
 		else if(bean.getRMVersion() != null && !bean.getRMVersion().equals(this.getRMVersion()))

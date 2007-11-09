@@ -25,6 +25,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.RMMsgContext;
@@ -86,9 +87,9 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		rmsBean.setCreateSeqMsgID(SandeshaUtil.getUUID());
 		rmsBean.setSequenceID(seqID);
 		rmsBean.setInternalSequenceID(SandeshaUtil.getInternalSequenceID(seqID, null));
-		rmsBean.setToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmsBean.setAcksToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmsBean.setReplyToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
+		rmsBean.setToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmsBean.setAcksToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmsBean.setReplyToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 		rmsBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmsBean.setClientCompletedMessages(new RangeString());
 		rmsBean.setNextMessageNumber(1);
@@ -157,9 +158,9 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		rmsBean.setCreateSeqMsgID(SandeshaUtil.getUUID());
 		rmsBean.setSequenceID(seqID);
 		rmsBean.setInternalSequenceID(SandeshaUtil.getInternalSequenceID(seqID, null));
-		rmsBean.setToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmsBean.setAcksToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
-		rmsBean.setReplyToEPR(AddressingConstants.Final.WSA_ANONYMOUS_URL);
+		rmsBean.setToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmsBean.setAcksToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		rmsBean.setReplyToEndpointReference(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 		rmsBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmsBean.setClientCompletedMessages(new RangeString());
 		rmsBean.setNextMessageNumber(4);
@@ -274,6 +275,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		return bean;
 	}
 }
+
 
 
 

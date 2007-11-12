@@ -227,8 +227,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				transaction = storageManager.getTransaction();
 
 				// Piggyback ack messages based on the 'To' address of the message
-				transaction = AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager, transaction);
+				AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager);
 			}
+			if (transaction != null && transaction.isActive()) 
+				transaction.commit();			
+			
+			transaction = storageManager.getTransaction();
 
 			
 			if (transaction != null && transaction.isActive()) 

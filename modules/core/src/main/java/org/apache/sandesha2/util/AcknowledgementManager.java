@@ -59,7 +59,7 @@ public class AcknowledgementManager {
 	 * @param applicationRMMsgContext
 	 * @throws SandeshaException
 	 */
-	public static Transaction piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager, Transaction transaction)
+	public static void piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
@@ -103,14 +103,14 @@ public class AcknowledgementManager {
 				}
 			}
 			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
-			return transaction;
+			return;
 		}
 		else{
 			//an addressable EPR
 			if(SandeshaUtil.hasReferenceParameters(target)){
 				//we should not proceed since we cannot properly compare ref params
 				if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
-				return transaction;
+				return;
 			}
 			
 		    // From here on, we must be dealing with a real address. Piggyback all sequences that have an
@@ -168,7 +168,7 @@ public class AcknowledgementManager {
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent");
-		return transaction;
+		return;
 	}
 
 	/**

@@ -224,8 +224,10 @@ public class PollingManager extends SandeshaThread {
 			// in the MakeConnection message.
 			wireAddress = replyTo.getAddress();
 		} else {
-			wireSeqId = rmBean.getSequenceID();
+			wireSeqId = rmBean.getSequenceID(); //this case could make us non-RSP compliant
 		}
+		
+		if(log.isDebugEnabled()) log.debug("Debug: PollingManager::pollForSequence, wireAddress=" + wireAddress + ", wireSeqId=" + wireSeqId);
 		
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,context);
 		if(referenceMessage!=null){

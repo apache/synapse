@@ -36,7 +36,7 @@ import org.apache.sandesha2.storage.beans.RMBean;
 abstract class InMemoryBeanMgr {
 
 	private static final Log log = LogFactory.getLog(InMemoryBeanMgr.class);
-	private Hashtable table;
+	protected Hashtable table;
 	protected InMemoryStorageManager mgr;
 
 	protected InMemoryBeanMgr(InMemoryStorageManager mgr, AbstractContext context, String key) {
@@ -145,29 +145,9 @@ abstract class InMemoryBeanMgr {
 		return beans;
 	}
 
-	protected RMBean findUnique (RMBean matchInfo) throws SandeshaException {
+	protected RMBean findUnique (RMBean matchInfo) throws SandeshaStorageException {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " findUnique " + matchInfo);
-		RMBean result = null;
-		synchronized (table) {
-			Iterator i = table.values().iterator();
-			while(i.hasNext()) {
-				RMBean candidate = (RMBean)i.next();
-				if(candidate.match(matchInfo)) {
-					if(result == null) {
-						result = candidate;
-					} else {
-						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.nonUniqueResult,
-								result.toString(),
-								candidate.toString());
-						SandeshaException e = new SandeshaException(message);
-						log.error(message, e);
-						throw e;
-					}
-				}
-			}
-		}
-		
+		RMBean result = findUniqueNoLock(matchInfo);		
 		// Now we have a point-in-time view of the bean, lock it, and double
 		// check that it is still in the table 
 		if(result != null) {
@@ -180,5 +160,30 @@ abstract class InMemoryBeanMgr {
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " findUnique " + result);
 		return result;
 	}
+  
+  protected RMBean findUniqueNoLock (RMBean matchInfo) throws SandeshaStorageException {
+    RMBean result = null;
+    synchronized (table) {
+      Iterator i = table.values().iterator();
+      while(i.hasNext()) {
+        RMBean candidate = (RMBean)i.next();
+        if(candidate.match(matchInfo)) {
+          if(result == null) {
+            result = candidate;
+          } else {
+            String message = SandeshaMessageHelper.getMessage(
+                SandeshaMessageKeys.nonUniqueResult,
+                result.toString(),
+                candidate.toString());
+            SandeshaStorageException e = new SandeshaStorageException(message);
+            log.error(message, e);
+            throw e;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
 
 }

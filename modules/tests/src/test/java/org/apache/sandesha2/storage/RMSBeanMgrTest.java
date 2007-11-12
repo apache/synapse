@@ -78,15 +78,15 @@ public class RMSBeanMgrTest extends SandeshaTestCase {
     	createSeqBean1.setSequenceID("SeqId1");
     	
     	RMSBean createSeqBean2 = new RMSBean ();
-    	createSeqBean2.setInternalSequenceID("TmpSeqId1");
+    	createSeqBean2.setInternalSequenceID("TmpSeqId2");
     	createSeqBean2.setCreateSeqMsgID("CreateSeqMsgId2");
-    	createSeqBean2.setSequenceID("SeqId2");
+    	createSeqBean2.setSequenceID("SeqId1");
     	
         mgr.insert(createSeqBean1);
         mgr.insert(createSeqBean2);
 
         RMSBean target = new RMSBean();
-        target.setInternalSequenceID("TmpSeqId1");
+        target.setSequenceID("SeqId1");
 
         Iterator iter = mgr.find(target).iterator();
         RMSBean tmp = (RMSBean) iter.next();

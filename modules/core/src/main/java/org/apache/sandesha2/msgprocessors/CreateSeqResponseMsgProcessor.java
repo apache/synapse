@@ -158,8 +158,11 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 		}
 
+    // Get the CreateSeqBean based on the message id to take a lock on the bean
+    SenderBean createSeqBean = retransmitterMgr.retrieve(createSeqMsgId);
+    
 		// deleting the create sequence sender bean entry.
-		retransmitterMgr.delete(createSeqMsgId);
+		retransmitterMgr.delete(createSeqBean.getMessageID());
 		
 		// Remove the create sequence message
 		storageManager.removeMessageContext(rmsBean.getCreateSequenceMsgStoreKey());

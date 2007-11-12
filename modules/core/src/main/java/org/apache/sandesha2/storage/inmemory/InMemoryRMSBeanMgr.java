@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -35,7 +34,14 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 	}
 
 	public boolean insert(RMSBean bean) throws SandeshaStorageException {
-		return super.insert(bean.getCreateSeqMsgID(), bean);
+    boolean res = false;
+    synchronized (table) {
+      RMSBean findBean = new RMSBean();
+      findBean.setInternalSequenceID(bean.getInternalSequenceID());
+      if (findUniqueNoLock(findBean) == null)
+        res = super.insert(bean.getCreateSeqMsgID(), bean);
+    }
+		return res;
 	}
 
 	public boolean delete(String msgId) throws SandeshaStorageException {
@@ -54,7 +60,7 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 		return super.find(bean);
 	}
 	
-	public RMSBean findUnique (RMSBean bean) throws SandeshaException {
+	public RMSBean findUnique (RMSBean bean) throws SandeshaStorageException {
 		return (RMSBean) super.findUnique(bean);
 	}
 

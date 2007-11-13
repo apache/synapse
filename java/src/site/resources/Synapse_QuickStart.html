@@ -114,22 +114,9 @@ beginning.</p>
 <p>You should have following pre-requisites installed on your system to
 follow through this guide</p>
 <ul>
-  <li>A Java 2 SE - JDK or JRE of version 1.4.2 or higher</li>
+  <li>A Java 2 SE - JDK or JRE of version 1.5.x or higher</li>
   <li>Apache Ant http://ant.apache.org</li>
 </ul>
-
-<p>Note: To use the bundled https transport, you will need a Java 2 SE
-runtime of version 1.5 or later. If you are using a J2SE below 1.5 and does
-not require the https transport, you may comment out the following section
-from your repository/conf/axis2.xml and
-samples/axis2Server/repository/conf/axis2.xml configuration files.</p>
-<pre>...
-   &lt;transportReceiver name="https"...<br>      ...<br>   &lt;/transportReceiver&gt;
-   ...
-   &lt;transportSender name="https"...<br>      ...<br>   &lt;/transportSender&gt;
-....</pre>
-
-<p></p>
 
 <h2>Message Mediation</h2>
 
@@ -144,15 +131,15 @@ communication protocols etc. So, let's start with the basics.</p>
 
 <p>Our first task is to download Synapse. Open a web browser and access the
 following URL: http://ws.apache.org/synapse/download.cgi. You will then see
-the list of available releases. Click on the 1.0 version, and you will be
-directed to the Synapse 1.0 release download page. Now download the 'Standard
+the list of available releases. Click on the 1.1 version, and you will be
+directed to the Synapse 1.1 release download page. Now download the 'Standard
 binary distribution' ZIP or tar.gz archive compatible with your operating
 system.</p>
 
 <h3>Installation</h3>
 
 <p>Synapse can be installed just by extracting the downloaded binary
-archive.. A directory named synapse-1.0 will be created in the selected
+archive.. A directory named synapse-1.1 will be created in the selected
 parent directory, containing all the files required for Synapse. We will
 refer to this directory as &lt;synapse-home&gt; from now on.</p>
 
@@ -178,30 +165,31 @@ directory. Run "ant" to build and deploy this service to the sample Axis2
 server. </p>
 
 <p></p>
-<pre>user@host:/opt/synapse/samples/axis2Server$ cd src/SimpleStockQuoteService/
-user@host:/opt/synapse/samples/axis2Server/src/SimpleStockQuoteService$ ant
+<pre>user@host:/opt/synapse-1.1/samples/axis2Server$ cd src/SimpleStockQuoteService/
+user@host:/opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService$ ant
 Buildfile: build.xml
 
 clean:
-   [delete] Deleting directory /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp
 
 init:
-    [mkdir] Created dir: /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp
-    [mkdir] Created dir: /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+    [mkdir] Created dir: /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp
+    [mkdir] Created dir: /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+    [mkdir] Created dir: /opt/synapse-1.1/samples/axis2Server/repository/services
 
 compile-all:
-    [javac] Compiling 9 source files to /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+    [javac] Compiling 9 source files to /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
 
 build-service:
-    [mkdir] Created dir: /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-    [mkdir] Created dir: /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-     [copy] Copying 1 file to /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-     [copy] Copying 1 file to /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-     [copy] Copying 9 files to /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-      [jar] Building jar: /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
+    [mkdir] Created dir: /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+    [mkdir] Created dir: /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+     [copy] Copying 1 file to /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+     [copy] Copying 1 file to /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+     [copy] Copying 9 files to /opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+      [jar] Building jar: /opt/synapse-1.1/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
 
 BUILD SUCCESSFUL
-Total time: 1 second</pre>
+Total time: 2 seconds
+user@host:/opt/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService$</pre>
 
 <p>Now go to &lt;synapse-home&gt;/samples/axis2Server directory and start the
 server using the following command. This will start Axis2 server on port 9000
@@ -214,16 +202,19 @@ server using the following command. This will start Axis2 server on port 9000
 </div>
 
 <p>You will see the following messages on the console.</p>
-<pre>user@host:/opt/synapse/samples/axis2Server$ ./axis2server.sh 
+<pre>user@host:/opt/synapse-1.1/samples/axis2Server$ ./axis2server.sh
+ Using Bouncy castle JAR for Java 1.5
  Using JAVA_HOME:   /opt/jdk1.5_06
- Using AXIS2 Repository :   /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/repository
- Using AXIS2 Configuration :   /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/repository/conf/axis2.xml
-[SimpleAxisServer] Using the Axis2 Repository : /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/repository
-[SimpleAxisServer] Using the Axis2 Configuration File : /home/asankha/java/synapse-1.0-RC1-SNAPSHOT/samples/axis2Server/repository/conf/axis2.xml
-[main] INFO  HttpCoreNIOSender - HTTPS Sender starting 
-[main] INFO  HttpCoreNIOSender - HTTP Sender starting 
-[main] INFO  HttpCoreNIOListener - HTTPS Listener starting on port : 9002 
-[main] INFO  HttpCoreNIOListener - HTTP Listener starting on port : 9000 </pre>
+ Using AXIS2 Repository :   /opt/synapse-1.1/samples/axis2Server/repository
+ Using AXIS2 Configuration :   /opt/synapse-1.1/samples/axis2Server/repository/conf/axis2.xml
+2007-11-05 14:36:41,462 [-] [main]  INFO SimpleHTTPServer [SimpleAxisServer] Starting
+[SimpleAxisServer] Using the Axis2 Repository : /opt/synapse-1.1/samples/axis2Server/repository
+[SimpleAxisServer] Using the Axis2 Configuration File : /opt/synapse-1.1/samples/axis2Server/repository/conf/axis2.xml
+2007-11-05 14:36:43,864 [-] [main]  INFO HttpCoreNIOSender HTTPS Sender starting
+2007-11-05 14:36:43,891 [-] [main]  INFO HttpCoreNIOSender HTTP Sender starting
+2007-11-05 14:36:44,288 [-] [main]  INFO HttpCoreNIOListener HTTPS Listener starting on port : 9002
+2007-11-05 14:36:44,298 [-] [main]  INFO HttpCoreNIOListener HTTP Listener starting on port : 9000
+2007-11-05 14:36:44,350 [-] [main]  INFO SimpleHTTPServer [SimpleAxisServer] Started</pre>
 
 <p></p>
 
@@ -252,26 +243,30 @@ Synapse will be started on port 8080 (http) and 8443 (https - under JDK
 
 <p>Following messages will be displayed on the console to indicate the
 successfull startup of Synapse.</p>
-<pre>user@host:/opt/synapse/bin$ ./synapse.sh -sample 0
+<pre>user@host:/opt/synapse-1.1/bin$ ./synapse.sh -sample 0
+ Using Bouncy castle JAR for Java 1.5
 Starting Synapse/Java ...
-Using SYNAPSE_HOME:    /opt/synapse
+Using SYNAPSE_HOME:    /opt/synapse-1.1
 Using JAVA_HOME:       /opt/jdk1.5_06
-Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse/repository/conf/sample/synapse_sample_0.xml
-[SynapseServer] Using the Axis2 Repository /opt/synapse/repository
-[main] INFO  SynapseModule - Initializing the Synapse configuration ... 
-...
-[main] INFO  SynapseConfigurationBuilder - Loaded Synapse configuration from : /opt/synapse/repository/conf/sample/synapse_sample_0.xml 
-[main] INFO  SynapseModule - Deploying the Synapse service.. 
-[main] INFO  SynapseModule - Deploying Proxy services... 
-[main] INFO  SynapseModule - Synapse initialized successfully...! 
-[main] ERROR SandeshaModule - Could not load module policies. Using default values. 
-[main] INFO  HttpCoreNIOSender - HTTPS Sender starting 
-[main] INFO  HttpCoreNIOSender - HTTP Sender starting 
-[main] INFO  HttpCoreNIOListener - HTTPS Listener starting on port : 8443 
-[SynapseServer] Starting transport https on port 8443
-[main] INFO  HttpCoreNIOListener - HTTP Listener starting on port : 8080 
-[SynapseServer] Starting transport http on port 8080
-[SynapseServer] Ready</pre>
+Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse-1.1/repository/conf/sample/synapse_sample_0.xml
+2007-11-05 14:58:55,029 [-] [main]  INFO ServerManager Using the Axis2 Repository /opt/synapse-1.1/repository
+2007-11-05 14:58:56,617 [-] [main]  INFO SynapseInitializationModule Initializing Synapse at : Mon Nov 05 14:58:56 LKT 2007
+2007-11-05 14:58:56,618 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Loading mediator extensions...
+2007-11-05 14:58:56,619 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Initializing the Synapse configuration ...
+2007-11-05 14:58:56,624 [127.0.1.1-asankha] [main]  INFO XMLConfigurationBuilder Generating the Synapse configuration model by parsing the XML configuration
+2007-11-05 14:58:56,717 [127.0.1.1-asankha] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-1.1/repository/conf/sample/synapse_sample_0.xml
+2007-11-05 14:58:56,724 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Deploying the Synapse service..
+2007-11-05 14:58:56,740 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Initializing Sandesha 2...
+2007-11-05 14:58:56,801 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Deploying Proxy services...
+2007-11-05 14:58:56,801 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Synapse initialized successfully...!
+2007-11-05 14:58:56,886 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOSender HTTPS Sender starting
+2007-11-05 14:58:56,887 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOSender HTTP Sender starting
+2007-11-05 14:58:57,039 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOListener HTTPS Listener starting on port : 8443
+2007-11-05 14:58:57,040 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport https on port 8443
+2007-11-05 14:58:57,041 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOListener HTTP Listener starting on port : 8080
+2007-11-05 14:58:57,041 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport http on port 8080
+2007-11-05 14:58:57,085 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport vfs
+2007-11-05 14:58:57,086 [127.0.1.1-asankha] [main]  INFO ServerManager Ready for processing</pre>
 
 <p></p>
 
@@ -280,15 +275,17 @@ Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse/repository/conf/sample/synapse
 <p>Now the final step, running the client. Go to
 &lt;synapse-home&gt;/samples/axis2Client directory and type the following
 command</p>
-<pre>user@host:/opt/synapse/samples/axis2Client$ ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080 -Dmode=quote -Dsymbol=IBM
+<pre>user@host:/opt/synapse-1.1/samples/axis2Client$ ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080 -Dmode=quote -Dsymbol=IBM
 Buildfile: build.xml
 
 init:
+    [mkdir] Created dir: /opt/synapse-1.1/samples/axis2Client/target/classes
 
 compile:
+    [javac] Compiling 10 source files to /opt/synapse-1.1/samples/axis2Client/target/classes
 
 stockquote:
-     [java] Standard :: Stock price = $175.56196739870038
+     [java] Standard :: Stock price = $91.09641757880443
 
 BUILD SUCCESSFUL</pre>
 
@@ -328,43 +325,49 @@ Transfer-Encoding: chunked
 
 <p>Now take a look at the console running Synapse. You will see that all the
 details of the mediation are logged along with all the SOAP messages passed
-through Synapse - as Synapse is running on debug mode by default.</p>
-<pre>[I/O reactor worker thread 5] INFO  PipeImpl - Using native OS Pipes for event-driven to stream IO bridging
-[HttpServerWorker-1] DEBUG SynapseMessageReceiver - Synapse received a new message for message mediation...
-[HttpServerWorker-1] DEBUG SynapseMessageReceiver - Received To: http://localhost:9000/soap/SimpleStockQuoteService
-[HttpServerWorker-1] DEBUG SynapseMessageReceiver - SOAPAction: urn:getQuote
-[HttpServerWorker-1] DEBUG SynapseMessageReceiver - WSA-Action: urn:getQuote
-[HttpServerWorker-1] DEBUG SynapseMessageReceiver - Body :
-&lt;?xml version='1.0' encoding='utf-8'?&gt;<br>&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;<br>&lt;soapenv:Header&gt;<br>&lt;wsa:To&gt;http://localhost:9000/soap/SimpleStockQuoteService&lt;/wsa:To&gt;<br>&lt;wsa:MessageID&gt;urn:uuid:32748ED82860C9DBDE1177504004875&lt;/wsa:MessageID&gt;<br>&lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;&lt;/soapenv:Header&gt;<br>&lt;soapenv:Body&gt;&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;<br>&lt;/m0:getQuote&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;main&gt; :: mediate()
-[HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
-[HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate()
-[HttpServerWorker-1] INFO  LogMediator - To : http://localhost:9000/soap/SimpleStockQuoteService, <br>MessageID : urn:uuid:32748ED82860C9DBDE1177504004875, Action : urn:getQuote, Envelope: <br>&lt;?xml version='1.0' encoding='utf-8'?&gt;<br>&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;<br>&lt;soapenv:Header&gt;<br>&lt;wsa:To&gt;http://localhost:9000/soap/SimpleStockQuoteService&lt;/wsa:To&gt;<br>&lt;wsa:MessageID&gt;urn:uuid:32748ED82860C9DBDE1177504004875&lt;/wsa:MessageID&gt;&lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;<br>&lt;/soapenv:Header&gt;&lt;soapenv:Body&gt;&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;<br>&lt;/m0:request&gt;&lt;/m0:getQuote&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
-[HttpServerWorker-1] DEBUG SendMediator - Sending message using implicit message properties..
-[HttpServerWorker-1] DEBUG SendMediator - Sending To: http://localhost:9000/soap/SimpleStockQuoteService
-[HttpServerWorker-1] DEBUG SendMediator - SOAPAction: urn:getQuote
-[HttpServerWorker-1] DEBUG SendMediator - Body :
-&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" <br>xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Header&gt;<br>&lt;wsa:To&gt;http://localhost:9000/soap/SimpleStockQuoteService&lt;/wsa:To&gt;<br>&lt;wsa:MessageID&gt;urn:uuid:32748ED82860C9DBDE1177504004875&lt;/wsa:MessageID&gt;&lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;&lt;/soapenv:Header&gt;<br>&lt;soapenv:Body&gt;&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;<br>&lt;/m0:getQuote&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-[HttpServerWorker-1] DEBUG Axis2FlexibleMEPClient - sending [add = false] [sec = false] [rm = false] <br>[ to Address: http://localhost:9000/soap/SimpleStockQuoteService]
-[HttpClientWorker-1] DEBUG SynapseCallbackReceiver - Synapse received an asynchronous response message
-[HttpClientWorker-1] DEBUG SynapseCallbackReceiver - Received To: null
-[HttpClientWorker-1] DEBUG SynapseCallbackReceiver - SOAPAction: null
-[HttpClientWorker-1] DEBUG SynapseCallbackReceiver - WSA-Action: null
-[HttpClientWorker-1] DEBUG SynapseCallbackReceiver - Body :
-&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;<br>&lt;soapenv:Body&gt;&lt;soapenv:Envelope&gt;&lt;soapenv:Body&gt;&lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;<br>&lt;ns:return&gt;&lt;ns:change&gt;3.9759712191629117&lt;/ns:change&gt;&lt;ns:earnings&gt;-9.463240695957264&lt;/ns:earnings&gt;<br>&lt;ns:high&gt;97.0893936590198&lt;/ns:high&gt;&lt;ns:last&gt;93.87052890651084&lt;/ns:last&gt;<br>&lt;ns:lastTradeTimestamp&gt;Wed Apr 25 18:26:46 LKT 2007&lt;/ns:lastTradeTimestamp&gt;&lt;ns:low&gt;96.4856592398509&lt;/ns:low&gt;<br>&lt;ns:marketCap&gt;5.572519121414568E7&lt;/ns:marketCap&gt;&lt;ns:name&gt;IBM Company&lt;/ns:name&gt;&lt;ns:open&gt;-92.43795414108462&lt;/ns:open&gt;<br>&lt;ns:peRatio&gt;-18.381880013551893&lt;/ns:peRatio&gt;<br>&lt;ns:percentageChange&gt;-4.5174961332793435&lt;/ns:percentageChange&gt;&lt;ns:prevClose&gt;-88.01271991962221&lt;/ns:prevClose&gt;<br>&lt;ns:symbol&gt;IBM&lt;/ns:symbol&gt;&lt;ns:volume&gt;15381&lt;/ns:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;<br>&lt;/soapenv:Envelope&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-[HttpClientWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;main&gt; :: mediate()
-[HttpClientWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
-[HttpClientWorker-1] DEBUG LogMediator - Log mediator :: mediate()
-[HttpClientWorker-1] INFO  LogMediator - Envelope: &lt;?xml version='1.0' encoding='utf-8'?&gt;<br>&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;soapenv:Envelope&gt;&lt;soapenv:Body&gt;<br>&lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;&lt;ns:return&gt;&lt;ns:change&gt;3.9759712191629117&lt;/ns:change&gt;<br>&lt;ns:earnings&gt;-9.463240695957264&lt;/ns:earnings&gt;&lt;ns:high&gt;97.0893936590198&lt;/ns:high&gt;&lt;ns:last&gt;93.87052890651084&lt;/ns:last&gt;<br>&lt;ns:lastTradeTimestamp&gt;Wed Apr 25 18:26:46 LKT 2007&lt;/ns:lastTradeTimestamp&gt;&lt;ns:low&gt;96.4856592398509&lt;/ns:low&gt;<br>&lt;ns:marketCap&gt;5.572519121414568E7&lt;/ns:marketCap&gt;&lt;ns:name&gt;IBM Company&lt;/ns:name&gt;&lt;ns:open&gt;-92.43795414108462&lt;/ns:open&gt;<br>&lt;ns:peRatio&gt;-18.381880013551893&lt;/ns:peRatio&gt;<br>&lt;ns:percentageChange&gt;-4.5174961332793435&lt;/ns:percentageChange&gt;&lt;ns:prevClose&gt;-88.01271991962221&lt;/ns:prevClose&gt;<br>&lt;ns:symbol&gt;IBM&lt;/ns:symbol&gt;&lt;ns:volume&gt;15381&lt;/ns:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;<br>&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-[HttpClientWorker-1] DEBUG SendMediator - Send mediator :: mediate()
-[HttpClientWorker-1] DEBUG SendMediator - Sending message using implicit message properties..
-[HttpClientWorker-1] DEBUG SendMediator - Sending To: null
-[HttpClientWorker-1] DEBUG SendMediator - SOAPAction: null
-[HttpClientWorker-1] DEBUG SendMediator - Body :
-&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;<br>&lt;soapenv:Body&gt;&lt;soapenv:Envelope&gt;&lt;soapenv:Body&gt;&lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;<br>&lt;ns:return&gt;&lt;ns:change&gt;3.9759712191629117&lt;/ns:change&gt;&lt;ns:earnings&gt;-9.463240695957264&lt;/ns:earnings&gt;<br>&lt;ns:high&gt;97.0893936590198&lt;/ns:high&gt;&lt;ns:last&gt;93.87052890651084&lt;/ns:last&gt;<br>&lt;ns:lastTradeTimestamp&gt;Wed Apr 25 18:26:46 LKT 2007&lt;/ns:lastTradeTimestamp&gt;&lt;ns:low&gt;96.4856592398509&lt;/ns:low&gt;<br>&lt;ns:marketCap&gt;5.572519121414568E7&lt;/ns:marketCap&gt;&lt;ns:name&gt;IBM Company&lt;/ns:name&gt;&lt;ns:open&gt;-92.43795414108462&lt;/ns:open&gt;<br>&lt;ns:peRatio&gt;-18.381880013551893&lt;/ns:peRatio&gt;<br>&lt;ns:percentageChange&gt;-4.5174961332793435&lt;/ns:percentageChange&gt;&lt;ns:prevClose&gt;-88.01271991962221&lt;/ns:prevClose&gt;<br>&lt;ns:symbol&gt;IBM&lt;/ns:symbol&gt;&lt;ns:volume&gt;15381&lt;/ns:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;<br>&lt;/soapenv:Envelope&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</pre>
-
-<p></p>
+through Synapse. If you execute Synapse in debug mode by editing the
+lib/log4j.properties "log4j.category.org.apache.synapse" as "DEBUG" instead
+of INFO, you will see more information as follows after a restart and replay
+of the above scenario again.</p>
+<pre>2007-11-05 15:03:51,082 [127.0.1.1-asankha] [I/O dispatcher 3]  INFO PipeImpl Using native OS Pipes for event-driven to stream IO bridging
+2007-11-05 15:03:51,206 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SynapseMessageReceiver Synapse received a new message for message mediation...
+2007-11-05 15:03:51,206 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SynapseMessageReceiver Received To: http://localhost:9000/soap/SimpleStockQuoteService
+2007-11-05 15:03:51,206 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SynapseMessageReceiver SOAPAction: urn:getQuote
+2007-11-05 15:03:51,206 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SynapseMessageReceiver WSA-Action: urn:getQuote
+2007-11-05 15:03:51,206 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG Axis2SynapseEnvironment Injecting MessageContext
+2007-11-05 15:03:51,207 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG Axis2SynapseEnvironment Using Main Sequence for injected message
+2007-11-05 15:03:51,207 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SequenceMediator Start : Sequence &lt;main&gt;
+2007-11-05 15:03:51,207 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SequenceMediator Sequence &lt;SequenceMediator&gt; :: mediate()
+2007-11-05 15:03:51,207 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG LogMediator Start : Log mediator
+2007-11-05 15:03:51,231 [127.0.1.1-asankha] [HttpServerWorker-1]  INFO LogMediator To: http://localhost:9000/soap/SimpleStockQuoteService, WSAction: urn:getQuote, SOAPAction: urn:getQuote, ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:DB76240DF26CE9AF1D1194253430879, Direction: request, Envelope: &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing"&gt;&lt;soapenv:Header&gt;&lt;wsa:To&gt;http://localhost:9000/soap/SimpleStockQuoteService&lt;/wsa:To&gt;&lt;wsa:MessageID&gt;urn:uuid:DB76240DF26CE9AF1D1194253430879&lt;/wsa:MessageID&gt;&lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;&lt;/soapenv:Header&gt;&lt;soapenv:Body&gt;&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;&lt;/m0:getQuote&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+2007-11-05 15:03:51,250 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG LogMediator End : Log mediator
+2007-11-05 15:03:51,250 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SendMediator Start : Send mediator
+2007-11-05 15:03:51,250 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SendMediator Sending request message using implicit message properties..
+Sending To: http://localhost:9000/soap/SimpleStockQuoteService
+SOAPAction: urn:getQuote
+2007-11-05 15:03:51,254 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG Axis2FlexibleMEPClient Sending [add = false] [sec = false] [rm = false] [ to Address: http://localhost:9000/soap/SimpleStockQuoteService]
+2007-11-05 15:03:51,302 [127.0.1.1-asankha] [HttpServerWorker-1]  INFO TimeoutHandler This engine will expire all callbacks after : 86400 seconds, irrespective of the timeout action, after the specified or optional timeout
+2007-11-05 15:03:51,356 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SendMediator End : Send mediator
+2007-11-05 15:03:51,356 [127.0.1.1-asankha] [HttpServerWorker-1] DEBUG SequenceMediator End : Sequence &lt;main&gt;
+2007-11-05 15:03:51,398 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Synapse received an asynchronous response message
+2007-11-05 15:03:51,400 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Received To: null
+2007-11-05 15:03:51,400 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver SOAPAction: null
+2007-11-05 15:03:51,400 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver WSA-Action: null
+2007-11-05 15:03:51,402 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Body : 
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;&lt;ns:return type="samples.services.GetQuoteResponse"&gt;&lt;ns:change&gt;4.03627430702446&lt;/ns:change&gt;&lt;ns:earnings&gt;-9.467701672785129&lt;/ns:earnings&gt;&lt;ns:high&gt;191.83014686803938&lt;/ns:high&gt;&lt;ns:last&gt;185.42637586281398&lt;/ns:last&gt;&lt;ns:lastTradeTimestamp&gt;Mon Nov 05 15:03:51 LKT 2007&lt;/ns:lastTradeTimestamp&gt;&lt;ns:low&gt;193.2690208751758&lt;/ns:low&gt;&lt;ns:marketCap&gt;-1737393.107878862&lt;/ns:marketCap&gt;&lt;ns:name&gt;IBM Company&lt;/ns:name&gt;&lt;ns:open&gt;-183.2632780777984&lt;/ns:open&gt;&lt;ns:peRatio&gt;-17.430497030284027&lt;/ns:peRatio&gt;&lt;ns:percentageChange&gt;1.9749680728382655&lt;/ns:percentageChange&gt;&lt;ns:prevClose&gt;204.37162314344914&lt;/ns:prevClose&gt;&lt;ns:symbol&gt;IBM&lt;/ns:symbol&gt;&lt;ns:volume&gt;6695&lt;/ns:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+2007-11-05 15:03:51,404 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG Axis2SynapseEnvironment Injecting MessageContext
+2007-11-05 15:03:51,404 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG Axis2SynapseEnvironment Using Main Sequence for injected message
+2007-11-05 15:03:51,404 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SequenceMediator Start : Sequence &lt;main&gt;
+2007-11-05 15:03:51,404 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SequenceMediator Sequence &lt;SequenceMediator&gt; :: mediate()
+2007-11-05 15:03:51,404 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG LogMediator Start : Log mediator
+2007-11-05 15:03:51,405 [127.0.1.1-asankha] [HttpClientWorker-1]  INFO LogMediator To: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:A6510AF6BD288D8DFB1194253431259544001-942151716, Direction: response, Envelope: &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;&lt;ns:return type="samples.services.GetQuoteResponse"&gt;&lt;ns:change&gt;4.03627430702446&lt;/ns:change&gt;&lt;ns:earnings&gt;-9.467701672785129&lt;/ns:earnings&gt;&lt;ns:high&gt;191.83014686803938&lt;/ns:high&gt;&lt;ns:last&gt;185.42637586281398&lt;/ns:last&gt;&lt;ns:lastTradeTimestamp&gt;Mon Nov 05 15:03:51 LKT 2007&lt;/ns:lastTradeTimestamp&gt;&lt;ns:low&gt;193.2690208751758&lt;/ns:low&gt;&lt;ns:marketCap&gt;-1737393.107878862&lt;/ns:marketCap&gt;&lt;ns:name&gt;IBM Company&lt;/ns:name&gt;&lt;ns:open&gt;-183.2632780777984&lt;/ns:open&gt;&lt;ns:peRatio&gt;-17.430497030284027&lt;/ns:peRatio&gt;&lt;ns:percentageChange&gt;1.9749680728382655&lt;/ns:percentageChange&gt;&lt;ns:prevClose&gt;204.37162314344914&lt;/ns:prevClose&gt;&lt;ns:symbol&gt;IBM&lt;/ns:symbol&gt;&lt;ns:volume&gt;6695&lt;/ns:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+2007-11-05 15:03:51,405 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG LogMediator End : Log mediator
+2007-11-05 15:03:51,405 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SendMediator Start : Send mediator
+2007-11-05 15:03:51,405 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SendMediator Sending response message using implicit message properties..
+Sending To: http://www.w3.org/2005/08/addressing/anonymous
+SOAPAction: null
+2007-11-05 15:03:51,408 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SendMediator End : Send mediator
+2007-11-05 15:03:51,408 [127.0.1.1-asankha] [HttpClientWorker-1] DEBUG SequenceMediator End : Sequence &lt;main&gt;</pre>
 
 <p>You have successfully completed the first part of this guide. Now let's
 look at the next scenario, proxy services.</p>
@@ -385,14 +388,13 @@ client sees as if they are hosted on it, and for example can perform ?wsdl
 and view the WSDL of the virtual proxy service. But in the Synapse
 configuration, such requests can be handled in anyway you like. Most obvious
 thing would be to do some processing to the message and send it to the actual
-service, probably running on a different computer. But it is not neccessary
-to always send the message to the actual service. You may list any
-combination of tasks to be performed on the messages received for the proxy
-service and terminate the flow or send some messge back to the client even
-without sending it to an actual service. Let's explore a simple proxy
-services scenario step by step to get a better feeling. As you have
-downloaded and installed Synapse in the previous section, now you can start
-directly on the sample.</p>
+service, probably running on a different computer. But it is not necessary to
+always send the message to the actual service. You may list any combination
+of tasks to be performed on the messages received for the proxy service and
+terminate the flow or send some java back to the client even without sending
+it to an actual service. Let's explore a simple proxy services scenario step
+by step to get a better feeling. As you have downloaded and installed Synapse
+in the previous section, now you can start directly on the sample.</p>
 
 <p></p>
 
@@ -422,7 +424,7 @@ command.</p>
 <h4>Starting Synapse</h4>
 
 <p>We have to start Synapse with a configuration containing a proxy service
-definition. In this case we are using the synapse_sample_100.xml, so that you
+definition. In this case we are using the synapse_sample_150.xml, so that you
 don't have to write the configuration your self.</p>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="StockQuoteProxy"&gt;
@@ -458,16 +460,16 @@ are explained in the samples and configuration guides.</p>
 <p></p>
 
 <div class="command">
-<p>Linux / Unix: . synapse.sh -sample 100</p>
+<p>Linux / Unix: . synapse.sh -sample 150</p>
 
-<p>Windows: synapse.bat -sample 100</p>
+<p>Windows: synapse.bat -sample 150</p>
 </div>
 
 <p></p>
 
 <p>Synapse will display a set of messages as in the previous section
 describing the steps of starting procedure. Before running the client, it is
-time to observe another feature of proxy services. That is diplaying the
+time to observe another feature of proxy services. That is displaying the
 published WSDL. Just open a web browser and point it to the address
 http://localhost:8080/soap/StockQuoteProxy?wsdl. You will see the
 sample_proxy_1.wsdl specified in the configuration but containing the correct
@@ -495,8 +497,8 @@ Standard :: Stock price = $165.32687331383468 </div>
 <p></p>
 
 <p>This quick guide illustrates the simple use case of proxy services. Please
-refer to samples #100 and above in the Samples guide, for indepth coverage of
-more advanced use cases.</p>
+refer to samples #100 and above in the Samples guide, for in depth coverage
+of more advanced use cases.</p>
 
 <p></p>
 

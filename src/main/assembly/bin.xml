@@ -119,7 +119,7 @@
         </fileSet>
         <fileSet>
             <directory>src/main/release/docs</directory>
-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}</outputDirectory>
             <includes>
                 <include>release_notes.txt</include>
             </includes>

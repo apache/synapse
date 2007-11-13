@@ -18,19 +18,30 @@
   -->
 
 <!-- Switching from ftp transport listener to mail transport sender -->
+
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-    <proxy name="StockQuoteProxy">
-        <target>
-            <endpoint>
-                <address uri="vfs:zip:file:///tmp/out/something.zip!out.xml"/>
-            </endpoint>
-                <outSequence>
-                <send/>
-                </outSequence>
-        </target>
-        <parameter name="transport.vfs.FileURI">file:///tmp/in</parameter>
-        <parameter name="transport.vfs.ContentType">text/xml</parameter>
-        <parameter name="transport.vfs.FileNamePattern">in.xml</parameter>
-        <parameter name="transport.PollInterval">60</parameter>
-    </proxy>
+  <proxy name="StockQuoteProxy" transports="vfs">
+    <parameter name="transport.vfs.FileURI">vfs:ftp://guest:guest@localhost/test?vfs.passive=true</parameter> <!--CHANGE-->
+    <parameter name="transport.vfs.ContentType">text/xml</parameter>
+    <parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
+    <parameter name="transport.PollInterval">15</parameter>
+    
+    <target>
+      <inSequence>
+        <header name="Action" value="urn:getQuote"/>
+      </inSequence>                        
+      <endpoint>
+        <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+      </endpoint>
+      <outSequence>
+        <property action="set" name="OUT_ONLY" value="true"/>
+        <send>
+          <endpoint>
+            <address uri="mailto:user@host"/> <!--CHANGE-->
+          </endpoint>                                        
+        </send>
+      </outSequence>
+    </target>
+    <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+  </proxy>
 </definitions>

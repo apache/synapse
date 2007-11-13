@@ -8,7 +8,7 @@
                 <wsp:All>
                     <throttle:MaximumCount>4</throttle:MaximumCount>
                     <throttle:UnitTime>800000</throttle:UnitTime>
-                    <throttle:ProhibitTimePeriod wsp:Optional="true">10000</throttle:ProhibitTimePeriod>
+                    <throttle:ProhibitTimePeriod wsp:Optional="true">1000</throttle:ProhibitTimePeriod>
                 </wsp:All>
                 <throttle:IsAllow>true</throttle:IsAllow>
             </wsp:ExactlyOne>

@@ -59,6 +59,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 	private String  messageContextKey;
 	private boolean ignoreNextMsg;
 	private boolean pooledThread;
+	boolean lastMessageInvoked;
 	
 	public InvokerWorker (ConfigurationContext configurationContext, InvokerBean bean) {
 		// All invoker workers need to use the same lock, so we point to the static one here.
@@ -99,11 +100,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 	public void run() {
 		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::run, message " + messageNumber + ", sequence " + sequence);
 		
-		// If we are not the holder of the correct lock, then we have to stop
-		if(lock != null && !lock.ownsLock(workId, this)) {
-			if (log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run, another worker holds the lock");
-			return;
-		}
 		
 		Transaction tran = null;
 		try {
@@ -111,10 +107,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			Runnable nextRunnable = null;
 
 			// Invoke the first message
-			invokeMessage(null);
+	    	lastMessageInvoked = invokeMessage(null);
 
 			// Look for the next message, so long as we are still processing normally
-			while(!ignoreNextMsg) {
+			while(!ignoreNextMsg && lastMessageInvoked) {
+				if(log.isDebugEnabled()) log.debug("InvokerWorker:: looking for next msg to invoke");
 				InvokerBean finder = new InvokerBean();
 				finder.setSequenceID(sequence);
 				finder.setMsgNo(messageNumber + 1);
@@ -127,11 +124,12 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 				if(nextBean != null) {
 					if(pooledThread) {
+						if(log.isDebugEnabled()) log.debug("InvokerWorker:: pooledThread");
 						initializeFromBean(nextBean);
 						final Transaction theTran = tran;
 						Runnable work = new Runnable() {
 							public void run() {
-								invokeMessage(theTran);
+								lastMessageInvoked = invokeMessage(theTran);
 							}
 						};
 
@@ -146,6 +144,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 						tran = null;
 					} else {
+						if(log.isDebugEnabled()) log.debug("InvokerWorker:: not pooled thread");
 						nextWorker = new InvokerWorker(configurationContext, nextBean);
 						nextWorker.setPooled();
 						nextWorker.setWorkId(workId);
@@ -169,7 +168,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					// break out of the loop
 					break;
 				}
-			}
+			}//end while
 					
 			if (workId !=null && lock!=null) {
 				lock.removeWork(workId);
@@ -202,11 +201,18 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run");
 	}
 
-	private void invokeMessage(Transaction tran) {
+	private boolean invokeMessage(Transaction tran) {
 		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::invokeMessage");
 
 		Transaction transaction = null;
 		MessageContext msgToInvoke = null;
+		boolean messageInvoked = true;
+		
+	    // If we are not the holder of the correct lock, then we have to stop
+	    if(lock != null && (!lock.ownsLock(workId, this))) {
+	    	if (log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run, another worker holds the lock");
+	    	return false;
+	    }
 		
 		try {
 			
@@ -223,6 +229,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			InvokerBean invokerBean = invokerBeanMgr.retrieve(messageContextKey);
 
 			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
+			if(msgToInvoke==null){
+				//return since there is nothing to do
+				if(log.isDebugEnabled()) log.debug("null msg");
+				return false;
+			}
 
 			// ending the transaction before invocation.
 			if(transaction != null) {
@@ -288,6 +299,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 				if (transaction != null && transaction.isActive())
 					transaction.rollback();
+				messageInvoked = false;
 				
 				handleFault(rmMsg, e);
 			}
@@ -317,9 +329,9 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					TerminateManager.cleanReceivingSideAfterInvocation(invokerBean.getSequenceID(), storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
-					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage Last message return");	
 					if(transaction != null && transaction.isActive()) transaction.commit();
-					return;
+					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage Last message return " + messageInvoked);
+					return messageInvoked;	
 				}
 			}
 			
@@ -344,6 +356,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.toString(), e);
+			messageInvoked = false;
 		} finally {
 			if (transaction!=null && transaction.isActive()) {
 				try {
@@ -355,7 +368,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage");
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage " + messageInvoked);
+		return messageInvoked;
 	}
 
 	private void makeMessageReadyForReinjection(MessageContext messageContext) {

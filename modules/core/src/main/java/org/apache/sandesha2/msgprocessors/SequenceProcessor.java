@@ -382,7 +382,7 @@ public class SequenceProcessor {
 		// then we should hand the message over to the invoker thread. If not, we can invoke
 		// it directly ourselves.
 		InvokerWorker worker = null;
-		if (SandeshaUtil.isInOrder(msgCtx) || storageManager.hasUserTransaction(msgCtx)) {
+		if (SandeshaUtil.isInOrder(msgCtx)) {
 		    
 			InvokerBean invokerBean = new InvokerBean(key, msgNo, sequenceId);
 			ContextManager contextMgr = SandeshaUtil.getContextManager(configCtx);

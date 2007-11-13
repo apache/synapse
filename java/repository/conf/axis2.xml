@@ -267,19 +267,37 @@
     <!-- ================================================= -->
     <!-- Clustering  -->
     <!-- ================================================= -->
-    <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->
-    <!--
-    <cluster class="org.apache.axis2.cluster.tribes.TribesClusterManager">
-        <parameter name="param1">value1</parameter>
-        <parameter name="domain">apache.axis2.domain</parameter>
-    	<configurationManager class="org.apache.axis2.cluster.configuration.TribesConfigurationManager">
-    	    <listener class="org.apache.axis2.cluster.configuration.DefaultConfigurationManagerListener"/>
-    	</configurationManager>
-    	<contextManager class="org.apache.axis2.cluster.context.TribesContextManager">
-    	    <listener class="org.apache.axis2.cluster.context.DefaultContextManagerListener"/>
-    	</contextManager>
-    </cluster>
-     -->
+    <!-- Configure and uncomment following for preparing Synapse to a clustered environment -->
+    <!--<cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager">
+        <parameter name="AvoidInitiation">false</parameter>
+        <parameter name="domain">apache-synapse.domain</parameter>
+        <contextManager class="org.apache.axis2.clustering.context.DefaultContextManager">
+            <listener class="org.apache.axis2.clustering.context.DefaultContextManagerListener"/>
+            <replication>
+                <defaults>
+                    <exclude name="local_*"/>
+                    <exclude name="LOCAL_*"/>
+                </defaults>
+                <context class="org.apache.axis2.context.ConfigurationContext">
+                    <exclude name="UseAsyncOperations"/>
+                    <exclude name="SequencePropertyBeanMap"/>
+                    <exclude name="WORK_DIR"/>
+                    <exclude name="NextMsgBeanMap"/>
+                    <exclude name="RetransmitterBeanMap"/>
+                    <exclude name="StorageMapBeanMap"/>
+                    <exclude name="CreateSequenceBeanMap"/>
+                    <exclude name="ConfigContextTimeoutInterval"/>
+                    <exclude name="ContainerManaged"/>
+                </context>
+                <context class="org.apache.axis2.context.ServiceGroupContext">
+                    <exclude name="my.sandesha.*"/>
+                </context>
+                <context class="org.apache.axis2.context.ServiceContext">
+                    <exclude name="my.sandesha.*"/>
+                </context>
+            </replication>
+        </contextManager>
+    </cluster>-->
 
     <!-- ================================================= -->
     <!-- Phases  -->

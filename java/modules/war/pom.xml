@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>synapse</artifactId>
-        <version>SNAPSHOT</version>
+        <version>1.1.1-SNAPSHOT</version>
     </parent>
 
     <groupId>org.apache.synapse</groupId>
@@ -62,7 +62,7 @@
                                     <groupId>org.apache.sandesha2</groupId>
                                     <artifactId>sandesha2</artifactId>
                                     <version>${sandesha2.version}</version>
-                                    <type>mar</type>                                    
+                                    <type>mar</type>
                                     <outputDirectory>target/temp/lib</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
@@ -93,9 +93,9 @@
                             <directory>repository</directory>
                             <targetPath>WEB-INF/repository</targetPath>
                             <excludes>
-                                <exclude>repository/conf/web.xml</exclude>
-                                <exclude>repository/conf/axis2.xml</exclude>
-                                <exclude>repository/conf/synapse.xml</exclude>
+                                <exclude>conf/web.xml</exclude>
+                                <exclude>conf/axis2.xml</exclude>
+                                <exclude>conf/synapse.xml</exclude>
                             </excludes>
                         </resource>
                         <!--<resource>-->
@@ -119,6 +119,7 @@
                             <targetPath>WEB-INF/classes</targetPath>
                             <includes>
                                 <include>log4j.properties</include>
+                                <include>synapse.properties</include>
                                 <include>identity.jks</include>
                                 <include>trust.jks</include>
                             </includes>
@@ -223,23 +224,23 @@
                         </resource>
                         <resource>
                             <directory>repository/conf</directory>
-                            <targetPath>WEB-INF</targetPath>
-                            <includes>
-                                <include>web.xml</include>
-                            </includes>
-                        </resource>
-                        <resource>
-                            <directory>repository/conf</directory>
                             <targetPath>WEB-INF/conf</targetPath>
                             <includes>
                                 <include>axis2.xml</include>
                                 <include>synapse.xml</include>
                             </includes>
                         </resource>
+                        <resource>
+                            <directory>repository/conf</directory>
+                            <targetPath>WEB-INF</targetPath>
+                            <includes>
+                                <include>web.xml</include>
+                            </includes>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
-            
+
         </plugins>
     </build>
 </project>

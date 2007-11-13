@@ -17,19 +17,15 @@
   ~  under the License.
   -->
 
-<!-- TODO: Find the topic -->
+<!-- Use of both concurrency throttling and request rate based throttling -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
         <parameter name="root">file:repository/</parameter>
         <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
-        <parameter name="cachableDuration">15000</parameter>
+        <parameter name="cachableDuration">150000</parameter>
     </registry>
-
-
-    <localEntry key="thottlePolicy"
-                src="file:./repository/conf/sample/resources/policy/throttle_policy.xml"/>
 
     <sequence name="onAcceptSequence">
         <log level="custom">

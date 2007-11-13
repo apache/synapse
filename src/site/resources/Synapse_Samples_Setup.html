@@ -105,56 +105,80 @@
 
 <p></p>
 
-<p>Synapse ships with a set of working examples that demonstrates some of the
+<p>Synapse ships with a set of working examples that demonstrate some of the
 basic features and capabilities of Synapse. A set of sample clients and
-services are provided in addition to the sample configurations, and scripts
-are provided to execute the sample scenarions as explained below. </p>
+services are provided in addition to the sample configurations. Scripts are
+provided to execute the sample scenarios as explained below. </p>
 
-<h4>Pre-requisites</h4>
+<h4>Prerequisites</h4>
 
-<p>You will need a Java development kit / JRE version 1.4 or later and Apache
-Ant 1.5 or later at a minimum to try out the samples. Ant can be downloaded
-from http://ant.apache.org. The JMS examples could be executed against an
-ActiveMQ installation by default (or another JMS provider with configuration)
-and any https examples would require a JDK version 1.5 or later.</p>
+<p>To try out the samples you will need Java development kit version 1.5.x or
+later and Apache Ant version 1.6.5 or later. Ant can be downloaded from
+http://ant.apache.org. The JMS examples can be executed against an ActiveMQ
+installation by default (or another JMS provider with relevant configuration
+changes.)</p>
 
 <p></p>
 
-<p>Note*: The samples and the documentation assumes that you are running
-Synapse in DEBUG mode. You could switch from the default INFO log messages to
+<p>Note*: The samples and the documentation assume that you are running
+Synapse in DEBUG mode. You can switch from the default INFO log messages to
 DEBUG log messages by changing the line
 "log4j.category.org.apache.synapse=INFO" as
 "log4j.category.org.apache.synapse=DEBUG" in the lib/log4j.properties
 file.</p>
 
-<h2>Understanding the samples</h2>
+<h2>Understanding the Samples</h2>
 
-<p></p>
+<table border="1" style="width: 100%">
+  <caption></caption>
+  <tbody>
+    <tr>
+      <td>Client</td>
+      <td>Synapse</td>
+      <td>Service</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ant stockquote</td>
+      <td>./synapse.sh -sample &lt;n&gt;</td>
+      <td>SimpleStockQuoteService</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>SecureStockQuoteService etc.</td>
+    </tr>
+  </tbody>
+</table>
 
 <p>The above diagram depicts the interactions between the clients, Synapse
-and services at a high level. The Clients are able to send SOAP/REST or POX
-messages over transports such as http/s or JMS with WS-Addressing,
-WS-Security or WS-Reliable messaging. They could send binary optimized
-content using MTOM or SwA or binary or plain text JMS messages. After
-mediation through Synapse, the requests are passed over to the sample
-services. The sample clients and services are explained below.</p>
+and the services at a higher level. The Clients are able to send SOAP/REST or
+POX messages over transports such as http/s or JMS with WS-Addressing,
+WS-Security or WS-Reliable messaging. They can send binary optimized content
+using MTOM or SwA or binary or plain text JMS messages. After mediation
+through Synapse, the requests are passed over to the sample services. The
+sample clients and services are explained below.</p>
 
 <p></p>
 
-<h2>Using the sample clients</h2>
+<h2>Using the Sample Clients</h2>
 
 <p></p>
 
-<p>The sample clients could be executed from the samples/axis2Client
-directory through the provided ant script. Simply executing 'ant' displays
-the available clients and some of the sample options used to configure them.
-The sample clients available are listed below:</p>
+<p>The sample clients can be executed from the samples/axis2Client directory
+through the provided ant script. Simply executing 'ant' displays the
+available clients and some of the sample options used to configure them. The
+sample clients available are listed below:</p>
 
-<h3>1. Stock quote client</h3>
+<h3>1. Stock Quote Client</h3>
 
 <p></p>
 
-<p>This is a simple SOAP client that could send stock quote requests, and
+<p>This is a simple SOAP client that can send stock quote requests, and
 receive and display the last sale price for a stock symbol. </p>
 <pre>ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
   [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
@@ -166,7 +190,7 @@ receive and display the last sale price for a stock symbol. </p>
 payloads listed below as SOAP messages:</p>
 <ul>
   <li>quote - send a quote request for a single stock as follows. The
-    response contains the last sales price for the stock which would be
+    response contains the last sales price for the stock which will be
     displayed 
     <pre>&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
   &lt;m:request&gt;
@@ -174,11 +198,11 @@ payloads listed below as SOAP messages:</p>
   &lt;/m:request&gt;
 &lt;/m:getQuote&gt;</pre>
   </li>
-  <li>customquote - send a quote request in a custom format. Synapse would
-    transform this custom request into the standard stock quote request
-    format and send it to the service. Upon receipt of the response, it would
-    be transformed again to a custom response format and returned to the
-    client, which will then display the last sales price. 
+  <li>customquote - send a quote request in a custom format. Synapse will
+    transform this custom request to the standard stock quote request format
+    and send it to the service. Upon receipt of the response, it will be
+    transformed again to a custom response format and returned to the client,
+    which will then display the last sales price. 
     <pre>&lt;m0:checkPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;
   &lt;m0:Code&gt;symbol&lt;/m0:Code&gt;
 &lt;/m0:checkPriceRequest&gt;</pre>
@@ -215,17 +239,17 @@ payloads listed below as SOAP messages:</p>
 <p>Note : See samples/axis2Client/src/samples/common/StockQuoteHandler.java
 for sample responses expected by the clients.</p>
 
-<h4>Smart client mode:</h4>
+<h4>Smart Client Mode:</h4>
 
 <p>The 'addurl' property sets the WS-Addressing EPR, and the 'trpurl' sets a
 transport URL for a message. Thus by specifying both of these properties, the
-client could operate in the 'smart client' mode, where the addressing EPR
-could specify the ultimate receiver, while the transport URL set to Synapse
-would ensure that any necessary mediation takes place before the message is
-delivered to the ultimate reciver. </p>
+client can operate in the 'smart client' mode, where the addressing EPR can
+specify the ultimate receiver, while the transport URL set to Synapse will
+ensure that any necessary mediation takes place before the message is
+delivered to the ultimate receiver. </p>
 <pre>e.g: ant stockquote -Daddurl=&lt;addressingEPR&gt; -Dtrpurl=&lt;synapse&gt;</pre>
 
-<h4>Gateway / Dumb client mode:</h4>
+<h4>Gateway / Dumb Client Mode:</h4>
 
 <p>By specifying only a transport URL, the client operates in the 'dumb
 client' mode, where it sends the message to Synapse and depends on the
@@ -233,12 +257,12 @@ Synapse rules for proper mediation and routing of the message to the ultimate
 destination.</p>
 <pre>e.g: ant stockquote -Dtrpurl=&lt;synapse&gt;</pre>
 
-<h4>Proxy client mode:</h4>
+<h4>Proxy Client Mode:</h4>
 
 <p>In this mode, the client uses the 'prxurl' as a http proxy to send the
-request. Thus by setting the 'prxurl' to Synapse, the client could ensure
-that the message would reach Synapse for mediation. The client could
-optionally set a WS-Addressing EPR if required.</p>
+request. Thus by setting the 'prxurl' to Synapse, the client can ensure that
+the message will reach Synapse for mediation. The client can optionally set a
+WS-Addressing EPR if required.</p>
 <pre>e.g: ant stockquote -Dprxurl=&lt;synapse&gt; [-Daddurl=&lt;addressingEPR&gt;]</pre>
 
 <p></p>
@@ -246,27 +270,27 @@ optionally set a WS-Addressing EPR if required.</p>
 <p>Specifying a policy</p>
 
 <p>By specifying a WS-Policy using the 'policy' property, QoS aspects such as
-WS-Security could be enforced on the request. The policy could specify
-details such as timestamps, signatures and encryption. See Apache Axis2 and
-Apache Rampart documentation for more information.</p>
+WS-Security can be enforced on the request. The policy can specify details
+such as timestamps, signatures and encryption. See Apache Axis2 and Apache
+Rampart documentation for more information.</p>
 
 <p></p>
 
-<h3>2. Generic JMS client</h3>
+<h3>2. Generic JMS Client</h3>
 
 <p></p>
 
 <p>The JMS client is able to send plain text, plain binary content or POX
 content by directly publishing a JMS message to the specified destination.
 The JMS destination name should be specified with the 'jms_dest' property.
-The 'jms_type' property could specify 'text', 'binary' or 'pox' to specify
-the type of message payload. </p>
+The 'jms_type' property can specify 'text', 'binary' or 'pox' to specify the
+type of message payload. </p>
 
 <p></p>
 
-<p>The plain text payload for a 'text' message could be specified through the
-'payload' property. For binary messages, the 'payload' property would contain
-the path to the binary file. For POX messages, the 'payload' property would
+<p>The plain text payload for a 'text' message can be specified through the
+'payload' property. For binary messages, the 'payload' property will contain
+the path to the binary file. For POX messages, the 'payload' property will
 hold a stock symbol name to be used within the POX request for stock order
 placement request.</p>
 
@@ -281,22 +305,22 @@ above) installation on the local machine.</p>
 
 <p></p>
 
-<h3>3. MTOM / SwA client</h3>
+<h3>3. MTOM / SwA Client</h3>
 
 <p></p>
 
 <p>The MTOM / SwA client is able to send a binary image file as a MTOM or SwA
 optimized message, and receive the same file again through the response and
-save it as a temporary file. The 'opt_mode' could specify 'mtom' or 'swa'
+save it as a temporary file. The 'opt_mode' can specify 'mtom' or 'swa'
 respectively for the above mentioned optimizations. Optionally the path to a
-custom file could be specified through the 'opt_file' property, and the
-destination address could be changed through the 'opt_url' property if
+custom file can be specified through the 'opt_file' property, and the
+destination address can be changed through the 'opt_url' property if
 required.</p>
 <pre>e.g. ant optimizeclient -Dopt_mode=[mtom | swa]</pre>
 
 <p></p>
 
-<h2>Starting the sample services</h2>
+<h2>Starting the Sample Services</h2>
 
 <p></p>
 
@@ -306,14 +330,13 @@ JMS transports, using WS-Addressing, WS-Security and WS-Reliable Messaging
 and handling of binary content using MTOM and SwA.</p>
 
 <p>The sample services can be found in the samples/axis2Server/src directory
-and could be built and deployed using ant from within each service
-directory</p>
-<pre>user@host:/tmp/synapse-1.0/samples/axis2Server/src/SimpleStockQuoteService$ ant
+and can be built and deployed using ant from within each service directory</p>
+<pre>user@host:/tmp/synapse-1.1/samples/axis2Server/src/SimpleStockQuoteService$ ant
 Buildfile: build.xml
 ...
 build-service:
    ....
-      [jar] Building jar: /tmp/synapse-1.0/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
+      [jar] Building jar: /tmp/synapse-1.1/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
 
 BUILD SUCCESSFUL
 Total time: 3 seconds</pre>
@@ -325,14 +348,14 @@ execute the axis2server.sh or axis2server.bat script. This starts the Axis2
 server with the http transport listener on port 9000 and https on 9002
 respectively. To enable JMS transport, you will need to setup and start a JMS
 provider. An ActiveMQ 4.0.1 or later JMS server on the local machine is
-supported by default, and could be easily enabled by uncommenting the JMS
+supported by default, and can be easily enabled by uncommenting the JMS
 transport from the repository/conf/axis2.xml</p>
 
 <p></p>
 
-<p>Sample services</p>
+<h3>Sample services</h3>
 
-<h3>1. SimpleStockQuoteService</h3>
+<h4>1. SimpleStockQuoteService</h4>
 
 <p>This service has four operations, getQuote (in-out), getFullQuote(in-out),
 getMarketActivity(in-out) and placeOrder (in-only). The getQuote operation
@@ -342,24 +365,24 @@ of days, and the getMarketActivity operation returns stock quotes for a list
 of given symbols. The placeOrder operation will accept a one way message for
 an order.</p>
 
-<h3>2. SecureStockQuoteService </h3>
+<h4>2. SecureStockQuoteService </h4>
 
 <p>This service is a clone of the SimpleStockQuoteService, but has
 WS-Security enabled and an attached security policy for signing and
 encryption of messages.</p>
 
-<h3>3. MTOMSwASampleService</h3>
+<h4>3. MTOMSwASampleService</h4>
 
 <p>This service has three operations uploadFileUsingMTOM(in-out),
 uploadFileUsingSwA(in-out) and oneWayUploadUsingMTOM(in-only) and
 demonstrates the use of MTOM and SwA. The uploadFileUsingMTOM and
 uploadFileUsingSwA operations accept a binary image from the SOAP request as
-MTOM and SwA, and returns this image back again as the response; while the
+MTOM and SwA, and returns this image back again as the response, while the
 oneWayUploadUsingMTOM saves the request message to disk.</p>
 
 <p></p>
 
-<p>Starting sample Synapse configurations</p>
+<h3>Starting Sample Synapse Configurations</h3>
 
 <p>To start Synapse with the sample default configuration, execute the
 synapse.bat or synapse.sh script found in the /bin directory. This starts up
@@ -373,7 +396,7 @@ synapse.sh -sample &lt;n&gt;</pre>
 
 <p></p>
 
-<h2>Setting up JMS</h2>
+<h2>Setting up the JMS Listener</h2>
 
 <p></p>
 
@@ -382,15 +405,11 @@ synapse.sh -sample &lt;n&gt;</pre>
 need to copy the following client JAR files into the Synapse 'lib' folder to
 support ActiveMQ. These files are found in the 'lib' directory of the
 ActiveMQ installation.</p>
-
-<p></p>
 <ul>
   <li>activeio-core-3.0.0-incubator.jar</li>
   <li>activemq-core-4.1.0-incubator.jar</li>
   <li>geronimo-j2ee-management_1.0_spec-1.0.jar</li>
 </ul>
-
-<p></p>
 
 <p>To enable the JMS transport, you need to uncomment the JMS transport
 listener configuration. If you are using a JMS provider other than ActiveMQ
@@ -400,7 +419,7 @@ for synapse, the repository/conf/axis2.xml must be updated, while to enable
 JMS support for the sample Axis2 server the
 samples/axis2Server/repository/conf/axis2.xml file must be updated.</p>
 <pre>    &lt;!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)--&gt;
-    &lt;transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"&gt;
+    &lt;transportReceiver name="jms" class="org.apache.synapse.transport.jms.JMSListener"&gt;
         &lt;parameter name="myTopicConnectionFactory" locked="false"&gt;
                 &lt;parameter name="java.naming.factory.initial" locked="false"&gt;org.apache.activemq.jndi.ActiveMQInitialContextFactory&lt;/parameter&gt;
                 &lt;parameter name="java.naming.provider.url" locked="false"&gt;tcp://localhost:61616&lt;/parameter&gt;
@@ -422,15 +441,12 @@ samples/axis2Server/repository/conf/axis2.xml file must be updated.</p>
 
 <p></p>
 
-
-<h2 id="mailsender">Setting up mail transport sender</h2>
+<h2 id="mailsender">Setting up Mail Transport Sender</h2>
 
 <p>To enable the mail transport, you need to uncomment the mail transport
-sender configuration in the repository/conf/axis2.xml.  Change the mail.smtp.host parameter value
-to a working SMTP host.</p>
-
-<pre>
-    &lt;!-- ================================================= --&gt;
+sender configuration in the repository/conf/axis2.xml. Change the
+mail.smtp.host parameter value to a working SMTP host.</p>
+<pre>    &lt;!-- ================================================= --&gt;
     &lt;!-- Mail Transport Sender  --&gt;
     &lt;!--Only need to uncomment the sender. Configuration is achieved with every client.
         At any instant mail host should be given. Sample configuration has been given.
@@ -438,34 +454,65 @@ to a working SMTP host.</p>
     &lt;!-- ================================================= --&gt;
     &lt;transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender"&gt;
         &lt;parameter name="mail.smtp.host"&gt;localhost&lt;/parameter&gt;
-    &lt;/transportSender&gt;
-</pre>
+    &lt;/transportSender&gt;</pre>
 
 <p></p>
 
-
-<h2 id="script">Configuring Synapse for Script Mediator support</h2>
+<h2 id="script">Configuring Synapse for Script Mediator Support</h2>
 
 <p></p>
 
 <p>The Synapse Script Mediator is a Synapse extension, and thus all
-pre-requisites are not bundled by default with the Synapse distribution.
+prerequisites are not bundled by default with the Synapse distribution.
 Before you use some script mediators you may need to manually add the
 required jar files to the Synapse lib directory, and optionally perform other
 installation tasks as may be required by the individual scripting language.
-This is detailed in the following sections.</p>
+This is explained in the following sections.</p>
 
-<h4>JavaScript support</h4>
+<h4>JavaScript Support</h4>
 
 <p>The JavaScript/E4X support is enabled by default and comes ready-to-use
 with the Synapse distribution.</p>
 
-<h4>Ruby support</h4>
+<h4>Ruby Support</h4>
 
 <p>For Ruby support you need to download the 'jruby-complete.jar' from the
-Maven repository for JRuby, and copy it into the 'lib' folder of Synapse . The
-JRuby JAR can be downloaded from <a
+Maven repository for JRuby, and copy it into the 'lib' folder of Synapse .
+The JRuby JAR can be downloaded from <a
 href="http://repo1.maven.org/maven2/org/jruby/jruby-complete/">here</a>.</p>
+
+<p></p>
+
+<h2 id="derby">Setting up Derby database server</h2>
+
+<p>You can download Apache Derby distribution from <a
+href="http://db.apache.org/derby/">http://db.apache.org/derby/</a></p>
+<ol>
+  <li>Set up and start the Derby network server</li>
+  <li>Create and open a connection to the database using the Derby client
+    driver 
+    <p>CONNECT
+    'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</p>
+  </li>
+  <li>Create a table using the following statement 
+    <p>create table company(name varchar(10), id varchar(10), price
+    double);</p>
+  </li>
+  <li>Inserts some data using following statements 
+    <p>insert into company values ('IBM','c1',0.0);</p>
+    <p>insert into company values ('SUN','c2',0.0);</p>
+    <p>insert into company values ('MSFT','c3',0.0);</p>
+  </li>
+</ol>
+
+<p>When using Derby, you need to add derby.jar, derbyclient.jar and
+derbynet.jar to the classpath. This can be done by putting the above three
+jars into the Synapse lib directory. For testing these samples Derby 10.1.1.0
+binary distribution was used.</p>
+
+<p>You can use any other database product instead of Derby. Then you have to
+change the database connection details accordingly. Also you have to copy the
+required database driver jars to the Synapse classpath.</p>
 
 <p></p>
 </body>

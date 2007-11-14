@@ -31,8 +31,9 @@ import java.util.Iterator;
 
 /**
  * Creates an instance of a Cache mediator using XML configuration specified
- * 
- * &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="mili-seconds"&gt;
+ *
+ * &lt;cache (id="string")? scope="string" collector=(true | false)
+ *      hashGenerator="class" timeout="mili-seconds"&gt;
  *  &lt;onCacheHit (sequence="key")?&gt;
  *   (mediator)+
  *  &lt;/onCacheHit&gt;
@@ -42,17 +43,18 @@ import java.util.Iterator;
 public class CacheMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName CACHE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "cache");
-    private static final QName ATT_ID  = new QName("id");
+    private static final QName ATT_ID = new QName("id");
+    private static final QName ATT_COLLECTOR = new QName("collector");
     private static final QName ATT_HASH_GENERATOR = new QName("hashGenerator");
-    private static final QName ATT_TIMEOUT        = new QName("timeout");
-    private static final QName ATT_SCOPE          = new QName("scope");
-    private static final QName ATT_SEQUENCE       = new QName("sequence");
-    private static final QName ATT_TYPE           = new QName("type");
-    private static final QName ATT_SIZE           = new QName("maxSize");
-    private static final QName ON_CACHE_HIT_Q
-        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onCacheHit");
-    private static final QName IMPLEMENTATION_Q
-        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "implementation");
+    private static final QName ATT_TIMEOUT = new QName("timeout");
+    private static final QName ATT_SCOPE = new QName("scope");
+    private static final QName ATT_SEQUENCE = new QName("sequence");
+    private static final QName ATT_TYPE = new QName("type");
+    private static final QName ATT_SIZE = new QName("maxSize");
+    private static final QName ON_CACHE_HIT_Q =
+        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onCacheHit");
+    private static final QName IMPLEMENTATION_Q =
+        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "implementation");
     private static final long DEFAULT_TIMEOUT = 5000L;
     private static final int DEFAULT_DISK_CACHE_SIZE = 200;
 
@@ -62,83 +64,92 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
             handleException("Unable to create the cache mediator. " +
                 "Unexpected element as the cache mediator configuration");
         }
-        
+
         CacheMediator cache = new CacheMediator();
 
         OMAttribute idAttr = elem.getAttribute(ATT_ID);
-        if (idAttr != null && idAttr.getAttributeValue() != null){
+        if (idAttr != null && idAttr.getAttributeValue() != null) {
             cache.setId(idAttr.getAttributeValue());
         }
 
-        OMAttribute hashGeneratorAttr = elem.getAttribute(ATT_HASH_GENERATOR);
-        if (hashGeneratorAttr != null && hashGeneratorAttr.getAttributeValue() != null) {
-            try {
-                Class generator = Class.forName(hashGeneratorAttr.getAttributeValue());
-                Object o = generator.newInstance();
-                if (o instanceof DigestGenerator) {
-                    cache.setDigestGenerator((DigestGenerator) o);
-                } else {
-                    handleException("Specified class for the hashGenerator is not a " +
-                        "DigestGenerator. It *must* implement " +
-                        "org.wso2.caching.digest.DigestGenerator interface");
-                }
-            } catch (ClassNotFoundException e) {
-                handleException("Unable to load the hash generator class", e);
-            } catch (IllegalAccessException e) {
-                handleException("Unable to access the hash generator class", e);
-            } catch (InstantiationException e) {
-                handleException("Unable to instantiate the hash generator class", e);
-            }
-        }
-
-        OMAttribute timeoutAttr = elem.getAttribute(ATT_TIMEOUT);
-        if (timeoutAttr != null && timeoutAttr.getAttributeValue() != null) {
-            cache.setTimeout(Long.parseLong(timeoutAttr.getAttributeValue()));
-        } else {
-            cache.setTimeout(DEFAULT_TIMEOUT);
-        }
-
         OMAttribute scopeAttr = elem.getAttribute(ATT_SCOPE);
-        if (scopeAttr != null && scopeAttr.getAttributeValue() != null
-            && isValidScope(scopeAttr.getAttributeValue())) {
+        if (scopeAttr != null && scopeAttr.getAttributeValue() != null &&
+            isValidScope(scopeAttr.getAttributeValue())) {
             cache.setScope(scopeAttr.getAttributeValue());
         } else {
             cache.setScope(CachingConstants.SCOPE_PER_HOST);
         }
 
-        OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
-        if (onCacheHitElem != null) {
-            OMAttribute sequenceAttr = onCacheHitElem.getAttribute(ATT_SEQUENCE);
-            if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
-                cache.setOnCacheHitRef(sequenceAttr.getAttributeValue());
-            } else {
-                cache.setOnCacheHitSequence(
-                    new SequenceMediatorFactory().createAnonymousSequence(onCacheHitElem));
-            }
-        }
+        OMAttribute collectorAttr = elem.getAttribute(ATT_COLLECTOR);
+        if (collectorAttr != null && collectorAttr.getAttributeValue() != null &&
+            "true".equals(collectorAttr.getAttributeValue())) {
 
-        for (Iterator itr = elem.getChildrenWithName(IMPLEMENTATION_Q); itr.hasNext();) {
-            OMElement implElem = (OMElement) itr.next();
-            OMAttribute typeAttr = implElem.getAttribute(ATT_TYPE);
-            OMAttribute sizeAttr = implElem.getAttribute(ATT_SIZE);
-            if (typeAttr != null && typeAttr.getAttributeValue() != null) {
-                String type = typeAttr.getAttributeValue();
-                if (CachingConstants.TYPE_MEMORY.equals(type) && sizeAttr != null
-                    && sizeAttr.getAttributeValue() != null) {
-                    cache.setInMemoryCacheSize(Integer.parseInt(sizeAttr.getAttributeValue()));
-                } else if (CachingConstants.TYPE_DISK.equals(type)) {
-                    log.warn("Disk based and hirearchycal caching is not implemented yet");
-                    if (sizeAttr != null && sizeAttr.getAttributeValue() != null) {
-                        cache.setDiskCacheSize(Integer.parseInt(sizeAttr.getAttributeValue()));
+            cache.setCollector(true);
+        } else {
+            
+            cache.setCollector(false);
+
+            OMAttribute hashGeneratorAttr = elem.getAttribute(ATT_HASH_GENERATOR);
+            if (hashGeneratorAttr != null && hashGeneratorAttr.getAttributeValue() != null) {
+                try {
+                    Class generator = Class.forName(hashGeneratorAttr.getAttributeValue());
+                    Object o = generator.newInstance();
+                    if (o instanceof DigestGenerator) {
+                        cache.setDigestGenerator((DigestGenerator) o);
                     } else {
-                        cache.setDiskCacheSize(DEFAULT_DISK_CACHE_SIZE);
+                        handleException("Specified class for the hashGenerator is not a " +
+                            "DigestGenerator. It *must* implement " +
+                            "org.wso2.caching.digest.DigestGenerator interface");
                     }
+                } catch (ClassNotFoundException e) {
+                    handleException("Unable to load the hash generator class", e);
+                } catch (IllegalAccessException e) {
+                    handleException("Unable to access the hash generator class", e);
+                } catch (InstantiationException e) {
+                    handleException("Unable to instantiate the hash generator class", e);
+                }
+            }
+
+            OMAttribute timeoutAttr = elem.getAttribute(ATT_TIMEOUT);
+            if (timeoutAttr != null && timeoutAttr.getAttributeValue() != null) {
+                cache.setTimeout(Long.parseLong(timeoutAttr.getAttributeValue()));
+            } else {
+                cache.setTimeout(DEFAULT_TIMEOUT);
+            }
+
+            OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
+            if (onCacheHitElem != null) {
+                OMAttribute sequenceAttr = onCacheHitElem.getAttribute(ATT_SEQUENCE);
+                if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
+                    cache.setOnCacheHitRef(sequenceAttr.getAttributeValue());
                 } else {
-                    handleException("unknown implementation type for the Cache mediator");
+                    cache.setOnCacheHitSequence(
+                        new SequenceMediatorFactory().createAnonymousSequence(onCacheHitElem));
+                }
+            }
+
+            for (Iterator itr = elem.getChildrenWithName(IMPLEMENTATION_Q); itr.hasNext();) {
+                OMElement implElem = (OMElement) itr.next();
+                OMAttribute typeAttr = implElem.getAttribute(ATT_TYPE);
+                OMAttribute sizeAttr = implElem.getAttribute(ATT_SIZE);
+                if (typeAttr != null && typeAttr.getAttributeValue() != null) {
+                    String type = typeAttr.getAttributeValue();
+                    if (CachingConstants.TYPE_MEMORY.equals(type) && sizeAttr != null &&
+                        sizeAttr.getAttributeValue() != null) {
+                        cache.setInMemoryCacheSize(Integer.parseInt(sizeAttr.getAttributeValue()));
+                    } else if (CachingConstants.TYPE_DISK.equals(type)) {
+                        log.warn("Disk based and hirearchycal caching is not implemented yet");
+                        if (sizeAttr != null && sizeAttr.getAttributeValue() != null) {
+                            cache.setDiskCacheSize(Integer.parseInt(sizeAttr.getAttributeValue()));
+                        } else {
+                            cache.setDiskCacheSize(DEFAULT_DISK_CACHE_SIZE);
+                        }
+                    } else {
+                        handleException("unknown implementation type for the Cache mediator");
+                    }
                 }
             }
         }
-
 
         return cache;
     }

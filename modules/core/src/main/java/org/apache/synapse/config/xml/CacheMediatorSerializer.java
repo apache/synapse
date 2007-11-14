@@ -25,8 +25,9 @@ import org.apache.synapse.mediators.builtin.CacheMediator;
 
 /**
  * Serializes the Cache mediator to the XML configuration specified
- *
- * &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="mili-seconds"&gt;
+ * <p/>
+ * &lt;cache (id="string")? scope="string" collector=(true | false)
+ *      hashGenerator="class" timeout="mili-seconds"&gt;
  *  &lt;onCacheHit (sequence="key")?&gt;
  *   (mediator)+
  *  &lt;/onCacheHit&gt;
@@ -48,46 +49,53 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
             cache.addAttribute(fac.createOMAttribute("id", nullNS, mediator.getId()));
         }
 
-        if (mediator.getDigestGenerator() != null) {
-            cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS,
-                mediator.getDigestGenerator().getClass().getName()));
-        }
-
         if (mediator.getScope() != null) {
             cache.addAttribute(fac.createOMAttribute("scope", nullNS, mediator.getScope()));
         }
 
-        if (mediator.getTimeout() != 0) {
-            cache.addAttribute(
-                fac.createOMAttribute("timeout", nullNS, Long.toString(mediator.getTimeout())));
-        }
+        if (mediator.isCollector()) {
+            cache.addAttribute(fac.createOMAttribute("collector", nullNS, "true"));
+        } else {
 
-        if (mediator.getOnCacheHitRef() != null) {
-            OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
-            onCacheHit.addAttribute(
-                fac.createOMAttribute("sequence", nullNS, mediator.getOnCacheHitRef()));
-            cache.addChild(onCacheHit);
-        } else if (mediator.getOnCacheHitSequence() != null) {
-            OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
-            new SequenceMediatorSerializer().serializeChildren(
-                onCacheHit, mediator.getOnCacheHitSequence().getList());
-            cache.addChild(onCacheHit);
-        }
+            cache.addAttribute(fac.createOMAttribute("collector", nullNS, "true"));
 
-        if (mediator.getInMemoryCacheSize() != 0) {
-            OMElement implElem = fac.createOMElement("implementation", synNS);
-            implElem.addAttribute(fac.createOMAttribute("type", nullNS, "memory"));
-            implElem.addAttribute(fac.createOMAttribute(
-                "maxSize", nullNS, Integer.toString(mediator.getInMemoryCacheSize())));
-            cache.addChild(implElem);
-        }
-        
-        if (mediator.getDiskCacheSize() != 0) {
-            OMElement implElem = fac.createOMElement("implementation", synNS);
-            implElem.addAttribute(fac.createOMAttribute("type", nullNS, "disk"));
-            implElem.addAttribute(fac.createOMAttribute(
-                "maxSize", nullNS, Integer.toString(mediator.getDiskCacheSize())));
-            cache.addChild(implElem);
+            if (mediator.getDigestGenerator() != null) {
+                cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS,
+                    mediator.getDigestGenerator().getClass().getName()));
+            }
+
+            if (mediator.getTimeout() != 0) {
+                cache.addAttribute(
+                    fac.createOMAttribute("timeout", nullNS, Long.toString(mediator.getTimeout())));
+            }
+
+            if (mediator.getOnCacheHitRef() != null) {
+                OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
+                onCacheHit.addAttribute(
+                    fac.createOMAttribute("sequence", nullNS, mediator.getOnCacheHitRef()));
+                cache.addChild(onCacheHit);
+            } else if (mediator.getOnCacheHitSequence() != null) {
+                OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
+                new SequenceMediatorSerializer()
+                    .serializeChildren(onCacheHit, mediator.getOnCacheHitSequence().getList());
+                cache.addChild(onCacheHit);
+            }
+
+            if (mediator.getInMemoryCacheSize() != 0) {
+                OMElement implElem = fac.createOMElement("implementation", synNS);
+                implElem.addAttribute(fac.createOMAttribute("type", nullNS, "memory"));
+                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,
+                    Integer.toString(mediator.getInMemoryCacheSize())));
+                cache.addChild(implElem);
+            }
+
+            if (mediator.getDiskCacheSize() != 0) {
+                OMElement implElem = fac.createOMElement("implementation", synNS);
+                implElem.addAttribute(fac.createOMAttribute("type", nullNS, "disk"));
+                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,
+                    Integer.toString(mediator.getDiskCacheSize())));
+                cache.addChild(implElem);
+            }
         }
 
         if (parent != null) {

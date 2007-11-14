@@ -51,6 +51,7 @@ public class CacheMediator extends AbstractMediator {
 
     private String id = null;
     private String scope = CachingConstants.SCOPE_PER_HOST;
+    private boolean collector = false;
     private DigestGenerator digestGenerator = CachingConstants.DEFAULT_XML_IDENTIFIER;
     private int inMemoryCacheSize = CachingConstants.DEFAULT_CACHE_SIZE;
     // if this is 0 then no disk cache, and if there is no size specified in the config
@@ -114,7 +115,7 @@ public class CacheMediator extends AbstractMediator {
 
         boolean result = true;
         if (synCtx.isResponse()) {
-            processResponseMessage(traceOrDebugOn, traceOn, synCtx, cache);
+            processResponseMessage(synCtx, traceOrDebugOn, traceOn, cache);
 
         } else {
             result = processRequestMessage(synCtx, traceOrDebugOn, traceOn, cache);
@@ -143,8 +144,12 @@ public class CacheMediator extends AbstractMediator {
      * @param synCtx         the current message (response)
      * @param cache          the cache
      */
-    private void processResponseMessage(boolean traceOrDebugOn, boolean traceOn,
-        MessageContext synCtx, Cache cache) {
+    private void processResponseMessage(MessageContext synCtx, boolean traceOrDebugOn,
+        boolean traceOn, Cache cache) {
+
+        if (!collector) {
+            handleException("Response messages cannot be handled in a non collector cache", synCtx);
+        }
 
         String requestHash = (String) synCtx.getProperty(CachingConstants.REQUEST_HASH_KEY);
 
@@ -177,7 +182,7 @@ public class CacheMediator extends AbstractMediator {
                 // in the future there can be a situation where user sends the request with the
                 // response hash (if client side caching is on) in which case we can compare that
                 // response hash with the given response hash and respond with not-modified http header
-                cachedObj.setResponseHash(digestGenerator.getDigest(
+                cachedObj.setResponseHash(cache.getGenerator().getDigest(
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
 
                 cachedObj.setExpireTime(System.currentTimeMillis() + cachedObj.getTimeout());
@@ -206,6 +211,10 @@ public class CacheMediator extends AbstractMediator {
      */
     private boolean processRequestMessage(MessageContext synCtx, boolean traceOrDebugOn,
         boolean traceOn, Cache cache) {
+
+        if (collector) {
+            handleException("Request messages cannot be handled in a collector cache", synCtx);
+        }
 
         String requestHash = digestGenerator
             .getDigest(((Axis2MessageContext) synCtx).getAxis2MessageContext());
@@ -344,6 +353,14 @@ public class CacheMediator extends AbstractMediator {
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    public boolean isCollector() {
+        return collector;
+    }
+
+    public void setCollector(boolean collector) {
+        this.collector = collector;
     }
 
     public DigestGenerator getDigestGenerator() {

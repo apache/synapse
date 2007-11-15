@@ -25,4 +25,5 @@ public class NhttpConstants {
     public static final String FORCE_HTTP_1_0 = "FORCE_HTTP_1.0";
 
     public static final String WSDL_EPR_PREFIX = "WSDLEPRPrefix";
+    public static final String REMOTE_HOST ="REMOTE_HOST";
 }

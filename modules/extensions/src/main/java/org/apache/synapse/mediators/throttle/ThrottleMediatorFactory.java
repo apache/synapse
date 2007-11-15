@@ -64,14 +64,16 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
                     throttleMediator.setInLinePolicy(inLine);
                 }
             }
-        } 
+        }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processTraceState(throttleMediator,elem);
 
         String id = elem.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "id"));
-        if (id != null) {
+        if (id != null && !"".equals(id)) {
             throttleMediator.setId(id.trim());
+        } else {
+           handleException("Idy attribute must have defined ");
         }
 
         SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();

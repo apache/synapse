@@ -817,7 +817,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.throttle</groupId>
-            <artifactId>wso2throttle</artifactId>
+            <artifactId>wso2throttle-core</artifactId>
             <version>${wso2throttle.version}</version>
             <type>jar</type>
             <exclusions>
@@ -828,6 +828,10 @@
                 <exclusion>
                     <groupId>org.apache.neethi</groupId>
                     <artifactId>neethi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -1053,7 +1057,7 @@
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>
         <wso2caching.version>SNAPSHOT</wso2caching.version>
-        <wso2throttle.version>r9300</wso2throttle.version>
+        <wso2throttle.version>2.1-SNAPSHOT</wso2throttle.version>
         <spring.version>1.2.6</spring.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta2</bsf.version>

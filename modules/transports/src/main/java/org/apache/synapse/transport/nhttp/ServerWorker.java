@@ -161,6 +161,7 @@ public class ServerWorker implements Runnable {
             InetAddress remoteAddr = inetConn.getRemoteAddress();
             if (remoteAddr != null) {
                 msgContext.setProperty(MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
+                msgContext.setProperty(NhttpConstants.REMOTE_HOST, remoteAddr.getHostName());
             }
         }
 

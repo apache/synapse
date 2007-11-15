@@ -150,11 +150,17 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                 log.debug("Scanning directory or file : " + fileURI);
             }
             fileObject = fsManager.resolveFile(fileURI);
-
+            
         } catch (FileSystemException e) {
             processFailure("Unable to resolve file or directory : " + fileURI, e, entry);
+            return;
         }
 
+        if(fileObject == null) {
+            processFailure("Failed to resolve file " + fileURI, null, entry);
+            return;
+        }
+        
         try {
             if (fileObject.exists() && fileObject.isReadable()) {
 

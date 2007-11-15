@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map;
 
 
 /**
@@ -68,6 +69,23 @@ public interface MessageContext {
      * @param se the reference to the Synapse Environment
      */
     public void setEnvironment(SynapseEnvironment se);
+
+    /**
+     * Return all the entries which are in the MessageContext. This does not represent
+     * all the declared entries in the configuration, rather only the entries that the
+     * context has already used. This will not lookup for the entries in the Configuration.
+     * @return the set of local entries in the context
+     */
+    public Map getContextEntries();
+
+    /**
+     * Sets the entries to the current context and not to the configuration. This can be
+     * used to focely override an existing set of resources in the configuration, because
+     * the resource lookup will look for the context first. But this only sets the entries
+     * to the current context
+     * @param entries the set of local entries to be set
+     */
+    public void setContextEntries(Map entries);
 
     /**
      * Return the main sequence from the configuration, or the local message context

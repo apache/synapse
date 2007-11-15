@@ -48,6 +48,10 @@ public class MessageHelper {
         axis2MC.setAxis2MessageContext(
             cloneAxis2MessageContext(((Axis2MessageContext) synCtx).getAxis2MessageContext()));
 
+        newCtx.setConfiguration(synCtx.getConfiguration());
+        newCtx.setEnvironment(synCtx.getEnvironment());
+        newCtx.setContextEntries(synCtx.getContextEntries());
+
         // set the parent corelation details to the cloned MC -
         //                              for the use of aggregation like tasks
         newCtx.setProperty(EIPConstants.AGGREGATE_CORELATION, synCtx.getMessageID());

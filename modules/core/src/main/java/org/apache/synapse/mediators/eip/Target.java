@@ -83,7 +83,7 @@ public class Target {
         if (sequence != null) {
             synCtx.getEnvironment().injectAsync(synCtx, sequence);
         } else if (sequenceRef != null) {
-            SequenceMediator refSequence = (SequenceMediator) synCtx.getConfiguration().getSequence(sequenceRef);
+            SequenceMediator refSequence = (SequenceMediator) synCtx.getSequence(sequenceRef);
             if (refSequence != null) {
                 synCtx.getEnvironment().injectAsync(synCtx, refSequence);
             }

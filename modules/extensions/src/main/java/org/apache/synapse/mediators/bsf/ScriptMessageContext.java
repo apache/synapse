@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.bsf;
 
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map;
 
 import javax.script.ScriptException;
 
@@ -121,6 +122,14 @@ public class ScriptMessageContext implements MessageContext {
 
     public void setEnvironment(SynapseEnvironment se) {
         mc.setEnvironment(se);
+    }
+
+    public Map getContextEntries() {
+        return mc.getContextEntries();
+    }
+
+    public void setContextEntries(Map entries) {
+        mc.setContextEntries(entries);
     }
 
     public Object getProperty(String key) {

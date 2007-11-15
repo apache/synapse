@@ -101,6 +101,14 @@ public class Axis2MessageContext implements MessageContext {
         this.synEnv = synEnv;
     }
 
+    public Map getContextEntries() {
+        return localEntries;
+    }
+
+    public void setContextEntries(Map entries) {
+        this.localEntries = entries;
+    }
+
     public Mediator getMainSequence() {
         Object o = localEntries.get(SynapseConstants.MAIN_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {

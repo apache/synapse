@@ -65,6 +65,14 @@ public class TestMessageContext implements MessageContext {
     public void setEnvironment(SynapseEnvironment se) {
     }
 
+    public Map getContextEntries() {
+        return localEntries;
+    }
+
+    public void setContextEntries(Map entries) {
+        this.localEntries = entries;
+    }
+
     public Object getProperty(String key) {
         return properties.get(key);
     }

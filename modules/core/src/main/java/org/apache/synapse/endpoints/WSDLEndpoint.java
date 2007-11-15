@@ -145,6 +145,8 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
+        setActive(false, synCtx);        
+
         if (parentEndpoint != null) {
             parentEndpoint.onChildEndpointFail(this, synCtx);
         } else {

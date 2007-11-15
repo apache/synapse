@@ -34,7 +34,6 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.throttle.*;
-import org.wso2.throttle.factory.AccessControllerFactory;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -244,8 +243,8 @@ public class ThrottleMediatorTest extends TestCase {
                 }
                 AccessController accessControler;
                 try {
-                    accessControler = AccessControllerFactory.createAccessControler(ThrottleConstants.IP_BASE);
-                    boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
+                    accessControler =new AccessController();
+                    boolean canAccess = accessControler.canAccess(throttleContext, remoteIP,ThrottleConstants.IP_BASE);
                     if (!canAccess) {
                         throw new SynapseException("Access has currently been denied by the IP_BASE throttle for IP :\t" + remoteIP);
                     }

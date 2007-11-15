@@ -22,13 +22,14 @@ import org.apache.axiom.om.OMElement;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.clustering.context.Replicator;
+import org.apache.axis2.clustering.ClusteringFault;
 import org.wso2.throttle.*;
-import org.wso2.throttle.factory.AccessControllerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,47 +43,56 @@ import java.util.Map;
 
 public class ThrottleMediator extends AbstractMediator {
 
-    private static final String  KEY ="keyOfConcurrentAcessControllers";
-    /** The key for getting the throttling policy - key refers to a/an [registry] entry  */
+    private static final String KEY = "keyOfthrottles";
+    /**
+     * The key for getting the throttling policy - key refers to a/an [registry] entry
+     */
     private String policyKey = null;
-    /** InLine policy object - XML */
+    /**
+     * InLine policy object - XML
+     */
     private OMElement inLinePolicy = null;
-    /** The throttle - hold runtime + configuration data of throttle */
-    private Throttle throttle = null;
-    /** The reference to the sequence which will execute when access is denied */
+    /**
+     * The reference to the sequence which will execute when access is denied
+     */
     private String onRejectSeqKey = null;
-    /** The in-line sequence which will execute when access is denied */
+    /**
+     * The in-line sequence which will execute when access is denied
+     */
     private Mediator onRejectMediator = null;
-    /** The reference to the sequence which will execute when access is allowed */
+    /**
+     * The reference to the sequence which will execute when access is allowed
+     */
     private String onAcceptSeqKey = null;
-    /** The in-line sequence which will execute when access is allowed */
+    /**
+     * The in-line sequence which will execute when access is allowed
+     */
     private Mediator onAcceptMediator = null;
-    /** The concurrect access control group id */
+    /**
+     * The concurrect access control group id
+     */
     private String id;
-    /** The ConcurrentAccessController for this mediator instance */
-    private ConcurrentAccessController concurrentAccessController;
-    /** Does my configuration state an IP based throttling policy segment */
-    private boolean includesIPThrottling = false;
-    /** The concurrent connection limit */
-    private int concurrentLimit;
-    /** Access rate controller*/
+    /**
+     * Access rate controller
+     */
     private AccessController accessControler;
 
+    private final Object throttleLock = new Object();
+
     public ThrottleMediator() {
-        try {
-            this.accessControler =
-                AccessControllerFactory.createAccessControler(ThrottleConstants.IP_BASE);
-        } catch (ThrottleException e) {
-            String msg = "Error occurred when creating an accesscontroller";
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
-        }
+        this.accessControler = new AccessController();
     }
 
     public boolean mediate(MessageContext synCtx) {
 
         boolean traceOn = isTraceOn(synCtx);
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        boolean isResponse = synCtx.isResponse();
+        Throttle throttle = null;
+        ConcurrentAccessController concurrentAccessController = null;
+        ConfigurationContext configctx;
+        Object remoteIP;
+        String domainName;
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Start : Throttle mediator");
@@ -91,312 +101,235 @@ public class ThrottleMediator extends AbstractMediator {
                 trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
+        synchronized (throttleLock) {
+            
+            org.apache.axis2.context.MessageContext axis2MessageContext
+                = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            configctx = axis2MessageContext.getConfigurationContext();
+            remoteIP = axis2MessageContext.getProperty(
+                org.apache.axis2.context.MessageContext.REMOTE_ADDR);
+            domainName = (String) axis2MessageContext.getProperty(NhttpConstants.REMOTE_HOST);
+            //all the throttle states are in a map which itself in config context
+            Map throttles = (Map) configctx.getProperty(KEY);
+            if (throttles != null) {
+                if (throttles.containsKey(id)) {
+                    throttle = (Throttle) throttles.get(id);
+                }
+            } else {
+                throttles = new HashMap();
+                configctx.setProperty(KEY, throttles);
+            }
+            // Throttle only will be created ,if the massage flow is IN
+            if (!isResponse) {
+                // for request messages, read the policy for throttling and initialize
+                if (inLinePolicy != null) {
+                    // this uses a static policy
+                    if (throttle == null) {
+                        if (traceOn && trace.isTraceEnabled()) {
+                            trace.trace("Initializing using static throttling policy : " + inLinePolicy);
+                        }
+                        try {
+                            throttle = ThrottlePolicyProcessor.processPolicy(
+                                PolicyEngine.getPolicy(inLinePolicy));
+                            if (throttle != null) {
+                                throttles.put(id, throttle);
+                            }
+                        } catch (ThrottleException e) {
+                            handleException("Error processing the throttling policy", e, synCtx);
+                        }
+                    }
 
-        if (!synCtx.isResponse()) {
-            // for request messages, read the policy for throttling and initialize
-            initThrottle(synCtx, traceOrDebugOn, traceOn);
+                } else if (policyKey != null) {
 
-        } else {
-            // for response messages, load the concurrent access controller object
-            // do this ONLY ONCE - the first time when our iniial reference is null
-            if (concurrentAccessController == null && id != null) {
+                    // load or re-load policy from registry or local entry if not already available
+                    Entry entry = synCtx.getConfiguration().getEntryDefinition(policyKey);
+                    if (entry == null) {
+                        handleException("Cannot find throttling policy using key : " + policyKey, synCtx);
 
-                org.apache.axis2.context.MessageContext axis2MessageContext
-                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    } else {
+                        boolean reCreate = false;
+                        // if the key refers to a dynamic resource
+                        if (entry.isDynamic()) {
+                            if (!entry.isCached() || entry.isExpired()) {
+                                reCreate = true;
+                            }
+                        }
+                        if (reCreate || throttle == null) {
+                            Object entryValue = synCtx.getEntry(policyKey);
+                            if (entryValue == null) {
+                                handleException(
+                                    "Null throttling policy returned by Entry : " + policyKey, synCtx);
 
-                ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
+                            } else {
+                                if (!(entryValue instanceof OMElement)) {
+                                    handleException("Policy returned from key : " + policyKey +
+                                        " is not an OMElement", synCtx);
 
-                Map accessContollers = (Map) configctx.getProperty(KEY);
-
-                if (accessContollers != null) {
-
-                    concurrentAccessController =
-                        (ConcurrentAccessController) accessContollers.get(id);
-
-                    if (concurrentAccessController != null) {
-
-                        concurrentLimit = concurrentAccessController.getLimit();
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Concurrent access controller for ID : " + id +
-                                " allows : " + concurrentLimit + " concurrent accesses");
+                                } else {
+                                    try {
+                                        throttle = ThrottlePolicyProcessor.processPolicy(
+                                            PolicyEngine.getPolicy((OMElement) entryValue));
+                                        if (throttle != null) {
+                                            throttles.put(id, throttle);
+                                        }
+                                    } catch (ThrottleException e) {
+                                        handleException("Error processing the throttling policy", e, synCtx);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+            // get the access controller
+            if (throttle != null) {
+                concurrentAccessController =
+                    throttle.getConcurrentAccessController();
+            }
         }
 
-        // check access allow or not
-        boolean result = canAccess(synCtx, traceOrDebugOn, traceOn);
+        boolean result = true;
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Throttle mediator");
+        if (throttle != null) {
+
+            if (concurrentAccessController != null) {
+                // do the concurrecy throttling
+                int concurrentLimit = concurrentAccessController.getLimit();
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Concurrent access controller for ID : " + id +
+                        " allows : " + concurrentLimit + " concurrent accesses");
+                }
+                int available = 0;
+                if (!isResponse) {
+                    available = concurrentAccessController.getAndDecrement();
+                    result = available > 0;
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Access " + (result ? "allowed" : "denied") +
+                            " :: " + available + " of available of " + concurrentLimit + " connections");
+                    }
+                } else {
+                    available = concurrentAccessController.incrementAndGet();
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Connection returned" +
+                            " :: " + available + " of available of " + concurrentLimit + " connections");
+                    }
+                }
+            }
+
+            if (!isResponse && result) {
+
+                ThrottleContext throttleContext = null;
+
+                if (domainName != null) {
+                    // do the domain based throttling
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "The Domain Name of the caller is :" + domainName);
+                    }
+                    throttleContext
+                        = throttle.getThrottleContext(ThrottleConstants.DOMAIN_BASED_THROTTLE_KEY);
+
+                    if (throttleContext != null) {
+                        try {
+                            result = accessControler.canAccess(throttleContext,
+                                domainName, ThrottleConstants.DOMAIN_BASE);
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Access " + (result ? "allowed" : "denied")
+                                    + " for Domain Name : " + domainName);
+                            }
+                            if (!result && concurrentAccessController != null) {
+                                concurrentAccessController.incrementAndGet();
+                            }
+                        } catch (ThrottleException e) {
+                            handleException("Error occurd during throttling", e, synCtx);
+                        }
+                    }
+                } else {
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "The Domain name of the caller cannot be found");
+                    }
+                }
+
+                if (throttleContext == null) {
+                    //do the IP-based throttling
+                    if (remoteIP == null) {
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "The IP address of the caller cannot be found");
+                        }
+                        result = true;
+
+                    } else {
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "The IP Address of the caller is :" + remoteIP);
+                        }
+                        try {
+                            throttleContext =
+                                throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
+
+                            if (throttleContext != null) {
+
+                                result = accessControler.canAccess(throttleContext,
+                                    remoteIP, ThrottleConstants.IP_BASE);
+
+                                if (traceOrDebugOn) {
+                                    traceOrDebug(traceOn, "Access " + (result ? "allowed" : "denied")
+                                        + " for IP : " + remoteIP);
+                                }
+
+                                if (!result && concurrentAccessController != null) {
+                                    concurrentAccessController.incrementAndGet();
+                                }
+                            }
+                        } catch (ThrottleException e) {
+                            handleException("Error occurd during throttling", e, synCtx);
+                        }
+                    }
+                }
+            }
+            //replicate the current state
+            if (configctx != null) {
+                try {
+                    Replicator.replicate(configctx);
+                } catch (ClusteringFault clusteringFault) {
+                    handleException("Error during replicate states ", clusteringFault, synCtx);
+                }
+            }
         }
-        return result;
-    }
 
-    /**
-     * To check whether allow access or not for caller
-     * Current Implementaion only support IP Based Throttling
-     *
-     * @param synContext Current Message Context
-     * @param traceOn    indicate whether trace is eanabled or not
-     * @return boolean which indicate whether this caller can or not access
-     */
-    private boolean canAccess(MessageContext synContext, boolean traceOrDebugOn, boolean traceOn) {
-
-        boolean isResponse = synContext.isResponse();
-        // do the concurrent throttling
-        boolean isAllowed = throttleByConcurrency(isResponse, traceOrDebugOn, traceOn);
-
-        if (includesIPThrottling && isAllowed && !isResponse) {
-            // do the normal throttling
-            isAllowed = throttleByRate(synContext, traceOrDebugOn, traceOn);
-        }
-
-        if (isAllowed) {
+        if (result) {
             if (onAcceptSeqKey != null) {
-                Mediator mediator = synContext.getSequence(onAcceptSeqKey);
+                Mediator mediator = synCtx.getSequence(onAcceptSeqKey);
                 if (mediator != null) {
-                    return mediator.mediate(synContext);
+                    return mediator.mediate(synCtx);
                 } else {
                     handleException("Unable to find onAccept sequence with key : "
-                        + onAcceptSeqKey, synContext);
+                        + onAcceptSeqKey, synCtx);
                 }
             } else if (onAcceptMediator != null) {
-                return onAcceptMediator.mediate(synContext);
+                return onAcceptMediator.mediate(synCtx);
             } else {
                 return true;
             }
 
         } else {
             if (onRejectSeqKey != null) {
-                Mediator mediator = synContext.getSequence(onRejectSeqKey);
+                Mediator mediator = synCtx.getSequence(onRejectSeqKey);
                 if (mediator != null) {
-                    return mediator.mediate(synContext);
+                    return mediator.mediate(synCtx);
                 } else {
                     handleException("Unable to find onReject sequence with key : "
-                        + onRejectSeqKey, synContext);
+                        + onRejectSeqKey, synCtx);
                 }
             } else if (onRejectMediator != null) {
-                return onRejectMediator.mediate(synContext);
+                return onRejectMediator.mediate(synCtx);
             } else {
                 return false;
             }
         }
-        return true;
-    }
 
-    /**
-     * Doing concurrency throttlling
-     *
-     * @param isResponse     indicate whether message flow is OUT or IN
-     * @param traceOrDebugOn is tracing or debbug on
-     * @param traceOn        indicate whether trace is ON or OFF
-     * @return True if message can continue ,otherwise false
-     */
-    private boolean throttleByConcurrency(boolean isResponse, boolean traceOrDebugOn, boolean traceOn) {
-
-        if (concurrentAccessController != null) {
-            int available = 0;
-            if (!isResponse) {
-                available = concurrentAccessController.getAndDecrement();
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Access " + (available > 0 ? "allowed" : "denied") +
-                        " :: " + available + " of available of " + concurrentLimit + " connections");
-                }
-                return available > 0;
-            } else {
-                available = concurrentAccessController.incrementAndGet();
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Connection returned" +
-                        " :: " + available + " of available of " + concurrentLimit + " connections");
-                }
-                return true;
-            }
-        } else {
-            return true;
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Throttle mediator");
         }
-    }
-
-    /**
-     * Processing throughh IP based throttle
-     *
-     * @param synContext     Current Message
-     * @param traceOrDebugOn
-     * @param traceOn        Indicates whether trace is ON or OFF
-     * @return True if message can continue ,otherwise false
-     */
-    private boolean throttleByRate(MessageContext synContext, boolean traceOrDebugOn, boolean traceOn) {
-
-        if (throttle == null) {
-            handleException("Cannot find throttle object instance", synContext);
-            return true;
-        }
-
-        org.apache.axis2.context.MessageContext axis2MessageContext
-            = ((Axis2MessageContext) synContext).getAxis2MessageContext();
-        // IP based throttling
-        Object remoteIP = axis2MessageContext.getProperty(
-            org.apache.axis2.context.MessageContext.REMOTE_ADDR);
-
-        if (remoteIP == null) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "The IP address of the caller cannot be found");
-            }
-            return true;
-
-        } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "The IP Address of the caller is :" + remoteIP);
-            }
-
-            ThrottleContext throttleContext
-                = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
-            if (throttleContext == null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Cannot find the configuartion context for IP throttle");
-                }
-                return true;
-            }
-
-            try {
-                boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Access " + (canAccess ? "allowed" : "denied")
-                        + " for IP : " + remoteIP);
-                }
-                return canAccess;
-
-            } catch (ThrottleException e) {
-                handleException("Error occurd during throttling", e, synContext);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * To init throttle with the policy
-     * If the policy is defined as a Registry key ,then Policy will only process after it has expired
-     * Any runtime changes to the policy will take effect
-     * If the policy is defined as a Inline XML ,then only one time policy will process and any runtime
-     * changes to the policy will not reflect
-     *
-     * @param synCtx         Current Message
-     * @param traceOrDebugOn is tracing or debug on?
-     * @param traceOn        is tracing on?
-     */
-    protected void initThrottle(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
-
-        if (inLinePolicy != null) {
-            // this uses a static policy
-            if (throttle == null) {
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace("Initializing using static throttling policy : " + inLinePolicy);
-                }
-                createThrottleMetaData(inLinePolicy, synCtx, traceOrDebugOn, traceOn, false);
-            }
-
-        } else if (policyKey != null) {
-
-            // load or re-load policy from registry or local entry if not already available
-            Entry entry = synCtx.getConfiguration().getEntryDefinition(policyKey);
-            if (entry == null) {
-                handleException("Cannot find throttling policy using key : " + policyKey, synCtx);
-
-            } else {
-
-                boolean reCreate = false;
-
-                // if the key refers to a dynamic resource
-                if (entry.isDynamic()) {
-                    if (!entry.isCached() || entry.isExpired()) {
-                        reCreate = true;
-                    }
-                }
-                createThrottleMetaData(
-                    null, synCtx, traceOrDebugOn, traceOn, reCreate);
-            }
-        }
-    }
-
-    /**
-     * Create the throttling policy and the "Throttle" object applicable. If this is a
-     * concurrent throttling instance, set the throttling access controller to the shared
-     * map
-     *
-     * @param policy         throttling policy
-     * @param synCtx         incoming message
-     * @param traceOrDebugOn is tracing or debug on?
-     * @param traceOn        is tracing on?
-     * @param reCreate       is it need to reCreate the throttle
-     */
-    private synchronized void createThrottleMetaData(OMElement policy,
-                                                     MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn, boolean reCreate) {
-
-        if (!reCreate && throttle != null) {
-            // this uses a static policy, and one thread has already created the "Throttle"
-            // object, just return...
-            return;
-        }
-        try {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Creating a new throttle configuration by parsing the Policy");
-            }
-            if (policy != null) {
-                throttle = ThrottlePolicyProcessor.processPolicy(
-                    PolicyEngine.getPolicy(policy));
-            } else {
-                Object entryValue = synCtx.getEntry(policyKey);
-                if (entryValue == null) {
-                    handleException(
-                        "Null throttling policy returned by Entry : " + policyKey, synCtx);
-
-                } else {
-                    if (!(entryValue instanceof OMElement)) {
-                        handleException("Policy returned from key : " + policyKey +
-                            " is not an OMElement", synCtx);
-
-                    } else {
-                        throttle = ThrottlePolicyProcessor.processPolicy(
-                            PolicyEngine.getPolicy((OMElement) entryValue));
-                    }
-                }
-            }
-
-            if (throttle != null) {
-
-                includesIPThrottling = (
-                    throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY) != null);
-
-                if (id != null) {
-                    concurrentAccessController = throttle.getConcurrentAccessController();
-
-                    org.apache.axis2.context.MessageContext axis2MessageContext
-                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-                    ConfigurationContext configctx = axis2MessageContext.getConfigurationContext();
-                    Map accessContollers = (Map) configctx.getProperty(KEY);
-
-                    if (accessContollers == null) {
-                        accessContollers = new HashMap();
-                        configctx.setProperty(KEY, accessContollers);
-                    }
-                    if (concurrentAccessController == null) {
-                        accessContollers.remove(id);
-                    } else {
-                        concurrentLimit = concurrentAccessController.getLimit();
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn,
-                                "Initiating ConcurrentAccessControler for throttle group id : " + id
-                                    + " limit : " + concurrentLimit);
-                        }
-                        accessContollers.put(id, concurrentAccessController);
-                    }
-                }
-            }
-        }
-        catch (ThrottleException e) {
-            handleException("Error processing the throttling policy", e, synCtx);
-        }
+        return result;
     }
 
     public String getType() {
@@ -408,6 +341,7 @@ public class ThrottleMediator extends AbstractMediator {
      *
      * @return String
      */
+
     public String getPolicyKey() {
         return policyKey;
     }

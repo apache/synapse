@@ -184,6 +184,10 @@ public class GetPropertyFunction implements Function {
                     return SynapseConstants.FORMAT_SOAP11;
                 else
                     return SynapseConstants.FORMAT_SOAP12;
+            } else if (SynapseConstants.SYSTEM_DATE.equals(key)) {
+                return new java.util.Date().toString();
+            } else if (SynapseConstants.SYSTEM_TIME.equals(key)) {
+                return Long.toString(System.currentTimeMillis());
             } else {
                 Object result = synCtx.getProperty(key);
                 if (result != null) {

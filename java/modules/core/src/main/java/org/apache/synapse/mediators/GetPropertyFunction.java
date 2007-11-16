@@ -35,6 +35,8 @@ import org.jaxen.function.StringFunction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 
 /**
  * Implements the XPath extension function synapse:get-property(scope,prop-name)
@@ -75,17 +77,28 @@ public class GetPropertyFunction implements Function {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Property key value for lookup is not specified");
             }
-            return null;
+            return NULL_STRING;
 
         } else {
             int size = args.size();
             if (size == 1) {
                 return evaluate(
-                    XMLConfigConstants.SCOPE_DEFAULT, args.get(0), context.getNavigator());
+                    XMLConfigConstants.SCOPE_DEFAULT, args.get(0), null, context.getNavigator());
 
             } else if (size == 2) {
-                return evaluate(args.get(0), args.get(1), context.getNavigator());
-
+                String argOne = StringFunction.evaluate(args.get(0), context.getNavigator());
+                if (argOne != null) {
+                    if (!XMLConfigConstants.SCOPE_AXIS2.equals(argOne) &&
+                        !XMLConfigConstants.SCOPE_DEFAULT.equals(argOne) &&
+                        !XMLConfigConstants.SCOPE_TRANSPORT.equals(argOne)) {
+                        return evaluate(XMLConfigConstants.SCOPE_DEFAULT, args.get(0),
+                            args.get(1), context.getNavigator());
+                    } else {
+                        return evaluate(args.get(0), args.get(1), null, context.getNavigator());
+                    }
+                }
+            } else if (size == 3) {
+                return evaluate(args.get(0), args.get(1), args.get(2), context.getNavigator());
             } else {
 
                 String msg = "Invalid arguments for synapse:get-property(prop-name) 0r  " +
@@ -97,6 +110,7 @@ public class GetPropertyFunction implements Function {
                 throw new FunctionCallException(msg);
             }
         }
+        return NULL_STRING;
     }
 
     /**
@@ -106,9 +120,10 @@ public class GetPropertyFunction implements Function {
      *        i.e. axis2, transport, default/synapse
      * @param keyObject the key of the property
      * @param navigator object model which can be used for navigation around
+     * @param dateformat The dateformat that need to convert
      * @return The String value of property using arg one as key and arg two as scope
      */
-    public Object evaluate(Object scopeObject, Object keyObject, Navigator navigator) {
+    public Object evaluate(Object scopeObject, Object keyObject, Object dateformat,Navigator navigator) {
 
         boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
@@ -130,9 +145,28 @@ public class GetPropertyFunction implements Function {
                     "property-name should be provided when executing synapse:get-property" +
                     "(scope,prop-name) or synapse:get-property(prop-name) Xpath function");
             }
-            return null;
+            return NULL_STRING;
         }
-        
+
+        //Irrespective of the scope ,if the dateformat has provided ,
+        // should return the Date according to the provided format
+
+        if (SynapseConstants.SYSTEM_DATE.equals(key)) {
+            if (dateformat != null) {
+                Format formatter = new SimpleDateFormat(dateformat.toString());
+                return formatter.format(new java.util.Date());
+            } else {
+                Format formatter = new SimpleDateFormat();
+                return formatter.format(new java.util.Date());
+            }
+        }
+
+        //return the current system time as a string , don't care scope
+        if (SynapseConstants.SYSTEM_TIME.equals(key)) {
+
+            return Long.toString(System.currentTimeMillis());
+        }
+
         if (XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
 
             if (SynapseConstants.HEADER_TO.equals(key)) {
@@ -178,16 +212,12 @@ public class GetPropertyFunction implements Function {
                     return NULL_STRING;
                 }
             } else if (SynapseConstants.PROPERTY_MESSAGE_FORMAT.equals(key)) {
-                if(synCtx.isDoingPOX())
+                if (synCtx.isDoingPOX())
                     return SynapseConstants.FORMAT_POX;
-                else  if (synCtx.isSOAP11())
+                else if (synCtx.isSOAP11())
                     return SynapseConstants.FORMAT_SOAP11;
                 else
                     return SynapseConstants.FORMAT_SOAP12;
-            } else if (SynapseConstants.SYSTEM_DATE.equals(key)) {
-                return new java.util.Date().toString();
-            } else if (SynapseConstants.SYSTEM_TIME.equals(key)) {
-                return Long.toString(System.currentTimeMillis());
             } else {
                 Object result = synCtx.getProperty(key);
                 if (result != null) {
@@ -196,7 +226,6 @@ public class GetPropertyFunction implements Function {
                     return synCtx.getEntry(key);
                 }
             }
-
         } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
             && synCtx instanceof Axis2MessageContext) {
 

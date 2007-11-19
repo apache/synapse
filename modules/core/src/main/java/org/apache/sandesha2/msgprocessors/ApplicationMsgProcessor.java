@@ -43,6 +43,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -67,6 +68,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private String inboundSequence = null;
 	private long   inboundMessageNumber;
+	private Transaction appMsgProcTran = null;
 	
 	public ApplicationMsgProcessor() {
 		// Nothing to do
@@ -89,6 +91,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processOutMessage");
 
+		appMsgProcTran= tran;
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 		
@@ -244,6 +247,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		String outSequenceID = null;
 
+
 		// Work out if there is a user transaction involved before updating any store state
 		// to give any storage manager interface a chance to setup any transactional state
 		boolean hasUserTransaction = storageManager.hasUserTransaction(msgContext);
@@ -264,16 +268,18 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					if (rmsBean == null) {
 						rmsBean = SequenceManager.setupNewClientSequence(msgContext, internalSequenceId, storageManager);
 						rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, storageManager);
-	
-						if (rmsBean == null && tran != null && tran.isActive()) {
+						if(rmsBean != null) outSequenceID = rmsBean.getSequenceID();
+						
+						if (rmsBean == null && appMsgProcTran != null && appMsgProcTran.isActive()) {
 							// Rollback the current locks.
-							tran.rollback();
+							appMsgProcTran.rollback();
 	
 							// Create a new tran.  This avoids a potential deadlock where the RMS/RMDBeans
 							// are taken in reverse order.
-							tran = storageManager.getTransaction();
+							appMsgProcTran = storageManager.getTransaction();
 						}
 					}
+
 				}
 	
 			} else {
@@ -435,15 +441,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//reliable message. If he doesn't have a endpoint he should use polling mechanisms.
 			msgContext.pause();
 			
-			if (tran != null && tran.isActive()) {
-				tran.commit();
-				tran = null;
+			if (appMsgProcTran != null && appMsgProcTran.isActive()) {
+				appMsgProcTran.commit();
+				appMsgProcTran = null;
 			}
 		}
+
 		finally {
-			if (tran != null && tran.isActive())
-				tran.rollback();
+			if (appMsgProcTran != null && appMsgProcTran.isActive())
+				appMsgProcTran.rollback();
 		}
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processOutMessage " + Boolean.TRUE);
 		return true;
@@ -458,7 +466,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
 		ConfigurationContext configCtx = applicationMsg.getConfigurationContext();
 
-		// generating a new create sequeuce message.
+		// generating a new create sequence message.
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg);
 
 		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
@@ -474,7 +482,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
 		createSeqMsg.setRelationships(null); // create seq msg does not
-												// relateTo anything
+											 // relateTo anything
 		
 		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key that will be used to store 
 																	   //the create sequence message.
@@ -517,20 +525,76 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey, storageManager);
 	
 			storageManager.getSenderBeanMgr().insert(createSeqEntry);
-	
+			
+			if(appMsgProcTran != null && createSeqRMMessage.getMessageId() != null && !storageManager.hasUserTransaction(createSeqMsg)) {
+
+				// Lock the sender bean before we insert it, if we are planning to send it ourselves
+				String workId = createSeqEntry.getMessageID() + createSeqEntry.getTimeToSend();
+				SandeshaThread sender = storageManager.getSender();
+
+				ConfigurationContext context = createSeqMsg.getConfigurationContext();
+				WorkerLock lock = sender.getWorkerLock();
+		
+				SenderWorker worker = new SenderWorker(context, createSeqEntry, rmsBean.getRMVersion());
+				worker.setLock(lock);
+				worker.setWorkId(workId);
+				// Actually take the lock
+				lock.addWork(workId, worker);
+			  
+				// Commit the transaction, so that the sender worker starts with a clean slate.
+				if(appMsgProcTran.isActive()) appMsgProcTran.commit();				
+						
+				if(worker != null) {
+					try {
+						worker.run();
+					} catch(Exception e)  {
+					log.error("Caught exception running SandeshaWorker", e);
+					}
+				}
+		
+				//Create transaction
+				appMsgProcTran = storageManager.getTransaction();
+			
+				//Find RMSBean
+				RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+				RMSBean tempRMSBean = new RMSBean();
+				tempRMSBean.setInternalSequenceID(rmsBean.getInternalSequenceID());
+				rmsBean = rmsBeanMgr.findUnique(tempRMSBean);
+			
+				// If the RMSBean has been terminated this means that we may 
+				// well have encountered a problem sending this message
+				if (rmsBean == null || rmsBean.isTerminated()){
+					
+					if (log.isDebugEnabled())
+						log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage, Failed to establish sequence " + rmsBean);
+					
+					if (rmsBean != null && rmsBean.getLastSendError() != null) {
+						if (rmsBean.getLastSendError() instanceof AxisFault)
+							throw (AxisFault)rmsBean.getLastSendError();
+					}
+					if (rmsBean.getLastSendError() != null)
+						throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused), 
+								rmsBean.getLastSendError());
+					
+					throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused));
+						
+				}
+			}
 			// Setup enough of the workers to get this create sequence off the box.
 			SandeshaUtil.startWorkersForSequence(configCtx, rmsBean);
 		} else {
 			rmsBean = null;
 		}
-		
+				
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage, " + rmsBean);
+		
 		return rmsBean;
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg, RMSBean rmsBean, String internalSequenceId, String outSequenceID, long messageNumber,
 		    String storageKey, StorageManager storageManager, Transaction tran, boolean hasUserTransaction) throws AxisFault {
+
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId + ", " + outSequenceID);
 
@@ -623,7 +687,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 		
 		// Commit the transaction, so that the sender worker starts with a clean slate.
-		if(tran != null && tran.isActive()) tran.commit();
+		if(appMsgProcTran != null && appMsgProcTran.isActive()) appMsgProcTran.commit();
 		 
 		if(worker != null) {
 		  try {

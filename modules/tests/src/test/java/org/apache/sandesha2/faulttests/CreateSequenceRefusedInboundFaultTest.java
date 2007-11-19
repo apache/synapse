@@ -19,6 +19,7 @@ package org.apache.sandesha2.faulttests;
 import java.io.File;
 
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -99,7 +100,12 @@ public class CreateSequenceRefusedInboundFaultTest extends SandeshaTestCase {
 		serviceClient.setOptions(clientOptions);		
 		
 		TestCallback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
+		boolean caughtException = false;
+		try {
+			serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
+		} catch (AxisFault e) {
+			caughtException = true;
+		}
         
 		long limit = System.currentTimeMillis() + waitTime;
 		Error lastError = null;
@@ -112,7 +118,9 @@ public class CreateSequenceRefusedInboundFaultTest extends SandeshaTestCase {
 				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 				
-				assertTrue(callback1.isErrorReported());
+				if (!caughtException)
+					assertTrue(callback1.isErrorReported());
+				
 				assertEquals(callback1.getResult(),null);
 				
 				lastError = null;
@@ -130,4 +138,6 @@ public class CreateSequenceRefusedInboundFaultTest extends SandeshaTestCase {
 	}
 	
 }
+
+
 

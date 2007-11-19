@@ -47,7 +47,7 @@ public abstract class SandeshaThread extends Thread{
 	private boolean stopRequested = false;
 	
 	private int sleepTime;
-  private WorkerLock lock = null;
+    private WorkerLock lock = null;
 
 	private ArrayList workingSequences = new ArrayList();
 	
@@ -56,9 +56,11 @@ public abstract class SandeshaThread extends Thread{
 	protected StorageManager storageManager = null;
 	private boolean reRunThread;
 
+	
 	public SandeshaThread(int sleepTime) {
 		this.sleepTime = sleepTime;
-  	lock = new WorkerLock ();
+		this.setDaemon(true);
+  	    lock = new WorkerLock ();
 	}
 	
 	public final WorkerLock getWorkerLock() {
@@ -91,7 +93,7 @@ public abstract class SandeshaThread extends Thread{
 				//ignore
 			}
 		}
-		
+				
 		//we can now request a pause - the next pause will be our
 		pauseRequired = true;
 				

@@ -34,9 +34,13 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.workers.SandeshaThread;
+import org.apache.sandesha2.workers.SenderWorker;
+import org.apache.sandesha2.workers.WorkerLock;
 
 public class WSRMMessageSender  {
 
@@ -117,7 +121,7 @@ public class WSRMMessageSender  {
   }
 	
 	
-	protected void sendOutgoingMessage(RMMsgContext rmMsgCtx, int msgType, long delay) throws AxisFault {
+	protected void sendOutgoingMessage(RMMsgContext rmMsgCtx, int msgType, long delay, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: WSRMParentProcessor::sendOutgoingMessage " + msgType + ", " + delay);
 		
@@ -154,6 +158,7 @@ public class WSRMMessageSender  {
 		{
 			senderBean.setSend(true);
 			senderBean.setSequenceID(outSequenceID);
+				
 		}
 		else
 			senderBean.setSend(false);			
@@ -173,10 +178,36 @@ public class WSRMMessageSender  {
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
 		
-    SandeshaUtil.executeAndStore(rmMsgCtx, key, storageManager);
+		SandeshaUtil.executeAndStore(rmMsgCtx, key, storageManager);
 	
 		retramsmitterMgr.insert(senderBean);
-		
+	
+		if (sequenceExists && !storageManager.hasUserTransaction(msgContext)) {
+
+			String workId = msgContext.getMessageID()
+					+ senderBean.getTimeToSend();
+			SandeshaThread sender = storageManager.getSender();
+			WorkerLock lock = sender.getWorkerLock();
+
+			SenderWorker worker = new SenderWorker(configurationContext,
+					senderBean, rmsBean.getRMVersion());
+			worker.setLock(lock);
+			worker.setWorkId(workId);
+			// Actually take the lock
+			lock.addWork(workId, worker);
+
+			// Commit the transaction, so that the sender worker starts with a clean state
+			if (transaction != null && transaction.isActive())
+				transaction.commit();
+
+			if (worker != null) {
+				try {
+					worker.run();
+				} catch (Exception e) {
+					log.error("Caught exception running SandeshaWorker", e);
+				}
+			}
+		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: WSRMParentProcessor::sendOutgoingMessage");
 

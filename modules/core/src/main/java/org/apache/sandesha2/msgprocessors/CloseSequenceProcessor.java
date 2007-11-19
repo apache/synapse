@@ -179,7 +179,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		rmMsgCtx.setSOAPAction(SpecSpecificConstants.getCloseSequenceAction (getRMVersion()));
 
 		// Send this outgoing message
-		sendOutgoingMessage(rmMsgCtx, Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE, 0);
+		sendOutgoingMessage(rmMsgCtx, Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE, 0, transaction);
 
 		// Pause the message context
 		rmMsgCtx.pause();

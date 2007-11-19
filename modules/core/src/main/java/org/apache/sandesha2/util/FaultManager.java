@@ -771,17 +771,14 @@ public class FaultManager {
 			return;			
 		}
 		
-	/*	if (rmsBean.getLastSendError() == null) {
-			// Indicate that there was an error when sending the Create Sequence.
-			rmsBean.setLastSendError(fault);
+		// Indicate that there was an error when sending the Create Sequence.
+		rmsBean.setLastSendError(fault);
+		// Mark the sequence as terminated
+		rmsBean.setTerminated(true);
 			
-			// Update the RMSBean
-			rmsBeanMgr.update(rmsBean);
-			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::processCreateSequenceRefusedFault Allowing another CreateSequence attempt");
-			return;
-		}
-*/
+		// Update the RMSBean
+		rmsBeanMgr.update(rmsBean);
+
 		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
 		if (createSequenceSenderBean == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound));

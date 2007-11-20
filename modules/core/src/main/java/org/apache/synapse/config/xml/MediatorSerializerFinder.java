@@ -56,7 +56,8 @@ public class MediatorSerializerFinder {
         AggregateMediatorSerializer.class,
         DBLookupMediatorSerializer.class,
         DBReportMediatorSerializer.class,
-        CacheMediatorSerializer.class
+        CacheMediatorSerializer.class,
+        CalloutMediatorSerializer.class
     };
 
     private static MediatorSerializerFinder instance = null;

@@ -24,7 +24,9 @@ import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -41,7 +43,7 @@ import java.util.Iterator;
 /**
  * This mediator will split the message in the criterian specified to it and inject in to Synapse
  */
-public class IterateMediator extends AbstractMediator {
+public class IterateMediator extends AbstractMediator implements ManagedLifecycle {
 
     /**
      * This holds whether to continue mediation on the parent message or not
@@ -235,4 +237,15 @@ public class IterateMediator extends AbstractMediator {
         this.target = target;
     }
 
+    public void init(SynapseEnvironment se) {
+        if (target.getSequence() != null) {
+            target.getSequence().init(se);
+        }
+    }
+
+    public void destroy() {
+        if (target.getSequence() != null) {
+            target.getSequence().destroy();
+        }
+    }
 }

@@ -38,7 +38,8 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     protected static final QName ATT_REGEX   = new QName("regex");
     protected static final QName ATT_EXPRN   = new QName("expression");
     protected static final QName ATT_KEY     = new QName("key");
-    protected static final QName ATT_SOURCE  = new QName("source");    
+    protected static final QName ATT_SOURCE  = new QName("source");
+    protected static final QName ATT_TARGET  = new QName("target");
     protected static final QName ATT_ONERROR = new QName("onError");
     protected static final QName ATT_STATS
         = new QName(XMLConfigConstants.STATISTICS_ATTRIB_NAME);

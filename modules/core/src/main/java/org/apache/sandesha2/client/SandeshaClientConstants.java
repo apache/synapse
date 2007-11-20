@@ -23,18 +23,18 @@ package org.apache.sandesha2.client;
  * Constants that are needed for the Sandesha2 Client API.
  */
 public class SandeshaClientConstants {
-	public static String AcksTo = "Sandesha2AcksTo";
-	public static String LAST_MESSAGE = "Sandesha2LastMessage";
-	public static String OFFERED_SEQUENCE_ID = "Sandesha2OfferedSequenceId";
-	public static String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
-	public static String SANDESHA_DEBUG_MODE = "Sandesha2DebugMode";
-	public static String SEQUENCE_KEY = "Sandesha2SequenceKey";
-	public static String MESSAGE_NUMBER = "Sandesha2MessageNumber";
-	public static String RM_SPEC_VERSION = "Sandesha2RMSpecVersion";
-	public static String DUMMY_MESSAGE = "Sandesha2DummyMessage"; //If this property is set, even though this message will invoke the RM handlers, this will not be sent as an actual application message
-	public static String UNRELIABLE_MESSAGE = "Sandesha2UnreliableMessage";
-	public static String SANDESHA_LISTENER = "Sandesha2Listener";
-	public static String USE_REPLY_TO_AS_ACKS_TO = "UseReplyToAsAcksTo";
-	public static String OFFERED_ENDPOINT = "OfferedEndpoint";
-	public static String AVOID_AUTO_TERMINATION = "AviodAutoTermination";
+	public static final String AcksTo = "Sandesha2AcksTo";
+	public static final String LAST_MESSAGE = "Sandesha2LastMessage";
+	public static final String OFFERED_SEQUENCE_ID = "Sandesha2OfferedSequenceId";
+	public static final String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
+	public static final String SANDESHA_DEBUG_MODE = "Sandesha2DebugMode";
+	public static final String SEQUENCE_KEY = "Sandesha2SequenceKey";
+	public static final String MESSAGE_NUMBER = "Sandesha2MessageNumber";
+	public static final String RM_SPEC_VERSION = "Sandesha2RMSpecVersion";
+	public static final String DUMMY_MESSAGE = "Sandesha2DummyMessage"; //If this property is set, even though this message will invoke the RM handlers, this will not be sent as an actual application message
+	public static final String UNRELIABLE_MESSAGE = "Sandesha2UnreliableMessage";
+	public static final String SANDESHA_LISTENER = "Sandesha2Listener";
+	public static final String USE_REPLY_TO_AS_ACKS_TO = "UseReplyToAsAcksTo";
+	public static final String OFFERED_ENDPOINT = "OfferedEndpoint";
+	public static final String AVOID_AUTO_TERMINATION = "AviodAutoTermination";
 }

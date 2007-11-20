@@ -36,15 +36,11 @@ public class Identifier {
 
 	private String identifier = null;
 	
-	private String namespaceValue = null;
-	
 	public Identifier(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
-		
-		this.namespaceValue = namespaceValue;
 	}
 
 	public void setIndentifer(String identifier) {

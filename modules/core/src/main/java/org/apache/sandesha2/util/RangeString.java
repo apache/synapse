@@ -347,7 +347,6 @@ public class RangeString implements Serializable{
 				
 				above.lowerValue = r.lowerValue; //extend down
 				rangeMap.put(new Long(above.lowerValue), above);
-				finalRange = above;
 			}
 			//finally we do the remove of the above range under its old key
 			rangeMap.remove(removeKey);

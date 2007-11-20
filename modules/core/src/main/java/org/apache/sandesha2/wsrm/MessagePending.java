@@ -108,7 +108,7 @@ public class MessagePending implements IOMRMPart {
 		
 		SOAPHeaderBlock headerBlock = header.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING,namespace);
 		
-		OMAttribute attribute = factory.createOMAttribute(Sandesha2Constants.WSRM_COMMON.PENDING,null,new Boolean (pending).toString());
+		OMAttribute attribute = factory.createOMAttribute(Sandesha2Constants.WSRM_COMMON.PENDING,null, Boolean.valueOf (pending).toString());
 		headerBlock.addAttribute(attribute);
 		
 		return headerElement;

@@ -178,7 +178,7 @@ public class MsgInitializer {
 		TerminateSequence terminateSequence = elements.getTerminateSequence();
 		TerminateSequenceResponse terminateSequenceResponse = elements.getTerminateSequenceResponse();
 		Iterator sequenceAcknowledgementsIter = elements.getSequenceAcknowledgements();
-		Sequence sequence = (Sequence) elements.getSequence();
+		Sequence sequence = elements.getSequence();
 		Iterator ackRequestedIter = elements.getAckRequests();
 		CloseSequence closeSequence = elements.getCloseSequence();
 		CloseSequenceResponse closeSequenceResponse = elements.getCloseSequenceResponse();

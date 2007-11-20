@@ -107,7 +107,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			Runnable nextRunnable = null;
 
 			// Invoke the first message
-	    	lastMessageInvoked = invokeMessage(null);
+			lastMessageInvoked = invokeMessage(null);
 
 			// Look for the next message, so long as we are still processing normally
 			while(!ignoreNextMsg && lastMessageInvoked) {
@@ -208,11 +208,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		MessageContext msgToInvoke = null;
 		boolean messageInvoked = true;
 		
-	    // If we are not the holder of the correct lock, then we have to stop
-	    if(lock != null && (!lock.ownsLock(workId, this))) {
-	    	if (log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run, another worker holds the lock");
-	    	return false;
-	    }
+		// If we are not the holder of the correct lock, then we have to stop
+		if(lock != null && (!lock.ownsLock(workId, this))) {
+			if (log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run, another worker holds the lock");
+			return false;
+		}
 		
 		try {
 			
@@ -244,14 +244,48 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 
 			// Lock the RMD Bean just to avoid deadlocks
-			SandeshaUtil.getRMDBeanFromSequenceId(storageManager, invokerBean.getSequenceID());
+			RMDBean rMDBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, invokerBean.getSequenceID());
+
+			boolean highestMessage = false;
+
+			if(!ignoreNextMsg){
+				// updating the next msg to invoke
+				long nextMsgNo = rMDBean.getNextMsgNoToProcess();
+				
+				if (!(invokerBean.getMsgNo()==nextMsgNo)) {
+					//someone else has invoked this before us - this run should now stop
+					if(log.isDebugEnabled()) log.debug("Operated message number is different from the Next Message Number to invoke");
+					return false;
+				}
+				
+				nextMsgNo++;
+				rMDBean.setNextMsgNoToProcess(nextMsgNo);
+				storageManager.getRMDBeanMgr().update(rMDBean);
+			}
+			
+			// Check if this is the last message
+			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+				Sequence sequence = (Sequence) rmMsg
+						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+				
+				if (sequence.getLastMessage() != null) {
+					//this will work for RM 1.0 only
+					highestMessage = true;
+				} else {
+					if (rMDBean!=null && rMDBean.isTerminated()) {
+						long highestInMsgNo = rMDBean.getHighestInMessageNumber();
+						if (invokerBean.getMsgNo()==highestInMsgNo)
+							highestMessage = true;
+					}
+				}
+			}
+
 			// Depending on the transaction  support, the service will be invoked only once. 
 			// Therefore we delete the invoker bean and message now, ahead of time
 			invokerBeanMgr.delete(messageContextKey);
 			// removing the corresponding message context as well.
 			storageManager.removeMessageContext(messageContextKey);
 
-			
 			try {
 
 				boolean postFailureInvocation = false;
@@ -265,7 +299,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 						&& Sandesha2Constants.VALUE_TRUE.equals(postFaulureProperty))
 					postFailureInvocation = true;
 
-		        InvocationResponse response = null;
+				InvocationResponse response = null;
 				if (postFailureInvocation) {
 					makeMessageReadyForReinjection(msgToInvoke);
 					if (log.isDebugEnabled())
@@ -279,19 +313,31 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					msgToInvoke.setPaused(false);
 					response = AxisEngine.resumeReceive(msgToInvoke);
 				}
-		        if(!InvocationResponse.SUSPEND.equals(response)) {
-		            // Performance work - need to close the XMLStreamReader to prevent GC thrashing.
-		            SOAPEnvelope env = msgToInvoke.getEnvelope();
-		            if(env!=null){
-		              StAXBuilder sb = (StAXBuilder)msgToInvoke.getEnvelope().getBuilder();
-		              if(sb!=null){
-		                sb.close();
-		              }
-		            }
-		        }
-		        
-		        if (transaction != null && transaction.isActive())
-		        	transaction.commit();
+
+				if(!InvocationResponse.SUSPEND.equals(response)) {
+					// Performance work - need to close the XMLStreamReader to prevent GC thrashing.
+					SOAPEnvelope env = msgToInvoke.getEnvelope();
+					if(env!=null){
+						StAXBuilder sb = (StAXBuilder)msgToInvoke.getEnvelope().getBuilder();
+						if(sb!=null){
+							sb.close();
+						}
+					}
+				}
+
+				if (transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = storageManager.getTransaction();
+				}
+
+				if (highestMessage) {
+					//do cleaning stuff that hs to be done after the invocation of the last message.
+					TerminateManager.cleanReceivingSideAfterInvocation(invokerBean.getSequenceID(), storageManager);
+					// exit from current iteration. (since an entry
+					// was removed)
+					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage Last message return " + messageInvoked);					
+					return messageInvoked;
+				}
 
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
@@ -303,53 +349,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				
 				handleFault(rmMsg, e);
 			}
-
-			transaction = storageManager.getTransaction();
-			 
-			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-				Sequence sequence = (Sequence) rmMsg
-						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-				
-				boolean highestMessage = false;
-				if (sequence.getLastMessage() != null) {
-					//this will work for RM 1.0 only
-					highestMessage = true;
-				} else {
-					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, invokerBean.getSequenceID());
-					
-					if (rmdBean!=null && rmdBean.isTerminated()) {
-						long highestInMsgNo = rmdBean.getHighestInMessageNumber();
-						if (invokerBean.getMsgNo()==highestInMsgNo)
-							highestMessage = true;
-					}
-				}
-				
-				if (highestMessage) {
-					//do cleaning stuff that hs to be done after the invocation of the last message.
-					TerminateManager.cleanReceivingSideAfterInvocation(invokerBean.getSequenceID(), storageManager);
-					// exit from current iteration. (since an entry
-					// was removed)
-					if(transaction != null && transaction.isActive()) transaction.commit();
-					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::invokeMessage Last message return " + messageInvoked);
-					return messageInvoked;	
-				}
-			}
-			
-			if(!ignoreNextMsg){
-				// updating the next msg to invoke
-				RMDBean rMDBean = storageManager.getRMDBeanMgr().retrieve(invokerBean.getSequenceID());
-				long nextMsgNo = rMDBean.getNextMsgNoToProcess();
-				
-				if (!(invokerBean.getMsgNo()==nextMsgNo)) {
-					String message = "Operated message number is different from the Next Message Number to invoke";
-					throw new SandeshaException (message);
-				}
-				
-				nextMsgNo++;
-				rMDBean.setNextMsgNoToProcess(nextMsgNo);
-				storageManager.getRMDBeanMgr().update(rMDBean);
-			}
-			
 			if(transaction != null && transaction.isActive()) transaction.commit();
 			transaction = null;
 			

@@ -95,7 +95,6 @@ public class RMElements {
 		if(firstBodyElement != null) {
 			QName firstBodyQName = firstBodyElement.getQName();
 			String namespace = firstBodyQName.getNamespaceURI();
-			String localName = firstBodyQName.getLocalPart();
 
 			boolean isSPEC2007_02 = SPEC_2007_02.NS_URI.equals(namespace);
 			boolean isSPEC2005_02 = false;

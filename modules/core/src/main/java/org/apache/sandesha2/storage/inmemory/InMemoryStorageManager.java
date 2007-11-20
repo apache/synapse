@@ -343,7 +343,7 @@ public class InMemoryStorageManager extends StorageManager {
 		return useSerialization;
 	}
 
-	private class SerializedStorageEntry {
+	private static class SerializedStorageEntry {
 		MessageContext       message;
 		byte[]               data;
 		ConfigurationContext context;
@@ -354,7 +354,7 @@ public class InMemoryStorageManager extends StorageManager {
 		Object               inTransportOut;
 		Object               inTransportOutInfo;
 	}
-	private class StorageEntry {
+	private static class StorageEntry {
 		MessageContext msgContext;
 		SOAPEnvelope   envelope;
 	}

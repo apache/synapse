@@ -342,10 +342,10 @@ public class Invoker extends SandeshaThread {
 				try {
 					// Set the lock up before we start the thread, but roll it back
 					// if we hit any problems
-					getWorkerLock().addWork(workId, worker);
-					threadPool.execute(work);
+					if(worker.getLock().addWork(workId, worker))
+						threadPool.execute(work);
 				} catch(Exception e) {
-					getWorkerLock().removeWork(workId);
+					worker.getLock().removeWork(workId);
 				}				
 				processedMessage = true;
 			}

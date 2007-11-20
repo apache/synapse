@@ -571,13 +571,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					if (rmsBean != null && rmsBean.getLastSendError() != null) {
 						if (rmsBean.getLastSendError() instanceof AxisFault)
 							throw (AxisFault)rmsBean.getLastSendError();
-					}
-					if (rmsBean.getLastSendError() != null)
+						
 						throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused), 
 								rmsBean.getLastSendError());
+					}
 					
-					throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused));
-						
+					throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused));						
 				}
 			}
 			// Setup enough of the workers to get this create sequence off the box.

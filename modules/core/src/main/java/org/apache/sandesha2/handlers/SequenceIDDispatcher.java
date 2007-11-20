@@ -39,11 +39,9 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-import java.util.Map;
-
 public class SequenceIDDispatcher extends AbstractDispatcher {
 
-	private final String NAME = "SequenceIDDIspatcher";
+	private static final String NAME = "SequenceIDDIspatcher";
 	private static final Log log = LogFactory.getLog(SequenceIDDispatcher.class);
 	
 	public AxisOperation findOperation(AxisService service, MessageContext messageContext) {

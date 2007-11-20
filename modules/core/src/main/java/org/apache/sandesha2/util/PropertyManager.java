@@ -222,8 +222,6 @@ public class PropertyManager {
 
 	public static SandeshaPolicyBean loadPropertiesFromModuleDescPolicy(AxisModule desc,
 			SandeshaPolicyBean parentPropertyBean) throws SandeshaException {
-		
-        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
 
 		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
@@ -255,7 +253,7 @@ public class PropertyManager {
             return null;
         }
         
-        propertyBean = (SandeshaPolicyBean) assertion;
+        SandeshaPolicyBean propertyBean = (SandeshaPolicyBean) assertion;
         propertyBean.setParent(parentPropertyBean);
 
 		return propertyBean;
@@ -264,8 +262,6 @@ public class PropertyManager {
 	public static SandeshaPolicyBean loadPropertiesFromAxisDescription(AxisDescription desc,
 			SandeshaPolicyBean parentPropertyBean) throws SandeshaException {
 		
-        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
-
         Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
         if (policy == null) {
@@ -296,17 +292,16 @@ public class PropertyManager {
             return null;
         }
         
-        propertyBean = (SandeshaPolicyBean) assertion;
+        SandeshaPolicyBean propertyBean = (SandeshaPolicyBean) assertion;
         
         if (propertyBean!=parentPropertyBean) {
         	if(parentPropertyBean != null) propertyBean.setParent(parentPropertyBean);
         	return propertyBean;
-        } else {
-        	//propertyBean and parent being the same object means that there is no policy in this level, this is simply the reflection of 
-        	//the parent.
-        	return null;
-        }
+        } 
         
+        //propertyBean and parent being the same object means that there is no policy in this level, this is simply the reflection of 
+        //the parent.
+        return null;               
 	}
 
 	public static void reloadFromPropertyFile(InputStream stream) throws SandeshaException {

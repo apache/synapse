@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * <pre>
- * &lt;xslt key="property-key" [source="xpath"]&gt;
+ * &lt;xslt key="property-key" [source="xpath"] [target="string"]&gt;
  *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  * &lt;/transform&gt;
  * </pre>
@@ -61,6 +61,10 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
             xslt.addAttribute(fac.createOMAttribute(
                 "source", nullNS, mediator.getSource().toString()));
             serializeNamespaces(xslt, mediator.getSource());
+        }
+        if (mediator.getTargetPropertyName() != null) {
+            xslt.addAttribute(fac.createOMAttribute(
+                "target", nullNS, mediator.getTargetPropertyName()));
         }
         serializeProperties(xslt, mediator.getProperties());
         List features = mediator.getFeatures();

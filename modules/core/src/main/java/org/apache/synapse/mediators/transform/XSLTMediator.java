@@ -103,6 +103,11 @@ public class XSLTMediator extends AbstractMediator {
     private AXIOMXPath source = null;
 
     /**
+     * The name of the message context property to store the transformation result  
+     */
+    private String targetPropertyName = null;
+
+    /**
      * Any parameters which should be passed into the XSLT transformation
      */
     private List properties = new ArrayList();
@@ -439,13 +444,21 @@ public class XSLTMediator extends AbstractMediator {
                 }
             }
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Replace source node with result");
+            if (targetPropertyName != null) {
+                // add result XML as a message context property to the message
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Adding result as message context property : " +
+                        targetPropertyName);
+                }
+                synCtx.setProperty(targetPropertyName, result);
+            } else {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Replace source node with result");
+                }
+                // replace the sourceNode with the result.
+                sourceNode.insertSiblingAfter(result);
+                sourceNode.detach();
             }
-
-            // replace the sourceNode with the result.
-            sourceNode.insertSiblingAfter(result);
-            sourceNode.detach();
 
         } catch (TransformerException e) {
             handleException("Error performing XSLT transformation using : " + xsltKey, e, synCtx);
@@ -600,6 +613,14 @@ public class XSLTMediator extends AbstractMediator {
 
     public void setSourceXPathString(String sourceXPathString) {
         this.sourceXPathString = sourceXPathString;
+    }
+
+    public String getTargetPropertyName() {
+        return targetPropertyName;
+    }
+
+    public void setTargetPropertyName(String targetPropertyName) {
+        this.targetPropertyName = targetPropertyName;
     }
 }
 

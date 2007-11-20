@@ -62,6 +62,7 @@ public class MessageHelper {
         newCtx.setReplyTo(synCtx.getReplyTo());
         newCtx.setSoapAction(synCtx.getSoapAction());
         newCtx.setWSAAction(synCtx.getWSAAction());
+        newCtx.setResponse(synCtx.isResponse());
 
         // copy all the synapse level properties to the newCtx
         for (Object o : synCtx.getPropertyKeySet()) {

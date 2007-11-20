@@ -1101,14 +1101,18 @@ public class SandeshaUtil {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isMessageUnreliable");
 		boolean result = false;
 
-		//look at the msg ctx first
+		//look at the msg ctx first. It is either forced on or off at the msg ctx level
 		String unreliable = (String) mc.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 		if ("true".equals(unreliable)) {
 			if (log.isDebugEnabled()) log.debug("Unreliable message context");
 			result = true;
-		}			
-		
-		if(!result) {
+		}		
+		else if("false".equals(unreliable)){
+			//a forced reliable message
+			if (log.isDebugEnabled()) log.debug("Forced reliable message context");
+			result = false;
+		}	
+		else if(!result) {
 			//look at the operation
 			if (mc.getAxisOperation() != null) {
 				Parameter unreliableParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);

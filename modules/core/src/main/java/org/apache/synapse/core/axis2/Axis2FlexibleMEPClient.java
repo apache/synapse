@@ -27,6 +27,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
@@ -103,7 +104,8 @@ public class Axis2FlexibleMEPClient {
                     "] [ format = " + endpoint.getFormat() +                    
                     "] [ force soap11=" + endpoint.isForceSOAP11() +
                     "] [ force soap12=" + endpoint.isForceSOAP12() +
-                    "; pox=" + endpoint.isForcePOX() : "") +
+                    "] [ pox=" + endpoint.isForcePOX() +
+                    "] [ get=" + endpoint.isForcePOX() : "") +
                 "] [ to " + synapseOutMessageContext.getTo() + "]");
         }
 
@@ -121,6 +123,11 @@ public class Axis2FlexibleMEPClient {
 
             if (SynapseConstants.FORMAT_POX.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(true);
+
+            } else if (SynapseConstants.FORMAT_GET.equals(endpoint.getFormat())) {
+                axisOutMsgCtx.setDoingREST(true);
+                axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
+                    Constants.Configuration.HTTP_METHOD_GET);
                 
             } else if (SynapseConstants.FORMAT_SOAP11.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(false);

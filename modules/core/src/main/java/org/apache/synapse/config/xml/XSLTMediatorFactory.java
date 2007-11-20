@@ -37,7 +37,7 @@ import java.util.Iterator;
  * Creates a XSLT mediator from the given XML
  *
  * <pre>
- * &lt;xslt key="property-key" [source="xpath"]&gt;
+ * &lt;xslt key="property-key" [source="xpath"] [target="string"]&gt;
  *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  * &lt;/transform&gt;
  * </pre>
@@ -56,6 +56,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
         OMAttribute attXslt   = elem.getAttribute(ATT_KEY);
         OMAttribute attSource = elem.getAttribute(ATT_SOURCE);
+        OMAttribute attTarget = elem.getAttribute(ATT_TARGET);
 
         if (attXslt != null) {
             transformMediator.setXsltKey(attXslt.getAttributeValue());
@@ -75,6 +76,11 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
                     attSource.getAttributeValue());
             }
         }
+
+        if (attTarget != null) {
+            transformMediator.setTargetPropertyName(attTarget.getAttributeValue());    
+        }
+
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processTraceState(transformMediator, elem);

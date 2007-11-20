@@ -72,8 +72,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		// Processing the create sequence response.
 
-		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx.getCreateSequenceResponse();
 		if (createSeqResponsePart == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqResponse);
 			log.debug(message);

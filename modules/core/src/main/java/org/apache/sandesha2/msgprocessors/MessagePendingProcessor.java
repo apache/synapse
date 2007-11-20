@@ -40,7 +40,7 @@ public class MessagePendingProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: MessagePendingProcessor::processMessagePendingHeaders");
 
-		MessagePending messagePending = (MessagePending) message.getMessagePart(Sandesha2Constants.MessageParts.MESSAGE_PENDING);
+		MessagePending messagePending = (MessagePending) message.getMessagePending();
 		if (messagePending!=null) {
 			boolean pending = messagePending.isPending();
 			if (pending) {

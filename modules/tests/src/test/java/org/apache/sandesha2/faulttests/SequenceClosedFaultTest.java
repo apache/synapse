@@ -158,7 +158,7 @@ public class SequenceClosedFaultTest extends SandeshaTestCase {
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);
-		applicationRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
+		applicationRMMsg.setSequence(sequence);
 		applicationRMMsg.addSOAPEnvelope();
 
 		// --------------------------------------------

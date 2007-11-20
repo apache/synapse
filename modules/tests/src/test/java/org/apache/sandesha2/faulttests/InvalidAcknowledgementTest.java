@@ -244,7 +244,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		sequenceAck.addAcknowledgementRanges(ackRange);
 
 		// Set the SequenceAcknowledgement part in the message
-		applicationRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
+		applicationRMMsg.addSequenceAcknowledgement(sequenceAck);
 		applicationRMMsg.addSOAPEnvelope();
 
 		// --------------------------------------------

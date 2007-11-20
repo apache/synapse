@@ -470,8 +470,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg);
 
 		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
-		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage.getCreateSequence();
 
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {

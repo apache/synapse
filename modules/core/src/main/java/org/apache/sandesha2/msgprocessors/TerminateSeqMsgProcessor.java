@@ -76,8 +76,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		// Processing the terminate message
 		// TODO Add terminate sequence message logic.
-		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg.getTerminateSequence();
 		if (terminateSequence == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTerminateSeqPart);
 			log.debug(message);
@@ -332,10 +331,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				sequenceId,	storageManager, true);
 		
 		// copy over the ack parts
-		Iterator iter = ackRMMessage.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Iterator iter = ackRMMessage.getSequenceAcknowledgements();
 		while (iter.hasNext()) {
 			SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
-			terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, seqAck);
+			terminateSeqResponseRMMsg.addSequenceAcknowledgement(seqAck);
 		}
 		
 		terminateSeqResponseRMMsg.addSOAPEnvelope();
@@ -383,8 +382,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		getMsgContext().setOperationContext(opcontext);
 		getMsgContext().setAxisOperation(terminateOp);
 
-		TerminateSequence terminateSequencePart = (TerminateSequence) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		TerminateSequence terminateSequencePart = (TerminateSequence) rmMsgCtx.getTerminateSequence();
 		terminateSequencePart.getIdentifier().setIndentifer(getOutSequenceID());
 
 		rmMsgCtx.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(getRMVersion()));

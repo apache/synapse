@@ -79,8 +79,7 @@ public class SequenceManager {
 
 		EndpointReference replyTo = createSequenceMsg.getReplyTo();
 
-		CreateSequence createSequence = (CreateSequence) createSequenceMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+		CreateSequence createSequence = (CreateSequence) createSequenceMsg.getCreateSequence();
 		if (createSequence == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound);
 			log.debug(message);

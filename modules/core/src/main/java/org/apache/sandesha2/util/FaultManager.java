@@ -587,8 +587,8 @@ public class FaultManager {
 			// Need to get the sequence part from the Header.
 			if (log.isDebugEnabled()) 
 		    	log.debug("soap11");
-			try {
-				SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT);
+//			try {
+				SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getSequenceFault();
 	      
 				// If the sequence fault part is not null, then we have an RM specific fault.
 				if (sequenceFault != null) {
@@ -600,10 +600,10 @@ public class FaultManager {
 						log.debug("isSOAP11SequenceUnknownFault " + identifier);
 				} 
 	    		    	
-			} catch (SandeshaException e) {
-				if (log.isDebugEnabled()) 
-					log.debug("Unable to process SequenceFault", e);
-			}
+//			} catch (SandeshaException e) {
+//				if (log.isDebugEnabled()) 
+//					log.debug("Unable to process SequenceFault", e);
+//			}
 		}
 	
 		// If we haven't found a soapFaultSubcode at this point - look inside the AxisFault for the information.

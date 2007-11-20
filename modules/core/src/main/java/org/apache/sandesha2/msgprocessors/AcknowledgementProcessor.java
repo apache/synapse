@@ -68,7 +68,7 @@ public class AcknowledgementProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeaders");
 
-		Iterator iter = message.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Iterator iter = message.getSequenceAcknowledgements();
 		while(iter.hasNext()){
 			SequenceAcknowledgement sa = (SequenceAcknowledgement)iter.next();
 			processAckHeader(message, sa.getOriginalSequenceAckElement(), sa);
@@ -108,15 +108,10 @@ public class AcknowledgementProcessor {
 		  return;
 		}
 		
-		if (outSequenceId == null || "".equals(outSequenceId)) {
+		if (outSequenceId == null || outSequenceId.length()==0) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.outSeqIDIsNull);
 			log.debug(message);
 			throw new SandeshaException(message);
-		}
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager, piggybackedAck)) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence");
-			return;
 		}
 		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, outSequenceId, rmsBean, piggybackedAck)) {
 			if (log.isDebugEnabled())
@@ -135,12 +130,6 @@ public class AcknowledgementProcessor {
 		
 		if(log.isDebugEnabled()) log.debug("Got Ack for RM Sequence: " + outSequenceId + ", internalSeqId: " + internalSequenceId);
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
-
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager, piggybackedAck)) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence ");
-			return;
-		}
 		
 		if (FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, sequenceAck, storageManager, rmsBean, piggybackedAck)) {
 			if (log.isDebugEnabled())

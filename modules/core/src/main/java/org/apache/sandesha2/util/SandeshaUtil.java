@@ -704,11 +704,11 @@ public class SandeshaUtil {
 
 		String sequenceID = null;
 		if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
-			Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			Sequence sequence = (Sequence) rmMessageContext.getSequence();
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK) {
 			Iterator sequenceAckIter = rmMessageContext
-					.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+					.getSequenceAcknowledgements();
 			
 			//In case of ack messages sequenceId is decided based on the sequenceId of the first 
 			//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
@@ -718,7 +718,7 @@ public class SandeshaUtil {
 			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
 			Iterator ackRequestIter = rmMessageContext
-					.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+					.getAckRequests();
 	
 			//In case of ack request messages sequenceId is decided based on the sequenceId of the first 
 			//AckRequested.
@@ -727,11 +727,11 @@ public class SandeshaUtil {
 			sequenceID = ackReq.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
 			CloseSequence closeSequence = (CloseSequence) rmMessageContext
-					.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+					.getCloseSequence();
 			sequenceID = closeSequence.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE) {
 			CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMessageContext
-					.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE);
+					.getCloseSequenceResponse();;
 			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier();
 		}
 

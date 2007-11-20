@@ -82,109 +82,82 @@ public class MsgInitializer {
 		if (addressingNamespace == null && !msgCtx.isServerSide())
 			addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
 
-		RMElements elements = new RMElements(addressingNamespace);
-		elements.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
+		rmMsgContext.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
 
+		String sequenceID = null;
+
+		CreateSequence createSequence = rmMsgContext.getCreateSequence();
+		CreateSequenceResponse createSequenceResponse = rmMsgContext.getCreateSequenceResponse();
+		TerminateSequence terminateSequence = rmMsgContext.getTerminateSequence();
+		TerminateSequenceResponse terminateSequenceResponse = rmMsgContext.getTerminateSequenceResponse();
+		Iterator sequenceAcknowledgementsIter = rmMsgContext.getSequenceAcknowledgements();
+		Sequence sequence = rmMsgContext.getSequence();
+		Iterator ackRequestedIter = rmMsgContext.getAckRequests();
+		CloseSequence closeSequence = rmMsgContext.getCloseSequence();
+		CloseSequenceResponse closeSequenceResponse = rmMsgContext.getCloseSequenceResponse();
+		MakeConnection makeConnection = rmMsgContext.getMakeConnection();
+		
 		String rmNamespace = null;
 
-		if (elements.getCreateSequence() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, elements.getCreateSequence());
-			rmNamespace = elements.getCreateSequence().getNamespaceValue();
+		if (createSequence != null) {
+			rmNamespace = createSequence.getNamespaceValue();
 		}
 
-		if (elements.getCreateSequenceResponse() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE, elements
-					.getCreateSequenceResponse());
-			rmNamespace = elements.getCreateSequenceResponse().getNamespaceValue();
+		if (createSequenceResponse != null) {
+			rmNamespace = createSequenceResponse.getNamespaceValue();
 		}
 
-		if (elements.getSequence() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, elements.getSequence());
-			rmNamespace = elements.getSequence().getNamespaceValue();
+		if (sequence != null) {
+			rmNamespace = sequence.getNamespaceValue();
 		}
 
 		//In case of ack messages RM Namespace is decided based on the sequenceId of the last 
 		//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
 		//of different RM specifications in the same incoming message
-		for (Iterator iter = elements.getSequenceAcknowledgements();iter.hasNext();) {
-			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
+		while(sequenceAcknowledgementsIter.hasNext()){
+			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) sequenceAcknowledgementsIter.next();
 			rmNamespace = sequenceAck.getNamespaceValue();
 		}
 
-		if (elements.getTerminateSequence() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ, elements.getTerminateSequence());
-			rmNamespace = elements.getTerminateSequence().getNamespaceValue();
+		if (terminateSequence != null) {
+			rmNamespace = terminateSequence.getNamespaceValue();
 		}
 
-		if (elements.getTerminateSequenceResponse() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE, elements
-					.getTerminateSequenceResponse());
-			rmNamespace = elements.getTerminateSequenceResponse().getNamespaceValue();
+		if (terminateSequenceResponse != null) {
+			rmNamespace = terminateSequenceResponse.getNamespaceValue();
 		}
 
 		//In case of ack request messages RM Namespace is decided based on the sequenceId of the last 
 		//ack request.
-		for (Iterator iter = elements.getAckRequests();iter.hasNext();) {
-			AckRequested ackRequest = (AckRequested) iter.next();
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, ackRequest);
+		while(ackRequestedIter.hasNext()){
+			AckRequested ackRequest = (AckRequested) ackRequestedIter.next();
 			rmNamespace = ackRequest.getNamespaceValue();
 		}
 
-		if (elements.getCloseSequence() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE, elements.getCloseSequence());
-			rmNamespace = elements.getCloseSequence().getNamespaceValue();
+		if (closeSequence != null) {
+			rmNamespace = closeSequence.getNamespaceValue();
 		}
 
-		if (elements.getCloseSequenceResponse() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE, elements
-					.getCloseSequenceResponse());
-			rmNamespace = elements.getCloseSequenceResponse().getNamespaceValue();
+		if (closeSequenceResponse != null) {
+			rmNamespace = closeSequenceResponse.getNamespaceValue();
 		}
 		
-		if (elements.getUsesSequenceSTR() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.USES_SEQUENCE_STR, elements
-					.getUsesSequenceSTR());
-		}
-		
-		if (elements.getMakeConnection() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
-					elements.getMakeConnection());
-			String makeConnectionNamespace = elements.getMakeConnection().getNamespaceValue();
-			if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(makeConnectionNamespace))
+		if (makeConnection != null) {
+			if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(makeConnection.getNamespaceValue()))
 				rmNamespace = Sandesha2Constants.SPEC_2007_02.NS_URI;
 		}
 		
-		if (elements.getMessagePending() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MESSAGE_PENDING,
-					elements.getMessagePending());
-			String makeConnectionNamespace = elements.getMessagePending().getNamespaceValue();
+		if (rmMsgContext.getMessagePending() != null) {
+			String makeConnectionNamespace = rmMsgContext.getMessagePending().getNamespaceValue();
 			if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(makeConnectionNamespace))
 				rmNamespace = Sandesha2Constants.SPEC_2007_02.NS_URI;
 		}
-		
-		if (elements.getSequenceFault() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT,
-					elements.getSequenceFault());
-		}
-
 		if (rmNamespace!=null)
 			rmMsgContext.setRMNamespaceValue(rmNamespace);
 			
-				String sequenceID = null;
-
-		CreateSequence createSequence = elements.getCreateSequence();
-		CreateSequenceResponse createSequenceResponse = elements.getCreateSequenceResponse();
-		TerminateSequence terminateSequence = elements.getTerminateSequence();
-		TerminateSequenceResponse terminateSequenceResponse = elements.getTerminateSequenceResponse();
-		Iterator sequenceAcknowledgementsIter = elements.getSequenceAcknowledgements();
-		Sequence sequence = elements.getSequence();
-		Iterator ackRequestedIter = elements.getAckRequests();
-		CloseSequence closeSequence = elements.getCloseSequence();
-		CloseSequenceResponse closeSequenceResponse = elements.getCloseSequenceResponse();
-		MakeConnection makeConnection = elements.getMakeConnection();
-
-
+		sequenceAcknowledgementsIter = rmMsgContext.getSequenceAcknowledgements();
+		ackRequestedIter = rmMsgContext.getAckRequests();
+		
 		// Setting message type.
 		if (createSequence != null) {
 			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
@@ -199,7 +172,7 @@ public class MsgInitializer {
 			sequenceID = terminateSequenceResponse.getIdentifier().getIdentifier();
 		} else if (sequence != null) {
 			
-			Sequence seq = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			Sequence seq = (Sequence) rmMsgContext.getSequence();
 			LastMessage lastMessage = seq.getLastMessage();
 			SOAPEnvelope envelope = rmMsgContext.getSOAPEnvelope();
 			

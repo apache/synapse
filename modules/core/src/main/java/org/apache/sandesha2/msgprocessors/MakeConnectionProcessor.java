@@ -71,7 +71,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
 
-		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION);
+		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMakeConnection();
 		Address address = makeConnection.getAddress();
 		Identifier identifier = makeConnection.getIdentifier();
 		

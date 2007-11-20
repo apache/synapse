@@ -71,7 +71,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
 		boolean msgCtxPaused = false;
-		Iterator ackRequests = message.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		Iterator ackRequests = message.getAckRequests();
 		while(ackRequests.hasNext()){
 			AckRequested ackReq = (AckRequested)ackRequests.next();
 			boolean paused = processAckRequestedHeader(message, ackReq.getOriginalAckRequestedElement(), ackReq);
@@ -170,7 +170,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true);
 		
 		//this is not a client generated message. So set serverSide to true.
 		ackMsgCtx.setServerSide(true);
@@ -295,7 +295,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		getConfigurationContext().registerOperationContext(ackRequestRMMsg.getMessageId(), opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		
-		Iterator iterator = ackRequestRMMsg.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		Iterator iterator = ackRequestRMMsg.getAckRequests();
 		
 		AckRequested ackRequested = null;
 		while (iterator.hasNext()) {

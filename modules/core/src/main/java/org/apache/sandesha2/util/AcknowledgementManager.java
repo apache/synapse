@@ -81,7 +81,7 @@ public class AcknowledgementManager {
 					RMDBean sequence = (RMDBean) sequences.next();
 					if (sequence.getHighestInMessageNumber() > 0) {
 						if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequence.getSequenceID());
-						RMMsgCreator.addAckMessage(rmMessageContext, sequence.getSequenceID(), sequence);
+						RMMsgCreator.addAckMessage(rmMessageContext, sequence.getSequenceID(), sequence, false);
 					}
 				}
 				
@@ -96,7 +96,7 @@ public class AcknowledgementManager {
 						
 						if(acksToEPR == null || acksToEPR.hasAnonymousAddress()) {
 							if(log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
-							RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean);
+							RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean, false);
 						}
 					}
 				}
@@ -150,8 +150,9 @@ public class AcknowledgementManager {
 					retransmitterBeanMgr.delete(ackBean.getMessageID());
 					storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
 
-					if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
-			        RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
+				if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+		        RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
+
 
 			    } else if(rmMessageContext.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 			        if(log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
@@ -159,7 +160,7 @@ public class AcknowledgementManager {
 			        if(sequence.getHighestInMessageNumber() > 0) {
 						  if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
 
-						RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
+					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
 					}
 				}
 			}
@@ -228,7 +229,7 @@ public class AcknowledgementManager {
 		ackMsgCtx.setServerSide(serverSide);
 
 		// adding the SequenceAcknowledgement part.
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::generateAckMessage");

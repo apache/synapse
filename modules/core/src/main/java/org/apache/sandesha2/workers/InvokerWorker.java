@@ -265,8 +265,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			
 			// Check if this is the last message
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-				Sequence sequence = (Sequence) rmMsg
-						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+				Sequence sequence = rmMsg.getSequence();
 				
 				if (sequence.getLastMessage() != null) {
 					//this will work for RM 1.0 only

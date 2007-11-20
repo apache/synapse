@@ -65,8 +65,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			log.debug("Enter: CloseSequenceProcessor::processInMessage");
 
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
-		CloseSequence closeSequence = (CloseSequence) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getCloseSequence();
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
@@ -103,16 +102,14 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 
 		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, rmdBean, sequenceId, storageManager, true);
 		// adding the ack part(s) to the envelope.
-		Iterator sequenceAckIter = ackRMMsgCtx
-				.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Iterator sequenceAckIter = ackRMMsgCtx.getSequenceAcknowledgements();
 
 		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmdBean);
 		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();
 
 		while (sequenceAckIter.hasNext()) {
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
-			closeSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
-					sequenceAcknowledgement);
+			closeSeqResponseRMMsg.addSequenceAcknowledgement(sequenceAcknowledgement);
 		}
 		
 		closeSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
@@ -167,8 +164,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		
-		CloseSequence closeSequencePart = (CloseSequence) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+		CloseSequence closeSequencePart = (CloseSequence) rmMsgCtx.getCloseSequence();
 		Identifier identifier = closeSequencePart.getIdentifier();
 		if (identifier==null) {
 			identifier = new Identifier (closeSequencePart.getNamespaceValue());

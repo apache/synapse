@@ -77,7 +77,7 @@ public class SequenceProcessor {
 			log.debug("Enter: SequenceProcessor::processSequenceHeader");
 		
 		InvocationResponse result = InvocationResponse.CONTINUE;
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		Sequence sequence = (Sequence) rmMsgCtx.getSequence();
 		if(sequence != null) {
 			// This is a reliable message, so hand it on to the main routine
 			result = processReliableMessage(rmMsgCtx, transaction);
@@ -103,7 +103,7 @@ public class SequenceProcessor {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		Sequence sequence = (Sequence) rmMsgCtx.getSequence();
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		boolean lastMessage = sequence.getLastMessage() != null;
@@ -143,10 +143,12 @@ public class SequenceProcessor {
 			throw new SandeshaException(message);
 		}
 
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
-			return InvocationResponse.ABORT;
+		if(bean == null){
+			if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
+				return InvocationResponse.ABORT;
+			}
 		}
 
 		// throwing a fault if the sequence is terminated

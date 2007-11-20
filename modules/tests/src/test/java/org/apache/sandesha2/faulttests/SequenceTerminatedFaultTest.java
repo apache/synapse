@@ -429,7 +429,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);
-		applicationRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
+		applicationRMMsg.setSequence(sequence);
 		applicationRMMsg.addSOAPEnvelope();
 
 		// --------------------------------------------
@@ -477,10 +477,10 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);
+		applicationRMMsg.setCloseSequence(sequence);
 		LastMessageNumber lastMsgNumber = new LastMessageNumber(rmNamespaceValue);
 		lastMsgNumber.setMessageNumber(1);
 		sequence.setLastMessageNumber(lastMsgNumber);
-		applicationRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE, sequence);
 		applicationRMMsg.addSOAPEnvelope();
 
 		// --------------------------------------------
@@ -528,7 +528,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);
-		applicationRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE, sequence);
+		applicationRMMsg.addAckRequested(sequence);
 		applicationRMMsg.addSOAPEnvelope();
 
 		// --------------------------------------------

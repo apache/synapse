@@ -383,8 +383,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					// terminate sending side if this is the WSRM 1.0 spec. 
 					// If the WSRM versoion is 1.1 termination will happen in the terminate sequence response message.
 					
-					TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
-							.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+					TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getTerminateSequence();
 					String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 	
 					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
@@ -447,7 +446,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		   messageType == Sandesha2Constants.MessageTypes.LAST_MESSAGE) {
 			
 			String namespace = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			Sequence sequence = (Sequence) rmMsgContext.getSequence();
 			if(sequence == null) {
 				sequence = new Sequence(namespace);
 				
@@ -463,24 +462,23 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				// We just create the id here, we will add the value in later
 				id = new Identifier(namespace);
 				sequence.setIdentifier(id);
-				
-				rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
+				rmMsgContext.setSequence(sequence);
 				
 			}
 			
 		} else if(messageType == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			TerminateSequence terminate = (TerminateSequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+			TerminateSequence terminate = (TerminateSequence) rmMsgContext.getTerminateSequence();
 			id = terminate.getIdentifier();
 
 		} else if(messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
-			CloseSequence close = (CloseSequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+			CloseSequence close = (CloseSequence) rmMsgContext.getCloseSequence();
 			id = close.getIdentifier();
 		
 		} else if(messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
 			// The only time that we can have a message of this type is when we are sending a
 			// stand-alone ack request, and in that case we only expect to find a single ack
 			// request header in the message.
-			Iterator ackRequests = rmMsgContext.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+			Iterator ackRequests = rmMsgContext.getAckRequests();
 			AckRequested ackRequest = (AckRequested) ackRequests.next(); 
 			if (ackRequests.hasNext()) {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
@@ -490,17 +488,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		// TODO consider adding an extra ack request, as we are about to send the message and we
 		// know which sequence it is associated with.
-
-		if(id != null && !senderBean.getSequenceID().equals(id.getIdentifier())) {
-			id.setIndentifer(senderBean.getSequenceID());
-
-			// Write the changes back into the message context
-			rmMsgContext.addSOAPEnvelope();
-		}
 		
 		//if this is an sync WSRM 1.0 case we always have to add an ack
 		boolean ackPresent = false;
-		Iterator it = rmMsgContext.getMessageParts (Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Iterator it = rmMsgContext.getSequenceAcknowledgements();
 		if (it.hasNext()) 
 			ackPresent = true;
 		
@@ -516,12 +507,20 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				throw new SandeshaException ("InboundSequenceID is not set for the sequence:" + id);
 			
 			RMDBean incomingSequenceBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId);
-			
-			if (incomingSequenceBean!=null) 
-				RMMsgCreator.addAckMessage(rmMsgContext, inboundSequenceId, incomingSequenceBean);
-			
+
+			if (incomingSequenceBean!=null)
+				RMMsgCreator.addAckMessage(rmMsgContext, inboundSequenceId, incomingSequenceBean, false);
 		}
-		
+
+		if(id != null && !senderBean.getSequenceID().equals(id.getIdentifier())) {
+			id.setIndentifer(senderBean.getSequenceID());
+
+			// Write the changes back into the message context
+			rmMsgContext.addSOAPEnvelope();
+		} else if(rmMsgContext.getProperty(RMMsgCreator.ACK_TO_BE_WRITTEN) != null){
+			rmMsgContext.addSOAPEnvelope();
+		}
+
 		return senderBean;
 	}
 	

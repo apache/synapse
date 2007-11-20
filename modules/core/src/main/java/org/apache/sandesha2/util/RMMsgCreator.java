@@ -75,6 +75,8 @@ import org.apache.sandesha2.wsrm.UsesSequenceSTR;
 public class RMMsgCreator {
 
 	private static Log log = LogFactory.getLog(RMMsgCreator.class);
+	
+	public static final String ACK_TO_BE_WRITTEN = "ackToBeWritten";
 
 	/**
 	 * Create a new CreateSequence message.
@@ -210,7 +212,7 @@ public class RMMsgCreator {
 		AcksTo acksTo = new AcksTo(acksToEPR, rmNamespaceValue, addressingNamespace);
 		createSequencePart.setAcksTo(acksTo);
 		
-		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, createSequencePart);
+		createSeqRMMsg.setCreateSequence(createSequencePart);
 
 		// Find the token that should be used to secure this new sequence. If there is a token, then we
 		// save it in the properties so that the caller can store the token within the create sequence
@@ -286,12 +288,13 @@ public class RMMsgCreator {
 		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(rmsBean.getSequenceID());
 		terminateSequencePart.setIdentifier(identifier);
+
+		terminateRMMessage.setTerminateSequence(terminateSequencePart);
 		if(TerminateSequence.isLastMsgNumberRequired(rmNamespaceValue)){
 			LastMessageNumber lastMsgNumber = new LastMessageNumber(rmNamespaceValue);
 			lastMsgNumber.setMessageNumber(SandeshaUtil.getLastMessageNumber(rmsBean.getInternalSequenceID(), storageManager));
 			terminateSequencePart.setLastMessageNumber(lastMsgNumber);
 		}
-		terminateRMMessage.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ, terminateSequencePart);
 
 		// no need for an incoming transport for a terminate
 		// message. If this is put, sender will look for an response.
@@ -316,7 +319,7 @@ public class RMMsgCreator {
 	 */
 	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, RMSequenceBean rmSequenceBean) throws AxisFault {
 
-		CreateSequence cs = (CreateSequence) createSeqMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+		CreateSequence cs = (CreateSequence) createSeqMessage.getCreateSequence();
 		String namespace = createSeqMessage.getRMNamespaceValue();
 
 		CreateSequenceResponse response = new CreateSequenceResponse(namespace);
@@ -359,7 +362,7 @@ public class RMMsgCreator {
 	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
         
 		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+				.getTerminateSequence();
 		String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 
 		String namespace = terminateSeqRMMsg.getRMNamespaceValue();
@@ -379,7 +382,7 @@ public class RMMsgCreator {
 	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
 
 		CloseSequence closeSequence = (CloseSequence) closeSeqRMMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+				.getCloseSequence();
 		String sequenceID = closeSequence.getIdentifier().getIdentifier();
 
 		String namespace = closeSeqRMMsg.getRMNamespaceValue();
@@ -420,7 +423,13 @@ public class RMMsgCreator {
 
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		responseRMMsg.setSOAPEnvelop(envelope);
-		responseRMMsg.setMessagePart(messagePartId, part);
+		
+		switch(messagePartId){
+			case Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE: responseRMMsg.setCloseSequenceResponse((CloseSequenceResponse) part);break;
+			case Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE: responseRMMsg.setTerminateSequenceResponse((TerminateSequenceResponse) part);break;
+			case Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE: responseRMMsg.setCreateSequenceResponse((CreateSequenceResponse) part);break;
+			default: throw new RuntimeException("Boom");
+		}
 
 		outMessage.setWSAAction(action);
 		outMessage.setSoapAction(action);
@@ -441,7 +450,7 @@ public class RMMsgCreator {
 	 * @param sequenceId - The sequence to which we will be Acking
 	 * @throws SandeshaException
 	 */
-	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean)
+	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean, boolean addToEnvelope)
 			throws SandeshaException {
 		if(log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
@@ -465,7 +474,7 @@ public class RMMsgCreator {
 			}
 		}
 
-		applicationMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
+		applicationMsg.addSequenceAcknowledgement(sequenceAck);
 
 		if (applicationMsg.getWSAAction()==null) {
 			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(rmVersion));
@@ -475,12 +484,17 @@ public class RMMsgCreator {
 			applicationMsg.setMessageId(SandeshaUtil.getUUID());
 		}
 		
-		// Write the ack into the soap envelope
-		try {
-			applicationMsg.addSOAPEnvelope();
-		} catch(AxisFault e) {
-			if(log.isDebugEnabled()) log.debug("Caught AxisFault", e);
-			throw new SandeshaException(e.getMessage(), e);
+		if(addToEnvelope){
+			// Write the ack into the soap envelope
+			try {
+				applicationMsg.addSOAPEnvelope();
+			} catch(AxisFault e) {
+				if(log.isDebugEnabled()) log.debug("Caught AxisFault", e);
+				throw new SandeshaException(e.getMessage(), e);
+			}
+		}else{
+			// Should use a constant in the final fix.
+			applicationMsg.setProperty(ACK_TO_BE_WRITTEN, Boolean.TRUE);
 		}
 		
 		// Ensure the message also contains the token that needs to be used
@@ -532,8 +546,7 @@ public class RMMsgCreator {
 		makeConnectionMessageCtx.setTo(epr);
 		makeConnectionMessageCtx.setWSAAction(SpecSpecificConstants.getMakeConnectionAction(rmVersion));
 		makeConnectionMessageCtx.setMessageID(SandeshaUtil.getUUID());
-		makeConnectionRMMessageCtx.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
-				makeConnection);
+		makeConnectionRMMessageCtx.setMakeConnection(makeConnection);
 		
 		//generating the SOAP Envelope.
 		makeConnectionRMMessageCtx.addSOAPEnvelope();

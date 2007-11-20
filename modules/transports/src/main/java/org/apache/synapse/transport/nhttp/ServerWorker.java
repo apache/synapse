@@ -248,6 +248,7 @@ public class ServerWorker implements Runnable {
         }
 
         String serviceName = null;
+        String operation = null;
         if (uri.startsWith(servicePath)) {
             serviceName = uri.substring(servicePath.length());
             if (serviceName.startsWith("/")) {
@@ -256,6 +257,12 @@ public class ServerWorker implements Runnable {
             if (serviceName.indexOf("?") != -1) {
                 serviceName = serviceName.substring(0, serviceName.indexOf("?"));
             }
+        }
+
+        int opnStart = serviceName.indexOf("/");
+        if (opnStart != -1) {
+            operation = serviceName.substring(opnStart+1);
+            serviceName = serviceName.substring(0, opnStart);
         }
 
         Map parameters = new HashMap();
@@ -271,6 +278,11 @@ public class ServerWorker implements Runnable {
                     parameters.put(param, null);
                 }
             }
+        }
+
+        if ("GET".equalsIgnoreCase(request.getRequestLine().getMethod())) {
+            msgContext.setProperty(Constants.Configuration.HTTP_METHOD,
+                Constants.Configuration.HTTP_METHOD_GET);
         }
 
         if (uri.equals("/favicon.ico")) {
@@ -378,7 +390,8 @@ public class ServerWorker implements Runnable {
             }
 
         } else {
-            if (parameters.isEmpty()) {
+
+            if (parameters.isEmpty() && operation == null) {
                 AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
                     getServices().get(serviceName);
                 if (service != null) {
@@ -398,7 +411,7 @@ public class ServerWorker implements Runnable {
 
             } else {
                 try {
-
+                    
                     HTTPTransportUtils.processHTTPGetRequest(
                             msgContext, os,
                             (request.getFirstHeader(SOAPACTION) != null ?
@@ -415,6 +428,7 @@ public class ServerWorker implements Runnable {
                             request.getRequestLine().getUri(), axisFault);
                 }
             }
+
         }
 
         // make sure that the output stream is flushed and closed properly

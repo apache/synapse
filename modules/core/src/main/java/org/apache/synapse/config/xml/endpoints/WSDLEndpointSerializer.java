@@ -111,6 +111,9 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
             
+        } else if (SynapseConstants.FORMAT_GET.equals(endpointDefinition.getFormat())) {
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "get"));
+
         } else if (SynapseConstants.FORMAT_SOAP11.equals(endpointDefinition.getFormat())) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
             
@@ -120,7 +123,8 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             // following two kept for backward compatibility
         } else if (endpointDefinition.isForcePOX()) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
-            
+        } else if (endpointDefinition.isForceGET()) {
+            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "get"));
         } else if (endpointDefinition.isForceSOAP11()) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (endpointDefinition.isForceSOAP12()) {

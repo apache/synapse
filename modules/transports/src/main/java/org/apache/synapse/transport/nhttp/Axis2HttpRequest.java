@@ -21,12 +21,15 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.synapse.transport.nhttp.util.PipeImpl;
+import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.http.*;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.axiom.om.OMOutputFormat;
@@ -98,18 +101,41 @@ public class Axis2HttpRequest {
      */
     public HttpRequest getRequest() throws IOException {
 
-        HttpEntityEnclosingRequest httpRequest = null;
+        boolean doingGET = Constants.Configuration.HTTP_METHOD_GET.equals(
+            msgContext.getProperty(Constants.Configuration.HTTP_METHOD));
+        HttpRequest httpRequest = null;
         if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
-            httpRequest = new BasicHttpEntityEnclosingRequest(
-                "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            messageFormatter.writeTo(msgContext, format, baos, true);
-            BasicHttpEntity entity = new BasicHttpEntity();
-            entity.setContentLength(baos.toByteArray().length);
-            httpRequest.setEntity(entity);
+            
+            if (doingGET) {
+                
+                httpRequest = new BasicHttpRequest(
+                    "GET", RESTUtil.getURI(
+                    msgContext, epr.getAddress()), HttpVersion.HTTP_1_0);
+                
+            } else {
+                
+                httpRequest = new BasicHttpEntityEnclosingRequest(
+                    "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
+                
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                messageFormatter.writeTo(msgContext, format, baos, true);
+                BasicHttpEntity entity = new BasicHttpEntity();
+                entity.setContentLength(baos.toByteArray().length);
+                ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
+            }
+
+
         } else {
-            httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());
-            httpRequest.setEntity(new BasicHttpEntity());
+            
+            if (doingGET) {
+
+                httpRequest = new BasicHttpRequest(
+                    "GET", RESTUtil.getURI(msgContext, epr.getAddress()));
+
+            } else {
+                httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());
+                ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(new BasicHttpEntity());
+            }
         }
 
         // set any transport headers
@@ -147,7 +173,6 @@ public class Axis2HttpRequest {
             httpRequest.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
                 soapAction);
         }
-
 
         httpRequest.setHeader(
             HTTP.CONTENT_TYPE,

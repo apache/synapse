@@ -14,6 +14,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -148,6 +149,8 @@ public class MessageHelper {
                 ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM));
         newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA,
                 ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
+        newMC.setProperty(Constants.Configuration.HTTP_METHOD,
+            ori.getProperty(Constants.Configuration.HTTP_METHOD));
 
         newMC.setDoingREST(ori.isDoingREST());
         newMC.setDoingMTOM(ori.isDoingMTOM());

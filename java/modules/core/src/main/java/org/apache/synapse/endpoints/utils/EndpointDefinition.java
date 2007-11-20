@@ -43,9 +43,11 @@ public class EndpointDefinition {
     private String wsSecPolicyKey = null;
     /** use a separate listener - implies addressing is on **/
 	private boolean useSeparateListener = false;
-	/** force REST on **/
+	/** force REST (POST) on **/
 	private boolean forcePOX = false;
-	/** force SOAP11 on **/
+    /** force REST (GET) on **/
+    private boolean forceGET = false;
+    /** force SOAP11 on **/
 	private boolean forceSOAP11 = false;
     /** force SOAP11 on **/
 	private boolean forceSOAP12 = false;
@@ -184,7 +186,15 @@ public class EndpointDefinition {
 		return forcePOX;
 	}
 
-	public void setForceSOAP11(boolean forceSOAP11) {
+    public boolean isForceGET() {
+        return forceGET;
+    }
+
+    public void setForceGET(boolean forceGET) {
+        this.forceGET = forceGET;
+    }
+
+    public void setForceSOAP11(boolean forceSOAP11) {
 		this.forceSOAP11 = forceSOAP11;
 	}
 

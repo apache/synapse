@@ -168,20 +168,24 @@ public class AddressEndpointFactory implements EndpointFactory {
         if (format != null)
         {
             String forceValue = format.getAttributeValue().trim().toLowerCase();
-            if (forceValue.equals(SynapseConstants.FORMAT_POX)) {
+            if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
                 endpoint.setForcePOX(true);
                 endpoint.setFormat(SynapseConstants.FORMAT_POX);
                 
-            } else if (forceValue.equals(SynapseConstants.FORMAT_SOAP11)) {
+            } else if (SynapseConstants.FORMAT_GET.equals(forceValue)) {
+            	endpoint.setForceGET(true);
+            	endpoint.setFormat(SynapseConstants.FORMAT_GET);
+
+            } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
             	endpoint.setForceSOAP11(true);
             	endpoint.setFormat(SynapseConstants.FORMAT_SOAP11);
                 
-            } else if (forceValue.equals(SynapseConstants.FORMAT_SOAP12)) {
+            } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
             	endpoint.setForceSOAP12(true);
                 endpoint.setFormat(SynapseConstants.FORMAT_SOAP12);
                 
             } else {
-                handleException("unknown value -\""+forceValue+"\". Attribute 'format' accepts only 'pox','soap11','soap12'");
+                handleException("unknown value -\""+forceValue+"\". Attribute 'format' accepts only 'pox', 'get', 'soap11', 'soap12'");
             }
         }
 

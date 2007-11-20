@@ -109,6 +109,9 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         if (SynapseConstants.FORMAT_POX.equals(endpt.getFormat())) {
         	address.addAttribute(fac.createOMAttribute("format", null, "pox"));
         	
+        } else if (SynapseConstants.FORMAT_GET.equals(endpt.getFormat())) {
+            address.addAttribute(fac.createOMAttribute("format", null, "get"));
+
         } else if (SynapseConstants.FORMAT_SOAP11.equals(endpt.getFormat())) {
             address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         	
@@ -117,8 +120,11 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         
         	// following two kept for backward compatibility
         } else if (endpt.isForcePOX()) {
-            address.addAttribute(fac.createOMAttribute("format", null, "pox"));
+            address.addAttribute(fac.createOMAttribute("format", null, "get"));
             
+        } else if (endpt.isForceGET()) {
+            address.addAttribute(fac.createOMAttribute("format", null, "pox"));
+
         } else if (endpt.isForceSOAP11()) {
             address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (endpt.isForceSOAP12()) {

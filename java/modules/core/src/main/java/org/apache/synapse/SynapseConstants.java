@@ -219,6 +219,7 @@ public final class SynapseConstants {
     
     /** Message format values in EndpointDefinition. Used by address, wsdl endpoints */
     public static final String FORMAT_POX = "pox";
+    public static final String FORMAT_GET = "get";
     public static final String FORMAT_SOAP11 = "soap11";
     public static final String FORMAT_SOAP12 = "soap12";    
 }

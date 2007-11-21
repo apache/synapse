@@ -268,6 +268,14 @@ public class ScriptMessageContext implements MessageContext {
         mc.setDoingPOX(b);
     }
 
+    public boolean isDoingGET() {
+        return mc.isDoingGET();
+    }
+
+    public void setDoingGET(boolean b) {
+        mc.setDoingGET(b);
+    }
+
     public boolean isSOAP11() {
         return mc.isSOAP11();
     }

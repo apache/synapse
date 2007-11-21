@@ -280,10 +280,22 @@ public interface MessageContext {
     public boolean isDoingPOX();
 
     /**
-     * Marks this message as over REST
-     * @param b true to mark as REST
+     * Marks this message as over POX
+     * @param b true to mark as POX
      */
     public void setDoingPOX(boolean b);
+
+    /**
+     * Is this message over GET?
+     * @return true if over GET
+     */
+    public boolean isDoingGET();
+
+    /**
+     * Marks this message as over REST/GET
+     * @param b true to mark as REST/GET
+     */
+    public void setDoingGET(boolean b);
 
     /**
      * Is this message a SOAP 1.1 message?

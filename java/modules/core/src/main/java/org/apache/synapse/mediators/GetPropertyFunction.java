@@ -214,6 +214,8 @@ public class GetPropertyFunction implements Function {
             } else if (SynapseConstants.PROPERTY_MESSAGE_FORMAT.equals(key)) {
                 if (synCtx.isDoingPOX())
                     return SynapseConstants.FORMAT_POX;
+                else if (synCtx.isDoingGET())
+                    return SynapseConstants.FORMAT_GET;
                 else if (synCtx.isSOAP11())
                     return SynapseConstants.FORMAT_SOAP11;
                 else

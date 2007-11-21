@@ -245,6 +245,13 @@ public class TestMessageContext implements MessageContext {
     public void setDoingPOX(boolean b) {
     }
 
+    public boolean isDoingGET() {
+        return false;
+    }
+
+    public void setDoingGET(boolean b) {
+    }
+
     public boolean isSOAP11() {
         return envelope.getNamespace().getNamespaceURI().equals(
             SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);

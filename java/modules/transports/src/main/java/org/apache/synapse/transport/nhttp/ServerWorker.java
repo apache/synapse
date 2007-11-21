@@ -259,10 +259,12 @@ public class ServerWorker implements Runnable {
             }
         }
 
-        int opnStart = serviceName.indexOf("/");
-        if (opnStart != -1) {
-            operation = serviceName.substring(opnStart+1);
-            serviceName = serviceName.substring(0, opnStart);
+        if (serviceName != null) {
+            int opnStart = serviceName.indexOf("/");
+            if (opnStart != -1) {
+                operation = serviceName.substring(opnStart+1);
+                serviceName = serviceName.substring(0, opnStart);
+            }
         }
 
         Map parameters = new HashMap();

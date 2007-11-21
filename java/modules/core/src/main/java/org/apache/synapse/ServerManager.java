@@ -131,6 +131,7 @@ public class ServerManager {
         } catch (Throwable t) {
             t.printStackTrace();
             log.fatal("Startup failed...");
+            System.exit(1); // must stop application
         }
     }
 

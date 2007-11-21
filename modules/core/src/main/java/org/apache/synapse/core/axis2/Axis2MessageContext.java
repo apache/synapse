@@ -27,6 +27,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
@@ -305,6 +306,22 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setDoingPOX(boolean b) {
         axis2MessageContext.setDoingREST(b);
+    }
+
+    public boolean isDoingGET() {
+        return Constants.Configuration.HTTP_METHOD_GET.equals(
+            axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD))
+            && axis2MessageContext.isDoingREST();
+    }
+
+    public void setDoingGET(boolean b) {
+        if(b) {
+            axis2MessageContext.setDoingREST(b);
+            axis2MessageContext.setProperty(Constants.Configuration.HTTP_METHOD,
+                Constants.Configuration.HTTP_METHOD_GET);
+        } else {
+            axis2MessageContext.removeProperty(Constants.Configuration.HTTP_METHOD);
+        }
     }
 
     public boolean isSOAP11() {

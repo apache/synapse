@@ -110,6 +110,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, configContext
 				.getAxisConfiguration());
 
+		//check the TO address is ok
+		SandeshaUtil.getEPRDecorator(configContext).checkEndpointReference(msgContext.getTo());
+		
 		boolean serverSide = msgContext.isServerSide();
 
 		// setting message Id if null

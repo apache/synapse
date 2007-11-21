@@ -37,4 +37,12 @@ public abstract class EPRDecorator {
 	 */
 	public abstract EndpointReference decorateEndpointReference(EndpointReference ref);
 	
+	/**
+	 * This method is called for outbound msgs in order to verify the TO EPR is valid
+	 * @param ref
+	 */
+	public void checkEndpointReference(EndpointReference ref){
+		//NO-OP unless overriden
+	}
+	
 }

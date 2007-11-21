@@ -20,7 +20,6 @@
 package org.apache.sandesha2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -47,7 +46,6 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
-import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.MessagePending;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -66,8 +64,6 @@ public class RMMsgContext {
 
 	private MessageContext msgContext;
 
-//	private HashMap rmMessageParts;
-
 	private int messageType;
 
 	private String rmNamespaceValue = null;
@@ -75,7 +71,6 @@ public class RMMsgContext {
 	private String rmSpecVersion = null;
 	
 	public RMMsgContext() {
-//		rmMessageParts = new HashMap();
 		messageType = Sandesha2Constants.MessageTypes.UNKNOWN;
 		rmNamespaceValue = Sandesha2Constants.DEFAULT_RM_NAMESPACE;
 	}
@@ -176,67 +171,6 @@ public class RMMsgContext {
 		if (msgType >= 0 && msgType <= Sandesha2Constants.MessageTypes.MAX_MESSAGE_TYPE)
 			this.messageType = msgType;
 	}
-
-	
-	/**
-	 * Sets an IRMPart object to the MessageContext. Possible parts are give in the 
-	 * 
-	 * 
-	 * @param partId
-	 * @param part
-	 */
-//	public void setMessagePart(int partId, IOMRMPart part) {
-//		if (partId >= 0 && partId <= Sandesha2Constants.MessageParts.MAX_MSG_PART_ID) {
-//			if (isMultiPart(partId)) {
-//				ArrayList partList = (ArrayList) rmMessageParts.get(new Integer (partId));
-//				if (partList==null) {
-//					partList = new ArrayList ();
-//					rmMessageParts.put(new Integer (partId),partList);
-//				}
-//				partList.add(part);
-//			} else {
-//				rmMessageParts.put(new Integer(partId), part); 
-//			}
-//		}
-//	}
-//	
-//
-//	public IOMRMPart getMessagePart(int partId) throws SandeshaException {
-//		if (isMultiPart(partId)) {
-//			String message = "It is possible for a multiple MessageParts of this type to exit. Please call the 'getMessageParts' method";
-//			throw new SandeshaException (message);
-//		}
-//		
-//		return (IOMRMPart) rmMessageParts.get(new Integer(partId));
-//	}
-//	
-//	public Iterator getMessageParts (int partId) {
-//		Object obj = rmMessageParts.get(new Integer (partId));
-//		if (obj==null)
-//			return new ArrayList().iterator();
-//		
-//		if (obj instanceof ArrayList) {
-//			return ((ArrayList) obj).iterator();
-//		} else {
-//			ArrayList arr = new ArrayList ();
-//			arr.add(obj);
-//			return arr.iterator();
-//		}
-//	}
-//	
-//	public void removeMessageParts (int messageType) {
-//		rmMessageParts.remove (new Integer (messageType));
-//	}
-	
-	//checks weather there can be multiple elements of these parts,
-	//if so getMessageParts method has to be called to get a ArrayList of parts..
-//	public boolean isMultiPart (int messagePartId) {
-//		if (messagePartId==Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT||
-//			messagePartId==Sandesha2Constants.MessageParts.ACK_REQUEST)
-//			return true;
-//		
-//		return false;
-//	}
 
 	public EndpointReference getFrom() {
 		return msgContext.getFrom();
@@ -549,7 +483,6 @@ public class RMMsgContext {
 		if(firstBodyElement != null) {
 			QName firstBodyQName = firstBodyElement.getQName();
 			String namespace = firstBodyQName.getNamespaceURI();
-			String localName = firstBodyQName.getLocalPart();
 
 			boolean isSPEC2007_02 = SPEC_2007_02.NS_URI.equals(namespace);
 			boolean isSPEC2005_02 = false;

@@ -65,7 +65,6 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
     private static final QName TIMEOUT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "timeout");
     private static final QName MIN_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "min");
     private static final QName MAX_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "max");
-    private static final QName TYPE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "type");
     private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
 
     public Mediator createMediator(OMElement elem) {

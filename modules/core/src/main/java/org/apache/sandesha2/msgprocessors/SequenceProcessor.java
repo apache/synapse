@@ -112,20 +112,11 @@ public class SequenceProcessor {
 		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
 		RMDBean bean = mgr.retrieve(sequenceId);
 		
-		if(bean != null && bean.getSecurityTokenData() != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
-			
-			QName seqName = new QName(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.SEQUENCE);
-			
-			SOAPEnvelope envelope = msgCtx.getEnvelope();
-			OMElement body = envelope.getBody();
-			OMElement seqHeader = envelope.getHeader().getFirstChildWithName(seqName);
-			
-			SecurityToken token = secManager.recoverSecurityToken(bean.getSecurityTokenData());
-			
-			secManager.checkProofOfPossession(token, seqHeader, msgCtx);
-			secManager.checkProofOfPossession(token, body, msgCtx);
-		}
+		//check the security credentials
+		SandeshaUtil.assertProofOfPossession(bean, msgCtx, msgCtx.getEnvelope().getHeader().
+				getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.SEQUENCE)));
+		SandeshaUtil.assertProofOfPossession(bean, msgCtx, msgCtx.getEnvelope().getBody());
+		
 		
 		// Store the inbound sequence id, number and lastMessage onto the operation context
 		OperationContext opCtx = msgCtx.getOperationContext();

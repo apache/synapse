@@ -95,12 +95,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		
 		// Check that the sender of this TerminateSequence holds the correct token
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
-		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
-			OMElement body = terminateSeqRMMsg.getSOAPEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
-			secManager.checkProofOfPossession(token, body, terminateSeqRMMsg.getMessageContext());
-		}
+		
+		//check security credentials
+		SandeshaUtil.assertProofOfPossession(rmdBean, terminateSeqMsg, 
+				terminateSeqMsg.getEnvelope().getBody());
 
 		if (FaultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId, storageManager, false)) {
 			if (log.isDebugEnabled())

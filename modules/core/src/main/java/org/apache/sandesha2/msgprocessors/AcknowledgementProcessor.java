@@ -121,12 +121,7 @@ public class AcknowledgementProcessor {
 
 		// Check that the sender of this Ack holds the correct token
 		String internalSequenceId = rmsBean.getInternalSequenceID();
-		if(rmsBean.getSecurityTokenData() != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			SecurityToken token = secManager.recoverSecurityToken(rmsBean.getSecurityTokenData());
-			
-			secManager.checkProofOfPossession(token, soapHeader, msgCtx);
-		}
+		SandeshaUtil.assertProofOfPossession(rmsBean, msgCtx, soapHeader);
 		
 		if(log.isDebugEnabled()) log.debug("Got Ack for RM Sequence: " + outSequenceId + ", internalSeqId: " + internalSequenceId);
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();

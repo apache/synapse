@@ -19,7 +19,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -28,8 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.polling.PollingManager;
-import org.apache.sandesha2.security.SecurityManager;
-import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -60,14 +57,9 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		String sequenceId = tsResponse.getIdentifier().getIdentifier();
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
-
-		// Check that the sender of this TerminateSequence holds the correct token
-		if(rmsBean != null && rmsBean.getSecurityTokenData() != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
-			OMElement body = terminateResRMMsg.getSOAPEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(rmsBean.getSecurityTokenData());
-			secManager.checkProofOfPossession(token, body, msgContext);
-		}
+		
+		//check security credentials
+		SandeshaUtil.assertProofOfPossession(rmsBean, msgContext, msgContext.getEnvelope().getBody());
 
 		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,rmsBean.getInternalSequenceID());
 

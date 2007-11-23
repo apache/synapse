@@ -21,6 +21,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.axis2.AxisFault;
@@ -39,10 +40,14 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -72,24 +77,66 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
 
 		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMakeConnection();
+		
 		Address address = makeConnection.getAddress();
 		Identifier identifier = makeConnection.getIdentifier();
 		
+		//some initial setup
 		ConfigurationContext configurationContext = rmMsgCtx.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
+		SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
+		SecurityToken token = secManager.getSecurityToken(rmMsgCtx.getMessageContext());
 		
+		//we want to find valid sender beans
+		SenderBean findSenderBean = new SenderBean();
+		if(token!=null){
+			if(log.isDebugEnabled()) log.debug("token found " + token);
+			//this means we have to scope our search for sender beans that belong to sequences that own the same token
+			String data = secManager.getTokenRecoveryData(token);
+			//first look for RMS beans
+			RMSBean finderRMS = new RMSBean();
+			finderRMS.setSecurityTokenData(data);
+			List possibleBeans = storageManager.getRMSBeanMgr().find(finderRMS);
+			
+			//try looking for RMD beans too
+			RMDBean finderRMD = new RMDBean();
+			finderRMD.setSecurityTokenData(data);
+			List tempList = storageManager.getRMDBeanMgr().find(finderRMD);
+			
+			//combine these two into one list
+			possibleBeans.addAll(tempList);
+			
+			int size = possibleBeans.size();
+			
+			if(size>0){
+				//select one at random: TODO better method?
+				Random random = new Random ();
+				int itemToPick = random.nextInt(size);
+				RMSequenceBean selectedSequence = (RMSequenceBean)possibleBeans.get(itemToPick);
+				findSenderBean.setSequenceID(selectedSequence.getSequenceID());
+				if(log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
+			}
+			else{
+				//we cannot match a RMD with the correct security credentials so we cannot process this msg under RSP
+				if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage : no RM sequence bean with security credentials" );
+				//return false; //TODO put this in once tested live
+			}
+		}
+			
+		//lookup a sender bean
 		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 		
 		//selecting the set of SenderBeans that suit the given criteria.
-		SenderBean findSenderBean = new SenderBean ();
 		findSenderBean.setSend(true);
 		findSenderBean.setTransportAvailable(false);
 		
 		if (address!=null)
 			findSenderBean.setToAddress(address.getAddress());
 		
-		if (identifier!=null)
+		if (identifier!=null){
+			if(log.isDebugEnabled()) log.debug("identifier set, this violates RSP " + identifier);
 			findSenderBean.setSequenceID(identifier.getIdentifier());
+		}
 		
 		// Set the time to send field to be now
 		findSenderBean.setTimeToSend(System.currentTimeMillis());

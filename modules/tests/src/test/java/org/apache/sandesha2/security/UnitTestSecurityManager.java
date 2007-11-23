@@ -41,7 +41,6 @@ public class UnitTestSecurityManager extends SecurityManager {
 	private static Log log = LogFactory.getLog(UnitTestSecurityManager.class);
 
 	private static HashMap tokens = new HashMap();
-	private static int id = 0;
 	private static String secNamespace = Sandesha2Constants.SPEC_2005_02.SEC_NS_URI;
 	private static QName unitTestHeader = new QName("http://unit.test.security", "tokenId");
 	
@@ -58,7 +57,7 @@ public class UnitTestSecurityManager extends SecurityManager {
 	{
 		log.debug("Enter: UnitTestSecurityManager::getSecurityToken(MessageContext)");
 
-		UnitTestSecurityToken result = new UnitTestSecurityToken(id++);
+		UnitTestSecurityToken result = new UnitTestSecurityToken(1); //use the same token for all messages in unit test
 		tokens.put(getTokenRecoveryData(result), result);
 
 		log.debug("Exit: UnitTestSecurityManager::getSecurityToken " + result);

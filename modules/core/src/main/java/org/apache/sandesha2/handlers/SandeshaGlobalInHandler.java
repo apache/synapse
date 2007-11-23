@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
@@ -43,8 +42,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.security.SecurityManager;
-import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -177,24 +174,16 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
       RMDBean bean = mgr.retrieve(sequenceId);
       
-      if(bean != null && bean.getSecurityTokenData() != null) {
-        SecurityManager secManager = SandeshaUtil.getSecurityManager(rmMsgCtx.getConfigurationContext());
-        
-        QName seqName = new QName(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.SEQUENCE);
-        
-        SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
-        OMElement body = envelope.getBody();
-        OMElement seqHeader = envelope.getHeader().getFirstChildWithName(seqName);
-        
-        SecurityToken token = secManager.recoverSecurityToken(bean.getSecurityTokenData());
-        
-        secManager.checkProofOfPossession(token, seqHeader, rmMsgCtx.getMessageContext());
-        secManager.checkProofOfPossession(token, body, rmMsgCtx.getMessageContext());
-      }
-      
       MessageContext messageContext = rmMsgCtx.getMessageContext();
-    
-      if (bean != null) {
+      
+      if(bean != null){
+    	  
+    	  //first check the security credentials of the msg is necessary
+    	  SandeshaUtil.assertProofOfPossession(bean, messageContext, messageContext.getEnvelope().getBody());
+    	  SandeshaUtil.assertProofOfPossession(bean, messageContext, 
+    			  messageContext.getEnvelope().getHeader().getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), 
+    					  Sandesha2Constants.WSRM_COMMON.SEQUENCE)));
+
         
         if (msgNo == 0) {
           String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
@@ -224,16 +213,16 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         	//still allow this msg if we have no corresponding invoker bean for it and we are inOrder
         	if(SandeshaUtil.isInOrder(rmMsgCtx.getMessageContext()))
         	{
-          	InvokerBean finderBean = new InvokerBean();
-          	finderBean.setMsgNo(msgNo);
-          	finderBean.setSequenceID(sequenceId);
-          	List invokerBeanList = storageManager.getInvokerBeanMgr().find(finderBean);
-          	if((invokerBeanList==null || invokerBeanList.size()==0) 
-          			&& bean.getNextMsgNoToProcess()<=msgNo){
-          		isDuplicate = false;
-              if (log.isDebugEnabled())
-                log.debug("Allowing completed message on sequence " + sequenceId + ", msgNo " + msgNo);
-          	}
+	          	InvokerBean finderBean = new InvokerBean();
+	          	finderBean.setMsgNo(msgNo);
+	          	finderBean.setSequenceID(sequenceId);
+	          	List invokerBeanList = storageManager.getInvokerBeanMgr().find(finderBean);
+	          	if((invokerBeanList==null || invokerBeanList.size()==0) 
+	          			&& bean.getNextMsgNoToProcess()<=msgNo){
+	          		isDuplicate = false;
+	              if (log.isDebugEnabled())
+	                log.debug("Allowing completed message on sequence " + sequenceId + ", msgNo " + msgNo);
+	          	}
         	}
         	
         	if(isDuplicate){

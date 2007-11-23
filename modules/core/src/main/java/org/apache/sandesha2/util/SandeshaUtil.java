@@ -69,6 +69,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
@@ -463,6 +464,25 @@ public class SandeshaUtil {
 
 	}
 	
+	public static void assertProofOfPossession(RMSequenceBean bean, MessageContext context, OMElement elementToCheck)throws SandeshaException{
+		if (log.isDebugEnabled()) 
+			log.debug("Enter: SandeshaUtil::assertProofOfPossession :" + bean + ", " + context + ", " + elementToCheck);
+		
+		String tokenData = null;
+		if(bean!=null){
+			tokenData = bean.getSecurityTokenData();
+		}
+		if(tokenData != null) {
+			if (log.isDebugEnabled()) log.debug("debug:" + tokenData);
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(context.getConfigurationContext());
+			SecurityToken token = secManager.recoverSecurityToken(tokenData);
+			secManager.checkProofOfPossession(token, elementToCheck, context); //this will exception if there is no proof
+		}
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::assertProofOfPossession");
+	}
+	
 
 	public static void copyConfiguredProperties (MessageContext fromMessage, MessageContext toMessage) throws AxisFault {
 
@@ -622,7 +642,6 @@ public class SandeshaUtil {
   }
 	
 	public static long getLastMessageNumber(String internalSequenceID, StorageManager storageManager)throws SandeshaException {
-		
 		RMSBean rMSBean = getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 		long lastMessageNumber = 0;
 		if(rMSBean!=null){
@@ -835,10 +854,11 @@ public class SandeshaUtil {
 			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
 			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
 
+			
 		  if (classLoader==null)
 	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
 		    
-		  Class c = classLoader.loadClass(className);
+		  	Class c = classLoader.loadClass(className);		  
 			Class configContextClass = context.getClass();
 			
 			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
@@ -849,6 +869,7 @@ public class SandeshaUtil {
 				throw new SandeshaException(message);
 			}
 			return (SecurityManager) obj;
+			
 			
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitSecurityManager, e.toString());
@@ -1120,6 +1141,11 @@ public class SandeshaUtil {
 					if (log.isDebugEnabled()) log.debug("Unreliable operation");
 					result = true;
 				}
+				else if(null != unreliableParam && "false".equals(unreliable)){
+					//a forced reliable message
+					if (log.isDebugEnabled()) log.debug("Forced reliable message context");
+					result = false;
+				}	
 			}
 		}
 		

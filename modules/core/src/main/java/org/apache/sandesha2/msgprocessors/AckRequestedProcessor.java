@@ -111,12 +111,10 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		
 		// Check that the sender of this AckRequest holds the correct token
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
-
-		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
-			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
-			
-			secManager.checkProofOfPossession(token, soapHeader, msgContext);
+		
+		//check security credentials
+		if(rmdBean!=null){
+			SandeshaUtil.assertProofOfPossession(rmdBean, msgContext, soapHeader);
 		}
 
 		// Check that the sequence requested exists

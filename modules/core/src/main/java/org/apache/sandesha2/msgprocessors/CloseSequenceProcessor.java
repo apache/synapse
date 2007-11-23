@@ -75,14 +75,9 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 				.getAxisConfiguration());
 
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
-
-		// Check that the sender of this CloseSequence holds the correct token
-		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
-			OMElement body = msgCtx.getEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
-			secManager.checkProofOfPossession(token, body, msgCtx);
-		}
+		
+		//check the security credentials
+		SandeshaUtil.assertProofOfPossession(rmdBean, msgCtx, msgCtx.getEnvelope().getBody());
 
 		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
 			if (log.isDebugEnabled())

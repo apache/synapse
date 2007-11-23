@@ -64,21 +64,44 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
         OMElement completeCond = fac.createOMElement("completeCondition", synNS);
         if (mediator.getCompleteTimeout() != 0) {
-            completeCond.addAttribute("timeout", "" + mediator.getCompleteTimeout(), nullNS);
+            completeCond.addAttribute("timeout", Long.toString(mediator.getCompleteTimeout()), nullNS);
         }
         OMElement messageCount = fac.createOMElement("messageCount", synNS);
         if (mediator.getMinMessagesToComplete() != 0) {
-            messageCount.addAttribute("min", "" + mediator.getMinMessagesToComplete(), nullNS);
+            messageCount.addAttribute("min", Integer.toString(mediator.getMinMessagesToComplete()), nullNS);
         }
         if (mediator.getMaxMessagesToComplete() != 0) {
-            messageCount.addAttribute("max", "" + mediator.getMaxMessagesToComplete(), nullNS);
+            messageCount.addAttribute("max", Integer.toString(mediator.getMaxMessagesToComplete()), nullNS);
         }
         completeCond.addChild(messageCount);
         aggregator.addChild(completeCond);
 
-        OMElement aggregatorElem = fac.createOMElement("aggregator", synNS);
-//        aggregatorElem.addAttribute("type", mediator.getAggregator().getClass().getName(), nullNS);
-//        aggregatorElem.addAttribute("expression", mediator.get)
+        OMElement onCompleteElem = fac.createOMElement("onComplete", synNS);
+        if (mediator.getAggregationExpression() != null) {
+            onCompleteElem.addAttribute("expression", mediator.getAggregationExpression().toString(), nullNS);
+            super.serializeNamespaces(onCompleteElem, mediator.getAggregationExpression());
+        }
+        if (mediator.getOnCompleteSequenceRef() != null) {
+            onCompleteElem.addAttribute("sequence", mediator.getOnCompleteSequenceRef(), nullNS);
+        } else if (mediator.getOnCompleteSequence() != null) {
+            new SequenceMediatorSerializer().serializeChildren(
+                    onCompleteElem, mediator.getOnCompleteSequence().getList());
+        }
+        aggregator.addChild(onCompleteElem);
+
+        OMElement invalidateElem = fac.createOMElement("invalidate", synNS);
+        invalidateElem.addAttribute("timeout", Long.toString(mediator.getInvlidateToDestroyTime()), nullNS);
+        if (mediator.getInvalidMsgSequenceRef() != null) {
+            invalidateElem.addAttribute("sequence", mediator.getInvalidMsgSequenceRef(), nullNS);
+        } else if (mediator.getInvalidMsgSequence() != null) {
+            new SequenceMediatorSerializer().serializeChildren(
+                    invalidateElem, mediator.getInvalidMsgSequence().getList());
+        }
+        aggregator.addChild(invalidateElem);
+
+        if (parent != null) {
+            parent.addChild(aggregator);
+        }
 
         return aggregator;
     }

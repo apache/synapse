@@ -4174,7 +4174,7 @@ responses for a particular release)</p>
 the actual service</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
-        &lt;cache timeout="20000" scope="per-host"
+        &lt;cache timeout="20000" scope="per-host" collector="false"
                hashGenerator="org.wso2.caching.digest.DOMHASHGenerator"&gt;
             &lt;implementation type="memory" maxSize="100"/&gt;
         &lt;/cache&gt;
@@ -4185,7 +4185,7 @@ the actual service</a></h2>
         &lt;/send&gt;
     &lt;/in&gt;
     &lt;out&gt;
-        &lt;cache/&gt;
+        &lt;cache collector="true"/&gt;
         &lt;send/&gt;
     &lt;/out&gt;
 &lt;/definitions&gt;</pre>

@@ -46,6 +46,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_ID = new QName("id");
     private static final QName ATT_COLLECTOR = new QName("collector");
     private static final QName ATT_HASH_GENERATOR = new QName("hashGenerator");
+    private static final QName ATT_MAX_MSG_SIZE = new QName("maxMessageSize");
     private static final QName ATT_TIMEOUT = new QName("timeout");
     private static final QName ATT_SCOPE = new QName("scope");
     private static final QName ATT_SEQUENCE = new QName("sequence");
@@ -74,7 +75,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
 
         OMAttribute scopeAttr = elem.getAttribute(ATT_SCOPE);
         if (scopeAttr != null && scopeAttr.getAttributeValue() != null &&
-            isValidScope(scopeAttr.getAttributeValue())) {
+            isValidScope(scopeAttr.getAttributeValue(), cache.getId())) {
             cache.setScope(scopeAttr.getAttributeValue());
         } else {
             cache.setScope(CachingConstants.SCOPE_PER_HOST);
@@ -117,6 +118,11 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                 cache.setTimeout(DEFAULT_TIMEOUT);
             }
 
+            OMAttribute maxMessageSizeAttr = elem.getAttribute(ATT_MAX_MSG_SIZE);
+            if (maxMessageSizeAttr != null && maxMessageSizeAttr.getAttributeValue() != null) {
+                cache.setMaxMessageSize(Integer.parseInt(maxMessageSizeAttr.getAttributeValue()));
+            }
+
             OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
             if (onCacheHitElem != null) {
                 OMAttribute sequenceAttr = onCacheHitElem.getAttribute(ATT_SEQUENCE);
@@ -154,11 +160,16 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
         return cache;
     }
 
-    private boolean isValidScope(String scope) {
+    private boolean isValidScope(String scope, String id) {
         if (CachingConstants.SCOPE_PER_HOST.equals(scope)) {
             return true;
         } else if (CachingConstants.SCOPE_PER_MEDIATOR.equals(scope)) {
-            return true;
+            if (id != null) {
+                return true;
+            } else {
+                handleException("Id is required for a cache wirth scope : " + scope);
+                return false;
+            }
         } else if (CachingConstants.SCOPE_DISTRIBUTED.equals(scope)) {
             handleException("Scope distributed is not supported yet by the Cache mediator");
             return false;

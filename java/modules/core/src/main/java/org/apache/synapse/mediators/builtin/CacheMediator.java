@@ -25,10 +25,12 @@ import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.saaj.util.SAAJUtil;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.FixedByteArrayOutputStream;
 import org.apache.synapse.util.MessageHelper;
 import org.wso2.caching.Cache;
 import org.wso2.caching.CachedObject;
@@ -60,6 +62,7 @@ public class CacheMediator extends AbstractMediator {
     private long timeout = 0L;
     private SequenceMediator onCacheHitSequence = null;
     private String onCacheHitRef = null;
+    private int maxMessageSize = 0;
     private String cacheObjKey = CachingConstants.CACHE_OBJECT; // default per-host
     private static final String CACHE_OBJ_PREFIX = "synapse.cache_obj_";
 
@@ -77,6 +80,23 @@ public class CacheMediator extends AbstractMediator {
             }
         }
 
+        // if maxMessageSize is specified check for the message size before processing
+        FixedByteArrayOutputStream fbaos = null;
+        if (maxMessageSize > 0) {
+            fbaos = new FixedByteArrayOutputStream(maxMessageSize);
+            try {
+                MessageHelper.cloneSOAPEnvelope(synCtx.getEnvelope()).serialize(fbaos);
+            } catch (XMLStreamException e) {
+                handleException("Error in checking the message size", e, synCtx);
+            } catch (SynapseException syne) {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Message size exceeds the upper bound for caching, " +
+                            "request will not be cached");
+                    return true;
+                }
+            }
+        }
+
         ConfigurationContext cfgCtx =
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext();
         if (cfgCtx == null) {
@@ -91,7 +111,7 @@ public class CacheMediator extends AbstractMediator {
         }
 
         // look up cache
-        Object prop = cfgCtx.getProperty(cacheObjKey);
+        Object prop = cfgCtx.getPropertyNonReplicable(cacheObjKey);
         Cache cache;
         if (prop != null && prop instanceof Cache) {
             cache = (Cache) prop;
@@ -99,7 +119,7 @@ public class CacheMediator extends AbstractMediator {
         } else {
             synchronized (cfgCtx) {
                 // check again after taking the lock to make sure no one else did it before us
-                prop = cfgCtx.getProperty(cacheObjKey);
+                prop = cfgCtx.getPropertyNonReplicable(cacheObjKey);
                 if (prop != null && prop instanceof Cache) {
                     cache = (Cache) prop;
 
@@ -115,10 +135,10 @@ public class CacheMediator extends AbstractMediator {
 
         boolean result = true;
         if (synCtx.isResponse()) {
-            processResponseMessage(synCtx, traceOrDebugOn, traceOn, cache);
+            processResponseMessage(synCtx, cfgCtx, traceOrDebugOn, traceOn, cache);
 
         } else {
-            result = processRequestMessage(synCtx, traceOrDebugOn, traceOn, cache);
+            result = processRequestMessage(synCtx, cfgCtx, traceOrDebugOn, traceOn, cache, fbaos);
         }
 
         try {
@@ -142,9 +162,10 @@ public class CacheMediator extends AbstractMediator {
      * @param traceOrDebugOn is trace or debug logging on?
      * @param traceOn        is tracing on?
      * @param synCtx         the current message (response)
+     * @param cfgCtx         the abstract context in which the cache will be kept
      * @param cache          the cache
      */
-    private void processResponseMessage(MessageContext synCtx, boolean traceOrDebugOn,
+    private void processResponseMessage(MessageContext synCtx, ConfigurationContext cfgCtx, boolean traceOrDebugOn,
         boolean traceOn, Cache cache) {
 
         if (!collector) {
@@ -178,14 +199,16 @@ public class CacheMediator extends AbstractMediator {
                     handleException("Unable to set the response to the Cache", e, synCtx);
                 }
 
-                // this is not required yet can commented this for perf improvements
-                // in the future there can be a situation where user sends the request with the
-                // response hash (if client side caching is on) in which case we can compare that
-                // response hash with the given response hash and respond with not-modified http header
-                cachedObj.setResponseHash(cache.getGenerator().getDigest(
-                    ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
+                /* this is not required yet, can commented this for perf improvements
+                   in the future there can be a situation where user sends the request with the
+                   response hash (if client side caching is on) in which case we can compare that
+                   response hash with the given response hash and respond with not-modified http header */
+                // cachedObj.setResponseHash(cache.getGenerator().getDigest(
+                //     ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
 
                 cachedObj.setExpireTime(System.currentTimeMillis() + cachedObj.getTimeout());
+
+                cfgCtx.setProperty(cacheObjKey, cache);
 
             } else {
                 auditWarn("A response message without a valid mapping to the " +
@@ -204,13 +227,15 @@ public class CacheMediator extends AbstractMediator {
      * this message as a response and sends back directly to client.
      *
      * @param synCtx         incoming request message
+     * @param cfgCtx         the AbstractContext in which the cache will be kept
      * @param traceOrDebugOn is tracing or debug logging on?
      * @param traceOn        is tracing on?
      * @param cache          the cache
+     * @param fbaos          the serialized request envelope
      * @return should this mediator terminate further processing?
      */
-    private boolean processRequestMessage(MessageContext synCtx, boolean traceOrDebugOn,
-        boolean traceOn, Cache cache) {
+    private boolean processRequestMessage(MessageContext synCtx, ConfigurationContext cfgCtx, boolean traceOrDebugOn,
+        boolean traceOn, Cache cache, FixedByteArrayOutputStream fbaos) {
 
         if (collector) {
             handleException("Request messages cannot be handled in a collector cache", synCtx);
@@ -296,6 +321,8 @@ public class CacheMediator extends AbstractMediator {
                     traceOrDebug(traceOn,
                         "Existing cached response has expired. Reset cache element");
                 }
+
+                cfgCtx.setProperty(cacheObjKey, cache);
             }
 
         } else {
@@ -308,10 +335,10 @@ public class CacheMediator extends AbstractMediator {
                         traceOrDebug(traceOn, "In-memory cache is full. Unable to cache");
                     }
                 } else {
-                    storeRequestToCache(synCtx, requestHash, cache);
+                    storeRequestToCache(synCtx, cfgCtx, requestHash, cache, fbaos);
                 }
             } else {
-                storeRequestToCache(synCtx, requestHash, cache);
+                storeRequestToCache(synCtx, cfgCtx, requestHash, cache, fbaos);
             }
         }
         return true;
@@ -321,21 +348,33 @@ public class CacheMediator extends AbstractMediator {
      * Store request message to the cache
      *
      * @param synCtx      the request message
+     * @param cfgCtx      the Abstract context in which the cache will be kept
      * @param requestHash the request hash that has already been computed
      * @param cache       the cache
+     * @param fbaos       the serialized request envelope
      */
-    private void storeRequestToCache(MessageContext synCtx, String requestHash, Cache cache) {
+    private void storeRequestToCache(MessageContext synCtx, ConfigurationContext cfgCtx, String requestHash, Cache cache,
+        FixedByteArrayOutputStream fbaos) {
+        
         CachedObject cachedObj = new CachedObject();
-        ByteArrayOutputStream requestStream = new ByteArrayOutputStream();
-        try {
-            MessageHelper.cloneSOAPEnvelope(synCtx.getEnvelope()).serialize(requestStream);
-            cachedObj.setRequestEnvelope(requestStream.toByteArray());
-        } catch (XMLStreamException e) {
-            handleException("Unable to store the request in to the cache", e, synCtx);
+        if (fbaos != null) {
+            cachedObj.setRequestEnvelope(fbaos.toByteArray());
+        } else {
+            // this else block can be commented out for the perf improvements, because we are not using
+            // this for the moment
+            ByteArrayOutputStream requestStream = new ByteArrayOutputStream();
+            try {
+                MessageHelper.cloneSOAPEnvelope(synCtx.getEnvelope()).serialize(requestStream);
+                cachedObj.setRequestEnvelope(requestStream.toByteArray());
+            } catch (XMLStreamException e) {
+                handleException("Unable to store the request in to the cache", e, synCtx);
+            }
         }
         cachedObj.setRequestHash(requestHash);
         cachedObj.setTimeout(timeout);
         cache.addResponseWithKey(requestHash, cachedObj);
+
+        cfgCtx.setProperty(cacheObjKey, cache);
     }
 
     public String getId() {
@@ -344,7 +383,6 @@ public class CacheMediator extends AbstractMediator {
 
     public void setId(String id) {
         this.id = id;
-        this.cacheObjKey = CACHE_OBJ_PREFIX + id;
     }
 
     public String getScope() {
@@ -353,6 +391,9 @@ public class CacheMediator extends AbstractMediator {
 
     public void setScope(String scope) {
         this.scope = scope;
+        if (CachingConstants.SCOPE_PER_MEDIATOR.equals(scope)) {
+            cacheObjKey = CACHE_OBJ_PREFIX + id;
+        }
     }
 
     public boolean isCollector() {
@@ -409,5 +450,13 @@ public class CacheMediator extends AbstractMediator {
 
     public void setOnCacheHitRef(String onCacheHitRef) {
         this.onCacheHitRef = onCacheHitRef;
+    }
+
+    public int getMaxMessageSize() {
+        return maxMessageSize;
+    }
+
+    public void setMaxMessageSize(int maxMessageSize) {
+        this.maxMessageSize = maxMessageSize;
     }
 }

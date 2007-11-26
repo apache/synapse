@@ -69,6 +69,11 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
                     fac.createOMAttribute("timeout", nullNS, Long.toString(mediator.getTimeout())));
             }
 
+            if (mediator.getMaxMessageSize() != 0) {
+                cache.addAttribute(
+                    fac.createOMAttribute("maxMessageSize", nullNS, Integer.toString(mediator.getMaxMessageSize())));
+            }
+
             if (mediator.getOnCacheHitRef() != null) {
                 OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
                 onCacheHit.addAttribute(

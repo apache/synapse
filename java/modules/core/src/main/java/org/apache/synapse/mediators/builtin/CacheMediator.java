@@ -430,11 +430,11 @@ public class CacheMediator extends AbstractMediator {
     }
 
     public long getTimeout() {
-        return timeout;
+        return timeout / 1000;
     }
 
     public void setTimeout(long timeout) {
-        this.timeout = timeout;
+        this.timeout = timeout * 1000;
     }
 
     public SequenceMediator getOnCacheHitSequence() {

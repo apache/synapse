@@ -20,7 +20,7 @@
 <!-- Simple cache implemented on synapse for the actual service -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <in>
-        <cache timeout="20000" scope="per-host"
+        <cache timeout="20" scope="per-host" collector="false"
                hashGenerator="org.wso2.caching.digest.DOMHASHGenerator">
             <implementation type="memory" maxSize="100"/>
         </cache>
@@ -31,7 +31,7 @@
         </send>
     </in>
     <out>
-        <cache/>
+        <cache collector="true"/>
         <send/>
     </out>
 </definitions>

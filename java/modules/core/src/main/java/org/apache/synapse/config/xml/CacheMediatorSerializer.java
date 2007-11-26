@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.builtin.CacheMediator;
  * Serializes the Cache mediator to the XML configuration specified
  * <p/>
  * &lt;cache (id="string")? scope="string" collector=(true | false)
- *      hashGenerator="class" timeout="mili-seconds"&gt;
+ *      hashGenerator="class" timeout="mili-seconds" maxMessageSize="in-bytes"&gt;
  *  &lt;onCacheHit (sequence="key")?&gt;
  *   (mediator)+
  *  &lt;/onCacheHit&gt;
@@ -71,7 +71,8 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
 
             if (mediator.getMaxMessageSize() != 0) {
                 cache.addAttribute(
-                    fac.createOMAttribute("maxMessageSize", nullNS, Integer.toString(mediator.getMaxMessageSize())));
+                    fac.createOMAttribute("maxMessageSize", nullNS,
+                        Integer.toString(mediator.getMaxMessageSize())));
             }
 
             if (mediator.getOnCacheHitRef() != null) {

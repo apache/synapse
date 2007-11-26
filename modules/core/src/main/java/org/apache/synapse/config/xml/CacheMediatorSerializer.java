@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.builtin.CacheMediator;
  * Serializes the Cache mediator to the XML configuration specified
  * <p/>
  * &lt;cache (id="string")? scope="string" collector=(true | false)
- *      hashGenerator="class" timeout="mili-seconds" maxMessageSize="in-bytes"&gt;
+ *      hashGenerator="class" timeout="seconds" maxMessageSize="in-bytes"&gt;
  *  &lt;onCacheHit (sequence="key")?&gt;
  *   (mediator)+
  *  &lt;/onCacheHit&gt;

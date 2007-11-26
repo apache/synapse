@@ -1042,7 +1042,7 @@ type defined by the JSR-000225 (XQJ API). The supported types are:</p>
 <p>The expressions will be evaluated against the current SOAP envelope.</p>
 
 <h4><a name="cache">Cache</a></h4>
-<pre> &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="milliseconds"&gt;
+<pre> &lt;cache (id="string")? hashGenerator="class" scope="string" timeout="seconds" collector=(true | false) maxMessageSize="in-bytes"&gt;
    &lt;onCacheHit (sequence="key")?&gt;
      (mediator)+
    &lt;/onCacheHit&gt;

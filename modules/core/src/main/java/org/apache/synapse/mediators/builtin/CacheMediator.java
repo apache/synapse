@@ -100,8 +100,8 @@ public class CacheMediator extends AbstractMediator {
         ConfigurationContext cfgCtx =
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext();
         if (cfgCtx == null) {
-            handleException("Unable to perform caching, " + " ConfigurationContext cannot be found",
-                synCtx);
+            handleException("Unable to perform caching, "
+                + " ConfigurationContext cannot be found", synCtx);
             return false; // never executes.. but keeps IDE happy
         }
 
@@ -165,8 +165,8 @@ public class CacheMediator extends AbstractMediator {
      * @param cfgCtx         the abstract context in which the cache will be kept
      * @param cache          the cache
      */
-    private void processResponseMessage(MessageContext synCtx, ConfigurationContext cfgCtx, boolean traceOrDebugOn,
-        boolean traceOn, Cache cache) {
+    private void processResponseMessage(MessageContext synCtx, ConfigurationContext cfgCtx,
+        boolean traceOrDebugOn, boolean traceOn, Cache cache) {
 
         if (!collector) {
             handleException("Response messages cannot be handled in a non collector cache", synCtx);
@@ -180,7 +180,7 @@ public class CacheMediator extends AbstractMediator {
                     scope + " with ID : " + cacheObjKey + " for request hash : " + requestHash);
             }
 
-            Object obj = cache.getResponseForKey(requestHash);
+            Object obj = cache.getResponseForKey(requestHash, cfgCtx);
 
             if (obj != null && obj instanceof CachedObject) {
 
@@ -200,9 +200,10 @@ public class CacheMediator extends AbstractMediator {
                 }
 
                 /* this is not required yet, can commented this for perf improvements
-                   in the future there can be a situation where user sends the request with the
-                   response hash (if client side caching is on) in which case we can compare that
-                   response hash with the given response hash and respond with not-modified http header */
+                   in the future there can be a situation where user sends the request
+                   with the response hash (if client side caching is on) in which case
+                   we can compare that response hash with the given response hash and
+                   respond with not-modified http header */
                 // cachedObj.setResponseHash(cache.getGenerator().getDigest(
                 //     ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
 
@@ -234,8 +235,8 @@ public class CacheMediator extends AbstractMediator {
      * @param fbaos          the serialized request envelope
      * @return should this mediator terminate further processing?
      */
-    private boolean processRequestMessage(MessageContext synCtx, ConfigurationContext cfgCtx, boolean traceOrDebugOn,
-        boolean traceOn, Cache cache, FixedByteArrayOutputStream fbaos) {
+    private boolean processRequestMessage(MessageContext synCtx, ConfigurationContext cfgCtx,
+        boolean traceOrDebugOn, boolean traceOn, Cache cache, FixedByteArrayOutputStream fbaos) {
 
         if (collector) {
             handleException("Request messages cannot be handled in a collector cache", synCtx);
@@ -250,11 +251,11 @@ public class CacheMediator extends AbstractMediator {
         }
 
         if (cache.containsKey(requestHash) &&
-            cache.getResponseForKey(requestHash) instanceof CachedObject) {
+            cache.getResponseForKey(requestHash, cfgCtx) instanceof CachedObject) {
 
             // get the response from the cache and attach to the context and change the
             // direction of the message
-            CachedObject cachedObj = (CachedObject) cache.getResponseForKey(requestHash);
+            CachedObject cachedObj = (CachedObject) cache.getResponseForKey(requestHash, cfgCtx);
 
             if (!cachedObj.isExpired() && cachedObj.getResponseEnvelope() != null) {
 
@@ -328,9 +329,9 @@ public class CacheMediator extends AbstractMediator {
         } else {
 
             // if not found in cache, check if we can cache this request
-            if (cache.getCache().size() == inMemoryCacheSize) {
-                cache.removeExpiredResponses();
-                if (cache.getCache().size() == inMemoryCacheSize) {
+            if (cache.getCacheKeys().size() == inMemoryCacheSize) {
+                cache.removeExpiredResponses(cfgCtx);
+                if (cache.getCacheKeys().size() == inMemoryCacheSize) {
                     if (traceOrDebugOn) {
                         traceOrDebug(traceOn, "In-memory cache is full. Unable to cache");
                     }
@@ -353,15 +354,15 @@ public class CacheMediator extends AbstractMediator {
      * @param cache       the cache
      * @param fbaos       the serialized request envelope
      */
-    private void storeRequestToCache(MessageContext synCtx, ConfigurationContext cfgCtx, String requestHash, Cache cache,
-        FixedByteArrayOutputStream fbaos) {
+    private void storeRequestToCache(MessageContext synCtx, ConfigurationContext cfgCtx,
+        String requestHash, Cache cache, FixedByteArrayOutputStream fbaos) {
         
         CachedObject cachedObj = new CachedObject();
         if (fbaos != null) {
             cachedObj.setRequestEnvelope(fbaos.toByteArray());
         } else {
-            // this else block can be commented out for the perf improvements, because we are not using
-            // this for the moment
+            // this else block can be commented out for the perf improvements,
+            // because we are not using this for the moment
             ByteArrayOutputStream requestStream = new ByteArrayOutputStream();
             try {
                 MessageHelper.cloneSOAPEnvelope(synCtx.getEnvelope()).serialize(requestStream);
@@ -372,7 +373,7 @@ public class CacheMediator extends AbstractMediator {
         }
         cachedObj.setRequestHash(requestHash);
         cachedObj.setTimeout(timeout);
-        cache.addResponseWithKey(requestHash, cachedObj);
+        cache.addResponseWithKey(requestHash, cachedObj, cfgCtx);
 
         cfgCtx.setProperty(cacheObjKey, cache);
     }

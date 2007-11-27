@@ -2571,7 +2571,7 @@ text JMS message of the form "&lt;price&gt; &lt;qty&gt; &lt;symbol&gt;".
 Synapse converts this message into a SOAP message and sends this to the
 SimpleStockQuoteServices' placeOrder operation. Synapse uses the script
 mediator to transform the text message into a XML payload using the
-Javascript support available to tokenize the string. The proxy service
+JavaScript support available to tokenize the string. The proxy service
 property named "transport.jms.Wrapper" defines a custom wrapper element
 QName, to be used when wrapping text/binary content into a SOAP envelope.</p>
 
@@ -3012,7 +3012,7 @@ uses the function attribute to specify which function should be invoked. Use
 the stock quote client to issue a custom quote client as follows.:</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
 
-<p>Synapse uses the script mediator and the specified Javascript function to
+<p>Synapse uses the script mediator and the specified JavaScript function to
 convert the custom request to a standard quote request. Subsequently the
 response received is transformed and sent back to the client.</p>
 

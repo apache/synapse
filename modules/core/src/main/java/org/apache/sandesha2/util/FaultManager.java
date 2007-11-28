@@ -794,7 +794,7 @@ public class FaultManager {
 		// Cleanup sending side.
 		if (log.isDebugEnabled())
 			log.debug("Terminating sending sequence " + rmsBean);
-		TerminateManager.terminateSendingSide(rmsBean, storageManager);
+		TerminateManager.terminateSendingSide(rmsBean, storageManager, false);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::processCreateSequenceRefusedFault");
@@ -820,16 +820,16 @@ public class FaultManager {
 		// Find the rmsBean
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
 		if (rmsBean != null) {
-		
-			// Notify the clients of a failure
-			notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
-			
+					
 			rmMsgCtx.pause();
 			
 			// Cleanup sending side.
 			if (log.isDebugEnabled())
 				log.debug("Terminating sending sequence " + rmsBean);
-			TerminateManager.terminateSendingSide(rmsBean, storageManager);
+			if(!TerminateManager.terminateSendingSide(rmsBean, storageManager, true)){
+				// We did not reallocate so we notify the clients of a failure
+				notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
+			}
 			
 			// Update the last activated time.
 			rmsBean.setLastActivatedTime(System.currentTimeMillis());

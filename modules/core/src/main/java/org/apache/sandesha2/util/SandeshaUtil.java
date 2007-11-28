@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -41,6 +42,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -1062,6 +1064,40 @@ public class SandeshaUtil {
 		            
 		return targetEnv;
 	}
+	
+	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, List msgsToSend)throws AxisFault{
+	    if (log.isDebugEnabled())
+	        log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");
+	    
+		ConfigurationContext ctx = storageManager.getContext();
+		ServiceClient client = new ServiceClient(ctx,  null);
+		
+		//populate the client options
+		Options options = client.getOptions();
+		options.setTo(oldRMSBean.getToEndpointReference());
+		options.setReplyTo(oldRMSBean.getReplyToEndpointReference());
+		
+        //internal sequence ID is different
+        String internalSequenceID = oldRMSBean.getInternalSequenceID();
+        //we also need to obtain the sequenceKey from the internalSequenceID.
+        String sequenceKey = 
+          SandeshaUtil.getSequenceKeyFromInternalSequenceID(internalSequenceID, oldRMSBean.getToEndpointReference().getAddress());
+        options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey); 
+        options.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceID);
+        options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, oldRMSBean.getRMVersion());
+      	options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+      	
+        //send the msgs
+      	Iterator it = msgsToSend.iterator();
+      	while(it.hasNext()){
+      		MessageContext msgCtx = (MessageContext)it.next();
+      		client.getOptions().setAction(msgCtx.getWSAAction());
+      		client.fireAndForget(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement());
+      	}
+      	
+	    if (log.isDebugEnabled())
+	        log.debug("Exit: SandeshaUtil::reallocateMessagesToNewSequence");
+	}
 
   /**
    * Remove the MustUnderstand header blocks.
@@ -1117,6 +1153,32 @@ public class SandeshaUtil {
 		
 		return newEPR;
 	}	
+	
+	public static boolean isAutoStartNewSequence(MessageContext mc){
+		if(log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isAutoStartNewSequence");
+		boolean result = false;
+
+		//look at the msg ctx first
+		String auto = (String) mc.getProperty(SandeshaClientConstants.AUTO_START_NEW_SEQUENCE);
+		if ("true".equals(auto)) {
+			if (log.isDebugEnabled()) log.debug("Autostart message context");
+			result = true;
+		}			
+		
+		if(!result) {
+			//look at the operation
+			if (mc.getAxisOperation() != null) {
+				Parameter autoParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.AUTO_START_NEW_SEQUENCE);
+				if (null != autoParam && "true".equals(autoParam.getValue())) {
+					if (log.isDebugEnabled()) log.debug("autostart operation");
+					result = true;
+				}
+			}
+		}
+		
+		if(log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isAutoStartNewSequence, " + result);
+		return result;		
+	}
 	
 	public static boolean isMessageUnreliable(MessageContext mc) {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isMessageUnreliable");

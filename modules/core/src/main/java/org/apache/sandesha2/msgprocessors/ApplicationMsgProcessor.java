@@ -87,6 +87,46 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		return false;
 	}
 	
+	private String getSequenceID(RMMsgContext rmMsgCtx, boolean serverSide, boolean forceNewSequence)throws SandeshaException{
+		MessageContext msgContext = rmMsgCtx.getMessageContext();
+		ConfigurationContext configContext = msgContext.getConfigurationContext();
+		
+		String internalSequenceId = null;
+		if (serverSide) {
+			if (inboundSequence == null || "".equals(inboundSequence)) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.incomingSequenceNotValidID, inboundSequence);
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
+
+			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(inboundSequence);
+		} else {
+			// set the internal sequence id for the client side.
+			EndpointReference toEPR = msgContext.getTo();
+			if (toEPR == null || toEPR.getAddress() == null || "".equals(toEPR.getAddress())) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
+
+			String to = toEPR.getAddress();
+			String sequenceKey = null;
+			if(forceNewSequence){
+				sequenceKey = SandeshaUtil.getUUID();
+				msgContext.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
+			}
+			else{
+				sequenceKey = (String) msgContext.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+				if (sequenceKey == null)
+					sequenceKey = (String)configContext.getAxisConfiguration().getParameterValue(SandeshaClientConstants.SEQUENCE_KEY);
+			}
+
+			
+			internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		}
+		return internalSequenceId;
+	}
+	
 	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction tran) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processOutMessage");
@@ -119,9 +159,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (msgContext.getMessageID() == null)
 			msgContext.setMessageID(SandeshaUtil.getUUID());
 
-		// find internal sequence id
-		String internalSequenceId = null;
-
 		String storageKey = SandeshaUtil.getUUID(); // the key which will be
 													// used to store this
 													// message.
@@ -132,32 +169,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		 * side - a derivation of the sequenceId of the incoming sequence client
 		 * side - a derivation of wsaTo & SeequenceKey
 		 */
-
+		String internalSequenceId = getSequenceID(rmMsgCtx, serverSide, false); //get a sequenceID, possibly pre-existing
+		
 		boolean lastMessage = false;
-		if (serverSide) {
-			if (inboundSequence == null || "".equals(inboundSequence)) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.incomingSequenceNotValidID, inboundSequence);
-				log.debug(message);
-				throw new SandeshaException(message);
-			}
-
-			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(inboundSequence);
-		} else {
-			// set the internal sequence id for the client side.
-			EndpointReference toEPR = msgContext.getTo();
-			if (toEPR == null || toEPR.getAddress() == null || "".equals(toEPR.getAddress())) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-				log.debug(message);
-				throw new SandeshaException(message);
-			}
-
-			String to = toEPR.getAddress();
-			String sequenceKey = (String) msgContext.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-			if (sequenceKey == null)
-				sequenceKey = (String)configContext.getAxisConfiguration().getParameterValue(SandeshaClientConstants.SEQUENCE_KEY);
-			
-			internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
-
+		if(!serverSide){
 			String lastAppMessage = (String) msgContext.getProperty(SandeshaClientConstants.LAST_MESSAGE);
 			if (lastAppMessage != null && "true".equals(lastAppMessage))
 				lastMessage = true;
@@ -195,18 +210,21 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 
 		//see if the sequence is closed
-		if(rmsBean != null && rmsBean.isSequenceClosedClient()){
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
-		}
-
-		//see if the sequence is terminated
-		if(rmsBean != null && rmsBean.isTerminateAdded()) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
-		}
-
-		//see if the sequence is timed out
-		if(rmsBean != null && rmsBean.isTimedOut()){
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
+		if(rmsBean != null && 
+			(rmsBean.isSequenceClosedClient() || rmsBean.isTerminateAdded() || rmsBean.isTimedOut())){
+			if(SandeshaUtil.isAutoStartNewSequence(msgContext)){
+				internalSequenceId = getSequenceID(rmMsgCtx, serverSide, true); //require a new sequence
+				rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+			}
+			else if(rmsBean.isSequenceClosedClient()){
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
+			}
+			else if(rmsBean.isTerminateAdded()){
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
+			}
+			else if(rmsBean.isTimedOut()){
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
+			}
 		}
 		
 		// If the call application is a 2-way MEP, and uses a anonymous replyTo, and the

@@ -76,6 +76,7 @@ public class SandeshaMessageKeys {
 	public static final String propertyInvalidValue="propertyInvalidValue";
 	public static final String invalidRange="invalidRange";
 	public static final String workAlreadyAssigned="workAlreadyAssigned";
+	public static final String reallocationFailed="reallocationFailed"; 
 
 
 	public static final String rmNamespaceNotMatchSequence="rmNamespaceNotMatchSequence";

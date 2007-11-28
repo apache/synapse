@@ -22,11 +22,14 @@ package org.apache.sandesha2.util;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
@@ -34,6 +37,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -45,6 +50,8 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+
+import com.ibm.xslt4j.bcel.generic.RETURN;
 
 /**
  * Contains logic to remove all the storad data of a sequence. Methods of this
@@ -225,16 +232,18 @@ public class TerminateManager {
 	 * @param configContext
 	 * @param sequenceID
 	 * @throws SandeshaException
+	 * 
+	 * @return true if the reallocation happened sucessfully
 	 */
-	public static void terminateSendingSide(RMSBean rmsBean, 
-			StorageManager storageManager) throws SandeshaException {
+	public static boolean terminateSendingSide(RMSBean rmsBean, 
+			StorageManager storageManager, boolean reallocate) throws SandeshaException {
 
 		// Indicate that the sequence is terminated
 		rmsBean.setTerminated(true);
 		rmsBean.setTerminateAdded(true);
 		storageManager.getRMSBeanMgr().update(rmsBean);
 		
-		cleanSendingSideData (rmsBean.getInternalSequenceID(), storageManager, rmsBean);
+		return cleanSendingSideData (rmsBean.getInternalSequenceID(), storageManager, rmsBean, reallocate);
 	}
 
 	public static void timeOutSendingSideSequence(String internalSequenceId,
@@ -245,26 +254,72 @@ public class TerminateManager {
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
-		cleanSendingSideData(internalSequenceId, storageManager, rmsBean);
+		cleanSendingSideData(internalSequenceId, storageManager, rmsBean, false);
 	}
 
-	private static void cleanSendingSideData(String internalSequenceId, StorageManager storageManager, RMSBean rmsBean) throws SandeshaException {
+	private static boolean cleanSendingSideData(String internalSequenceId, StorageManager storageManager, 
+			RMSBean rmsBean, boolean reallocateIfPossible) throws SandeshaException {
 
+		if(log.isDebugEnabled())
+			log.debug("Enter: TerminateManager::cleanSendingSideData " + internalSequenceId + ", " + reallocateIfPossible);
+		
+		boolean reallocatedOK = false;
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
 		// removing retransmitterMgr entries and corresponding message contexts.
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
+		List msgsToReallocate = null;
+		if(reallocateIfPossible){
+			msgsToReallocate = new LinkedList();
+		}
+		Range[] ranges = rmsBean.getClientCompletedMessages().getRanges();
+		long lastAckedMsg = -1;
+		
+		if(ranges.length==1){
+			//a single contiguous acked range
+			lastAckedMsg = ranges[0].upperValue;
+		}
+		else{
+			//cannot reallocate as there are gaps
+			reallocateIfPossible=false;
+			if(log.isDebugEnabled())
+				log.debug("cannot reallocate sequence as there are gaps");
+		}
+		
 		while (iterator.hasNext()) {
 			SenderBean retransmitterBean = (SenderBean) iterator.next();
 			if(retransmitterBean.getMessageType()!=Sandesha2Constants.MessageTypes.TERMINATE_SEQ || rmsBean.isTerminated()){
 				//remove all but terminate sequence messages
-				retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
-
 				String messageStoreKey = retransmitterBean.getMessageContextRefKey();
+				if(reallocateIfPossible
+					&& retransmitterBean.getMessageType()!=Sandesha2Constants.MessageTypes.APPLICATION
+					&& retransmitterBean.getMessageNumber()==lastAckedMsg+1){
+					
+					//try to reallocate application msgs
+					msgsToReallocate.add(storageManager.retrieveMessageContext(messageStoreKey, storageManager.getContext()));
+					lastAckedMsg++;
+				}
+				retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
 				storageManager.removeMessageContext(messageStoreKey);				
 			}
 		}
+		
+		if(reallocateIfPossible && msgsToReallocate.size()>0){
+			try{
+			      SandeshaUtil.reallocateMessagesToNewSequence(storageManager, rmsBean, msgsToReallocate);	
+			      reallocatedOK = true;
+			}
+			catch(Exception e){
+				//want that the reallocation failed
+				if(log.isDebugEnabled())
+					log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reallocationFailed, rmsBean.getSequenceID(), e.toString()));				
+			}			
+		}
+		
+		if(log.isDebugEnabled())
+			log.debug("Exit: TerminateManager::cleanSendingSideData " + reallocatedOK);
+		return reallocatedOK;
 	}
 
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String internalSequenceID, String outSequenceId, StorageManager storageManager) throws AxisFault {

@@ -37,4 +37,5 @@ public class SandeshaClientConstants {
 	public static final String USE_REPLY_TO_AS_ACKS_TO = "UseReplyToAsAcksTo";
 	public static final String OFFERED_ENDPOINT = "OfferedEndpoint";
 	public static final String AVOID_AUTO_TERMINATION = "AviodAutoTermination";
+	public static String AUTO_START_NEW_SEQUENCE = "AutoStartNewSequence";
 }

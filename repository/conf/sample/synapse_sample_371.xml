@@ -28,7 +28,7 @@
                                 xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle">
                         <throttle:ThrottleAssertion>
                             <wsp:All>
-                                <throttle:ID throttle:type="IP">Other</throttle:ID>
+                                <throttle:ID throttle:type="IP">other</throttle:ID>
                                 <wsp:ExactlyOne>
                                     <wsp:All>
                                         <throttle:MaximumCount>4</throttle:MaximumCount>

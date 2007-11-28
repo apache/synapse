@@ -3,7 +3,7 @@
     <throttle:ThrottleAssertion>
         <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>
         <wsp:All>
-            <throttle:ID throttle:type="IP">Other</throttle:ID>
+            <throttle:ID throttle:type="IP">other</throttle:ID>
             <wsp:ExactlyOne>
                 <wsp:All>
                     <throttle:MaximumCount>4</throttle:MaximumCount>
@@ -14,12 +14,12 @@
             </wsp:ExactlyOne>
         </wsp:All>
         <wsp:All>
-            <throttle:ID throttle:type="IP">192.168.8.200-192.168.8.222</throttle:ID>
+            <throttle:ID throttle:type="IP">10.100.1.150-10.100.1.152</throttle:ID>
             <wsp:ExactlyOne>
                 <wsp:All>
-                    <throttle:MaximumCount>8</throttle:MaximumCount>
+                    <throttle:MaximumCount>5</throttle:MaximumCount>
                     <throttle:UnitTime>800000</throttle:UnitTime>
-                    <throttle:ProhibitTimePeriod wsp:Optional="true">10</throttle:ProhibitTimePeriod>
+                    <throttle:ProhibitTimePeriod wsp:Optional="true">100000</throttle:ProhibitTimePeriod>
                 </wsp:All>
                 <throttle:IsAllow>true</throttle:IsAllow>
             </wsp:ExactlyOne>

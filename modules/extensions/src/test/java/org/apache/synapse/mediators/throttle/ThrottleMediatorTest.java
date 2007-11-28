@@ -55,7 +55,7 @@ public class ThrottleMediatorTest extends TestCase {
             "        <throttle:ThrottleAssertion>\n" +
             "            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\n" +           
             "            <wsp:All>\n" +
-            "                <throttle:ID throttle:type=\"IP\">Other</throttle:ID>\n" +
+            "                <throttle:ID throttle:type=\"IP\">other</throttle:ID>\n" +
             "                <wsp:ExactlyOne>\n" +
             "                    <wsp:All>\n" +
             "                        <throttle:MaximumCount>8</throttle:MaximumCount>\n" +
@@ -241,9 +241,9 @@ public class ThrottleMediatorTest extends TestCase {
                     throw new ThrottleException("Can not find a configuartion for IP Based Throttle");
 
                 }
-                AccessController accessControler;
+                AccessRateController accessControler;
                 try {
-                    accessControler =new AccessController();
+                    accessControler =new AccessRateController();
                     boolean canAccess = accessControler.canAccess(throttleContext, remoteIP,ThrottleConstants.IP_BASE);
                     if (!canAccess) {
                         throw new SynapseException("Access has currently been denied by the IP_BASE throttle for IP :\t" + remoteIP);

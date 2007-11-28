@@ -16,8 +16,11 @@
 
 package org.tempuri;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.axiom.om.OMFactory;
+import org.apache.axis2.databinding.ADBException;
 import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
@@ -205,6 +208,15 @@ public class EchoString implements org.apache.axis2.databinding.ADBBean {
 		}
 
 	}
+	
+    public void serialize(final QName parentQName,
+            final OMFactory factory,
+            MTOMAwareXMLStreamWriter xmlWriter)throws XMLStreamException, ADBException{}
+
+    public void serialize(final QName parentQName,
+            final OMFactory factory,
+            MTOMAwareXMLStreamWriter xmlWriter,
+            boolean serializeType)throws XMLStreamException, ADBException{}
 
 	/**
 	 * Factory class that keeps the parse method

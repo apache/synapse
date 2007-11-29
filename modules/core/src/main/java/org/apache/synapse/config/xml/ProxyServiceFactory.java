@@ -19,27 +19,29 @@
 
 package org.apache.synapse.config.xml;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.axis2.wsdl.WSDLConstants;
-
-import javax.xml.namespace.QName;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Creates a ProxyService instance using the XML fragment specification
  * <p/>
- * <proxy-service name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
+ * <proxy-service name="string" [transports="(http |https |jms )+|all"] [pinnedServers="(serverName)+"] [trace="enable|disable"]>
  *    <description>..</description>?
  *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
@@ -105,6 +107,25 @@ public class ProxyServiceFactory {
                 proxy.setTransports(transportList);
             }
         }
+        
+        OMAttribute pinnedServers = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "pinnedServers"));
+        if (pinnedServers != null) {
+            String pinnedServersValue = pinnedServers.getAttributeValue();
+            if (pinnedServersValue == null) {
+                // default to all servers
+            } else {
+                StringTokenizer st = new StringTokenizer(pinnedServersValue, " ,");
+                List pinnedServersList = new ArrayList();
+                while (st.hasMoreTokens()) {
+                    String token = st.nextToken();
+                    if (token.length() != 0) {
+                      pinnedServersList.add(token);
+                    }
+                }
+                proxy.setPinnedServers(pinnedServersList);
+            }
+        }
+        
         OMAttribute trace = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
         if (trace != null) {
             String traceValue = trace.getAttributeValue();

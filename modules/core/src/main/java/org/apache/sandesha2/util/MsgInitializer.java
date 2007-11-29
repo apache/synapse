@@ -208,10 +208,7 @@ public class MsgInitializer {
 				sequenceID = makeConnection.getIdentifier().getIdentifier();
 			} else if (makeConnection.getAddress()!=null){
 				//TODO get sequenceId based on the anonymous address.
-			} else {
-				throw new SandeshaException (
-						"Invalid MakeConnection message. Either Address or Identifier must be present");
-			}
+			} 
 		} else
 			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 		

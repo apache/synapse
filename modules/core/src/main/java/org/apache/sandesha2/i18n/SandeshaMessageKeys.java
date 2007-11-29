@@ -226,6 +226,8 @@ public class SandeshaMessageKeys {
 	public static final String unknownSequenceFault="unknownSequenceFault";
 	public static final String invalidAckFault="invalidAckFault";
 	public static final String cannotAcceptMsgAsSequenceClosedFault="cannotAcceptMsgAsSequenceClosedFault"; 
+	public static final String unsuportedSelectionFault="unsuportedSelectionFault";
+	public static final String missingSelectionFault="missingSelectionFault";
 	
 	public final static String policyBeanNotFound = "policyBeanNotFound";
 	public final static String cloneDoesNotMatchToOriginal = "cloneDoesNotMatchToOriginal";

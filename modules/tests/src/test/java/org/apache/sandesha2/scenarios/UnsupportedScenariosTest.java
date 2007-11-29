@@ -26,7 +26,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 public class UnsupportedScenariosTest extends RMScenariosTest {
 
 	public UnsupportedScenariosTest () {
-		super ("RMScenariosTest");
+		super ("UnsupportedScenariosTest");
 	}
 	
 	public void setUp () throws Exception {

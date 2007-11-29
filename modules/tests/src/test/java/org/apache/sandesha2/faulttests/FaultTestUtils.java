@@ -49,9 +49,13 @@ public class FaultTestUtils {
 	 * @return
 	 * @throws IOException 
 	 */
-	public static final String retrieveResponseMessage(HttpURLConnection connection) throws IOException {
-		
-		InputStream tmpIn2 = connection.getInputStream();
+	public static final String retrieveResponseMessage(HttpURLConnection connection) {
+		InputStream tmpIn2 = null;
+		try {
+			tmpIn2 = connection.getInputStream();
+		} catch (IOException e) {
+			tmpIn2 = connection.getErrorStream();
+		}
 
 		// Read the sync response
 		boolean done = false;

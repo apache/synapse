@@ -96,9 +96,9 @@ public class SpecSpecificConstants {
 	public static String getTerminateSequenceResponseAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE;
-		else 
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownSpec));
+		 
+		throw new SandeshaException (SandeshaMessageHelper.getMessage(
+				SandeshaMessageKeys.unknownSpec));
 	}
 	
 	public static String getCloseSequenceAction (String specVersion) throws SandeshaException {
@@ -193,10 +193,10 @@ public class SpecSpecificConstants {
 	public static String getTerminateSequenceResponseSOAPAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE;
-		else 
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownSpec,
-					specVersion));
+		 
+		throw new SandeshaException (SandeshaMessageHelper.getMessage(
+				SandeshaMessageKeys.unknownSpec,
+				specVersion));
 	}
 	
 	public static String getAckRequestSOAPAction (String specVersion) throws SandeshaException {
@@ -439,6 +439,16 @@ public class SpecSpecificConstants {
 				case Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED:
 					result = Sandesha2Constants.SPEC_2007_02.QNames.SequenceTerminated;
 					break;
+			}
+		}
+		else if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(namespaceValue)) {			
+			switch (faultType) {			
+				case Sandesha2Constants.SOAPFaults.FaultType.UNSUPPORTED_SELECTION:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.UnsupportedSelection;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.MISSING_SELECTION:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.MissingSelection;
+					break;			
 			}
 		}
 		else

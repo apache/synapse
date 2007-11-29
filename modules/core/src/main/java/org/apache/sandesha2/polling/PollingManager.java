@@ -233,7 +233,7 @@ public class PollingManager extends SandeshaThread {
 		if(referenceMessage!=null){
 			RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 			RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
-					rmBean, wireSeqId, wireAddress, storageManager);
+					rmBean, wireSeqId, wireAddress);
 			
 			
 			//we must set serverSide to false. Having serverSide as true (I.e. when polling for RMD) will cause the SenderWorker to ignore

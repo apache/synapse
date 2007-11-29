@@ -19,6 +19,8 @@
 
 package org.apache.sandesha2.wsrm;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -40,6 +42,8 @@ public class MakeConnection implements IOMRMPart {
 	Identifier identifier = null;
 	
 	Address address = null;
+	
+	QName unexpectedElement = null;
 	
 	public MakeConnection (String namespaceValue) throws SandeshaException {
 		
@@ -64,17 +68,22 @@ public class MakeConnection implements IOMRMPart {
 
 	public Object fromOMElement(OMElement makeConnectionElement) throws OMException, AxisFault {
 
-		OMElement identifierElement = makeConnectionElement.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.Identifier);
-		if(identifierElement == null) {
-			identifierElement = makeConnectionElement.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Identifier);
-		}
-		OMElement addressElement = makeConnectionElement.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSA.ADDRESS));
+		Iterator childElements = makeConnectionElement.getChildElements();
 		
-		if (identifierElement==null && addressElement==null) {
-			String message = "MakeConnection element should have at lease one of Address and Identifier subelements";
-			throw new SandeshaException (message);
-		}
+		OMElement identifierElement = null;
+		OMElement addressElement = null;
 		
+		while (childElements.hasNext()) {
+			OMElement element = (OMElement)childElements.next();
+			if (Sandesha2Constants.SPEC_2007_02.QNames.Identifier.getLocalPart().equals(element.getLocalName()))
+				identifierElement = element;
+			else if (Sandesha2Constants.WSA.ADDRESS.equals(element.getLocalName()))
+				addressElement = element;
+			else 
+				unexpectedElement = element.getQName();
+			
+		}
+
 		if (identifierElement!=null) {
 			identifier = new Identifier (identifierElement.getNamespace().getNamespaceURI());
 			identifier.fromOMElement(identifierElement);
@@ -107,10 +116,6 @@ public class MakeConnection implements IOMRMPart {
 					SandeshaMessageHelper.getMessage(message));
 		}
 
-	/*	if (identifier==null && address==null) {
-			String message = "Invalid MakeConnection object. Both Identifier and Address are null";
-		}
-		*/
 		OMFactory factory = body.getOMFactory();
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_MC);
 		OMElement makeConnectionElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION,rmNamespace);
@@ -120,6 +125,14 @@ public class MakeConnection implements IOMRMPart {
 		if (address!=null)
 			address.toOMElement(makeConnectionElement);
 
+		// Added to test Invalid MakeConnection messages
+		if (unexpectedElement != null)
+		{
+			OMElement unexElement = factory.createOMElement(unexpectedElement);
+
+			makeConnectionElement.addChild(unexElement);
+		}
+			
 		body.addChild(makeConnectionElement);
 		
 		return body;
@@ -141,4 +154,11 @@ public class MakeConnection implements IOMRMPart {
 		this.identifier = identifier;
 	}
 
+	public void setUnexpectedElement(QName unexpectedElement) {
+		  this.unexpectedElement = unexpectedElement;	
+		}
+
+	public QName getUnexpectedElement() {
+		return unexpectedElement;
+	}	
 }

@@ -345,6 +345,118 @@ public class FaultManager {
 	}
 	
 	/**
+	 * Makes the WSMC UnsupportedSelectionFault
+	 */
+	public static void makeUnsupportedSelectionFault(RMMsgContext rmMessageContext, QName unsupportedElement) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::makeUnsupportedSelectionFault, " + unsupportedElement);
+		
+		// Return a UnsupportedSelectionFault error
+
+		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMessageContext.getMessageContext().getEnvelope());
+
+		FaultData data = new FaultData();
+		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+			data.setCode(SOAP11Constants.FAULT_CODE_RECEIVER);
+		else
+			data.setCode(SOAP12Constants.FAULT_CODE_RECEIVER);
+
+		data.setSubcode(SpecSpecificConstants.getFaultSubcode(Sandesha2Constants.SPEC_2007_02.MC_NS_URI, 
+				Sandesha2Constants.SOAPFaults.FaultType.UNSUPPORTED_SELECTION ));
+
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+		OMElement element = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.UNSUPPORTED_ELEMENT,
+				Sandesha2Constants.SPEC_2007_02.MC_NS_URI, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_MC);
+		element.setText(unsupportedElement);
+		data.setDetail(element);
+
+		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unsuportedSelectionFault));
+		
+		data.setType(Sandesha2Constants.SOAPFaults.FaultType.UNSUPPORTED_SELECTION);
+
+		makeMakeConnectionFault(rmMessageContext, data);
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::makeUnsupportedSelectionFault");
+	}
+
+	/**
+	 * Makes WSMC MissingSelectionFault
+	 */
+	public static void makeMissingSelectionFault(RMMsgContext rmMessageContext) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::makeMissingSelectionFault");
+		
+		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMessageContext.getMessageContext().getEnvelope());
+
+		FaultData data = new FaultData();
+		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+			data.setCode(SOAP11Constants.FAULT_CODE_RECEIVER);
+		else
+			data.setCode(SOAP12Constants.FAULT_CODE_RECEIVER);
+
+		data.setSubcode(SpecSpecificConstants.getFaultSubcode(Sandesha2Constants.SPEC_2007_02.MC_NS_URI, 
+				Sandesha2Constants.SOAPFaults.FaultType.MISSING_SELECTION ));
+
+		data.setDetail(null);
+
+		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.missingSelectionFault));
+		
+		data.setType(Sandesha2Constants.SOAPFaults.FaultType.MISSING_SELECTION);
+
+		makeMakeConnectionFault(rmMessageContext, data);
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::makeMissingSelectionFault");
+	}
+
+	private static void makeMakeConnectionFault(RMMsgContext referenceRMMsgContext, FaultData data) throws AxisFault {
+		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
+		
+		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
+		SOAPFaultSubCode faultSubCode = factory.createSOAPFaultSubCode(faultCode);
+		
+		SOAPFaultValue faultColdValue = factory.createSOAPFaultValue(faultCode);
+		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
+		
+		faultSubcodeValue.setText(data.getSubcode());
+
+		faultCode.setSubCode(faultSubCode);
+		
+		SOAPFaultReason reason = factory.createSOAPFaultReason();
+		SOAPFaultText reasonText = factory.createSOAPFaultText();
+		reasonText.setText(data.getReason());
+		
+		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
+		if (data.getDetail() != null)
+			detail.addDetailEntry(data.getDetail());
+		
+		String SOAPNamespaceValue = factory.getSoapVersionURI();
+		
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+                        reasonText.setLang(Sandesha2Constants.LANG_EN);
+			reason.addSOAPText(reasonText);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+			faultColdValue.setText(data.getCode());
+			
+		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
+			reason.setText(data.getReason());
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
+			faultColdValue.setText(data.getSubcode());
+			
+		}
+		
+		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+		fault.setFaultAction(Sandesha2Constants.SPEC_2007_02.Actions.MC_FAULT);
+		
+		//if this is throwable throwing it out, else we will log here.
+		throw fault; 
+	}
+	
+	/**
 	 * Checks if a sequence is terminated and returns a SequenceTerminated fault.
 	 * @param referenceRMMessage
 	 * @param sequenceID
@@ -433,7 +545,7 @@ public class FaultManager {
 			log.debug("Exit: FaultManager::checkForSequenceClosed");
 		return false;
 	}
-	
+		
 	/**
 	 * Adds the necessary Fault elements as properties to the message context.
 	 * Or if this is a SOAP11 Fault, generates the correct RM Fault and sends.
@@ -495,7 +607,7 @@ public class FaultManager {
 
 			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
 			
-			// Set the action
+			// Set the action // TODO SET THE ACTION BASED ON THE SPEC
 			faultMessageContext.setWSAAction(
 					SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
 			
@@ -536,8 +648,9 @@ public class FaultManager {
         			log.debug("Exit: FaultManager::getOrSendFault: " + fault);
                 throw fault; 
             }
-        else
-			log.error("Sandesha2 got a fault when processing the message essage " + referenceRMMsgContext.getMessageId(), fault);
+        
+		// TODO - Remove console written strings
+		log.error("Sandesha2 got a fault when processing the message " + referenceRMMsgContext.getMessageId(), fault);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::getOrSendFault");
@@ -588,7 +701,7 @@ public class FaultManager {
 			if (log.isDebugEnabled()) 
 		    	log.debug("soap11");
 //			try {
-				SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getSequenceFault();
+				SequenceFault sequenceFault = rmMsgCtx.getSequenceFault();
 	      
 				// If the sequence fault part is not null, then we have an RM specific fault.
 				if (sequenceFault != null) {

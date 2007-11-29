@@ -125,7 +125,7 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
 		messageContext = createSeqRMMessage.getMessageContext();
 		messageContext.setWSAAction(SpecSpecificConstants.getCreateSequenceAction(Sandesha2Constants.SPEC_VERSIONS.v1_1));
 
-		CreateSequence createSeqResPart = (CreateSequence) createSeqRMMessage.getCreateSequence();
+		CreateSequence createSeqResPart = createSeqRMMessage.getCreateSequence();
 
 		createSeqResPart.setAcksTo(
 				new AcksTo(new EndpointReference(AddressingConstants.Final.WSA_NONE_URI), 

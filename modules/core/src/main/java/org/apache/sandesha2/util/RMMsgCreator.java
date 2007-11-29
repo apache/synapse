@@ -319,7 +319,7 @@ public class RMMsgCreator {
 	 */
 	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, RMSequenceBean rmSequenceBean) throws AxisFault {
 
-		CreateSequence cs = (CreateSequence) createSeqMessage.getCreateSequence();
+		CreateSequence cs = createSeqMessage.getCreateSequence();
 		String namespace = createSeqMessage.getRMNamespaceValue();
 
 		CreateSequenceResponse response = new CreateSequenceResponse(namespace);
@@ -361,8 +361,7 @@ public class RMMsgCreator {
 
 	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
         
-		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg
-				.getTerminateSequence();
+		TerminateSequence terminateSequence = terminateSeqRMMsg.getTerminateSequence();
 		String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 
 		String namespace = terminateSeqRMMsg.getRMNamespaceValue();
@@ -381,8 +380,7 @@ public class RMMsgCreator {
 
 	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
 
-		CloseSequence closeSequence = (CloseSequence) closeSeqRMMsg
-				.getCloseSequence();
+		CloseSequence closeSequence = closeSeqRMMsg.getCloseSequence();
 		String sequenceID = closeSequence.getIdentifier().getIdentifier();
 
 		String namespace = closeSeqRMMsg.getRMNamespaceValue();
@@ -508,8 +506,7 @@ public class RMMsgCreator {
 	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,
 															RMSequenceBean bean,
 															String makeConnectionSeqId,
-															String makeConnectionAnonURI,
-															StorageManager storageManager)
+															String makeConnectionAnonURI)
 	throws AxisFault
 	{
 		

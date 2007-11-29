@@ -49,6 +49,7 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
@@ -76,10 +77,17 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
 
-		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMakeConnection();
+		MakeConnection makeConnection = rmMsgCtx.getMakeConnection();
 		
 		Address address = makeConnection.getAddress();
 		Identifier identifier = makeConnection.getIdentifier();
+		
+		// If there is no address or identifier - make the MissingSelection Fault.
+		if (address == null && identifier == null)
+			FaultManager.makeMissingSelectionFault(rmMsgCtx);
+		
+		if (makeConnection.getUnexpectedElement() != null)
+			FaultManager.makeUnsupportedSelectionFault(rmMsgCtx, makeConnection.getUnexpectedElement());
 		
 		//some initial setup
 		ConfigurationContext configurationContext = rmMsgCtx.getConfigurationContext();

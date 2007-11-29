@@ -123,6 +123,7 @@ public interface Sandesha2Constants {
 			
 			// WS-MC actions
 			public static final String ACTION_MAKE_CONNECTION             = SPEC_2007_02.MC_NS_URI + "/MakeConnection";
+			public static final String MC_FAULT                           = SPEC_2007_02.MC_NS_URI + "/fault";
 
 			public static final String SOAP_ACTION_CREATE_SEQUENCE             = ACTION_CREATE_SEQUENCE;
 			public static final String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE    = ACTION_CREATE_SEQUENCE_RESPONSE;
@@ -165,6 +166,8 @@ public interface Sandesha2Constants {
 			QName LastMessageNoExceeded = new QName(NS_URI, SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED);
 			QName SequenceClosed = new QName(NS_URI, SOAPFaults.Subcodes.SEQUENCE_CLOSED);
 			QName SequenceTerminated = new QName(NS_URI, SOAPFaults.Subcodes.SEQUENCE_TERMINATED);
+			QName UnsupportedSelection = new QName(MC_NS_URI, SOAPFaults.Subcodes.UNSUPPORTED_SELECTION);
+			QName MissingSelection = new QName(MC_NS_URI, SOAPFaults.Subcodes.MISSING_SELECTION);
 		}
 	}
 	
@@ -239,6 +242,8 @@ public interface Sandesha2Constants {
 		String USES_SEQUENCE_STR = "UsesSequenceSTR";
 		
 		String ENDPOINT = "Endpoint";
+		
+		String UNSUPPORTED_ELEMENT = "UnsupportedElement";
 	}
 
 	public interface WSA {
@@ -380,6 +385,9 @@ public interface Sandesha2Constants {
 
 			String CREATE_SEQUENCE_REFUSED = "CreateSequenceRefused";
 			
+			String MISSING_SELECTION = "MissingSelection";
+
+			String UNSUPPORTED_SELECTION = "UnsupportedSelection";
 
 		}
 
@@ -398,6 +406,10 @@ public interface Sandesha2Constants {
 			public static final int SEQUENCE_CLOSED = 6;
 
 			public static final int SEQUENCE_TERMINATED = 7;
+
+			public static final int UNSUPPORTED_SELECTION = 8;
+			
+			public static final int MISSING_SELECTION = 9;
 		}
 	}
 

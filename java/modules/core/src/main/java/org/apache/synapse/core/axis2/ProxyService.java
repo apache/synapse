@@ -84,6 +84,10 @@ public class ProxyService {
      */
     private ArrayList transports;
     /**
+     * Server names for which this service should be exposed
+     */
+    private List pinnedServers = new ArrayList();
+    /**
      * The target endpoint key
      */
     private String targetEndpoint = null;
@@ -712,6 +716,14 @@ public class ProxyService {
 
     public void setTargetInLineFaultSequence(SequenceMediator targetInLineFaultSequence) {
         this.targetInLineFaultSequence = targetInLineFaultSequence;
+    }
+
+    public List getPinnedServers() {
+      return pinnedServers;
+    }
+
+    public void setPinnedServers(List pinnedServers) {
+      this.pinnedServers = pinnedServers;
     }
 
 }

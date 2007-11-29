@@ -15,6 +15,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.wso2.throttle.ThrottleConstants;
 
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -177,7 +178,16 @@ public class MessageHelper {
 
         for (Object o1 : ori.getProperties().keySet()) {
             String key = (String) o1;
-            newMC.setProperty(key, ori.getProperty(key));
+            if (key != null) {
+                //In clustered environment, all the properties related to the throttle ,
+                //will be replicated explicitly  by throttling Mediator ,
+                //therefore It should avoid any implicitly replication from any other component 
+                if (key.startsWith(ThrottleConstants.THROTTLE_PROPERTY_PREFIX)) {
+                    newMC.setNonReplicableProperty(key, ori.getPropertyNonReplicable(key));
+                } else {
+                    newMC.setProperty(key, ori.getProperty(key));
+                }
+            }
         }
 
         newMC.setServerSide(false);

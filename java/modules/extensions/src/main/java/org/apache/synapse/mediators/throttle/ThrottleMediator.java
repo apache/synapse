@@ -122,7 +122,6 @@ public class ThrottleMediator extends AbstractMediator {
                             trace.trace("Initializing using static throttling policy : "
                                                                                     + inLinePolicy);
                         }
-
                         try {
                             // process the policy
                             throttle = ThrottlePolicyProcessor.processPolicy(
@@ -225,13 +224,18 @@ public class ThrottleMediator extends AbstractMediator {
         if (throttle != null && !isResponse && canAccess) {
             canAccess = throttleByAccessRate(synCtx, axisMC, cc, traceOrDebugOn, traceOn);
         }
-        //replicate the current state
-        if (isClusteringEnable) {
+        // all the replication functionality of the access rate based throttling handles by itself 
+        // Just replicate the current state of ConcurrentAccessController
+        if (isClusteringEnable && concurrentAccessController != null) {
             if (cc != null) {
                 try {
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Going to replicates the  " +
+                            "states of the ConcurrentAccessController with key : " + key);
+                    }
                     Replicator.replicate(cc);
                 } catch (ClusteringFault clusteringFault) {
-                    handleException("Error during replicate states ", clusteringFault, synCtx);
+                    handleException("Error during the replicating  states ", clusteringFault, synCtx);
                 }
             }
         }
@@ -293,13 +297,13 @@ public class ThrottleMediator extends AbstractMediator {
                 available = concurrentAccessController.getAndDecrement();
                 canAcess = available > 0;
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Access " + (canAcess ? "allowed" : "denied") +
+                    traceOrDebug(traceOn, "Concurrency Throttle : Access " + (canAcess ? "allowed" : "denied") +
                         " :: " + available + " of available of " + concurrentLimit + " connections");
                 }
             } else {
                 available = concurrentAccessController.incrementAndGet();
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Connection returned" +
+                    traceOrDebug(traceOn, "Concurrency Throttle : Connection returned" +
                         " :: " + available + " of available of " + concurrentLimit + " connections");
                 }
             }
@@ -366,7 +370,10 @@ public class ThrottleMediator extends AbstractMediator {
                             //then it is possible to occur death situation.To avoid that reset,
                             //if the access has denied by rate based throttling
                             if (!canAccess && concurrentAccessController != null) {
-                                concurrentAccessController.set(concurrentAccessController.getLimit());
+                                concurrentAccessController.incrementAndGet();
+                                if (isClusteringEnable) {
+                                    cc.setProperty(key, concurrentAccessController);
+                                }
                             }
                         } catch (ThrottleException e) {
                             handleException("Error occurd during throttling", e, synCtx);
@@ -425,8 +432,10 @@ public class ThrottleMediator extends AbstractMediator {
                                 //then it is possible to occur death situation.To avoid that reset,
                                 //if the access has denied by rate based throttling
                                 if (!canAccess && concurrentAccessController != null) {
-                                    concurrentAccessController.set(
-                                                              concurrentAccessController.getLimit());
+                                    concurrentAccessController.incrementAndGet();
+                                    if (isClusteringEnable) {
+                                        cc.setProperty(key, concurrentAccessController);
+                                    }
                                 }
                             }
                         }

@@ -19,19 +19,24 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.*;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
-
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.net.URI;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
  * <proxyService name="string" [transports="(http |https |jms )+|all"]>
@@ -85,6 +90,15 @@ public class ProxyServiceSerializer {
             proxy.addAttribute(fac.createOMAttribute("transports", nullNS, transportStr));
         }
 
+        List pinnedServers = service.getPinnedServers();
+        if (pinnedServers != null && !pinnedServers.isEmpty()) {
+          String pinnedServersStr = "" + pinnedServers.get(0);
+          for (int i = 1; i < pinnedServers.size(); i++) {
+            pinnedServersStr = pinnedServersStr + " " + pinnedServers.get(i);
+          }
+          proxy.addAttribute(fac.createOMAttribute("pinnedServers", nullNS, pinnedServersStr));
+        }
+        
         if (service.isStartOnLoad()) {
             proxy.addAttribute(fac.createOMAttribute(
                     "startOnLoad", nullNS, "true"));

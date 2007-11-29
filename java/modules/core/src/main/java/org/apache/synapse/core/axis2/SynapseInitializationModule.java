@@ -104,10 +104,41 @@ public class SynapseInitializationModule implements Module {
             sandesha2.init(configurationContext, sandeshaAxisModule);
         }
 
+        // this server name given by system property SynapseServerName
+        // otherwise take host-name
+        // else assume localhost
+        String thisServerName = System.getProperty(SynapseConstants.SYNAPSE_SERVER_NAME);
+        if(thisServerName == null || thisServerName.equals("")) {
+          try {
+            InetAddress addr = InetAddress.getLocalHost();
+            thisServerName = addr.getHostName();
+
+          } catch (UnknownHostException e) {
+            log.warn("Could not get local host name", e);
+          }
+          
+          if(thisServerName == null || thisServerName.equals("")) {
+            thisServerName = "localhost";
+          }
+        }
+        log.info("Synapse server name : " + thisServerName);
+        
         log.info("Deploying Proxy services...");
         Iterator iter = synCfg.getProxyServices().iterator();
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
+
+            // start proxy service if,
+            // pinned server name list is empty
+            // else pinned server list has this server name
+            List pinnedServers = proxy.getPinnedServers();
+            if(pinnedServers != null && !pinnedServers.isEmpty()) {
+              if(!pinnedServers.contains(thisServerName)) {
+                log.info("Server name not in pinned servers list. Not deploying Proxy service : " + proxy.getName());
+                continue;
+              }
+            }
+            
             proxy.buildAxisService(synCfg, axisCfg);
             log.info("Deployed Proxy service : " + proxy.getName());
             if (!proxy.isStartOnLoad()) {

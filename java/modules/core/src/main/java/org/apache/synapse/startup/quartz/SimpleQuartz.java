@@ -19,7 +19,10 @@
 
 package org.apache.synapse.startup.quartz;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -29,6 +32,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.startup.AbstractStartup;
 import org.quartz.CronTrigger;
@@ -56,6 +60,7 @@ public class SimpleQuartz extends AbstractStartup {
     private int repeatCount = -1;
     private long repeatInterval;
     private String className;
+    private List pinnedServers;
     private Scheduler sch;
     Set xmlProperties = new HashSet();
 
@@ -76,6 +81,37 @@ public class SimpleQuartz extends AbstractStartup {
 
     public void init(SynapseEnvironment synapseEnvironment) {
 
+        // this server name given by system property SynapseServerName
+        // otherwise take host-name
+        // else assume localhost
+        String thisServerName = System.getProperty(SynapseConstants.SYNAPSE_SERVER_NAME);
+        if(thisServerName == null || thisServerName.equals("")) {
+          try {
+            InetAddress addr = InetAddress.getLocalHost();
+            thisServerName = addr.getHostName();
+  
+          } catch (UnknownHostException e) {
+            log.warn("Could not get local host name", e);
+          }
+          
+          if(thisServerName == null || thisServerName.equals("")) {
+            thisServerName = "localhost";
+          }
+        }
+        log.debug("Synapse server name : " + thisServerName);
+        
+        // start proxy service if either,
+        // pinned server name list is empty
+        // or pinned server list has this server name
+        List pinnedServers = getPinnedServers();
+        if(pinnedServers != null && !pinnedServers.isEmpty()) {
+          if(!pinnedServers.contains(thisServerName)) {
+            log.info("Server name not in pinned servers list. Not starting Task : " + getName());
+            return;
+          }
+        }
+      
+      
         try {
             DirectSchedulerFactory.getInstance().createVolatileScheduler(THREADPOOLSIZE);
             sch = DirectSchedulerFactory.getInstance().getScheduler();
@@ -162,6 +198,14 @@ public class SimpleQuartz extends AbstractStartup {
 
     public String getCron() {
         return cron;
+    }
+
+    public List getPinnedServers() {
+      return pinnedServers;
+    }
+
+    public void setPinnedServers(List pinnedServers) {
+      this.pinnedServers = pinnedServers;
     }
 
 }

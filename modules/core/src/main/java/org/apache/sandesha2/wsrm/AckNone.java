@@ -52,8 +52,7 @@ public class AckNone implements IOMRMElement {
 	public Object fromOMElement(OMElement nonePart) throws OMException {
 		if (nonePart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noNonePartInElement,
-					nonePart.toString()));
+					SandeshaMessageKeys.noNonePartInElement));
 
 		return this;
 	}

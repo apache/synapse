@@ -52,8 +52,7 @@ public class AckFinal implements IOMRMElement {
 		
 		if (finalPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noFinalPartInElement,
-					finalPart.toString()));
+					SandeshaMessageKeys.noFinalPartInElement));
 
 		return this;
 	}

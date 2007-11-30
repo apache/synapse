@@ -21,7 +21,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -39,8 +38,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.security.SecurityManager;
-import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -76,7 +73,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		// Processing the terminate message
 		// TODO Add terminate sequence message logic.
-		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg.getTerminateSequence();
+		TerminateSequence terminateSequence = terminateSeqRMMsg.getTerminateSequence();
 		if (terminateSequence == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTerminateSeqPart);
 			log.debug(message);
@@ -380,7 +377,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		getMsgContext().setOperationContext(opcontext);
 		getMsgContext().setAxisOperation(terminateOp);
 
-		TerminateSequence terminateSequencePart = (TerminateSequence) rmMsgCtx.getTerminateSequence();
+		TerminateSequence terminateSequencePart = rmMsgCtx.getTerminateSequence();
 		terminateSequencePart.getIdentifier().setIndentifer(getOutSequenceID());
 
 		rmMsgCtx.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(getRMVersion()));

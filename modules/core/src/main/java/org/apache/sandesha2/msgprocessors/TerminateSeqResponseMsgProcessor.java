@@ -52,8 +52,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
 		
-		TerminateSequenceResponse tsResponse = (TerminateSequenceResponse)
-		  terminateResRMMsg.getTerminateSequenceResponse();
+		TerminateSequenceResponse tsResponse = terminateResRMMsg.getTerminateSequenceResponse();
 		
 		String sequenceId = tsResponse.getIdentifier().getIdentifier();
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);

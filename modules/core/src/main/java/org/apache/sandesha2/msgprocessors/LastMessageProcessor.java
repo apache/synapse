@@ -62,7 +62,7 @@ public class LastMessageProcessor  implements MsgProcessor {
 		if (!Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgCtx.getRMSpecVersion()))
 			return;
 		
-		Sequence sequence = (Sequence) rmMsgCtx.getSequence();
+		Sequence sequence = rmMsgCtx.getSequence();
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		
 		ConfigurationContext configurationContext = rmMsgCtx.getConfigurationContext();

@@ -171,7 +171,7 @@ public class MsgInitializer {
 			sequenceID = terminateSequenceResponse.getIdentifier().getIdentifier();
 		} else if (sequence != null) {
 			
-			Sequence seq = (Sequence) rmMsgContext.getSequence();
+			Sequence seq = rmMsgContext.getSequence();
 			LastMessage lastMessage = seq.getLastMessage();
 			SOAPEnvelope envelope = rmMsgContext.getSOAPEnvelope();
 			

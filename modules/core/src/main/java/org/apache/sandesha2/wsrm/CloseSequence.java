@@ -142,8 +142,8 @@ public class CloseSequence implements IOMRMPart {
 	public boolean isLastMsgNumberRequired(String namespaceName){
 		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
 			return true;
-		else 
-			return false;		
+		 
+		return false;		
 	}
 	
 	public void setLastMessageNumber(LastMessageNumber number){

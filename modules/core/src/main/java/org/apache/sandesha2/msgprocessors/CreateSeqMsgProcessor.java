@@ -74,7 +74,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 		try {
 			
-			CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg.getCreateSequence();
+			CreateSequence createSeqPart = createSeqRMMsg.getCreateSequence();
 			if (createSeqPart == null) {
 				if (log.isDebugEnabled())
 					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts));
@@ -152,7 +152,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			// for making sure that this won't be processed again
 			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); 
 			
-			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.getCreateSequenceResponse();
+			CreateSequenceResponse createSeqResPart = createSeqResponse.getCreateSequenceResponse();
 	
 				// OFFER PROCESSING
 			SequenceOffer offer = createSeqPart.getSequenceOffer();

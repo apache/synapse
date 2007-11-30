@@ -152,8 +152,8 @@ public class TerminateSequence implements IOMRMPart {
 		
 		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
 			return true;
-		else
-			return false;		
+		
+		return false;		
 	}
 	
 }

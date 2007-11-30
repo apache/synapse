@@ -57,8 +57,7 @@ public class MessageNumber {
 	public Object fromOMElement(OMElement msgNumberPart) throws OMException {
 		if (msgNumberPart==null)
 			throw new OMException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noMessageNumberPartInElement,
-					msgNumberPart.toString()));
+					SandeshaMessageKeys.noMessageNumberPartInElement));
 		
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);

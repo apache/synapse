@@ -52,8 +52,7 @@ public class LastMessage implements IOMRMElement {
 	public Object fromOMElement(OMElement lastMessagePart) throws OMException {
 		if (lastMessagePart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noLastMessagePartInElement,
-					lastMessagePart.toString()));
+					SandeshaMessageKeys.noLastMessagePartInElement));
 
 		return this;
 	}

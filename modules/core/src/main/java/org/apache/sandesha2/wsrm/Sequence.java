@@ -65,8 +65,7 @@ public class Sequence implements IOMRMPart {
 
 		if (shb == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noSequencePartInElement,
-					shb.toString()));
+					SandeshaMessageKeys.noSequencePartInElement));
 		
 		OMElement identifierPart = null;
 		OMElement msgNumberPart = null;

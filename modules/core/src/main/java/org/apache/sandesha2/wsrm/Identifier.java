@@ -55,7 +55,7 @@ public class Identifier {
 		if (identifierPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidIdentifier,
-					identifierPart.toString()));
+					null));
 		
 		String identifierText = identifierPart.getText();
 		if (identifierText == null || identifierText == "")

@@ -21,8 +21,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -44,8 +42,6 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
-import org.apache.sandesha2.security.SecurityManager;
-import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -77,7 +73,7 @@ public class SequenceProcessor {
 			log.debug("Enter: SequenceProcessor::processSequenceHeader");
 		
 		InvocationResponse result = InvocationResponse.CONTINUE;
-		Sequence sequence = (Sequence) rmMsgCtx.getSequence();
+		Sequence sequence = rmMsgCtx.getSequence();
 		if(sequence != null) {
 			// This is a reliable message, so hand it on to the main routine
 			result = processReliableMessage(rmMsgCtx, transaction);
@@ -103,7 +99,7 @@ public class SequenceProcessor {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
-		Sequence sequence = (Sequence) rmMsgCtx.getSequence();
+		Sequence sequence = rmMsgCtx.getSequence();
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		boolean lastMessage = sequence.getLastMessage() != null;

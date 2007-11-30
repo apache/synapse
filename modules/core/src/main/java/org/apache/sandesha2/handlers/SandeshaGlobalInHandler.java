@@ -157,7 +157,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
     if (log.isDebugEnabled())
       log.debug("Enter: SandeshaGlobalInHandler::processApplicationMessage");
     // Check if this is a duplicate message
-    Sequence sequence = (Sequence) rmMsgCtx.getSequence();
+    Sequence sequence = rmMsgCtx.getSequence();
     String sequenceId = sequence.getIdentifier().getIdentifier();
     long msgNo = sequence.getMessageNumber().getMessageNumber();
 

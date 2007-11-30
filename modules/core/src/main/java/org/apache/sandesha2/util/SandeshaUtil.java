@@ -720,12 +720,12 @@ public class SandeshaUtil {
 		return propertyBean;
 	}
 
-	public static String getSequenceIDFromRMMessage(RMMsgContext rmMessageContext) throws SandeshaException {
+	public static String getSequenceIDFromRMMessage(RMMsgContext rmMessageContext) {
 		int messageType = rmMessageContext.getMessageType();
 
 		String sequenceID = null;
 		if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
-			Sequence sequence = (Sequence) rmMessageContext.getSequence();
+			Sequence sequence = rmMessageContext.getSequence();
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK) {
 			Iterator sequenceAckIter = rmMessageContext
@@ -747,12 +747,10 @@ public class SandeshaUtil {
 			AckRequested ackReq = (AckRequested) ackRequestIter.next();
 			sequenceID = ackReq.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
-			CloseSequence closeSequence = (CloseSequence) rmMessageContext
-					.getCloseSequence();
+			CloseSequence closeSequence = rmMessageContext.getCloseSequence();
 			sequenceID = closeSequence.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE) {
-			CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMessageContext
-					.getCloseSequenceResponse();;
+			CloseSequenceResponse closeSequenceResponse = rmMessageContext.getCloseSequenceResponse();;
 			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier();
 		}
 
@@ -930,8 +928,8 @@ public class SandeshaUtil {
 	public static boolean isWSRMAnonymous(String address) {
 		if (address!=null && address.startsWith(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX))
 			return true;
-		else 
-			return false;
+		 
+		return false;
 	}
 	 public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey, StorageManager manager) throws AxisFault {
 		if (log.isDebugEnabled())
@@ -1223,7 +1221,8 @@ public class SandeshaUtil {
 		if(localName.equals(Sandesha2Constants.RM_DUPLICATE_IN_ONLY_OPERATION.getLocalPart())){
 			return true;
 		}
-		else return false;
+		
+		return false;
 	}
 	
 	public static boolean isDuplicateInOutMessage(MessageContext msgContext)
@@ -1233,7 +1232,8 @@ public class SandeshaUtil {
 		if(localName.equals(Sandesha2Constants.RM_DUPLICATE_IN_OUT_OPERATION.getLocalPart())){
 			return true;
 		}
-		else return false;
+		
+		return false;
 	}	
 	 	  
 	public static final String getStackTraceFromException(Exception e) {

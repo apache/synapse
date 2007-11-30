@@ -383,7 +383,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					// terminate sending side if this is the WSRM 1.0 spec. 
 					// If the WSRM versoion is 1.1 termination will happen in the terminate sequence response message.
 					
-					TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getTerminateSequence();
+					TerminateSequence terminateSequence = rmMsgCtx.getTerminateSequence();
 					String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 	
 					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
@@ -446,7 +446,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		   messageType == Sandesha2Constants.MessageTypes.LAST_MESSAGE) {
 			
 			String namespace = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-			Sequence sequence = (Sequence) rmMsgContext.getSequence();
+			Sequence sequence = rmMsgContext.getSequence();
 			if(sequence == null) {
 				sequence = new Sequence(namespace);
 				
@@ -467,11 +467,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 			
 		} else if(messageType == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			TerminateSequence terminate = (TerminateSequence) rmMsgContext.getTerminateSequence();
+			TerminateSequence terminate = rmMsgContext.getTerminateSequence();
 			id = terminate.getIdentifier();
 
 		} else if(messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
-			CloseSequence close = (CloseSequence) rmMsgContext.getCloseSequence();
+			CloseSequence close = rmMsgContext.getCloseSequence();
 			id = close.getIdentifier();
 		
 		} else if(messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {

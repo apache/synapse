@@ -21,7 +21,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -36,8 +35,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.security.SecurityManager;
-import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMDBean;
@@ -65,7 +62,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			log.debug("Enter: CloseSequenceProcessor::processInMessage");
 
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
-		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getCloseSequence();
+		CloseSequence closeSequence = rmMsgCtx.getCloseSequence();
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
@@ -159,7 +156,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		
-		CloseSequence closeSequencePart = (CloseSequence) rmMsgCtx.getCloseSequence();
+		CloseSequence closeSequencePart = rmMsgCtx.getCloseSequence();
 		Identifier identifier = closeSequencePart.getIdentifier();
 		if (identifier==null) {
 			identifier = new Identifier (closeSequencePart.getNamespaceValue());

@@ -19,7 +19,10 @@
 
 package org.apache.synapse.startup.quartz;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 
@@ -85,6 +88,25 @@ public class SimpleQuartzFactory implements StartupFactory {
                 q.setJobClass(classname);
             } else {
                 handleException("Syntax error in the Task : no task class specified");
+            }
+            
+            // set pinned server list
+            OMAttribute pinnedServers = el.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "pinnedServers"));
+            if (pinnedServers != null) {
+                String pinnedServersValue = pinnedServers.getAttributeValue();
+                if (pinnedServersValue == null) {
+                    // default to all servers
+                } else {
+                    StringTokenizer st = new StringTokenizer(pinnedServersValue, " ,");
+                    List pinnedServersList = new ArrayList();
+                    while (st.hasMoreTokens()) {
+                        String token = st.nextToken();
+                        if (token.length() != 0) {
+                          pinnedServersList.add(token);
+                        }
+                    }
+                    q.setPinnedServers(pinnedServersList);
+                }
             }
 
             // next sort out the property children

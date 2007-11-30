@@ -19,6 +19,8 @@
 
 package org.apache.synapse.startup.quartz;
 
+import java.util.List;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -53,6 +55,15 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         task.addAttribute("name", sq.getName(), nullNS);
         task.addAttribute("class", sq.getJobClass(), nullNS);
 
+        List pinnedServers = sq.getPinnedServers();
+        if (pinnedServers != null && !pinnedServers.isEmpty()) {
+          String pinnedServersStr = "" + pinnedServers.get(0);
+          for (int i = 1; i < pinnedServers.size(); i++) {
+            pinnedServersStr = pinnedServersStr + " " + pinnedServers.get(i);
+          }
+          task.addAttribute(fac.createOMAttribute("pinnedServers", nullNS, pinnedServersStr));
+        }
+        
         OMElement el = fac.createOMElement("trigger", synNS, task);
         if (sq.getInterval() == 1 && sq.getCount() == 1) {
             el.addAttribute("once", "true", nullNS);

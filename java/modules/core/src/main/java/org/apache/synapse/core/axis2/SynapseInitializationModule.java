@@ -104,9 +104,9 @@ public class SynapseInitializationModule implements Module {
             sandesha2.init(configurationContext, sandeshaAxisModule);
         }
 
-        // this server name given by system property SynapseServerName
+        // this server name is given by system property SynapseServerName
         // otherwise take host-name
-        // else assume localhost
+        // if nothing found assume localhost
         String thisServerName = System.getProperty(SynapseConstants.SYNAPSE_SERVER_NAME);
         if(thisServerName == null || thisServerName.equals("")) {
           try {
@@ -128,9 +128,9 @@ public class SynapseInitializationModule implements Module {
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
 
-            // start proxy service if,
+            // start proxy service if either,
             // pinned server name list is empty
-            // else pinned server list has this server name
+            // or pinned server list has this server name
             List pinnedServers = proxy.getPinnedServers();
             if(pinnedServers != null && !pinnedServers.isEmpty()) {
               if(!pinnedServers.contains(thisServerName)) {

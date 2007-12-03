@@ -19,14 +19,16 @@
 
 package org.apache.synapse.mediators.ext;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.*;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-
-import java.util.*;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.Command;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
  * This mediator will use the specified command object and execute the command after setting
@@ -150,7 +152,7 @@ public class POJOCommandMediator extends AbstractMediator {
      * @param obj POJO instance
      * @param synCtx current message
      */
-    private void setInstanceProperty(String name, String value, Object obj, MessageContext synCtx) {
+    protected void setInstanceProperty(String name, String value, Object obj, MessageContext synCtx) {
 
         String mName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
         Method method = null;

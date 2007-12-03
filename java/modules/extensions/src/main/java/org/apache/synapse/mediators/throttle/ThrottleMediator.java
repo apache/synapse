@@ -322,10 +322,10 @@ public class ThrottleMediator extends AbstractMediator {
      */
     private boolean throttleByAccessRate(MessageContext synCtx, org.apache.axis2.context.MessageContext axisMC, ConfigurationContext cc, boolean traceOrDebugOn, boolean traceOn) {
 
-        Object callerId = null;
+        String callerId = null;
         boolean canAccess = true;
         //remote ip of the caller
-        Object remoteIP = axisMC.getPropertyNonReplicable(
+        String remoteIP = (String) axisMC.getPropertyNonReplicable(
             org.apache.axis2.context.MessageContext.REMOTE_ADDR);
         //domain name of the caller
         String domainName = (String) axisMC.getPropertyNonReplicable(NhttpConstants.REMOTE_HOST);
@@ -527,6 +527,6 @@ public class ThrottleMediator extends AbstractMediator {
 
     public void setId(String id) {
         this.id = id;
-        this.key = ThrottleConstants.THROTTLE_PROPERTY_PREFIX + id + ThrottleConstants.CAC_KEY;
+        this.key = ThrottleConstants.THROTTLE_PROPERTY_PREFIX + id + ThrottleConstants.CAC_SUFFIX;
     }
 }

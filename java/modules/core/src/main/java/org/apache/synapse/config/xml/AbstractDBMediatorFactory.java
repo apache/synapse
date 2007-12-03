@@ -105,7 +105,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         // get the 'pool' element and determine if we need to create a DataSource or
         // look up using JNDI
         try {
-            AXIOMXPath xpath = new AXIOMXPath("//syn:connection/syn:pool");
+            AXIOMXPath xpath = new AXIOMXPath("self::node()/syn:connection/syn:pool");
             xpath.addNamespace("syn", XMLConfigConstants.SYNAPSE_NAMESPACE);
             pool = (OMElement) xpath.selectSingleNode(elem);
 

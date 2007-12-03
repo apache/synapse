@@ -229,7 +229,7 @@ public class ThrottleMediatorTest extends TestCase {
 
             }
             //IP based throttling
-            Object remoteIP = synContext.getProperty(REMOTE_ADDR);
+            String remoteIP = (String)synContext.getProperty(REMOTE_ADDR);
             if (remoteIP == null) {
                 throw new ThrottleException("IP address of the caller can not find - Currently only support caller-IP base access control" +
                         "- Thottling will not happen ");

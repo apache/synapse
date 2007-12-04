@@ -854,19 +854,15 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
+                    <artifactId>axis2-kernel</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.neethi</groupId>
-                    <artifactId>neethi</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                    <artifactId>axiom-impl</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>ant</groupId>
-                    <artifactId>ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ant</groupId>
-                    <artifactId>ant-nodeps</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                    <artifactId>axiom-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

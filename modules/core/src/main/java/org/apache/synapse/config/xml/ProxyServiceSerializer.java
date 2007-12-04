@@ -39,7 +39,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
- * <proxyService name="string" [transports="(http |https |jms )+|all"]>
+ * <proxy name="string" [transports="(http |https |jms )+|all"]>
  *    <description>..</description>?
  *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
@@ -56,7 +56,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  *    <parameter name="string">
  *       text | xml
  *    </parameter>?
- * </proxyService>
+ * </proxy>
  */
 public class ProxyServiceSerializer {
 

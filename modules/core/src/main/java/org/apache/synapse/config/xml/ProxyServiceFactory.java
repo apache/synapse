@@ -41,7 +41,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 /**
  * Creates a ProxyService instance using the XML fragment specification
  * <p/>
- * <proxy-service name="string" [transports="(http |https |jms )+|all"] [pinnedServers="(serverName)+"] [trace="enable|disable"]>
+ * <proxy name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
  *    <description>..</description>?
  *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
@@ -60,7 +60,7 @@ import org.apache.synapse.core.axis2.ProxyService;
  *    <parameter name="string">
  *       text | xml
  *    </parameter>?
- * </proxy-service>
+ * </proxy>
  */
 public class ProxyServiceFactory {
 
@@ -107,7 +107,7 @@ public class ProxyServiceFactory {
                 proxy.setTransports(transportList);
             }
         }
-        
+
         OMAttribute pinnedServers = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "pinnedServers"));
         if (pinnedServers != null) {
             String pinnedServersValue = pinnedServers.getAttributeValue();

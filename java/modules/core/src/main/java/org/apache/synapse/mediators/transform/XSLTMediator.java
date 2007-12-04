@@ -21,31 +21,32 @@ package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.FixedByteArrayOutputStream;
-import org.apache.synapse.util.TextFileDataSource;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.util.FixedByteArrayOutputStream;
+import org.apache.synapse.util.TextFileDataSource;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.activation.FileDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -55,13 +56,9 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.namespace.QName;
-import javax.activation.FileDataSource;
-import javax.activation.DataHandler;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * The XSLT mediator performs an XSLT transformation requested, using

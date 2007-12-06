@@ -47,7 +47,7 @@ public class CloneMediator extends AbstractMediator {
     /**
      * Holds the list of targets to which cloned copies of the message will be given for mediation
      */
-    private List targets = new ArrayList();
+    private List<Target> targets = new ArrayList<Target>();
 
     /**
      * This will implement the mediate method of the Mediator interface and will provide the
@@ -97,7 +97,7 @@ public class CloneMediator extends AbstractMediator {
         OperationContext opCtx
             = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getOperationContext();
         if (!continueParent && opCtx != null) {
-            opCtx.setProperty(Constants.RESPONSE_WRITTEN,"SKIP");
+            opCtx.setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
         }
 
         // if continue parent is true mediators after the clone will be called for the further
@@ -114,7 +114,7 @@ public class CloneMediator extends AbstractMediator {
      * @return MessageContext which is cloned from the given parameters
      */
     private MessageContext getClonedMessageContext(MessageContext synCtx, int messageSequence,
-        int messageCount) {
+                                                   int messageCount) {
 
         MessageContext newCtx = null;
         try {
@@ -125,8 +125,9 @@ public class CloneMediator extends AbstractMediator {
         }
 
         // Sets the property MESSAGE_SEQUENCE to the MC for aggragation purposes 
-        newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
-            String.valueOf(messageSequence) + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + messageCount);
+        assert newCtx != null;
+        newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE, String.valueOf(messageSequence)
+            + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + messageCount);
 
         return newCtx;
     }
@@ -143,11 +144,11 @@ public class CloneMediator extends AbstractMediator {
         this.continueParent = continueParent;
     }
 
-    public List getTargets() {
+    public List<Target> getTargets() {
         return targets;
     }
 
-    public void setTargets(List targets) {
+    public void setTargets(List<Target> targets) {
         this.targets = targets;
     }
 

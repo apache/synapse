@@ -75,9 +75,9 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
         }
 
         // then set the static/constant properties first
-        for (Iterator iter = getStaticProps().keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = getStaticSetterProperties().keySet().iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
-            setInstanceProperty(name, (String) getStaticProps().get(name), commandObject, synCtx);
+            setInstanceProperty(name, (String) getStaticSetterProperties().get(name), commandObject, synCtx);
         }
         
         

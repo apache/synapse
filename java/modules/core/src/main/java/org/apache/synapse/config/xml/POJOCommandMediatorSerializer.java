@@ -21,12 +21,9 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
 
-import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
@@ -61,23 +58,47 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Invalid POJO Command mediator. The command class name is required");
         }
 
-        for (Iterator itr = mediator.getStaticProps().keySet().iterator(); itr.hasNext(); ) {
+        for (Iterator itr = mediator.getStaticSetterProperties().keySet().iterator(); itr.hasNext(); ) {
             String propName = (String) itr.next();
-            String value = (String) mediator.getStaticProps().get(propName);
+            String value = (String) mediator.getStaticSetterProperties().get(propName);
             OMElement prop = fac.createOMElement(PROP_Q);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
             prop.addAttribute(fac.createOMAttribute("value", nullNS, value));
+            prop.addAttribute(fac.createOMAttribute("action", nullNS, "set"));
             pojoCommand.addChild(prop);
         }
 
-        for (Iterator itr = mediator.getDynamicProps().keySet().iterator(); itr.hasNext(); ) {
+        for (Iterator itr = mediator.getDynamicSetterProperties().keySet().iterator(); itr.hasNext(); ) {
             String propName = (String) itr.next();
-            AXIOMXPath exprn = (AXIOMXPath) mediator.getDynamicProps().get(propName);
+            AXIOMXPath exprn = (AXIOMXPath) mediator.getDynamicSetterProperties().get(propName);
             OMElement prop = fac.createOMElement(PROP_Q);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
             prop.addAttribute(fac.createOMAttribute("expression", nullNS,
                 exprn.toString()));
             serializeNamespaces(prop, exprn);
+            prop.addAttribute(fac.createOMAttribute("action", nullNS, "set"));
+            pojoCommand.addChild(prop);
+        }
+
+        for (Iterator itr = mediator.getContextGetterProperties().keySet().iterator(); itr.hasNext(); ) {
+            String propName = (String) itr.next();
+            String value = (String) mediator.getContextGetterProperties().get(propName);
+            OMElement prop = fac.createOMElement(PROP_Q);
+            prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
+            prop.addAttribute(fac.createOMAttribute("value", nullNS, value));
+            prop.addAttribute(fac.createOMAttribute("action", nullNS, "get"));
+            pojoCommand.addChild(prop);
+        }
+
+        for (Iterator itr = mediator.getMessageGetterProperties().keySet().iterator(); itr.hasNext(); ) {
+            String propName = (String) itr.next();
+            AXIOMXPath exprn = (AXIOMXPath) mediator.getMessageGetterProperties().get(propName);
+            OMElement prop = fac.createOMElement(PROP_Q);
+            prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
+            prop.addAttribute(fac.createOMAttribute("expression", nullNS,
+                exprn.toString()));
+            serializeNamespaces(prop, exprn);
+            prop.addAttribute(fac.createOMAttribute("action", nullNS, "get"));
             pojoCommand.addChild(prop);
         }
 

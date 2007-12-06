@@ -179,14 +179,11 @@ public class MessageHelper {
         for (Object o1 : ori.getProperties().keySet()) {
             String key = (String) o1;
             if (key != null) {
-                //In clustered environment, all the properties related to the throttle ,
-                //will be replicated explicitly  by throttling Mediator ,
-                //therefore It should avoid any implicitly replication from any other component 
-                if (key.startsWith(ThrottleConstants.THROTTLE_PROPERTY_PREFIX)) {
-                    newMC.setNonReplicableProperty(key, ori.getPropertyNonReplicable(key));
-                } else {
-                    newMC.setProperty(key, ori.getProperty(key));
-                }
+                //In clustered environment, all the properties that are need to be relpicated,
+                //will be replicated explicitly  by the corresponding  Mediators
+                //(Ex: throttle,cache),therefore It should avoid any implicitly replication from
+                //any other component.
+                newMC.setNonReplicableProperty(key, ori.getPropertyNonReplicable(key));
             }
         }
 

@@ -70,8 +70,10 @@ public class GenericJMSClient {
     private void sendBytesMessage(String destName, byte[] payload) throws Exception {
         InitialContext ic = getInitialContext();
         ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = JMSUtils.createConnection(confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
-        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
+        Connection connection = JMSUtils.createConnection(
+            confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
+        Session session = JMSUtils.createSession(
+            connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
 
         BytesMessage bm = session.createBytesMessage();
         bm.writeBytes(payload);
@@ -82,8 +84,10 @@ public class GenericJMSClient {
     private void sendTextMessage(String destName, String payload) throws Exception {
         InitialContext ic = getInitialContext();
         ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = JMSUtils.createConnection(confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
-        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
+        Connection connection = JMSUtils.createConnection(
+            confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
+        Session session = JMSUtils.createSession(
+            connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
 
         TextMessage tm = session.createTextMessage(payload);
         JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName), tm);
@@ -96,7 +100,8 @@ public class GenericJMSClient {
             env.put("java.naming.provider.url", "tcp://localhost:61616");
         }
         if (System.getProperty("java.naming.factory.initial") == null) {
-            env.put("java.naming.factory.initial", "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+            env.put("java.naming.factory.initial",
+                "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         }
         return new InitialContext(env);
     }

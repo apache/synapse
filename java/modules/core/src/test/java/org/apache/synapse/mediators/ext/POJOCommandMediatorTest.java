@@ -19,10 +19,13 @@
 
 package org.apache.synapse.mediators.ext;
 
-import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.mediators.AbstractMediatorTestCase;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMAbstractFactory;
 
 /**
  * Tests the pojo command mediator instantiation and setting of literal and
@@ -78,6 +81,35 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         POJOCommandTestHelper.reset();
         pcm.mediate(new TestMessageContext());
         assertEquals("Test Property", POJOCommandTestHelper.getInstance().getChangedProperty());
+        assertTrue(POJOCommandTestHelper.getInstance().isExecuted());
+    }
+
+    public void testPojoWithContextPropertiesCommandImpl() throws Exception {
+        Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
+                "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
+                        "xmlns='http://ws.apache.org/ns/synapse'><property name=\"testProp\" " +
+                        "value=\"Test Property\"/><property name=\"testProp\" value=\"testPropInMC\" action=\"get\"/></pojoCommand>"));
+        POJOCommandTestHelper.reset();
+        MessageContext ctx = new TestMessageContext();
+        pcm.mediate(ctx);
+        assertEquals("Test Property", POJOCommandTestHelper.getInstance().getChangedProperty());
+        assertEquals("Test Property", ctx.getProperty("testPropInMC"));
+        assertTrue(POJOCommandTestHelper.getInstance().isExecuted());
+    }
+
+    public void testPojoWithMessagePropertiesCommandImpl() throws Exception {
+        Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
+                "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
+                        "xmlns='http://ws.apache.org/ns/synapse'><property name=\"testProp\" " +
+                        "value=\"TestProperty\"/><property name=\"testProp\" expression=\"//testNode\" action=\"get\"/></pojoCommand>"));
+        POJOCommandTestHelper.reset();
+        MessageContext ctx = new TestMessageContext();
+        SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        envelope.getBody().addChild(createOMElement("<original><testNode/></original>"));
+        ctx.setEnvelope(envelope);
+        pcm.mediate(ctx);
+        assertEquals("TestProperty", POJOCommandTestHelper.getInstance().getChangedProperty());
+        assertEquals("<original>TestProperty</original>", ctx.getEnvelope().getBody().getFirstOMChild().toString());
         assertTrue(POJOCommandTestHelper.getInstance().isExecuted());
     }
 }

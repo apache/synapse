@@ -89,14 +89,14 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
                             xpath = new AXIOMXPath(
                                 child.getAttribute(ATT_EXPRN).getAttributeValue());
                             OMElementUtils.addNameSpaces(xpath, child, log);
-                            pojoMediator.addDynamicProperty(propName, xpath);
+                            pojoMediator.addDynamicSetterProperty(propName, xpath);
                         } catch (JaxenException e) {
                             handleException("Error instantiating XPath expression : " +
                                 child.getAttribute(ATT_EXPRN), e);
                         }
                     } else {
                         if (child.getAttribute(ATT_VALUE) != null) {
-                            pojoMediator.addStaticProperty(propName,
+                            pojoMediator.addStaticSetterProperty(propName,
                                 child.getAttribute(ATT_VALUE).getAttributeValue());
                         } else {
                             handleException("A POJO mediator property must specify either " +

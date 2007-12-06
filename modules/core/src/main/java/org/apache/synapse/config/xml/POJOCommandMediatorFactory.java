@@ -37,17 +37,19 @@ import java.util.Iterator;
  * <p/>
  * <pre>
  * &lt;pojoCommand name=&quot;class-name&quot;&gt;
- *   &lt;property name=&quot;string&quot; value=&quot;literal&quot;&gt;
+ *   &lt;property name=&quot;string&quot; value=&quot;literal&quot;
+ *                action=(&quot;get&quot; | &quot;set&quot;)&gt;
  *      either literal or XML child
  *   &lt;/property&gt;
- *   &lt;property name=&quot;string&quot; expression=&quot;XPATH expression&quot;/&gt;
+ *   &lt;property name=&quot;string&quot; expression=&quot;XPATH expression&quot;
+ *                action=(&quot;get&quot; | &quot;set&quot;)/&gt;
  * &lt;/pojoCommand&gt;
  * </pre>
  */
 public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName POJO_COMMAND_Q =
-        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
+    private static final QName POJO_COMMAND_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
+    protected static final QName ATT_ACTION   = new QName("action");    
 
     public Mediator createMediator(OMElement elem) {
 
@@ -84,22 +86,55 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
                 } else {
                     if (child.getAttribute(ATT_EXPRN) != null) {
                         AXIOMXPath xpath = null;
+
                         try {
-                            xpath = new AXIOMXPath(
-                                child.getAttribute(ATT_EXPRN).getAttributeValue());
+                            xpath = new AXIOMXPath(child.getAttribute(ATT_EXPRN).getAttributeValue());
                             OMElementUtils.addNameSpaces(xpath, child, log);
-                            pojoMediator.addDynamicProperty(propName, xpath);
+
+                            if (child.getAttribute(ATT_ACTION) != null) {
+                                
+                                String action = child.getAttribute(ATT_ACTION).getAttributeValue();
+                                if ("get".equals(action)) {
+                                    pojoMediator.addMessageGetterProperty(propName, xpath);
+                                } else if ("set".equals(action)) {
+                                    pojoMediator.addDynamicSetterProperty(propName, xpath);
+                                } else {
+                                    // if there is an action attribute and the value is not neigther get nor set
+                                    handleException("Property action for the " +
+                                            "POJOCommand mediator should be eigther 'get' or 'set'");
+                                }
+                            } else {
+                                // if no action is provided take it as a setter propperty
+                                pojoMediator.addDynamicSetterProperty(propName, xpath);
+                            }
+                            
                         } catch (JaxenException e) {
                             handleException("Error instantiating XPath expression : " +
                                 child.getAttribute(ATT_EXPRN), e);
                         }
                     } else {
                         if (child.getAttribute(ATT_VALUE) != null) {
-                            pojoMediator.addStaticProperty(propName,
-                                child.getAttribute(ATT_VALUE).getAttributeValue());
+
+                            String value = child.getAttribute(ATT_VALUE).getAttributeValue();
+                            if (child.getAttribute(ATT_ACTION) != null) {
+
+                                String action = child.getAttribute(ATT_ACTION).getAttributeValue();
+                                if ("get".equals(action)) {
+                                    pojoMediator.addContextGetterProperty(propName, value);
+                                } else if ("set".equals(action)) {
+                                    pojoMediator.addStaticSetterProperty(propName, value);
+                                } else {
+                                    // if there is an action attribute and the value is not neigther get nor set
+                                    handleException("Property action for the " +
+                                            "POJOCommand mediator should be eigther 'get' or 'set'");
+                                }
+                            } else {
+                                // if no action is provided take it as a setter propperty
+                                pojoMediator.addStaticSetterProperty(propName, value);
+                            }
                         } else {
                             handleException("A POJO mediator property must specify either " +
-                                "name and expression attributes, or name and value attributes");
+                                    "name and expression attributes, or name and value attributes");
                         }
                     }
                 }

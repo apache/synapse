@@ -50,7 +50,7 @@ public class POJOCommandMediatorSerializationTest extends AbstractTestCase {
     public void testPOJOCommandNotImplementedMediatorWithPropertySerialization() throws Exception {
         String inputXml = "<pojoCommand xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "name=\"org.apache.synapse.mediators.ext.POJOCommandTestMediator\">" +
-                "<property name=\"testProp\" expression=\"fn:concat('XPATH ', 'FUNC')\"/></pojoCommand>";
+                "<property name=\"testProp\" expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"set\"/></pojoCommand>";
         assertTrue(serialization(inputXml, pojoCommandMediatorFactory, pojoCommandMediatorSerializer));
         assertTrue(serialization(inputXml, pojoCommandMediatorSerializer));
     }
@@ -58,7 +58,7 @@ public class POJOCommandMediatorSerializationTest extends AbstractTestCase {
     public void testPOJOCommandMediatorImplementedWithPropertySerialization() throws Exception {
         String inputXml = "<pojoCommand xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "name=\"org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator\">" +
-                "<property name=\"testProp\" expression=\"fn:concat('XPATH ', 'FUNC')\"/></pojoCommand>";
+                "<property name=\"testProp\" expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"set\"/></pojoCommand>";
         assertTrue(serialization(inputXml, pojoCommandMediatorFactory, pojoCommandMediatorSerializer));
         assertTrue(serialization(inputXml, pojoCommandMediatorSerializer));
     }
@@ -66,7 +66,23 @@ public class POJOCommandMediatorSerializationTest extends AbstractTestCase {
     public void testPOJOCommandMediatorWithStaticPropertySerialization() throws Exception {
         String inputXml = "<pojoCommand xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "name=\"org.apache.synapse.mediators.ext.POJOCommandTestMediator\">" +
-                "<property name=\"testProp\" value=\"Test Property\"/></pojoCommand>";
+                "<property name=\"testProp\" value=\"Test Property\" action=\"set\"/></pojoCommand>";
+        assertTrue(serialization(inputXml, pojoCommandMediatorFactory, pojoCommandMediatorSerializer));
+        assertTrue(serialization(inputXml, pojoCommandMediatorSerializer));
+    }
+
+    public void testPOJOCommandMediatorWithMessagePropertySerialization() throws Exception {
+        String inputXml = "<pojoCommand xmlns=\"http://ws.apache.org/ns/synapse\" " +
+                "name=\"org.apache.synapse.mediators.ext.POJOCommandTestMediator\">" +
+                "<property name=\"testProp\" expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"get\"/></pojoCommand>";
+        assertTrue(serialization(inputXml, pojoCommandMediatorFactory, pojoCommandMediatorSerializer));
+        assertTrue(serialization(inputXml, pojoCommandMediatorSerializer));
+    }
+
+    public void testPOJOCommandMediatorWithContextPropertySerialization() throws Exception {
+        String inputXml = "<pojoCommand xmlns=\"http://ws.apache.org/ns/synapse\" " +
+                "name=\"org.apache.synapse.mediators.ext.POJOCommandTestMediator\">" +
+                "<property name=\"testProp\" value=\"Test Property\" action=\"get\"/></pojoCommand>";
         assertTrue(serialization(inputXml, pojoCommandMediatorFactory, pojoCommandMediatorSerializer));
         assertTrue(serialization(inputXml, pojoCommandMediatorSerializer));
     }

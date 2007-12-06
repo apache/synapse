@@ -49,6 +49,8 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     private JMSConnectionFactory jmsConnectionFactory = null;
     /** the Destination queue or topic for the outgoing message */
     private Destination destination = null;
+    /** the Destination queue or topic for the outgoing message i.e. JMSConstants.DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC */
+    private String destinationType = null;
     /** the EPR properties when the out-transport info is generated from a target EPR */
     private Hashtable properties = null;
     /** the target EPR string where applicable */
@@ -88,6 +90,8 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             handleException("Invalid prefix for a JMS EPR : " + targetEPR);
         } else {
             properties = JMSUtils.getProperties(targetEPR);
+            String destinationType = (String) properties.get(JMSConstants.DEST_PARAM_TYPE);
+            setDestinationType(destinationType);
         }
     }
 
@@ -203,4 +207,13 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     public String getTargetEPR() {
         return targetEPR;
     }
+
+    public String getDestinationType() {
+      return destinationType;
+    }
+
+    public void setDestinationType(String destinationType) {
+      this.destinationType = destinationType;
+    }
+    
 }

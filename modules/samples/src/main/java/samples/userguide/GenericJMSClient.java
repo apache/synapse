@@ -19,6 +19,7 @@
 
 package samples.userguide;
 
+import org.apache.synapse.transport.jms.JMSConstants;
 import org.apache.synapse.transport.jms.JMSUtils;
 
 import javax.jms.*;
@@ -69,8 +70,8 @@ public class GenericJMSClient {
     private void sendBytesMessage(String destName, byte[] payload) throws Exception {
         InitialContext ic = getInitialContext();
         ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = JMSUtils.createConnection(confac, null, null);
-        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE);
+        Connection connection = JMSUtils.createConnection(confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
+        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
 
         BytesMessage bm = session.createBytesMessage();
         bm.writeBytes(payload);
@@ -81,8 +82,8 @@ public class GenericJMSClient {
     private void sendTextMessage(String destName, String payload) throws Exception {
         InitialContext ic = getInitialContext();
         ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = JMSUtils.createConnection(confac, null, null);
-        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE);
+        Connection connection = JMSUtils.createConnection(confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
+        Session session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
 
         TextMessage tm = session.createTextMessage(payload);
         JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName), tm);

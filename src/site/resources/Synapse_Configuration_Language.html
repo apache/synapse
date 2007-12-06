@@ -418,7 +418,7 @@ as there is at least one active endpoint among the listed endpoints.</p>
 <h2><a name="proxy">Proxy service</a></h2>
 
 <p>A &lt;proxy&gt; element is used to define a Synapse Proxy service.</p>
-<pre> &lt;proxy name="string" [transports="(http |https |jms )+|all"]&gt;
+<pre> &lt;proxy name="string" [transports="(http |https |jms )+|all"] [pinnedServers="(serverName)+"]&gt;
    &lt;description&gt;...&lt;/description&gt;?
    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
       &lt;inSequence&gt;...&lt;/inSequence&gt;?
@@ -443,15 +443,28 @@ the underlying Axis2 instance, exposing service EPR's as per the standard
 Axis2 conventions - based on the service name. (Note: that currently Axis2
 does not allow custom URI's to be set for services on some transports.) The
 Proxy service could be exposed over all enabled Axis2 transports such as
-http, https, JMS etc. or on a subset of these. Each service could define the
-target for received messages as a named sequence or a direct endpoint. Target
-inSequence or endpoint is required for the proxy configuration, and a target
-outSequence defines how responses should be handled. Any supplied WS-Policies
-would apply as service level policies, and any service parameters could be
-passed into the proxy services' AxisService instance using the parameter
-elements (e.g. the JMS destination etc). If the proxy service should enable
-WS-Reliable Messaging or Security, the appropriate modules could be engaged,
-and specified policies will apply.</p>
+http, https, JMS etc. or on a subset of these. </p>
+
+<p>You can give a list of synapse server names where this proxy service
+should be deployed using pinnedServers attribute.  It takes the server names
+separated by comma or space character. If there is no pinned server list then
+proxy service will start in all server instances.  If a pinned server names
+list is given it will only start in the given named Synapse server instances.
+The Synapse server name is taken as follows. First it looks for the system
+property SynapseServerName.  If it is not found it will take the hostname of
+the machine. Otherwise it will default to name 'localhost'. You can give a
+name to the starting Synapse server instance using ./synapse.sh
+-DSynapseServerName=&lt;ServerName&gt;</p>
+
+<p>Each service could define the target for received messages as a named
+sequence or a direct endpoint. Target inSequence or endpoint is required for
+the proxy configuration, and a target outSequence defines how responses
+should be handled. Any supplied WS-Policies would apply as service level
+policies, and any service parameters could be passed into the proxy services'
+AxisService instance using the parameter elements (e.g. the JMS destination
+etc). If the proxy service should enable WS-Reliable Messaging or Security,
+the appropriate modules could be engaged, and specified policies will
+apply.</p>
 
 <p>A Dynamic Proxy may be defined by specifying the properties of the proxy
 as dynamic entries by refering them with the key. (For example one could
@@ -606,7 +619,7 @@ key="string"/&gt; is wrong)</p>
 <h2><a name="task">Tasks</a></h2>
 
 <p>A &lt;task&gt; element is used to define a Synapse Startup Task.</p>
-<pre> &lt;task class="org.my.synapse.Task" name="string"&gt;
+<pre> &lt;task class="org.my.synapse.Task" name="string" [pinnedServers="(serverName)+"]&gt;
    &lt;property name="stringProp" value="String"/&gt;
    &lt;property name="xmlProp"&gt;
      &lt;somexml&gt;config&lt;/somexml&gt;
@@ -618,12 +631,13 @@ key="string"/&gt; is wrong)</p>
 as specified by the cron expression. The Task class specifies the actual task
 implementation class (which must implement org.apache.synapse.startup.Task
 interface) to be executed at the specified interval/s, and name specifies an
-identifier for the scheduled task. Fields in the task class can be set using
-properties provided as string literals or as XML fragments. (For example; if
-the task implementation class has a field named "version" with a
-corresponding setter method, the configuration value which will be assigned
-to this field before running the task can be specified using a property with
-the name version)</p>
+identifier for the scheduled task. </p>
+
+<p>Fields in the task class can be set using properties provided as string
+literals or as XML fragments. (For example; if the task implementation class
+has a field named "version" with a corresponding setter method, the
+configuration value which will be assigned to this field before running the
+task can be specified using a property with the name version)</p>
 
 <p>There are three different trigger mechanisms to schedule tasks. A simple
 trigger is specified specifying a 'count' and an 'interval', implying that
@@ -633,7 +647,16 @@ trigger is specified using the 'once' attribute as true in the definition and
 could be specified as true in which case this task will be executed only once
 just after the initialization of Synapse</p>
 
-<p></p>
+<p>You can give a list of synapse server names where this task should be
+started using pinnedServers attribute.  It takes the server names separated
+by comma or space character. If there is no pinned server list then task will
+start in all server instances.  If a pinned server names list is given it
+will only start in the given named Synapse server instances. The Synapse
+server name is taken as follows. First it looks for the system property
+SynapseServerName.  If it is not found it will take the hostname of the
+machine. Otherwise it will default to name 'localhost'. You can give a name
+to the starting Synapse server instance using ./synapse.sh
+-DSynapseServerName=&lt;ServerName&gt;</p>
 
 <h2><a name="mediator">Mediators</a></h2>
 

@@ -82,6 +82,8 @@ public class JMSConnectionFactory {
     private String connFactoryJNDIName = null;
     /** Map of destination JNDI names to service names */
     private Map serviceJNDINameMapping = null;
+    /** Map of destination JNDI names to destination types*/
+    private Map destinationTypeMapping = null;
     /** Map of JMS destination names to service names */
     private Map serviceDestinationNameMapping = null;
     /** JMS Sessions currently active. One session for each Destination / Service */
@@ -92,6 +94,8 @@ public class JMSConnectionFactory {
     private Context context = null;
     /** The actual ConnectionFactory instance held within */
     private ConnectionFactory conFactory = null;
+    /** The JMS connection factory type */
+    private String connectionFactoryType = null;
     /** The JMS Connection opened */
     private Connection connection = null;
     /** The JMS Message receiver for this connection factory */
@@ -111,6 +115,7 @@ public class JMSConnectionFactory {
         this.name = name;
         this.cfgCtx = cfgCtx;
         serviceJNDINameMapping = new HashMap();
+        destinationTypeMapping = new HashMap();
         serviceDestinationNameMapping = new HashMap();
         jndiProperties = new Hashtable();
         jmsSessions = new HashMap();
@@ -123,7 +128,7 @@ public class JMSConnectionFactory {
      * @param destinationJNDIName destination JNDI name
      * @param serviceName     the service to which it belongs
      */
-    public void addDestination(String destinationJNDIName, String serviceName) {
+    public void addDestination(String destinationJNDIName, String destinationType, String serviceName) {
 
         String destinationName = getPhysicalDestinationName(destinationJNDIName);
 
@@ -133,7 +138,7 @@ public class JMSConnectionFactory {
             try {
                 log.info("Creating a JMS Queue with the JNDI name : " + destinationJNDIName +
                     " using the connection factory definition named : " + name);
-                JMSUtils.createDestination(conFactory, destinationJNDIName);
+                JMSUtils.createDestination(conFactory, destinationJNDIName, destinationType);
 
                 destinationName = getPhysicalDestinationName(destinationJNDIName);
                 
@@ -148,6 +153,7 @@ public class JMSConnectionFactory {
         }
 
         serviceJNDINameMapping.put(destinationJNDIName, serviceName);
+        destinationTypeMapping.put(destinationJNDIName, destinationType);
         serviceDestinationNameMapping.put(destinationName, serviceName);
 
         log.info("Mapped JNDI name : " + destinationJNDIName + " and JMS Destination name : " +
@@ -211,12 +217,15 @@ public class JMSConnectionFactory {
         log.info("Connected to the JMS connection factory : " + connFactoryJNDIName);
 
         try {
+            ConnectionFactory conFac = null;
             QueueConnectionFactory qConFac = null;
             TopicConnectionFactory tConFac = null;
-            if (conFactory instanceof QueueConnectionFactory) {
+            if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(getConnectionFactoryType())) {
                 qConFac = (QueueConnectionFactory) conFactory;
-            } else {
+            } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(getConnectionFactoryType())) {
                 tConFac = (TopicConnectionFactory) conFactory;
+            } else {
+                conFac = conFactory;
             }
 
             String user = (String) jndiProperties.get(Context.SECURITY_PRINCIPAL);
@@ -225,14 +234,18 @@ public class JMSConnectionFactory {
             if (user != null && pass != null) {
                 if (qConFac != null) {
                     connection = qConFac.createQueueConnection(user, pass);
-                } else {
+                } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection(user, pass);
+                } else {
+                    connection = conFac.createConnection(user, pass);
                 }
             } else {
                 if (qConFac != null) {
                     connection = qConFac.createQueueConnection();
-                } else {
+                } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection();
+                } else {
+                    connection = conFac.createConnection();
                 }
             }
 
@@ -242,7 +255,9 @@ public class JMSConnectionFactory {
 
         Iterator destJNDINameIter = serviceJNDINameMapping.keySet().iterator();
         while (destJNDINameIter.hasNext()) {
-            startListeningOnDestination((String) destJNDINameIter.next());
+            String destJNDIName = (String) destJNDINameIter.next();
+            String destinationType = (String) destinationTypeMapping.get(destJNDIName);
+            startListeningOnDestination(destJNDIName, destinationType);
         }
 
         connection.start(); // indicate readyness to start receiving messages
@@ -287,7 +302,7 @@ public class JMSConnectionFactory {
      *
      * @param destinationJNDIname the JMS destination to listen on
      */
-    public void startListeningOnDestination(String destinationJNDIname) {
+    public void startListeningOnDestination(String destinationJNDIname, String destinationType) {
 
         Session session = (Session) jmsSessions.get(destinationJNDIname);
         // if we already had a session open, close it first
@@ -298,7 +313,7 @@ public class JMSConnectionFactory {
         }
 
         try {
-            session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE);
+            session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE, destinationType);
             Destination destination = null;
 
             try {
@@ -306,7 +321,7 @@ public class JMSConnectionFactory {
 
             } catch (NameNotFoundException e) {
                 log.warn("Cannot find destination : " + destinationJNDIname + ". Creating a Queue");
-                destination = JMSUtils.createDestination(session, destinationJNDIname);
+                destination = JMSUtils.createDestination(session, destinationJNDIname, destinationType);
             }
 
             MessageConsumer consumer = JMSUtils.createConsumer(session, destination);
@@ -552,5 +567,13 @@ public class JMSConnectionFactory {
     private void handleException(String msg, Exception e) throws AxisJMSException {
         log.error(msg, e);
         throw new AxisJMSException(msg, e);
+    }
+
+    public String getConnectionFactoryType() {
+      return connectionFactoryType;
+    }
+
+    public void setConnectionFactoryType(String connectionFactoryType) {
+      this.connectionFactoryType = connectionFactoryType;
     }
 }

@@ -27,6 +27,9 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.MessageHelper;
+
+import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageHandler;
 
 import java.util.Iterator;
 import java.util.List;
@@ -88,7 +91,8 @@ public class SOAPUtils {
         if(log.isDebugEnabled()) {
             log.debug("convert SOAP11 to SOAP12");
         }
-        SOAPEnvelope oldEnvelope = axisOutMsgCtx.getEnvelope();
+        // get a clone otherwise affects original message context
+        SOAPEnvelope oldEnvelope = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope());
 
         SOAPFactory soap12Factory = OMAbstractFactory.getSOAP12Factory();
         SOAPEnvelope newEnvelope  = soap12Factory.getDefaultEnvelope();
@@ -225,7 +229,8 @@ public class SOAPUtils {
         if (log.isDebugEnabled()) {
             log.debug("convert SOAP12 to SOAP11");
         }
-        SOAPEnvelope oldEnvelope = axisOutMsgCtx.getEnvelope();
+        // get a clone otherwise affects original message context
+        SOAPEnvelope oldEnvelope = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope());
 
         SOAPFactory soap11Factory = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope newEnvelope  = soap11Factory.getDefaultEnvelope();

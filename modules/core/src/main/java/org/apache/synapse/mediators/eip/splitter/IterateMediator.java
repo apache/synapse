@@ -119,54 +119,21 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
                 // iterate through the list
                 for (Object o : splitElements) {
 
-                    // clone the message for the mediation in iteration
-                    MessageContext newCtx = MessageHelper.cloneMessageContext(synCtx);
-                    // set the messageSequence property for possibal aggreagtions
-                    newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
-                        msgNumber + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + msgCount);
-                    // get a clone of the envelope to be attached
-                    SOAPEnvelope newEnvelope = MessageHelper.cloneSOAPEnvelope(envelope);
-
                     // for the moment iterator will look for an OMNode as the iteration element
                     if (!(o instanceof OMNode)) {
-                        handleException(
-                            "Error in splitting the message with expression : " + expression,
-                            synCtx);
+                        handleException("Error in splitting the message with expression : "
+                            + expression, synCtx);
                     }
 
-                    // if payload should be preserved then attach the iteration element to the
-                    // node specified by the attachPath
-                    if (preservePayload) {
-
-                        Object attachElem = attachPath.evaluate(newEnvelope);
-                        if (attachElem instanceof List) {
-                            attachElem = ((List) attachElem).get(0);
-                        }
-
-                        // for the moment attaching element should be an OMElement
-                        if (attachElem instanceof OMElement) {
-                            ((OMElement) attachElem).addChild((OMNode) o);
-                        } else {
-                            handleException("Error in attaching the splitted elements :: " +
-                                "Unable to get the attach path specified by the expression " +
-                                attachPath, synCtx);
-                        }
-                        // if not preserve payload then attach the iteration element to the body
-                    } else if (o instanceof OMNode && newEnvelope.getBody() != null) {
-                        newEnvelope.getBody().addChild((OMNode) o);
-                    }
-
-                    // set the envelope ant mediate as specified in the target
-                    newCtx.setEnvelope(newEnvelope);
-                    target.mediate(newCtx);
+                    target.mediate(
+                        getIteratedMessage(synCtx, msgNumber, msgCount, envelope, (OMNode) o));
                     msgNumber++;
 
                 }
 
             } else {
-                handleException(
-                    "Splitting by expression : " + expression + " did not yeild in an OMElement",
-                    synCtx);
+                handleException("Splitting by expression : " + expression
+                    + " did not yeild in an OMElement", synCtx);
             }
 
         } catch (JaxenException e) {
@@ -191,6 +158,57 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
 
         // whether to continue mediation on the original message
         return continueParent;
+    }
+
+    /**
+     * This will create a new message context with the iteration parameters
+     *
+     * @param synCtx    - original message context
+     * @param msgNumber - message number in the iteration
+     * @param msgCount  - message count in the iteration
+     * @param envelope  - cloned envelope to be used in the iteration
+     * @param o         - element which participates in the iteration replacement
+     * @return newCtx created by the iteration
+     * @throws AxisFault if there is a message creation failure
+     * @throws JaxenException if the expression evauation failure
+     */
+    private MessageContext getIteratedMessage(MessageContext synCtx, int msgNumber, int msgCount,
+        SOAPEnvelope envelope, OMNode o) throws AxisFault, JaxenException {
+        
+        // clone the message for the mediation in iteration
+        MessageContext newCtx = MessageHelper.cloneMessageContext(synCtx);
+        // set the messageSequence property for possibal aggreagtions
+        newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
+            msgNumber + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + msgCount);
+        // get a clone of the envelope to be attached
+        SOAPEnvelope newEnvelope = MessageHelper.cloneSOAPEnvelope(envelope);
+
+        // if payload should be preserved then attach the iteration element to the
+        // node specified by the attachPath
+        if (preservePayload) {
+
+            Object attachElem = attachPath.evaluate(newEnvelope);
+            if (attachElem instanceof List) {
+                attachElem = ((List) attachElem).get(0);
+            }
+
+            // for the moment attaching element should be an OMElement
+            if (attachElem instanceof OMElement) {
+                ((OMElement) attachElem).addChild(o);
+            } else {
+                handleException("Error in attaching the splitted elements :: " +
+                    "Unable to get the attach path specified by the expression " +
+                    attachPath, synCtx);
+            }
+            // if not preserve payload then attach the iteration element to the body
+        } else if (newEnvelope.getBody() != null) {
+            newEnvelope.getBody().addChild(o);
+        }
+
+        // set the envelope ant mediate as specified in the target
+        newCtx.setEnvelope(newEnvelope);
+
+        return newCtx;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////

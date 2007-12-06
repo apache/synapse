@@ -95,7 +95,7 @@ public class MessageHelper {
         org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         org.apache.axis2.context.MessageContext newMC = clonePartially(mc);
-        newMC.setEnvelope(cloneSOAPEnvelope(cloneSOAPEnvelope(mc.getEnvelope())));
+        newMC.setEnvelope(cloneSOAPEnvelope(mc.getEnvelope()));
         
         newMC.setServiceContext(mc.getServiceContext());
         newMC.setOperationContext(mc.getOperationContext());

@@ -160,10 +160,12 @@ public class JMSListener extends AbstractTransportListener {
         String destinationName = JMSUtils.getJNDIDestinationNameForService(service);
         serviceNameToEPRMap.put(service.getName(), JMSUtils.getEPR(cf, destinationName));
 
-        log.info("Starting to listen on destination : " + destinationName +
-            " for service " + service.getName());
-        cf.addDestination(destinationName, service.getName());
-        cf.startListeningOnDestination(destinationName);
+        String destinationType = JMSUtils.getDestinationTypeForService(service);
+        
+        log.info("Starting to listen on destination : " + destinationName + " of type " + destinationType
+            + " for service " + service.getName());
+        cf.addDestination(destinationName, destinationType, service.getName());
+        cf.startListeningOnDestination(destinationName, destinationType);
     }
 
     /**

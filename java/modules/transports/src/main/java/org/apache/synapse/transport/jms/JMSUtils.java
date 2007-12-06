@@ -148,6 +148,28 @@ public class JMSUtils extends BaseUtils {
     }
 
     /**
+     * Get the JMS destination type of this service
+     *
+     * @param service the Axis Service
+     * @return the name of the JMS destination
+     */
+    public static String getDestinationTypeForService(AxisService service) {
+        Parameter destTypeParam = service.getParameter(JMSConstants.DEST_PARAM_TYPE);
+        if (destTypeParam != null) {
+            String paramValue = (String) destTypeParam.getValue();
+            if(JMSConstants.DESTINATION_TYPE_QUEUE.equals(paramValue) || JMSConstants.DESTINATION_TYPE_TOPIC.equals(paramValue) )  {
+                return paramValue;
+            } else {
+               handleException("Invalid destinaton type value " + paramValue);
+               return null;
+            }
+        } else {
+            log.debug("JMS destination type not given. default queue");
+            return JMSConstants.DESTINATION_TYPE_QUEUE;
+        }
+    }
+    
+    /**
      * Extract connection factory properties from a given URL
      *
      * @param url a JMS URL of the form jms:/<destination>?[<key>=<value>&]*
@@ -248,7 +270,10 @@ public class JMSUtils extends BaseUtils {
 
             Parameter p = (Parameter) params.next();
 
-            if (Context.INITIAL_CONTEXT_FACTORY.equals(p.getName())) {
+            if (JMSConstants.CONFAC_TYPE.equals(p.getName())) {
+                String connectionFactoryType = (String) p.getValue();
+                jmsConFactory.setConnectionFactoryType(connectionFactoryType);
+            } else if (Context.INITIAL_CONTEXT_FACTORY.equals(p.getName())) {
                 jmsConFactory.addJNDIContextProperty(
                     Context.INITIAL_CONTEXT_FACTORY, (String) p.getValue());
             } else if (Context.PROVIDER_URL.equals(p.getName())) {
@@ -357,7 +382,7 @@ public class JMSUtils extends BaseUtils {
      * @return the JMS Destination where messages could be posted
      * @throws AxisFault if the target Destination does not exist and cannot be created
      */
-    public static Destination createDestinationIfRequired(Destination destination,
+    public static Destination createDestinationIfRequired(Destination destination, String destinationType,
         String targetAddress, Session session) throws AxisFault {
         if (destination == null) {
             if (targetAddress != null) {
@@ -367,7 +392,7 @@ public class JMSUtils extends BaseUtils {
                 }
 
                 try {
-                    destination = createDestination(session, name);
+                    destination = createDestination(session, name, destinationType);
                 } catch (JMSException e) {
                     handleException("Error creating destination Queue : " + name, e);
                 }
@@ -653,51 +678,65 @@ public class JMSUtils extends BaseUtils {
 
     // ----------- JMS 1.0.2b compatibility methods -------------
     public static Connection createConnection(
-        ConnectionFactory conFactory, String user, String pass) throws JMSException {
+        ConnectionFactory conFactory, String user, String pass, String destinationType) throws JMSException {
 
-        if (conFactory instanceof QueueConnectionFactory) {
+        if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(destinationType) ) {
             if (user != null && pass != null) {
                 return ((QueueConnectionFactory) conFactory).createQueueConnection(user, pass);
             } else {
                 return ((QueueConnectionFactory) conFactory).createQueueConnection();
             }
-        } else {
+            
+        } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(destinationType) ) {
             if (user != null && pass != null) {
                 return ((TopicConnectionFactory) conFactory).createTopicConnection(user, pass);
             } else {
                 return ((TopicConnectionFactory) conFactory).createTopicConnection();
             }
+            
+        } else {
+            if (user != null && pass != null) {
+                return ((ConnectionFactory) conFactory).createConnection(user, pass);
+            } else {
+                return ((ConnectionFactory) conFactory).createConnection();
+            }
         }
     }
 
     public static Session createSession(Connection con,
-        boolean transacted, int acknowledgeMode) throws JMSException {
+        boolean transacted, int acknowledgeMode, String destinationType) throws JMSException {
 
-        if (con instanceof QueueConnection) {
+        if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(destinationType) ) {
             return ((QueueConnection) con).createQueueSession(transacted, acknowledgeMode);
-        } else {
+        } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(destinationType) ) {
             return ((TopicConnection) con).createTopicSession(transacted, acknowledgeMode);
+        } else {
+            log.debug("JMS destination type not given or invalid. default queue. was " + destinationType);
+            return ((QueueConnection) con).createQueueSession(transacted, acknowledgeMode);
         }
     }
 
-    public static Destination createDestination(Session session, String destName)
+    public static Destination createDestination(Session session, String destName, String destinationType)
         throws JMSException {
 
-        if (session instanceof QueueSession) {
+        if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(destinationType)) {
             return ((QueueSession) session).createQueue(destName);
-        } else {
+        } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(destinationType) ) {
             return ((TopicSession) session).createTopic(destName);
+        } else {
+            log.debug("JMS destination type not given or invalid. default queue. was " + destinationType);
+            return ((QueueSession) session).createQueue(destName);          
         }
     }
 
     public static void createDestination(ConnectionFactory conFactory,
-        String destinationJNDIName) throws JMSException {
+        String destinationJNDIName, String destinationType) throws JMSException {
 
-        if (conFactory instanceof QueueConnectionFactory) {
+        if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(destinationType)) {
             JMSUtils.createJMSQueue(
                 ((QueueConnectionFactory) conFactory).createQueueConnection(),
                 destinationJNDIName);
-        } else {
+        } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(destinationType) ) {
             JMSUtils.createJMSTopic(
                 ((TopicConnectionFactory) conFactory).createTopicConnection(),
                 destinationJNDIName);

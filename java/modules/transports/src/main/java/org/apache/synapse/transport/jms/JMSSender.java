@@ -127,32 +127,42 @@ public class JMSSender extends AbstractTransportSender {
 
                         QueueConnectionFactory qConFac = null;
                         TopicConnectionFactory tConFac = null;
-                        if (jmsOut.getConnectionFactory() instanceof QueueConnectionFactory) {
+                        ConnectionFactory conFac = null;
+                        
+                        if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(jmsOut.getDestinationType())) {
                             qConFac = (QueueConnectionFactory) jmsOut.getConnectionFactory();
-                        } else {
+                        } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(jmsOut.getDestinationType())) {
                             tConFac = (TopicConnectionFactory) jmsOut.getConnectionFactory();
+                        } else {
+                            conFac = (ConnectionFactory) jmsOut.getConnectionFactory();
                         }
 
                         if (user != null && pass != null) {
                             if (qConFac != null) {
                                 connection = qConFac.createQueueConnection(user, pass);
-                            } else {
+                            } else if (tConFac != null) {
                                 connection = tConFac.createTopicConnection(user, pass);
+                            } else {
+                                connection = conFac.createConnection(user, pass);
                             }
                         } else {
                            if (qConFac != null) {
                                 connection = qConFac.createQueueConnection();
-                            } else {
+                            } else if (tConFac != null) {
                                 connection = tConFac.createTopicConnection();
+                            } else {
+                                connection = conFac.createConnection();
                             }
                         }
 
-                        if (qConFac != null) {
+                        if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(jmsOut.getDestinationType())) {
                             session = ((QueueConnection)connection).
                                 createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-                        } else {
+                        } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(jmsOut.getDestinationType())) {
                             session = ((TopicConnection)connection).
                                 createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+                        } else {
+                            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                         }
 
                     } catch (JMSException e) {
@@ -194,9 +204,11 @@ public class JMSSender extends AbstractTransportSender {
                     handleException("Error creating a JMS message from the axis message context", e);
                 }
 
+                String destinationType = jmsOut.getDestinationType();
+                
                 // if the destination does not exist, see if we can create it
                 destination = JMSUtils.createDestinationIfRequired(
-                    destination, targetAddress, session);
+                    destination, destinationType, targetAddress, session);
 
                 // should we wait for a synchronous response on this same thread?
                 boolean waitForResponse = waitForSynchronousResponse(msgCtx);

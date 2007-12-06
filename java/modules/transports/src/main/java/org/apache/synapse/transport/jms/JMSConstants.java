@@ -48,9 +48,24 @@ public class JMSConstants {
      */
     public static final String DEST_PARAM = "transport.jms.Destination";
     /**
+     * The Parameter name indicating a JMS destination type for requests. i.e. DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC
+     */
+    public static final String DEST_PARAM_TYPE = "transport.jms.DestinationType";
+    /**
      * The Parameter name indicating the response JMS destination
      */
     public static final String REPLY_PARAM = "transport.jms.ReplyDestination";
+    /**
+     * The Parameter name indicating the response JMS destination. i.e. DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC
+     */
+    public static final String REPLY_PARAM_TYPE = "transport.jms.ReplyDestinationType";
+    
+    /**
+     * Values used for DEST_PARAM_TYPE, REPLY_PARAM_TYPE
+     */
+    public static final String DESTINATION_TYPE_QUEUE = "queue";
+    public static final String DESTINATION_TYPE_TOPIC = "topic";
+
     /**
      * The Parameter name of an Axis2 service, indicating the JMS connection
      * factory which should be used to listen for messages for it. This is
@@ -58,10 +73,14 @@ public class JMSConstants {
      */
     public static final String CONFAC_PARAM = "transport.jms.ConnectionFactory";
     /**
+     * Connection factory type if using JMS 1.0, either DESTINATION_TYPE_QUEUE or DESTINATION_TYPE_TOPIC
+     */
+    public static final String CONFAC_TYPE = "transport.jms.ConnectionFactoryType";
+    /**
      * The Parameter name indicating the JMS connection factory JNDI name
      */
     public static final String CONFAC_JNDI_NAME_PARAM = "transport.jms.ConnectionFactoryJNDIName";
-
+    
 
     //------------ message context / transport header properties and client options ------------
     /**

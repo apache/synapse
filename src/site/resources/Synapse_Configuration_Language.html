@@ -350,6 +350,30 @@ and responses will not be processed after that.</p>
   &lt;/timeout&gt;?
 &lt;/address&gt;</pre>
 
+<p>Following are some sample uri definitions.</p>
+
+<p>HTTP</p>
+<pre>http://localhost:9000/soap/SimpleStockQuoteService</pre>
+
+<p>JMS full definition</p>
+<pre>jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=topic</pre>
+
+<p>JMS connection factory reference which is defined in JMSListener of
+axis2.xml as a parameter</p>
+<pre>jms:/SimpleStockQuoteService?transport.jms.ConnectionFactory=myQueueConnectionFactory</pre>
+
+<p>SMTP</p>
+<pre>mailto:guest@host</pre>
+
+<p>Directory</p>
+<pre>vfs:file:///home/user/directory</pre>
+
+<p>File</p>
+<pre>vfs:file:///home/user/file</pre>
+
+<p>FTP</p>
+<pre>vfs:ftp://guest:guest@localhost/directory?vfs.passive=true</pre>
+
 <h4><a name="wsdl-endpoint">WSDL Endpoint</a></h4>
 
 <p>WSDL endpoint is an endpoint based on a WSDL document. It can extract the
@@ -498,14 +522,21 @@ key="string"/&gt; is wrong)</p>
       <td></td>
       <td>Optional</td>
       <td>transport.jms.Destination</td>
-      <td>The JMS Destination name (Defaults to a Queue with the service
+      <td>The JMS destination name (Defaults to a Queue with the service
       name)</td>
     </tr>
     <tr>
       <td></td>
       <td>Optional</td>
+      <td>transport.jms.DestinationType</td>
+      <td>The JMS destination  type. Accept values 'queue' or 'topic' 
+        (default: queue)</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Optional</td>
       <td>transport.jms.ReplyDestination</td>
-      <td>The Destination where a reply would be posted</td>
+      <td>The destination where a reply will be posted</td>
     </tr>
     <tr>
       <td></td>

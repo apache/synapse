@@ -80,6 +80,13 @@ public class JMSSender extends AbstractTransportSender {
      * @return the corresponding JMS connection factory, if any
      */
     private JMSConnectionFactory getJMSConnectionFactory(JMSOutTransportInfo trpInfo) {
+        if(trpInfo.getProperties() != null) {
+          String jmsConnectionFactoryName = (String) trpInfo.getProperties().get(JMSConstants.CONFAC_PARAM);
+          if(jmsConnectionFactoryName != null) {
+            return (JMSConnectionFactory) connectionFactories.get(jmsConnectionFactoryName);
+          }
+        }
+      
         Iterator cfNames = connectionFactories.keySet().iterator();
         while (cfNames.hasNext()) {
             String cfName = (String) cfNames.next();

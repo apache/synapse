@@ -276,7 +276,8 @@ public class JMSConnectionFactory {
 
         if (session == null) {
             try {                
-                Destination dest = (Destination) context.lookup(destinationJNDIname);
+                Destination dest = (Destination) getPhysicalDestination(destinationJNDIname);
+
                 if (dest instanceof Topic) {
                     session = ((TopicConnection) connection).
                         createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -287,8 +288,6 @@ public class JMSConnectionFactory {
 
                 jmsSessions.put(destinationJNDIname, session);
 
-            } catch (NamingException e) {
-                handleException("Error looking up destination : " + destinationJNDIname, e);
             } catch (JMSException e) {
                 handleException("Unable to create a session using connection factory : " + name, e);
             }
@@ -386,6 +385,30 @@ public class JMSConnectionFactory {
      * @return the provider specific Destination name or null if cannot be found
      */
     private String getPhysicalDestinationName(String destinationJndi) {
+        Destination destination = getPhysicalDestination(destinationJndi);
+
+        if (destination != null) {
+            try {
+                if (destination instanceof Queue) {
+                    return ((Queue) destination).getQueueName();
+                } else if (destination instanceof Topic) {
+                    return ((Topic) destination).getTopicName();
+                }
+            } catch (JMSException e) {
+                log.warn("Error reading Destination name for JNDI destination : " + destinationJndi, e);
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Return the provider specific [physical] Destination if any
+     * for the destination with the given JNDI name
+     *
+     * @param destinationJndi the JNDI name of the destination
+     * @return the provider specific Destination or null if cannot be found
+     */
+    private Destination getPhysicalDestination(String destinationJndi) {
         Destination destination = null;
 
         try {
@@ -409,18 +432,7 @@ public class JMSConnectionFactory {
             }
         }
 
-        if (destination != null) {
-            try {
-                if (destination instanceof Queue) {
-                    return ((Queue) destination).getQueueName();
-                } else if (destination instanceof Topic) {
-                    return ((Topic) destination).getTopicName();
-                }
-            } catch (JMSException e) {
-                log.warn("Error reading Destination name for JNDI destination : " + destinationJndi, e);
-            }
-        }
-        return null;
+        return destination;
     }
 
     /**

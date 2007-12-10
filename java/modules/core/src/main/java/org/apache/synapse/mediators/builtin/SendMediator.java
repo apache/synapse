@@ -32,18 +32,18 @@ import org.apache.axis2.context.OperationContext;
 import java.util.List;
 
 /**
- * SendMediator sends a message using specified semantics. If it contains an endpoint it will send the
- * message to that endpoint. Once a message is sent to the endpoint further sending behaviors are completely
- * governed by that endpoint. If there is no endpoint available, SendMediator will send the message to
- * the implicitly stated destination.
+ * SendMediator sends a message using specified semantics. If it contains an endpoint it will
+ * send the message to that endpoint. Once a message is sent to the endpoint further sending
+ * behaviors are completely governed by that endpoint. If there is no endpoint available,
+ * SendMediator will send the message to the implicitly stated destination.
  * */
 public class SendMediator extends AbstractMediator {
 
     private Endpoint endpoint = null;
 
     /**
-     * This is a leaf mediator. i.e. processing stops once send is invoked,
-     * as it always returns false
+     * This will call the send method on the messages with implivit message parameters
+     * or else if there is an endpoint, with that endpoint parameters
      *
      * @param synCtx the current message to be sent
      * @return false always as this is a leaf mediator

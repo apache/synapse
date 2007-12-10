@@ -57,7 +57,7 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
             cache.addAttribute(fac.createOMAttribute("collector", nullNS, "true"));
         } else {
 
-            cache.addAttribute(fac.createOMAttribute("collector", nullNS, "true"));
+            cache.addAttribute(fac.createOMAttribute("collector", nullNS, "false"));
 
             if (mediator.getDigestGenerator() != null) {
                 cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS,

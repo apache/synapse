@@ -237,7 +237,8 @@ public class ProxyService {
 
                 try {
                     // detect version of the WSDL 1.1 or 2.0
-                    if (trace()) trace.info("WSDL Namespace is : " + wsdlNamespace.getNamespaceURI());
+                    if (trace()) trace.info("WSDL Namespace is : "
+                        + wsdlNamespace.getNamespaceURI());
 
                     if (wsdlNamespace != null) {
                         boolean isWSDL11 = false;
@@ -247,7 +248,8 @@ public class ProxyService {
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
                                     new WSDL20ToAxisServiceBuilder(wsdlInputStream, null, null);
-                            wsdlToAxisServiceBuilder.setBaseUri(wsdlURI != null ? wsdlURI.toString() : "");
+                            wsdlToAxisServiceBuilder.setBaseUri(
+                                wsdlURI != null ? wsdlURI.toString() : "");
 
                         } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
                                 equals(wsdlNamespace.getNamespaceURI())) {
@@ -292,7 +294,8 @@ public class ProxyService {
                                     AxisBindingOperation axisBindingOperation =
                                         (AxisBindingOperation) children.next();
                                     axisBindingOperation.setProperty(
-                                        WSDL2Constants.ATTR_WHTTP_IGNORE_UNCITED, new Boolean(false));
+                                        WSDL2Constants.ATTR_WHTTP_IGNORE_UNCITED,
+                                        new Boolean(false));
                                 }
                             }
                         }
@@ -337,7 +340,9 @@ public class ProxyService {
         }
 
         // process parameters
-        if (trace()) trace.info("Setting service parameters : " + parameters);
+        if (trace() && parameters.size() > 0) {
+            trace.info("Setting service parameters : " + parameters);
+        }
         Iterator iter = parameters.keySet().iterator();
         while (iter.hasNext()) {
             String name = (String) iter.next();
@@ -355,10 +360,12 @@ public class ProxyService {
             }
         }
 
-        if (trace()) trace.info("Setting service level policies : " + serviceLevelPolicies);
         // if service level policies are specified, apply them
-
         if (!serviceLevelPolicies.isEmpty()) {
+
+            if (trace()) {
+                trace.info("Setting service level policies : " + serviceLevelPolicies);
+            }
             Policy svcEffectivePolicy = null;
             iter = serviceLevelPolicies.iterator();
 
@@ -371,8 +378,9 @@ public class ProxyService {
                         svcEffectivePolicy = PolicyEngine.getPolicy(
                             SynapseConfigUtils.getStreamSource(policyProp).getInputStream());
                     } else {
-                        svcEffectivePolicy = (Policy) svcEffectivePolicy.merge(
-                            PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(policyProp).getInputStream()));
+                        svcEffectivePolicy = svcEffectivePolicy.merge(
+                            PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
+                                policyProp).getInputStream()));
                     }
                 }
             }

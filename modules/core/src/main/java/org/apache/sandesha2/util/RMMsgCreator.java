@@ -414,6 +414,10 @@ public class RMMsgCreator {
 
 		MessageContext outMessage = MessageContextBuilder.createOutMessageContext (requestMsg.getMessageContext());
 		RMMsgContext responseRMMsg = new RMMsgContext(outMessage);
+		
+		if(rmSequenceBean.getAcksToEndpointReference()!=null){
+			responseRMMsg.setTo(rmSequenceBean.getAcksToEndpointReference());
+		}
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(requestMsg.getSOAPEnvelope()));
 
 		String namespace = requestMsg.getRMNamespaceValue();
@@ -426,7 +430,7 @@ public class RMMsgCreator {
 			case Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE: responseRMMsg.setCloseSequenceResponse((CloseSequenceResponse) part);break;
 			case Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE: responseRMMsg.setTerminateSequenceResponse((TerminateSequenceResponse) part);break;
 			case Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE: responseRMMsg.setCreateSequenceResponse((CreateSequenceResponse) part);break;
-			default: throw new RuntimeException("Boom");
+			default: throw new RuntimeException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.internalError));
 		}
 
 		outMessage.setWSAAction(action);

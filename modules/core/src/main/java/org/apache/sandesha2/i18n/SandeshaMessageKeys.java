@@ -36,6 +36,7 @@ public class SandeshaMessageKeys {
 	public static final String contextManagerMustImplement="contextManagerMustImplement";
 	public static final String cannotFindModulePolicies="cannotFindModulePolicies";
 	public static final String cannotPauseThread = "cannotPauseThread";
+	public static final String internalError = "internalError";
 
 	public static final String commitError="commitError";
 	public static final String rollbackError="rollbackError";

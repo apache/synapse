@@ -338,6 +338,9 @@ public class FaultManager {
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED);
 		
 		data.setExceptionString(SandeshaUtil.getStackTraceFromException(e));
+		
+		if(log.isWarnEnabled())
+			log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, messageContext.getAxisService().getName()));
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::makeCreateSequenceRefusedFault");
@@ -847,6 +850,9 @@ public class FaultManager {
 			log.debug("Enter: FaultManager::processCreateSequenceRefusedFault");
 
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
+		
+		if(log.isWarnEnabled())
+			log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, rmMsgCtx.getMessageContext().getAxisService().getName()));
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());

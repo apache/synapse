@@ -38,6 +38,8 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -71,10 +73,13 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
 
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		RMSequenceBean rmBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		if(rmBean==null){
+			rmBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
+		}
 		
 		//check the security credentials
-		SandeshaUtil.assertProofOfPossession(rmdBean, msgCtx, msgCtx.getEnvelope().getBody());
+		SandeshaUtil.assertProofOfPossession(rmBean, msgCtx, msgCtx.getEnvelope().getBody());
 
 		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
 			if (log.isDebugEnabled())
@@ -83,32 +88,35 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		}
 		
 		// throwing a fault if the sequence is terminated
-		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean, false)) {
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmBean, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: CloseSequenceProcessor::processInMessage, Sequence terminated");
 			return false;
 		}
 
-		rmdBean.setClosed(true);
-		storageManager.getRMDBeanMgr().update(rmdBean);
+		rmBean.setClosed(true);
+		Iterator sequenceAckIter = null;
+		if(rmBean instanceof RMDBean){
+			storageManager.getRMDBeanMgr().update((RMDBean)rmBean);
+			RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, (RMDBean)rmBean, sequenceId, storageManager, true);
+			// adding the ack part(s) to the envelope.
+			sequenceAckIter = ackRMMsgCtx.getSequenceAcknowledgements();
+		}
+		else{
+			storageManager.getRMSBeanMgr().update((RMSBean)rmBean);
+		}
 
-		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, rmdBean, sequenceId, storageManager, true);
-		// adding the ack part(s) to the envelope.
-		Iterator sequenceAckIter = ackRMMsgCtx.getSequenceAcknowledgements();
-
-		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmdBean);
+		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmBean);
 		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();
 
-		while (sequenceAckIter.hasNext()) {
+		while (sequenceAckIter!=null && sequenceAckIter.hasNext()) {
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
 			closeSeqResponseRMMsg.addSequenceAcknowledgement(sequenceAcknowledgement);
 		}
 		
 		closeSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		closeSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
-
 		closeSequenceResponseMsg.setResponseWritten(true);
-
 		closeSeqResponseRMMsg.addSOAPEnvelope();
 		
 		//

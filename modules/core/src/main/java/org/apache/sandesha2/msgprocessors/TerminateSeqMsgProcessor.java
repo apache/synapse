@@ -43,6 +43,7 @@ import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
@@ -91,10 +92,13 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
 		
 		// Check that the sender of this TerminateSequence holds the correct token
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		RMSequenceBean rmBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		if(rmBean==null){
+			rmBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
+		}
 		
 		//check security credentials
-		SandeshaUtil.assertProofOfPossession(rmdBean, terminateSeqMsg, 
+		SandeshaUtil.assertProofOfPossession(rmBean, terminateSeqMsg, 
 				terminateSeqMsg.getEnvelope().getBody());
 
 		if (FaultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId, storageManager, false)) {
@@ -106,24 +110,21 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		// add the terminate sequence response if required.
 		RMMsgContext terminateSequenceResponse = null;
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired(terminateSeqRMMsg.getRMSpecVersion()))
-			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, rmdBean, sequenceId, storageManager);
+			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, rmBean, sequenceId, storageManager);
 
 		setUpHighestMsgNumbers(context, storageManager, sequenceId, terminateSeqRMMsg);
 		
-		
-		
 		boolean inOrderInvocation = SandeshaUtil.getDefaultPropertyBean(context.getAxisConfiguration()).isInOrder();
 		
-		
-		//if the invocation is inOrder and if this is RM 1.1 there is a posibility of all the messages having eleady being invoked.
+		//if the invocation is inOrder and if this is RM 1.1 there is a posibility of all the messages having aleady being invoked.
 		//In this case we should do the full termination.
 		
 		boolean doFullTermination = false;
 		
-		if (inOrderInvocation) {
+		if (inOrderInvocation && rmBean instanceof RMDBean) {
 
-			long highestMsgNo = rmdBean.getHighestInMessageNumber();
-			long nextMsgToProcess = rmdBean.getNextMsgNoToProcess();
+			long highestMsgNo = ((RMDBean)rmBean).getHighestInMessageNumber();
+			long nextMsgToProcess = ((RMDBean)rmBean).getNextMsgNoToProcess();
 			
 			if (nextMsgToProcess>highestMsgNo) {
 				//all the messages have been invoked, u can do the full termination
@@ -140,10 +141,14 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		} else
 			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
 
-		rmdBean.setTerminated(true);		
-		rmdBean.setLastActivatedTime(System.currentTimeMillis());
-		storageManager.getRMDBeanMgr().update(rmdBean);
-
+		rmBean.setTerminated(true);		
+		rmBean.setLastActivatedTime(System.currentTimeMillis());
+		if(rmBean instanceof RMDBean){
+			storageManager.getRMDBeanMgr().update((RMDBean)rmBean);
+		}
+		else{
+			storageManager.getRMSBeanMgr().update((RMSBean)rmBean);
+		}
 
 		//sending the terminate sequence response
 		if (terminateSequenceResponse != null) {
@@ -313,25 +318,26 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			log.debug("Exit: TerminateSeqMsgProcessor::setUpHighestMsgNumbers");
 	}
 
-	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, RMDBean rmdBean, String sequenceId,
+	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, RMSequenceBean rmBean, String sequenceId,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceId);
 
-		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg, rmdBean);
+		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg, rmBean);
 		MessageContext outMessage = terminateSeqResponseRMMsg.getMessageContext();
-
-		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, rmdBean, 
-				sequenceId,	storageManager, true);
 		
-		// copy over the ack parts
-		Iterator iter = ackRMMessage.getSequenceAcknowledgements();
-		while (iter.hasNext()) {
-			SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
-			terminateSeqResponseRMMsg.addSequenceAcknowledgement(seqAck);
-		}
-		
+		if(rmBean instanceof RMDBean){
+			RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, (RMDBean)rmBean, 
+					sequenceId,	storageManager, true);
+			
+			// copy over the ack parts
+			Iterator iter = ackRMMessage.getSequenceAcknowledgements();
+			while (iter.hasNext()) {
+				SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
+				terminateSeqResponseRMMsg.addSequenceAcknowledgement(seqAck);
+			}
+		}		
 		terminateSeqResponseRMMsg.addSOAPEnvelope();
 
 		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);

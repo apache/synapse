@@ -81,10 +81,10 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
                     classMediator.addProperty(propName, value);
                     PropertyHelper.setInstanceProperty(propName, value, m);
                 } else {
-                    OMNode omNode = child.getFirstOMChild();
-                    if (omNode != null) {
-                        classMediator.addProperty(propName, omNode);
-                        PropertyHelper.setInstanceProperty(propName, omNode, m);
+                    OMNode omElt = child.getFirstElement();
+                    if (omElt != null) {
+                        classMediator.addProperty(propName, omElt);
+                        PropertyHelper.setInstanceProperty(propName, omElt, m);
                     } else {
                         handleException("A Class mediator property must specify " +
                             "name and value attributes, or a name and a child XML fragment");

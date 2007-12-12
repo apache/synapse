@@ -887,6 +887,10 @@
                     <artifactId>axis2-kernel</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2-saaj</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.ws.commons.axiom</groupId>
                     <artifactId>axiom-impl</artifactId>
                 </exclusion>

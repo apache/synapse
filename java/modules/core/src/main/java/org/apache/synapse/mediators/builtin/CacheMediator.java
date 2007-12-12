@@ -180,7 +180,7 @@ public class CacheMediator extends AbstractMediator {
             handleException("Response messages cannot be handled in a non collector cache", synCtx);
         }
 
-        String requestHash = (String) synCtx.getProperty(CachingConstants.REQUEST_HASH_KEY);
+        String requestHash = (String) synCtx.getProperty(CachingConstants.REQUEST_HASH);
 
         if (requestHash != null) {
             if (traceOrDebugOn) {
@@ -251,8 +251,9 @@ public class CacheMediator extends AbstractMediator {
 
         String requestHash = null;
         try {  
-            requestHash = digestGenerator.getDigest(((Axis2MessageContext) synCtx).getAxis2MessageContext());
-            synCtx.setProperty(CachingConstants.REQUEST_HASH_KEY, requestHash);
+            requestHash = digestGenerator.getDigest(
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext());
+            synCtx.setProperty(CachingConstants.REQUEST_HASH, requestHash);
         } catch (CachingException e) {
             handleException("Error in calculating the hash value of the request", e, synCtx);
         }
@@ -288,14 +289,14 @@ public class CacheMediator extends AbstractMediator {
 
                     synCtx.setEnvelope(omSOAPEnv);
                 } catch (AxisFault axisFault) {
-                    handleException("Error setting response envelope from cache : " + cacheManagerKey,
-                        synCtx);
+                    handleException("Error setting response envelope from cache : "
+                        + cacheManagerKey, synCtx);
                 } catch (IOException ioe) {
-                    handleException("Error setting response envelope from cache : " + cacheManagerKey,
-                        ioe, synCtx);
+                    handleException("Error setting response envelope from cache : "
+                        + cacheManagerKey, ioe, synCtx);
                 } catch (SOAPException soape) {
-                    handleException("Error setting response envelope from cache : " + cacheManagerKey,
-                        soape, synCtx);
+                    handleException("Error setting response envelope from cache : "
+                        + cacheManagerKey, soape, synCtx);
                 }
 
                 // take specified action on cache hit
@@ -342,7 +343,6 @@ public class CacheMediator extends AbstractMediator {
 
         } else {
 
-            // todo: find a proper way of achieving the cache size check
             // if not found in cache, check if we can cache this request
             if (cacheManager.getCacheKeys().size() == inMemoryCacheSize) {
                 cacheManager.removeExpiredResponses(cfgCtx);

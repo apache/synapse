@@ -72,7 +72,7 @@ import java.util.Map;
  * </parameter>
  * </transportReceiver>
  */
-public class JMSConnectionFactory {
+public class JMSConnectionFactory implements ExceptionListener {
 
     private static final Log log = LogFactory.getLog(JMSConnectionFactory.class);
 
@@ -102,6 +102,8 @@ public class JMSConnectionFactory {
     private JMSMessageReceiver jmsMessageReceiver = null;
     /** The axis2 configuration context */
     private ConfigurationContext cfgCtx = null;
+    /** if connection dropped, reconnect timeout in milliseconds; default 30 seconds */
+    private long reconnectTimeout = 30000;
 
     /**
      * Create a JMSConnectionFactory for the given [axis2] name the
@@ -248,6 +250,8 @@ public class JMSConnectionFactory {
                     connection = conFac.createConnection();
                 }
             }
+            
+            connection.setExceptionListener(this);
 
         } catch (JMSException e) {
             handleException("Error connecting to Connection Factory : " + connFactoryJNDIName, e);
@@ -587,5 +591,40 @@ public class JMSConnectionFactory {
 
     public void setConnectionFactoryType(String connectionFactoryType) {
       this.connectionFactoryType = connectionFactoryType;
+    }
+    
+    public long getReconnectTimeout() {
+      return reconnectTimeout;
+    }
+
+    public void setReconnectTimeout(long reconnectTimeout) {
+      this.reconnectTimeout = reconnectTimeout;
+    }
+
+    public void onException(JMSException e) {
+      log.error("jms error ", e);
+      boolean wasError = true;
+      
+      // try to connect
+      // if error occurs wait and try again
+      while(wasError == true) {
+        
+        try {
+          connectAndListen();
+          wasError = false;
+          
+        } catch (Exception e1) {
+          log.error("jms reconnect error ", e);
+        } 
+        
+        if(wasError == true) {
+          try {
+            Thread.sleep(getReconnectTimeout());
+          } catch (InterruptedException e2) {
+            e2.printStackTrace();
+          }
+        }
+      } // wasError
+      
     }
 }

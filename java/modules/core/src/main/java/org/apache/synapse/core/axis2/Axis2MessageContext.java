@@ -22,6 +22,7 @@ package org.apache.synapse.core.axis2;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
@@ -475,6 +476,8 @@ public class Axis2MessageContext implements MessageContext {
                                 s = o.toString();
                             }
                             textValue.append(s);
+                        } else if (o instanceof OMDocumentImpl) {
+                            textValue.append(((OMDocumentImpl) o).getOMDocumentElement().toString());
                         }
                     }
                 } else {

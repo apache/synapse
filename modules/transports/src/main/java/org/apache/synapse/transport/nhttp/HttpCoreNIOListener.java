@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.lang.management.ManagementFactory;
 
 import javax.net.ssl.SSLContext;
+import javax.management.*;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -39,17 +41,20 @@ import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
-import org.apache.http.nio.reactor.ListeningIOReactor;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.synapse.transport.base.ManagementSupport;
+import org.apache.synapse.transport.base.MetricsCollector;
+import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.base.TransportView;
 
 /**
  * NIO transport listener for Axis2 based on HttpCore and NIO extensions
  */
-public class HttpCoreNIOListener implements TransportListener {
+public class HttpCoreNIOListener implements TransportListener, ManagementSupport {
 
     private static final Log log = LogFactory.getLog(HttpCoreNIOListener.class);
 
@@ -68,6 +73,10 @@ public class HttpCoreNIOListener implements TransportListener {
     private SSLContext sslContext = null;
     /** The SSL session handler that manages client authentication etc */
     private SSLIOSessionHandler sslIOSessionHandler = null;
+    /** Metrics collector for this transport */
+    private MetricsCollector metrics = new MetricsCollector();
+    /** state of the listener */
+    private int state = BaseConstants.STOPPED;
 
     /**
      * configure and start the IO reactor on the specified port
@@ -96,10 +105,10 @@ public class HttpCoreNIOListener implements TransportListener {
             log.error("Error starting the IOReactor", e);
         }
 
-        NHttpServiceHandler handler = new ServerHandler(cfgCtx, params, sslContext != null);
+        NHttpServiceHandler handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
         IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslIOSessionHandler, params);
-
+        state = BaseConstants.STARTED;
         try {
             ioReactor.listen(new InetSocketAddress(port));
             ioReactor.execute(ioEventDispatch);
@@ -171,6 +180,19 @@ public class HttpCoreNIOListener implements TransportListener {
             serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, (String) param.getValue());
         } else {
             serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, host, port);
+        }
+
+        // register with JMX
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = null;
+        try {
+            name = new ObjectName("org.apache.axis2:Type=Transport,ConnectorName=" +
+                "nio-http" + (sslContext == null ? "" : "s"));
+            TransportView tBean = new TransportView(this, null);
+            mbs.registerMBean(tBean, name);
+        } catch (Exception e) {
+            handleException("Error registering the non-blocking http" +
+                (sslContext == null ? "" : "s") + " transport for JMX management", e);
         }
     }
 
@@ -244,13 +266,67 @@ public class HttpCoreNIOListener implements TransportListener {
      * @throws AxisFault on error
      */
     public void stop() throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
         try {
             ioReactor.shutdown();
+            state = BaseConstants.STOPPED;
             log.info("Listener shut down");
         } catch (IOException e) {
             handleException("Error shutting down IOReactor", e);
         }
     }
+
+    /**
+     * Pause the listener - Stops accepting new connections, but continues processing existing
+     * connections until they complete. This helps bring an instance into a maintenence mode
+     * @throws AxisFault
+     */
+    public void pause() throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        try {
+            ioReactor.pause();
+            state = BaseConstants.PAUSED;
+            log.info("Listener paused");
+        } catch (IOException e) {
+            handleException("Error pausing IOReactor", e);
+        }
+    }
+
+    /**
+     * Resume the lister - Brings the lister into active mode back from a paused state
+     * @throws AxisFault
+     */
+    public void resume() throws AxisFault {
+        if (state != BaseConstants.PAUSED) return;
+        try {
+            ioReactor.resume();
+            state = BaseConstants.STARTED;
+            log.info("Listener resumed");
+        } catch (IOException e) {
+            handleException("Error resuming IOReactor", e);
+        }
+    }
+
+    /**
+     * Stop accepting new connections, and wait the maximum specified time for in-flight
+     * requests to complete before a controlled shutdown for maintenence
+     *
+     * @param millis a number of milliseconds to wait until pending requests are allowed to complete
+     * @throws AxisFault
+     */
+    public void maintenenceShutdown(long millis) throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        try {
+            long start = System.currentTimeMillis();
+            ioReactor.pause();
+            ioReactor.shutdown(millis);
+            state = BaseConstants.STOPPED;
+            log.info("Listener shutdown in : " + (System.currentTimeMillis() - start) / 1000 + "s");
+        } catch (IOException e) {
+            handleException("Error shutting down the IOReactor for maintenence", e);
+        }
+    }
+
 
     /**
      * Return the EPR for the given service (implements deprecated method temporarily)
@@ -297,4 +373,37 @@ public class HttpCoreNIOListener implements TransportListener {
         throw new AxisFault(msg);
     }
 
+    // -- jmx/management methods--
+    public long getMessagesReceived() {
+        if (metrics != null) {
+            return metrics.getMessagesReceived();
+        }
+        return -1;
+    }
+
+    public long getFaultsReceiving() {
+        if (metrics != null) {
+            return metrics.getFaultsReceiving();
+        }
+        return -1;
+    }
+
+    public long getBytesReceived() {
+        if (metrics != null) {
+            return metrics.getBytesReceived();
+        }
+        return -1;
+    }
+
+    public long getMessagesSent() {
+        return -1;
+    }
+
+    public long getFaultsSending() {
+        return -1;
+    }
+
+    public long getBytesSent() {
+        return -1;
+    }
 }

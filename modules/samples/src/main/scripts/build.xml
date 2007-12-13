@@ -156,6 +156,9 @@
             <sysproperty key="mode" value="${mode}"/>
             <sysproperty key="port" value="${port}"/>
             <sysproperty key="i" value="${i}"/>
+            <sysproperty key="addurl" value="${addurl}"/>
+            <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="prxurl" value="${prxurl}"/>
         </java>
     </target>
 

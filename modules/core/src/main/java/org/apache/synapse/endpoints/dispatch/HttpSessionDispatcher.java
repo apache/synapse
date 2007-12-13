@@ -34,11 +34,15 @@ import java.util.Collections;
  */
 public class HttpSessionDispatcher implements Dispatcher {
 
+    private final static String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
+    /*HTTP Headers  */
+    private final static String COOKIE = "Cookie";
+    private final static String SET_COOKIE = "Set-Cookie";
     /**
      * Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
      * multiple threds (e.g. multiple clients different sessions).
      */
-    Map sessionMap = Collections.synchronizedMap(new HashMap());
+    private final Map sessionMap = Collections.synchronizedMap(new HashMap());
 
     /**
      * Check if "Cookie" HTTP header is available. If so, check if that cookie is in the session map.
@@ -46,7 +50,6 @@ public class HttpSessionDispatcher implements Dispatcher {
      * that session.
      *
      * @param synCtx MessageContext possibly containing a "Cookie" HTTP header.
-     *
      * @return Endpoint Server endpoint for the given HTTP session.
      */
     public Endpoint getEndpoint(MessageContext synCtx) {
@@ -54,12 +57,12 @@ public class HttpSessionDispatcher implements Dispatcher {
         Endpoint endpoint = null;
 
         org.apache.axis2.context.MessageContext axis2MessageContext =
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        Object o = axis2MessageContext.getProperty("TRANSPORT_HEADERS");
+        Object o = axis2MessageContext.getProperty(TRANSPORT_HEADERS);
         if (o != null && o instanceof Map) {
             Map headerMap = (Map) o;
-            Object cookie = headerMap.get("Cookie");
+            Object cookie = headerMap.get(COOKIE);
 
             if (cookie != null) {
                 Object e = sessionMap.get(cookie);
@@ -77,22 +80,22 @@ public class HttpSessionDispatcher implements Dispatcher {
      * session ID is not already in the session map update the session map by mapping the cookie
      * to the endpoint.
      *
-     * @param synCtx MessageContext possibly containing the "Set-Cookie" HTTP header.
+     * @param synCtx   MessageContext possibly containing the "Set-Cookie" HTTP header.
      * @param endpoint Endpoint to be mapped to the session.
      */
     public void updateSession(MessageContext synCtx, Endpoint endpoint) {
 
         org.apache.axis2.context.MessageContext axis2MessageContext =
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        Object o = axis2MessageContext.getProperty("TRANSPORT_HEADERS");
+        Object o = axis2MessageContext.getProperty(TRANSPORT_HEADERS);
         if (o != null && o instanceof Map) {
             Map headerMap = (Map) o;
-            Object cookie = headerMap.get("Set-Cookie");
+            Object cookie = headerMap.get(SET_COOKIE);
 
             if (cookie != null) {
                 // synchronized to avoid possible replacement of sessions
-                synchronized(sessionMap) {
+                synchronized (sessionMap) {
                     if (!sessionMap.containsKey(cookie)) {
                         sessionMap.put(cookie, endpoint);
                     }
@@ -104,12 +107,12 @@ public class HttpSessionDispatcher implements Dispatcher {
     public void unbind(MessageContext synCtx) {
 
         org.apache.axis2.context.MessageContext axis2MessageContext =
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        Object o = axis2MessageContext.getProperty("TRANSPORT_HEADERS");
+        Object o = axis2MessageContext.getProperty(TRANSPORT_HEADERS);
         if (o != null && o instanceof Map) {
             Map headerMap = (Map) o;
-            Object cookie = headerMap.get("Cookie");
+            Object cookie = headerMap.get(COOKIE);
 
             if (cookie != null) {
                 sessionMap.remove(cookie);

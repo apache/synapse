@@ -73,8 +73,10 @@ public class VFSUtils extends BaseUtils {
                 getBytesFromInputStream(getInputStream(message),
                 (int) ((FileContent) message).getSize()));
         } catch (Exception e) {
-            handleException("Error reading message payload as text for : " +
+            if (log.isDebugEnabled()) {
+                log.debug("Error reading message payload as text for : " +
                 ((FileContent) message).getFile().getName(), e);
+            }
         }
         return null;
     }

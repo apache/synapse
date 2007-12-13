@@ -54,6 +54,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.transport.base.MetricsCollector;
 
 /**
  * Processes an incoming request through Axis2. An instance of this class would be created to
@@ -81,6 +82,8 @@ public class ServerWorker implements Runnable {
     private InputStream is = null;
     /** the output stream to write the response message body */
     private OutputStream os = null;
+    /** the metrics collector */
+    private MetricsCollector metrics = null;
     private static final String SOAPACTION   = "SOAPAction";
     private static final String LOCATION     = "Location";
     private static final String CONTENT_TYPE = "Content-Type";
@@ -102,6 +105,7 @@ public class ServerWorker implements Runnable {
      */
     public ServerWorker(final ConfigurationContext cfgCtx, final NHttpServerConnection conn,
         final boolean isHttps,
+        final MetricsCollector metrics,
         final ServerHandler serverHandler,
         final HttpRequest request, final InputStream is,
         final HttpResponse response, final OutputStream os) {
@@ -109,6 +113,7 @@ public class ServerWorker implements Runnable {
         this.cfgCtx = cfgCtx;
         this.conn = conn;
         this.isHttps = isHttps;
+        this.metrics = metrics;
         this.serverHandler = serverHandler;
         this.request = request;
         this.response = response;
@@ -222,6 +227,9 @@ public class ServerWorker implements Runnable {
                 (contentType != null ? contentType.getValue() : null),
                 (soapAction != null  ? soapAction.getValue()  : null),
                 request.getRequestLine().getUri());
+            if (metrics != null) {
+                metrics.incrementMessagesReceived();
+            }
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);
         }
@@ -421,6 +429,9 @@ public class ServerWorker implements Runnable {
                             request.getRequestLine().getUri(),
                             cfgCtx,
                             parameters);
+                    if (metrics != null) {
+                        metrics.incrementMessagesReceived();
+                    }
                     // do not let the output stream close (as by default below) since
                     // we are serving this GET request through the Synapse engine
                     return;
@@ -443,6 +454,10 @@ public class ServerWorker implements Runnable {
 
     private void handleException(String msg, Exception e) {
 
+        if (metrics != null) {
+            metrics.incrementFaultsReceiving();
+        }
+        
         if (e == null) {
             log.error(msg);
         } else {

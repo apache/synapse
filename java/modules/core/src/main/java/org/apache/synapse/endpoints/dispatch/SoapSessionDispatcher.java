@@ -51,16 +51,19 @@ public class SoapSessionDispatcher implements Dispatcher {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
-        if(header != null) {
-            OMElement sgcID = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
+        if (header != null) {
+            OMElement sgcElm = header.getFirstChildWithName(
+                new QName("http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
 
-            if(sgcID != null && sgcID.getText() != null) {
+            if (sgcElm != null) {
+                String sgcID = sgcElm.getText();
 
-                Object e = sessionMap.get(sgcID.getText());
+                if (sgcID != null) {
+                    Object e = sessionMap.get(sgcID);
 
-                if (e != null) {
-                    endpoint = (Endpoint) e;
+                    if (e != null) {
+                        endpoint = (Endpoint) e;
+                    }
                 }
             }
         }
@@ -84,22 +87,24 @@ public class SoapSessionDispatcher implements Dispatcher {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
-        if(header != null) {
+        if (header != null) {
             OMElement replyTo = header.getFirstChildWithName
-                    (new QName("http://www.w3.org/2005/08/addressing", "ReplyTo", "wsa"));
+                (new QName("http://www.w3.org/2005/08/addressing", "ReplyTo", "wsa"));
 
-            if(replyTo != null) {
+            if (replyTo != null) {
                 OMElement referenceParameters = replyTo.getFirstChildWithName(new QName(
-                        "http://www.w3.org/2005/08/addressing", "ReferenceParameters", "wsa"));
+                    "http://www.w3.org/2005/08/addressing", "ReferenceParameters", "wsa"));
 
-                if(referenceParameters != null) {
-                    OMElement sgcID = referenceParameters.getFirstChildWithName(new QName(
-                            "http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
+                if (referenceParameters != null) {
+                    OMElement sgcElm = referenceParameters.getFirstChildWithName(new QName(
+                        "http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
 
                     // synchronized to avoid possible replacement of sessions
-                    synchronized(sessionMap) {
-                        if(!sessionMap.containsKey(sgcID.getText())) {
-                            sessionMap.put(sgcID.getText(), endpoint);
+                    synchronized (sessionMap) {
+                        String sgcID = sgcElm.getText();
+                        
+                        if (!sessionMap.containsKey(sgcID)) {
+                            sessionMap.put(sgcID, endpoint);
                         }
                     }
                 }
@@ -111,11 +116,16 @@ public class SoapSessionDispatcher implements Dispatcher {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
-        if(header != null) {
-            OMElement sgcID = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
-            if(sgcID != null && sgcID.getText() != null) {
-                sessionMap.remove(sgcID.getText());
+        if (header != null) {
+            OMElement sgcIDElm = header.getFirstChildWithName(
+                new QName("http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
+
+            if (sgcIDElm != null) {
+                String sgcID = sgcIDElm.getText();
+
+                if (sgcID != null) {
+                    sessionMap.remove(sgcID);
+                }
             }
         }
     }

@@ -23,7 +23,6 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,12 +124,11 @@ public class LoadbalanceEndpoint implements Endpoint {
      * having one active child endpoint is enough to consider this as active.
      *
      * @param synMessageContext MessageContext of the current message. This is not used here.
-     *
      * @return true if active. false otherwise.
      */
     public boolean isActive(MessageContext synMessageContext) {
 
-        if (!active) {
+        if (!active && endpoints != null) {
             for (int i = 0; i < endpoints.size(); i++) {
                 Endpoint endpoint = (Endpoint) endpoints.get(i);
                 if (endpoint.isActive(synMessageContext)) {

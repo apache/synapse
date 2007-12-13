@@ -34,8 +34,8 @@ import org.wso2.throttle.*;
 
 
 /**
- * The Mediator for the throttling - Throtting will occur according to the ws-policy which is specified as
- * the key for lookup from the registry or the inline policy
+ * The Mediator for the throttling - Throtting will occur according to the ws-policy
+ * which is specified as the key for lookup from the registry or the inline policy
  * Only support IP based throttling- Throotling can manage per IP using the throttle policy
  */
 
@@ -59,7 +59,8 @@ public class ThrottleMediator extends AbstractMediator {
     private AccessRateController accessControler;
     /* ConcurrentAccessController - limit the remote calleres concurrent access */
     private ConcurrentAccessController concurrentAccessController = null;
-    /* The property key that used when the ConcurrentAccessController look up from ConfigurationContext */
+    /* The property key that used when the ConcurrentAccessController
+       look up from ConfigurationContext */
     private String key;
     /* Is this env. support clustering*/
     private boolean isClusteringEnable = false;
@@ -98,7 +99,7 @@ public class ThrottleMediator extends AbstractMediator {
 
             //To ensure check for clustering environment only happens one time
             if ((throttle == null && !isResponse) || (isResponse
-                            && concurrentAccessController == null)) {
+                && concurrentAccessController == null)) {
                 ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
                 if (clusterManager != null &&
                     clusterManager.getContextManager() != null) {
@@ -108,7 +109,8 @@ public class ThrottleMediator extends AbstractMediator {
 
             // Throttle only will be created ,if the massage flow is IN
             if (!isResponse) {
-                //check the availability of the ConcurrentAccessControler if this is a clustered environment
+                //check the availability of the ConcurrentAccessControler
+                //if this is a clustered environment
                 if (isClusteringEnable) {
                     concurrentAccessController =
                         (ConcurrentAccessController) cc.getProperty(key);
@@ -120,7 +122,7 @@ public class ThrottleMediator extends AbstractMediator {
 
                         if (traceOn && trace.isTraceEnabled()) {
                             trace.trace("Initializing using static throttling policy : "
-                                                                                    + inLinePolicy);
+                                + inLinePolicy);
                         }
                         try {
                             // process the policy
@@ -133,7 +135,8 @@ public class ThrottleMediator extends AbstractMediator {
                             //if this is the first instance on the cluster ,
                             // that message mediation has occurred through this mediator.
                             if (throttle != null && concurrentAccessController == null) {
-                                concurrentAccessController = throttle.getConcurrentAccessController();
+                                concurrentAccessController =
+                                    throttle.getConcurrentAccessController();
                                 if (concurrentAccessController != null) {
                                     cc.setProperty(key, concurrentAccessController);
                                 }
@@ -151,7 +154,7 @@ public class ThrottleMediator extends AbstractMediator {
                     Entry entry = synCtx.getConfiguration().getEntryDefinition(policyKey);
                     if (entry == null) {
                         handleException("Cannot find throttling policy using key : "
-                                                                                + policyKey, synCtx);
+                            + policyKey, synCtx);
 
                     } else {
                         boolean reCreate = false;
@@ -166,7 +169,7 @@ public class ThrottleMediator extends AbstractMediator {
                             if (entryValue == null) {
                                 handleException(
                                     "Null throttling policy returned by Entry : "
-                                                                                + policyKey, synCtx);
+                                        + policyKey, synCtx);
 
                             } else {
                                 if (!(entryValue instanceof OMElement)) {
@@ -179,7 +182,8 @@ public class ThrottleMediator extends AbstractMediator {
                                     // is not null and throttle is not null , then must reload.
                                     if (isClusteringEnable && concurrentAccessController != null
                                         && throttle != null) {
-                                        concurrentAccessController = null; // set null ,because need reload
+                                        concurrentAccessController = null; // set null ,
+                                        // because need reload
                                     }
 
                                     try {
@@ -188,10 +192,11 @@ public class ThrottleMediator extends AbstractMediator {
                                             PolicyEngine.getPolicy((OMElement) entryValue));
 
                                         //For non-clustered  environment , must re-initiates
-                                        //For  clustered  environment, if concurrent access controller is null ,
+                                        //For  clustered  environment,
+                                        //concurrent access controller is null ,
                                         //then must re-initiates
                                         if (throttle != null && (concurrentAccessController == null
-                                                                    || !isClusteringEnable)) {
+                                            || !isClusteringEnable)) {
                                             concurrentAccessController =
                                                 throttle.getConcurrentAccessController();
                                             if (concurrentAccessController != null) {
@@ -235,7 +240,8 @@ public class ThrottleMediator extends AbstractMediator {
                     }
                     Replicator.replicate(cc);
                 } catch (ClusteringFault clusteringFault) {
-                    handleException("Error during the replicating  states ", clusteringFault, synCtx);
+                    handleException("Error during the replicating  states ",
+                        clusteringFault, synCtx);
                 }
             }
         }
@@ -278,9 +284,10 @@ public class ThrottleMediator extends AbstractMediator {
 
     /**
      * Helper method that handles the concurrent access through throttle
-     * @param isResponse Current Message is response or not
+     *
+     * @param isResponse     Current Message is response or not
      * @param traceOrDebugOn is trace or debug on?
-     * @param traceOn is trace on?
+     * @param traceOn        is trace on?
      * @return true if the caller can access ,o.w. false
      */
     private boolean doThrottleByConcurrency(boolean isResponse, boolean traceOrDebugOn, boolean traceOn) {
@@ -297,14 +304,15 @@ public class ThrottleMediator extends AbstractMediator {
                 available = concurrentAccessController.getAndDecrement();
                 canAcess = available > 0;
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Concurrency Throttle : Access " + (canAcess ? "allowed" : "denied") +
-                        " :: " + available + " of available of " + concurrentLimit + " connections");
+                    traceOrDebug(traceOn, "Concurrency Throttle : Access " +
+                        (canAcess ? "allowed" : "denied") + " :: " + available
+                        + " of available of " + concurrentLimit + " connections");
                 }
             } else {
                 available = concurrentAccessController.incrementAndGet();
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Concurrency Throttle : Connection returned" +
-                        " :: " + available + " of available of " + concurrentLimit + " connections");
+                    traceOrDebug(traceOn, "Concurrency Throttle : Connection returned" + " :: " +
+                        available + " of available of " + concurrentLimit + " connections");
                 }
             }
         }
@@ -312,12 +320,13 @@ public class ThrottleMediator extends AbstractMediator {
     }
 
     /**
-     * Helper method that handles the access-rate based throttling 
-     * @param synCtx  MessageContext(Synapse)
-     * @param axisMC MessageContext(Axis2)
-     * @param cc   ConfigurationContext
+     * Helper method that handles the access-rate based throttling
+     *
+     * @param synCtx         MessageContext(Synapse)
+     * @param axisMC         MessageContext(Axis2)
+     * @param cc             ConfigurationContext
      * @param traceOrDebugOn is trace or debug on?
-     * @param traceOn is trace on?
+     * @param traceOn        is trace on?
      * @return ue if the caller can access ,o.w. false
      */
     private boolean throttleByAccessRate(MessageContext synCtx, org.apache.axis2.context.MessageContext axisMC, ConfigurationContext cc, boolean traceOrDebugOn, boolean traceOn) {
@@ -330,8 +339,8 @@ public class ThrottleMediator extends AbstractMediator {
         //domain name of the caller
         String domainName = (String) axisMC.getPropertyNonReplicable(NhttpConstants.REMOTE_HOST);
 
-       //Using remote caller domain name , If there is a throttle configuration for this domain name ,
-       //then throttling will occur according to that configuration
+        //Using remote caller domain name , If there is a throttle configuration for
+        // this domain name ,then throttling will occur according to that configuration
         if (domainName != null) {
             // do the domain based throttling
             if (traceOrDebugOn) {
@@ -423,7 +432,8 @@ public class ThrottleMediator extends AbstractMediator {
                                     callerId, ThrottleConstants.IP_BASE);
 
                                 if (traceOrDebugOn) {
-                                    traceOrDebug(traceOn, "Access " + (canAccess ? "allowed" : "denied")
+                                    traceOrDebug(traceOn, "Access " +
+                                        (canAccess ? "allowed" : "denied")
                                         + " for IP : " + remoteIP);
                                 }
                                 //In the case of both of concurrency throttling and

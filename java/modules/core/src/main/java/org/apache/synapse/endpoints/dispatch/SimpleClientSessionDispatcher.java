@@ -41,7 +41,7 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
      * Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
      * multiple threds (e.g. multiple clients different sessions).
      */
-    private Map sessionMap = Collections.synchronizedMap(new HashMap());
+    private final Map sessionMap = Collections.synchronizedMap(new HashMap());
 
     public Endpoint getEndpoint(MessageContext synCtx) {
 

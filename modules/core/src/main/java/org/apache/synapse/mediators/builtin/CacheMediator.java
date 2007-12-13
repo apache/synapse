@@ -332,6 +332,7 @@ public class CacheMediator extends AbstractMediator {
             } else {
                 // cache exists, but has expired...
                 cachedObj.expire();
+                cachedObj.setTimeout(timeout);
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn,
                         "Existing cached response has expired. Reset cache element");

@@ -362,4 +362,13 @@ public class ScriptMediator extends AbstractMediator {
         log.error(msg);
         throw new SynapseException(msg);
     }
+
+    public Map getIncludeMap() {
+      return includes;
+    }
+
+    public void setIncludeMap(Map includeMap) {
+      this.includes = includeMap;
+    }
+    
 }

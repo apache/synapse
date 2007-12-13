@@ -18,12 +18,18 @@
  */
 package org.apache.synapse.mediators.bsf;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.Mediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
+
+import com.sun.java_cup.internal.internal_error;
+
 
 import javax.xml.stream.XMLStreamConstants;
 
@@ -58,6 +64,15 @@ public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
             OMTextImpl textData = (OMTextImpl) fac.createOMText(scriptMediator.getScriptSrc().trim());
             textData.setType(XMLStreamConstants.CDATA);
             script.addChild(textData);
+        }
+        
+        Map includeMap = scriptMediator.getIncludeMap();
+        Iterator iterIncludeMap = includeMap.keySet().iterator();
+        while(iterIncludeMap.hasNext()) {
+          String includeKey = (String) iterIncludeMap.next();
+          OMElement includeKeyElement = fac.createOMElement("include", synNS);
+          includeKeyElement.addAttribute(fac.createOMAttribute("key", nullNS, includeKey));
+          script.addChild(includeKeyElement);
         }
 
         saveTracingState(script, scriptMediator);

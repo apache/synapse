@@ -262,7 +262,7 @@ public class EndpointDefinition {
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsState
+     * @param statisticsState   Indicates whether statictics is enable or not
      */
     public void setStatisticsState(int statisticsState) {
         this.statisticsState = statisticsState;

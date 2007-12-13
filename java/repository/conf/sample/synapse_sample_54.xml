@@ -48,6 +48,7 @@
                     </loadbalance>
                 </endpoint>
             </send>
+            <drop/>
         </in>
 
         <out>

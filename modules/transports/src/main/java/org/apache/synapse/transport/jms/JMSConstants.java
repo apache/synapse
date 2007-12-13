@@ -73,6 +73,10 @@ public class JMSConstants {
      */
     public static final String CONFAC_PARAM = "transport.jms.ConnectionFactory";
     /**
+     * If reconnect timeout if connection error occurs in seconds
+     */
+    public static final String RECONNECT_TIMEOUT = "transport.jms.ReconnectTimeout";
+    /**
      * Connection factory type if using JMS 1.0, either DESTINATION_TYPE_QUEUE or DESTINATION_TYPE_TOPIC
      */
     public static final String CONFAC_TYPE = "transport.jms.ConnectionFactoryType";

@@ -194,7 +194,7 @@ public abstract class AbstractTransportListener implements TransportListener {
      */
     public void handleIncomingMessage(
         MessageContext msgCtx, Map trpHeaders,
-        String soapAction, String contentType) {
+        String soapAction, String contentType) throws AxisFault {
 
         // set the soapaction if one is available via a transport header
         if (soapAction != null) {
@@ -219,6 +219,7 @@ public abstract class AbstractTransportListener implements TransportListener {
                 }
         } catch (AxisFault axisFault) {
             logException("Error processing received message", axisFault);
+            throw axisFault;
         }
     }
 

@@ -21,17 +21,14 @@ package org.apache.synapse.mediators.bsf;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.Mediator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.xml.stream.XMLStreamConstants;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
-
-import com.sun.java_cup.internal.internal_error;
-
-
-import javax.xml.stream.XMLStreamConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
 /**
  * Serializer for a script mediator

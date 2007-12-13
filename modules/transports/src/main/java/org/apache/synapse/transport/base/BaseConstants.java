@@ -23,6 +23,10 @@ package org.apache.synapse.transport.base;
 import javax.xml.namespace.QName;
 
 public class BaseConstants {
+    // -- status of a transport --
+    public final static int STOPPED = 0;
+    public final static int STARTED = 1;
+    public final static int PAUSED  = 2;
 
     /**
      * The JMS message property specifying the SOAP Action

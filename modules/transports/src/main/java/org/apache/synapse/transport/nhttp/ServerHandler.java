@@ -22,6 +22,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.nhttp.util.WorkerPool;
 import org.apache.synapse.transport.nhttp.util.WorkerPoolFactory;
+import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -70,6 +71,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     /** the thread pool to process requests */
     private WorkerPool workerPool = null;
+    /** the metrics collector */
+    private MetricsCollector metrics = null;
 
     private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
     private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
@@ -77,11 +80,12 @@ public class ServerHandler implements NHttpServiceHandler {
     private static final String RESPONSE_BUFFER = "response-buffer";
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
-        final boolean isHttps) {
+        final boolean isHttps, final MetricsCollector metrics) {
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
         this.isHttps = isHttps;
+        this.metrics = metrics;
         this.responseFactory = new DefaultHttpResponseFactory();
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
@@ -131,16 +135,22 @@ public class ServerHandler implements NHttpServiceHandler {
 
             // hand off processing of the request to a thread off the pool
             workerPool.execute(
-                new ServerWorker(cfgCtx, conn, isHttps, this,
+                new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
                     request, Channels.newInputStream(requestPipe.source()),
                     response, Channels.newOutputStream(responsePipe.sink())));
 
         } catch (IOException e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
+            if (metrics != null) {
+               metrics.incrementFaultsReceiving();
+            }
         } catch (Exception e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
+            if (metrics != null) {
+                metrics.incrementFaultsReceiving();
+            }
         }
     }
 
@@ -159,6 +169,9 @@ public class ServerHandler implements NHttpServiceHandler {
             while (decoder.read(inbuf) > 0) {
                 inbuf.flip();
                 sink.write(inbuf);
+                if (metrics != null) {
+                    metrics.incrementBytesReceived(inbuf.position());
+                }
                 inbuf.compact();
             }
 
@@ -241,16 +254,23 @@ public class ServerHandler implements NHttpServiceHandler {
             }
         } else {
             log.warn("Connection Timeout");
+            if (metrics != null) {
+                metrics.incrementTimeoutsReceiving();
+            }            
         }
         shutdownConnection(conn);
     }
 
     public void connected(final NHttpServerConnection conn) {
-        log.trace("New incoming connection");
+        if (log.isTraceEnabled()) {
+            log.trace("New incoming connection");
+        }
     }
 
     public void closed(final NHttpServerConnection conn) {
-        log.trace("Connection closed");
+        if (log.isTraceEnabled()) {
+            log.trace("Connection closed");
+        }
     }
 
     /**

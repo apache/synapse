@@ -47,6 +47,7 @@
                         </loadbalance>
                     </endpoint>
                 </send>
+                <drop/>
             </inSequence>
             <outSequence>
                 <send/>

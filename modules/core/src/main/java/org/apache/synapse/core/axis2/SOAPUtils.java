@@ -19,20 +19,27 @@
 
 package org.apache.synapse.core.axis2;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.soap.*;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPFault;
+import org.apache.axiom.soap.SOAPFaultCode;
+import org.apache.axiom.soap.SOAPFaultReason;
+import org.apache.axiom.soap.SOAPFaultText;
+import org.apache.axiom.soap.SOAPFaultValue;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.MessageHelper;
-
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageHandler;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class SOAPUtils {
 

@@ -273,6 +273,13 @@ public class JMSUtils extends BaseUtils {
             if (JMSConstants.CONFAC_TYPE.equals(p.getName())) {
                 String connectionFactoryType = (String) p.getValue();
                 jmsConFactory.setConnectionFactoryType(connectionFactoryType);
+            
+            } else if (JMSConstants.RECONNECT_TIMEOUT.equals(p.getName())) {
+              String strTimeout = (String) p.getValue();
+              int reconnectTimeoutSeconds = Integer.parseInt(strTimeout);
+              long reconnectTimeoutMillis = reconnectTimeoutSeconds * 1000;
+              jmsConFactory.setReconnectTimeout(reconnectTimeoutMillis);
+              
             } else if (Context.INITIAL_CONTEXT_FACTORY.equals(p.getName())) {
                 jmsConFactory.addJNDIContextProperty(
                     Context.INITIAL_CONTEXT_FACTORY, (String) p.getValue());

@@ -35,11 +35,16 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.transport.http.HttpTransportProperties;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.wsdl.WSDLConstants;
 
 import javax.xml.namespace.QName;
 import java.util.Random;
 import java.io.File;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 public class LoadbalanceFailoverClient {
 
@@ -73,13 +78,16 @@ public class LoadbalanceFailoverClient {
         int iterations = 100;
         boolean infinite = true;
 
-        String pPort = System.getProperty("port");
-        String pIterations = System.getProperty("i");
+        String pPort = getProperty("port", synapsePort);
+        String pIterations = getProperty("i", null);
+        String addUrl = getProperty("addurl", null);
+        String trpUrl = getProperty("trpurl", null);
+        String prxUrl = getProperty("prxurl", null);
 
         if (pPort != null) {
             try {
-                stringToInt(pPort);
-                synapsePort = System.getProperty("port");
+                Integer.parseInt(pPort);
+                synapsePort = pPort;
             } catch (NumberFormatException e) {
                 // run with default value
             }
@@ -87,7 +95,7 @@ public class LoadbalanceFailoverClient {
 
         if (pIterations != null) {
             try {
-                iterations = stringToInt(pIterations);
+                iterations = Integer.parseInt(pIterations);
                 if (iterations != -1) {
                     infinite = false;
                 }
@@ -103,23 +111,47 @@ public class LoadbalanceFailoverClient {
         Options options = new Options();
         options.setTo(new EndpointReference("http://localhost:" + synapsePort));
 
-        options.setAction("sampleOperation");
+        options.setAction("urn:sampleOperation");
 
         String repo = System.getProperty("repository");
         ConfigurationContext configContext;
         if (repo != null) {
             configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                    repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
+                repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
         } else {
             configContext = ConfigurationContextFactory.
-                    createConfigurationContextFromFileSystem("client_repo", null);
+                createConfigurationContextFromFileSystem("client_repo", null);
         }
         ServiceClient client = new ServiceClient(configContext, null);
         options.setTimeOutInMilliSeconds(10000000);
 
-        client.setOptions(options);
-        client.engageModule("addressing");
+        // set addressing, transport and proxy url
+        if (addUrl != null && !"null".equals(addUrl)) {
+            client.engageModule("addressing");
+            options.setTo(new EndpointReference(addUrl));
+        }
+        if (trpUrl != null && !"null".equals(trpUrl)) {
+            options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);
+        } else {
+            client.engageModule("addressing");
+        }
+        if (prxUrl != null && !"null".equals(prxUrl)) {
+            HttpTransportProperties.ProxyProperties proxyProperties =
+                new HttpTransportProperties.ProxyProperties();
+            try {
+                URL url = new URL(prxUrl);
+                proxyProperties.setProxyName(url.getHost());
+                proxyProperties.setProxyPort(url.getPort());
+                proxyProperties.setUserName("");
+                proxyProperties.setPassWord("");
+                proxyProperties.setDomain("");
+                options.setProperty(HTTPConstants.PROXY, proxyProperties);
+            } catch (MalformedURLException e) {
+                throw new AxisFault("Error creating proxy URL", e);
+            }
+        }
 
+        client.setOptions(options);
         String testString = "";
 
         long i = 0;
@@ -148,13 +180,17 @@ public class LoadbalanceFailoverClient {
         int iterations = 100;
         boolean infinite = true;
 
-        String pPort = System.getProperty("port");
-        String pIterations = System.getProperty("i");
+        String pPort = getProperty("port", synapsePort);
+        String pIterations = getProperty("i", null);
+        String addUrl = getProperty("addurl", null);
+        String trpUrl = getProperty("trpurl", null);
+        String prxUrl = getProperty("prxurl", null);
 
         if (pPort != null) {
             try {
-                stringToInt(pPort);
-                synapsePort = System.getProperty("port");
+
+                Integer.parseInt(pPort);
+                synapsePort = pPort;
             } catch (NumberFormatException e) {
                 // run with default value
             }
@@ -162,7 +198,7 @@ public class LoadbalanceFailoverClient {
 
         if (pIterations != null) {
             try {
-                iterations = stringToInt(pIterations);
+                iterations = Integer.parseInt(pIterations);
                 if (iterations != -1) {
                     infinite = false;
                 }
@@ -173,8 +209,9 @@ public class LoadbalanceFailoverClient {
 
         Options options = new Options();
         options.setTo(new EndpointReference("http://localhost:" + synapsePort));
-        options.setAction("sampleOperation");
+        options.setAction("urn:sampleOperation");
         options.setTimeOutInMilliSeconds(10000000);
+
 
         try {
 
@@ -184,10 +221,35 @@ public class LoadbalanceFailoverClient {
             SOAPEnvelope[] envelopes = {env1, env2, env3};
 
             ConfigurationContext configContext = ConfigurationContextFactory.
-                    createConfigurationContextFromFileSystem("client_repo", null);
+                createConfigurationContextFromFileSystem("client_repo", null);
             ServiceClient client = new ServiceClient(configContext, null);
+            
+            // set addressing, transport and proxy url
+            if (addUrl != null && !"null".equals(addUrl)) {
+                client.engageModule("addressing");
+                options.setTo(new EndpointReference(addUrl));
+            }
+            if (trpUrl != null && !"null".equals(trpUrl)) {
+                options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);
+            } else {
+                client.engageModule("addressing");
+            }
+            if (prxUrl != null && !"null".equals(prxUrl)) {
+                HttpTransportProperties.ProxyProperties proxyProperties =
+                    new HttpTransportProperties.ProxyProperties();
+                try {
+                    URL url = new URL(prxUrl);
+                    proxyProperties.setProxyName(url.getHost());
+                    proxyProperties.setProxyPort(url.getPort());
+                    proxyProperties.setUserName("");
+                    proxyProperties.setPassWord("");
+                    proxyProperties.setDomain("");
+                    options.setProperty(HTTPConstants.PROXY, proxyProperties);
+                } catch (MalformedURLException e) {
+                    throw new AxisFault("Error creating proxy URL", e);
+                }
+            }
             client.setOptions(options);
-            client.engageModule("addressing");
 
             int i = 0;
             int sessionNumber = 0;
@@ -204,14 +266,14 @@ public class LoadbalanceFailoverClient {
                 op.execute(true);
 
                 MessageContext responseContext =
-                        op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+                    op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
                 SOAPEnvelope responseEnvelope = responseContext.getEnvelope();
 
                 OMElement vElement =
-                        responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
+                    responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
                 System.out.println(
-                        "Request: " + i + " Session number: " +
-                                sessionNumber + " " + vElement.getText());
+                    "Request: " + i + " Session number: " +
+                        sessionNumber + " " + vElement.getText());
             }
 
         } catch (AxisFault axisFault) {
@@ -232,7 +294,7 @@ public class LoadbalanceFailoverClient {
         SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();
 
         OMNamespace wsaNamespace = soapFactory.
-                createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
+            createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
 
         SOAPEnvelope envelope = soapFactory.createSOAPEnvelope();
 
@@ -240,7 +302,7 @@ public class LoadbalanceFailoverClient {
         envelope.addChild(header);
 
         OMNamespace synNamespace = soapFactory.
-                createOMNamespace("http://ws.apache.org/namespaces/synapse", "syn");
+            createOMNamespace("http://ws.apache.org/namespaces/synapse", "syn");
         OMElement clientIDElement = soapFactory.createOMElement("ClientID", synNamespace);
         clientIDElement.setText(clientID);
         header.addChild(clientIDElement);
@@ -255,10 +317,11 @@ public class LoadbalanceFailoverClient {
         return envelope;
     }
 
-    private int stringToInt(String stringNumber) {
-
-        int number = new Integer(stringNumber).intValue();
-
-        return number;
+    private static String getProperty(String name, String def) {
+        String result = System.getProperty(name);
+        if (result == null || result.length() == 0) {
+            result = def;
+        }
+        return result;
     }
 }

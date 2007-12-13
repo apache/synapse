@@ -41,12 +41,12 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * Choose an active endpoint using the round robin algorithm. If there are no active endpoints
      * available, returns null.
      *
-     * @param synapseMessageContext
+     * @param synapseMessageContext MessageContext instance which holds all per-message properties 
      * @return endpoint to send the next message
      */
     public Endpoint getNextEndpoint(MessageContext synapseMessageContext) {
 
-        Endpoint nextEndpoint = null;
+        Endpoint nextEndpoint;
         int attempts = 0;
 
         do {

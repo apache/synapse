@@ -22,8 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
@@ -48,8 +46,17 @@ import java.util.Iterator;
  */
 public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName POJO_COMMAND_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
-    protected static final QName ATT_ACTION   = new QName("action");    
+    private static final QName POJO_COMMAND_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
+    protected static final QName ATT_ACTION = new QName("action");
+    protected static final QName ATT_CTXNAME = new QName("context-name");
+
+    protected static final String RM_ACTION = "ReadMessage";
+    protected static final String UM_ACTION = "UpdateMessage";
+    protected static final String RC_ACTION = "ReadContext";
+    protected static final String UC_ACTION = "UpdateContext";
+    protected static final String RAUM_ACTION = "ReadAndUpdateMessage";
+    protected static final String RAUC_ACTION = "ReadAndUpdateContext";
 
     public Mediator createMediator(OMElement elem) {
 
@@ -79,69 +86,146 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
             OMElement child = (OMElement) it.next();
             if("property".equals(child.getLocalName())) {
 
-                String propName = child.getAttribute(ATT_NAME).getAttributeValue();
-                if (propName == null) {
-                    handleException(
-                        "A POJO command mediator property must specify the name attribute");
+                OMAttribute nameAttr = child.getAttribute(ATT_NAME);
+                if (nameAttr != null && nameAttr.getAttributeValue() != null
+                    && !"".equals(nameAttr.getAttributeValue())) {
+
+                    handlePropertyAction(nameAttr.getAttributeValue(), child, pojoMediator);
                 } else {
-                    if (child.getAttribute(ATT_EXPRN) != null) {
-                        AXIOMXPath xpath = null;
-
-                        try {
-                            xpath = new AXIOMXPath(child.getAttribute(ATT_EXPRN).getAttributeValue());
-                            OMElementUtils.addNameSpaces(xpath, child, log);
-
-                            if (child.getAttribute(ATT_ACTION) != null) {
-                                
-                                String action = child.getAttribute(ATT_ACTION).getAttributeValue();
-                                if ("get".equals(action)) {
-                                    pojoMediator.addMessageGetterProperty(propName, xpath);
-                                } else if ("set".equals(action)) {
-                                    pojoMediator.addDynamicSetterProperty(propName, xpath);
-                                } else {
-                                    // if there is an action attribute and the value is not neigther get nor set
-                                    handleException("Property action for the " +
-                                            "POJOCommand mediator should be eigther 'get' or 'set'");
-                                }
-                            } else {
-                                // if no action is provided take it as a setter propperty
-                                pojoMediator.addDynamicSetterProperty(propName, xpath);
-                            }
-                            
-                        } catch (JaxenException e) {
-                            handleException("Error instantiating XPath expression : " +
-                                child.getAttribute(ATT_EXPRN), e);
-                        }
-                    } else {
-                        if (child.getAttribute(ATT_VALUE) != null) {
-
-                            String value = child.getAttribute(ATT_VALUE).getAttributeValue();
-                            if (child.getAttribute(ATT_ACTION) != null) {
-
-                                String action = child.getAttribute(ATT_ACTION).getAttributeValue();
-                                if ("get".equals(action)) {
-                                    pojoMediator.addContextGetterProperty(propName, value);
-                                } else if ("set".equals(action)) {
-                                    pojoMediator.addStaticSetterProperty(propName, value);
-                                } else {
-                                    // if there is an action attribute and the value is not neigther get nor set
-                                    handleException("Property action for the " +
-                                            "POJOCommand mediator should be eigther 'get' or 'set'");
-                                }
-                            } else {
-                                // if no action is provided take it as a setter propperty
-                                pojoMediator.addStaticSetterProperty(propName, value);
-                            }
-                        } else {
-                            handleException("A POJO mediator property must specify either " +
-                                    "name and expression attributes, or name and value attributes");
-                        }
-                    }
+                    handleException("A POJO command mediator " +
+                        "property must specify the name attribute");
                 }
             }
         }
 
         return pojoMediator;
+    }
+
+    private void handlePropertyAction(String name, OMElement propElem, POJOCommandMediator m) {
+
+        OMAttribute valueAttr   = propElem.getAttribute(ATT_VALUE);
+        OMAttribute exprAttr    = propElem.getAttribute(ATT_EXPRN);
+        OMAttribute ctxNameAttr = propElem.getAttribute(ATT_CTXNAME);
+        OMAttribute actionAttr  = propElem.getAttribute(ATT_ACTION);
+
+        AXIOMXPath xpath = null;
+        try {
+            if (exprAttr != null) {
+                xpath = new AXIOMXPath(exprAttr.getAttributeValue());
+                OMElementUtils.addNameSpaces(xpath, propElem, log);
+            }
+        } catch (JaxenException e) {
+            handleException("Error in building the expression as an AXIOMXPath" + e);
+        }
+
+        // if there is a value attribute there is no action (action is implied as read value)
+        if (valueAttr != null) {
+            String value = valueAttr.getAttributeValue();
+            // all other three attributes can not co-exists
+            if (exprAttr != null && ctxNameAttr != null) {
+                handleException("Command properties can not contain all three 'value', " +
+                    "'expression' and 'context-name' attributes. Only one or " +
+                    "combination of two can be there.");
+            } else {
+                m.addStaticSetterProperty(name, value);
+                if (exprAttr != null) {
+                    // action ==> ReadValueAndUpdateMesssage
+                    m.addMessageGetterProperty(name, xpath);
+                } else if (ctxNameAttr != null) {
+                    // action ==> ReadValueAndUpdateContext
+                    m.addContextGetterProperty(name, ctxNameAttr.getAttributeValue());
+                } // else the action ==> ReadValue
+            }
+        } else if (propElem.getFirstElement() != null) {
+            // all other two attributes can not co-exists
+            if (exprAttr != null && ctxNameAttr != null) {
+                handleException("Command properties can not contain all the " +
+                    "'expression' and 'context-name' attributes with a child. Only one " +
+                    "attribute of those can co-exists with a child");
+            } else {
+                m.addStaticSetterProperty(name, propElem.getFirstElement());
+                if (exprAttr != null) {
+                    // action ==> ReadValueAndUpdateMesssage
+                    m.addMessageGetterProperty(name, xpath);
+                } else if (ctxNameAttr != null) {
+                    // action ==> ReadValueAndUpdateContext
+                    m.addContextGetterProperty(name, ctxNameAttr.getAttributeValue());
+                } // else the action ==> ReadValue
+            }
+        } else {
+            // if both context-name and expression is there
+            if (exprAttr != null && ctxNameAttr != null) {
+                if (actionAttr != null && actionAttr.getAttributeValue() != null) {
+                    String action = actionAttr.getAttributeValue();
+                    if (RM_ACTION.equals(action) || UC_ACTION.equals(action)) {
+                        // action ==> ReadMessageAndUpdateContext
+                        m.addMessageSetterProperty(name, xpath);
+                        m.addContextGetterProperty(name, ctxNameAttr.getAttributeValue());
+                    } else if (RC_ACTION.equals(action) || UM_ACTION.equals(action)) {
+                        // action ==> ReadContextAndUpdateMessage
+                        m.addContextSetterProperty(name, ctxNameAttr.getAttributeValue());
+                        m.addMessageGetterProperty(name, xpath);
+                    } else {
+                        handleException("Invalid action for " +
+                            "the command property with the name " + name);
+                    }
+                } else {
+                    handleException("Action attribute " +
+                        "is required for the command property with name " + name);
+                }
+            } else {
+                // only one of expression or context-name is present
+                if (actionAttr != null && actionAttr.getAttributeValue() != null) {
+                    String action = actionAttr.getAttributeValue();
+                    if (exprAttr != null) {
+                        if (RM_ACTION.equals(action)) {
+                            // action ==> ReadMessage
+                            m.addMessageSetterProperty(name, xpath);
+                        } else if (UM_ACTION.equals(action)) {
+                            // action ==> UpdateMessage
+                            m.addMessageGetterProperty(name, xpath);
+                        } else if (RAUM_ACTION.equals(action)) {
+                            // action ==> ReadAndUpdateMessage
+                            m.addMessageSetterProperty(name, xpath);
+                            m.addMessageGetterProperty(name, xpath);
+                        } else {
+                            handleException("Invalid action for " +
+                                "the command property with the name " + name);
+                        }
+                    } else if (ctxNameAttr != null) {
+                        String ctxName = ctxNameAttr.getAttributeValue();
+                        if (RC_ACTION.equals(action)) {
+                            // action ==> ReadContext
+                            m.addContextSetterProperty(name, ctxName);
+                        } else if (UC_ACTION.equals(action)) {
+                            // action ==> UpdateContext
+                            m.addContextGetterProperty(name, ctxName);
+                        } else if (RAUC_ACTION.equals(action)) {
+                            // action ==> ReadAndUpdateContext
+                            m.addContextSetterProperty(name, ctxName);
+                            m.addContextGetterProperty(name, ctxName);
+                        } else {
+                            handleException("Invalid action for " +
+                                "the command property with the name " + name);
+                        }
+                    } else {
+                        handleException("Unrecognized command property with the name " + name);
+                    }
+                } else {
+                    // action ==> ReadAndUpdateMessage/Context
+                    if (exprAttr != null) {
+                        m.addMessageSetterProperty(name, xpath);
+                        m.addMessageGetterProperty(name, xpath);
+                    } else if (ctxNameAttr != null) {
+                        String ctxName = ctxNameAttr.getAttributeValue();
+                        m.addContextSetterProperty(name, ctxName);
+                        m.addContextGetterProperty(name, ctxName);
+                    } else {
+                        handleException("Unrecognized command property with the name " + name);
+                    }
+                }
+            }
+        }
     }
 
     public QName getTagQName() {

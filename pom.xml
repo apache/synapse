@@ -844,6 +844,10 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
                     <artifactId>axis2-adb</artifactId>
                 </exclusion>
                 <exclusion>

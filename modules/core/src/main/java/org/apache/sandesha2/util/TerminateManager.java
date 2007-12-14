@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -271,7 +272,7 @@ public class TerminateManager {
 		long lastAckedMsg = -1;
 		
 		if(ranges.length==1){
-			//a single contiguous acked range
+			//the sequence is a single contiguous acked range
 			lastAckedMsg = ranges[0].upperValue;
 		}
 		else{
@@ -286,20 +287,50 @@ public class TerminateManager {
 			if(retransmitterBean.getMessageType()!=Sandesha2Constants.MessageTypes.TERMINATE_SEQ || rmsBean.isTerminated()){
 				//remove all but terminate sequence messages
 				String messageStoreKey = retransmitterBean.getMessageContextRefKey();
+				//if we have been asked to reallocate we need to send all unacked messages to a new sequence.
+				//We must ensure that we rerieve these messages in the correct order 
 				if(reallocateIfPossible
-					&& retransmitterBean.getMessageType()!=Sandesha2Constants.MessageTypes.APPLICATION
+					&& retransmitterBean.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION
 					&& retransmitterBean.getMessageNumber()==lastAckedMsg+1){
 					
-					//try to reallocate application msgs
+					if(log.isDebugEnabled())
+						log.debug("adding message for reallocate: " + retransmitterBean.getMessageNumber());
+					
+					//try to reallocate application msgs that are next in the outgoing list to 
 					msgsToReallocate.add(storageManager.retrieveMessageContext(messageStoreKey, storageManager.getContext()));
+					retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
+					storageManager.removeMessageContext(messageStoreKey);	
 					lastAckedMsg++;
 				}
-				retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
-				storageManager.removeMessageContext(messageStoreKey);				
+				else if(reallocateIfPossible){
+					//we are reallocating but this message does not fit the criteria. We should not delete it
+					if(log.isDebugEnabled())
+						log.debug("cannot reallocate: " + retransmitterBean.getMessageNumber());
+					if(msgsToReallocate.size()==0){
+						try{
+							//however we might need this message if there are no messages to reallocate but we still
+							//need a new sequence - we use a dummy message
+							MessageContext dummy = SandeshaUtil.cloneMessageContext(
+									storageManager.retrieveMessageContext(messageStoreKey, storageManager.getContext()));
+							dummy.getOptions().setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_TRUE);	
+							msgsToReallocate.add(dummy);							
+						}
+						catch(Exception e){
+							if(log.isDebugEnabled())
+								log.debug("Exit: TerminateManager::cleanSendingSideData " + e);
+							throw new SandeshaStorageException(e);
+						}
+					}
+				}
+				else{
+					//we are not reallocating so just delete the messages
+					retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
+					storageManager.removeMessageContext(messageStoreKey);						
+				}
 			}
 		}
 		
-		if(reallocateIfPossible && msgsToReallocate.size()>0){
+		if(reallocateIfPossible){
 			try{
 			      SandeshaUtil.reallocateMessagesToNewSequence(storageManager, rmsBean, msgsToReallocate);	
 			      reallocatedOK = true;

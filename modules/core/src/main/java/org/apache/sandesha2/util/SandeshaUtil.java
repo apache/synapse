@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.events.Characters;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.CopyUtils;
@@ -1078,14 +1079,17 @@ public class SandeshaUtil {
         //internal sequence ID is different
         String internalSequenceID = oldRMSBean.getInternalSequenceID();
         //we also need to obtain the sequenceKey from the internalSequenceID.
-        String sequenceKey = 
+        String oldSequenceKey = 
           SandeshaUtil.getSequenceKeyFromInternalSequenceID(internalSequenceID, oldRMSBean.getToEndpointReference().getAddress());
-        options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey); 
+        //remove the old sequence key from the internal sequence ID
+        internalSequenceID = internalSequenceID.substring(0, internalSequenceID.length()-oldSequenceKey.length());
+        options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, 
+        		SandeshaUtil.getUUID()); //using a new sequence Key to differentiate from the old sequence 
         options.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceID);
         options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, oldRMSBean.getRMVersion());
       	options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
       	
-        //send the msgs
+        //send the msgs - this will setup a new sequence to the same endpoint
       	Iterator it = msgsToSend.iterator();
       	while(it.hasNext()){
       		MessageContext msgCtx = (MessageContext)it.next();

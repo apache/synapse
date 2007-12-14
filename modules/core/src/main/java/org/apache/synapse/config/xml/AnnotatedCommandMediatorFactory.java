@@ -22,12 +22,9 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.AnnotatedCommandMediator;
-import org.apache.synapse.mediators.ext.POJOCommandMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -89,7 +86,7 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
                             xpath = new AXIOMXPath(
                                 child.getAttribute(ATT_EXPRN).getAttributeValue());
                             OMElementUtils.addNameSpaces(xpath, child, log);
-                            pojoMediator.addDynamicSetterProperty(propName, xpath);
+                            pojoMediator.addMessageSetterProperty(propName, xpath);
                         } catch (JaxenException e) {
                             handleException("Error instantiating XPath expression : " +
                                 child.getAttribute(ATT_EXPRN), e);

@@ -117,6 +117,10 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		closeSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		closeSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 		closeSequenceResponseMsg.setResponseWritten(true);
+		if(rmBean instanceof RMSBean && rmBean.getRMVersion().equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){
+			//we expect a response
+			closeSequenceResponseMsg.setReplyTo(rmBean.getReplyToEndpointReference());
+		}
 		closeSeqResponseRMMsg.addSOAPEnvelope();
 		
 		//

@@ -393,6 +393,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		// Update the RMSBean with the terminate added flag
 		getStorageManager().getRMSBeanMgr().update(rmsBean);
+		
+		if(rmsBean.getRMVersion().equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){
+			rmMsgCtx.setReplyTo(rmsBean.getAcksToEndpointReference());
+		}
 
 		// Send the outgoing message
 		// Set a retransmitter lastSentTime so that terminate will be send with

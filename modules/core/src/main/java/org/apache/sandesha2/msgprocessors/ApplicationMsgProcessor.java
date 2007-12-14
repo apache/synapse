@@ -243,7 +243,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				} else {
 					specVersion = rmsBean.getRMVersion();
 				}
-				if(specVersion == Sandesha2Constants.SPEC_VERSIONS.v1_1) {
+				if(specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
 					EndpointReference replyTo = msgContext.getReplyTo();
 					if(replyTo == null || replyTo.hasAnonymousAddress()) {
 						//we are sync

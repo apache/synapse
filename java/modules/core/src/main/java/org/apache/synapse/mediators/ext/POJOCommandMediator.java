@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.ext;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Command;
@@ -55,25 +56,31 @@ public class POJOCommandMediator extends AbstractMediator {
      * 'static' properties whose values are constant and does not depend
      * on the current message (i.e. and XPath over it)
      */
-    private Map staticSetterProperties = new HashMap();
+    private Map<String, Object> staticSetterProperties = new HashMap<String, Object>();
 
     /**
      * 'dynamic' properties whose values are dynamically evaluated before each
      * invocation of the command, by evaluating an XPath against the current message
      */
-    private Map dynamicSetterProperties = new HashMap();
+    private Map<String, AXIOMXPath> messageSetterProperties = new HashMap<String, AXIOMXPath>();
+
+    /**
+     * 'dynamic' properties whose values are dynamically evaluated before each
+     * invocation of the command, by getting a property from the message context
+     */
+    private Map<String, String> contextSetterProperties = new HashMap<String, String>();
 
     /**
      * 'context' properties whose values are set back to the message context as message
      * context properties
      */
-    private Map contextGetterProperties = new HashMap();
+    private Map<String, String> contextGetterProperties = new HashMap<String, String>();
 
     /**
      * 'messsage' properties whose values are set back to the current message, from the command
      * and as specified by the XPATH
      */
-    private Map messageGetterProperties = new HashMap();
+    private Map<String, AXIOMXPath> messageGetterProperties = new HashMap<String, AXIOMXPath>();
 
     /**
      * Implements the mediate method of the Mediator interface. This method will instantiate
@@ -116,15 +123,21 @@ public class POJOCommandMediator extends AbstractMediator {
         // then set the static/constant properties first
         for (Iterator iter = staticSetterProperties.keySet().iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
-            setInstanceProperty(name,
-                (String) staticSetterProperties.get(name), commandObject, synCtx);
+            setInstanceProperty(name, staticSetterProperties.get(name), commandObject, synCtx);
+        }
+
+        // now set the any dynamic properties from the message context properties
+        for (Iterator iter = contextSetterProperties.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String) iter.next();
+            setInstanceProperty(name, synCtx.getProperty(contextSetterProperties.get(name)),
+                commandObject, synCtx);
         }
 
         // now set the any dynamic properties evaluating XPath's on the current message
-        for (Iterator iter = dynamicSetterProperties.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = messageSetterProperties.keySet().iterator(); iter.hasNext(); ) {
 
             String name = (String) iter.next();
-            AXIOMXPath xpath = (AXIOMXPath) dynamicSetterProperties.get(name);
+            AXIOMXPath xpath = messageSetterProperties.get(name);
             String value = Axis2MessageContext.getStringValue(xpath, synCtx);
 
             setInstanceProperty(name, value, commandObject, synCtx);
@@ -161,7 +174,7 @@ public class POJOCommandMediator extends AbstractMediator {
         // then set the context properties back to the messageContext from the command
         for (Iterator iter = contextGetterProperties.keySet().iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
-            synCtx.setProperty((String) contextGetterProperties.get(name),
+            synCtx.setProperty(contextGetterProperties.get(name),
                 getInstanceProperty(name, commandObject, synCtx));
         }
 
@@ -170,7 +183,7 @@ public class POJOCommandMediator extends AbstractMediator {
         for (Iterator iter = messageGetterProperties.keySet().iterator(); iter.hasNext(); ) {
 
             String name = (String) iter.next();
-            AXIOMXPath xpath = (AXIOMXPath) messageGetterProperties.get(name);
+            AXIOMXPath xpath = messageGetterProperties.get(name);
 
             Object resultValue = getInstanceProperty(name, commandObject, synCtx);
 
@@ -190,7 +203,8 @@ public class POJOCommandMediator extends AbstractMediator {
                 } else {
                     if (traceOrDebugOn) {
                         traceOrDebug(traceOn, "Unable to set the message property " + resultValue
-                            + "back to the message : Specified element by the xpath " + xpath + " can not be found");
+                            + "back to the message : Specified element by the xpath "
+                            + xpath + " can not be found");
                     }
                 }
             } catch (JaxenException e) {
@@ -245,7 +259,8 @@ public class POJOCommandMediator extends AbstractMediator {
      * @param obj POJO instance
      * @param synCtx current message
      */
-    protected void setInstanceProperty(String name, String value, Object obj, MessageContext synCtx) {
+    protected void setInstanceProperty(
+        String name, Object value, Object obj, MessageContext synCtx) {
 
         String mName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
         Method method = null;
@@ -260,31 +275,42 @@ public class POJOCommandMediator extends AbstractMediator {
                     if (params.length != 1) {
                         handleException("Did not find a setter method named : " + mName +
                             "() that takes a single String, int, long, float, double " +
-                            "or boolean parameter", synCtx);
-                    } else {
+                            "or boolean or OMElement parameter", synCtx);
+                    } else if (value instanceof String) {
                         if (params[0].equals(String.class)) {
                             method = obj.getClass().getMethod(mName, new Class[]{String.class});
-                            method.invoke(obj, new String[]{value});
+                            method.invoke(obj, new String[]{(String) value});
                         } else if (params[0].equals(int.class)) {
                             method = obj.getClass().getMethod(mName, new Class[]{int.class});
-                            method.invoke(obj, new Integer[]{new Integer(value)});
+                            method.invoke(obj, new Integer[]{new Integer((String) value)});
                         } else if (params[0].equals(long.class)) {
                             method = obj.getClass().getMethod(mName, new Class[]{long.class});
-                            method.invoke(obj, new Long[]{new Long(value)});
+                            method.invoke(obj, new Long[]{new Long((String) value)});
                         } else if (params[0].equals(float.class)) {
                             method = obj.getClass().getMethod(mName, new Class[]{float.class});
-                            method.invoke(obj, new Float[]{new Float(value)});
+                            method.invoke(obj, new Float[]{new Float((String) value)});
                         } else if (params[0].equals(double.class)) {
                             method = obj.getClass().getMethod(mName, new Class[]{double.class});
-                            method.invoke(obj, new Double[]{new Double(value)});
+                            method.invoke(obj, new Double[]{new Double((String) value)});
                         } else if (params[0].equals(boolean.class)) {
                             method = obj.getClass().getMethod(mName, new Class[]{boolean.class});
-                            method.invoke(obj, new Boolean[]{new Boolean(value)});
+                            method.invoke(obj, new Boolean[]{new Boolean((String) value)});
                         } else {
                             handleException("Did not find a setter method named : " + mName +
                                 "() that takes a single String, int, long, float, double " +
                                 "or boolean parameter", synCtx);
                         }
+                    } else if (value instanceof OMElement) {
+                        if (params[0].equals(OMElement.class)) {
+                            method = obj.getClass().getMethod(mName, new Class[]{OMElement.class});
+                            method.invoke(obj, new OMElement[]{(OMElement) value});                            
+                        } else {
+                            handleException("Did not find a setter method named : " + mName
+                                + "() that takes an OMElement as the parameter", synCtx);
+                        }
+                    } else {
+                        handleException("Can not handle the value type : "
+                            + value.getClass(), synCtx);
                     }
                     invoked = true;
                 }
@@ -311,35 +337,43 @@ public class POJOCommandMediator extends AbstractMediator {
         this.command = command;
     }
 
-    public void addStaticSetterProperty(String name, String value) {
+    public void addStaticSetterProperty(String name, Object value) {
         this.staticSetterProperties.put(name, value);
     }
 
-    public void addDynamicSetterProperty(String name, Object value) {
-        this.dynamicSetterProperties.put(name, value);
+    public void addMessageSetterProperty(String name, AXIOMXPath xpath) {
+        this.messageSetterProperties.put(name, xpath);
+    }
+    
+    public void addContextSetterProperty(String name, String ctxName) {
+        this.contextSetterProperties.put(name, ctxName);
     }
 
     public void addContextGetterProperty(String name, String value) {
         this.contextGetterProperties.put(name, value);
     }
 
-    public void addMessageGetterProperty(String name, Object value) {
-        this.messageGetterProperties.put(name, value);
+    public void addMessageGetterProperty(String name, AXIOMXPath xpath) {
+        this.messageGetterProperties.put(name, xpath);
     }
 
-    public Map getStaticSetterProperties() {
+    public Map<String, Object> getStaticSetterProperties() {
         return this.staticSetterProperties;
     }
 
-    public Map getDynamicSetterProperties() {
-        return this.dynamicSetterProperties;
+    public Map<String, AXIOMXPath> getMessageSetterProperties() {
+        return this.messageSetterProperties;
     }
 
-    public Map getContextGetterProperties() {
+    public Map<String, String> getContextSetterProperties() {
+        return this.contextSetterProperties;
+    }
+
+    public Map<String, String> getContextGetterProperties() {
         return this.contextGetterProperties;
     }
 
-    public Map getMessageGetterProperties() {
+    public Map<String, AXIOMXPath> getMessageGetterProperties() {
         return this.messageGetterProperties;
     }
 }

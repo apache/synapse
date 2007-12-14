@@ -191,7 +191,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             TransportView tBean = new TransportView(this, null);
             mbs.registerMBean(tBean, name);
         } catch (Exception e) {
-            handleException("Error registering the non-blocking http" +
+            log.warn("Error registering the non-blocking http" +
                 (sslContext == null ? "" : "s") + " transport for JMX management", e);
         }
     }

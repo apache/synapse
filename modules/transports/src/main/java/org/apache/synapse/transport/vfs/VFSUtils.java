@@ -120,7 +120,23 @@ public class VFSUtils extends BaseUtils {
         }
         return fileName;
     }
+    
+    public static int getMaxRetryCount(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
+          if(vfsOutInfo.getMaxRetryCount() != 0) {
+            return vfsOutInfo.getMaxRetryCount();
+          }
+          
+          return VFSConstants.DEFAULT_MAX_RETRY_COUNT; 
+    }    
 
+    public static long getReconnectTimout(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
+      if(vfsOutInfo.getReconnectTimeout() != 0) {
+        return vfsOutInfo.getReconnectTimeout();
+      }
+
+      return VFSConstants.DEFAULT_RECONNECT_TIMEOUT; 
+    }   
+    
     public static byte[] getBytesFromInputStream(InputStream is, int length) throws IOException {
 
         byte[] bytes = new byte[length];

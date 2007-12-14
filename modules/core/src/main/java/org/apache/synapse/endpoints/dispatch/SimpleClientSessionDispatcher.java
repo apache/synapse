@@ -47,13 +47,19 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
-        if(header != null) {
-            OMElement csID = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
-            if(csID != null && csID.getText() != null) {
-                Object o = sessionMap.get(csID.getText());
-                if (o != null) {
-                    return (Endpoint) o;
+        if (header != null) {
+            OMElement sgcIDElm = header.getFirstChildWithName(
+                new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+
+            if (sgcIDElm != null) {
+                String sgcID = sgcIDElm.getText();
+
+                if (sgcID != null) {
+                    Object o = sessionMap.get(sgcID);
+
+                    if (o != null) {
+                        return (Endpoint) o;
+                    }
                 }
             }
         }
@@ -65,14 +71,19 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
-        if(header != null) {
-            OMElement csID = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
-            if(csID != null && csID.getText() != null) {
-                // synchronized to avoid possible replacement of sessions
-                synchronized(sessionMap) {
-                    if (!sessionMap.containsKey(csID.getText())) {
-                        sessionMap.put(csID.getText(), endpoint);
+        if (header != null) {
+            OMElement csIDElm = header.getFirstChildWithName(
+                new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+
+            if (csIDElm != null) {
+                String csID = csIDElm.getText();
+
+                if (csID != null) {
+                    // synchronized to avoid possible replacement of sessions
+                    synchronized (sessionMap) {
+                        if (!sessionMap.containsKey(csID)) {
+                            sessionMap.put(csID, endpoint);
+                        }
                     }
                 }
             }
@@ -83,11 +94,16 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
-        if(header != null) {
-            OMElement csID = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
-            if(csID != null && csID.getText() != null) {
-                sessionMap.remove(csID.getText());
+        if (header != null) {
+            OMElement csIDElm = header.getFirstChildWithName(
+                new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+
+            if (csIDElm != null) {
+                String csID = csIDElm.getText();
+
+                if (csID != null) {
+                    sessionMap.remove(csID);
+                }
             }
         }
     }

@@ -65,6 +65,8 @@ public class PollTableEntry {
     /** where to move the file after total failure */
     private String moveAfterFailure;
 
+    private int maxRetryCount;
+    private long reconnectTimeout;
 
     public String getServiceName() {
         return serviceName;
@@ -201,4 +203,21 @@ public class PollTableEntry {
             this.moveAfterFailure = moveAfterFailure;
         }
     }
+
+    public int getMaxRetryCount() {
+      return maxRetryCount;
+    }
+
+    public void setMaxRetryCount(int maxRetryCount) {
+      this.maxRetryCount = maxRetryCount;
+    }
+
+    public long getReconnectTimeout() {
+      return reconnectTimeout;
+    }
+
+    public void setReconnectTimeout(long reconnectTimeout) {
+      this.reconnectTimeout = reconnectTimeout;
+    }
+    
 }

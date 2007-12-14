@@ -145,21 +145,43 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
     private void scanFileOrDirectory(final PollTableEntry entry, String fileURI) {
 
         FileObject fileObject = null;
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Scanning directory or file : " + fileURI);
-            }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Scanning directory or file : " + fileURI);
+        }
+      
+        boolean wasError = true;
+        int retryCount = 0;
+        int maxRetryCount = entry.getMaxRetryCount();
+        long reconnectionTimeout = entry.getReconnectTimeout();
+        
+        while(wasError == true) {
+          try {
+            retryCount++;
             fileObject = fsManager.resolveFile(fileURI);
             
-        } catch (FileSystemException e) {
-            processFailure("Unable to resolve file or directory : " + fileURI, e, entry);
-            return;
-        }
-
-        if(fileObject == null) {
-            processFailure("Failed to resolve file " + fileURI, null, entry);
-            return;
-        }
+            if(fileObject == null) {
+              log.error("fileObject is null");
+              throw new FileSystemException("fileObject is null");
+            }
+            
+            wasError = false;
+                                
+          } catch(FileSystemException e) {
+            log.error("cannot resolve fileObject", e);
+            if(maxRetryCount <= retryCount)
+              processFailure("cannot resolve fileObject repeatedly: " + e.getMessage(), e, entry);
+              return;
+          }
+        
+          if(wasError == true) {
+            try {
+              Thread.sleep(reconnectionTimeout);
+            } catch (InterruptedException e2) {
+              e2.printStackTrace();
+            }
+          }
+        }            
         
         try {
             if (fileObject.exists() && fileObject.isReadable()) {
@@ -486,6 +508,16 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                 service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
             entry.setMoveAfterFailure(moveDirectoryAfterFailure);
 
+            String strMaxRetryCount = BaseUtils.getOptionalServiceParam(
+                service, VFSConstants.MAX_RETRY_COUNT);
+            if(strMaxRetryCount != null)
+              entry.setMaxRetryCount(Integer.parseInt(strMaxRetryCount));
+
+            String strReconnectTimeout = BaseUtils.getOptionalServiceParam(
+                service, VFSConstants.RECONNECT_TIMEOUT);            
+            if(strReconnectTimeout != null)
+              entry.setReconnectTimeout(Integer.parseInt(strReconnectTimeout) * 1000);
+            
             entry.setServiceName(service.getName());
             schedulePoll(service, pollInterval);            
             pollTable.add(entry);

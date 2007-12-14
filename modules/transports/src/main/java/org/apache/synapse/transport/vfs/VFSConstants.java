@@ -39,7 +39,12 @@ public class VFSConstants {
     public static final String REPLY_FILE_NAME = "transport.vfs.ReplyFileName";
 
     public static final String DEFAULT_RESPONSE_FILE = "response.xml";
-
+    
+    public static final String MAX_RETRY_COUNT = "transport.vfs.MaxRetryCount";
+    public static final String RECONNECT_TIMEOUT = "transport.vfs.ReconnectTimeout";
+    public static final int DEFAULT_MAX_RETRY_COUNT = 3;
+    public static final long DEFAULT_RECONNECT_TIMEOUT = 30000;
+    
     // transport header property names used by the VFS transport
     public static final String FILE_PATH = "FILE_PATH";
     public static final String FILE_NAME = "FILE_NAME";

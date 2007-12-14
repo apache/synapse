@@ -102,7 +102,39 @@ public class VFSTransportSender extends AbstractTransportSender {
         if (vfsOutInfo != null) {
             FileObject replyFile = null;
             try {
-                replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
+                
+                boolean wasError = true;
+                int retryCount = 0;
+                int maxRetryCount = VFSUtils.getMaxRetryCount(msgCtx, vfsOutInfo);
+                long reconnectionTimeout = VFSUtils.getReconnectTimout(msgCtx, vfsOutInfo);
+                
+                while(wasError == true) {
+                  try {
+                    retryCount++;
+                    replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
+                    
+                    if(replyFile == null) {
+                      log.error("replyFile is null");
+                      throw new FileSystemException("replyFile is null");
+                    }
+                    
+                    wasError = false;
+                                        
+                  } catch(FileSystemException e) {
+                    log.error("cannot resolve replyFile", e);
+                    if(maxRetryCount <= retryCount)
+                      handleException("cannot resolve replyFile repeatedly: " + e.getMessage(), e);
+                  }
+                
+                  if(wasError == true) {
+                    try {
+                      Thread.sleep(reconnectionTimeout);
+                    } catch (InterruptedException e2) {
+                      e2.printStackTrace();
+                    }
+                  }
+                }
+                
                 if (replyFile.exists()) {
 
                     if (replyFile.getType() == FileType.FOLDER) {

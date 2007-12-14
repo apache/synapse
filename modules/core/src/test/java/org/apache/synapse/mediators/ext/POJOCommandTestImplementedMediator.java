@@ -28,9 +28,11 @@ import org.apache.synapse.Command;
 public class POJOCommandTestImplementedMediator implements Command {
     
     public static String testProp = null;
+    private String ctxTest = "";
 
     public void execute() {
         POJOCommandTestHelper.getInstance().setExecuted(true);
+        ctxTest += "command";
     }
 
     public void setTestProp(String s) {
@@ -40,5 +42,13 @@ public class POJOCommandTestImplementedMediator implements Command {
 
     public String getTestProp() {
         return testProp;
+    }
+
+    public String getCtxTest() {
+        return ctxTest;
+    }
+
+    public void setCtxTest(String ctxTest) {
+        this.ctxTest = ctxTest;
     }
 }

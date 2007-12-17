@@ -188,6 +188,8 @@
         format from SOAP to REST/POX</a></li>
       <li><a href="#Sample153">Sample 153: Routing the messages arrived to a
         proxy service without processing the security headers</a></li>
+      <li><a href="#Sample154">Sample 154: Load Balancing with Proxy Service
+        </a></li>
     </ul>
   </li>
   <li><a href="#ProxyServiceQoS">QoS addition and deduction for service
@@ -235,7 +237,8 @@
             context API methods using scripting language</a></li>
           <li><a href="#Sample353">Sample 353: Using Ruby scripts for
             mediation</a></li>
-<li><a href="#Sample354">Sample 354: Using In-lined Ruby scripts for            mediation</a></li>
+          <li><a href="#Sample354">Sample 354: Using In-lined Ruby scripts
+            for mediation</a></li>
         </ul>
       </li>
       <li><a href="#DBMediators">Database interactions in mediation (DBLookup
@@ -1253,6 +1256,7 @@ endpoints</a></h2>
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
+&lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -1367,6 +1371,7 @@ for 60 seconds after detecting the failure. </p>
                     &lt;/failover&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
+&lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -1468,6 +1473,7 @@ endpoints</a></h2>
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
+&lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -1578,6 +1584,7 @@ fail over endpoints</a></h2>
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
+&lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -2235,6 +2242,77 @@ response received does use WS-Security, and forwarded back to the client
 without any modification. You should note that this wont be a security hole
 because the message inside synapse is signed and encrypted and can only be
 forwarded to a secure service to be useful.</p>
+
+<h2><a name="Sample154">Sample 154: Load Balancing with Proxy Service
+</a></h2>
+
+<div>
+<pre>   &lt;!-- A proxy service with a loadbalace endpoint --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="LBProxy" transports="https http" startOnLoad="true"&gt;
+        &lt;target faultSequence="errorHandler"&gt;
+            &lt;inSequence&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;session type="simpleClientSession"/&gt;
+                        &lt;loadbalance algorithm="roundRobin"&gt;
+                            &lt;endpoint&gt;
+                                &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                    &lt;enableAddressing/&gt;
+                                    &lt;suspendDurationOnFailure&gt;20&lt;/suspendDurationOnFailure&gt;
+                                &lt;/address&gt;
+                            &lt;/endpoint&gt;
+                            &lt;endpoint&gt;
+                                &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                    &lt;enableAddressing/&gt;
+                                    &lt;suspendDurationOnFailure&gt;20&lt;/suspendDurationOnFailure&gt;
+                                &lt;/address&gt;
+                            &lt;/endpoint&gt;
+                            &lt;endpoint&gt;
+                                &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                    &lt;enableAddressing/&gt;
+                                    &lt;suspendDurationOnFailure&gt;20&lt;/suspendDurationOnFailure&gt;
+                                &lt;/address&gt;
+                            &lt;/endpoint&gt;
+                        &lt;/loadbalance&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+                &lt;drop/&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_2.wsdl"/&gt;
+    &lt;/proxy&gt;
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Load Balancing with Proxy Service </strong></p>
+
+<p><strong>Prerequisites:</strong> Sample setup is same as LoadBalance
+endpoints (#53 to #54).</p>
+
+<p>Start the Synapse configuration numbered 154: i.e. synapse -sample 154<br>
+Start the Axis2 server and deploy the SecureStockQuoteService if not already
+done</p>
+
+<p>Runs the client with </p>
+<pre>  ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8080/soap/LBProxy </pre>
+
+<p>Functionality is similar to the sample #54. </p>
+</div>
 
 <h1><a name="ProxyServiceQoS">QoS addition and deduction for service
 mediation (proxy) samples</a></h1>

@@ -235,6 +235,7 @@
             context API methods using scripting language</a></li>
           <li><a href="#Sample353">Sample 353: Using Ruby scripts for
             mediation</a></li>
+<li><a href="#Sample354">Sample 354: Using In-lined Ruby scripts for            mediation</a></li>
         </ul>
       </li>
       <li><a href="#DBMediators">Database interactions in mediation (DBLookup
@@ -282,10 +283,10 @@
         </ul>
       </li>
       <!--<li><a href="#Aggregator">Aggregating messages and process in batch</a> -->
-        <!--<ul>-->
-          <!--<li><a href="#Sample410">Sample 410: Message splitting and-->
-            <!--aggregating the responses</a></li>-->
-        <!--</ul>-->
+      <!--<ul>-->
+      <!--<li><a href="#Sample410">Sample 410: Message splitting and-->
+      <!--aggregating the responses</a></li>-->
+      <!--</ul>-->
       <!--</li>-->
       <li><a href="#Cache">Caching the responses over the requests</a> 
         <ul>
@@ -2909,9 +2910,9 @@ trigger</a></h2>
     &lt;/in&gt;
     &lt;out&gt;
         &lt;log level="custom"&gt;
-            &lt;property name="Stock Quote on" expression="//ns:return/ns:lastTradeTimestamp/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
-            &lt;property name="For the organization" expression="//ns:return/ns:name/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
-            &lt;property name="Last Value" expression="//ns:return/ns:last/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
+            &lt;property name="Stock_Quote_on" expression="//ns:return/ns:lastTradeTimestamp/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
+            &lt;property name="For_the_organization" expression="//ns:return/ns:name/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
+            &lt;property name="Last_Value" expression="//ns:return/ns:last/child::text()" xmlns:ns="http://services.samples/xsd"/&gt;
         &lt;/log&gt;
     &lt;/out&gt;
 
@@ -3169,6 +3170,65 @@ functions, 'transformRequest' and 'transformResponse', and the Synapse
 configuration specifies which function is to be invoked when used. Execute
 the stock quote client to send a custom stock quote as per example #500 and
 check the received stock quote response.</p>
+
+<h2><a name="Sample354">Sample 354: Using In-lined Ruby scripts for
+mediation</a></h2>
+
+<div>
+<pre>      &lt;!-- Using In-lined Ruby scripts for mediation --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+        &lt;script language="rb"&gt;
+            &lt;![CDATA[
+                require 'rexml/document'
+                include REXML
+                newRequest= Document.new '&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;&lt;m:request&gt;&lt;m:symbol&gt;...test...&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;'
+                newRequest.root.elements[1].elements[1].text = $mc.getPayloadXML().root.elements[1].get_text
+                $mc.setPayloadXML(newRequest)
+            ]]&gt;
+        &lt;/script&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;script language="rb"&gt;
+            &lt;![CDATA[
+                require 'rexml/document'
+                include REXML
+                newResponse = Document.new '&lt;m:CheckPriceResponse xmlns:m="http://services.samples/xsd"&gt;&lt;m:Code&gt;&lt;/m:Code&gt;&lt;m:Price&gt;&lt;/m:Price&gt;&lt;/m:CheckPriceResponse&gt;'
+                newResponse.root.elements[1].text = $mc.getPayloadXML().root.elements[1].elements[1].get_text
+                newResponse.root.elements[2].text = $mc.getPayloadXML().root.elements[1].elements[2].get_text
+                $mc.setPayloadXML(newResponse)
+            ]]&gt;
+        &lt;/script&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Script mediators using Ruby(In-line Ruby
+Script)</strong></p>
+
+<p><strong>Prerequisites:</strong></p>
+
+<p>This sample uses Ruby so first setup support for this in Synapse as
+described at <a href="Synapse_Samples_Setup.html#script">Configuring
+JRuby</a>. </p>
+
+<p>Start the Synapse configuration numbered 354: i.e. bin/synapse -sample
+354<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p></p>
+
+<p>This sample is functionally equivalent to the sample 353. </p>
+
+<p>Run the client with </p>
+<pre> ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+</div>
 
 <h2><a name="DBMediators">Database interactions in mediation (DBLookup /
 DBReport)</a></h2>
@@ -4218,9 +4278,8 @@ this by looking at the printed line of the axis2 server, as well as by
 observing a constant rate as the response to the client instead of the random
 rate, which changes by each and every 20 seconds.</p>
 
-<p>&nbsp;</p>
+<p>&#xa0;</p>
 
-<p>&nbsp;</p>
-
+<p>&#xa0;</p>
 </body>
 </html>

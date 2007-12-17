@@ -38,9 +38,9 @@
     </in>
     <out>
         <log level="custom">
-            <property name="Stock Quote on" expression="//ns:return/ns:lastTradeTimestamp/child::text()" xmlns:ns="http://services.samples/xsd"/>
-            <property name="For the organization" expression="//ns:return/ns:name/child::text()" xmlns:ns="http://services.samples/xsd"/>
-            <property name="Last Value" expression="//ns:return/ns:last/child::text()" xmlns:ns="http://services.samples/xsd"/>
+            <property name="Stock_Quote_on" expression="//ns:return/ns:lastTradeTimestamp/child::text()" xmlns:ns="http://services.samples/xsd"/>
+            <property name="For_the_organization" expression="//ns:return/ns:name/child::text()" xmlns:ns="http://services.samples/xsd"/>
+            <property name="Last_Value" expression="//ns:return/ns:last/child::text()" xmlns:ns="http://services.samples/xsd"/>
         </log>
     </out>
 

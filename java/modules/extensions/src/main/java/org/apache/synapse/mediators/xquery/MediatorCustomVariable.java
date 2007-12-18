@@ -22,6 +22,9 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
@@ -30,6 +33,8 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.List;
+
+import net.sf.saxon.javax.xml.xquery.XQItemType;
 
 /**
  * The value of the custom variable will be evaluated dynamically.
@@ -108,18 +113,32 @@ public class MediatorCustomVariable extends MediatorVariable {
     }
 
     /**
-     * Return the OMNode to be used for the variable value
+     * Return the object to be used for the variable value
      *
      * @param source The source on which will be evaluated the XPath expression
      * @return Return the OMNode to be used for the variable value
      */
     private Object evaluate(Object source) {
         try {
-            Object o = expression.evaluate(source);
-            if (o instanceof List && !((List) o).isEmpty()) {
-                return ((List) o).get(0);  // Always fetches *only* the first
+            Object result = expression.evaluate(source);
+            if (result instanceof List && !((List) result).isEmpty()) {
+                result = ((List) result).get(0);  // Always fetches *only* the first
+            }
+            if (result instanceof OMNode) {
+                //if the type is not document-node(), then get the text value of the node
+                if (this.getType() != XQItemType.XQITEMKIND_DOCUMENT
+                    && this.getType() != XQItemType.XQITEMKIND_DOCUMENT_ELEMENT
+                    && this.getType() != XQItemType.XQITEMKIND_ELEMENT) {
+                    int nodeType = ((OMNode) result).getType();
+                    if (nodeType == OMNode.TEXT_NODE) {
+                        return ((OMText) result).getText();
+                    } else if (nodeType == OMNode.ELEMENT_NODE) {
+                        return ((OMElement) result).getText();
+                    }
+                }
+                return result;
             } else {
-                return o;
+                return result;
             }
         } catch (JaxenException e) {
             handleException("Error evaluating XPath " + expression + " on message");

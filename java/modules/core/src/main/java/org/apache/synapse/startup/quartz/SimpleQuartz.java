@@ -56,6 +56,14 @@ public class SimpleQuartz extends AbstractStartup {
     private static final Log log = LogFactory.getLog(SimpleQuartz.class);
     private static final int THREADPOOLSIZE = 5;
 
+    static {
+      try {
+        DirectSchedulerFactory.getInstance().createVolatileScheduler(THREADPOOLSIZE);
+      } catch (SchedulerException e) {
+        throw new SynapseException("Error initializing scheduler factory", e);
+      }
+    }
+    
     private String cron;
     private int repeatCount = -1;
     private long repeatInterval;
@@ -113,7 +121,6 @@ public class SimpleQuartz extends AbstractStartup {
       
       
         try {
-            DirectSchedulerFactory.getInstance().createVolatileScheduler(THREADPOOLSIZE);
             sch = DirectSchedulerFactory.getInstance().getScheduler();
 
             Trigger trigger = null;

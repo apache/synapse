@@ -213,7 +213,9 @@ public class CacheMediator extends AbstractMediator {
                 // cachedObj.setResponseHash(cache.getGenerator().getDigest(
                 //     ((Axis2MessageContext) synCtx).getAxis2MessageContext()));
 
-                cachedObj.setExpireTimeMillis(System.currentTimeMillis() + cachedObj.getTimeout());
+                if (cachedObj.getTimeout() > 0) {
+                    cachedObj.setExpireTimeMillis(System.currentTimeMillis() + cachedObj.getTimeout());
+                }
 
                 cfgCtx.setProperty(cacheManagerKey, cacheManager);
                 Replicator.replicate(cfgCtx);

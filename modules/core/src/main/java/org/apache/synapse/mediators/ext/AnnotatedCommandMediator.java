@@ -234,51 +234,25 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
 
         // First add any default namespaces
         if (defaultNamespaces != null) {
-            if (defaultNamespaces.value()[0].length()>0) {
-                allNamespaces.put(defaultNamespaces.value()[0], defaultNamespaces.value()[1]);
-            }
-            if (defaultNamespaces.ns() != null && defaultNamespaces.ns().length() > 0) {
-                allNamespaces.put("ns", defaultNamespaces.ns());
-            }
-            if (defaultNamespaces.ns1() != null && defaultNamespaces.ns1().length() > 0) {
-                allNamespaces.put("ns1", defaultNamespaces.ns());
-            }
-            if (defaultNamespaces.ns2() != null && defaultNamespaces.ns2().length() > 0) {
-                allNamespaces.put("ns2", defaultNamespaces.ns());
-            }
-            if (defaultNamespaces.ns3() != null && defaultNamespaces.ns3().length() > 0) {
-                allNamespaces.put("ns3", defaultNamespaces.ns());
-            }
-            if (defaultNamespaces.ns4() != null && defaultNamespaces.ns4().length() > 0) {
-                allNamespaces.put("ns4", defaultNamespaces.ns());
-            }
-            if (defaultNamespaces.ns5() != null && defaultNamespaces.ns5().length() > 0) {
-                allNamespaces.put("ns5", defaultNamespaces.ns());
+            for (String namespaceValue : defaultNamespaces.value()) {
+                int i = namespaceValue.indexOf(':');
+                if (i > 0) {
+                    String prefix = namespaceValue.substring(0, i);
+                    String namespace = namespaceValue.substring(i+1);
+                    allNamespaces.put(prefix, namespace);
+                }
             }
         }
 
         // add any namespaces which will overwrite any previously added default namespaces
         if (namespaces != null) {
-            if (namespaces.value()[0].length()>0) {
-                allNamespaces.put(namespaces.value()[0], namespaces.value()[1]);
-            }
-            if (namespaces.ns() != null && namespaces.ns().length() > 0) {
-                allNamespaces.put("ns", namespaces.ns());
-            }
-            if (namespaces.ns1() != null && namespaces.ns1().length() > 0) {
-                allNamespaces.put("ns1", namespaces.ns());
-            }
-            if (namespaces.ns2() != null && namespaces.ns2().length() > 0) {
-                allNamespaces.put("ns2", namespaces.ns());
-            }
-            if (namespaces.ns3() != null && namespaces.ns3().length() > 0) {
-                allNamespaces.put("ns3", namespaces.ns());
-            }
-            if (namespaces.ns4() != null && namespaces.ns4().length() > 0) {
-                allNamespaces.put("ns4", namespaces.ns());
-            }
-            if (namespaces.ns5() != null && namespaces.ns5().length() > 0) {
-                allNamespaces.put("ns5", namespaces.ns());
+            for (String namespaceValue : namespaces.value()) {
+                int i = namespaceValue.indexOf(':');
+                if (i > 0) {
+                    String prefix = namespaceValue.substring(0, i);
+                    String namespace = namespaceValue.substring(i+1);
+                    allNamespaces.put(prefix, namespace);
+                }
             }
         }
         return allNamespaces;

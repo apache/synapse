@@ -367,6 +367,20 @@ public class XQueryMediator extends AbstractMediator {
                         xqDynamicContext.bindBoolean(name, booleanValue, null);
                         break;
                     }
+                    case(XQItemType.XQBASETYPE_INTEGER): {
+                        int intValue = -1;
+                        if (value instanceof String) {
+                            intValue = Integer.parseInt((String) value);
+                        } else if (value instanceof Integer) {
+                            intValue = ((Integer) value).intValue();
+                        } else {
+                            handleException("Incompatible type for the Integer");
+                        }
+                        if (intValue != -1) {
+                            xqDynamicContext.bindInt(name, intValue, null);
+                        }
+                        break;
+                    }
                     case(XQItemType.XQBASETYPE_INT): {
                         int intValue = -1;
                         if (value instanceof String) {

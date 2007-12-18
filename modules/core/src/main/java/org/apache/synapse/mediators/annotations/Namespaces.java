@@ -29,18 +29,17 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation used to declare namespaces available to be used in XPATH expressions
+ * 
+ * To support setting multiple namespaces with arbitrary prefixes the namespace and 
+ * namespace prefix are held in as a single string value seperated by a colon. For
+ * example, "ns:http://tempuri.org" represents the namespace uri http://tempuri.org
+ * and the namespace prefix "ns", and the complete Namespaces annotation for that
+ * example would be @Namespaces({"ns:http://tempuri.org"})
  */
 @Target({TYPE, FIELD, METHOD})
 @Retention(RUNTIME)
 public @interface Namespaces {
 
-    String[] value() default {"",""};
-
-    String ns() default "";
-    String ns1() default "";
-    String ns2() default "";
-    String ns3() default "";
-    String ns4() default "";
-    String ns5() default "";
+    String[] value();
 
 }

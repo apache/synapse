@@ -31,10 +31,16 @@ import java.util.Iterator;
  * <p/>
  * <pre>
  * &lt;pojoCommand name=&quot;class-name&quot;&gt;
- *   &lt;property name=&quot;string&quot; value=&quot;literal&quot;&gt;
+ *   &lt;property name=&quot;string&quot; value=&quot;literal&quot; expression=&quot;xpath&quot;?
+ *          context-name=&quot;string&quot;? &gt;
  *      either literal or XML child
  *   &lt;/property&gt;
- *   &lt;property name=&quot;string&quot; expression=&quot;XPATH expression&quot;/&gt;
+ *   &lt;property name=&quot;string&quot; expression=&quot;XPATH expression&quot;
+ *                action=(&quot;ReadMessage&quot; | &quot;UpdateMessage&quot; |
+ *                  &quot;ReadAndUpdateMessage&quot;) context-name=&quot;string&quot;? /&gt;
+ *   &lt;property name=&quot;string&quot; context-name=&quot;string&quot;
+ *                action=(&quot;ReadContext&quot; | &quot;UpdateContext&quot; |
+ *                  &quot;ReadAndUpdateContext&quot;) expression=&quot;XPATH expression&quot;? /&gt;
  * &lt;/pojoCommand&gt;
  * </pre>
  */

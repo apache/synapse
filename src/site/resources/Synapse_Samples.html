@@ -4120,7 +4120,8 @@ Mediator)</a></h2>
 
 <h2><a name="Sample390">Sample 390: Introduction to the XQuery
 mediator</a></h2>
-<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>    &lt;!-- Introduction to the XQuery mediator --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
@@ -4146,16 +4147,23 @@ mediator</a></h2>
             &lt;/inSequence&gt;
             &lt;outSequence&gt;
                 &lt;out&gt;
-                     &lt;xquery key="xquery/xquery_res.xq"&gt;
+                    &lt;xquery key="xquery/xquery_res.xq"&gt;
                         &lt;variable name="payload" type="ELEMENT"/&gt;
+                        &lt;variable name="code" type="STRING"
+                                  expression="self::node()//m0:return/m0:symbol/child::text()"
+                                  xmlns:m0="http://services.samples/xsd"/&gt;
+                        &lt;variable name="price" type="DOUBLE"
+                                  expression="self::node()//m0:return/m0:last/child::text()"
+                                  xmlns:m0="http://services.samples/xsd"/&gt;
                     &lt;/xquery&gt;
-                     &lt;send/&gt;
+                    &lt;send/&gt;
                 &lt;/out&gt;
             &lt;/outSequence&gt;
         &lt;/target&gt;
-        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;&lt;/proxy&gt;&lt;/definitions&gt; </pre>
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
 
-<p></p>
+&lt;/definitions&gt;                                  </pre>
 
 <p><b>Objective: Introduction transformation using XQuery mediator</b></p>
 

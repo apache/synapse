@@ -22,17 +22,17 @@ package org.apache.synapse.mediators.ext;
 import org.apache.synapse.mediators.annotations.Namespaces;
 import org.apache.synapse.mediators.annotations.ReadFromMessage;
 
-@Namespaces({"soapenv", "http://schemas.xmlsoap.org/soap/envelope/"})
+@Namespaces({"soapenv:http://schemas.xmlsoap.org/soap/envelope/"})
 public class AnnotatedCommand2 {
 
     static String fieldResult;
     static String methodResult;
     
-    @Namespaces({"m", "http://services.samples/xsd"})
+    @Namespaces({"m:http://services.samples/xsd"})
     @ReadFromMessage("/soapenv:Envelope/soapenv:Body/m:getQuote/m:request/m:symbol")
     String beforeField;
 
-    @Namespaces({"m", "http://services.samples/xsd"})
+    @Namespaces({"m:http://services.samples/xsd"})
     @ReadFromMessage("/soapenv:Envelope/soapenv:Body/m:getQuote/m:request/m:symbol")
     public void setSymbol(String s) {
         methodResult = s;

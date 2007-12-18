@@ -24,7 +24,7 @@ import org.apache.synapse.mediators.annotations.ReadAndUpdate;
 import org.apache.synapse.mediators.annotations.ReadFromMessage;
 import org.apache.synapse.mediators.annotations.UpdateMessage;
 
-@Namespaces({"myns", "http://myns"})
+@Namespaces({"myns:http://myns"})
 public class AnnotatedCommand {
 
     @ReadFromMessage("/beforeField")
@@ -36,11 +36,11 @@ public class AnnotatedCommand {
     @ReadAndUpdate("/@ReadAndUpdateField")
     String ReadAndUpdateField;
     
-    @Namespaces(ns="http://ns")
+    @Namespaces({"ns:http://ns"})
     @UpdateMessage("/afterField")
     String nsTest1;
 
-    @Namespaces({"xns", "http://xns"})
+    @Namespaces({"xns:http://xns"})
     @UpdateMessage("/afterField")
     String nsTest2;
 

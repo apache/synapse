@@ -248,8 +248,6 @@ public class ProxyService {
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
                                     new WSDL20ToAxisServiceBuilder(wsdlInputStream, null, null);
-                            wsdlToAxisServiceBuilder.setBaseUri(
-                                wsdlURI != null ? wsdlURI.toString() : "");
 
                         } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
                                 equals(wsdlNamespace.getNamespaceURI())) {
@@ -265,6 +263,9 @@ public class ProxyService {
                                     "Could not get the WSDL to Axis Service Builder");
                         }
 
+                        wsdlToAxisServiceBuilder.setBaseUri(
+                                wsdlURI != null ? wsdlURI.toString() : "");
+                        
                         if (trace()) {
                             trace.info("Populating Axis2 service using WSDL");
                             if (trace.isTraceEnabled()) {

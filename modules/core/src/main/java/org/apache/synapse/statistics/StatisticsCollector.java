@@ -135,20 +135,20 @@ public class StatisticsCollector {
      * To reset the sequence statistics
      */
     public void resetSequenceStatistics() {
-        this.sequenceStatistics = Collections.synchronizedMap(new HashMap());
+        this.sequenceStatistics.clear();
     }
 
     /**
      * To reset the proxy service statistics
      */
     public void resetProxyServiceStatistics() {
-        this.proxyServicesStatistics = Collections.synchronizedMap(new HashMap());
+        this.proxyServicesStatistics.clear();
     }
 
     /**
      * To reset the endpoint statistics
      */
     public void resetEndPointStatistics() {
-        this.endpointStatistics = Collections.synchronizedMap(new HashMap());
+        this.endpointStatistics.clear();
     }
 }

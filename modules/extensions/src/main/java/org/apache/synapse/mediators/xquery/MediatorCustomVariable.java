@@ -18,23 +18,22 @@
  */
 package org.apache.synapse.mediators.xquery;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Entry;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import net.sf.saxon.javax.xml.xquery.XQItemType;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Entry;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.List;
-
-import net.sf.saxon.javax.xml.xquery.XQItemType;
 
 /**
  * The value of the custom variable will be evaluated dynamically.
@@ -46,19 +45,27 @@ public class MediatorCustomVariable extends MediatorVariable {
 
     private static final Log log = LogFactory.getLog(MediatorCustomVariable.class);
 
-    /** The XPath expression which yeilds the element from given XMLDocument  */
+    /**
+     * The XPath expression which yeilds the element from given XMLDocument
+     */
     private AXIOMXPath expression;
 
-    /** The key to lookup the xml document from registry*/
+    /**
+     * The key to lookup the xml document from registry
+     */
     private String regKey;
 
-    /** The default XPath which yeilds the first child of the SOAP Envelop */
+    /**
+     * The default XPath which yeilds the first child of the SOAP Envelop
+     */
 //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
 //                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
         "s12:Body/child::*[position()=1]";
-    
-    /** Lock used to ensure thread-safe lookup of the object from the registry */
+
+    /**
+     * Lock used to ensure thread-safe lookup of the object from the registry
+     */
     private final Object resourceLock = new Object();
 
     public MediatorCustomVariable(QName name) {
@@ -129,6 +136,7 @@ public class MediatorCustomVariable extends MediatorVariable {
                 if (this.getType() != XQItemType.XQITEMKIND_DOCUMENT
                     && this.getType() != XQItemType.XQITEMKIND_DOCUMENT_ELEMENT
                     && this.getType() != XQItemType.XQITEMKIND_ELEMENT) {
+
                     int nodeType = ((OMNode) result).getType();
                     if (nodeType == OMNode.TEXT_NODE) {
                         return ((OMText) result).getText();
@@ -141,7 +149,7 @@ public class MediatorCustomVariable extends MediatorVariable {
                 return result;
             }
         } catch (JaxenException e) {
-            handleException("Error evaluating XPath " + expression + " on message");
+            handleException("Error evaluating XPath " + expression + " on message" + source);
         }
         return null;
     }

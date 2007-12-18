@@ -370,7 +370,12 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_INTEGER): {
                         int intValue = -1;
                         if (value instanceof String) {
-                            intValue = Integer.parseInt((String) value);
+                            try {
+                                intValue = Integer.parseInt((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' " +
+                                    "for the Integer", e);
+                            }
                         } else if (value instanceof Integer) {
                             intValue = ((Integer) value).intValue();
                         } else {
@@ -384,7 +389,11 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_INT): {
                         int intValue = -1;
                         if (value instanceof String) {
-                            intValue = Integer.parseInt((String) value);
+                            try {
+                                intValue = Integer.parseInt((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' for the Int", e);
+                            }
                         } else if (value instanceof Integer) {
                             intValue = ((Integer) value).intValue();
                         } else {
@@ -398,7 +407,12 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_LONG): {
                         long longValue = -1;
                         if (value instanceof String) {
-                            longValue = Long.parseLong((String) value);
+                            try {
+                                longValue = Long.parseLong((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' " +
+                                    "for the long ", e);
+                            }
                         } else if (value instanceof Long) {
                             longValue = ((Long) value).longValue();
                         } else {
@@ -412,7 +426,12 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_SHORT): {
                         short shortValue = -1;
                         if (value instanceof String) {
-                            shortValue = Short.parseShort((String) value);
+                            try {
+                                shortValue = Short.parseShort((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' " +
+                                    "for the short ", e);
+                            }
                         } else if (value instanceof Short) {
                             shortValue = ((Short) value).shortValue();
                         } else {
@@ -426,7 +445,12 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_DOUBLE): {
                         double doubleValue = -1;
                         if (value instanceof String) {
-                            doubleValue = Double.parseDouble((String) value);
+                            try {
+                                doubleValue = Double.parseDouble((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' " +
+                                    "for the double ", e);
+                            }
                         } else if (value instanceof Double) {
                             doubleValue = ((Double) value).doubleValue();
                         } else {
@@ -440,7 +464,12 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_FLOAT): {
                         float floatValue = -1;
                         if (value instanceof String) {
-                            floatValue = Float.parseFloat((String) value);
+                            try {
+                                floatValue = Float.parseFloat((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' " +
+                                    "for the float ", e);
+                            }
                         } else if (value instanceof Float) {
                             floatValue = ((Float) value).floatValue();
                         } else {
@@ -454,7 +483,12 @@ public class XQueryMediator extends AbstractMediator {
                     case(XQItemType.XQBASETYPE_BYTE): {
                         byte byteValue = -1;
                         if (value instanceof String) {
-                            byteValue = Byte.parseByte((String) value);
+                            try {
+                                byteValue = Byte.parseByte((String) value);
+                            } catch (NumberFormatException e) {
+                                handleException("Incompatible value '" + value + "' " +
+                                    "for the byte ", e);
+                            }
                         } else if (value instanceof Byte) {
                             byteValue = ((Byte) value).byteValue();
                         } else {

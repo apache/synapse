@@ -122,6 +122,14 @@ public class SimpleQuartz extends AbstractStartup {
       
         try {
             sch = DirectSchedulerFactory.getInstance().getScheduler();
+            if (sch == null) {
+              DirectSchedulerFactory.getInstance().createVolatileScheduler(THREADPOOLSIZE);
+              sch = DirectSchedulerFactory.getInstance().getScheduler();
+            }
+            
+            if(sch == null) {
+              throw new NullPointerException("Scheduler is null");
+            }
 
             Trigger trigger = null;
             if (cron == null) {

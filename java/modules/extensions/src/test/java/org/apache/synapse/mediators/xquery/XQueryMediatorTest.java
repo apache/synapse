@@ -100,6 +100,7 @@ public class XQueryMediatorTest extends TestCase {
                              "declare variable $shortVar as xs:short external;" +
                              "declare variable $floatVar as xs:float external;" +
                              "declare variable $stringVar as xs:string external;" +
+                             "declare variable $integerVar as xs:integer external;" +
                              "document { " +
                              "<a xmlns='http://a/uri' z:in='out' xmlns:z='http://z/uri'>" +
                              "<b>{$intVar+2}<e>{$boolVar}</e>" +
@@ -110,6 +111,7 @@ public class XQueryMediatorTest extends TestCase {
                              "{$longVar}," +
                              "{$floatVar}," +
                              "{$stringVar}," +
+                             "{$integerVar+xs:integer('5')}," +
                              "</all></b></a> }");
         List list = new ArrayList();
         MediatorVariable intVariable = new MediatorBaseVariable(new QName("intVar"));
@@ -144,6 +146,10 @@ public class XQueryMediatorTest extends TestCase {
         stringValue.setType(XQItemType.XQBASETYPE_STRING);
         stringValue.setValue("synapse");
         list.add(stringValue);
+        MediatorVariable integerValue = new MediatorBaseVariable(new QName("integerVar"));
+        integerValue.setType(XQItemType.XQBASETYPE_INTEGER);
+        integerValue.setValue(new Integer(5));
+        list.add(integerValue);
         mediator.addAllVariables(list);
         assertTrue(mediator.mediate(mc));
         assertEquals("10", mc.getEnvelope().getBody().getFirstElement().

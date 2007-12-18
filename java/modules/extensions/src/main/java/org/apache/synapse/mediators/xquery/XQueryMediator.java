@@ -18,33 +18,33 @@
  */
 package org.apache.synapse.mediators.xquery;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.MediatorProperty;
+import net.sf.saxon.javax.xml.xquery.*;
+import net.sf.saxon.xqj.SaxonXQDataSource;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
+import org.apache.axiom.om.util.ElementHelper;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.util.ElementHelper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
-import org.xml.sax.InputSource;
 import org.w3c.dom.Element;
-import net.sf.saxon.javax.xml.xquery.*;
-import net.sf.saxon.xqj.SaxonXQDataSource;
+import org.xml.sax.InputSource;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import java.util.List;
-import java.util.ArrayList;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -61,42 +61,64 @@ import java.io.StringReader;
 
 public class XQueryMediator extends AbstractMediator {
 
-    /** Properties that must set to the XQDataSource */
+    /**
+     * Properties that must set to the XQDataSource
+     */
     private List dataSourceProperties = new ArrayList();
 
-    /** The key for lookup the xquery */
+    /**
+     * The key for lookup the xquery
+     */
     private String queryKey;
 
-    /** The source of the xquery */
+    /**
+     * The source of the xquery
+     */
     private String querySource;
 
-    /** The default xpath to get the first child of the SOAPBody*/
+    /**
+     * The default xpath to get the first child of the SOAPBody
+     */
 //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
 //                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
         "s12:Body/child::*[position()=1]";
 
-    /** The (optional) XPath expression which yeilds the target element to attached the result  */
+    /**
+     * The (optional) XPath expression which yeilds the target element to attached the result
+     */
     private AXIOMXPath target = null;
 
-    /** The list of variables for binding to the DyanamicContext in order to available for querying*/
+    /**
+     * The list of variables for binding to the DyanamicContext in order to available for querying
+     */
     private List variables = new ArrayList();
 
-    /** Lock used to ensure thread-safe lookup of the object from the registry  */
+    /**
+     * Lock used to ensure thread-safe lookup of the object from the registry
+     */
     private final Object resourceLock = new Object();
 
-    /** Is it need to use DOMSource and DOMResult?   */
+    /**
+     * Is it need to use DOMSource and DOMResult?
+     */
     private boolean useDOMSource = false;
 
-    /** The DataSource which use to create a connection to XML database */
+    /**
+     * The DataSource which use to create a connection to XML database
+     */
     private XQDataSource cachedXQDataSource = null;
 
-    /** connection with a specific XQuery engine.Connection will live as long as synapse live*/
-    private XQConnection cachedConnection = null;     
+    /**
+     * connection with a specific XQuery engine.Connection will live as long as synapse live
+     */
+    private XQConnection cachedConnection = null;
 
-    /** An expression that use for multiple  executions.Expression will recreate if query has changed */
+    /**
+     * An expression that use for multiple  executions.Expression will recreate if query has changed
+     */
     private XQPreparedExpression cachedPreparedExpression = null;
-    
+
     public XQueryMediator() {
         // create the default XPath
         try {
@@ -242,7 +264,7 @@ public class XQueryMediator extends AbstractMediator {
                         //if the value has changed or need binding because the expression has recreated
                         if (hasValueChanged || needBind) {
                             //Binds the external variable to the DynamicContext
-                            bindVariable(cachedPreparedExpression, variable,traceOrDebugOn, traceOn);
+                            bindVariable(cachedPreparedExpression, variable, traceOrDebugOn, traceOn);
                         }
                     }
                 }
@@ -333,9 +355,9 @@ public class XQueryMediator extends AbstractMediator {
      *
      * @param xqDynamicContext The Dynamic Context  to which the variable will be binded
      * @param variable         The variable which contains the name and vaule for binding
+     * @param traceOrDebugOn   is tracing or debbug on
+     * @param traceOn          indicate whether trace is ON or OF
      * @throws XQException throws if any error occurs when binding the variable
-     * @param traceOrDebugOn is tracing or debbug on
-     * @param traceOn        indicate whether trace is ON or OF
      */
     private void bindVariable(XQDynamicContext xqDynamicContext, MediatorVariable variable,
                               boolean traceOrDebugOn, boolean traceOn) throws XQException {
@@ -594,7 +616,8 @@ public class XQueryMediator extends AbstractMediator {
                     + target + " must target in an OMNode");
             }
         } catch (JaxenException e) {
-            handleException("Error evaluating XPath " + target + " on message");
+            handleException("Error evaluating XPath " + target +
+                " on message" + synCtx.getEnvelope());
         }
         return null;
     }

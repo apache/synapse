@@ -93,9 +93,13 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                     log.error(msg);
                     throw new SynapseException(msg);
                 }
-                faultMediator.setFaultCodeValue(
-                    new QName(OMElementUtils.getNameSpaceWithPrefix(prefix, code), name, prefix));
-                
+                String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, code);
+                if (namespaceURI == null) {
+                    String msg = "Invalid namespace prefix '" + prefix + "' in code attribute";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
+                faultMediator.setFaultCodeValue(new QName(namespaceURI, name, prefix));
             } else if (expression != null) {
                 try {
                     AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());

@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * This is the thread factory for Synapse threads which are accessibal through the
- * SynapseEnvironment as pooled threads
+ * This is the thread factory for Synapse threads which are accessible through the
+ * SynapseEnvironment as pooled threads.
  */
 public class SynapseThreadFactory implements ThreadFactory {
 

@@ -42,7 +42,7 @@ import java.util.List;
  * header from the current message instance. This supports the headers currently
  * supported by the HeaderType class. If an expression is supplied, its runtime value
  * is evaluated using the current message. Unless the action is set to remove, the
- * default behaviour of this mediator is to set a header value.
+ * default behavior of this mediator is to set a header value.
  */
 public class HeaderMediator extends AbstractMediator {
 

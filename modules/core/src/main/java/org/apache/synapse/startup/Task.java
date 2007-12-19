@@ -20,12 +20,12 @@
 package org.apache.synapse.startup;
 
 /**
- * Defines the Task for a SimpleQuarts Startup
+ * Defines the Task for a SimpleQuartzStartup.
  */
 public interface Task {
 
     /**
-     * Esecute method will be invoked by the SimpleQuartzStartup
+     * Execute method will be invoked by the SimpleQuartzStartup.
      */
     public void execute();
 }

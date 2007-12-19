@@ -32,7 +32,7 @@ import java.util.List;
 
 public class SequenceStatisticsStack implements StatisticsStack {
 
-    /** The list to hols SequenceStatistics */
+    /** The list to hold SequenceStatistics */
     private List sequenceStatisticsList = new ArrayList();
 
     /**

@@ -44,9 +44,9 @@ public interface SynapseEnvironment {
     public boolean injectMessage(MessageContext smc);
 
     /**
-     * This method injects a new message into the synapse engine for the mediation
+     * This method injects a new message into the Synapse engine for the mediation
      * by the specified sequence. This is used by custom mediation tasks like splitting message
-     * in EIP mediations. This method will do the mediation asynchronouslly using a separate
+     * in EIP mediations. This method will do the mediation asynchronously using a separate
      * thread from the environment thread pool
      *
      * @param smc - Synapse message context to be injected
@@ -71,7 +71,7 @@ public interface SynapseEnvironment {
     public MessageContext createMessageContext();
 
     /**
-     * This method returns the StatisticsCollector
+     * This method returns the StatisticsCollector.
      *
      * @return Returns the StatisticsCollector
      */

@@ -45,7 +45,7 @@ import java.util.*;
 /**
  * This is the message receiver that receives the responses for outgoing messages sent out
  * by Synapse. It holds a callbackStore that maps the [unique] messageID of each message to
- * a callback object that gets executed on timeout or when a response is recived (before timeout)
+ * a callback object that gets executed on timeout or when a response is received (before timeout)
  *
  * The AnonymousServiceFactory uses this MessageReceiver for all Anonymous services created by it.
  * This however - effectively - is a singleton class

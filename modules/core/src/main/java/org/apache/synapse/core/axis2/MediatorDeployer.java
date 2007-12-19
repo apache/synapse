@@ -63,9 +63,9 @@ public class MediatorDeployer implements Deployer {
     }
 
     /**
-     * This will be called when there is a change in the specified deployement
-     * folder (in the axis2.xml) and this will load the relevant classe to the system and
-     * registeres them with the MediatorFactoryFinder
+     * This will be called when there is a change in the specified deployment
+     * folder (in the axis2.xml) and this will load the relevant classes to the system and
+     * register them with the MediatorFactoryFinder
      *
      * @param deploymentFileData - describes the updated file
      * @throws DeploymentException - in case an error on the deployment
@@ -177,7 +177,7 @@ public class MediatorDeployer implements Deployer {
     }
 
     /**
-     * This will be called when a particulr jar file is deleted from the specified folder
+     * This will be called when a particular jar file is deleted from the specified folder.
      *
      * @param string - filename of the deleted file
      * @throws DeploymentException - incase of an error in undeployment

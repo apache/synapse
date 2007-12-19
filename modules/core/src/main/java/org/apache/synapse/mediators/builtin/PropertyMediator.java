@@ -59,8 +59,7 @@ public class PropertyMediator extends AbstractMediator {
 
     /**
      * Sets a property into the current (local) Synapse Context or into the Axis Message Context
-     * or into Transports Header
-     * And Removes above properties from the corresspounding locations
+     * or into Transports Header and removes above properties from the corresponding locations.
      *
      * @param synCtx the message context
      * @return true always

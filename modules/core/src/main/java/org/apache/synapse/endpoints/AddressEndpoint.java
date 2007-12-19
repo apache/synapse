@@ -30,8 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import java.util.Stack;
 
 /**
- * This class represents an actual endpoint to send the message. It is resposible for sending the
- * message, performing reries if a failure occured and informing the parent endpoint if a failure
+ * This class represents an actual endpoint to send the message. It is responsible for sending the
+ * message, performing retries if a failure occurred and informing the parent endpoint if a failure
  * couldn't be recovered.
  */
 public class AddressEndpoint extends FaultHandler implements Endpoint {

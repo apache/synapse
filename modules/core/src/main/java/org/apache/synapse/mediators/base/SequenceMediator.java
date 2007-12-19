@@ -37,7 +37,7 @@ import java.util.Stack;
  * If this instance defines a sequence mediator, then the name is required, and
  * an errorHandler sequence name optional. If this instance refers to another (defined)
  * sequence mediator, the errorHandler will not have a meaning, and if an error in
- * encountered in the reffered sequence, its errorHandler would execute.
+ * encountered in the referred sequence, its errorHandler would execute.
  */
 public class SequenceMediator extends AbstractListMediator {
 
@@ -197,8 +197,8 @@ public class SequenceMediator extends AbstractListMediator {
     }
 
     /**
-     * To get the key which which is used to fick the sequence definition from the local registry
-     * @return  return the key which is used to fick the sequence definition from the local registry
+     * To get the key which is used to pick the sequence definition from the local registry
+     * @return  return the key which is used to pick the sequence definition from the local registry
      */
     public String getKey() {
         return key;

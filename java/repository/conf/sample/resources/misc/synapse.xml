@@ -19,17 +19,37 @@
 
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
+    <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
+        <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
+        <parameter name="root">file:./../../repository/conf/sample/resources/</parameter>
+        <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
+        <parameter name="cachableDuration">15000</parameter>
+    </registry>
+
     <sequence name="commodityQuote">
         <!-- set the To address to the real endpoint -->
         <header name="To" value="http://127.0.0.1:10101/soap/Services"/>
-        <header name="Action" value="urn:commodity"/>    
+        <header name="Action" value="urn:commodity"/>
     </sequence>
 
-  	<!-- Check if the URL matches the stockquote gateway/dumb case -->
-  	<filter source="get-property('To')" regex=".*/CommodityQuote.*">
-  		<sequence key="commodityQuote"/>
-  	</filter>
+    <!-- Check if the URL matches the stockquote gateway/dumb case -->
+    <filter source="get-property('To')" regex=".*/CommodityQuote.*">
+        <sequence key="commodityQuote"/>
+    </filter>
 
-  	<send/>
+    <send/>
+    <proxy name="StockQuoteProxy">
+        <target>
+            <endpoint>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            </endpoint>
+            <outSequence>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:./../../repository/conf/sample/resources/misc/proxy/test_proxy_1.xml">
+            <resource location="test_proxy_1.xsd" key="misc/proxy/test_proxy_1.xsd"/>
+        </publishWSDL>
+    </proxy>
 
 </definitions>

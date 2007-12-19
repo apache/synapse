@@ -50,6 +50,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  *    <publishWSDL uri=".." key="string">
  *       <wsdl:definition>...</wsdl:definition>?
  *       <wsdl20:description>...</wsdl20:description>?
+ *       <resource location="..." key="..."/>*
  *    </publishWSDL>?
  *    <policy key="string">
  *       // optional service parameters
@@ -167,17 +168,18 @@ public class ProxyServiceSerializer {
         String wsdlKey = service.getWSDLKey();
         URI wsdlUri = service.getWsdlURI();
         Object inLineWSDL = service.getInLineWSDL();
-        OMElement wsdl = fac.createOMElement("publishWSDL", synNS);
-        if (wsdlKey != null) {
-            wsdl.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, wsdlKey));
-            proxy.addChild(wsdl);
-        } else if (inLineWSDL != null) {
-            wsdl.addChild((OMNode) inLineWSDL);
-            proxy.addChild(wsdl);
-        } else if (wsdlUri != null) {
-            wsdl.addAttribute(fac.createOMAttribute(
-                    "uri", nullNS, wsdlUri.toString()));
+        if (wsdlKey != null || wsdlUri != null || inLineWSDL != null) {
+            OMElement wsdl = fac.createOMElement("publishWSDL", synNS);
+            if (wsdlKey != null) {
+                wsdl.addAttribute(fac.createOMAttribute(
+                        "key", nullNS, wsdlKey));
+            } else if (inLineWSDL != null) {
+                wsdl.addChild((OMNode) inLineWSDL);
+            } else if (wsdlUri != null) {
+                wsdl.addAttribute(fac.createOMAttribute(
+                        "uri", nullNS, wsdlUri.toString()));
+            }
+            ResourceMapSerializer.serializeResourceMap(wsdl, service.getResourceMap());
             proxy.addChild(wsdl);
         }
 

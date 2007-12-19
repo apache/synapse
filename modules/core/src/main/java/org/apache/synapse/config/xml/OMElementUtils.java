@@ -51,15 +51,23 @@ public class OMElementUtils {
             log.warn("Searching for null NS prefix and/or using null OMElement");
             return null;
         }
-
-        Iterator iter = elem.getAllDeclaredNamespaces();
-        while (iter.hasNext()) {
-            OMNamespace ns = (OMNamespace) iter.next();
-            if (prefix.equals(ns.getPrefix())) {
-                return ns.getNamespaceURI();     
+        
+        OMElement currentElem = elem;
+        while (true) {
+            Iterator iter = currentElem.getAllDeclaredNamespaces();
+            while (iter.hasNext()) {
+                OMNamespace ns = (OMNamespace) iter.next();
+                if (prefix.equals(ns.getPrefix())) {
+                    return ns.getNamespaceURI();     
+                }
+            }
+            OMContainer parent = currentElem.getParent();
+            if (parent != null && parent instanceof OMElement) {
+                currentElem = (OMElement)parent;
+            } else {
+                return null;
             }
         }
-        return null;
     }
 
     /**

@@ -52,6 +52,7 @@ import org.apache.synapse.core.axis2.ProxyService;
  *    <publishWSDL uri=".." key="string">
  *       <wsdl:definition>...</wsdl:definition>?
  *       <wsdl20:description>...</wsdl20:description>?
+ *       <resource location="..." key="..."/>*
  *    </publishWSDL>?
  *    <enableSec/>?
  *    <enableRM/>?
@@ -238,6 +239,7 @@ public class ProxyServiceFactory {
                     }
                 }
             }
+            proxy.setResourceMap(ResourceMapFactory.createResourceMap(wsdl));
         }
 
 //        OMElement schema = elem.getFirstChildWithName(

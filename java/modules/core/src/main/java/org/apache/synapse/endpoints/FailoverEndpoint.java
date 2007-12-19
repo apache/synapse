@@ -41,7 +41,7 @@ public class FailoverEndpoint implements Endpoint {
     private String name = null;
 
     /**
-     * Determine whether this endpoint is active or not. This is active iff all child endpoints of
+     * Determine whether this endpoint is active or not. This is active if all child endpoints of
      * this endpoint is active. This is always loaded from the memory as it could be accessed from
      * multiple threads simultaneously.
      */

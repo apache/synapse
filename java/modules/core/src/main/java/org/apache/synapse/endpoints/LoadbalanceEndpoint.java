@@ -27,12 +27,12 @@ import java.util.List;
 
 /**
  * Load balance endpoint can have multiple endpoints. It will route messages according to the
- * specified loadbalance algorithm. This will assume that all immediate child endpoints are identical
+ * specified load balancing algorithm. This will assume that all immediate child endpoints are identical
  * in state (state is replicated) or state is not maintained at those endpoints. If an endpoint is
  * failing, the failed endpoint is marked as inactive and the message to the next endpoint obtained
- * using the loadbalance algorithm. If all the endpoints have failed and the parent endpoint is
- * available, onChildEndpointFail(...) methos of parent endpoint is called. If parent is not
- * avialable, this will call next FaultHandler for the message context.
+ * using the load balancing algorithm. If all the endpoints have failed and the parent endpoint is
+ * available, onChildEndpointFail(...) method of parent endpoint is called. If parent is not
+ * available, this will call next FaultHandler for the message context.
  */
 public class LoadbalanceEndpoint implements Endpoint {
 
@@ -54,8 +54,8 @@ public class LoadbalanceEndpoint implements Endpoint {
     private LoadbalanceAlgorithm algorithm = null;
 
     /**
-     * Determine whether this endpoint is active or not. This is active iff all child endpoints of
-     * this endpoint is active. This is always loaded from the memory as it could be accessed from
+     * Determine whether this endpoint is active or not. This is active if all child endpoints of
+     * this endpoint are active. This is always loaded from the memory as it could be accessed from
      * multiple threads simultaneously.
      */
     private volatile boolean active = true;

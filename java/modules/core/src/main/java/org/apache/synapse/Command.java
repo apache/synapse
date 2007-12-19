@@ -27,8 +27,8 @@ package org.apache.synapse;
 public interface Command {
 
     /**
-     * Thsi method will be implemented with a set of getters and setters for the command properties
-     * in an implementation of a Command
+     * This method will be implemented with a set of getters and setters for the command properties
+     * in an implementation of a Command.
      */
     public void execute();
 }

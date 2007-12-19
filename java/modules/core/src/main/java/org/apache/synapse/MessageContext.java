@@ -80,7 +80,7 @@ public interface MessageContext {
 
     /**
      * Sets the entries to the current context and not to the configuration. This can be
-     * used to focely override an existing set of resources in the configuration, because
+     * used to forcibly override an existing set of resources in the configuration, because
      * the resource lookup will look for the context first. But this only sets the entries
      * to the current context
      * @param entries the set of local entries to be set

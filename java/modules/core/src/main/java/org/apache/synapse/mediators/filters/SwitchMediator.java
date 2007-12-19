@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The switch mediator implements the functionality of the "switch" contruct. It first
+ * The switch mediator implements the functionality of the "switch" construct. It first
  * evaluates the given XPath expression into a String value, and performs a match against
  * the given list of cases. This is actually a list of sequences, and depending on the
  * selected case, the selected sequence gets executed.

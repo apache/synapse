@@ -22,7 +22,7 @@ package org.apache.synapse;
 import javax.xml.namespace.QName;
 
 /**
- * This startup interface will be instatiated to create startup tasks
+ * This startup interface will be instantiated to create startup tasks.
  */
 public interface Startup extends ManagedLifecycle {
 

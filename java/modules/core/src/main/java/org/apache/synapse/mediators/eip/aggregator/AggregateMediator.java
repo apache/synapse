@@ -56,22 +56,22 @@ public class AggregateMediator extends AbstractMediator {
     private long timeToInvalidate = 0;
 
     /**
-     * Messages comming to the aggregator will be examined for the existance of a node described
+     * Messages coming to the aggregator will be examined for the existance of a node described
      * in this XPATH and if it contains the XPATH pick that, if not try to find the messageSequence
-     * property for the corelation and if not pass the message through
+     * property for the correlation and if not pass the message through
      */
     private AXIOMXPath corelateExpression = null;
 
     /**
      * This will be used in the complete condition to complete the aggregation after waiting a
-     * specified timeout and send the messages gatherd in the aggregate after aggregation
+     * specified timeout and send the messages gathered in the aggregate after aggregation
      * if there are any messages
      */
     private long completeTimeout = 0;
 
     /**
      * Minimum number of messages required to evaluate the complete condition to true unless the
-     * aggregate has timedout with the provided timeout if there is a one
+     * aggregate has timed out with the provided timeout if there is a one
      */
     private int minMessagesToComplete = -1;
 
@@ -94,12 +94,12 @@ public class AggregateMediator extends AbstractMediator {
     private String invalidMsgSequenceRef = null;
 
     /**
-     * Sequece which will be called to mediate the invalid messages comming in to aggregator
+     * Sequence which will be called to mediate the invalid messages coming in to aggregator
      */
     private SequenceMediator invalidMsgSequence = null;
 
     /**
-     * This will be used to destroy the aggreagtes which were kept in the expiredAggregates map
+     * This will be used to destroy the aggregates which were kept in the expiredAggregates map
      */
     private long invlidateToDestroyTime = 0;
 
@@ -114,13 +114,13 @@ public class AggregateMediator extends AbstractMediator {
     private SequenceMediator onCompleteSequence = null;
 
     /**
-     * This will hold the map of active aggragates at any given time
+     * This will hold the map of active aggregates at any given time
      */
     private Map activeAggregates = new HashMap();
 
     /**
      * This will hold the expired aggregates at any given time, these will be cleaned by a timer
-     * task time to time in order to ensure uncontroled growth
+     * task time to time in order to ensure uncontrolled growth
      */
     private Map expiredAggregates = new HashMap();
 
@@ -142,8 +142,8 @@ public class AggregateMediator extends AbstractMediator {
 
     /**
      * This is the mediate method implementation of the AggregateMediator. And this will aggregate
-     * the messages going through this mediator according to the corelation criteria and the
-     * aggregation algorith specified to it
+     * the messages going through this mediator according to the correlation criteria and the
+     * aggregation algorithm specified to it
      *
      * @param synCtx - MessageContext to be mediated and aggregated
      * @return boolean true if the complete condition for the particular aggregate is validated

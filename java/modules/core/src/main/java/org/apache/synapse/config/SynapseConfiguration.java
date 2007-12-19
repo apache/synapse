@@ -51,7 +51,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	Registry registry = null;
 
     /**
-     * This holds the default QName of the configuraiton
+     * This holds the default QName of the configuration.
      */
     private QName defaultQName = null;
 
@@ -76,7 +76,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
     private Properties properties = new Properties();
 
     /**
-     * This will provide the timer deamon object for the sheduled tasks.
+     * This will provide the timer daemon object for the scheduled tasks.
      */
     private Timer synapseTimer = new Timer(true);
 
@@ -116,10 +116,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	}
 
 	/**
-	 * Returns the map of defined sequences in the configuraiton excluding the
-	 * fetched sequences from remote registry
+	 * Returns the map of defined sequences in the configuration excluding the
+	 * fetched sequences from remote registry.
 	 *
-	 * @return Map of SequenceMediators defined in the local configuraion
+	 * @return Map of SequenceMediators defined in the local configuration
 	 */
 	public Map getDefinedSequences() {
 		Map definedSequences = new HashMap();
@@ -247,8 +247,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-	 * Returns the map of defined entries in the configuraiton excluding the
-	 * fetched entries from remote registry
+	 * Returns the map of defined entries in the configuration excluding the
+	 * fetched entries from remote registry.
 	 *
 	 * @return Map of Entries defined in the local configuraion
 	 */
@@ -383,10 +383,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	}
 
 	/**
-	 * Returns the map of defined endpoints in the configuraiton excluding the
+	 * Returns the map of defined endpoints in the configuration excluding the
 	 * fetched endpoints from remote registry
 	 *
-	 * @return Map of Endpoints defined in the local configuraion
+	 * @return Map of Endpoints defined in the local configuration
 	 */
 	public Map getDefinedEndpoints() {
 		Map definedEndpoints = new HashMap();
@@ -578,7 +578,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	}
 
     /**
-     * Get the default QName of the configuraiton
+     * Get the default QName of the configuration.
      * 
      * @return default QName of the configuration
      */
@@ -633,7 +633,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Gets the properties to configure the synapse enviorenment
+     * Gets the properties to configure the Synapse environment.
      * 
      * @return set of properties as Properties
      */
@@ -642,7 +642,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Sets the properties to configure the synapse enviorenment
+     * Sets the properties to configure the Synapse enviornment.
      *
      * @param properties - Properties which needs to be set
      */
@@ -696,7 +696,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     /**
      * This method will be called on the soft shutdown or destroying the configuration
-     * and will destroy all the statefull managed parts of the configuration
+     * and will destroy all the stateful managed parts of the configuration.
      */
     public void destroy() {
         

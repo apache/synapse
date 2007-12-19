@@ -42,7 +42,7 @@ public class SendMediator extends AbstractMediator {
     private Endpoint endpoint = null;
 
     /**
-     * This will call the send method on the messages with implivit message parameters
+     * This will call the send method on the messages with implicit message parameters
      * or else if there is an endpoint, with that endpoint parameters
      *
      * @param synCtx the current message to be sent

@@ -25,9 +25,9 @@ import org.apache.axiom.om.OMElement;
 
 /**
  * All endpoint factories should implement this interface. Use EndpointAbstractFactory to obtain the
- * correct endpoint fatory for particular endpoint configuration. As endpoints can be nested inside
+ * correct endpoint factory for particular endpoint configuration. As endpoints can be nested inside
  * each other, EndpointFactory implementations may call other EndpointFactory implementations recursively
- * to obtain the required endpoint hierachy.
+ * to obtain the required endpoint hierarchy.
  *
  * This also serves as the XMLToObjactMapper implementation for specific endpoint implementations.
  * If the endpoint type is not known use XMLToEndpointMapper as the generic XMLToObjectMapper for

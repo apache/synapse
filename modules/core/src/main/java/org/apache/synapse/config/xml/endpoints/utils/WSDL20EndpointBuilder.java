@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 
 /**
- * Currently this class is not used as woden is dependent on xerces, which is not included in the
+ * Currently this class is not used as Woden is dependent on Xerces, which is not included in the
  * current release.
  *  
  * Builder for WSDL 2.0 endpoints. This class extracts endpoint information from the given WSDL 2.0

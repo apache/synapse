@@ -48,7 +48,7 @@ import java.util.List;
  *
  * This endpoint gets the target endpoint first from the dispatch manager, which will ask all listed
  * dispatchers for a matching session. If a matching session is found it will just invoke the send(...)
- * method of that endpoint. If not it will find an endpoint using the loadbalance policy and send to
+ * method of that endpoint. If not it will find an endpoint using the load balancing policy and send to
  * that endpoint.
  */
 public class SALoadbalanceEndpoint implements Endpoint {

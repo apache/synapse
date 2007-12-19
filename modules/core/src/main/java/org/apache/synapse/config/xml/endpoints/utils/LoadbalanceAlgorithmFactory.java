@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 
 /**
- * Factroy of all load balance algorithms. ESBSendMediatorFactroy will use this to create the
+ * Factory of all load balance algorithms. ESBSendMediatorFactroy will use this to create the
  * appropriate algorithm implementation.
  */
 public class LoadbalanceAlgorithmFactory {

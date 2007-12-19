@@ -40,7 +40,7 @@ public class HttpSessionDispatcher implements Dispatcher {
     private final static String SET_COOKIE = "Set-Cookie";
     /**
      * Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
-     * multiple threds (e.g. multiple clients different sessions).
+     * multiple threads (e.g. multiple clients different sessions).
      */
     private final Map sessionMap = Collections.synchronizedMap(new HashMap());
 

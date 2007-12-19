@@ -68,7 +68,7 @@ public interface Registry {
     public RegistryEntry[] getChildren(RegistryEntry entry);
 
     /**
-     * Returns all decendant entries of the given registry entry
+     * Returns all descendant entries of the given registry entry
      * @param entry - parent registry entry
      * @return Array of decendant registry entries of the given registry entry
      */

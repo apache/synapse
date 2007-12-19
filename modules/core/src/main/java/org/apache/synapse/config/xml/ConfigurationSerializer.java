@@ -28,12 +28,12 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.axiom.om.OMElement;
 
 /**
- * This interface defines the configuration serializers of Synapse
+ * This interface defines the configuration serializers of Synapse.
  */
 public interface ConfigurationSerializer {
 
     /**
-     * Serializes the given configuraiton to an OMElement
+     * Serializes the given configuration to an OMElement.
      *
      * @param synCfg Configuration to be serialized
      * @return OMElement describing the configuraiton

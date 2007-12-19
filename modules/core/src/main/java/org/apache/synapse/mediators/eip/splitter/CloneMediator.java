@@ -40,7 +40,7 @@ public class CloneMediator extends AbstractMediator {
 
     /**
      * This variable specifies whether to continue the parent message (i.e. message which is
-     * sbjuected to cloning) or not
+     * subjected to cloning) or not
      */
     private boolean continueParent = false;
 

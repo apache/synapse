@@ -23,7 +23,7 @@ import org.apache.synapse.endpoints.*;
 import org.apache.synapse.SynapseException;
 
 /**
- * Abstract serialier for endpoint serializers. Use this class to obtain the EndpointSerializer
+ * Abstract serializer for endpoint serializers. Use this class to obtain the EndpointSerializer
  * implementation for particular endpoint type.
  */
 public class EndpointAbstractSerializer {

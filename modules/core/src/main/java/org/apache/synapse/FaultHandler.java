@@ -103,7 +103,7 @@ public abstract class FaultHandler {
     }
 
     /**
-     * This will be executed to handle any Exceptions occured within the Synapse environment.
+     * This will be executed to handle any Exceptions occurred within the Synapse environment.
      * @param synCtx SynapseMessageContext of which the fault occured message comprises
      * @throws SynapseException in case there is a failure in the fault execution
      */

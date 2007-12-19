@@ -48,10 +48,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Cacche Mediator will cache the response messages indexed using the hash value of the
+ * CacheMediator will cache the response messages indexed using the hash value of the
  * request message, and subsequent messages with the same request (request hash will be
  * generated and checked for the equality) within the cache expiration period will be served
- * from the stored resposnses in the cache
+ * from the stored responses in the cache
  *
  * @see org.apache.synapse.Mediator
  */

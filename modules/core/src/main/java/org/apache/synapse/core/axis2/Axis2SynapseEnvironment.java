@@ -203,8 +203,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /**
      * This method will be used to create a new MessageContext in the Axis2 environment for
-     * synapse. This will set all the relevant parts to the messagecontext, but for this message
-     * context to be usefull creator has to fill in the data like envelope and operation context
+     * Synapse. This will set all the relevant parts to the messagecontext, but for this message
+     * context to be useful creator has to fill in the data like envelope and operation context
      * and so on. This will set a default envelope of type soap12 and a new messageID for the
      * created message along with the ConfigurationContext is being set in to the message
      * correctly.

@@ -89,7 +89,7 @@ public class ValidateMediator extends AbstractListMediator {
     private final Object validatorLock = new Object();
 
     /**
-     * The SchemaFactory for whcih used to create new schema instance
+     * The SchemaFactory used to create new schema instances.
      */
     private  SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
@@ -383,8 +383,8 @@ public class ValidateMediator extends AbstractListMediator {
     }
 
     /**
-     * Get the source XPath which yeilds the source element for validation
-     * @return the XPath which yeilds the source element for validation
+     * Get the source XPath which yields the source element for validation
+     * @return the XPath which yields the source element for validation
      */
     public AXIOMXPath getSource() {
         return source;

@@ -62,7 +62,7 @@ import java.util.List;
 
 /**
  * The XSLT mediator performs an XSLT transformation requested, using
- * the current message. The source attribute (if available) spcifies the source element
+ * the current message. The source attribute (if available) specifies the source element
  * on which the transformation would be applied. It will default to the first child of
  * the messages' SOAP body, if it is omitted.
  *
@@ -95,7 +95,7 @@ public class XSLTMediator extends AbstractMediator {
     private String sourceXPathString = null;
 
     /**
-     * The (optional) XPath expression which yeilds the source element for a transformation
+     * The (optional) XPath expression which yields the source element for a transformation
      */
     private AXIOMXPath source = null;
 

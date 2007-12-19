@@ -47,7 +47,7 @@ public class XMLConfigurationSerializer {
     private static final Log log = LogFactory.getLog(XMLConfigurationSerializer.class);
 
     /**
-     * order of entries is irrelavant, however its nice to have some order
+     * Order of entries is irrelevant, however its nice to have some order.
      * @param synCfg
      * @param outputStream
      * @throws XMLStreamException

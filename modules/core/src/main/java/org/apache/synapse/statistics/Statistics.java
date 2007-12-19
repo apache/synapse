@@ -24,13 +24,13 @@ package org.apache.synapse.statistics;
 
 public class Statistics {
 
-    /**  Maximum Processing time for a one way flow  */
+    /**  Maximum processing time for a one way flow  */
     private long maxProcessingTime = 0;
-    /** Minmum Processing time for a one way flow   */
+    /** Minimum processing time for a one way flow   */
     private long minProcessingTime = -1;
-    /** Avarage Processing time for a one way flow */
+    /** Average processing time for a one way flow */
     private double avgProcessingTime = 0;
-    /** Total Processing time for a one way flow  */
+    /** Total processing time for a one way flow  */
     private double totalProcessingTime;
     /** The number of access count for a one way flow  */
     private int count = 0;

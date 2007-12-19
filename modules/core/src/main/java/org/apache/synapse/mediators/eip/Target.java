@@ -41,7 +41,7 @@ public class Target {
     private String soapAction = null;
 
     /**
-     * Holds the target mediation sequence as an annonymous sequence
+     * Holds the target mediation sequence as an anonymous sequence
      */
     private SequenceMediator sequence = null;
 

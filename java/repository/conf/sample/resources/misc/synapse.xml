@@ -47,7 +47,7 @@
                 <send/>
             </outSequence>
         </target>
-        <publishWSDL uri="file:./../../repository/conf/sample/resources/misc/proxy/test_proxy_1.xml">
+        <publishWSDL uri="file:./../../repository/conf/sample/resources/misc/proxy/test_proxy_1.wsdl">
             <resource location="test_proxy_1.xsd" key="misc/proxy/test_proxy_1.xsd"/>
         </publishWSDL>
     </proxy>

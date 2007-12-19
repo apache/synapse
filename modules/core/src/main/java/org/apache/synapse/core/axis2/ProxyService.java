@@ -34,6 +34,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -56,6 +57,7 @@ import java.net.*;
  *    <publishWSDL uri=".." key="string">
  *       <wsdl:definition>...</wsdl:definition>?
  *       <wsdl20:description>...</wsdl20:description>?
+ *       <resource location="..." key="..."/>*
  *    </publishWSDL>?
  *    <enableSec/>?
  *    <enableRM/>?
@@ -135,6 +137,11 @@ public class ProxyService {
      * The inlined representation of the service WSDL, if defined inline
      */
     private Object inLineWSDL;
+    /**
+     * A ResourceMap object allowing to locate artifacts (WSDL and XSD) imported
+     * by the service WSDL to be located in the registry.
+     */
+    private ResourceMap resourceMap;
     /**
      * The keys for any supplied policies that would apply at the service level
      */
@@ -265,6 +272,24 @@ public class ProxyService {
 
                         wsdlToAxisServiceBuilder.setBaseUri(
                                 wsdlURI != null ? wsdlURI.toString() : "");
+
+                        if (resourceMap != null) {
+
+                            if (trace()) {
+                                trace.info("Setting up custom resolvers");
+                            }
+                            // Set up the URIResolver
+                            wsdlToAxisServiceBuilder.setCustomResolver(
+                                new ResourceMapURIResolver(resourceMap, synCfg));
+                            // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
+                            if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
+                                ((WSDL11ToAxisServiceBuilder)
+                                    wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
+                                    new ResourceMapWSDLLocator(new InputSource(wsdlInputStream),
+                                                          wsdlURI != null ? wsdlURI.toString() : "",
+                                                          resourceMap, synCfg));
+                            }
+                        }
                         
                         if (trace()) {
                             trace.info("Populating Axis2 service using WSDL");
@@ -733,6 +758,14 @@ public class ProxyService {
 
     public void setPinnedServers(List pinnedServers) {
       this.pinnedServers = pinnedServers;
+    }
+
+    public ResourceMap getResourceMap() {
+        return resourceMap;
+    }
+
+    public void setResourceMap(ResourceMap resourceMap) {
+        this.resourceMap = resourceMap;
     }
 
 }

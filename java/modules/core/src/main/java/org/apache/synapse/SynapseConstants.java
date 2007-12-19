@@ -87,9 +87,9 @@ public final class SynapseConstants {
     public static final String SYNAPSE_HOME = "synapse.home";
     /** The default synapse.properties file path */
     public static final String DEFAULT_PROP_PATH = "synapse.properties";
-    /** The name of the system property used to specify/override the synapse config XML location */
+    /** The name of the system property used to specify/override the Synapse config XML location */
     public static final String SYNAPSE_XML = "synapse.xml";
-    /** The name of the system property used to specify/override the synapse properties location */
+    /** The name of the system property used to specify/override the Synapse properties location */
     public static final String SYNAPSE_PROPERTIES = "synapse.properties";
 
     //- Synapse Message Context Properties -
@@ -170,7 +170,7 @@ public final class SynapseConstants {
         /**
          * Interval for activating the timeout handler for cleaning up expired requests. Note that
          * there can be an error as large as the value of the interval. But for smaller intervals
-         * and larger timeouts this error is negligable.
+         * and larger timeouts this error is negligilble.
          */
         public static final long DEFAULT_TIMEOUT_HANDLER_INTERVAL = 15000;
 

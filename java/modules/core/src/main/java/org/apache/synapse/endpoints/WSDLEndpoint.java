@@ -32,12 +32,12 @@ import java.util.Stack;
 
 /**
  * WSDLEndpoint represents the endpoints built using a wsdl document. It stores the details about
- * the endpoint in a EndpointDefinition object. Once the WSDLEndpoint object is contructed, it should
- * not access the wsdl document at runtime to obtain endpoint information. If it is neccessary to
+ * the endpoint in a EndpointDefinition object. Once the WSDLEndpoint object is constructed, it should
+ * not access the wsdl document at runtime to obtain endpoint information. If it is necessary to
  * create an endpoint using a dynamic wsdl, store the endpoint configuration in the registry and
  * create a dynamic wsdl endpoint using that registry key.
  * <p/>
- * TODO: This should allow variuos policies to be applied on fine grained level (e.g. operations).
+ * TODO: This should allow various policies to be applied on fine grained level (e.g. operations).
  */
 public class WSDLEndpoint extends FaultHandler implements Endpoint {
 

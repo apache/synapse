@@ -22,12 +22,12 @@ package org.apache.synapse.endpoints;
 import org.apache.synapse.MessageContext;
 
 /**
- * Endpoint defines the bahavior common to all synapse endpoints. Synapse endpoints should be able
- * to send the given synapse message context, rather than just providing the information for sending
- * the message. The task a particuler endpoint does in its send(...) methis is specific to the endpoint.
- * For example a loadbalance endpoint may choose another endpoint using its loadbalance policy and
- * call its send(...) method while an address endpoint (leaf level) may send the message to a actual
- * endpoint url. Endpoints may contain zero or more endpoints in them and build up a heirachycal
+ * Endpoint defines the behavior common to all Synapse endpoints. Synapse endpoints should be able
+ * to send the given Synapse message context, rather than just providing the information for sending
+ * the message. The task a particular endpoint does in its send(...) method is specific to the endpoint.
+ * For example a loadbalance endpoint may choose another endpoint using its load balance policy and
+ * call its send(...) method while an address endpoint (leaf level) may send the message to an actual
+ * endpoint url. Endpoints may contain zero or more endpoints in them and build up a hierarchical
  * structure of endpoints.
  */
 public interface Endpoint {
@@ -41,7 +41,7 @@ public interface Endpoint {
 
     /**
      * Endpoints that contain other endpoints should implement this method. It will be called if a
-     * child endpoint causes an exception. Action to be taken on such failure is upto the implementation.
+     * child endpoint causes an exception. Action to be taken on such failure is up to the implementation.
      * But it is good practice to first try addressing the issue. If it can't be addressed propagate the
      * exception to parent endpoint by calling parent endpoint's onChildEndpointFail(...) method.
      *

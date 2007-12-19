@@ -23,8 +23,8 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.MessageContext;
 
 /**
- * Defines the behavior of session dispatchers. There can be two dispatcher types. Server intiated
- * session dispatchers and client initialted session dispatchers. In the former one, server generates
+ * Defines the behavior of session dispatchers. There can be two dispatcher types. Server initiated
+ * session dispatchers and client initiated session dispatchers. In the former one, server generates
  * the session ID and sends it to the client in the first RESPONSE. In the later case, client should
  * generate the session ID and send it to the server in the first REQUEST. A dispatcher object will
  * be created for each session affinity load balance endpoint.
@@ -33,7 +33,7 @@ public interface Dispatcher {
 
     /**
      * Dispatcher should check the session id pattern in the synapseMessageContext and return the
-     * matching endpoint for that session id, if availabale. If the session id in the given
+     * matching endpoint for that session id, if available. If the session id in the given
      * synapseMessageContext is not found it should return null.
      *
      * @param synCtx client -> esb message context.
@@ -59,7 +59,7 @@ public interface Dispatcher {
     public void unbind(MessageContext synCtx);
 
     /**
-     * Determine whether the session supported by the implementing dispatcher is intiated by the
+     * Determine whether the session supported by the implementing dispatcher is initiated by the
      * server (e.g. soap session) or by the client. This can be used for optimizing session updates.
      *
      * @return true, if the session is initiated by the server. false, otherwise.

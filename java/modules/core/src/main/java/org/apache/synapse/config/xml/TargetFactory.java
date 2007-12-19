@@ -103,7 +103,7 @@ public class TargetFactory {
     }
 
     /**
-     * This privaet method is used for the exception handling and logging purposes
+     * This private method is used for exception handling and logging purposes.
      *
      * @param message - String message to be logged and the message of the exception
      */

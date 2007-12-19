@@ -23,7 +23,7 @@ import org.apache.synapse.MessageContext;
 
 /**
  * All Synapse mediators must implement this Mediator interface. As a message passes
- * through the synapse system, each mediator's mediate() method is invoked in the
+ * through the Synapse system, each mediator's mediate() method is invoked in the
  * sequence/order defined in the SynapseConfiguration.
  */
 public interface Mediator {

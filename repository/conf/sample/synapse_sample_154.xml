@@ -19,7 +19,7 @@
     <!-- A proxy service with a loadbalace endpoint -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <proxy name="LBProxy" transports="https http" startOnLoad="true">
+    <proxy name="LBProxy" transports="http" startOnLoad="true">
         <target faultSequence="errorHandler">
             <inSequence>
                 <send>

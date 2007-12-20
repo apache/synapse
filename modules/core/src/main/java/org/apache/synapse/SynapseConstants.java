@@ -68,6 +68,10 @@ public final class SynapseConstants {
     public static final String HEADER_MESSAGE_ID = "MessageID";
     /** Message format: pox, soap11, soap12 */
     public static final String PROPERTY_MESSAGE_FORMAT = "MESSAGE_FORMAT";
+    /** WSDL operation name **/
+    public static final String PROPERTY_OPERATION_NAME = "OperationName";
+    /** WSDL operation namespace **/
+    public static final String PROPERTY_OPERATION_NAMESPACE = "OperationNamespace";
     /** System time in milliseconds - the offset from epoch (i.e. System.currentTimeMillis) */
     public static final String SYSTEM_TIME = "SYSTEM_TIME";
     /** System date */

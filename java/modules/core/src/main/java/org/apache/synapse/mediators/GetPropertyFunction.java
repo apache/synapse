@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators;
 
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -220,6 +221,19 @@ public class GetPropertyFunction implements Function {
                     return SynapseConstants.FORMAT_SOAP11;
                 else
                     return SynapseConstants.FORMAT_SOAP12;
+            } else if (SynapseConstants.PROPERTY_OPERATION_NAME.equals(key) ||
+                       SynapseConstants.PROPERTY_OPERATION_NAMESPACE.equals(key)) {
+                if (synCtx instanceof Axis2MessageContext) {
+                    AxisOperation axisOperation
+                        = ((Axis2MessageContext)synCtx).getAxis2MessageContext().getAxisOperation();
+                    if (axisOperation != null) {
+                        if (SynapseConstants.PROPERTY_OPERATION_NAMESPACE.equals(key)) {
+                            return axisOperation.getName().getNamespaceURI();
+                        } else {
+                            return axisOperation.getName().getLocalPart();
+                        }
+                    }
+                }
             } else {
                 Object result = synCtx.getProperty(key);
                 if (result != null) {

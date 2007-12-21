@@ -53,7 +53,9 @@ import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
+import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.workers.SenderWorker;
+import org.apache.sandesha2.workers.WorkerLock;
 import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MakeConnection;
@@ -251,7 +253,28 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				}
 			}
 		}
+		
 		if(continueSending){
+
+			SandeshaThread sender = storageManager.getSender();
+			WorkerLock lock = sender.getWorkerLock();
+			
+			String workId = matchingMessage.getMessageID();
+			while (lock.isWorkPresent(workId)) {
+				try {
+					//wait on the lock.
+					lock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
+			worker.setLock(lock);
+			worker.setWorkId(workId);
+
+			lock.addWork(workId, worker);
+			
 			setTransportProperties (returnMessage, pollMessage);
 			
 			// Link the response to the request
@@ -273,7 +296,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			//This will allow Sandesha2 to consider both of following senarios equally.
 			//  1. A message being sent by the Sender thread.
 			//  2. A message being sent as a reply to an MakeConnection.
-			SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
+	
 			worker.setMessage(returnRMMsg);
 			worker.run();			
 			

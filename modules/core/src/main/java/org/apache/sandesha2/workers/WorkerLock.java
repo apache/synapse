@@ -46,6 +46,10 @@ public class WorkerLock {
 	public synchronized void removeWork (String work) {
 		if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::removeWork " + work);
 		locks.remove(work);
+		
+		//wake up some thread that is waiting on this lock.
+		this.notify();
+		
 		if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::removeWork");
 	}
 	

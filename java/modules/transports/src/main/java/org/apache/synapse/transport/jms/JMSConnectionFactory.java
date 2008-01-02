@@ -602,29 +602,29 @@ public class JMSConnectionFactory implements ExceptionListener {
     }
 
     public void onException(JMSException e) {
-      log.error("jms error ", e);
-      boolean wasError = true;
-      
-      // try to connect
-      // if error occurs wait and try again
-      while(wasError == true) {
-        
-        try {
-          connectAndListen();
-          wasError = false;
-          
-        } catch (Exception e1) {
-          log.error("jms reconnect error ", e);
-        } 
-        
-        if(wasError == true) {
-          try {
-            Thread.sleep(getReconnectTimeout());
-          } catch (InterruptedException e2) {
-            e2.printStackTrace();
-          }
-        }
-      } // wasError
-      
+        log.error("JMS connection factory " + name + " encountered an error", e);
+        boolean wasError = true;
+
+        // try to connect
+        // if error occurs wait and try again
+        while (wasError == true) {
+
+            try {
+                connectAndListen();
+                wasError = false;
+
+            } catch (Exception e1) {
+                log.warn("JMS reconnection attempt failed for connection factory : " + name, e);
+            }
+
+            if (wasError == true) {
+                try {
+                    log.info("Attempting reconnection for connection factory " + name +
+                        " in " + getReconnectTimeout()/1000 +  " seconds");
+                    Thread.sleep(getReconnectTimeout());
+                } catch (InterruptedException ignore) {}
+            }
+        } // wasError
+
     }
 }

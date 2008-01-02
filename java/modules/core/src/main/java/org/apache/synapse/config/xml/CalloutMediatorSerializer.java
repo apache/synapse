@@ -50,6 +50,7 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
         if (mediator.getRequestXPathString() != null) {
             source.addAttribute(fac.createOMAttribute(
                 "xpath", nullNS, mediator.getRequestXPathString()));
+            serializeNamespaces(source, mediator.getRequestXPath());
         } else if (mediator.getRequestKey() != null) {
             source.addAttribute(fac.createOMAttribute(
                 "key", nullNS, mediator.getRequestKey()));
@@ -59,6 +60,7 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
         if (mediator.getTargetXPathString() != null) {
             target.addAttribute(fac.createOMAttribute(
                 "xpath", nullNS, mediator.getTargetXPathString()));
+            serializeNamespaces(target, mediator.getTargetXPath());
         } else if (mediator.getTargetKey() != null) {
             target.addAttribute(fac.createOMAttribute(
                 "key", nullNS, mediator.getTargetKey()));

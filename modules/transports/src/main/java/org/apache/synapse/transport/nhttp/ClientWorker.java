@@ -27,7 +27,9 @@ import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
-import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.*;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.axiom.om.OMException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -154,10 +156,26 @@ public class ClientWorker implements Runnable {
             // question is still under debate and due to the timelines, I am commiting this
             // workaround as Axis2 1.2 is about to be released and Synapse 1.0
             responseMsgCtx.setServerSide(false);
-            envelope = TransportUtils.createSOAPMessage(
+            try {
+                envelope = TransportUtils.createSOAPMessage(
                 responseMsgCtx,
                 in,
                 contentType);
+            } catch (OMException e) {
+                // handle non SOAP and POX/REST payloads (probably text/html)
+                log.error("Unexpected response received", e);
+                SOAPFactory factory = new SOAP11Factory();
+                envelope = factory.getDefaultFaultEnvelope();
+                SOAPFaultDetail detail = factory.createSOAPFaultDetail();
+                detail.setText("Unexpected response received : " + e.getMessage());
+                envelope.getBody().getFault().setDetail(detail);
+                SOAPFaultReason reason = factory.createSOAPFaultReason();
+                reason.setText(this.response.getStatusLine().getReasonPhrase());
+                envelope.getBody().getFault().setReason(reason);
+                SOAPFaultCode code = factory.createSOAPFaultCode();
+                code.setText(Integer.toString(this.response.getStatusLine().getStatusCode()));
+                envelope.getBody().getFault().setCode(code);
+            }
             responseMsgCtx.setServerSide(true);
             responseMsgCtx.setEnvelope(envelope);
 

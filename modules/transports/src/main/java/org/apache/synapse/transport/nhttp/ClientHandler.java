@@ -352,6 +352,37 @@ public class ClientHandler implements NHttpClientHandler {
             }
             case HttpStatus.SC_OK : {
                 processResponse(conn, context, response);
+                return;
+            }
+            default : {
+                log.warn("Unexpected HTTP status code received : " +
+                    response.getStatusLine().getStatusCode() + " :: " +
+                    response.getStatusLine().getReasonPhrase());
+
+                Header contentType = response.getFirstHeader(CONTENT_TYPE);
+                if (contentType != null) {
+                    if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0) ||
+                     contentType.getValue().indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Received an unexpected response with a SOAP payload");
+                        }
+                    } else if (contentType.getValue().indexOf("html") == -1) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Received an unexpected response with a POX/REST payload");
+                        }
+                    } else {
+                        log.error("Received an unexpected response - of content type : " +
+                            contentType.getValue() + " and status code : " +
+                            response.getStatusLine().getStatusCode() + " with reason : " +
+                            response.getStatusLine().getReasonPhrase());
+                    }
+                } else {
+                    log.error("Received an unexpected response - of unknown content type " +
+                        " with status code : " +
+                        response.getStatusLine().getStatusCode() + " and reason : " +
+                        response.getStatusLine().getReasonPhrase());
+                }
+                processResponse(conn, context, response);
             }
         }
     }

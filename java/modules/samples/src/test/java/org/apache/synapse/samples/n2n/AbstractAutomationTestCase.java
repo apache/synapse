@@ -27,6 +27,7 @@ import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 import samples.util.SampleAxis2Server;
+import samples.util.SampleAxis2ServerManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -70,11 +71,14 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
         return os.toString();
     }
 
-    protected ListenerManager startCustomAxis2Server(String httpPort, String httpsPort) throws Exception {
+    protected void startCustomAxis2Server(String httpPort, String httpsPort) throws Exception {
         System.setProperty("http_port", httpPort);
         System.setProperty("https_port", httpsPort);
-        return SampleAxis2Server.startServer(new String[]{"-repo", "modules/samples/target/test_repos/axis2Server/",
+        SampleAxis2ServerManager.getInstance().start(new String[]{"-repo", "modules/samples/target/test_repos/axis2Server/",
                     "-conf", "modules/samples/target/test_repos/axis2Server/conf/axis2.xml"});
+    }
+    protected void stopCustomAxis2Server(String httpPort, String httpsPort) throws Exception {
+        SampleAxis2ServerManager.getInstance().stop();
     }
 
     protected void tearDown() throws Exception {

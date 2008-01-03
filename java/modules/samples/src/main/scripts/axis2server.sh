@@ -159,5 +159,5 @@ if [ "$HTTPS_PORT_SET" = "FALSE" ]; then
 	PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttps_port=9002 "
 fi
 
-java $PROGRAM_PARAMS -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
+java $PROGRAM_PARAMS -Djava.io.tmpdir=$AXIS2_HOME/../../work/temp/sampleServer -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
 -repo $AXIS2_HOME/repository -conf $AXIS2_HOME/repository/conf/axis2.xml

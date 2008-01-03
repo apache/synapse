@@ -30,7 +30,6 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.StringReader;
 import java.io.IOException;
 
@@ -59,8 +58,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
 
             XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
             StAXOMBuilder builder = new StAXOMBuilder(reader);
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
+            return builder.getDocumentElement();
 
         }
         catch (XMLStreamException e) {

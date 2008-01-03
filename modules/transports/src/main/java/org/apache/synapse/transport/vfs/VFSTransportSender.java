@@ -184,19 +184,23 @@ public class VFSTransportSender extends AbstractTransportSender {
             if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
                 try {
                     OutputStream os = responseFile.getContent().getOutputStream();
-                    OMNode omNode = firstChild.getFirstOMChild();
-                    if (omNode != null && omNode instanceof OMText) {
-                        Object dh = ((OMText) omNode).getDataHandler();
-                        if (dh != null && dh instanceof DataHandler) {
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            try {
-                                ((DataHandler) dh).writeTo(baos);
-                            } catch (IOException e) {
-                                handleException("Error serializing binary content of element : " +
-                                    BaseConstants.DEFAULT_BINARY_WRAPPER, e);
+                    try {
+                        OMNode omNode = firstChild.getFirstOMChild();
+                        if (omNode != null && omNode instanceof OMText) {
+                            Object dh = ((OMText) omNode).getDataHandler();
+                            if (dh != null && dh instanceof DataHandler) {
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                try {
+                                    ((DataHandler) dh).writeTo(baos);
+                                } catch (IOException e) {
+                                    handleException("Error serializing binary content of element : " +
+                                        BaseConstants.DEFAULT_BINARY_WRAPPER, e);
+                                }
+                                os.write(baos.toByteArray());
                             }
-                            os.write(baos.toByteArray());
                         }
+                    } finally {
+                    	os.close();
                     }
                 } catch (FileSystemException e) {
                     handleException("Error getting an output stream to file : " +
@@ -208,11 +212,14 @@ public class VFSTransportSender extends AbstractTransportSender {
             } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
                 try {
                     OutputStream os = responseFile.getContent().getOutputStream();
-
-                    if (firstChild instanceof OMSourcedElementImpl) {
-                        firstChild.serializeAndConsume(os);
-                    } else {
-                        os.write(firstChild.getText().getBytes());
+                    try {
+                        if (firstChild instanceof OMSourcedElementImpl) {
+                            firstChild.serializeAndConsume(os);
+                        } else {
+                            os.write(firstChild.getText().getBytes());
+                        }
+                    } finally {
+                    	os.close();
                     }
                 } catch (FileSystemException e) {
                     handleException("Error getting an output stream to file : " +
@@ -247,8 +254,14 @@ public class VFSTransportSender extends AbstractTransportSender {
 
         try {
             OutputStream os = responseFile.getContent().getOutputStream();
-            messageFormatter.writeTo(msgContext, format, os, true);
+            try {
+            	messageFormatter.writeTo(msgContext, format, os, true);
+            } finally {
+            	os.close();
+            }
         } catch (FileSystemException e) {
+            handleException("IO Error while creating response file : " + responseFile.getName(), e);
+        } catch (IOException e) {
             handleException("IO Error while creating response file : " + responseFile.getName(), e);
         }
     }

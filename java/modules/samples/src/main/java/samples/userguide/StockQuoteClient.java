@@ -194,20 +194,23 @@ public class StockQuoteClient {
             if (Boolean.parseBoolean(wsrm)) {
                 // give some time for RM to terminate normally
                 Thread.sleep(5000);
-
-                configContext.getListenerManager().stop();
+                if (configContext != null) {
+                    configContext.getListenerManager().stop();
+                }
                 serviceClient.cleanup();
                 System.exit(0);
             }
         }
 
         try {
-            //configContext.terminate();
+            if (configContext != null) {
+                configContext.terminate();
+            }
             // the above statement was used on reccomendation by Chamikara as I remember, but
             // since using Axis2 1.3 - this causes some unexpected classloading issue on the
             // Axis2 server side - which cannot be described. This using the below as suggested
             // by Deepal
-            serviceClient.cleanup();
+//            serviceClient.cleanup();
         } catch (Exception ignore) {
         }
     }

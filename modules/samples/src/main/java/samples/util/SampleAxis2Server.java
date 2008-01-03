@@ -21,144 +21,46 @@ package samples.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.util.CommandLineOptionParser;
-import org.apache.axis2.util.OptionsValidator;
-import org.apache.axis2.util.CommandLineOption;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.description.TransportInDescription;
-
-import javax.xml.namespace.QName;
-import java.util.List;
-import java.util.Map;
-import java.io.File;
-import java.net.ServerSocket;
 
 public class SampleAxis2Server {
 
-    private static final Log log = LogFactory.getLog(SimpleHTTPServer.class);
-
-    int port = -1;
-
-    public static int DEFAULT_PORT = 9000;
-
+    private static final Log log = LogFactory.getLog(SampleAxis2Server.class);
 
     /**
      * Expected system properties
-     *      http_port: Port to bind HTTP transport (default is 9000)
-     *      https_port: Port to bind HTTPS transport (default is 9002)
-     *      server_name: Name of this instance of the server (optional)
+     * http_port: Port to bind HTTP transport (default is 9000)
+     * https_port: Port to bind HTTPS transport (default is 9002)
+     * server_name: Name of this instance of the server (optional)
      *
-     * @param args  1: Axis2 repository
-     *              2: Axis2 configuration file (axis2.xml)
-     *
+     * @param args 1: Axis2 repository
+     *             2: Axis2 configuration file (axis2.xml)
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
         startServer(args);
+        addShutdownHook();
     }
 
-    public static ListenerManager startServer(String[] args) {
-        String repoLocation = null;
-		String confLocation = null;
-
-		CommandLineOptionParser optionsParser = new CommandLineOptionParser(args);
-		List invalidOptionsList = optionsParser.getInvalidOptions(new OptionsValidator() {
-			public boolean isInvalid(CommandLineOption option) {
-				String optionType = option.getOptionType();
-				return !("repo".equalsIgnoreCase(optionType) || "conf"
-						.equalsIgnoreCase(optionType));
-			}
-		});
-
-		if ((invalidOptionsList.size()>0)||(args.length>4))
-		{
-			printUsage();
-			return null;
-		}
-
-		Map optionsMap = optionsParser.getAllOptions();
-
-		CommandLineOption repoOption = (CommandLineOption) optionsMap
-				.get("repo");
-		CommandLineOption confOption = (CommandLineOption) optionsMap
-				.get("conf");
-
-		log.info("[SimpleAxisServer] Starting");
-		if (repoOption != null) {
-			repoLocation = repoOption.getOptionValue();
-			System.out.println("[SimpleAxisServer] Using the Axis2 Repository : "
-					+ new File(repoLocation).getAbsolutePath());
-		}
-		if (confOption != null) {
-			confLocation = confOption.getOptionValue();
-			System.out
-					.println("[SimpleAxisServer] Using the Axis2 Configuration File : "
-							+ new File(confLocation).getAbsolutePath());
-		}
-
-		try {
-			ConfigurationContext configctx = ConfigurationContextFactory
-					.createConfigurationContextFromFileSystem(repoLocation,
-							confLocation);
-
-            configurePort(configctx);
-
-            ListenerManager listenerManager =  new ListenerManager();
-				listenerManager.init(configctx);
-			listenerManager.start();
-            log.info("[SimpleAxisServer] Started");
-            return listenerManager;
-        } catch (Throwable t) {
-            log.fatal("[SimpleAxisServer] Shutting down. Error starting SimpleAxisServer", t);
-        }
-        return null;
-    }
-
-    private static void configurePort(ConfigurationContext configCtx) {
-
-        TransportInDescription trsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get("http");
-
-        if(trsIn != null) {
-            String port = System.getProperty("http_port");
-            if(port != null) {
+    private static void addShutdownHook() {
+        Thread shutdownHook = new Thread() {
+            public void run() {
+                log.info("Shutting down SimpleAxisServer ...");
                 try {
-                    new Integer(port);
-                    trsIn.getParameter("port").setValue(port);
-                } catch (NumberFormatException e) {
-                    log.error("Given port is not a valid integer. Using 9000 for port.");
-                    trsIn.getParameter("port").setValue("9000");
+                    stopServer();
+                    log.info("Shutdown complete");
+                    log.info("Halting JVM");
+                } catch (Exception e) {
+                    log.warn("Error occurred while shutting down SimpleAxisServer : " + e);
                 }
-            } else {
-                trsIn.getParameter("port").setValue("9000");
             }
-        }
-
-        TransportInDescription httpsTrsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get("https");
-
-        if(httpsTrsIn != null) {
-            String port = System.getProperty("https_port");
-            if(port != null) {
-                try {
-                    new Integer(port);
-                    httpsTrsIn.getParameter("port").setValue(port);
-                } catch (NumberFormatException e) {
-                    log.error("Given port is not a valid integer. Using 9000 for port.");
-                    httpsTrsIn.getParameter("port").setValue("9002");
-                }
-            } else {
-                httpsTrsIn.getParameter("port").setValue("9002");
-            }
-        }
+        };
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
     }
 
-    public static void printUsage() {
-        System.out.println("Usage: SampleAxisServer -repo <repository>  -conf <axis2 configuration file>");
-        System.out.println();
-        System.exit(1);
+    public static void startServer(String[] args) throws Exception {
+        SampleAxis2ServerManager.getInstance().start(args);
+    }
+    public static void stopServer() throws Exception {
+        SampleAxis2ServerManager.getInstance().stop();
     }
 }

@@ -26,14 +26,11 @@ public class SynapseSample_54_Integration extends AbstractAutomationTestCase {
         setUpSynapseEnv();
         startCustomAxis2Server("9001", "9005");
         startCustomAxis2Server("9002", "9006");
-        listenerManager = startCustomAxis2Server("9003", "9007");
+        startCustomAxis2Server("9003", "9007");
         String resultString = (new LoadbalanceFailoverClient()).sessionlessClient();
         assertTrue(resultString.contains("9001"));
         assertTrue(resultString.contains("9002"));
-        assertTrue(resultString.contains("9003"));
-
-        listenerManager.destroy();
-        listenerManager.isStopped();
+        assertTrue(resultString.contains("9003"));        
         resultString = (new LoadbalanceFailoverClient()).sessionlessClient();
         assertTrue(resultString.contains("9001"));
         assertTrue(resultString.contains("9002"));

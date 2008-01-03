@@ -104,6 +104,7 @@
             <sysproperty key="itr" value="${itr}"/>
             <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
             <!--
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xnoagent"/>
@@ -121,6 +122,7 @@
               classpathref="javac.classpath" fork="true">
             <sysproperty key="addurl" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
             <sysproperty key="trpurl" value="http://localhost:8080/"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
         </java>
     </target>
 
@@ -130,6 +132,7 @@
             <sysproperty key="jms_dest"    value="${jms_dest}"/>
             <sysproperty key="jms_type"    value="${jms_type}"/>
             <sysproperty key="jms_payload" value="${jms_payload}"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
         </java>
     </target>
 
@@ -141,6 +144,7 @@
             <sysproperty key="opt_file" value="${opt_file}"/>
             <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
             <!--
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xnoagent"/>
@@ -159,6 +163,7 @@
             <sysproperty key="addurl" value="${addurl}"/>
             <sysproperty key="trpurl" value="${trpurl}"/>
             <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
         </java>
     </target>
 
@@ -172,6 +177,7 @@
             <sysproperty key="msg" value="${msg}"/>
             <sysproperty key="t" value="${t}"/>
             <sysproperty key="session" value="${session}"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
         </java>
     </target>
 

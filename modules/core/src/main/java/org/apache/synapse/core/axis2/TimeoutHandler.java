@@ -115,6 +115,7 @@ public class TimeoutHandler extends TimerTask {
                                 // add an error code to the message context, so that error sequences
                                 // can identify the cause of error
                                 msgContext.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.TIME_OUT);
+                                msgContext.setProperty(SynapseConstants.ERROR_MESSAGE, "Send timeout");
 
                                 Stack faultStack = msgContext.getFaultStack();
 

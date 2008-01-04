@@ -55,11 +55,19 @@ abstract class InMemoryBeanMgr {
 	protected boolean insert(Object key, RMBean bean) throws SandeshaStorageException {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " insert " + key + ", " + bean);
 		mgr.enlistBean(bean);
+		boolean returnValue;
 		synchronized (table) {
-			table.put(key, bean);
+			if(table.containsKey(key)){
+				//we want to ensure there are no duplicate entries since this should never happen
+				returnValue =  false;
+			}
+			else{
+				table.put(key, bean);
+				returnValue = true;
+			}
 		}
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " insert " + true);
-		return true;
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " insert " + returnValue);
+		return returnValue;
 	}
 
 	protected boolean delete(Object key) throws SandeshaStorageException {

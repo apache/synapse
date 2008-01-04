@@ -53,7 +53,7 @@ public class JMSSender extends AbstractTransportSender {
     /** A Map containing the JMS connection factories managed by this, keyed by name */
     private Map connectionFactories = new HashMap();
 
-    static {
+    public JMSSender() {
         log = LogFactory.getLog(JMSSender.class);
     }
 
@@ -224,14 +224,6 @@ public class JMSSender extends AbstractTransportSender {
                 if (waitForResponse) {
                     replyDestination = JMSUtils.setReplyDestination(
                         replyDestination, session, message);
-                    // force the use of a JMS correlation ID if synchronous
-                    try {
-                        correlationId = message.getJMSCorrelationID();
-                        if (correlationId == null) {
-                            correlationId = UUIDGenerator.getUUID();
-                            message.setJMSCorrelationID(correlationId);
-                        }
-                    } catch (JMSException ignore) {}
                 }
 
                 // send the outgoing message over JMS to the destination selected
@@ -239,6 +231,12 @@ public class JMSSender extends AbstractTransportSender {
 
                 // if we are expecting a synchronous response back for the message sent out
                 if (waitForResponse) {
+                    try {
+                        connection.start();
+                    } catch (JMSException ignore) {}
+                    try {
+                        correlationId = message.getJMSMessageID();
+                    } catch(JMSException ignore) {}
                     waitForResponseAndProcess(session, replyDestination, msgCtx, correlationId);
                 }
             }

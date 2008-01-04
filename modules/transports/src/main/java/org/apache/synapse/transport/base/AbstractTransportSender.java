@@ -39,7 +39,7 @@ import java.util.Map;
 public abstract class AbstractTransportSender extends AbstractHandler implements TransportSender {
 
     /** the reference to the actual commons logger to be used for log messages */
-    protected static Log log = null;
+    protected Log log = null;
 
     /** the name of the transport */
     protected String transportName = null;

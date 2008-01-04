@@ -127,7 +127,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             } else {
                 // TODO invoke a generic synapse error handler for this message
                 log.warn("Synapse received a response for the request with message Id : " +
-                    messageID + " But a callback has not been registered to process this response");
+                    messageID + " But a callback is not registered (anymore) to process this response");
             }
 
         } else if (!messageCtx.isPropertyTrue(NhttpConstants.SC_ACCEPTED)){

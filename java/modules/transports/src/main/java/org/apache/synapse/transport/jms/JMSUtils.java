@@ -434,6 +434,13 @@ public class JMSUtils extends BaseUtils {
                 ((TopicPublisher) producer).publish(message);
             }
 
+            if (log.isDebugEnabled()) {
+                log.debug("Sent message to destination : " + destination +
+                    "\nMessage ID : " + message.getJMSMessageID() +
+                    "\nCorrelation ID : " + message.getJMSCorrelationID() +
+                    "\nReplyTo ID : " + message.getJMSReplyTo());
+            }
+
         } catch (JMSException e) {
             handleException("Error creating a producer or sending to : " + destination, e);
         } finally {

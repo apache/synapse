@@ -132,6 +132,12 @@ public class JMSMessageReceiver implements MessageListener {
 
             MessageContext msgContext = jmsListener.createMessageContext();
 
+            // set the JMS Message ID as the Message ID of the MessageContext
+            try {
+                msgContext.setMessageID(message.getJMSMessageID());
+                msgContext.setProperty(JMSConstants.JMS_COORELATION_ID, message.getJMSMessageID());
+            } catch (JMSException ignore) {}
+
             try {
                 Destination dest = message.getJMSDestination();
                 String destinationName = null;

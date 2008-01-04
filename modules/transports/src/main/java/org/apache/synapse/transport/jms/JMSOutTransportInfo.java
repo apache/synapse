@@ -147,7 +147,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             return (Destination) context.lookup(destinationName);
         } catch (NameNotFoundException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot locate destination : " + destinationName + " using " + url, e);
+                log.debug("Cannot locate destination : " + destinationName + " using " + url);
             }
         } catch (NamingException e) {
             handleException("Cannot locate destination : " + destinationName + " using " + url, e);

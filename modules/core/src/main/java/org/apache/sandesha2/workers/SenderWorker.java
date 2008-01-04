@@ -200,7 +200,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// If we are anonymous, and this is not a makeConnection, then we must have a transport waiting
 			if((toEPR==null || toEPR.hasAnonymousAddress()) &&
 			   (makeConnection == null || !makeConnection.booleanValue()) &&
-			   (t != null && !t.getStatus().equals(RequestResponseTransportStatus.WAITING))) {
+			   (t == null && !t.getStatus().equals(RequestResponseTransportStatus.WAITING))) {
 				
 				// Mark this sender bean so that we know that the transport is unavailable, if the
 				// bean is still stored.
@@ -568,11 +568,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				SandeshaUtil.copyConfiguredProperties(msgCtx, responseMessageContext);
 				// If the request operation context is Out-In then it's reasonable to assume
 				// that the response is related to the request.
-				int mep = requestMsgOpCtx.getAxisOperation().getAxisSpecificMEPConstant();
-				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				//int mep = requestMsgOpCtx.getAxisOperation().getAxisSpecificMEPConstant();
+				//if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 					//this line causes issues in addressing
 					//responseMessageContext.setOperationContext(requestMsgOpCtx);
-				}
+				//}
 				responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, requestMsgOpCtx
 								.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));
 				responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx
@@ -596,9 +596,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setProperty(MessageContext.TRANSPORT_IN, msgCtx
 						.getProperty(MessageContext.TRANSPORT_IN));
 				
-				//we will not be setting the operation context here since this msgs may not be an application reply.
-				//we let other dispatchers find it.
-				responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 				responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
 
 				responseMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY,
@@ -630,6 +627,23 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					return;
 				}
 				
+				//we will not be setting the operation context here since this msgs may not be an application reply.
+				//we let other dispatchers find it.
+				int messageType = MsgInitializer.initializeMessage(msgCtx).getMessageType();
+				RMMsgContext responseRMMessage = MsgInitializer.initializeMessage(responseMessageContext);
+				int responseMessageType = responseRMMessage.getMessageType();
+				if(log.isDebugEnabled()) log.debug("inboundMsgType" + responseMessageType + "outgoing message type " + messageType);
+				 				
+				if (responseMessageType != Sandesha2Constants.MessageTypes.APPLICATION ) {
+					if(log.isDebugEnabled()) log.debug("setting service ctx on msg as this is NOT an application response");
+					responseMessageContext.setServiceContext(msgCtx.getServiceContext());
+				}
+				else{
+					//we cannot set service ctx for application response msgs since the srvc ctx will not match the op ctx, causing
+					//problems with addressing
+					if(log.isDebugEnabled()) log.debug("NOT setting service ctx for response type " + messageType + ", current srvc ctx =" + responseMessageContext.getServiceContext());
+				}
+				
 				//If addressing is disabled we will be adding this message simply as the application response of the request message.
 				Boolean addressingDisabled = (Boolean) msgCtx.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
 				if (addressingDisabled!=null && Boolean.TRUE.equals(addressingDisabled)) {
@@ -643,7 +657,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						ServiceContext serviceCtx = responseMessageContext.getServiceContext();
 						AxisOperation op = msgCtx.getAxisService().getOperation(Sandesha2Constants.RM_IN_ONLY_OPERATION);
 						responseMsgOpCtx = OperationContextFactory.createOperationContext (op.getAxisSpecificMEPConstant(), op, serviceCtx);					
-
 					}
 					
 					responseMessageContext.setOperationContext(responseMsgOpCtx);
@@ -654,7 +667,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						&& !(operation instanceof OutOnlyAxisOperation))
 					responseMessageContext.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
 
-				RMMsgContext responseRMMessage = MsgInitializer.initializeMessage(responseMessageContext);
 				if (responseRMMessage.getMessageType()==Sandesha2Constants.MessageTypes.ACK) {
 					responseMessageContext.setAxisOperation(SpecSpecificConstants.getWSRMOperation
 							(Sandesha2Constants.MessageTypes.ACK, responseRMMessage.getRMSpecVersion(), responseMessageContext.getAxisService()));

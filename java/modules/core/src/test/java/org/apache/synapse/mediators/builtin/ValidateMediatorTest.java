@@ -17,18 +17,18 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.validate;
+package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.mediators.TestMediator;
+import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.apache.synapse.config.xml.ValidateMediatorFactory;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.TestMediator;
-import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.MessageContext;
 
 import javax.xml.stream.XMLStreamException;

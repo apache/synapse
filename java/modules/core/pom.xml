@@ -124,6 +124,16 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>org.xml.sax.driver</name>
+                            <value>org.apache.xerces.parsers.SAXParser</value>
+                        </property>
+                        <property>
+                            <name>javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema</name>
+                            <value>org.apache.xerces.jaxp.validation.XMLSchemaFactory</value>
+                        </property>
+                    </systemProperties>
                     <forkMode>pertest</forkMode>
                     <!--<redirectTestOutputToFile>true</redirectTestOutputToFile>-->
                     <!--<workingDirectory>../..</workingDirectory>-->

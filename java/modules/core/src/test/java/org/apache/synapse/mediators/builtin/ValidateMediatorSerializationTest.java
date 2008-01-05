@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.validate;
+package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.mediators.AbstractTestCase;
 import org.apache.synapse.config.xml.ValidateMediatorFactory;

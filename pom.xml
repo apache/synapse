@@ -673,6 +673,16 @@
             <version>${commons.vfs.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.qpid</groupId>
+            <artifactId>qpid-common</artifactId>
+            <version>${qpid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.qpid</groupId>
+            <artifactId>qpid-client</artifactId>
+            <version>${qpid.version}</version>
+        </dependency>
+        <dependency>
             <groupId>de.schlichtherle.io</groupId>
             <artifactId>truezip</artifactId>
             <version>${truezip.version}</version>
@@ -1034,6 +1044,17 @@
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>qpid-private</id>
+            <name>Private repo for qpid jars</name>
+            <url>http://people.apache.org/~rajith/maven2/</url>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>      
     </repositories>
 
     <modules>
@@ -1109,6 +1130,8 @@
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>
         <servlet-api.version>2.3</servlet-api.version>
+
+        <qpid.version>1.0-incubating-M2-SNAPSHOT</qpid.version>
 
     </properties>
 

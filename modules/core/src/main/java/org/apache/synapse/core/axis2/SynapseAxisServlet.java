@@ -18,8 +18,13 @@
  */
 package org.apache.synapse.core.axis2;
 
+import java.lang.reflect.Field;
+
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.http.AxisServlet;
+import org.apache.axis2.transport.http.ListingAgent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerManager;
 
 import javax.servlet.ServletConfig;
@@ -32,8 +37,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 public class SynapseAxisServlet extends AxisServlet {
-
-
+    private final static Log log = LogFactory.getLog(SynapseAxisServlet.class);
+    
     /**
      * Overrides init method so that avoid  starting listeners again
      *
@@ -46,6 +51,18 @@ public class SynapseAxisServlet extends AxisServlet {
         this.axisConfiguration = this.configContext.getAxisConfiguration();
         servletContext.setAttribute(this.getClass().getName(), this);
         this.servletConfig = config;
+        
+        // Initialize the agent field. Since it is declared private, we need to do
+        // it using reflection.
+        try {
+            Field agentField = AxisServlet.class.getDeclaredField("agent");
+            agentField.setAccessible(true);
+            agentField.set(this, new ListingAgent(configContext));
+        }
+        catch (Throwable ex) {
+        	log.warn("Unable to initialize AxisServlet#agent. Published WSDL documents may be inaccessible.");
+        }
+        
         initParams();
     }
 

@@ -33,6 +33,8 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.registry.url.SimpleURLRegistry;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -58,6 +60,8 @@ public class TestUtils {
             }
         }
         synCtx.setConfiguration(testConfig);
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(
+            new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();

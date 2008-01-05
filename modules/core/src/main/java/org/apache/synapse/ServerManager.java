@@ -27,9 +27,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.util.ClasspathURLStreamHandler;
 
 import java.io.File;
 import java.net.ServerSocket;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.Iterator;
 import java.util.Collection;
 
@@ -65,6 +69,14 @@ public class ServerManager {
      * starting all the listeners
      */
     public void start() {
+
+        // Register custom protocol handler classpath://
+		try {
+			URL.setURLStreamHandlerFactory(new URLStreamHandlerFactoryImpl());
+		} catch (Throwable t) {
+			log.warn("Unable to register a URLStreamHandlerFactory - " +
+					"Custom URL protocols may not work properly (e.g. classpath://)");
+		}
 
         if (axis2Repolocation == null) {
             log.fatal("The Axis2 Repository must be provided");
@@ -207,5 +219,20 @@ public class ServerManager {
 
     public ConfigurationContext getConfigurationContext() {
         return configctx;
+    }
+
+    private static final class URLStreamHandlerFactoryImpl implements URLStreamHandlerFactory {
+
+        public URLStreamHandler createURLStreamHandler(String protocol) {
+
+            if (protocol == null) {
+                throw new IllegalArgumentException("'protocol' cannot be null");
+            }
+            URLStreamHandler urlSH = null;
+            if (protocol.equals("classpath")) {
+                urlSH = new ClasspathURLStreamHandler();
+            }
+            return urlSH;
+        }
     }
 }

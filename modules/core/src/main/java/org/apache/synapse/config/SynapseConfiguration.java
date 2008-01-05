@@ -757,6 +757,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
             log.debug("Initializing the Synapse Configuration");
         }
 
+        // initialize registry
+        if (registry != null && registry instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) registry).init(se);
+        }
+        
         // initialize all the proxy services
         for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
             Object o = it.next();

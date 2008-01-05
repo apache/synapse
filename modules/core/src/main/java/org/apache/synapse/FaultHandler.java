@@ -71,20 +71,20 @@ public abstract class FaultHandler {
         boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
 
-        if (synCtx.getProperty(SynapseConstants.ERROR_CODE) == null) {
-            synCtx.setProperty(SynapseConstants.ERROR_CODE, "00000");
-        }
-        if (synCtx.getProperty(SynapseConstants.ERROR_MESSAGE) == null) {
-            // use only the first line as the message for multiline exception messages (Axis2 has these)
-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
-        }
+        synCtx.setProperty(SynapseConstants.ERROR_CODE, "00000");
+        // use only the first line as the message for multiline exception messages (Axis2 has these)
+        synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
+
         synCtx.setProperty(SynapseConstants.ERROR_DETAIL, getStackTrace(e));
+        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, e);
 
         if (traceOrDebugOn) {
             traceOrDebugWarn(traceOn, "Fault handler - setting ERROR_MESSAGE : " +
                 synCtx.getProperty(SynapseConstants.ERROR_MESSAGE));
             traceOrDebugWarn(traceOn, "Fault handler - setting ERROR_DETAIL : " +
                 synCtx.getProperty(SynapseConstants.ERROR_DETAIL));
+            traceOrDebugWarn(traceOn, "Fault handler - setting ERROR_EXCEPTION : " +
+                synCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
         }
 
         synCtx.getServiceLog().warn("Fault handler - setting ERROR_MESSAGE : " +

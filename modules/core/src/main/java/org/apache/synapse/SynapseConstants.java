@@ -111,6 +111,8 @@ public final class SynapseConstants {
         public static final String ERROR_MESSAGE = "ERROR_MESSAGE";
         /** The message context property name which holds the error detail (stack trace) for the last encountered exception */
         public static final String ERROR_DETAIL = "ERROR_DETAIL";
+        /** The message context property name which holds the exception (if any) for the last encountered exception */
+        public static final String ERROR_EXCEPTION = "ERROR_EXCEPTION";
 
         /** Sandesha last message property name */
         public static final String SANDESHA_LAST_MESSAGE = "Sandesha2LastMessage";

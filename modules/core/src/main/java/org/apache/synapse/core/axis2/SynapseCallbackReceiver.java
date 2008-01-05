@@ -172,6 +172,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                             synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
                                     faultReason.getText());
                         }
+                        if (fault.getException() != null) {
+                            synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_EXCEPTION,
+                                    fault.getException());
+                        }
                         ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
                     }
                 }

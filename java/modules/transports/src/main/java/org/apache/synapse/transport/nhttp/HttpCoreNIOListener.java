@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.net.InetAddress;
 import java.lang.management.ManagementFactory;
 
 import javax.net.ssl.SSLContext;
@@ -69,6 +70,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private int port = 8080;
     /** The hostname to use, defaults to localhost */
     private String host = "localhost";
+    /** The bind addresses as (address, port) pairs */
+    private String bindAddress = null;
     /** SSLContext if this listener is a SSL listener */
     private SSLContext sslContext = null;
     /** The SSL session handler that manages client authentication etc */
@@ -110,7 +113,12 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             handler, sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;
         try {
-            ioReactor.listen(new InetSocketAddress(port));
+            if (bindAddress == null) {
+                ioReactor.listen(new InetSocketAddress(port));
+            } else {
+                ioReactor.listen(new InetSocketAddress(
+                    InetAddress.getByName(bindAddress), port));
+            }
             ioReactor.execute(ioEventDispatch);
         } catch (InterruptedIOException ex) {
             log.fatal("Reactor Interrupted");
@@ -158,6 +166,11 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         Parameter param = transprtIn.getParameter(PARAM_PORT);
         if (param != null) {
             port = Integer.parseInt((String) param.getValue());
+        }
+
+        param = transprtIn.getParameter(NhttpConstants.BIND_ADDRESS);
+        if (param != null) {
+            bindAddress = ((String) param.getValue()).trim();
         }
 
         param = transprtIn.getParameter(HOST_ADDRESS);
@@ -258,7 +271,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         }, "HttpCoreNIOListener");
 
         t.start();
-        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener starting on port : " + port);
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener starting on" +
+            (bindAddress != null ? " address : " + bindAddress : "") + " port : " + port);
     }
 
     /**

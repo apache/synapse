@@ -203,6 +203,8 @@ public class ValidateMediator extends AbstractListMediator {
                 // set error message and detail (stack trace) into the message context
                 synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
                     errorHandler.getSaxParseException().getMessage());
+                synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION,
+                    errorHandler.getSaxParseException());
                 synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
                     FaultHandler.getStackTrace(errorHandler.getSaxParseException()));
 

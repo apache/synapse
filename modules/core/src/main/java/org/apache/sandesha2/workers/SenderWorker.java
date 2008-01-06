@@ -200,7 +200,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// If we are anonymous, and this is not a makeConnection, then we must have a transport waiting
 			if((toEPR==null || toEPR.hasAnonymousAddress()) &&
 			   (makeConnection == null || !makeConnection.booleanValue()) &&
-			   (t == null && !t.getStatus().equals(RequestResponseTransportStatus.WAITING))) {
+			   (t == null || !t.getStatus().equals(RequestResponseTransportStatus.WAITING))) {
 				
 				// Mark this sender bean so that we know that the transport is unavailable, if the
 				// bean is still stored.

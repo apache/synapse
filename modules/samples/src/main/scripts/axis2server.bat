@@ -111,7 +111,7 @@ echo Using JAVA_HOME    %JAVA_HOME%
 echo Using AXIS2_HOME   %AXIS2_HOME%
 
 cd %AXIS2_HOME%
-"%_JAVACMD%" %_HTTPPORT% %_HTTPSPORT% %_SERVERNAME% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.io.tmpdir=$AXIS2_HOME\..\..\work\temp\sampleServer -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server -repo "%AXIS2_HOME%\repository" -conf "%AXIS2_HOME%\repository\conf\axis2.xml"
+"%_JAVACMD%" %_HTTPPORT% %_HTTPSPORT% %_SERVERNAME% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.io.tmpdir=%AXIS2_HOME%\..\..\work\temp\sampleServer -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server -repo "%AXIS2_HOME%\repository" -conf "%AXIS2_HOME%\repository\conf\axis2.xml"
 goto end
 
 :end

@@ -1,4 +1,4 @@
-Apache Synapse 1.1 build  (November 2007) - http://ws.apache.org/synapse/
+Apache Synapse 1.1.1 build  (January 2007) - http://ws.apache.org/synapse/
 ------------------------------------------------------------------------------------------
 
 -------------------

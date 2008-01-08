@@ -634,8 +634,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				int responseMessageType = responseRMMessage.getMessageType();
 				if(log.isDebugEnabled()) log.debug("inboundMsgType" + responseMessageType + "outgoing message type " + messageType);
 				 				
-				if (responseMessageType != Sandesha2Constants.MessageTypes.APPLICATION ) {
-					if(log.isDebugEnabled()) log.debug("setting service ctx on msg as this is NOT an application response");
+				//if this is an application response msg in response to a make connection then we have to take care with the service context
+				if ((messageType == Sandesha2Constants.MessageTypes.APPLICATION && responseMessageType == Sandesha2Constants.MessageTypes.APPLICATION)
+					|| responseMessageType != Sandesha2Constants.MessageTypes.APPLICATION) {
+					if(log.isDebugEnabled()) log.debug("setting service ctx on msg as this is NOT a makeConnection>appResponse exchange pattern");
 					responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 				}
 				else{

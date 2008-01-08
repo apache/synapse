@@ -297,6 +297,13 @@
             synapse for the actual service</a></li>
         </ul>
       </li>
+      <li><a href="#Callout">Synchronize web service invocation with Callout
+        mediator </a> 
+        <ul>
+          <li><a href="#Sample430">Sample 430: Simple Callout Mediator for
+            Synchronize web service invocation</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
@@ -4163,7 +4170,7 @@ mediator</a></h2>
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
     &lt;/proxy&gt;
 
-&lt;/definitions&gt;                                  </pre>
+&lt;/definitions&gt; </pre>
 
 <p><b>Objective: Introduction transformation using XQuery mediator</b></p>
 
@@ -4362,10 +4369,59 @@ only the first request is forwarded to the actual service, and the rest of
 the requests will be served by the cache inside Synapse. You could observe
 this by looking at the printed line of the axis2 server, as well as by
 observing a constant rate as the response to the client instead of the random
-rate, which changes by each and every 20 seconds.</p>
+rate, which changes by each and every 20 seconds.<br>
+</p>
+
+<h2><a name="Callout">Synchronize web service invocation with Callout
+mediator </a></h2>
+
+<p>The Callout mediator does the call for provided service URL with the
+request message which get through source attribute and wait for the response
+and attached received response to the destination which has specified by the
+target. Both of source and target could be a key or a XPath. In the case of
+source ,this key refers to either a message context property or to a local
+entry and for the target this key refers only to a message context property .
+</p>
+
+<h2><a name="Sample430">Sample 430: Simple Callout Mediator for Synchronize
+web service invocation</a></h2>
 
 <p>&#xa0;</p>
+<pre>  
+    &lt;!-- Simple callout  mediator --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;callout serviceURL="http://localhost:9000/soap/SimpleStockQuoteService"
+             action="urn:getQuote"&gt;
+        &lt;source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+        &lt;target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+    &lt;/callout&gt;
+    &lt;property name="RESPONSE" value="true"/&gt;
+    &lt;header name="To" action="remove"/&gt;
+    &lt;send/&gt;
+    &lt;drop/&gt;
+&lt;/definitions&gt; </pre>
 
-<p>&#xa0;</p>
+<div>
+<p> <strong>Objective:</strong> Demonstrate the use of the Callout mediator
+for the synchronize web service invocation</p>
+
+<p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
+sample Axis2 server and start it on port 9000.</p>
+
+<p>Start Synapse with the sample configuration 430 (i.e. synapse -sample
+430).</p>
+
+<p>In this sample , Callout mediator does the direct service invocation to
+the StockQuoteService using the client request and the get the response and
+set it as the first child of the SOAP message body. Then using send mediator
+message is sent back to the client. </p>
+
+<p>Invoke the client as follows. </p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+</div>
 </body>
 </html>

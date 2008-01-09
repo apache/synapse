@@ -28,12 +28,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.util.ClasspathURLStreamHandler;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.io.File;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
+import java.net.*;
 import java.util.Iterator;
 import java.util.Collection;
 
@@ -176,6 +174,7 @@ public class ServerManager {
         if (trsIn != null) {
 
             int port = 8080;
+            String bindAddress = null;
 
             String strPort = System.getProperty("port");
             if (strPort != null) {
@@ -184,18 +183,28 @@ public class ServerManager {
                     port = new Integer(strPort).intValue();
                 } catch (NumberFormatException e) {
                     // user supplied parameter is not a valid integer. so use the port in configuration.
-                    log.error("Given port is not a valid integer. Port specified in the configuration is used for the server.");
-                    port = Integer.parseInt(trsIn.getParameter("port").getValue().toString());
+                    log.error("System property 'port' does not provide a valid integer");
                 }
+            }
 
-            } else {
-                port = Integer.parseInt(trsIn.getParameter("port").getValue().toString());
+            Parameter param = trsIn.getParameter("port");
+            if (param != null && param.getValue() != null) {
+                port = Integer.parseInt(param.getValue().toString());
+            }
+
+            param = trsIn.getParameter(NhttpConstants.BIND_ADDRESS);
+            if (param != null && param.getValue() != null) {
+                bindAddress = ((String) param.getValue()).trim();
             }
 
             while (true) {
                 ServerSocket sock = null;
                 try {
-                    sock = new ServerSocket(port);
+                    if (bindAddress == null) {
+                        sock = new ServerSocket(port);
+                    } else {
+                        sock = new ServerSocket(port, 50, InetAddress.getByName(bindAddress));
+                    }
                     trsIn.getParameter("port").setValue(Integer.toString(port));
                     break;
                 } catch (Exception e) {

@@ -4375,16 +4375,16 @@ rate, which changes by each and every 20 seconds.<br>
 <h2><a name="Callout">Synchronize web service invocation with Callout
 mediator </a></h2>
 
-<p>The Callout mediator does the call for provided service URL with the
-request message which get through source attribute and wait for the response
-and attached received response to the destination which has specified by the
-target. Both of source and target could be a key or a XPath. In the case of
-source ,this key refers to either a message context property or to a local
-entry and for the target this key refers only to a message context property .
-</p>
+<p>The Callout mediator calls the given service URL with the request message
+which is given by the source attribute, waits for the response and attaches
+the received response to the destination which is given by the target
+attribute. Both the source and the target can be a key or an XPath. In the
+case of the source, this key refers to either a message context property or
+to a local entry. For the target, this key refers to a message context
+property only. </p>
 
-<h2><a name="Sample430">Sample 430: Simple Callout Mediator for Synchronize
-web service invocation</a></h2>
+<h2><a name="Sample430" id="Sample430">Sample 430: Simple Callout Mediator
+for synchronizing web service invocation</a></h2>
 
 <p>&#xa0;</p>
 <pre>  
@@ -4406,18 +4406,18 @@ web service invocation</a></h2>
 &lt;/definitions&gt; </pre>
 
 <div>
-<p> <strong>Objective:</strong> Demonstrate the use of the Callout mediator
-for the synchronize web service invocation</p>
+<p><strong>Objective:</strong> Demonstrate the use of the Callout mediator
+for the synchronized web service invocation</p>
 
-<p><strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in
+<p><strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in
 sample Axis2 server and start it on port 9000.</p>
 
 <p>Start Synapse with the sample configuration 430 (i.e. synapse -sample
 430).</p>
 
-<p>In this sample , Callout mediator does the direct service invocation to
-the StockQuoteService using the client request and the get the response and
-set it as the first child of the SOAP message body. Then using send mediator
+<p>In this sample, Callout mediator does the direct service invocation to the
+StockQuoteService using the client request, get the response and set it as
+the first child of the SOAP message body. Then using the send mediator, the
 message is sent back to the client. </p>
 
 <p>Invoke the client as follows. </p>

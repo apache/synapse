@@ -116,7 +116,7 @@ public class AggregateMediator extends AbstractMediator {
     /**
      * This will hold the map of active aggregates at any given time
      */
-    private Map activeAggregates = new HashMap();
+    private Map<String, Aggregate> activeAggregates = new HashMap<String, Aggregate>();
 
     /**
      * This will hold the expired aggregates at any given time, these will be cleaned by a timer
@@ -162,7 +162,7 @@ public class AggregateMediator extends AbstractMediator {
             }
         }
 
-//        todo: revisit this         
+//        todo: revisit this
 //        if (!isTimerSet) {
 //            synCtx.getConfiguration().getSynapseTimer()
 //                    .schedule(new AggregateCollector(this), 5000);
@@ -186,7 +186,8 @@ public class AggregateMediator extends AbstractMediator {
                 } else {
                     aggregate = new Aggregate(this.corelateExpression.toString(),
                             this.completeTimeout, this.minMessagesToComplete,
-                            this.maxMessagesToComplete);
+                            this.maxMessagesToComplete, this);
+                    synCtx.getConfiguration().getSynapseTimer().schedule(aggregate, completeTimeout);
                     activeAggregates.put(this.corelateExpression.toString(), aggregate);
                 }
 
@@ -224,7 +225,8 @@ public class AggregateMediator extends AbstractMediator {
 
                     } else {
                         aggregate = new Aggregate(corelation, this.completeTimeout,
-                                this.minMessagesToComplete, this.maxMessagesToComplete);
+                                this.minMessagesToComplete, this.maxMessagesToComplete, this);
+                        synCtx.getConfiguration().getSynapseTimer().schedule(aggregate, completeTimeout);                             
                         activeAggregates.put(corelation, aggregate);
                     }
 
@@ -311,12 +313,12 @@ public class AggregateMediator extends AbstractMediator {
 
             if ((this.corelateExpression != null && !this.corelateExpression
                     .toString().equals(aggregate.getCorelation())) ||
-                    this.corelateExpression == null) {
+                this.corelateExpression == null) {
 
-//                            aggregate.setExpireTime(
-//                                    System.currentTimeMillis() + this.invlidateToDestroyTime);
+//                aggregate.setExpireTime(
+//                    System.currentTimeMillis() + this.invlidateToDestroyTime);
                 expiredAggregates.put(aggregate.getCorelation(),
-                        new Long(System.currentTimeMillis() + this.invlidateToDestroyTime));
+                    new Long(System.currentTimeMillis() + this.invlidateToDestroyTime));
 
                 if (this.onCompleteSequence != null) {
                     this.onCompleteSequence.mediate(newSynCtx);

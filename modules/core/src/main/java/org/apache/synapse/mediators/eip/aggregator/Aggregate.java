@@ -27,11 +27,12 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.TimerTask;
 
 /**
  * This holds the Aggregate properties and the list of messages which participate in the aggregation
  */
-public class Aggregate {
+public class Aggregate extends TimerTask {
 
     /**
      *
@@ -68,10 +69,12 @@ public class Aggregate {
      */
     private String corelation = null;
 
+    private AggregateMediator mediator = null;
+
     /**
      *
      */
-    private List messages = new ArrayList();
+    private List<MessageContext> messages = new ArrayList<MessageContext>();
 
     /**
      * This is the constructor of the Aggregate which will set the timeout depending on the
@@ -81,8 +84,9 @@ public class Aggregate {
      * @param timeout -
      * @param min -
      * @param max -
+     * @param mediator -
      */
-    public Aggregate(String corelation, long timeout, int min, int max) {
+    public Aggregate(String corelation, long timeout, int min, int max, AggregateMediator mediator) {
         this.corelation = corelation;
         if (timeout > 0) {
             this.timeout = System.currentTimeMillis() + expireTime;
@@ -93,6 +97,7 @@ public class Aggregate {
         if (max > 0) {
             this.maxCount = max;
         }
+        this.mediator = mediator;
     }
 
     /**
@@ -175,7 +180,7 @@ public class Aggregate {
         return messages;
     }
 
-    public void setMessages(List messages) {
+    public void setMessages(List<MessageContext> messages) {
         this.messages = messages;
     }
 
@@ -187,4 +192,7 @@ public class Aggregate {
         this.expireTime = expireTime;
     }
 
+    public void run() {
+        mediator.completeAggregate(this);
+    }
 }

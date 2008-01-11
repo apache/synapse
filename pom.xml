@@ -1061,7 +1061,7 @@
 
         <!-- Axis2 1.2 and its dependencies -->
         <axis2.version>1.3</axis2.version>
-        <axis2-clustering.version>SNAPSHOT</axis2-clustering.version>
+        <axis2-clustering.version>610782</axis2-clustering.version>
         <axiom.version>1.2.5</axiom.version>
         <xml_schema.version>1.3.2-591227</xml_schema.version>
         <xml_apis.version>1.3.03</xml_apis.version>
@@ -1103,8 +1103,8 @@
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>
-        <wso2caching.version>SNAPSHOT</wso2caching.version>
-        <wso2throttle.version>SNAPSHOT</wso2throttle.version>
+        <wso2caching.version>1.6</wso2caching.version>
+        <wso2throttle.version>1.6</wso2throttle.version>
         <spring.version>1.2.8</spring.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta2</bsf.version>

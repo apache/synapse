@@ -100,21 +100,26 @@ public class EIPUtils {
     public static void enrichEnvelope(SOAPEnvelope envelope, SOAPEnvelope enricher,
         AXIOMXPath expression) throws JaxenException {
         OMElement enrichingElement;
-        Object o = getMatchingElements(envelope, expression).get(0);
-        if (o instanceof OMElement && ((OMElement) o).getParent() instanceof OMElement) {
-            enrichingElement = (OMElement) ((OMElement) o).getParent();
-        } else {
-            enrichingElement = envelope.getBody();
-        }
+        Object o = getMatchingElements(envelope, expression);
+        if (o != null && o instanceof List && !((List) o).isEmpty()) {
+            o = ((List) o).get(0);
 
-        Iterator itr = getMatchingElements(enricher, expression).iterator();
-        while (itr.hasNext()) {
-            o = itr.next();
-            if (o != null && o instanceof OMElement) {
-                enrichingElement.addChild((OMElement) o);
+            if (o instanceof OMElement && ((OMElement) o).getParent() instanceof OMElement) {
+                enrichingElement = (OMElement) ((OMElement) o).getParent();
+            } else {
+                enrichingElement = envelope.getBody();
+            }
+
+            List list = getMatchingElements(enricher, expression);
+            if (list != null) {
+                Iterator itr = list.iterator();
+                while (itr.hasNext()) {
+                    o = itr.next();
+                    if (o != null && o instanceof OMElement) {
+                        enrichingElement.addChild((OMElement) o);
+                    }
+                }
             }
         }
-
-    }
-    
+    }    
 }

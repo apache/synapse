@@ -19,49 +19,37 @@
 
 package org.apache.synapse.mediators.eip;
 
-import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.axis2.addressing.EndpointReference;
 
 /**
- * This class will be a bean which carries the target information for most of the EIP mediators
+ * A bean class that holds the target (i.e. sequence or endpoint) information for a message
+ * as used by common EIP mediators
  */
 public class Target {
 
-    /**
-     * Holds the to address of the target endpoint
-     */
-    private String to = null;
+    /** An optional To address to be set on the message when handing over to the target */
+    private String toAddress = null;
 
-    /**
-     * Holds the soapAction of the target service
-     */
+    /** An optional Action to be set on the message when handing over to the target */
     private String soapAction = null;
 
-    /**
-     * Holds the target mediation sequence as an anonymous sequence
-     */
+    /** The inlined target sequence definition */
     private SequenceMediator sequence = null;
 
-    /**
-     * Holds the target mediation sequence as a sequence reference
-     */
+    /** The target sequence reference key */
     private String sequenceRef = null;
 
-    /**
-     * Holds the target endpoint to which the message will be sent
-     */
+    /** The inlined target endpoint definition */
     private Endpoint endpoint = null;
 
-    /**
-     * Holds the reference to the target endpoint to which the message will be sent
-     */
+    /** The target endpoint reference key */
     private String endpointRef = null;
 
     /**
-     * This method will be called by the EIP mediators to mediated the target (may be to mediate
+     * process the message through this target (may be to mediate
      * using the target sequence, send message to the target endpoint or both)
      *
      * @param synCtx - MessageContext to be mediated
@@ -72,14 +60,16 @@ public class Target {
             synCtx.setSoapAction(soapAction);
         }
 
-        if (to != null) {
+        if (toAddress != null) {
             if (synCtx.getTo() != null) {
-                synCtx.getTo().setAddress(to);
+                synCtx.getTo().setAddress(toAddress);
             } else {
-                synCtx.setTo(new EndpointReference(to));
+                synCtx.setTo(new EndpointReference(toAddress));
             }
         }
 
+        // since we are injecting the new messages asynchronously, we cannot process a message
+        // through a sequence and then again with an endpoint
         if (sequence != null) {
             synCtx.getEnvironment().injectAsync(synCtx, sequence);
         } else if (sequenceRef != null) {
@@ -87,9 +77,7 @@ public class Target {
             if (refSequence != null) {
                 synCtx.getEnvironment().injectAsync(synCtx, refSequence);
             }
-        }
-
-        if (endpoint != null) {
+        } else if (endpoint != null) {
             endpoint.send(synCtx);
         } else if (endpointRef != null) {
             Endpoint epr = synCtx.getConfiguration().getEndpoint(endpointRef);
@@ -97,19 +85,18 @@ public class Target {
                 epr.send(synCtx);
             }
         }
-
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////
     //                        Getters and Setters                                        //
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    public String getTo() {
-        return to;
+    public String getToAddress() {
+        return toAddress;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setToAddress(String toAddress) {
+        this.toAddress = toAddress;
     }
 
     public String getSoapAction() {

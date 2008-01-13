@@ -30,83 +30,59 @@ import java.util.ArrayList;
 import java.util.TimerTask;
 
 /**
- * This holds the Aggregate properties and the list of messages which participate in the aggregation
+ * An instance of this class is created to manage each aggregation group, and it holds
+ * the aggregation properties and the messages collected during aggregation. This class also
+ * times out itself after the timeout expires it
  */
 public class Aggregate extends TimerTask {
 
-    /**
-     *
-     */
     private static final Log log = LogFactory.getLog(Aggregate.class);
-
-    /**
-     *
-     */
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
-    /**
-     *
-     */
-    private long timeout = 0;
-
-    /**
-     *
-     */
-    private long expireTime = 0;
-
-    /**
-     *
-     */
+    private long timeoutMillis = 0;
+    /** The time in millis at which this aggregation should be considered as expired */
+    private long expiryTimeMillis = 0;
+    /** The minimum number of messages to be collected to consider this aggregation as complete */
     private int minCount = -1;
-
-    /**
-     *
-     */
+    /** The maximum number of messages that should be collected by this aggregation */
     private int maxCount = -1;
-
-    /**
-     *
-     */
-    private String corelation = null;
-
-    private AggregateMediator mediator = null;
-
-    /**
-     *
-     */
+    private String correlation = null;
+    /** The AggregateMediator that should be invoked on completion of the aggregation */
+    private AggregateMediator aggregateMediator = null;
     private List<MessageContext> messages = new ArrayList<MessageContext>();
 
     /**
-     * This is the constructor of the Aggregate which will set the timeout depending on the
-     * timeout for the aggregate
+     * Save aggregation properties and timeout
      *
-     * @param corelation - String representing the corelation name of the messages in the aggregate
-     * @param timeout -
-     * @param min -
-     * @param max -
-     * @param mediator -
+     * @param corelation representing the corelation name of the messages in the aggregate
+     * @param timeoutMillis the timeout duration in milliseconds
+     * @param min the minimum number of messages to be aggregated
+     * @param max the maximum number of messages to be aggregated
+     * @param mediator
      */
-    public Aggregate(String corelation, long timeout, int min, int max, AggregateMediator mediator) {
-        this.corelation = corelation;
-        if (timeout > 0) {
-            this.timeout = System.currentTimeMillis() + expireTime;
+    public Aggregate(String corelation, long timeoutMillis, int min, int max, AggregateMediator mediator) {
+        this.correlation = corelation;
+        if (timeoutMillis > 0) {
+            expiryTimeMillis = System.currentTimeMillis() + timeoutMillis;
         }
         if (min > 0) {
-            this.minCount = min;
+            minCount = min;
         }
         if (max > 0) {
-            this.maxCount = max;
+            maxCount = max;
         }
-        this.mediator = mediator;
+        this.aggregateMediator = mediator;
     }
 
     /**
-     * @param synCtx -
-     * @return true if the message was added and false if not
+     * Add a message to the interlan message list
+     *
+     * @param synCtx message to be added into this aggregation group
+     * @return true if the message was added or false if not
      */
     public boolean addMessage(MessageContext synCtx) {
-        if (this.maxCount > 0 && this.messages.size() < this.maxCount || this.maxCount <= 0) {
-            this.messages.add(synCtx);
+        if (maxCount <= 0 || (maxCount > 0 && messages.size() < maxCount)) {
+            messages.add(synCtx);
             return true;
         } else {
             return false;
@@ -114,42 +90,87 @@ public class Aggregate extends TimerTask {
     }
 
     /**
-     * @return boolean stating the completeness of the corelation
+     * Has this aggregation group completed?
+     *
+     * @return boolean true if aggregation is complete
      */
-    public boolean isComplete() {
+    public boolean isComplete(boolean traceOn, boolean traceOrDebugOn, Log trace, Log log) {
 
-        boolean completed = false;
+        // if any messages have been collected, check if the completion criteria is met
         if (!messages.isEmpty()) {
 
-            Object o = messages.get(0);
-            if (o instanceof MessageContext) {
+            // get total messages for this group, from the first message we have collected
+            MessageContext mc = messages.get(0);
+            Object prop = mc.getProperty(EIPConstants.MESSAGE_SEQUENCE);
+            
+            if (prop != null && prop instanceof String) {
+                String[] msgSequence = prop.toString().split(EIPConstants.MESSAGE_SEQUENCE_DELEMITER);
+                int total = Integer.parseInt(msgSequence[1]);
 
-                Object prop = ((MessageContext) o).getProperty(EIPConstants.MESSAGE_SEQUENCE);
-                if (prop instanceof String) {
-
-                    String[] msgSequence
-                            = prop.toString().split(EIPConstants.MESSAGE_SEQUENCE_DELEMITER);
-                    if (messages.size() >= Integer.parseInt(msgSequence[1])) {
-                        completed = true;
-                    }
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, trace, log, messages.size() +
+                        " messages of " + total + " collected in current aggregation");
                 }
+
+                if (messages.size() >= total) {
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, trace, log, "Aggregation complete");
+                    }
+                    return true;
+                }
+            }
+        } else {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, trace, log, "No messages collected in current aggregation");
             }
         }
 
-        if (!completed && this.minCount > 0) {
-            completed = this.messages.size() >= this.minCount
-                    || this.timeout < System.currentTimeMillis();
+        // if the minimum number of messages has been reached, its complete
+        if (minCount > 0 && messages.size() >= minCount) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, trace, log,
+                    "Aggregation complete - the minimum : " + minCount + " messages has been reached");
+            }
+            return true;
         }
 
-        return completed;
+        if (maxCount > 0 && messages.size() >= maxCount) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, trace, log,
+                    "Aggregation complete - the maximum : " + maxCount + " messages has been reached");
+            }
+
+            return true;
+        }
+
+        // else, has this aggregation reached its timeout?
+        if (System.currentTimeMillis() >= expiryTimeMillis) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, trace, log,
+                    "Aggregation complete - the aggregation has timed out");
+            }
+
+            return true;
+        }
+        
+        return false;
     }
 
-    public long getTimeout() {
-        return timeout;
+    private void traceOrDebug(boolean traceOn, Log trace, Log log, String msg) {
+        if (traceOn) {
+            trace.info(msg);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(msg);
+        }
     }
 
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
+    public long getTimeoutMillis() {
+        return timeoutMillis;
+    }
+
+    public void setTimeoutMillis(long timeoutMillis) {
+        this.timeoutMillis = timeoutMillis;
     }
 
     public int getMinCount() {
@@ -168,15 +189,15 @@ public class Aggregate extends TimerTask {
         this.maxCount = maxCount;
     }
 
-    public String getCorelation() {
-        return corelation;
+    public String getCorrelation() {
+        return correlation;
     }
 
-    public void setCorelation(String corelation) {
-        this.corelation = corelation;
+    public void setCorrelation(String correlation) {
+        this.correlation = correlation;
     }
 
-    public List getMessages() {
+    public List<MessageContext> getMessages() {
         return messages;
     }
 
@@ -184,15 +205,19 @@ public class Aggregate extends TimerTask {
         this.messages = messages;
     }
 
-    public long getExpireTime() {
-        return expireTime;
+    public long getExpiryTimeMillis() {
+        return expiryTimeMillis;
     }
 
-    public void setExpireTime(long expireTime) {
-        this.expireTime = expireTime;
+    public void setExpiryTimeMillis(long expiryTimeMillis) {
+        this.expiryTimeMillis = expiryTimeMillis;
     }
 
     public void run() {
-        mediator.completeAggregate(this);
+        if (log.isDebugEnabled()) {
+            log.debug("Time : " + System.currentTimeMillis() + " and this aggregator expired at : " +
+                expiryTimeMillis);
+        }
+        aggregateMediator.completeAggregate(this);
     }
 }

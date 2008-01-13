@@ -32,23 +32,19 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Utility methods for the EIP implementations
+ * Utility methods for the EIP mediators
  */
 public class EIPUtils {
 
-    /**
-     * This will be used for logging purposes
-     */
     private static final Log log = LogFactory.getLog(EIPUtils.class);
 
     /**
-     * This static util method will be used to extract out the set of all elements described by the
-     * given XPath over the given SOAPEnvelope
+     * Return the set of elements specified by the XPath over the given envelope
      *
-     * @param envelope   SOAPEnvelope from which the the elements will be extracted
-     * @param expression AXIOMXPath expression describing the elements
-     * @return List of OMElements in the envelope matching the expression
-     * @throws JaxenException if the XPath expression evaluation fails for some reason
+     * @param envelope SOAPEnvelope from which the elements will be extracted
+     * @param expression AXIOMXPath expression describing the elements to be extracted
+     * @return List OMElements in the envelope matching the expression
+     * @throws JaxenException if the XPath expression evaluation fails
      */
     public static List getMatchingElements(SOAPEnvelope envelope, AXIOMXPath expression)
         throws JaxenException {
@@ -61,15 +57,17 @@ public class EIPUtils {
         } else if (o instanceof List) {
             return (List) o;
         } else {
-            return null;
+            return new ArrayList();
         }
     }
 
     /**
-     * @param envelope
-     * @param expression
-     * @return
-     * @throws JaxenException
+     * Return the set of detached elements specified by the XPath over the given envelope
+     *
+     * @param envelope SOAPEnvelope from which the elements will be extracted
+     * @param expression AXIOMXPath expression describing the elements to be extracted
+     * @return List detached OMElements in the envelope matching the expression
+     * @throws JaxenException if the XPath expression evaluation fails
      */
     public static List getDetachedMatchingElements(SOAPEnvelope envelope, AXIOMXPath expression)
         throws JaxenException {
@@ -90,8 +88,8 @@ public class EIPUtils {
     }
 
     /**
-     * This static util method will be used to enrich the envelope passed, by the element described
-     * by the XPath over the enricher envelope
+     * Merge two SOAP envelopes using the given XPath expression that specifies the
+     * element that enriches the first envelope from the second
      *
      * @param envelope   SOAPEnvelope to be enriched with the content
      * @param enricher   SOAPEnvelope from which the enriching element will be extracted
@@ -99,12 +97,18 @@ public class EIPUtils {
      */
     public static void enrichEnvelope(SOAPEnvelope envelope, SOAPEnvelope enricher,
         AXIOMXPath expression) throws JaxenException {
-        OMElement enrichingElement;
-        Object o = getMatchingElements(envelope, expression);
-        if (o != null && o instanceof List && !((List) o).isEmpty()) {
-            o = ((List) o).get(0);
 
-            if (o instanceof OMElement && ((OMElement) o).getParent() instanceof OMElement) {
+        OMElement enrichingElement;
+        List elementList = getMatchingElements(envelope, expression);
+
+        if (elementList != null && !elementList.isEmpty()) {
+
+            // attach at parent of the first result from the XPath, or to the SOAPBody
+            Object o = elementList.get(0);
+
+            if (o instanceof OMElement &&
+                ((OMElement) o).getParent() != null &&
+                ((OMElement) o).getParent() instanceof OMElement) {
                 enrichingElement = (OMElement) ((OMElement) o).getParent();
             } else {
                 enrichingElement = envelope.getBody();

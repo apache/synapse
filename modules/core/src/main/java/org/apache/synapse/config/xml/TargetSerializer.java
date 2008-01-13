@@ -61,8 +61,8 @@ public class TargetSerializer {
     public static OMElement serializeTarget(Target target) {
 
         OMElement targetElem = fac.createOMElement("target", synNS);
-        if (target.getTo() != null) {
-            targetElem.addAttribute("to", target.getTo(), nullNS);
+        if (target.getToAddress() != null) {
+            targetElem.addAttribute("to", target.getToAddress(), nullNS);
         }
 
         if (target.getSoapAction() != null) {

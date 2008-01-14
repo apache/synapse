@@ -141,6 +141,10 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>src/site/resources/images</directory>
+            <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>modules/samples/services</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
         </fileSet>

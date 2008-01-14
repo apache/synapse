@@ -27,16 +27,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * &lt;aggregate&gt;
- *  &lt;corelateOn expression="XPATH-expression"/&gt;
- *  &lt;completeCondition timeout="time-in-seconds"&gt;
- *   &lt;messageCount min="int-min" max="int-max"/&gt;
+ *  &lt;corelateOn expression="XPATH-expression"/&gt;?
+ *  &lt;completeCondition [timeout="time-in-seconds"]&gt;?
+ *   &lt;messageCount min="int-min" max="int-max"/&gt;?
  *  &lt;/completeCondition&gt;
- *  &lt;onComplete expression="XPATH-expression" sequence="sequence-ref"&gt;
+ *  &lt;onComplete expression="XPATH-expression" [sequence="sequence-ref"]&gt;
  *   (mediator +)?
  *  &lt;/onComplete&gt;
- *  &lt;invalidate sequence="sequence-ref" timeout="time-in-seconds"&gt;
- *   (mediator +)?
- *  &lt;/invalidate&gt;
  * &lt;/aggregate&gt;
  */
 public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
@@ -61,7 +58,7 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
         OMElement completeCond = fac.createOMElement("completeCondition", synNS);
         if (mediator.getCompletionTimeoutMillis() != 0) {
-            completeCond.addAttribute("timeout", Long.toString(mediator.getCompletionTimeoutMillis()), nullNS);
+            completeCond.addAttribute("timeout", Long.toString(mediator.getCompletionTimeoutMillis() / 1000), nullNS);
         }
         OMElement messageCount = fac.createOMElement("messageCount", synNS);
         if (mediator.getMinMessagesToComplete() != 0) {

@@ -50,7 +50,7 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
         saveTracingState(aggregator, mediator);
 
         if (mediator.getCorrelateExpression() != null) {
-            OMElement corelateOn = fac.createOMElement("corelateOn", synNS);
+            OMElement corelateOn = fac.createOMElement("correlateOn", synNS);
             corelateOn.addAttribute("expression", mediator.getCorrelateExpression().toString(), nullNS);
             super.serializeNamespaces(corelateOn, mediator.getCorrelateExpression());
             aggregator.addChild(corelateOn);

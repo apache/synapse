@@ -48,7 +48,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(AggregateMediatorFactory.class);
 
     private static final QName AGGREGATE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "aggregate");
-    private static final QName CORELATE_ON_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "corelateOn");
+    private static final QName CORELATE_ON_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "correlateOn");
     private static final QName COMPLETE_CONDITION_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "completeCondition");
     private static final QName MESSAGE_COUNT_Q

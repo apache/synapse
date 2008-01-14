@@ -33,7 +33,6 @@ import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPConstants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.synapse.MessageContext;
@@ -184,7 +183,7 @@ public class XSLTMediator extends AbstractMediator {
         }
 
         try {
-            performXLST(synCtx, traceOrDebugOn, traceOn);
+            performXSLT(synCtx, traceOrDebugOn, traceOn);
 
         } catch (Exception e) {
             handleException("Unable to perform XSLT transformation using : " + xsltKey +
@@ -207,7 +206,7 @@ public class XSLTMediator extends AbstractMediator {
      * @param traceOrDebugOn is trace or debug on?
      * @param traceOn is trace on?
      */
-    private void performXLST(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+    private void performXSLT(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
@@ -323,9 +322,12 @@ public class XSLTMediator extends AbstractMediator {
                 try {
                     cachedTemplates = transFact.newTemplates(
                         SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
-
-                } catch (TransformerConfigurationException e) {
-                    handleException("Error creating XSLT transformer using : " + xsltKey, e, synCtx);
+                    if (cachedTemplates == null) {
+                        handleException("Error compiling the XSLT with key : " + xsltKey, synCtx);
+                    }
+                } catch (Exception e) {
+                    handleException("Error creating XSLT transformer using : "
+                        + xsltKey, e, synCtx);
                 }
             }
         }

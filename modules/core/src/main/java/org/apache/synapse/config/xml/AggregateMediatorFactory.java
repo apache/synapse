@@ -34,16 +34,13 @@ import javax.xml.namespace.QName;
 
 /**
  * &lt;aggregate&gt;
- *  &lt;corelateOn expression="XPATH-expression"/&gt;
- *  &lt;completeCondition timeout="time-in-seconds"&gt;
- *   &lt;messageCount min="int-min" max="int-max"/&gt;
+ *  &lt;corelateOn expression="XPATH-expression"/&gt;?
+ *  &lt;completeCondition [timeout="time-in-seconds"]&gt;?
+ *   &lt;messageCount min="int-min" max="int-max"/&gt;?
  *  &lt;/completeCondition&gt;
- *  &lt;onComplete expression="XPATH-expression" sequence="sequence-ref"&gt;
+ *  &lt;onComplete expression="XPATH-expression" [sequence="sequence-ref"]&gt;
  *   (mediator +)?
  *  &lt;/onComplete&gt;
- *  &lt;invalidate sequence="sequence-ref" timeout="time-in-seconds"&gt;
- *   (mediator +)?
- *  &lt;/invalidate&gt;
  * &lt;/aggregate&gt;
  */
 public class AggregateMediatorFactory extends AbstractMediatorFactory {

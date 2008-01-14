@@ -31,9 +31,14 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
     
 7. Known Issues and limitations
 
-// TODO
+  * Does not support the ability to throttle by concurrency within a cluster
+  * The non-blocking http/s transports cannot handle WS-RM requests
+  * Does not allow the email subject and other properties to be changed
+  * Does not support PUT/DELETE rest operations
+  * XSLTMediator doesn't handle text output correctly
+  * XSLTMediator doesn't close/delete temporary files properlys
 
-    The Synapse JMS implementation supports JMS 1.0.2b, however due to licensing issues we include
+  * The Synapse JMS implementation supports JMS 1.0.2b, however due to licensing issues we include
     the JMS 1.1 spec JAR from Apache Geronimo (geronimo-jms_1.1_spec-1.1.jar) instead. If you have
     any issues with JMS 1.0.x, please download the Sun JMS 1.0.2b JAR and replace supplied JAR from
     Geronimo.
@@ -61,7 +66,13 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
 
 10. New features
     The 1.1.1 release
-    // TODO
+        * Clustering support for the Cache/Throttle Mediators
+        * Maintainance mode support for the HTTP transport
+        * JMX Monitoring support
+        * Callout Mediator
+        * Improved JMS/VFS transports
+        * Improved REST/POX support
+        * Annotations support for POJOCommand mediator
     
     The 1.1 release
         * Apache VFS based file transport

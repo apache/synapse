@@ -36,7 +36,7 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
   * Does not allow the email subject and other properties to be changed
   * Does not support PUT/DELETE rest operations
   * XSLTMediator doesn't handle text output correctly
-  * XSLTMediator doesn't close/delete temporary files properlys
+  * XSLTMediator doesn't close/delete temporary files properly
 
   * The Synapse JMS implementation supports JMS 1.0.2b, however due to licensing issues we include
     the JMS 1.1 spec JAR from Apache Geronimo (geronimo-jms_1.1_spec-1.1.jar) instead. If you have
@@ -73,6 +73,8 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
         * Improved JMS/VFS transports
         * Improved REST/POX support
         * Annotations support for POJOCommand mediator
+        * Ability to pin a proxy or a task to server instances
+
     
     The 1.1 release
         * Apache VFS based file transport

@@ -1142,7 +1142,7 @@
             <name>Glen Daniels</name>
             <id>gdaniels</id>
             <email>gdaniels AT apache.org</email>
-            <organization>Sonic Software</organization>
+            <organization>WSO2</organization>
         </developer>
         <developer>
             <name>Deepal Jayasinghe</name>
@@ -1201,14 +1201,23 @@
             <organization>WSO2</organization>
             <url>http://www.apache.org/~asankha</url>
         </developer>
+        <developer>
+            <name>Upul Godage</name>
+            <id>upul</id>
+            <email>upul AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Oleg Kalnichevski</name>
+            <id>oleg</id>
+            <email></email>
+            <organization></organization>
+        </developer>
     </developers>
 
     <contributors>
         <contributor>
-            <name>Oleg Kalnichevski</name>
-        </contributor>
-        <contributor>
-            <name>Upul Godage</name>
+            <name>Andreas Veithen</name>
         </contributor>
         <contributor>
             <name>Hadrian Zbarcea</name>

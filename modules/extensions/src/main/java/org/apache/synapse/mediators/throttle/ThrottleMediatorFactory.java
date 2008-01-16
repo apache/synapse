@@ -32,6 +32,14 @@ import javax.xml.namespace.QName;
 
 /**
  * The Factory for create throttle mediator- key or InLine XMl need to provide
+ *
+ * <pre>
+ * &lt;throttle [onReject="string"] [onAccept="string"] id="string"&gt;
+ *   (&lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;)
+ *    &lt;onReject&gt;..&lt;/onReject&gt;?
+ *    &lt;onAccept&gt;..&lt;/onAccept&gt;?
+ * &lt;/throttle&gt;
+ * </pre>
  */
 
 public class ThrottleMediatorFactory extends AbstractMediatorFactory {

@@ -24,20 +24,32 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.db.DBLookupMediator;
 
 /**
- * <dblookup>
- *   <connection>
- *     <jdbc>
- *       <driver/>
- *       <url/>
- *       <user/>
- *       <password/>
- *     </jdbc>
- *   </connection>
- *   <query setAttribute="queue_name">
- *     <sql>select queue from table where device_id = ?</sql>
- *     <parameter [property="" | xpath=""] type="int|string"/>*
- *   </query>+
- * </dblookup>
+ * <pre>
+ * &lt;dblookup&gt;
+ *   &lt;connection&gt;
+ *     &lt;pool&gt;
+ *      (
+ *       &lt;driver/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
+ *     |
+ *       &lt;dsName/&gt;
+ *       &lt;icClass/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
+ *     )
+ *       &lt;property name="name" value="value"/&gt;*
+ *     &lt;/pool&gt;
+ *   &lt;/connection&gt;
+ *   &lt;statement&gt;
+ *     &lt;sql&gt;select something from table where something_else = ?&lt;/sql&gt;
+ *     &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
+ *     &lt;result name="string" column="int|string"/&gt;*
+ *   &lt;/statement&gt;+
+ * &lt;/dblookup&gt;
+ * </pre>
  */
 public class DBLookupMediatorSerializer extends AbstractDBMediatorSerializer {
 

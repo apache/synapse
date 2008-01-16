@@ -36,14 +36,18 @@ import javax.xml.namespace.QName;
  * one part of the elements described in the XPATH expression.
  * <p/>
  * <pre>
- *  &lt;iterate continueParent=(true | false) preservePayload=(true | false)
- *                          (attachPath="XPATH expression")? expression="XPATH expression"&gt;
- *   &lt;target to="TO address" [soapAction="urn:Action"] sequence="sequence ref"
- *                                                         endpoint="endpoint ref"&gt;
- *    &lt;sequence&gt; (mediator +) &lt;/sequence&gt;
- *    &lt;endpoint&gt; endpoint &lt;/endpoint&gt;
- *   &lt;/target&gt;
- *  &lt;/iterate&gt;
+ * &lt;iterate [continueParent=(true | false)] [preservePayload=(true | false)]
+ *          (attachPath="xpath")? expression="xpath"&gt;
+ *   &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"]
+ *          [endpoint="endpoint_ref"]&gt;
+ *     &lt;sequence&gt;
+ *       (mediator)+
+ *     &lt;/sequence&gt;?
+ *     &lt;endpoint&gt;
+ *       endpoint
+ *     &lt;/endpoint&gt;?
+ *   &lt;/target&gt;+
+ * &lt;/iterate&gt;
  * </pre>
  */
 public class IterateMediatorFactory extends AbstractMediatorFactory {

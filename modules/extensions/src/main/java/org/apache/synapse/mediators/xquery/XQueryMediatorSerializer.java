@@ -37,12 +37,10 @@ import javax.xml.namespace.QName;
  * Serialize the given XQuery mediator into a XML
  * <p/>
  * <pre>
- * <xquery [target="XPath"]>
- *   <dataSource>*
- *      <property name="string" value="literal"/>*
- *   </dataSource>
- *   <variable name="string"  type="int" value="literal" [key="string"] [expression=XPath] />*
- * </xquery>
+ * &lt;xquery key="string" [target="xpath"]&gt;
+ *   &lt;variable name="string" type="string" [key="string"] [expression="xpath"]
+ *      [value="string"]/&gt;?
+ * &lt;/xquery&gt;
  * </pre>
  */
 public class XQueryMediatorSerializer extends AbstractMediatorSerializer {

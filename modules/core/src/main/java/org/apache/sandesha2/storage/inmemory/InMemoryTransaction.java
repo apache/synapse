@@ -42,17 +42,17 @@ public class InMemoryTransaction implements Transaction {
 
 	private InMemoryStorageManager manager;
 	private String threadName;
-	private int    threadId;
 	private ArrayList enlistedBeans = new ArrayList();
 	private InMemoryTransaction waitingForTran = null;
 	private boolean sentMessages = false;
 	private boolean active = true;
+	private Thread thread;
 	
-	InMemoryTransaction(InMemoryStorageManager manager, String threadName, int id) {
+	InMemoryTransaction(InMemoryStorageManager manager, Thread thread) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
 		this.manager = manager;
-		this.threadName = threadName;
-		this.threadId = id;
+		this.thread = thread;
+		this.threadName = thread.getName();
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
 	
@@ -150,8 +150,8 @@ public class InMemoryTransaction implements Transaction {
 	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
-		result.append("[InMemoryTransaction, id:");
-		result.append(threadId);
+		result.append("[InMemoryTransaction, thread:");
+		result.append(thread);
 		result.append(", name: ");
 		result.append(threadName);
 		result.append(", locks: ");
@@ -162,6 +162,14 @@ public class InMemoryTransaction implements Transaction {
 
 	public void setSentMessages(boolean sentMessages) {
 		this.sentMessages = sentMessages;
+	}
+	
+	/**
+	 * Get the thread which this transaction is associated with.
+	 * @return
+	 */
+	public Thread getThread(){
+		return thread;
 	}
 }
 

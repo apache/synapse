@@ -23,9 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -33,7 +33,6 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.SandeshaException;
@@ -44,14 +43,16 @@ import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.workers.Sender;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryStorageManager extends StorageManager {
 
@@ -64,7 +65,7 @@ public class InMemoryStorageManager extends StorageManager {
     private InvokerBeanMgr invokerBeanMgr = null;
     private Sender sender = null;
     private PollingManager pollingManager = null;
-    private HashMap transactions = new HashMap();
+    private ConcurrentHashMap transactions = new ConcurrentHashMap();
     private boolean useSerialization = false;
     private HashMap storageMap = new HashMap();
     
@@ -90,40 +91,25 @@ public class InMemoryStorageManager extends StorageManager {
 		// Calling getTransaction is the only way to set up a new transaction. If you
 		// do some work that requires a tran without there being a transaction in scope
 		// then the enlist method will throw an exception.
-		Transaction result = null;
-		synchronized (transactions) {
-			Thread key = Thread.currentThread();
-			String name = key.getName();
-			int    id = System.identityHashCode(key);
-			result = (Transaction) transactions.get(key);
-			if(result == null) {
-				result = new InMemoryTransaction(this, name, id);
-				transactions.put(key, result);
-			} else {
-				// We don't want to return an existing transaction, as someone else should
-				// decide if we commit it or not. If we get here then we probably have a
-				// bug.
-				if(log.isDebugEnabled()) log.debug("Possible re-used transaction: " + result);
-				result = null;
-			}
+		Thread thread = Thread.currentThread();
+		InMemoryTransaction result = new InMemoryTransaction(this, thread);
+		Transaction oldTran = (Transaction) transactions.putIfAbsent(thread, result);
+		if(oldTran!=null){
+			// We don't want to overwrite or return an existing transaction, as someone
+			// else should decide if we commit it or not. If we get here then we probably
+			// have a bug.
+			if(log.isDebugEnabled()) log.debug("Possible re-used transaction: " + oldTran);
+			result = null;
 		}
 		return result;
 	}
 
 	InMemoryTransaction getInMemoryTransaction() {
-		InMemoryTransaction result = null;
-		synchronized (transactions) {
-			Thread key = Thread.currentThread();
-			result = (InMemoryTransaction) transactions.get(key);
-		}
-		return result;
+		return (InMemoryTransaction) transactions.get(Thread.currentThread());
 	}
 
-	void removeTransaction(Transaction t) {
-		synchronized (transactions) {
-			Collection entries = transactions.values();
-			entries.remove(t);
-		}
+	void removeTransaction(InMemoryTransaction t) {
+		transactions.remove(t.getThread());
 	}
 	
 	/** 
@@ -148,17 +134,13 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	void enlistBean(RMBean bean) throws SandeshaStorageException {
-		InMemoryTransaction t = null;
-		synchronized (transactions) {
-			Thread key = Thread.currentThread();
-			t = (InMemoryTransaction) transactions.get(key);
-			if(t == null) {
-				// We attempted to do some work without a transaction in scope
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
-				SandeshaStorageException e = new SandeshaStorageException(message);
-				if(log.isDebugEnabled()) log.debug(message, e);
-				throw e;
-			}
+		InMemoryTransaction t = (InMemoryTransaction) transactions.get(Thread.currentThread());
+		if(t == null) {
+			// We attempted to do some work without a transaction in scope
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
+			SandeshaStorageException e = new SandeshaStorageException(message);
+			if(log.isDebugEnabled()) log.debug(message, e);
+			throw e;
 		}
 		t.enlist(bean);
 	}
@@ -359,12 +341,3 @@ public class InMemoryStorageManager extends StorageManager {
 		SOAPEnvelope   envelope;
 	}
 }
-
-
-
-
-
-
-
-
-

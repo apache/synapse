@@ -39,7 +39,6 @@ public class AnnotatedCommand2 {
     }
     
     public void execute() {
-        System.out.println("beforeField: " + beforeField);
         fieldResult = beforeField.toString();    
     }
 

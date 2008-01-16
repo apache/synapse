@@ -44,12 +44,10 @@ import net.sf.saxon.javax.xml.xquery.XQItemType;
  * Creates a XQuery mediator from the given XML
  * <p/>
  * <pre>
- * <xquery [key="XPath"]>
- *   <dataSource>*
- *      <property name="string" value="literal"/>*
- *   </dataSource>
- *   <variable name="string"  type="int" value="literal" [key="string"] [expression=XPath] />*
- * </xquery>
+ * &lt;xquery key="string" [target="xpath"]&gt;
+ *   &lt;variable name="string" type="string" [key="string"] [expression="xpath"]
+ *      [value="string"]/&gt;?
+ * &lt;/xquery&gt;
  * </pre>
  */
 

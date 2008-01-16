@@ -26,15 +26,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * <pre>
  * &lt;aggregate&gt;
- *  &lt;corelateOn expression="XPATH-expression"/&gt;?
- *  &lt;completeCondition [timeout="time-in-seconds"]&gt;?
- *   &lt;messageCount min="int-min" max="int-max"/&gt;?
- *  &lt;/completeCondition&gt;
- *  &lt;onComplete expression="XPATH-expression" [sequence="sequence-ref"]&gt;
- *   (mediator +)?
- *  &lt;/onComplete&gt;
+ *   &lt;correlateOn expression="xpath"/&gt;?
+ *   &lt;completeCondition [timeout="time-in-seconds"]&gt;
+ *     &lt;messageCount min="int-min" max="int-max"/&gt;?
+ *   &lt;/completeCondition&gt;?
+ *   &lt;onComplete expression="xpath" [sequence="sequence-ref"]&gt;
+ *     (mediator +)?
+ *   &lt;/onComplete&gt;
  * &lt;/aggregate&gt;
+ * </pre>
  */
 public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 

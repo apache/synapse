@@ -33,15 +33,17 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
+ * <pre>
  * &lt;aggregate&gt;
- *  &lt;corelateOn expression="XPATH-expression"/&gt;?
- *  &lt;completeCondition [timeout="time-in-seconds"]&gt;?
- *   &lt;messageCount min="int-min" max="int-max"/&gt;?
- *  &lt;/completeCondition&gt;
- *  &lt;onComplete expression="XPATH-expression" [sequence="sequence-ref"]&gt;
- *   (mediator +)?
- *  &lt;/onComplete&gt;
+ *   &lt;correlateOn expression="xpath"/&gt;?
+ *   &lt;completeCondition [timeout="time-in-seconds"]&gt;
+ *     &lt;messageCount min="int-min" max="int-max"/&gt;?
+ *   &lt;/completeCondition&gt;?
+ *   &lt;onComplete expression="xpath" [sequence="sequence-ref"]&gt;
+ *     (mediator +)?
+ *   &lt;/onComplete&gt;
  * &lt;/aggregate&gt;
+ * </pre>
  */
 public class AggregateMediatorFactory extends AbstractMediatorFactory {
 

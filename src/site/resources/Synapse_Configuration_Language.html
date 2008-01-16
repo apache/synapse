@@ -494,7 +494,7 @@ seconds for which this endpoint should be suspended.</p>
 on messages sent to an endpoint using the enableRM, enableSec and
 enableAddressing elements. Optionally, the WS-RM and WS-Security policies
 could be specified using the 'policy' attributes.</p>
-<pre>&lt;address uri="endpoint-address" format="soap11|soap12|pox|get" [optimize="mtom|swa"]&gt;
+<pre>&lt;address uri="endpoint-address" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]&gt;
   &lt;enableRM [policy="key"]/&gt;?
   &lt;enableSec [policy="key"]/&gt;?
   &lt;enableAddressing/&gt;?
@@ -611,11 +611,11 @@ http, https, JMS, Mail and File etc. or on a subset of these as specified
 with the optional 'transports' attribute.</p>
 
 <p>You can give a list of synapse server names where this proxy service
-should be deployed using 'pinnedServers' attribute.� It takes the server
-names separated by comma or space character. If there is no pinned server
-list then proxy service will be started in all server instances.� If a pinned
-server names list is given it will only start in the given named Synapse
-server instances. The Synapse server name picked up from the system property
+should be deployed using 'pinnedServers' attribute. It takes the server names
+separated by comma or space character. If there is no pinned server list then
+proxy service will be started in all server instances. If a pinned server
+names list is given it will only start in the given named Synapse server
+instances. The Synapse server name picked up from the system property
 'SynapseServerName', failing which the hostname of the machine would be used
 or default to 'localhost'. You can give a name to a Synapse server instance
 as ./synapse.sh -DSynapseServerName=&lt;ServerName&gt; or by editing the
@@ -638,6 +638,36 @@ the local configuration) As the remote registry entry changes, the properties
 of the proxy will dynamically be updated accordingly. (Note: proxy service
 definition itself can not be specified to be dynamic; i.e &lt;proxy
 key="string"/&gt; is wrong)</p>
+
+<p></p>
+
+<p>You can give the following as service parameters:</p>
+
+<table border="0" cellpadding="0" cellspacing="0" style="width: 100%"
+class="data-table">
+  <caption></caption>
+  <tbody>
+    <tr>
+      <th>Parameter</th>
+      <th>Value</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>useOrignalWSDL</td>
+      <td>true|false</td>
+      <td>false</td>
+      <td>Use the given WSDL instead of generating the WSDL.</td>
+    </tr>
+    <tr>
+      <td>modifyUserWSDLPortAddress</td>
+      <td>true|false</td>
+      <td>true</td>
+      <td>(Effective only with useOriginalWSDL=true) If true (default) modify
+        the port addresses to current host.</td>
+    </tr>
+  </tbody>
+</table>
 
 <p></p>
 
@@ -671,7 +701,7 @@ class="data-table">
       <td></td>
       <td>Optional</td>
       <td>transport.jms.DestinationType</td>
-      <td>The JMS destination� type. Accept values 'queue' or 'topic'�
+      <td>The JMS destination type. Accept values 'queue' or 'topic'
         (default: queue)</td>
     </tr>
     <tr>
@@ -1143,7 +1173,7 @@ versa.</p>
    &lt;/connection&gt;
    &lt;statement&gt;
      &lt;sql&gt;select something from table where something_else = ?&lt;/sql&gt;
-     &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
+     &lt;parameter [value="" | expression=""] type="CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP"/&gt;*
      &lt;result name="string" column="int|string"/&gt;*
    &lt;/statement&gt;+
 &lt;/dblookup&gt;</pre>

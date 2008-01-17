@@ -225,8 +225,8 @@ public class SynapseConfigUtils {
                 url = new URL("file:" + path);
             }
             URLConnection conn = url.openConnection();
-            conn.setReadTimeout(10000);
-            conn.setConnectTimeout(2000);
+            conn.setReadTimeout(100000);
+            conn.setConnectTimeout(20000);
             conn.setRequestProperty("Connection", "close"); // if http is being used
             InputStream urlInStream = conn.getInputStream();
             return new InputSource(urlInStream);

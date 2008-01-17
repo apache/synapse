@@ -126,7 +126,7 @@ echo Using SYNAPSE_HOME:    %SYNAPSE_HOME%
 echo Using JAVA_HOME:       %JAVA_HOME%
 echo Using SYNAPSE_XML:     %_SYNAPSE_XML%
 
-%_JAVACMD% -server -Xms128M -Xmx128M %_PORT% %_SYNAPSE_XML% -D-Dresolve.root=%SYNAPSE_HOME%\repository -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Dsynapse.home="%SYNAPSE_HOME%" -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED%  -Djava.io.tmpdir=$SYNAPSE_HOME\work\temp\synapse  %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer "%SYNAPSE_HOME%\repository"
+%_JAVACMD% -server -Xms128M -Xmx128M %_PORT% %_SYNAPSE_XML% -Dresolve.root=%SYNAPSE_HOME%\repository -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Dsynapse.home="%SYNAPSE_HOME%" -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED%  -Djava.io.tmpdir=$SYNAPSE_HOME\work\temp\synapse  %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer "%SYNAPSE_HOME%\repository"
 goto end
 
 :end

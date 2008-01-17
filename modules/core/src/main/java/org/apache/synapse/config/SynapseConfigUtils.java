@@ -115,13 +115,13 @@ public class SynapseConfigUtils {
                     String path = url.getPath();
                     if (log.isDebugEnabled()) {
                         log.debug("Can not open a connection to the URL with a path :" +
-                                  path);
+                            path);
                     }
                     String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
-                                      " URL using the synapse.home : " + synapseHome);
+                                " URL using the synapse.home : " + synapseHome);
                         }
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
@@ -132,7 +132,7 @@ public class SynapseConfigUtils {
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Faild to resolve an absolute path of the " +
-                                          " URL using the synapse.home : " + synapseHome);
+                                    " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL " + url.getPath() + e);
                         }
@@ -144,11 +144,11 @@ public class SynapseConfigUtils {
             }
             URLConnection urlc = url.openConnection();
             XMLToObjectMapper xmlToObject =
-                    getXmlToObjectMapper(urlc.getContentType());
+                getXmlToObjectMapper(urlc.getContentType());
 
             try {
                 XMLStreamReader parser = XMLInputFactory.newInstance().
-                        createXMLStreamReader(urlc.getInputStream());
+                    createXMLStreamReader(urlc.getInputStream());
                 StAXOMBuilder builder = new StAXOMBuilder(parser);
                 OMElement omElem = builder.getDocumentElement();
 
@@ -199,7 +199,7 @@ public class SynapseConfigUtils {
                 return doc;
             } catch (Exception e) {
                 handleException("Error parsing resource at URL : " + url +
-                                " as XML", e);
+                    " as XML", e);
             } finally {
                 try {
                     urlInStream.close();
@@ -283,7 +283,7 @@ public class SynapseConfigUtils {
                 } catch (IOException ignored) {
                     if (log.isDebugEnabled()) {
                         log.debug("Can not open a connection to the URL with a path :" +
-                                  path);
+                            path);
                     }
                     String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
@@ -292,24 +292,24 @@ public class SynapseConfigUtils {
                         }
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
-                                      " URL using the synapse.home : " + synapseHome);
+                                " URL using the synapse.home : " + synapseHome);
                         }
                         try {
                             url = new URL(url.getProtocol() + ":" + synapseHome + "/" +
-                                          url.getPath());
+                                url.getPath());
                             url.openStream();
                         } catch (MalformedURLException e) {
                             handleException("Invalid URL reference " + url.getPath() + e);
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Faild to resolve an absolute path of the " +
-                                          " URL using the synapse.home : " + synapseHome);
+                                    " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL : " + url.getPath() + e);
                         }
                     }
                 }
-            }             
+            }
         } catch (MalformedURLException e) {
             handleException("Invalid URL reference :  " + path, e);
         } catch (IOException e) {
@@ -335,7 +335,7 @@ public class SynapseConfigUtils {
                 return getInputSourceFormURI(importUri);
             }
         } catch (URISyntaxException e) {
-            handleException("Invalid Import URI", e);
+            handleException("Invalid URI", e);
         }
 
         if (parentLocation == null) {
@@ -343,7 +343,14 @@ public class SynapseConfigUtils {
         } else {
             // if the importuri is absolute
             if (relativeLocation.startsWith("/") || relativeLocation.startsWith("\\")) {
-                return getInputSourceFormURI(importUri);
+                if (importUri != null && !importUri.isAbsolute()) {
+                    try {
+                        importUri = new URI("file:" + relativeLocation);
+                        return getInputSourceFormURI(importUri);
+                    } catch (URISyntaxException e) {
+                        handleException("Invalid URI ' " + importUri.getPath() + " '", e);
+                    }
+                }
             } else {
                 int index = parentLocation.lastIndexOf("/");
                 if (index == -1) {
@@ -359,7 +366,7 @@ public class SynapseConfigUtils {
                         }
                         return getInputSourceFormURI(resolvedUri);
                     } catch (URISyntaxException e) {
-                        handleException("Invalid URI ' " + resolvedPath + " '");
+                        handleException("Invalid URI ' " + resolvedPath + " '", e);
                     }
                 } else {
                     return getInputSourceFormURI(importUri);

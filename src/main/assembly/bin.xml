@@ -233,17 +233,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/core/src/main/resources</directory>
-            <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
-            <includes>
-                <include>patches.txt</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>patches</directory>
             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
             <includes>
                 <include>*.jar</include>
+                <include>patches.txt</include>                
             </includes>
         </fileSet>
     </fileSets>

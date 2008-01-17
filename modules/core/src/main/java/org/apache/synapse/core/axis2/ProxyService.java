@@ -259,7 +259,7 @@ public class ProxyService {
                         } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
-                                    new WSDL11ToAxisServiceBuilder(wsdlInputStream, null, null);
+                                    new WSDL11ToAxisServiceBuilder(wsdlInputStream);
                             isWSDL11 = true;
                         } else {
                             handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
@@ -298,14 +298,6 @@ public class ProxyService {
                             }
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
-                        List schemaList = proxyService.getSchema();
-                        if (schemaList != null && schemaList.size() > 0) {
-                            // just pick the first schema's target namespace as Axis2's
-                            // HTTPTransportUtils code already contains a bug where it uses the
-                            // services' schema target NS for each operation
-                            proxyService.setSchemaTargetNamespace(
-                                proxyService.getSchema(0).getTargetNamespace());
-                        }
                         proxyService.setWsdlFound(true);
 
                         if (isWSDL11) {

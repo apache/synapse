@@ -19,6 +19,7 @@
 
 package org.apache.synapse.core.axis2;
 
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.xml.sax.InputSource;
@@ -26,17 +27,28 @@ import org.xml.sax.InputSource;
 /**
  * Class that adapts a ResourceMap to URIResolver.
  */
-public class ResourceMapURIResolver implements URIResolver {
-    private final ResourceMap resourceMap;
-    private final SynapseConfiguration synCfg;
-    
-    public ResourceMapURIResolver(ResourceMap resourceMap,
+public class CustomURIResolver implements URIResolver {
+    private ResourceMap resourceMap;
+    private SynapseConfiguration synCfg;
+
+    public CustomURIResolver() {
+    }
+
+    public CustomURIResolver(ResourceMap resourceMap,
                                   SynapseConfiguration synCfg) {
+        this();
         this.resourceMap = resourceMap;
         this.synCfg = synCfg;
     }
-    
+
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
-        return resourceMap.resolve(synCfg, schemaLocation);
+        InputSource result = null;
+        if (resourceMap != null) {
+            result = resourceMap.resolve(synCfg, schemaLocation);
+        }
+        if (result == null) {
+            result = SynapseConfigUtils.resolveRelativeURI(baseUri, schemaLocation);
+        }
+        return result;
     }
 }

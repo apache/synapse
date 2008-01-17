@@ -171,4 +171,4 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java -server -Xms128M -Xmx128M $XDEBUG $PORT $SYNAPSE_XML -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Dsynapse.home=$SYNAPSE_HOME -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseServer $SYNAPSE_HOME/repository
+$JAVA_HOME/bin/java -server -Xms128M -Xmx128M $XDEBUG $PORT $SYNAPSE_XML -Dresolve.root=$SYNAPSE_HOME/repository -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Dsynapse.home=$SYNAPSE_HOME -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseServer $SYNAPSE_HOME/repository

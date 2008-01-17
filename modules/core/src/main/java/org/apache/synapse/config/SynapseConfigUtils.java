@@ -331,6 +331,9 @@ public class SynapseConfigUtils {
         URI importUri = null;
         try {
             importUri = new URI(relativeLocation);
+            if (importUri.isAbsolute()) {
+                return getInputSourceFormURI(importUri);
+            }
         } catch (URISyntaxException e) {
             handleException("Invalid Import URI", e);
         }

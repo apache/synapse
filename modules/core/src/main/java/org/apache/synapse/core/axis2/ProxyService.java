@@ -276,24 +276,37 @@ public class ProxyService {
                         wsdlToAxisServiceBuilder.setBaseUri(
                                 wsdlURI != null ? wsdlURI.toString() : "");
 
-                        if (resourceMap != null) {
+                        if (trace()) {
+                            trace.info("Setting up custom resolvers");
+                        }
+                        // Set up the URIResolver
 
-                            if (trace()) {
-                                trace.info("Setting up custom resolvers");
-                            }
-                            // Set up the URIResolver
+                        if (resourceMap != null) {
+                            // if the resource map is available use it
                             wsdlToAxisServiceBuilder.setCustomResolver(
-                                new ResourceMapURIResolver(resourceMap, synCfg));
+                                new CustomURIResolver(resourceMap, synCfg));
                             // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
                             if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
                                 ((WSDL11ToAxisServiceBuilder)
                                     wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
-                                    new ResourceMapWSDLLocator(new InputSource(wsdlInputStream),
+                                    new CustomWSDLLocator(new InputSource(wsdlInputStream),
                                                           wsdlURI != null ? wsdlURI.toString() : "",
                                                           resourceMap, synCfg));
                             }
+                        } else {
+                            //if the resource map isn't available ,
+                            //then each import URIs will be resolved using base URI 
+                            wsdlToAxisServiceBuilder.setCustomResolver(
+                                new CustomURIResolver());
+                            // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
+                            if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
+                                ((WSDL11ToAxisServiceBuilder)
+                                    wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
+                                    new CustomWSDLLocator(new InputSource(wsdlInputStream),
+                                                          wsdlURI != null ? wsdlURI.toString() : ""));
+                            }
                         }
-                        
+
                         if (trace()) {
                             trace.info("Populating Axis2 service using WSDL");
                             if (trace.isTraceEnabled()) {

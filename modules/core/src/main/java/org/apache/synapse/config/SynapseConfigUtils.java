@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.xml.sax.InputSource;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,10 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 
 public class SynapseConfigUtils {
 
@@ -212,6 +210,34 @@ public class SynapseConfigUtils {
         return null;
     }
 
+    public static InputSource getInputSourceFormURI(URI uri) {
+        if (uri == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Can not create a URL from 'null' ");
+            }
+            return null;
+        }
+        try {
+            URL url = uri.toURL();
+            String protocol = url.getProtocol();
+            String path = url.getPath();
+            if (protocol == null || "".equals(protocol)) {
+                url = new URL("file:" + path);
+            }
+            URLConnection conn = url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(2000);
+            conn.setRequestProperty("Connection", "close"); // if http is being used
+            InputStream urlInStream = conn.getInputStream();
+            return new InputSource(urlInStream);
+        } catch (MalformedURLException e) {
+            handleException("Invalid URL ' " + uri + " '", e);
+        } catch (IOException e) {
+            handleException("Error reading at URI ' " + uri + " ' ", e);
+        }
+        return null;
+    }
+
     private static void handleException(String msg, Exception e) {
         log.warn(msg, e);
         throw new SynapseException(msg, e);
@@ -291,4 +317,53 @@ public class SynapseConfigUtils {
         }
         return url;
     }
+
+    public static InputSource resolveRelativeURI(String parentLocation, String relativeLocation) {
+
+        if (relativeLocation == null) {
+            throw new IllegalArgumentException("Import URI cannot be null");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Resolving import URI ' " + parentLocation + " '  against base URI ' " + relativeLocation + " '  ");
+        }
+
+        URI importUri = null;
+        try {
+            importUri = new URI(relativeLocation);
+        } catch (URISyntaxException e) {
+            handleException("Invalid Import URI", e);
+        }
+
+        if (parentLocation == null) {
+            return getInputSourceFormURI(importUri);
+        } else {
+            // if the importuri is absolute
+            if (relativeLocation.startsWith("/") || relativeLocation.startsWith("\\")) {
+                return getInputSourceFormURI(importUri);
+            } else {
+                int index = parentLocation.lastIndexOf("/");
+                if (index == -1) {
+                    index = parentLocation.lastIndexOf("\\");
+                }
+                if (index != -1) {
+                    String basepath = parentLocation.substring(0, index + 1);
+                    String resolvedPath = basepath + relativeLocation;
+                    try {
+                        URI resolvedUri = new URI(resolvedPath);
+                        if (!resolvedUri.isAbsolute()) {
+                            resolvedUri = new URI("file:" + resolvedPath);
+                        }
+                        return getInputSourceFormURI(resolvedUri);
+                    } catch (URISyntaxException e) {
+                        handleException("Invalid URI ' " + resolvedPath + " '");
+                    }
+                } else {
+                    return getInputSourceFormURI(importUri);
+                }
+            }
+        }
+        return null;
+    }
 }
+

@@ -19,8 +19,8 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -30,20 +30,23 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
-import java.net.*;
 
 /**
  * <proxy-service name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
@@ -474,6 +477,24 @@ public class ProxyService {
     public void start(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         if (axisConfig != null) {
+            
+            Parameter param = axisConfig.getParameter(SynapseConstants.SYNAPSE_ENV);
+            if (param != null && param.getValue() instanceof SynapseEnvironment)  {
+                SynapseEnvironment env = (SynapseEnvironment) param.getValue();
+                if (targetInLineInSequence != null) {
+                    targetInLineInSequence.init(env);
+                }
+                if (targetInLineOutSequence != null) {
+                    targetInLineOutSequence.init(env);
+                }
+                if (targetInLineFaultSequence != null) {
+                    targetInLineFaultSequence.init(env);
+                }
+            } else {
+                auditWarn("Unable to find the SynapseEnvironment. " +
+                    "Components of the proxy service may not be initialized");
+            }
+            
             axisConfig.getServiceForActivation(this.getName()).setActive(true);
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
@@ -490,6 +511,17 @@ public class ProxyService {
     public void stop(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         if (axisConfig != null) {
+
+            if (targetInLineInSequence != null) {
+                targetInLineInSequence.destroy();
+            }
+            if (targetInLineOutSequence != null) {
+                targetInLineOutSequence.destroy();
+            }
+            if (targetInLineFaultSequence != null) {
+                targetInLineFaultSequence.destroy();
+            }
+
             try {
                 AxisService as = axisConfig.getService(this.getName());
                 if (as != null) {

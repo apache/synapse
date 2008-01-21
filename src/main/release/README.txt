@@ -13,7 +13,6 @@ structure.
 			synapse.sh
 			synapse-daemon.sh
 			synapse.bat
-			run-synapse-service.bat
 			install-synapse-service.bat
 			uninstall-synapse-service.bat
 		/docs

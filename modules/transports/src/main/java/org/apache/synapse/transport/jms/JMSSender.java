@@ -141,7 +141,8 @@ public class JMSSender extends AbstractTransportSender {
                         } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(jmsOut.getDestinationType())) {
                             tConFac = (TopicConnectionFactory) jmsOut.getConnectionFactory();
                         } else {
-                            conFac = (ConnectionFactory) jmsOut.getConnectionFactory();
+                            handleException("Unable to determine type of JMS " +
+                                "Connection Factory - i.e Queue/Topic");
                         }
 
                         if (user != null && pass != null) {
@@ -149,16 +150,12 @@ public class JMSSender extends AbstractTransportSender {
                                 connection = qConFac.createQueueConnection(user, pass);
                             } else if (tConFac != null) {
                                 connection = tConFac.createTopicConnection(user, pass);
-                            } else {
-                                connection = conFac.createConnection(user, pass);
                             }
                         } else {
                            if (qConFac != null) {
                                 connection = qConFac.createQueueConnection();
                             } else if (tConFac != null) {
                                 connection = tConFac.createTopicConnection();
-                            } else {
-                                connection = conFac.createConnection();
                             }
                         }
 
@@ -168,8 +165,6 @@ public class JMSSender extends AbstractTransportSender {
                         } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(jmsOut.getDestinationType())) {
                             session = ((TopicConnection)connection).
                                 createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-                        } else {
-                            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                         }
 
                     } catch (JMSException e) {

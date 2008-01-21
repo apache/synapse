@@ -227,7 +227,7 @@ public class JMSConnectionFactory implements ExceptionListener {
             } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(getConnectionFactoryType())) {
                 tConFac = (TopicConnectionFactory) conFactory;
             } else {
-                conFac = conFactory;
+                handleException("Unable to determine type of Connection Factory - i.e. Queue/Topic", null);
             }
 
             String user = (String) jndiProperties.get(Context.SECURITY_PRINCIPAL);
@@ -238,16 +238,12 @@ public class JMSConnectionFactory implements ExceptionListener {
                     connection = qConFac.createQueueConnection(user, pass);
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection(user, pass);
-                } else {
-                    connection = conFac.createConnection(user, pass);
                 }
             } else {
                 if (qConFac != null) {
                     connection = qConFac.createQueueConnection();
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection();
-                } else {
-                    connection = conFac.createConnection();
                 }
             }
             

@@ -2527,7 +2527,7 @@ and connection factory etc.</p>
         &lt;target&gt;
             &lt;endpoint&gt;
                 &lt;address uri="jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;amp;
-                   java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616"/&gt;
+                   java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue"/&gt;
             &lt;/endpoint&gt;
             &lt;inSequence&gt;
                 &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
@@ -2560,7 +2560,7 @@ service at http://localhost:9000/soap/SimpleStockQuoteService?wsdl. JMS URL
 for the service is mentioned as below:</p>
 <pre>jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=
 QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
-java.naming.provider.url=tcp://localhost:61616</pre>
+java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue</pre>
 
 <p>You may also notice that the simple stock quote proxy service exposed in
 Synapse is now available only in HTTP as we have specified transport for that
@@ -2826,7 +2826,7 @@ the client. To test this, use 'ant -Dmode=placeorder...' and you will notice
 the one way JMS message flowing through Synapse into the sample Axis2 server
 instance over http, and Axis2 acknowledging it with a http 202 Accepted
 response.</p>
-<pre>ant stockquote -Dmode=placeorder -Dtrpurl="jms:/JMStoHTTPStockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"</pre>
+<pre>ant stockquote -Dmode=placeorder -Dtrpurl="jms:/JMStoHTTPStockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue"</pre>
 <pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
 
 <p>The second example shows how Synapse could be made to respond with a http

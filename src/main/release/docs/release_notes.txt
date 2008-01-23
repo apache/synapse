@@ -1,4 +1,4 @@
-Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
+Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes - January 2008
 
 1. Overview
     The Apache Synapse ESB is a robust, lightweight and highly scalable and distributed
@@ -33,7 +33,6 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
 
   * SYNAPSE-180 Does not support the ability to throttle by concurrency within a cluster
   * SYNAPSE-174 The non-blocking http/s transports cannot handle WS-RM requests
-  * SYNAPSE-189 Does not allow the email subject and other properties to be changed
   * SYNAPSE-186 Does not support PUT/DELETE rest operations
   * SYNAPSE-215 XSLTMediator doesn't handle text output correctly
   * SYNAPSE-212 XSLTMediator doesn't close/delete temporary files properly

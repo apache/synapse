@@ -420,10 +420,10 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
             Folder folder = store.getFolder(MailConstants.DEFAULT_FOLDER);
             folder.open(Folder.READ_WRITE);
             Message[] msgs = folder.getMessages();
-            System.out.println(msgs.length + " replies in reply mailbox");
+            log.debug(msgs.length + " replies in reply mailbox");
             for (Message m:msgs) {
                 String[] inReplyTo = m.getHeader(MailConstants.MAIL_HEADER_IN_REPLY_TO);
-                System.out.println("Got reply to : " + Arrays.toString(inReplyTo));
+                log.debug("Got reply to : " + Arrays.toString(inReplyTo));
                 if (inReplyTo != null && inReplyTo.length > 0) {
                     for (int j=0; j<inReplyTo.length; j++) {
                         if (requestMsgId.equals(inReplyTo[j])) {

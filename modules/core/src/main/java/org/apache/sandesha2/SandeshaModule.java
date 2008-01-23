@@ -261,9 +261,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 				String name = null;
 				QName qName = op.getName();
 				if(qName != null) name = qName.getLocalPart();
-				if((name != null && name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) ||
-				   ServiceClient.ANON_OUT_IN_OP.equals(qName))
-					break;
+				if((name != null && name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)))
+					continue;
 
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
@@ -280,9 +279,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			String name = null;
 			QName qName = op.getName();
 			if(qName != null) name = qName.getLocalPart();
-			if((name != null && !name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) &&
-			   !ServiceClient.ANON_OUT_IN_OP.equals(qName)) {
-
+			if((name != null && !name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX))) {
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
 				if(op.getAxisSpecificMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {

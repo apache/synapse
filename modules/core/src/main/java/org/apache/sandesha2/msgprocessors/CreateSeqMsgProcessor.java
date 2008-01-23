@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -173,9 +174,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				// offered seq id
 				String offeredSequenceID = offer.getIdentifer().getIdentifier(); 
 				
-				boolean offerEcepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
+				boolean offerAccepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
 	
-				if (offerEcepted) {
+				if (offerAccepted) {
 					// Setting the CreateSequence table entry for the outgoing
 					// side.
 					RMSBean rMSBean = new RMSBean();
@@ -185,9 +186,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
 					// this is a dummy value
 					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
-						
-					rMSBean.setToEndpointReference(rmdBean.getToEndpointReference());
-					rMSBean.setAcksToEndpointReference(rmdBean.getToEndpointReference());  // The acks need to flow back into this endpoint
+					
+					if(rmdBean.getToEndpointReference() != null){
+						rMSBean.setToEndpointReference(rmdBean.getToEndpointReference());
+					} else {
+						//It's Sync2Way so set to address to anonymous when spec 1.0 is used
+						String specVersion = rmdBean.getRMVersion();
+						if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) {
+							rMSBean.setToEndpointReference(new EndpointReference(AddressingConstants.Submission.WSA_ANONYMOUS_URL));
+						} 	
+					}
+					
+					rMSBean.setAcksToEndpointReference(rmdBean.getReplyToEndpointReference());  // The acks need to flow back into this endpoint
 					rMSBean.setReplyToEndpointReference(rmdBean.getReplyToEndpointReference());
 					rMSBean.setLastActivatedTime(System.currentTimeMillis());
 					rMSBean.setRMVersion(rmdBean.getRMVersion());

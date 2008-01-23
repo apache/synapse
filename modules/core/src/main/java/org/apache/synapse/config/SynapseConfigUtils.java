@@ -186,8 +186,8 @@ public class SynapseConfigUtils {
             return null;
         }
         URLConnection conn = url.openConnection();
-        conn.setReadTimeout(10000);
-        conn.setConnectTimeout(2000);
+        conn.setReadTimeout(getReadTimeout());
+        conn.setConnectTimeout(getConnectionTimeout());
         conn.setRequestProperty("Connection", "close"); // if http is being used
         InputStream urlInStream = conn.getInputStream();
 
@@ -225,8 +225,8 @@ public class SynapseConfigUtils {
                 url = new URL("file:" + path);
             }
             URLConnection conn = url.openConnection();
-            conn.setReadTimeout(100000);
-            conn.setConnectTimeout(20000);
+            conn.setReadTimeout(getReadTimeout());
+            conn.setConnectTimeout(getConnectionTimeout());
             conn.setRequestProperty("Connection", "close"); // if http is being used
             InputStream urlInStream = conn.getInputStream();
             return new InputSource(urlInStream);
@@ -236,6 +236,32 @@ public class SynapseConfigUtils {
             handleException("Error reading at URI ' " + uri + " ' ", e);
         }
         return null;
+    }
+
+    private static int getReadTimeout() {
+        //getting  read timeout
+        String readTO = System.getProperty(SynapseConstants.READTIMEOUT);
+        int readTimeout = SynapseConstants.DEFAULT_READTIMEOUT;
+        if (readTO != null && !"".equals(readTO)) {
+            try {
+                readTimeout = Integer.parseInt(readTO);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return readTimeout;
+    }
+
+    private static int getConnectionTimeout() {
+        //getting  connection timeout
+        String connectionTO = System.getProperty(SynapseConstants.CONNECTTIMEOUT);
+        int connectionTimeout = SynapseConstants.DEFAULT_CONNECTTIMEOUT;
+        if (connectionTO != null && !"".equals(connectionTO)) {
+            try {
+                connectionTimeout = Integer.parseInt(connectionTO);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return connectionTimeout;
     }
 
     private static void handleException(String msg, Exception e) {

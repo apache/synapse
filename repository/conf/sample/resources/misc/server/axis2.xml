@@ -189,23 +189,10 @@
         </parameter>
     </transportReceiver>-->
 
-    <!-- ================================================= -->
-    <!-- Mail Transport Listener  -->
-    <!-- This is a sample configuration. It assumes a mail server running in localhost.
-         Listener pops  messages that comes to the email address red@localhost. Users
-         password is red. Listener connect to the server every 3000 milliseconds.
-         Parameters with "transport." prefix is Axis2 specific. Others are all from Java Mail API. 
-         http://people.apache.org/~pzf/SMTPBase64Binding-0.2.html
-     -->
-    <!-- ================================================= -->
-    <!--<transportReceiver name="mailto" class="org.apache.axis2.transport.mail.SimpleMailListener">
-        <parameter name="mail.pop3.host">localhost</parameter>
-        <parameter name="mail.pop3.user">red</parameter>
-        <parameter name="mail.store.protocol">pop3</parameter>
-        <parameter name="transport.mail.pop3.password">red</parameter>
-        <parameter name="transport.mail.replyToAddress">red@localhost</parameter>
-        <parameter name="transport.listener.interval">3000</parameter>
-    </transportReceiver>-->
+    <transportReceiver name="mailto" class="org.apache.synapse.transport.mail.MailTransportListener">
+        <!-- configure any optional POP3/IMAP properties
+        check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
+    </transportReceiver>
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
@@ -241,14 +228,15 @@
     <transportSender name="jms"
                      class="org.apache.synapse.transport.jms.JMSSender"/>
 
-    <!-- ================================================= -->
-    <!-- Mail Transport Sender  -->
-    <!--Only need to uncomment the sender. Configuration is achieved with every client.
-        At any instant mail host should be given. Sample configuration has been given.
-        http://people.apache.org/~pzf/SMTPBase64Binding-0.2.html-->
-    <!-- ================================================= -->
-    <!--<transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender">
-        <parameter name="mail.smtp.host">localhost</parameter>
+    <!-- Uncomment and configure the SMTP server information
+    check com.sun.mail.smtp package documentation for descriptions of properties
+    <transportSender name="mailto" class="org.apache.synapse.transport.mail.MailTransportSender">
+        <parameter name="mail.smtp.host">smtp.gmail.com</parameter>
+        <parameter name="mail.smtp.port">587</parameter>
+        <parameter name="mail.smtp.starttls.enable">true</parameter>
+        <parameter name="mail.smtp.user">synapse.test.0</parameter>
+        <parameter name="mail.smtp.password">mailpassword</parameter>
+        <parameter name="mail.smtp.auth">true</parameter>
     </transportSender>-->
 
     <!-- ================================================= -->

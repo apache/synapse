@@ -68,6 +68,7 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes
     The 1.1.1 release
         * Clustering support for the Cache/Throttle Mediators
         * Maintainance mode support for the HTTP transport
+        * New Mail transport that supports POP3/IMAP/SMTP
         * JMX Monitoring support
         * Callout Mediator
         * Improved JMS/VFS transports

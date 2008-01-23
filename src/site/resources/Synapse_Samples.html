@@ -215,6 +215,8 @@
         medium using VFS transport listener and sender</a></li>
       <li><a href="#Sample255">Sample 255: Switching from ftp transport
         listener to mail transport sender</a></li>
+      <li><a href="#Sample256">Sample 256: Proxy services with the mail
+        transport</a></li>
     </ul>
   </li>
   <li><a href="#Task">Introduction to synapse tasks</a> 
@@ -2971,6 +2973,71 @@ directory given in transport.vfs.FileURI above.</p>
 server and send it to the Axis2 service. The file in the ftp directory will
 be deleted. The response will be sent to the given email address.</p>
 
+<h2><a name="Sample256">Sample 256: Proxy services with the mail transport
+</a></h2>
+<pre>&lt;!-- Using the mail transport --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy" transports="mailto"&gt;
+
+        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
+        &lt;parameter name="transport.mail.Protocol"&gt;pop3&lt;/parameter&gt;
+        &lt;parameter name="transport.PollInterval"&gt;5&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.host"&gt;pop.gmail.com&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.port"&gt;995&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.1&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.password"&gt;mailpassword&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.class"&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.fallback"&gt;false&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.port"&gt;995&lt;/parameter&gt;
+
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name="senderAddress" expression="get-property('transport', 'From')"/&gt;
+                &lt;log level="full"&gt;
+                    &lt;property name="Sender Address" expression="get-property('senderAddress')"/&gt;
+                &lt;/log&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;property name="Subject" value="Custom Subject for Response" scope="transport"/&gt;
+                &lt;header name="To" expression="fn:concat('mailto:', get-property('senderAddress'))"/&gt;
+                &lt;log level="full"&gt;
+                    &lt;property name="message" value="Response message"/&gt;
+                    &lt;property name="Sender Address" expression="get-property('senderAddress')"/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Using the mail transport with Proxy
+services</strong></p>
+
+<p><strong>Prerequisites:</strong><br>
+You will need access to an email account</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
+
+<p>Enable mail transport sender in the Synapse axis2.xml. See <a
+href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport
+sender</a> </p>
+
+<p>Start the Synapse configuration numbered 256: i.e. synapse -sample 256</p>
+
+<p>Send a plain/text email with the following body and any custom Subject
+from your mail account.</p>
+<pre>&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;&lt;/m0:getQuote&gt; </pre>
+
+<p>After a few seconds (e.g. 30s), you should receive a POX response in your email
+account with the stock quote reply.</p>
+
 <h1><a name="Task">Introduction to synapse tasks</a></h1>
 
 <h2><a name="Sample300">Sample 300: Introduction to tasks with simple
@@ -3650,8 +3717,7 @@ company database and logs it.</p>
 
 <p></p>
 
-<h2><a name="Throttle">Throtteling messages (Throttle Mediator)</a></h2>
-<!-- TODO: any text to go in here??? -->
+<h2><a name="Throttle">Throttling messages (Throttle Mediator)</a></h2>
 
 <h2><a name="Sample370">Sample 370: Introduction to throttle mediator and
 concurrency throttling</a></h2>
@@ -4123,7 +4189,6 @@ Discounted price: 138.77458254967408</pre>
 
 <h2><a name="XQuery">Evaluating XQuery for mediation (XQuery
 Mediator)</a></h2>
-<!-- TODO: what goes in herer -->
 
 <h2><a name="Sample390">Sample 390: Introduction to the XQuery
 mediator</a></h2>
@@ -4247,7 +4312,6 @@ commission.xml document will be added and given as a new price .</p>
 
 <h2><a name="Splitter">Splitting messages in to parts and process in parallel
 (Iterate / Clone)</a></h2>
-<!-- TODO: splitter declaration -->
 
 <h2><a name="Sample400">Sample 400: Message splitting and aggregating the
 responses</a></h2>
@@ -4383,7 +4447,7 @@ case of the source, this key refers to either a message context property or
 to a local entry. For the target, this key refers to a message context
 property only. </p>
 
-<h2><a name="Sample430" id="Sample430">Sample 430: Simple Callout Mediator
+<h2><a name="Sample430">Sample 430: Simple Callout Mediator
 for synchronizing web service invocation</a></h2>
 
 <p>&#xa0;</p>

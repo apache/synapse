@@ -102,7 +102,7 @@ public class SequenceProcessor {
 		Sequence sequence = rmMsgCtx.getSequence();
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
-		boolean lastMessage = sequence.getLastMessage() != null;
+		boolean lastMessage = sequence.getLastMessage();
 		
 		// Check that both the Sequence header and message body have been secured properly
 		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();

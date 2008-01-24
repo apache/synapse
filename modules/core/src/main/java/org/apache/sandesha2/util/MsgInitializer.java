@@ -33,7 +33,6 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
-import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -171,10 +170,10 @@ public class MsgInitializer {
 		} else if (sequence != null) {
 			
 			Sequence seq = rmMsgContext.getSequence();
-			LastMessage lastMessage = seq.getLastMessage();
+			boolean lastMessage = seq.getLastMessage();
 			SOAPEnvelope envelope = rmMsgContext.getSOAPEnvelope();
 			
-			if (lastMessage!=null && envelope.getBody().getFirstOMChild()==null) {
+			if (lastMessage && envelope.getBody().getFirstOMChild()==null) {
 				//the message is an empty body last message
 				rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.LAST_MESSAGE);
 			}else

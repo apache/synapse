@@ -50,7 +50,6 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.wsrm.Accept;
-import org.apache.sandesha2.wsrm.AckFinal;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.CloseSequence;
@@ -471,8 +470,7 @@ public class RMMsgCreator {
 		if (rmdBean.isClosed()) {
 			// sequence is closed. so add the 'Final' part.
 			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
-				AckFinal ackFinal = new AckFinal(rmNamespaceValue);
-				sequenceAck.setAckFinal(ackFinal);
+				sequenceAck.setAckFinal(true);
 			}
 		}
 

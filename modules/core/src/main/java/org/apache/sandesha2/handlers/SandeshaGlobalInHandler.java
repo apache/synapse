@@ -110,9 +110,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						SOAPHeaderBlock shb = (SOAPHeaderBlock) header.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence);
 						Sequence sequence = new Sequence(Sandesha2Constants.SPEC_2005_02.NS_URI);
 						sequence.fromHeaderBlock(shb);
-						if(sequence.getLastMessage() != null) {
-							lastMessageHeader = true;
-						}
+						lastMessageHeader = sequence.getLastMessage();
 					}
 				} catch(Exception e) {
 					// Do nothing, we failed to find a Sequence header

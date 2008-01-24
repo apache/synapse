@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -43,7 +44,7 @@ public class Sequence implements RMHeaderPart {
 
 	private Identifier identifier;
 	private MessageNumber messageNumber;
-	private LastMessage lastMessage = null;
+	private boolean lastMessage = false;
 	private String namespaceValue = null;
 	private OMNamespace omNamespace = null;
 	
@@ -89,8 +90,7 @@ public class Sequence implements RMHeaderPart {
 		messageNumber = new MessageNumber(namespaceValue);
 		messageNumber.fromOMElement(msgNumberPart);
 		if(lastMessageElement != null){
-			lastMessage = new LastMessage(namespaceValue);
-			lastMessage.fromOMElement(lastMessageElement);
+			lastMessage = true;
 		}
 
 		// Indicate that we have processed this part of the message.
@@ -103,7 +103,7 @@ public class Sequence implements RMHeaderPart {
 		return identifier;
 	}
 
-	public LastMessage getLastMessage() {
+	public boolean getLastMessage() {
 		return lastMessage;
 	}
 
@@ -115,7 +115,7 @@ public class Sequence implements RMHeaderPart {
 		this.identifier = identifier;
 	}
 
-	public void setLastMessage(LastMessage lastMessage) {
+	public void setLastMessage(boolean lastMessage) {
 		this.lastMessage = lastMessage;
 	}
 
@@ -138,7 +138,9 @@ public class Sequence implements RMHeaderPart {
 		sequenceHeaderBlock.setMustUnderstand(true);
 		identifier.toOMElement(sequenceHeaderBlock, omNamespace);
 		messageNumber.toOMElement(sequenceHeaderBlock, omNamespace);
-		if (lastMessage != null)
-			lastMessage.toOMElement(sequenceHeaderBlock);
+		if (lastMessage){		
+			OMElement lastMessageElement = sequenceHeaderBlock.getOMFactory().createOMElement(Sandesha2Constants.WSRM_COMMON.LAST_MSG, omNamespace);
+			sequenceHeaderBlock.addChild(lastMessageElement);
+		}
 	}
 }

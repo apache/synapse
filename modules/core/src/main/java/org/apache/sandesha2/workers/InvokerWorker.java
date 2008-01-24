@@ -267,7 +267,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = rmMsg.getSequence();
 				
-				if (sequence.getLastMessage() != null) {
+				if (sequence.getLastMessage()) {
 					//this will work for RM 1.0 only
 					highestMessage = true;
 				} else {

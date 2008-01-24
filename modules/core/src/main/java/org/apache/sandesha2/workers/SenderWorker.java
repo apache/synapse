@@ -67,7 +67,6 @@ import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
-import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
@@ -456,7 +455,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 				if(senderBean.isLastMessage() &&
 				    SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion)) {
-					sequence.setLastMessage(new LastMessage(namespace));
+					sequence.setLastMessage(true);
 				}
 				
 				// We just create the id here, we will add the value in later

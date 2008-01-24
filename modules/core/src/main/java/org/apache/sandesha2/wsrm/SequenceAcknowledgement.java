@@ -46,8 +46,8 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 	private ArrayList nackList;
 	private String namespaceValue = null;
 	private OMNamespace omNamespace = null;
-	private AckNone ackNone = null;
-	private AckFinal ackFinal = null;
+	private boolean ackNone = false;
+	private boolean ackFinal = false;
 	
 	private OMElement originalSequenceAckElement;
 	
@@ -89,14 +89,12 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 					String rmSpecVersion = SpecSpecificConstants.getSpecVersionString (namespaceValue);
 					if (SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
 						if(Sandesha2Constants.WSRM_COMMON.FINAL.equals(elementLocalName)){
-							ackFinal = new AckFinal (namespaceValue);
-							ackFinal.fromOMElement(element);
+							ackFinal = true;
 						}
 					}
 					if (SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
 						if(Sandesha2Constants.WSRM_COMMON.NONE.equals(elementLocalName)){
-							ackNone = new AckNone (namespaceValue);
-							ackNone.fromOMElement(element);
+							ackNone = true;
 						}
 					}
 				}
@@ -142,19 +140,19 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		return nackList;
 	}
 
-	public AckFinal getAckFinal() {
+	public boolean getAckFinal() {
 		return ackFinal;
 	}
 
-	public void setAckFinal(AckFinal ackFinal) {
+	public void setAckFinal(boolean ackFinal) {
 		this.ackFinal = ackFinal;
 	}
 
-	public AckNone getAckNone() {
+	public boolean getAckNone() {
 		return ackNone;
 	}
 
-	public void setAckNone(AckNone ackNone) {
+	public void setAckNone(boolean ackNone) {
 		this.ackNone = ackNone;
 	}
 	
@@ -195,11 +193,11 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		String rmSpecVersion = SpecSpecificConstants.getSpecVersionString(namespaceValue);
 
 		//setting a 'None' when nothing is there (for the correct RM version)
-		if (ackNone==null && acknowledgementRangeList.size()==0 && nackList.size()==0 && SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
-			ackNone = new AckNone (namespaceValue);
+		if (ackNone==false && acknowledgementRangeList.size()==0 && nackList.size()==0 && SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
+			ackNone = true;
 		}
 		
-		if (ackNone!=null) {
+		if (ackNone!=false) {
 			if (!SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.noneNotAllowedNamespace,
@@ -215,11 +213,11 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.noneNotAllowedNackPresent));
 			}
-			
-			ackNone.toOMElement(sequenceAcknowledgementHeaderBlock);
+			OMElement noneElement = sequenceAcknowledgementHeaderBlock.getOMFactory().createOMElement(Sandesha2Constants.WSRM_COMMON.NONE, omNamespace);
+			sequenceAcknowledgementHeaderBlock.addChild(noneElement);
 		}
 		
-		if (ackFinal!=null) {
+		if (ackFinal!=false) {
 			if (!SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.finalNotAllowedNamespace));
@@ -229,8 +227,8 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.cannotHaveFinalWithNack));
 			}
-			
-			ackFinal.toOMElement(sequenceAcknowledgementHeaderBlock);
+			OMElement finalElement = sequenceAcknowledgementHeaderBlock.getOMFactory().createOMElement(Sandesha2Constants.WSRM_COMMON.FINAL, omNamespace);
+			sequenceAcknowledgementHeaderBlock.addChild(finalElement);
 		}
 	}
 }

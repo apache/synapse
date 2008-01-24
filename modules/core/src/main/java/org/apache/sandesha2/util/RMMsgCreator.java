@@ -51,7 +51,6 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AcksTo;
-import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -524,7 +523,7 @@ public class RMMsgCreator {
 		MessageContext makeConnectionMessageCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,makeConnectionOperation);
 		RMMsgContext makeConnectionRMMessageCtx = MsgInitializer.initializeMessage(makeConnectionMessageCtx);
 		
-		MakeConnection makeConnection = new MakeConnection (Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
+		MakeConnection makeConnection = new MakeConnection();
 		if (makeConnectionSeqId!=null) {
 			Identifier identifier = new Identifier (rmNamespaceValue);
 			identifier.setIndentifer(makeConnectionSeqId);
@@ -532,9 +531,7 @@ public class RMMsgCreator {
 		}
 		
 		if (makeConnectionAnonURI!=null) {
-			Address address = new Address (Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
-			address.setAddress (makeConnectionAnonURI);
-			makeConnection.setAddress(address);
+			makeConnection.setAddress(makeConnectionAnonURI);
 		}
 		
 		// Setting the addressing properties. As this is a poll we must send it to an non-anon

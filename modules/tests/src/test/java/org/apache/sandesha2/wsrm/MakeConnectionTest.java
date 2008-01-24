@@ -40,7 +40,7 @@ public class MakeConnectionTest extends SandeshaTestCase {
     }
     
     public void testfromOMElement()  throws AxisFault {
-        MakeConnection makeConnection = new MakeConnection(mcNamespaceValue);
+        MakeConnection makeConnection = new MakeConnection();
         SOAPEnvelope envelope = getSOAPEnvelope("", "MakeConnection.xml");
         OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(new QName (mcNamespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
         makeConnection.fromOMElement(makeConnectionElement);
@@ -49,21 +49,17 @@ public class MakeConnectionTest extends SandeshaTestCase {
         assertNotNull(identifier);
         assertEquals(identifier.getIdentifier(),"urn:uuid:6367739C8350488CD411576188379313");
         
-        Address address = makeConnection.getAddress();
-        assertNotNull(address);
-        assertEquals(address.getAddress(),"http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
-
+        String address = makeConnection.getAddress();
+        assertEquals(address,"http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
     }
 
     public void testToSOAPEnvelope()  throws SandeshaException {
-        MakeConnection makeConnection = new MakeConnection (mcNamespaceValue);
+        MakeConnection makeConnection = new MakeConnection ();
 
-        Address address = new Address (mcNamespaceValue);
-        address.setAddress("http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
         Identifier identifier = new Identifier (rmNamespaceValue);
         identifier.setIndentifer("uuid:c3671020-15e0-11da-9b3b-f0439d4867bd");
         
-        makeConnection.setAddress(address);
+        makeConnection.setAddress("http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
         makeConnection.setIdentifier(identifier);
 
         SOAPEnvelope envelope = getEmptySOAPEnvelope();

@@ -550,7 +550,7 @@ public class RMMsgContext {
 					terminateSequenceResponse.fromOMElement(body);
 				}
 			}else if(Sandesha2Constants.SPEC_2007_02.QNames.MakeConnection.equals(firstBodyQName)) {
-				makeConnection = new MakeConnection(namespace);
+				makeConnection = new MakeConnection();
 				makeConnection.fromOMElement(firstBodyElement);
 			}
 		}

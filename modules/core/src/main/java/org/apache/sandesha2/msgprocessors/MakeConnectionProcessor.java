@@ -56,7 +56,6 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.workers.SenderWorker;
 import org.apache.sandesha2.workers.WorkerLock;
-import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.MessagePending;
@@ -81,7 +80,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 
 		MakeConnection makeConnection = rmMsgCtx.getMakeConnection();
 		
-		Address address = makeConnection.getAddress();
+		String address = makeConnection.getAddress();
 		Identifier identifier = makeConnection.getIdentifier();
 		
 		// If there is no address or identifier - make the MissingSelection Fault.
@@ -141,7 +140,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		findSenderBean.setTransportAvailable(false);
 		
 		if (address!=null)
-			findSenderBean.setToAddress(address.getAddress());
+			findSenderBean.setToAddress(address);
 		
 		if (identifier!=null){
 			if(log.isDebugEnabled()) log.debug("identifier set, this violates RSP " + identifier);

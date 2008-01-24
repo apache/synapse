@@ -26,39 +26,30 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
+/**
+ * Only MC namespace supported
+ */
 public class MakeConnection implements IOMRMPart {
 
-	private String namespaceValue = null;
-	
 	Identifier identifier = null;
-	
-	Address address = null;
-	
+	String address = null;
 	QName unexpectedElement = null;
 	
-	public MakeConnection (String namespaceValue) throws SandeshaException {
-		
-		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.specDoesNotSupportElement,
-					namespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
-		this.namespaceValue = namespaceValue;
+	public MakeConnection(){
 	}
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
-		OMElement elem = body.getFirstChildWithName(new QName(namespaceValue,
+		OMElement elem = body.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2007_02.MC_NS_URI,
 				Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
 		if (elem!=null)
 			elem.detach();
@@ -89,23 +80,16 @@ public class MakeConnection implements IOMRMPart {
 			identifier.fromOMElement(identifierElement);
 		}
 		
-		if (addressElement!=null) {
-			address = new Address (namespaceValue);
-			address.fromOMElement(makeConnectionElement);
+		if (addressElement!=null) {			
+			address = addressElement.getText();
+			if (address == null || "".equals(address))
+				throw new OMException(
+						SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.cannotFindAddressText,
+								addressElement.toString()));
 		}
 		
 		return this;
-	}
-
-	public String getNamespaceValue() {
-		return namespaceValue;
-	}
-
-	public boolean isNamespaceSupported(String namespaceName) {
-		if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(namespaceName))
-			return true;
-		
-		return false;
 	}
 
 	public OMElement toOMElement(OMElement body) throws OMException {
@@ -117,13 +101,18 @@ public class MakeConnection implements IOMRMPart {
 		}
 
 		OMFactory factory = body.getOMFactory();
-		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_MC);
-		OMElement makeConnectionElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION,rmNamespace);
+		OMElement makeConnectionElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION,Sandesha2Constants.SPEC_2007_02.OM_MC_NS_URI);
 		
 		if (identifier!=null)
 			identifier.toOMElement(makeConnectionElement, Sandesha2Constants.SPEC_2007_02.OM_NS_URI);
-		if (address!=null)
-			address.toOMElement(makeConnectionElement);
+		if (address!=null){
+			if (address == null ||  address.length()==0 )
+				throw new OMException(SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.addressNotValid));
+			OMElement addressElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ADDRESS, Sandesha2Constants.SPEC_2007_02.OM_MC_NS_URI);
+			addressElement.setText(address);
+			makeConnectionElement.addChild(addressElement);
+		}
 
 		// Added to test Invalid MakeConnection messages
 		if (unexpectedElement != null)
@@ -138,11 +127,11 @@ public class MakeConnection implements IOMRMPart {
 		return body;
 	}
 
-	public Address getAddress() {
+	public String getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(String address) {
 		this.address = address;
 	}
 
@@ -160,5 +149,13 @@ public class MakeConnection implements IOMRMPart {
 
 	public QName getUnexpectedElement() {
 		return unexpectedElement;
+	}
+
+	public String getNamespaceValue() {
+		return Sandesha2Constants.SPEC_2007_02.MC_NS_URI;
+	}
+
+	public boolean isNamespaceSupported(String namespaceName) {
+		return Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(namespaceName);
 	}	
 }

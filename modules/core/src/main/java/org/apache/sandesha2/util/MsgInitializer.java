@@ -147,9 +147,8 @@ public class MsgInitializer {
 		}
 		
 		if (rmMsgContext.getMessagePending() != null) {
-			String makeConnectionNamespace = rmMsgContext.getMessagePending().getNamespaceValue();
-			if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(makeConnectionNamespace))
-				rmNamespace = Sandesha2Constants.SPEC_2007_02.NS_URI;
+			//MessagePending only supported in 1.1 namespace... no need to check the namespace value
+			rmNamespace = Sandesha2Constants.SPEC_2007_02.NS_URI;
 		}
 		if (rmNamespace!=null)
 			rmMsgContext.setRMNamespaceValue(rmNamespace);

@@ -19,16 +19,11 @@
 
 package org.apache.sandesha2.wsrm;
 
-import java.util.Iterator;
-
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -41,30 +36,32 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
  * The 2005/02 spec includes a 'MessageNumber' part in the ack request, but
  * the 2006/08 spec does not. As the message number was never used in our
  * implementation we simply ignore it.
+ * 
+ * Either RM10 or RM11 namespace supported
  */
 
-public class AckRequested implements IOMRMPart {
+public class AckRequested implements RMHeaderPart {
 	
 	private Identifier identifier;
 	private String namespaceValue = null;
 	private boolean mustUnderstand = false;
-	
+	private OMNamespace omNamespace = null;
 	private OMElement originalAckRequestedElement;
 	
 	public AckRequested(String namespaceValue) throws SandeshaException {
-		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownSpec,
-					namespaceValue));
-		
 		this.namespaceValue = namespaceValue;
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
+			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
+		}else{
+			omNamespace = Sandesha2Constants.SPEC_2007_02.OM_NS_URI;
+		}
 	}
 
 	public String getNamespaceValue() {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement ackReqElement) throws OMException,SandeshaException {
+	public Object fromHeaderBlock(SOAPHeaderBlock ackReqElement) throws OMException,SandeshaException {
 		originalAckRequestedElement = ackReqElement;
 		identifier = new Identifier(namespaceValue);
 		OMElement identifierPart = ackReqElement.getFirstChildWithName(new QName(
@@ -74,48 +71,9 @@ public class AckRequested implements IOMRMPart {
 		}
 
 		// Indicate that we have processed this SOAPHeaderBlock
-		((SOAPHeaderBlock)ackReqElement).setProcessed();
+		ackReqElement.setProcessed();
 
 		return this;
-	}
-
-	public OMElement toOMElement(OMElement header) throws OMException {
-
-		if (header == null || !(header instanceof SOAPHeader))
-			throw new OMException(
-					SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.ackRequestedCannotBeAddedToNonHeader));
-
-		if (identifier == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.ackRequestNullID));
-		
-		OMFactory factory = header.getOMFactory();
-		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-
-		Iterator iter = header.getChildrenWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
-		while (iter.hasNext()) {
-			OMElement ackRequestedElement = (OMElement) iter.next();
-			
-			OMElement identifierElement = ackRequestedElement.getFirstChildWithName(new QName (namespaceValue,
-					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
-			String identifierVal = null;
-			if (identifierElement!=null)
-				identifierVal = identifierElement.getText();
-			
-			if (identifierVal!=null && 
-					(identifierVal.equals(identifier.getIdentifier()) || identifierVal.equals(Sandesha2Constants.TEMP_SEQUENCE_ID)))
-				ackRequestedElement.detach();
-			
-		}
-		
-		SOAPHeader SOAPHdr = (SOAPHeader) header;
-		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
-		ackReqHdrBlock.setMustUnderstand(isMustUnderstand());
-
-		identifier.toOMElement(ackReqHdrBlock, rmNamespace);
-
-		return header;
 	}
 
 	public void setIdentifier(Identifier identifier) {
@@ -125,17 +83,6 @@ public class AckRequested implements IOMRMPart {
 	public Identifier getIdentifier() {
 		return identifier;
 	}
-
-	public void toSOAPEnvelope(SOAPEnvelope envelope) {
-		SOAPHeader header = envelope.getHeader();
-		
-		if (header==null) {
-			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
-			header = factory.createSOAPHeader(envelope);
-		}
-		
-		toOMElement(header);
-	}
 	
 	public boolean isMustUnderstand() {
 		return mustUnderstand;
@@ -144,19 +91,18 @@ public class AckRequested implements IOMRMPart {
 	public void setMustUnderstand(boolean mustUnderstand) {
 		this.mustUnderstand = mustUnderstand;
 	}
-	
-	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
-			return true;
 		
-		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
-			return true;
-		
-		return false;
-	}
-	
 	public OMElement getOriginalAckRequestedElement() {
 		return originalAckRequestedElement;
 	}
-	
+
+	public void toHeader(SOAPHeader header) throws SandeshaException {
+		if (identifier == null)
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.ackRequestNullID));
+				
+		SOAPHeaderBlock ackReqHdrBlock = header.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, omNamespace);
+		ackReqHdrBlock.setMustUnderstand(isMustUnderstand());
+		identifier.toOMElement(ackReqHdrBlock, omNamespace);
+	}
 }

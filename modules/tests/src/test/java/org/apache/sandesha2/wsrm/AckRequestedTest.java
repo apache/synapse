@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
@@ -39,7 +40,7 @@ public class AckRequestedTest extends SandeshaTestCase {
 		QName name = new QName(rmNamespace, "AckRequested");
 		AckRequested ackReq = new AckRequested(rmNamespace);
 		SOAPEnvelope env = getSOAPEnvelope("", "AckRequested.xml");
-		ackReq.fromOMElement(env.getHeader().getFirstChildWithName(name));
+		ackReq.fromHeaderBlock((SOAPHeaderBlock) env.getHeader().getFirstChildWithName(name));
 		
 		Identifier identifier = ackReq.getIdentifier();
 		assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifier.getIdentifier());
@@ -52,7 +53,7 @@ public class AckRequestedTest extends SandeshaTestCase {
 		ackReq.setIdentifier(identifier);
 		
 		SOAPEnvelope env = getEmptySOAPEnvelope();
-		ackReq.toSOAPEnvelope(env);
+		ackReq.toHeader(env.getHeader());
 		
 		OMElement ackReqPart = env.getHeader().getFirstChildWithName(
 				new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));

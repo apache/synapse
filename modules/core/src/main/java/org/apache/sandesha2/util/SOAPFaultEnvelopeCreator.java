@@ -130,7 +130,7 @@ public class SOAPFaultEnvelopeCreator {
 		}
 		sequenceFault.setFaultCode(faultCode);
 		
-		sequenceFault.toOMElement(faultMessageContext.getEnvelope().getHeader());
+		sequenceFault.toHeader(faultMessageContext.getEnvelope().getHeader());
 	}
 
 	/**

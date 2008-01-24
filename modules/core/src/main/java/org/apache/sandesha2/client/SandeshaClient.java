@@ -860,7 +860,7 @@ public class SandeshaClient {
 		identifier.setIndentifer(sequenceID);
 		ackRequested.setIdentifier(identifier);
 
-		ackRequested.toSOAPEnvelope(dummyEnvelope);
+		ackRequested.toHeader(dummyEnvelope.getHeader());
 
 		return dummyEnvelope;
 	}

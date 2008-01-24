@@ -22,56 +22,21 @@ package org.apache.sandesha2.wsrm;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.Constants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
-public class MessagePending implements IOMRMPart {
+/**
+ * Only RM11 namespace supported
+ */
+public class MessagePending implements RMHeaderPart {
 
 	boolean pending = false;
-	String namespaceValue = null;
-	
-	public MessagePending (String namespaceValue) throws SandeshaException {
-		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownSpec,
-					namespaceValue));
-		
-		this.namespaceValue = namespaceValue;
-	}
-	
-	public void toSOAPEnvelope(SOAPEnvelope envelope) {
-		SOAPHeader header = envelope.getHeader();
-		
-		if (header==null) {
-			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
-			header = factory.createSOAPHeader(envelope);
-		}
-		
-		//detach if already exist.
-		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,
-				Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
-		if (elem!=null)
-			elem.detach();
-		
-		toOMElement(header);
-	}
 
-	public String getNamespaceValue() {
-		return namespaceValue;
-	}
-
-	public Object fromOMElement(OMElement messagePendingElement) throws OMException,
+	public Object fromHeaderBlock(SOAPHeaderBlock messagePendingElement) throws OMException,
 			SandeshaException {
 		
 		OMAttribute pendingAttr = messagePendingElement.getAttribute(new QName (Sandesha2Constants.WSRM_COMMON.PENDING));
@@ -91,34 +56,9 @@ public class MessagePending implements IOMRMPart {
 		}
 		
 		// Mark this element as processed
-		((SOAPHeaderBlock)messagePendingElement).setProcessed();
+		messagePendingElement.setProcessed();
 
 		return messagePendingElement;
-	}
-
-	public OMElement toOMElement(OMElement headerElement) throws OMException {
-		if (!(headerElement instanceof SOAPHeader)) {
-			String message = "'MessagePending' element can only be added to a SOAP Header";
-			throw new OMException(message);
-		}
-		
-		SOAPHeader header = (SOAPHeader) headerElement;
-		OMFactory factory = header.getOMFactory();
-		OMNamespace namespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		
-		SOAPHeaderBlock headerBlock = header.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING,namespace);
-		
-		OMAttribute attribute = factory.createOMAttribute(Sandesha2Constants.WSRM_COMMON.PENDING,null, Boolean.valueOf (pending).toString());
-		headerBlock.addAttribute(attribute);
-		
-		return headerElement;
-	}
-
-	public boolean isNamespaceSupported(String namespaceName) {
-		if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(namespaceName))
-			return true;
-		
-		return false;
 	}
 
 	public boolean isPending() {
@@ -129,5 +69,8 @@ public class MessagePending implements IOMRMPart {
 		this.pending = pending;
 	}
 
-	
+	public void toHeader(SOAPHeader header){		
+		SOAPHeaderBlock headerBlock = header.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING,Sandesha2Constants.SPEC_2007_02.OM_MC_NS_URI);
+		headerBlock.addAttribute(Sandesha2Constants.WSRM_COMMON.PENDING, Boolean.valueOf (pending).toString(), null);
+	}	
 }

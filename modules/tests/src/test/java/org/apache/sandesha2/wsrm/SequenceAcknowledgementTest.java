@@ -21,6 +21,7 @@ import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 
@@ -40,7 +41,7 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
     	  QName name = new QName(rmNamespace, "SequenceAcknowledgement");
         SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "SequenceAcknowledgement.xml");
-        sequenceAck.fromOMElement(env.getHeader().getFirstChildWithName(name));
+        sequenceAck.fromHeaderBlock((SOAPHeaderBlock) env.getHeader().getFirstChildWithName(name));
 
         Identifier identifier = sequenceAck.getIdentifier();
         assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifier.getIdentifier());
@@ -74,14 +75,14 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
     }
 
-    public void testToOMElement()  throws SandeshaException {
+    public void testToOMElement()  throws Exception {
         SequenceAcknowledgement seqAck = new SequenceAcknowledgement(rmNamespace);
         Identifier identifier = new Identifier(rmNamespace);
         identifier.setIndentifer("uuid:897ee740-1624-11da-a28e-b3b9c4e71445");
         seqAck.setIdentifier(identifier);
 
         SOAPEnvelope env = getEmptySOAPEnvelope();
-        seqAck.toSOAPEnvelope(env);
+        seqAck.toHeader(env.getHeader());
 
         OMElement sequenceAckPart = env.getHeader().getFirstChildWithName(
                 new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));

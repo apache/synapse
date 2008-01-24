@@ -104,6 +104,7 @@ public interface Sandesha2Constants {
 		OMNamespace OM_NS_URI = OMAbstractFactory.getOMFactory().createOMNamespace(NS_URI, "wsrm");
 
 		String MC_NS_URI            = "http://docs.oasis-open.org/ws-rx/wsmc/200702";
+		OMNamespace OM_MC_NS_URI = OMAbstractFactory.getOMFactory().createOMNamespace(MC_NS_URI, "wsmc");
 		String ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsmc/200702/anonymous?id=";
 		String SEC_NS_URI           = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 		String ADDRESSING_NS_URI    = AddressingConstants.Final.WSA_NAMESPACE;

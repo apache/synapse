@@ -29,6 +29,8 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -90,6 +92,8 @@ public class RMMsgContext {
 	 * envelope. In other words all the MessageParts that are available in the RMMsg will be added to the SOAP 
 	 * envelope after this.
 	 * 
+	 * TODO Re-work this method as it's poorly named and confusing.
+	 * 
 	 * @throws SandeshaException
 	 */
 	public void addSOAPEnvelope() throws AxisFault {
@@ -109,20 +113,47 @@ public class RMMsgContext {
 
 		SOAPEnvelope envelope = msgContext.getEnvelope();
 		
-		if(sequence != null){
-			sequence.toSOAPEnvelope(envelope);
+		boolean goingToAddHeader = (sequence != null) || (sequenceAcknowledgements.size()>0) || ackRequests.size()>0 || sequenceFault!=null || usesSequenceSTR!=null ||messagePending!=null;
+		if(goingToAddHeader){
+			// Clean up the SOAPHeader...
+			SOAPHeader header = envelope.getHeader();
+			if(header == null){
+				header = ((SOAPFactory)envelope.getOMFactory()).createSOAPHeader(envelope);
+			}else{
+				Iterator existingHeaders = header.getChildElements();
+				while(existingHeaders.hasNext()){
+					OMElement oe = (OMElement)existingHeaders.next();
+					if(rmNamespaceValue.equals(oe.getLocalName())){
+						oe.detach();
+					}
+				}
+			}
+			
+			// Set up any header elements
+			if(sequence != null){
+				sequence.toHeader(header);
+			}
+			//there can be more than one sequence ack or ack request in a single message.
+			for (Iterator iter=sequenceAcknowledgements.iterator();iter.hasNext();) {
+				SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
+				sequenceAck.toHeader(header);
+			}
+			for (Iterator iter=ackRequests.iterator();iter.hasNext();) {
+				AckRequested ackReq = (AckRequested) iter.next();
+				ackReq.toHeader(header);
+			}
+			if(sequenceFault != null){
+				sequenceFault.toHeader(header);
+			}
+			if(usesSequenceSTR != null){
+				usesSequenceSTR.toHeader(header);
+			}
+			if(messagePending != null){
+				messagePending.toHeader(header);
+			}
 		}
 		
-		//there can be more than one sequence ack or ack request in a single message.
-		for (Iterator iter=sequenceAcknowledgements.iterator();iter.hasNext();) {
-			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
-			sequenceAck.toSOAPEnvelope(envelope);
-		}
-		for (Iterator iter=ackRequests.iterator();iter.hasNext();) {
-			AckRequested ackReq = (AckRequested) iter.next();
-			ackReq.toSOAPEnvelope(envelope);
-		}
-		
+		// Then set up the body element (if appropriate)
 		if(createSequence != null){
 			createSequence.toSOAPEnvelope(envelope);
 		}
@@ -141,19 +172,9 @@ public class RMMsgContext {
 		if(closeSequenceResponse != null){
 			closeSequenceResponse.toSOAPEnvelope(envelope);
 		}
-		if(usesSequenceSTR != null){
-			usesSequenceSTR.toSOAPEnvelope(envelope);
-		}
-		if(messagePending != null){
-			messagePending.toSOAPEnvelope(envelope);
-		}
 		if(makeConnection != null){
 			makeConnection.toSOAPEnvelope(envelope);
 		}
-		if(sequenceFault != null){
-			sequenceFault.toSOAPEnvelope(envelope);
-		}
-		
 	}
 
 	public int getMessageType() {
@@ -466,11 +487,11 @@ public class RMMsgContext {
 					SandeshaMessageKeys.nullPassedElement));
 
 		// Check for RM defined elements, using either spec version
-		OMElement header = envelope.getHeader();
+		SOAPHeader header = envelope.getHeader();
 		SOAPBody body = envelope.getBody();
 
 		if(header != null){
-			processHeaders(envelope);
+			processHeaders(header);
 		}
 		if(body != null){
 			processBody(body);
@@ -535,61 +556,50 @@ public class RMMsgContext {
 		}
 	}
 	
-	private void processHeaders(SOAPEnvelope envelope) throws AxisFault {
+	private void processHeaders(SOAPHeader header) throws AxisFault {
+		Iterator headers = header.getChildElements();
+		while(headers.hasNext()){
+			SOAPHeaderBlock element = (SOAPHeaderBlock)headers.next();
+			QName elementName = element.getQName();
+			String namespace = elementName.getNamespaceURI();
+			String localName = elementName.getLocalPart();
 
-		if (envelope == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.nullPassedElement));
+			boolean isSPEC2007_02 = SPEC_2007_02.NS_URI.equals(namespace);
+			boolean isSPEC2005_02 = false;
+			if(!isSPEC2007_02){
+				isSPEC2005_02 = SPEC_2005_02.NS_URI.equals(namespace);
+			}
 
-		SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
-		OMElement header = envelope.getHeader();
-
-		if(header!=null)
-		{
-			Iterator headers = header.getChildElements();
-			while(headers.hasNext()){
-				OMElement element = (OMElement)headers.next();
-				QName elementName = element.getQName();
-				String namespace = elementName.getNamespaceURI();
-				String localName = elementName.getLocalPart();
-				
-				boolean isSPEC2007_02 = SPEC_2007_02.NS_URI.equals(namespace);
-				boolean isSPEC2005_02 = false;
-				if(!isSPEC2007_02){
-					isSPEC2005_02 = SPEC_2005_02.NS_URI.equals(namespace);
+			if(isSPEC2005_02 || isSPEC2007_02){
+				boolean isProcessed = false;
+				if(isSPEC2007_02){
+					if(WSRM_COMMON.USES_SEQUENCE_STR.equals(localName)){
+						usesSequenceSTR = new UsesSequenceSTR();
+						usesSequenceSTR.fromHeaderBlock(element);
+						isProcessed = true;
+					}else if(WSRM_COMMON.MESSAGE_PENDING.equals(localName)){
+						messagePending = new MessagePending();
+						messagePending.fromHeaderBlock(element);
+						isProcessed = true;
+					}
 				}
-				
-				if(isSPEC2005_02 || isSPEC2007_02){
-					boolean isProcessed = false;
-					if(isSPEC2007_02){
-						if(WSRM_COMMON.USES_SEQUENCE_STR.equals(localName)){
-							usesSequenceSTR = new UsesSequenceSTR(factory, namespace);
-							usesSequenceSTR.fromOMElement(element);
-							isProcessed = true;
-						}else if(WSRM_COMMON.MESSAGE_PENDING.equals(localName)){
-							messagePending = new MessagePending(namespace);
-							messagePending.fromOMElement(element);
-							isProcessed = true;
-						}
-					}
-					
-					if(!isProcessed){
-						if(WSRM_COMMON.SEQUENCE.equals(localName)){
-							sequence = new Sequence(namespace);
-							sequence.fromOMElement(element);
-						}else if(WSRM_COMMON.SEQUENCE_ACK.equals(localName)){
-							SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(namespace);
-							sequenceAcknowledgement.fromOMElement(element);
-							sequenceAcknowledgements.add(sequenceAcknowledgement);
-						}else if(WSRM_COMMON.ACK_REQUESTED.equals(localName)){
-							AckRequested ackRequest = new AckRequested(namespace);
-							ackRequest.fromOMElement(element);
-							ackRequests.add(ackRequest);
-						}else if(WSRM_COMMON.SEQUENCE_FAULT.equals(localName)){
-							sequenceFault = new SequenceFault(namespace);
-							sequenceFault.fromOMElement(element);
-						}	
-					}
+
+				if(!isProcessed){
+					if(WSRM_COMMON.SEQUENCE.equals(localName)){
+						sequence = new Sequence(namespace);
+						sequence.fromHeaderBlock(element);
+					}else if(WSRM_COMMON.SEQUENCE_ACK.equals(localName)){
+						SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(namespace);
+						sequenceAcknowledgement.fromHeaderBlock(element);
+						sequenceAcknowledgements.add(sequenceAcknowledgement);
+					}else if(WSRM_COMMON.ACK_REQUESTED.equals(localName)){
+						AckRequested ackRequest = new AckRequested(namespace);
+						ackRequest.fromHeaderBlock(element);
+						ackRequests.add(ackRequest);
+					}else if(WSRM_COMMON.SEQUENCE_FAULT.equals(localName)){
+						sequenceFault = new SequenceFault(namespace);
+						sequenceFault.fromHeaderBlock(element);
+					}	
 				}
 			}
 		}

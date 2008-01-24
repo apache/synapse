@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
@@ -106,8 +107,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				try {
 					SOAPHeader header = env.getHeader();
 					if(header != null) {
+						SOAPHeaderBlock shb = (SOAPHeaderBlock) header.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence);
 						Sequence sequence = new Sequence(Sandesha2Constants.SPEC_2005_02.NS_URI);
-						sequence.fromOMElement(header);
+						sequence.fromHeaderBlock(shb);
 						if(sequence.getLastMessage() != null) {
 							lastMessageHeader = true;
 						}

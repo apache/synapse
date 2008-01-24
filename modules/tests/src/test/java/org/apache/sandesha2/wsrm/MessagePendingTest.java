@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
@@ -38,24 +39,24 @@ public class MessagePendingTest extends SandeshaTestCase  {
 
     public void testFromOMElement()  throws SandeshaException {
     	
-    	MessagePending messagePending = new MessagePending (mcNamespace);
+    	MessagePending messagePending = new MessagePending ();
     	SOAPEnvelope env = getSOAPEnvelope("", "MessagePending.xml");
     	
     	OMElement messagePendingElement = env.getHeader().getFirstChildWithName( 
     			new QName (mcNamespace,Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
-    	messagePending.fromOMElement(messagePendingElement);
+    	messagePending.fromHeaderBlock((SOAPHeaderBlock) messagePendingElement);
  
     	assertTrue(messagePending.isPending());
     }
 
     public void testToOMElement()  throws SandeshaException {
     	
-    	MessagePending messagePending = new MessagePending (mcNamespace);
+    	MessagePending messagePending = new MessagePending ();
     	messagePending.setPending(true);
     	
     	
         SOAPEnvelope env = getEmptySOAPEnvelope();
-        messagePending.toSOAPEnvelope(env);
+        messagePending.toHeader(env.getHeader());
 
         OMElement messagePendingElement = env.getHeader().getFirstChildWithName(
         		new QName (mcNamespace,Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));

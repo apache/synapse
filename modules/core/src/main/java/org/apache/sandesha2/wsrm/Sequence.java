@@ -20,13 +20,12 @@
 package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -37,9 +36,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 /**
  * Represents a Sequence element which get carried within a RM application 
  * message.
+ * 
+ * Either RM10 or RM11 namespace supported
  */
-
-public class Sequence implements IOMRMPart {
+public class Sequence implements RMHeaderPart {
 
 	private Identifier identifier;
 	private MessageNumber messageNumber;
@@ -48,21 +48,19 @@ public class Sequence implements IOMRMPart {
 	private OMNamespace omNamespace = null;
 	
 	public Sequence(String namespaceValue) throws SandeshaException {
-		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownSpec,
-					namespaceValue));
-		
 		this.namespaceValue = namespaceValue;
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
+			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
+		}else{
+			omNamespace = Sandesha2Constants.SPEC_2007_02.OM_NS_URI;
+		}
 	}
 
 	public String getNamespaceValue() {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement ome) throws OMException,SandeshaException {
-		SOAPHeaderBlock shb = (SOAPHeaderBlock)ome;
-
+	public Object fromHeaderBlock(SOAPHeaderBlock shb) throws OMException,SandeshaException {
 		if (shb == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noSequencePartInElement));
@@ -101,34 +99,6 @@ public class Sequence implements IOMRMPart {
 		return this;
 	}
 	
-	public OMElement toOMElement(OMElement headerElement) throws OMException {
-
-		if (headerElement == null || !(headerElement instanceof SOAPHeader))
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.seqElementCannotBeAddedToNonHeader));
-
-		SOAPHeader soapHeader = (SOAPHeader) headerElement;
-
-		if (identifier == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.nullMsgId));
-		if (messageNumber == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.seqPartIsNull));
-
-		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE, omNamespace);
-		
-    // Always set the MustUnderstand to true for Sequence messages 
-		sequenceHeaderBlock.setMustUnderstand(true);
-		identifier.toOMElement(sequenceHeaderBlock, omNamespace);
-		messageNumber.toOMElement(sequenceHeaderBlock, omNamespace);
-		if (lastMessage != null)
-			lastMessage.toOMElement(sequenceHeaderBlock);
-
-		return headerElement;
-	}
-
 	public Identifier getIdentifier() {
 		return identifier;
 	}
@@ -152,36 +122,23 @@ public class Sequence implements IOMRMPart {
 	public void setMessageNumber(MessageNumber messageNumber) {
 		this.messageNumber = messageNumber;
 	}
-
-	public void toSOAPEnvelope(SOAPEnvelope envelope) {
-		SOAPHeader header = envelope.getHeader();
-		
-		if (header==null) {
-			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
-			header = factory.createSOAPHeader(envelope);
-		}
-		
-		//detach if already exist.
-		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-		if (elem!=null)
-			elem.detach();
-		
-		toOMElement(header);
-	}
 	
-	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName)) {
-			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
-			return true;
-		}
-		
-		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName)) {
-			omNamespace = Sandesha2Constants.SPEC_2007_02.OM_NS_URI;
-			return true;
-		}
-		
-		return false;
-	}
+	public void toHeader(SOAPHeader header){
+		if (identifier == null)
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullMsgId));
+		if (messageNumber == null)
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.seqPartIsNull));
 
+		SOAPHeaderBlock sequenceHeaderBlock = header.addHeaderBlock(
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, omNamespace);
+		
+		// Always set the MustUnderstand to true for Sequence messages 
+		sequenceHeaderBlock.setMustUnderstand(true);
+		identifier.toOMElement(sequenceHeaderBlock, omNamespace);
+		messageNumber.toOMElement(sequenceHeaderBlock, omNamespace);
+		if (lastMessage != null)
+			lastMessage.toOMElement(sequenceHeaderBlock);
+	}
 }

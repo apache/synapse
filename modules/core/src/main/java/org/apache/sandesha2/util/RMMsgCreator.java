@@ -227,8 +227,8 @@ public class RMMsgCreator {
 			// If we are using token based security, and the 1.1 spec level, then we
 			// should introduce a UsesSequenceSTR header into the message.
 			if(createSequencePart.getNamespaceValue().equals(Sandesha2Constants.SPEC_2007_02.NS_URI)) {
-				UsesSequenceSTR header = new UsesSequenceSTR(null, Sandesha2Constants.SPEC_2007_02.NS_URI);
-				header.toSOAPEnvelope(createSeqmsgContext.getEnvelope());
+				UsesSequenceSTR usesSeqStr = new UsesSequenceSTR();
+				usesSeqStr.toHeader(createSeqmsgContext.getEnvelope().getHeader());
 			}
 
 			// Ensure that the correct token will be used to secure the outbound create sequence message.

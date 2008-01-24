@@ -307,9 +307,9 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	}
 	
 	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) throws SandeshaException {
-		MessagePending messagePending = new MessagePending(namespace);
+		MessagePending messagePending = new MessagePending();
 		messagePending.setPending(true);
-		messagePending.toSOAPEnvelope(returnMessage.getEnvelope());
+		messagePending.toHeader(returnMessage.getEnvelope().getHeader());
 	}
 
 	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction) {

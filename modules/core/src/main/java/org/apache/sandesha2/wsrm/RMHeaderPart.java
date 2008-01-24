@@ -19,29 +19,12 @@
 
 package org.apache.sandesha2.wsrm;
 
-import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 
-/**
- * Class which handles the UsesSequenceSTR header block
- * 
- * Only RM11 namespace supported
- */
-public class UsesSequenceSTR implements RMHeaderPart {
-	
-	public Object fromHeaderBlock(SOAPHeaderBlock headerBlock) throws OMException {
-	    // Set that we have processed the must understand
-		headerBlock.setProcessed();
-		return this;
-	}
-
-	public void toHeader(SOAPHeader header) throws SandeshaException {
-		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = header.addHeaderBlock(
-				Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR,Sandesha2Constants.SPEC_2007_02.OM_NS_URI);
-		// This header _must_ always be understood
-		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
-	}
+public interface RMHeaderPart {
+	public void toHeader (SOAPHeader header) throws SandeshaException;
+	public Object fromHeaderBlock(SOAPHeaderBlock element) throws AxisFault ;
 }

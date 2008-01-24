@@ -45,8 +45,7 @@ public class SequenceTest extends SandeshaTestCase {
         Identifier identifier = sequence.getIdentifier();
         assertEquals("uuid:879da420-1624-11da-bed9-84d13db13902", identifier.getIdentifier());
 
-        MessageNumber msgNo = sequence.getMessageNumber();
-        assertEquals(1, msgNo.getMessageNumber());
+        assertEquals(1, sequence.getMessageNumber());
     }
 
     public void testToSOAPEnvelope()  throws Exception {
@@ -56,9 +55,7 @@ public class SequenceTest extends SandeshaTestCase {
         identifier.setIndentifer("uuid:879da420-1624-11da-bed9-84d13db13902");
         sequence.setIdentifier(identifier);
 
-        MessageNumber msgNo = new MessageNumber(rmNamespace);
-        msgNo.setMessageNumber(1);
-        sequence.setMessageNumber(msgNo);
+        sequence.setMessageNumber(1);
 
         SOAPEnvelope envelope = getEmptySOAPEnvelope();
         sequence.toHeader(envelope.getHeader());

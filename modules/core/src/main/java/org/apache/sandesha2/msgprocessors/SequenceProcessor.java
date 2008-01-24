@@ -101,7 +101,7 @@ public class SequenceProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
 		Sequence sequence = rmMsgCtx.getSequence();
 		String sequenceId = sequence.getIdentifier().getIdentifier();
-		long msgNo = sequence.getMessageNumber().getMessageNumber();
+		long msgNo = sequence.getMessageNumber();
 		boolean lastMessage = sequence.getLastMessage();
 		
 		// Check that both the Sequence header and message body have been secured properly
@@ -212,7 +212,7 @@ public class SequenceProcessor {
 				  findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 			  
 			  findSenderBean.setInboundSequenceId(sequence.getIdentifier().getIdentifier());
-			  findSenderBean.setInboundMessageNumber(sequence.getMessageNumber().getMessageNumber());
+			  findSenderBean.setInboundMessageNumber(sequence.getMessageNumber());
 			  findSenderBean.setSend(true);
 		
 			  SenderBean replyMessageBean = senderBeanMgr.findUnique(findSenderBean);

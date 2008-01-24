@@ -23,8 +23,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -32,6 +36,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 
 /**
@@ -76,13 +81,35 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 			String elementLocalName = element.getQName().getLocalPart();
 			if(namespaceValue.equals(elementNamespace)){
 				if(Sandesha2Constants.WSRM_COMMON.ACK_RANGE.equals(elementLocalName)){
-					AcknowledgementRange ackRange = new AcknowledgementRange(namespaceValue);
-					ackRange.fromOMElement(element);
-					acknowledgementRangeList.add(ackRange);
+					String lowerAttribValue = element.getAttributeValue(new QName(
+							Sandesha2Constants.WSRM_COMMON.LOWER));
+					String upperAttribValue = element.getAttributeValue(new QName(
+							Sandesha2Constants.WSRM_COMMON.UPPER));
+
+					if (lowerAttribValue == null || upperAttribValue == null)
+						throw new OMException(
+								SandeshaMessageHelper.getMessage(
+										SandeshaMessageKeys.noUpperOrLowerAttributesInElement,
+										element.toString()));
+
+					try {
+						long lower = Long.parseLong(lowerAttribValue);
+						long upper = Long.parseLong(upperAttribValue);
+						acknowledgementRangeList.add(new Range(lower, upper));
+					} catch (Exception ex) {
+						throw new OMException(
+								SandeshaMessageHelper.getMessage(
+										SandeshaMessageKeys.ackRandDoesNotHaveCorrectValues,
+										element.toString()));
+					}
 				}else if(Sandesha2Constants.WSRM_COMMON.NACK.equals(elementLocalName)){
-					Nack nack = new Nack(namespaceValue);
-					nack.fromOMElement(element);
-					nackList.add(nack);
+					try {
+						Long nack = Long.valueOf(element.getText());
+						nackList.add(nack);
+					}catch (Exception ex ) {
+						throw new OMException (SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.nackDoesNotContainValidLongValue));
+					}
 				}else if(Sandesha2Constants.WSRM_COMMON.IDENTIFIER.equals(elementLocalName)){
 					identifierPart = element;
 				}else {
@@ -117,13 +144,13 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		acknowledgementRangeList = acknowledgementRagngesList;
 	}
 
-	public Nack addNackRanges(Nack nack) {
+	public Long addNack(Long nack) {
 		nackList.add(nack);
 		return nack;
 	}
 
-	public AcknowledgementRange addAcknowledgementRanges(
-			AcknowledgementRange ackRange) {
+	public Range addAcknowledgementRanges(
+			Range ackRange) {
 		acknowledgementRangeList.add(ackRange);
 		return ackRange;
 	}
@@ -164,9 +191,6 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = header.addHeaderBlock(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,omNamespace);
 		
-		if (sequenceAcknowledgementHeaderBlock == null)
-			throw new OMException("Cant set sequence acknowledgement since the element is null");
-
 		if (identifier == null)
 			throw new OMException(
 					SandeshaMessageHelper.getMessage(
@@ -179,15 +203,39 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 
 		Iterator ackRangeIt = acknowledgementRangeList.iterator();
 		while (ackRangeIt.hasNext()) {
-			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIt
-					.next();
-			ackRange.toOMElement(sequenceAcknowledgementHeaderBlock);
+			Range ackRange = (Range) ackRangeIt.next();
+			
+			if (ackRange.upperValue <= 0 || ackRange.lowerValue <= 0 || ackRange.lowerValue > ackRange.upperValue)
+				throw new OMException(
+						SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.ackRandDoesNotHaveCorrectValues,
+								ackRange.upperValue + ":" + ackRange.lowerValue));
+
+			OMFactory factory = sequenceAcknowledgementHeaderBlock.getOMFactory();
+			
+			OMAttribute lowerAttrib = factory.createOMAttribute(
+					Sandesha2Constants.WSRM_COMMON.LOWER, null, Long.toString(ackRange.lowerValue));
+			OMAttribute upperAttrib = factory.createOMAttribute(
+					Sandesha2Constants.WSRM_COMMON.UPPER, null, Long.toString(ackRange.upperValue));
+
+			OMElement acknowledgementRangeElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACK_RANGE, omNamespace);
+			
+			acknowledgementRangeElement.addAttribute(lowerAttrib);
+			acknowledgementRangeElement.addAttribute(upperAttrib);
+			sequenceAcknowledgementHeaderBlock.addChild(acknowledgementRangeElement);
 		}
 
 		Iterator nackIt = nackList.iterator();
 		while (nackIt.hasNext()) {
-			Nack nack = (Nack) nackIt.next();
-			nack.toOMElement(sequenceAcknowledgementHeaderBlock);
+			Long nack = (Long) nackIt.next();
+			
+			if (nack.longValue()<=0)
+				throw new OMException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.nackDoesNotContainValidLongValue));
+						
+			OMElement nackElement = sequenceAcknowledgementHeaderBlock.getOMFactory().createOMElement(Sandesha2Constants.WSRM_COMMON.NACK,omNamespace);
+			nackElement.setText(nack.toString());
+			sequenceAcknowledgementHeaderBlock.addChild(nackElement);
 		}
 		
 		String rmSpecVersion = SpecSpecificConstants.getSpecVersionString(namespaceValue);

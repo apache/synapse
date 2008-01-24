@@ -67,7 +67,6 @@ import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
-import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -448,10 +447,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			Sequence sequence = rmMsgContext.getSequence();
 			if(sequence == null) {
 				sequence = new Sequence(namespace);
-				
-				MessageNumber msgNumber = new MessageNumber(namespace);
-				msgNumber.setMessageNumber(senderBean.getMessageNumber());
-				sequence.setMessageNumber(msgNumber);
+				sequence.setMessageNumber(senderBean.getMessageNumber());
 
 				if(senderBean.isLastMessage() &&
 				    SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion)) {

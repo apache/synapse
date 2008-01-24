@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.Characters;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.CopyUtils;
@@ -82,7 +81,6 @@ import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.wsrm.AckRequested;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -142,9 +140,7 @@ public class SandeshaUtil {
 
 		Range[] ranges = completedMessageRanges.getRanges();
 		for(int i=0; i<ranges.length; i++){
-			AcknowledgementRange ackRange = new AcknowledgementRange(rmNamespaceValue);
-			ackRange.setLowerValue(ranges[i].lowerValue);
-			ackRange.setUpperValue(ranges[i].upperValue);
+			Range ackRange = new Range(ranges[i].lowerValue, ranges[i].upperValue);
 			ackRanges.add(ackRange);			
 		}
 		

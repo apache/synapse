@@ -28,7 +28,6 @@ import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 import junit.framework.TestCase;
 
@@ -81,24 +80,24 @@ public class SandeshaUtilTest extends TestCase {
 		assertEquals(list.size(),3);
 		
 		Iterator it = list.iterator();
-		AcknowledgementRange ackRange = null;
+		Range ackRange = null;
 		
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),1);
-		assertEquals(ackRange.getUpperValue(),3);
-		
-		ackRange = null;
-		ackRange = (AcknowledgementRange) it.next();
-		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),5);
-		assertEquals(ackRange.getUpperValue(),6);
+		assertEquals(ackRange.lowerValue,1);
+		assertEquals(ackRange.upperValue,3);
 		
 		ackRange = null;
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),8);
-		assertEquals(ackRange.getUpperValue(),8);
+		assertEquals(ackRange.lowerValue,5);
+		assertEquals(ackRange.upperValue,6);
+		
+		ackRange = null;
+		ackRange = (Range) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.lowerValue,8);
+		assertEquals(ackRange.upperValue,8);
 		
 		assertFalse(it.hasNext());
 	}
@@ -119,24 +118,24 @@ public class SandeshaUtilTest extends TestCase {
 		assertEquals(list.size(),3);
 		
 		Iterator it = list.iterator();
-		AcknowledgementRange ackRange = null;
+		Range ackRange = null;
 		
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),1);
-		assertEquals(ackRange.getUpperValue(),4);
-		
-		ackRange = null;
-		ackRange = (AcknowledgementRange) it.next();
-		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),6);
-		assertEquals(ackRange.getUpperValue(),6);
+		assertEquals(ackRange.lowerValue,1);
+		assertEquals(ackRange.upperValue,4);
 		
 		ackRange = null;
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),9);
-		assertEquals(ackRange.getUpperValue(),10);
+		assertEquals(ackRange.lowerValue,6);
+		assertEquals(ackRange.upperValue,6);
+		
+		ackRange = null;
+		ackRange = (Range) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.lowerValue,9);
+		assertEquals(ackRange.upperValue,10);
 		
 		assertFalse(it.hasNext());
 		
@@ -148,16 +147,16 @@ public class SandeshaUtilTest extends TestCase {
 		it = list.iterator();
 		ackRange = null;
 		
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),1);
-		assertEquals(ackRange.getUpperValue(),6);
+		assertEquals(ackRange.lowerValue,1);
+		assertEquals(ackRange.upperValue,6);
 		
 		ackRange = null;
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),9);
-		assertEquals(ackRange.getUpperValue(),10);
+		assertEquals(ackRange.lowerValue,9);
+		assertEquals(ackRange.upperValue,10);
 		
 		assertFalse(it.hasNext());
 		
@@ -170,10 +169,10 @@ public class SandeshaUtilTest extends TestCase {
 		it = list.iterator();
 		ackRange = null;
 		
-		ackRange = (AcknowledgementRange) it.next();
+		ackRange = (Range) it.next();
 		assertNotNull(ackRange);
-		assertEquals(ackRange.getLowerValue(),1);
-		assertEquals(ackRange.getUpperValue(),10);
+		assertEquals(ackRange.lowerValue,1);
+		assertEquals(ackRange.upperValue,10);
 		
 		assertFalse(it.hasNext());
 	}

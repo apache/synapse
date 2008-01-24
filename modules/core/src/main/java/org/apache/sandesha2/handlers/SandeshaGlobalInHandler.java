@@ -159,7 +159,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
     // Check if this is a duplicate message
     Sequence sequence = rmMsgCtx.getSequence();
     String sequenceId = sequence.getIdentifier().getIdentifier();
-    long msgNo = sequence.getMessageNumber().getMessageNumber();
+    long msgNo = sequence.getMessageNumber();
 
     StorageManager storageManager = 
       SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getConfigurationContext(), 

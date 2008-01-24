@@ -25,7 +25,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -72,7 +71,6 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
@@ -241,14 +239,11 @@ public class FaultManager {
 		Iterator it = sequenceAckList.iterator();
 
 		while (it.hasNext()) {
-			AcknowledgementRange acknowledgementRange = (AcknowledgementRange) it.next();
-			long upper = acknowledgementRange.getUpperValue();
-			long lower = acknowledgementRange.getLowerValue();
-
-			if (lower > upper) {
+			Range acknowledgementRange = (Range) it.next();
+			if (acknowledgementRange.lowerValue > acknowledgementRange.upperValue) {
 				invalidAck = true;					
 				// check upper isn't bigger than the highest out msg number
-			} else if ( upper > rmsBean.getHighestOutMessageNumber() ) {
+			} else if ( acknowledgementRange.upperValue > rmsBean.getHighestOutMessageNumber() ) {
 				invalidAck = true;
 			}
 				
@@ -272,7 +267,7 @@ public class FaultManager {
 	 * @throws AxisFault 
 	 */
 	public static void makeInvalidAcknowledgementFault(RMMsgContext rmMsgCtx, 
-			SequenceAcknowledgement sequenceAcknowledgement, AcknowledgementRange acknowledgementRange,
+			SequenceAcknowledgement sequenceAcknowledgement, Range acknowledgementRange,
 			StorageManager storageManager, boolean piggybackedMessage, EndpointReference acksToEPR) throws AxisFault {
 		FaultData data = new FaultData();
 		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMsgCtx.getMessageContext().getEnvelope());
@@ -285,18 +280,8 @@ public class FaultManager {
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMsgCtx.getRMNamespaceValue(), 
 				Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT ));
 		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckFault));
-
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
-		OMNamespace rmNamespace = factory.createOMNamespace(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		OMElement seqAckElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
-	
-		// Set the sequence Id
-		sequenceAcknowledgement.getIdentifier().toOMElement(seqAckElement, rmNamespace);
-
-		// Set the Ack Range
-		acknowledgementRange.toOMElement(seqAckElement);
 		
-		data.setDetail(seqAckElement);
+		data.setDetail(sequenceAcknowledgement.getOriginalSequenceAckElement());
 							
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");

@@ -52,7 +52,6 @@ import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.LastMessageNumber;
-import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 
 
@@ -423,9 +422,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 
 		Sequence sequence = new Sequence(rmNamespaceValue);
-		MessageNumber msgNumber = new MessageNumber(rmNamespaceValue);
-		msgNumber.setMessageNumber(1);
-		sequence.setMessageNumber(msgNumber);
+		sequence.setMessageNumber(1);
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);

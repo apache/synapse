@@ -37,10 +37,10 @@ import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
@@ -238,9 +238,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		sequenceAck.setIdentifier(id);
 		
 		// Set the Invalid range!
-		AcknowledgementRange ackRange = new AcknowledgementRange(rmNamespaceValue);
-		ackRange.setLowerValue(1);
-		ackRange.setUpperValue(3);
+		Range ackRange = new Range(1,3);
 		sequenceAck.addAcknowledgementRanges(ackRange);
 
 		// Set the SequenceAcknowledgement part in the message

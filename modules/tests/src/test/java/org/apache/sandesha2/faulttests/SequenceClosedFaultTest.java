@@ -41,7 +41,6 @@ import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Identifier;
-import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 
 
@@ -152,9 +151,7 @@ public class SequenceClosedFaultTest extends SandeshaTestCase {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 
 		Sequence sequence = new Sequence(rmNamespaceValue);
-		MessageNumber msgNumber = new MessageNumber(rmNamespaceValue);
-		msgNumber.setMessageNumber(1);
-		sequence.setMessageNumber(msgNumber);
+		sequence.setMessageNumber(1);
 		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(uuid);
 		sequence.setIdentifier(id1);

@@ -47,7 +47,6 @@ import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -141,9 +140,9 @@ public class AcknowledgementProcessor {
 		long numberOfNewMessagesAcked = 0;
 
 		while(ackRangeIterator.hasNext()) {
-			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator.next();
-			long lower = ackRange.getLowerValue();
-			long upper = ackRange.getUpperValue();
+			Range ackRange = (Range) ackRangeIterator.next();
+			long lower = ackRange.lowerValue;
+			long upper = ackRange.upperValue;
 			Range ackedRange = new Range(lower, upper);
 			// Quick check to see if the whole range is already covered
 			if(!completedMessages.isRangeCompleted(ackedRange)) {

@@ -16,17 +16,19 @@
 
 package org.apache.sandesha2.wsrm;
 
-import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SandeshaTestCase;
-import org.apache.sandesha2.Sandesha2Constants;
+import java.util.Iterator;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-
-import javax.xml.namespace.QName;
-import java.util.Iterator;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SandeshaTestCase;
+import org.apache.sandesha2.util.Range;
 
 public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
@@ -48,27 +50,27 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
         Iterator iterator = sequenceAck.getAcknowledgementRanges().iterator();
         while (iterator.hasNext()) {
-            AcknowledgementRange ackRange = (AcknowledgementRange) iterator.next();
-            if (ackRange.getLowerValue() == 1){
-                assertEquals(2, ackRange.getUpperValue());
+        	Range ackRange = (Range) iterator.next();
+            if (ackRange.lowerValue == 1){
+                assertEquals(2, ackRange.upperValue);
 
-            } else if (ackRange.getLowerValue() == 4) {
-                assertEquals(6, ackRange.getUpperValue());
+            } else if (ackRange.lowerValue == 4) {
+                assertEquals(6, ackRange.upperValue);
 
-            } else if (ackRange.getLowerValue() == 8) {
-                assertEquals(10, ackRange.getUpperValue());
+            } else if (ackRange.lowerValue == 8) {
+                assertEquals(10, ackRange.upperValue);
             }
         }
 
         iterator = sequenceAck.getNackList().iterator();
         while (iterator.hasNext()) {
-            Nack nack = (Nack) iterator.next();
-            if (nack.getNackNumber() == 3) {
+            Long nack = (Long) iterator.next();
+            if (nack.longValue() == 3) {
 
-            } else if (nack.getNackNumber() == 7) {
+            } else if (nack.longValue() == 7) {
 
             } else {
-                fail("invalid nack : " +  nack.getNackNumber());
+                fail("invalid nack : " +  nack);
             }
         }
 

@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -43,7 +42,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 public class Sequence implements RMHeaderPart {
 
 	private Identifier identifier;
-	private MessageNumber messageNumber;
+	private long messageNumber;
 	private boolean lastMessage = false;
 	private String namespaceValue = null;
 	private OMNamespace omNamespace = null;
@@ -87,8 +86,13 @@ public class Sequence implements RMHeaderPart {
 		
 		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(identifierPart);
-		messageNumber = new MessageNumber(namespaceValue);
-		messageNumber.fromOMElement(msgNumberPart);
+		
+		if (msgNumberPart==null)
+			throw new OMException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noMessageNumberPartInElement));
+		
+		messageNumber = Long.parseLong(msgNumberPart.getText());
+		
 		if(lastMessageElement != null){
 			lastMessage = true;
 		}
@@ -107,7 +111,7 @@ public class Sequence implements RMHeaderPart {
 		return lastMessage;
 	}
 
-	public MessageNumber getMessageNumber() {
+	public long getMessageNumber() {
 		return messageNumber;
 	}
 
@@ -119,7 +123,7 @@ public class Sequence implements RMHeaderPart {
 		this.lastMessage = lastMessage;
 	}
 
-	public void setMessageNumber(MessageNumber messageNumber) {
+	public void setMessageNumber(long messageNumber) {
 		this.messageNumber = messageNumber;
 	}
 	
@@ -127,9 +131,11 @@ public class Sequence implements RMHeaderPart {
 		if (identifier == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.nullMsgId));
-		if (messageNumber == null)
+		if (messageNumber <= 0 ){
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.seqPartIsNull));
+					SandeshaMessageKeys.setAValidMsgNumber,
+					Long.toString(messageNumber)));
+		}
 
 		SOAPHeaderBlock sequenceHeaderBlock = header.addHeaderBlock(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE, omNamespace);
@@ -137,7 +143,11 @@ public class Sequence implements RMHeaderPart {
 		// Always set the MustUnderstand to true for Sequence messages 
 		sequenceHeaderBlock.setMustUnderstand(true);
 		identifier.toOMElement(sequenceHeaderBlock, omNamespace);
-		messageNumber.toOMElement(sequenceHeaderBlock, omNamespace);
+		
+		OMElement messageNoElement = sequenceHeaderBlock.getOMFactory().createOMElement(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER,omNamespace);
+		messageNoElement.setText(Long.toString(messageNumber));
+		sequenceHeaderBlock.addChild(messageNoElement);
+		
 		if (lastMessage){		
 			OMElement lastMessageElement = sequenceHeaderBlock.getOMFactory().createOMElement(Sandesha2Constants.WSRM_COMMON.LAST_MSG, omNamespace);
 			sequenceHeaderBlock.addChild(lastMessageElement);

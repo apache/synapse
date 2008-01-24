@@ -35,7 +35,7 @@ if "%AXIS2_HOME%"=="" set AXIS2_HOME=%~dps0
 rem find AXIS2_HOME if it does not exist due to either an invalid value passed
 rem by the user or the %0 problem on Windows 9x
 
-if exist "%AXIS2_HOME%\..\..\repository\conf\axis2.xml" goto checkJava
+if exist "%AXIS2_HOME%\repository\conf\axis2.xml" goto checkJava
 
 :noAxis2Home
 echo AXIS2_HOME environment variable is set incorrectly or AXIS2 could not be located.
@@ -57,6 +57,7 @@ if ""%1""=="""" goto runAxis2
 if ""%1""==""-http"" goto httpport
 if ""%1""==""-https"" goto httpsport
 if ""%1""==""-name"" goto servername
+if ""%1""==""-xdebug"" goto xdebug
 shift
 goto setupArgs
 
@@ -79,40 +80,56 @@ set _SERVERNAME="-Dserver_name=%1"
 shift
 goto setupArgs
 
+rem is there is a -xdebug in the options
+:xdebug
+set _XDEBUG="wrapper.java.additional.7=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
+shift
+goto setupArgs
+
 :noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 echo JAVA_HOME environment variable is set incorrectly or Java runtime could not be located.
 echo Please set the JAVA_HOME variable appropriately
 goto end
 
+
 :runAxis2
-rem set the classes by looping through the libs
-setlocal EnableDelayedExpansion
-set AXIS2_CLASS_PATH=%AXIS2_HOME%/../../lib;%AXIS2_HOME%/../../repository/conf
-FOR %%C in ("%AXIS2_HOME%\..\..\lib\*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
-
-rem use proper bouncy castle version for the JDK
-
-"%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.4" >NUL
-IF ERRORLEVEL 1 goto checkJdk15
-echo  Using Bouncy castle JAR for Java 1.4
-FOR %%C in ("%AXIS2_HOME%\..\..\lib\bcprov-jdk13*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
-goto runServer
-
-:checkJdk15
-"%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.5" >NUL
-IF ERRORLEVEL 1 goto runServer
-echo  Using Bouncy castle JAR for Java 1.5
-FOR %%C in ("%AXIS2_HOME%\..\..\lib\bcprov-jdk15*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
-
-:runServer
-set AXIS2_ENDORSED=%AXIS2_HOME%\..\..\lib\endorsed
-echo Using JAVA_HOME    %JAVA_HOME%
-echo Using AXIS2_HOME   %AXIS2_HOME%
 
 cd %AXIS2_HOME%
-"%_JAVACMD%" %_HTTPPORT% %_HTTPSPORT% %_SERVERNAME% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.io.tmpdir=%AXIS2_HOME%\..\..\work\temp\sampleServer -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server -repo "%AXIS2_HOME%\repository" -conf "%AXIS2_HOME%\repository\conf\axis2.xml"
-goto end
+echo "Starting Sample Axis2 Server ..."
+echo Using AXIS2_HOME:        %AXIS2_HOME%
+echo Using JAVA_HOME:       %JAVA_HOME%
+
+rem Decide on the wrapper binary.
+set _WRAPPER_BASE=wrapper
+set _WRAPPER_DIR=%AXIS2_HOME%..\..\bin\native\
+set _WRAPPER_EXE=%_WRAPPER_DIR%%_WRAPPER_BASE%-windows-x86-32.exe
+if exist "%_WRAPPER_EXE%" goto conf
+set _WRAPPER_EXE=%_WRAPPER_DIR%%_WRAPPER_BASE%-windows-x86-64.exe
+if exist "%_WRAPPER_EXE%" goto conf
+set _WRAPPER_EXE=%_WRAPPER_DIR%%_WRAPPER_BASE%.exe
+if exist "%_WRAPPER_EXE%" goto conf
+echo Unable to locate a Wrapper executable using any of the following names:
+echo %_WRAPPER_DIR%%_WRAPPER_BASE%-windows-x86-32.exe
+echo %_WRAPPER_DIR%%_WRAPPER_BASE%-windows-x86-64.exe
+echo %_WRAPPER_DIR%%_WRAPPER_BASE%.exe
+pause
+goto :eof
+
+rem
+rem Find the wrapper.conf
+rem
+:conf
+set _WRAPPER_CONF="%AXIS2_HOME%..\..\repository\conf\sample-server-wrapper.conf"
+
+rem
+rem Start the Wrapper
+rem
+:startup
+"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.java.additional.1=%_HTTPPORT% wrapper.java.additional.2=%_HTTPSPORT% wrapper.java.additional.3=%_SERVERNAME% %_XDEBUG%
+
+if not errorlevel 1 goto :eof
+pause
 
 :end
 set _JAVACMD=

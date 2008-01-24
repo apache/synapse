@@ -123,7 +123,7 @@ public class RMMsgContext {
 				Iterator existingHeaders = header.getChildElements();
 				while(existingHeaders.hasNext()){
 					OMElement oe = (OMElement)existingHeaders.next();
-					if(rmNamespaceValue.equals(oe.getLocalName())){
+					if(rmNamespaceValue.equals(oe.getNamespace().getNamespaceURI())){
 						oe.detach();
 					}
 				}

@@ -21,7 +21,6 @@ package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -39,19 +38,13 @@ public class MessagePending implements RMHeaderPart {
 	public Object fromHeaderBlock(SOAPHeaderBlock messagePendingElement) throws OMException,
 			SandeshaException {
 		
-		OMAttribute pendingAttr = messagePendingElement.getAttribute(new QName (Sandesha2Constants.WSRM_COMMON.PENDING));
-		if (pendingAttr==null) {
-			String message = "MessagePending header must have an attribute named 'pending'";
-			throw new SandeshaException (message);
-		}
-		
-		String value = pendingAttr.getAttributeValue();
+		String value = messagePendingElement.getAttributeValue(new QName (Sandesha2Constants.WSRM_COMMON.PENDING));
 		if (Constants.VALUE_TRUE.equals(value))
 			pending = true;
 		else if (Constants.VALUE_FALSE.equals(value))
 			pending = false;
 		else {
-			String message = "Attribute 'pending' must have value 'true' or 'false'";
+			String message = "Attribute 'pending' must have value 'true' or 'false'. Value was:"+value;
 			throw new SandeshaException (message);
 		}
 		

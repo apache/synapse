@@ -35,6 +35,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAPBody;
 import org.jaxen.JaxenException;
 
 import java.util.List;
@@ -73,14 +74,18 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         try {
             Options options = new Options();
             options.setTo(new EndpointReference(serviceURL));
-            options.setAction(action);
+
+            if (action != null) {
+                options.setAction(action);
+            }
+
             options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
             sc.setOptions(options);
 
             OMElement request = getRequestPayload(synCtx);
             if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "About to invoke service : " + serviceURL +
-                    " with action : " + action);
+                traceOrDebug(traceOn, "About to invoke service : " + serviceURL + (action != null ?
+                    " with action : " + action : ""));
                 if (traceOn && trace.isTraceEnabled()) {
                     trace.trace("Request message payload : " + request);
                 }
@@ -120,7 +125,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
             }
 
         } catch (Exception e) {
-            handleException("Error invoking service : " + serviceURL + " with action : " + action, e, synCtx);
+            handleException("Error invoking service : " + serviceURL +
+                (action != null ? " with action : " + action : ""), e, synCtx);
         }
 
         if (traceOrDebugOn) {

@@ -19,11 +19,13 @@
 
 package org.apache.synapse.mediators.eip;
 
-/** Holds all the constants related to the eip mediators */
+/** Constants related to the EIP mediators */
 public final class EIPConstants {
 
-    /** Constant for the correlation property key */
-    public static final String AGGREGATE_CORELATION = "aggregateCorelation";
+    /** Typically the message ID of the parent message in a split/iterate etc so that
+     * its children could be uniquely aggregated by the aggrgate mediator etc
+     */
+    public static final String AGGREGATE_CORRELATION = "aggregateCorelation";
 
     /** Constant for the message sequence property key */
     public static final String MESSAGE_SEQUENCE = "messageSequence";

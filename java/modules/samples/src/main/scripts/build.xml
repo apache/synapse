@@ -183,6 +183,7 @@
 
     <target name="init">
         <mkdir dir="${class.dir}"/>
+        <mkdir dir="./../../work/temp/sampleClient"/>
         <path id="javac.classpath">
             <pathelement path="${class.dir}"/>
             <pathelement path="../../lib"/>

@@ -31,6 +31,14 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
  * The Serializer for Throttle Mediator  saving throttle instance
+ *
+ * <pre>
+ * &lt;throttle [onReject="string"] [onAccept="string"] id="string"&gt;
+ *   (&lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;)
+ *    &lt;onReject&gt;..&lt;/onReject&gt;?
+ *    &lt;onAccept&gt;..&lt;/onAccept&gt;?
+ * &lt;/throttle&gt;
+ * </pre>
  */
 
 public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {

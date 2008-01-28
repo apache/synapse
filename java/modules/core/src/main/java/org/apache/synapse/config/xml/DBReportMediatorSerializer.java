@@ -24,20 +24,31 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.db.DBReportMediator;
 
 /**
- * <dbreport>
- *   <connection>
- *     <jdbc>
- *       <driver/>
- *       <url/>
- *       <user/>
- *       <password/>
- *     </jdbc>
- *   </connection>
- *   <insert>
- *     <sql>insert into table values (?, ?, ..)</sql>
- *     <parameter [property="" | xpath=""] type="int|string"/>*
- *   </insert>+
- * </dbreport>
+ * <pre>
+ * &lt;dbreport&gt;
+ *   &lt;connection&gt;
+ *     &lt;pool&gt;
+ *      (
+ *       &lt;driver/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
+ *     |
+ *       &lt;dsName/&gt;
+ *       &lt;icClass/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
+ *     )
+ *       &lt;property name="name" value="value"/&gt;*
+ *     &lt;/pool&gt;
+ *   &lt;/connection&gt;
+ *   &lt;statement&gt;
+ *     &lt;sql&gt;insert into something values(?, ?, ?, ?)&lt;/sql&gt;
+ *     &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
+ *    &lt;/statement&gt;+
+ * &lt;/dblreport&gt;
+ * </pre>
  */
 public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
 

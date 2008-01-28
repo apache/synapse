@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.xml.sax.InputSource;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,10 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 
 public class SynapseConfigUtils {
 
@@ -117,13 +115,13 @@ public class SynapseConfigUtils {
                     String path = url.getPath();
                     if (log.isDebugEnabled()) {
                         log.debug("Can not open a connection to the URL with a path :" +
-                                  path);
+                            path);
                     }
                     String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
-                                      " URL using the synapse.home : " + synapseHome);
+                                " URL using the synapse.home : " + synapseHome);
                         }
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
@@ -134,7 +132,7 @@ public class SynapseConfigUtils {
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Faild to resolve an absolute path of the " +
-                                          " URL using the synapse.home : " + synapseHome);
+                                    " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL " + url.getPath() + e);
                         }
@@ -146,11 +144,11 @@ public class SynapseConfigUtils {
             }
             URLConnection urlc = url.openConnection();
             XMLToObjectMapper xmlToObject =
-                    getXmlToObjectMapper(urlc.getContentType());
+                getXmlToObjectMapper(urlc.getContentType());
 
             try {
                 XMLStreamReader parser = XMLInputFactory.newInstance().
-                        createXMLStreamReader(urlc.getInputStream());
+                    createXMLStreamReader(urlc.getInputStream());
                 StAXOMBuilder builder = new StAXOMBuilder(parser);
                 OMElement omElem = builder.getDocumentElement();
 
@@ -188,8 +186,8 @@ public class SynapseConfigUtils {
             return null;
         }
         URLConnection conn = url.openConnection();
-        conn.setReadTimeout(10000);
-        conn.setConnectTimeout(2000);
+        conn.setReadTimeout(getReadTimeout());
+        conn.setConnectTimeout(getConnectionTimeout());
         conn.setRequestProperty("Connection", "close"); // if http is being used
         InputStream urlInStream = conn.getInputStream();
 
@@ -201,7 +199,7 @@ public class SynapseConfigUtils {
                 return doc;
             } catch (Exception e) {
                 handleException("Error parsing resource at URL : " + url +
-                                " as XML", e);
+                    " as XML", e);
             } finally {
                 try {
                     urlInStream.close();
@@ -210,6 +208,60 @@ public class SynapseConfigUtils {
             }
         }
         return null;
+    }
+
+    public static InputSource getInputSourceFormURI(URI uri) {
+        if (uri == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Can not create a URL from 'null' ");
+            }
+            return null;
+        }
+        try {
+            URL url = uri.toURL();
+            String protocol = url.getProtocol();
+            String path = url.getPath();
+            if (protocol == null || "".equals(protocol)) {
+                url = new URL("file:" + path);
+            }
+            URLConnection conn = url.openConnection();
+            conn.setReadTimeout(getReadTimeout());
+            conn.setConnectTimeout(getConnectionTimeout());
+            conn.setRequestProperty("Connection", "close"); // if http is being used
+            InputStream urlInStream = conn.getInputStream();
+            return new InputSource(urlInStream);
+        } catch (MalformedURLException e) {
+            handleException("Invalid URL ' " + uri + " '", e);
+        } catch (IOException e) {
+            handleException("Error reading at URI ' " + uri + " ' ", e);
+        }
+        return null;
+    }
+
+    private static int getReadTimeout() {
+        //getting  read timeout
+        String readTO = System.getProperty(SynapseConstants.READTIMEOUT);
+        int readTimeout = SynapseConstants.DEFAULT_READTIMEOUT;
+        if (readTO != null && !"".equals(readTO)) {
+            try {
+                readTimeout = Integer.parseInt(readTO);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return readTimeout;
+    }
+
+    private static int getConnectionTimeout() {
+        //getting  connection timeout
+        String connectionTO = System.getProperty(SynapseConstants.CONNECTTIMEOUT);
+        int connectionTimeout = SynapseConstants.DEFAULT_CONNECTTIMEOUT;
+        if (connectionTO != null && !"".equals(connectionTO)) {
+            try {
+                connectionTimeout = Integer.parseInt(connectionTO);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return connectionTimeout;
     }
 
     private static void handleException(String msg, Exception e) {
@@ -257,7 +309,7 @@ public class SynapseConfigUtils {
                 } catch (IOException ignored) {
                     if (log.isDebugEnabled()) {
                         log.debug("Can not open a connection to the URL with a path :" +
-                                  path);
+                            path);
                     }
                     String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
@@ -266,24 +318,24 @@ public class SynapseConfigUtils {
                         }
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
-                                      " URL using the synapse.home : " + synapseHome);
+                                " URL using the synapse.home : " + synapseHome);
                         }
                         try {
                             url = new URL(url.getProtocol() + ":" + synapseHome + "/" +
-                                          url.getPath());
+                                url.getPath());
                             url.openStream();
                         } catch (MalformedURLException e) {
                             handleException("Invalid URL reference " + url.getPath() + e);
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Faild to resolve an absolute path of the " +
-                                          " URL using the synapse.home : " + synapseHome);
+                                    " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL : " + url.getPath() + e);
                         }
                     }
                 }
-            }             
+            }
         } catch (MalformedURLException e) {
             handleException("Invalid URL reference :  " + path, e);
         } catch (IOException e) {
@@ -291,4 +343,63 @@ public class SynapseConfigUtils {
         }
         return url;
     }
+
+    public static InputSource resolveRelativeURI(String parentLocation, String relativeLocation) {
+
+        if (relativeLocation == null) {
+            throw new IllegalArgumentException("Import URI cannot be null");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Resolving import URI ' " + parentLocation + " '  against base URI ' " + relativeLocation + " '  ");
+        }
+
+        URI importUri = null;
+        try {
+            importUri = new URI(relativeLocation);
+            if (importUri.isAbsolute()) {
+                return getInputSourceFormURI(importUri);
+            }
+        } catch (URISyntaxException e) {
+            handleException("Invalid URI", e);
+        }
+
+        if (parentLocation == null) {
+            return getInputSourceFormURI(importUri);
+        } else {
+            // if the importuri is absolute
+            if (relativeLocation.startsWith("/") || relativeLocation.startsWith("\\")) {
+                if (importUri != null && !importUri.isAbsolute()) {
+                    try {
+                        importUri = new URI("file:" + relativeLocation);
+                        return getInputSourceFormURI(importUri);
+                    } catch (URISyntaxException e) {
+                        handleException("Invalid URI ' " + importUri.getPath() + " '", e);
+                    }
+                }
+            } else {
+                int index = parentLocation.lastIndexOf("/");
+                if (index == -1) {
+                    index = parentLocation.lastIndexOf("\\");
+                }
+                if (index != -1) {
+                    String basepath = parentLocation.substring(0, index + 1);
+                    String resolvedPath = basepath + relativeLocation;
+                    try {
+                        URI resolvedUri = new URI(resolvedPath);
+                        if (!resolvedUri.isAbsolute()) {
+                            resolvedUri = new URI("file:" + resolvedPath);
+                        }
+                        return getInputSourceFormURI(resolvedUri);
+                    } catch (URISyntaxException e) {
+                        handleException("Invalid URI ' " + resolvedPath + " '", e);
+                    }
+                } else {
+                    return getInputSourceFormURI(importUri);
+                }
+            }
+        }
+        return null;
+    }
 }
+

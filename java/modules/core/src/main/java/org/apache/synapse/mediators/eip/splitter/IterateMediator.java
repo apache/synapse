@@ -41,49 +41,42 @@ import java.util.List;
 import java.util.Iterator;
 
 /**
- * This mediator will split the message in the criterian specified to it and inject in to Synapse
+ * Splits a message using an XPath expression and creates a new message to hold
+ * each resulting element. This is very much similar to the clone mediator, and
+ * hands over the newly created messages to a target for processing
  */
 public class IterateMediator extends AbstractMediator implements ManagedLifecycle {
 
-    /**
-     * This holds whether to continue mediation on the parent message or not
-     */
+    /** Continue mediation on the parent message or not? */
     private boolean continueParent = false;
 
     /**
-     * This holds whether to preserve the payload and attach the iteration child to specified node
-     * or to attach the child to the body of the envelope
+     * Preserve the payload as a template to create new messages with the selected
+     * elements with the rest of the parent, or create new message that contain only
+     * the selected element as its payload?
      */
     private boolean preservePayload = false;
 
-    /**
-     * This holds the expression which will be evaluated for the presence of elements in the
-     * mediating message for iterations
-     */
+    /** The XPath that will list the elements to be splitted */
     private AXIOMXPath expression = null;
 
     /**
-     * This holds the node to which the iteration childs will be attached. This does not have any
-     * meaning when the preservePayload is set to false
+     * An XPath expression that specifies where the splitted elements should be attached when
+     * the payload is being preserved
      */
     private AXIOMXPath attachPath = null;
 
-    /**
-     * This holds the target object for the newly created messages by the iteration
-     */
+    /** The target for the newly splitted messages */
     private Target target = null;
 
     /**
-     * This method implemenents the Mediator interface and this mediator implements the message
-     * splitting logic
+     * Splits the message by iterating over the results of the given XPath expression
      *
      * @param synCtx - MessageContext to be mediated
-     * @return boolean false if need to stop processing the parent message, boolean true if further
-     *         processing of the parent message is required
+     * @return boolean false if need to stop processing of the parent message
      */
     public boolean mediate(MessageContext synCtx) {
 
-        // initializes the logging and tracing for the mediator
         boolean traceOn = isTraceOn(synCtx);
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
 
@@ -104,48 +97,44 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
             // get the iteration elements and iterate through the list,
             // this call will also detach all the iteration elements 
             List splitElements = EIPUtils.getDetachedMatchingElements(envelope, expression);
-            if (splitElements != null) {
 
-                int msgCount = splitElements.size();
-                int msgNumber = 0;
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Splitting with XPath : " + expression + " resulted in " +
+                    splitElements.size() + " elements");
+            }
 
-                // if not preservePayload remove all the child elements
-                if (!preservePayload && envelope.getBody() != null) {
-                    for (Iterator itr = envelope.getBody().getChildren(); itr.hasNext();) {
-                        ((OMNode) itr.next()).detach();
-                    }
+            // if not preservePayload remove all the child elements
+            if (!preservePayload && envelope.getBody() != null) {
+                for (Iterator itr = envelope.getBody().getChildren(); itr.hasNext();) {
+                    ((OMNode) itr.next()).detach();
+                }
+            }
+
+            int msgCount = splitElements.size();
+            int msgNumber = 0;
+
+            // iterate through the list
+            for (Object o : splitElements) {
+
+                // for the moment iterator will look for an OMNode as the iteration element
+                if (!(o instanceof OMNode)) {
+                    handleException("Error splitting message with XPath : "
+                        + expression + " - result not an OMNode", synCtx);
                 }
 
-                // iterate through the list
-                for (Object o : splitElements) {
-
-                    // for the moment iterator will look for an OMNode as the iteration element
-                    if (!(o instanceof OMNode)) {
-                        handleException("Error in splitting the message with expression : "
-                            + expression, synCtx);
-                    }
-
-                    target.mediate(
-                        getIteratedMessage(synCtx, msgNumber, msgCount, envelope, (OMNode) o));
-                    msgNumber++;
-
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Submitting " + (msgNumber+1) + " of " + msgNumber +
+                        " messages for processing in parallel");
                 }
 
-            } else {
-                handleException("Splitting by expression : " + expression
-                    + " did not yeild in an OMElement", synCtx);
+                target.mediate(
+                    getIteratedMessage(synCtx, msgNumber++, msgCount, envelope, (OMNode) o));
             }
 
         } catch (JaxenException e) {
-            handleException("Error evaluating XPath expression : " + expression, e, synCtx);
-        } catch (AxisFault axisFault) {
-            handleException("Unable to split the message using the expression : " + expression,
-                axisFault, synCtx);
-        }
-
-        // finalizing the tracing and logging on the iterate mediator
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Iterate mediator");
+            handleException("Error evaluating split XPath expression : " + expression, e, synCtx);
+        } catch (AxisFault af) {
+            handleException("Error creating an iterated copy of the message", af, synCtx);
         }
 
         // if the continuation of the parent message is stopped from here set the RESPONSE_WRITTEN
@@ -156,17 +145,22 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
             opCtx.setProperty(Constants.RESPONSE_WRITTEN,"SKIP");
         }
 
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Iterate mediator");
+        }
+
         // whether to continue mediation on the original message
         return continueParent;
     }
 
     /**
-     * This will create a new message context with the iteration parameters
+     * Create a new message context using the given original message context, the envelope
+     * and the split result element.
      *
      * @param synCtx    - original message context
      * @param msgNumber - message number in the iteration
-     * @param msgCount  - message count in the iteration
-     * @param envelope  - cloned envelope to be used in the iteration
+     * @param msgCount  - total number of messages in the split
+     * @param envelope  - envelope to be used in the iteration
      * @param o         - element which participates in the iteration replacement
      * @return newCtx created by the iteration
      * @throws AxisFault if there is a message creation failure
@@ -177,9 +171,12 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         
         // clone the message for the mediation in iteration
         MessageContext newCtx = MessageHelper.cloneMessageContext(synCtx);
+
         // set the messageSequence property for possibal aggreagtions
-        newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
+        newCtx.setProperty(
+            EIPConstants.MESSAGE_SEQUENCE,
             msgNumber + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + msgCount);
+
         // get a clone of the envelope to be attached
         SOAPEnvelope newEnvelope = MessageHelper.cloneSOAPEnvelope(envelope);
 
@@ -188,24 +185,26 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         if (preservePayload) {
 
             Object attachElem = attachPath.evaluate(newEnvelope);
-            if (attachElem instanceof List) {
+            if (attachElem != null &&
+                attachElem instanceof List && !((List) attachElem).isEmpty()) {
                 attachElem = ((List) attachElem).get(0);
             }
 
             // for the moment attaching element should be an OMElement
-            if (attachElem instanceof OMElement) {
+            if (attachElem != null && attachElem instanceof OMElement) {
                 ((OMElement) attachElem).addChild(o);
             } else {
                 handleException("Error in attaching the splitted elements :: " +
                     "Unable to get the attach path specified by the expression " +
                     attachPath, synCtx);
             }
-            // if not preserve payload then attach the iteration element to the body
+
         } else if (newEnvelope.getBody() != null) {
+            // if not preserve payload then attach the iteration element to the body
             newEnvelope.getBody().addChild(o);
         }
 
-        // set the envelope ant mediate as specified in the target
+        // set the envelope and mediate as specified in the target
         newCtx.setEnvelope(newEnvelope);
 
         return newCtx;

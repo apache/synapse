@@ -19,20 +19,19 @@
 
 package org.apache.synapse.core.axis2;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.xml.sax.InputSource;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A resource map.
@@ -45,7 +44,7 @@ import org.xml.sax.InputSource;
  * object.
  */
 public class ResourceMap {
-    private static final Log log = LogFactory.getLog(ResourceMapURIResolver.class);
+    private static final Log log = LogFactory.getLog(ResourceMap.class);
     
     private final Map/*<String,String>*/ resources = new LinkedHashMap();
     

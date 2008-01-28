@@ -30,13 +30,17 @@ import java.util.Iterator;
  * This will serialize the CloneMediator to the xml configuration as specified bellow
  *
  * <pre>
- *  &lt;clone continueParent=(true | false)&gt;
- *   &lt;target to="TO address" [soapAction="urn:Action"] sequence="sequence ref"
- *                                                         endpoint="endpoint ref"&gt;
- *    &lt;sequence&gt; (mediator +) &lt;/sequence&gt;
- *    &lt;endpoint&gt; endpoint &lt;/endpoint&gt;
- *   &lt;/target&gt;
- *  &lt;/iterate&gt;
+ *  &lt;clone [continueParent=(true | false)]&gt;
+ *   &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"]
+ *          [endpoint="endpoint_ref"]&gt;
+ *     &lt;sequence&gt;
+ *       (mediator)+
+ *     &lt;/sequence&gt;?
+ *     &lt;endpoint&gt;
+ *       endpoint
+ *     &lt;/endpoint&gt;?
+ *   &lt;/target&gt;+
+ * &lt;/clone&gt;
  * </pre>
  */
 public class CloneMediatorSerializer extends AbstractMediatorSerializer {

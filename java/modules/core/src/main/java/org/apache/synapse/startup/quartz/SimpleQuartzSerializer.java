@@ -75,7 +75,8 @@ public class SimpleQuartzSerializer implements StartupSerializer {
             }
 
             if (sq.getInterval() != 0) {
-                el.addAttribute("interval", Long.toString(sq.getInterval()), nullNS);
+                long interval = sq.getInterval() / 1000;
+                el.addAttribute("interval", Long.toString(interval), nullNS);
             }
         }
         

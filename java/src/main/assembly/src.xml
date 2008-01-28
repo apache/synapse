@@ -60,5 +60,9 @@
                 <exclude>**/.settings/**/*</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>patches</directory>
+            <outputDirectory>synapse-${synapse.version}-src/patches</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>

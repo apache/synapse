@@ -221,10 +221,8 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 			
 			
 			Object key = it.next();
-			System.out.println("key "+key);
 			if (key instanceof String) {
 				Object o = this.get(key);
-				System.out.println("key "+key);
 				entry.addAttribute(NAME, (String) key, attrNS);
 				if (o instanceof Character) {
 					entry.addAttribute(TYPE, CHAR, attrNS);

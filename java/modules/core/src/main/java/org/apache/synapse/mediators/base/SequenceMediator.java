@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.base;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.statistics.StatisticsUtils;
@@ -49,6 +50,8 @@ public class SequenceMediator extends AbstractListMediator {
     private String errorHandler = null;
     /** is this definition dynamic */
     private boolean dynamic = false;
+    /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
+    private boolean initialized = false;
     /** the registry key to load this definition if dynamic */
     private String registryKey = null;
 
@@ -178,6 +181,24 @@ public class SequenceMediator extends AbstractListMediator {
         }
 
         return false;
+    }
+
+    /**
+     * This method will ensure that each and every sequence wil only be initialized atmost once
+     * @param se - enviorenment to be initialized
+     */
+    public synchronized void init(SynapseEnvironment se) {
+        if (!initialized) {
+            super.init(se);
+            initialized = true;
+        }
+    }
+
+    public synchronized void destroy() {
+        if (initialized) {
+            super.destroy();
+            initialized = false;
+        }
     }
 
     /**

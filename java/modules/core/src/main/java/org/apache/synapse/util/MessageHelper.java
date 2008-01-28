@@ -15,7 +15,6 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.wso2.throttle.ThrottleConstants;
 
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class MessageHelper {
 
         // set the parent corelation details to the cloned MC -
         //                              for the use of aggregation like tasks
-        newCtx.setProperty(EIPConstants.AGGREGATE_CORELATION, synCtx.getMessageID());
+        newCtx.setProperty(EIPConstants.AGGREGATE_CORRELATION, synCtx.getMessageID());
 
         // copying the core parameters of the synapse MC
         newCtx.setTo(synCtx.getTo());

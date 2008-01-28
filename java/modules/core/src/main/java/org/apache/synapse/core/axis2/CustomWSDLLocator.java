@@ -19,28 +19,34 @@
 
 package org.apache.synapse.core.axis2;
 
-import javax.wsdl.xml.WSDLLocator;
-
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.xml.sax.InputSource;
+
+import javax.wsdl.xml.WSDLLocator;
 
 /**
  * Class that adapts a ResourceMap object to WSDLLocator.
  */
-public class ResourceMapWSDLLocator implements WSDLLocator {
+public class CustomWSDLLocator implements WSDLLocator {
     private final InputSource baseInputSource;
     private final String baseURI;
-    private final ResourceMap resourceMap;
-    private final SynapseConfiguration synCfg;
-    
+    private ResourceMap resourceMap;
+    private SynapseConfiguration synCfg;
+
     private String latestImportURI;
-    
-    public ResourceMapWSDLLocator(InputSource baseInputSource,
+
+    public CustomWSDLLocator(InputSource baseInputSource,
+                                  String baseURI) {
+        this.baseInputSource = baseInputSource;
+        this.baseURI = baseURI;
+    }
+
+    public CustomWSDLLocator(InputSource baseInputSource,
                                   String baseURI,
                                   ResourceMap resourceMap,
                                   SynapseConfiguration synCfg) {
-        this.baseInputSource = baseInputSource;
-        this.baseURI = baseURI;
+        this(baseInputSource, baseURI);
         this.resourceMap = resourceMap;
         this.synCfg = synCfg;
     }
@@ -54,8 +60,14 @@ public class ResourceMapWSDLLocator implements WSDLLocator {
     }
 
     public InputSource getImportInputSource(String parentLocation, String relativeLocation) {
-        InputSource result = resourceMap.resolve(synCfg, relativeLocation);
-        latestImportURI = relativeLocation;
+        InputSource result = null;
+        if (resourceMap != null) {
+            result = resourceMap.resolve(synCfg, relativeLocation);
+        }
+        if (result == null) {
+            result = SynapseConfigUtils.resolveRelativeURI(parentLocation, relativeLocation);
+        }
+        this.latestImportURI = relativeLocation;
         return result;
     }
 

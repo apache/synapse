@@ -432,18 +432,19 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
 
             public void failed(SessionRequest request) {
-                handleError(request);
+                handleError(request, false);
             }
 
             public void timeout(SessionRequest request) {
-                handleError(request);
+                handleError(request, true);
+                request.cancel();
             }
 
             public void cancelled(SessionRequest sessionRequest) {
 
             }
 
-            private void handleError(SessionRequest request) {
+            private void handleError(SessionRequest request, boolean isTimeout) {
                 if (request.getAttachment() != null &&
                     request.getAttachment() instanceof Axis2HttpRequest) {
 
@@ -456,11 +457,17 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                         // inform that this is a sending error (e.g. endpoint failure) and handle it
                         // differently at the message receiver.
 
-                        Exception exception = request.getException();
+                        AxisFault axisFault;
+                        if (isTimeout) {
+                            // In case of a timeout there is no exception
+                            axisFault = new AxisFault("The connection timed out");
+                        } else {
+                            Exception exception = request.getException();
+                            /** this is not a mistake I do NOT want getMessage()*/
+                            axisFault = new AxisFault(exception.toString(), exception);
+                        }
                         MessageContext nioFaultMessageContext =
-                            MessageContextBuilder.createFaultMessageContext(
-                                /** this is not a mistake I do NOT want getMessage()*/
-                                mc, new AxisFault(exception.toString(), exception));
+                            MessageContextBuilder.createFaultMessageContext(mc, axisFault);
                         nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
                         mr.receive(nioFaultMessageContext);
                         

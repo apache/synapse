@@ -50,7 +50,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     /** the Destination queue or topic for the outgoing message */
     private Destination destination = null;
     /** the Destination queue or topic for the outgoing message i.e. JMSConstants.DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC */
-    private String destinationType = null;
+    private String destinationType = JMSConstants.DESTINATION_TYPE_QUEUE;
     /** the EPR properties when the out-transport info is generated from a target EPR */
     private Hashtable properties = null;
     /** the target EPR string where applicable */
@@ -213,7 +213,9 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     }
 
     public void setDestinationType(String destinationType) {
-      this.destinationType = destinationType;
+      if (destinationType != null) {
+        this.destinationType = destinationType;
+      }
     }
     
 }

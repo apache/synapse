@@ -131,6 +131,8 @@ public class ServerWorker implements Runnable {
     private MessageContext createMessageContext(HttpRequest request) {
 
         MessageContext msgContext = new MessageContext();
+        msgContext.setMessageID(UUIDGenerator.getUUID());
+
         // There is a discrepency in what I thought, Axis2 spawns a nes threads to
         // send a message is this is TRUE - and I want it to be the other way
         msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);

@@ -27,29 +27,31 @@ import org.apache.synapse.mediators.db.DBReportMediator;
 import javax.xml.namespace.QName;
 
 /**
- * <dbreport>
- *   <connection>
- *     <pool>
- *       (
- *       <driver/>
- *       <url/>
- *       <user/>
- *       <password/>
+ * <pre>
+ * &lt;dbreport&gt;
+ *   &lt;connection&gt;
+ *     &lt;pool&gt;
+ *      (
+ *       &lt;driver/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
  *     |
- *       <dsName/>
- *       <icClass/>
- *       <url/>
- *       <user/>
- *       <password/>
+ *       &lt;dsName/&gt;
+ *       &lt;icClass/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
  *     )
- *       <property name="name" value="value"/>*
- *     </pool>
- *   </connection>
- *   <statement>
- *     <sql>insert into table values (?, ?, ..)</sql>
- *     <parameter [value="" | expression=""] type="int|string"/>*
- *   </statement>+
- * </dbreport>
+ *       &lt;property name="name" value="value"/&gt;*
+ *     &lt;/pool&gt;
+ *   &lt;/connection&gt;
+ *   &lt;statement&gt;
+ *     &lt;sql&gt;insert into something values(?, ?, ?, ?)&lt;/sql&gt;
+ *     &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
+ *    &lt;/statement&gt;+
+ * &lt;/dblreport&gt;
+ * </pre>
  */
 public class DBReportMediatorFactory extends AbstractDBMediatorFactory {
 

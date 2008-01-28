@@ -64,7 +64,7 @@ public class TargetFactory {
         Target target = new Target();
         OMAttribute toAttr = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "to"));
         if (toAttr != null && toAttr.getAttributeValue() != null) {
-            target.setTo(toAttr.getAttributeValue());
+            target.setToAddress(toAttr.getAttributeValue());
         }
 
         OMAttribute soapAction = elem.getAttribute(

@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 import java.lang.management.ManagementFactory;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.management.*;
@@ -197,12 +198,16 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
         // register with JMX
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = null;
+        String jmxAgentName = System.getProperty("jmx.agent.name");
+        if (jmxAgentName == null || "".equals(jmxAgentName)) {
+            jmxAgentName = "org.apache.synapse";
+        }
+        String name;
         try {
-            name = new ObjectName("org.apache.axis2:Type=Transport,ConnectorName=" +
-                "nio-http" + (sslContext == null ? "" : "s"));
+            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
+                "nio-http" + (sslContext == null ? "" : "s");
             TransportView tBean = new TransportView(this, null);
-            mbs.registerMBean(tBean, name);
+            registerMBean(mbs, tBean, name);
         } catch (Exception e) {
             log.warn("Error registering the non-blocking http" +
                 (sslContext == null ? "" : "s") + " transport for JMX management", e);
@@ -419,5 +424,21 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     public long getBytesSent() {
         return -1;
+    }
+
+    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
+        try {
+            ObjectName name = new ObjectName(objectName);
+            Set set = mbs.queryNames(name, null);
+            if (set != null && set.isEmpty()) {
+                mbs.registerMBean(mbeanInstance, name);
+            } else {
+                mbs.unregisterMBean(name);
+                mbs.registerMBean(mbeanInstance, name);
+            }
+        } catch (Exception e) {
+            log.warn("Error registering a MBean with objectname ' " + objectName +
+                " ' for JMX management", e);
+        }
     }
 }

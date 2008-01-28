@@ -68,7 +68,7 @@ public class MediatorWorker implements Runnable {
     public void run() {
         try {
             seq.mediate(synCtx);
-            ((Axis2MessageContext)synCtx).getAxis2MessageContext().getEnvelope().discard();
+            //((Axis2MessageContext)synCtx).getAxis2MessageContext().getEnvelope().discard();
 
         } catch (SynapseException syne) {
             if (!synCtx.getFaultStack().isEmpty()) {
@@ -81,7 +81,7 @@ public class MediatorWorker implements Runnable {
             }
 
         } catch (Exception e) {
-            String msg = "Unexpected error executing task";
+            String msg = "Unexpected error executing task/async inject";
             log.error(msg, e);
             if (synCtx.getServiceLog() != null) {
                 synCtx.getServiceLog().error(msg, e);

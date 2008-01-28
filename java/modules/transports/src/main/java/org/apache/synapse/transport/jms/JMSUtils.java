@@ -707,14 +707,10 @@ public class JMSUtils extends BaseUtils {
             } else {
                 return ((TopicConnectionFactory) conFactory).createTopicConnection();
             }
-            
         } else {
-            if (user != null && pass != null) {
-                return ((ConnectionFactory) conFactory).createConnection(user, pass);
-            } else {
-                return ((ConnectionFactory) conFactory).createConnection();
-            }
+            handleException("Unable to determine type of JMS Connection Factory - i.e Queue/Topic");
         }
+        return null;
     }
 
     public static Session createSession(Connection con,

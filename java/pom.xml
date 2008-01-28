@@ -38,7 +38,7 @@
     <description>Apache Synapse</description>
 
     <packaging>pom</packaging>
-    <url>http://ws.apache.org/synapse/</url>
+    <url>http://synapse.apache.org/</url>
 
     <issueManagement>
         <url>http://issues.apache.org/jira/browse/SYNAPSE</url>

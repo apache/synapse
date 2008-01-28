@@ -108,6 +108,7 @@
       </p>
       <form action="[location]" method="get" id="SelectMirror">
         Other mirrors: <select name="Preferred">
+        [if-any http][for http]
         <option value="[http]" selected="selected">
           [http]</option>[end][end][if-any ftp][for ftp]
         <option value="[ftp]">

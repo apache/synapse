@@ -1001,7 +1001,7 @@
         </repository>
         <site>
             <id>website</id>
-            <url>scpexe://people.apache.org/www/ws.apache.org/synapse</url>
+            <url>scpexe://people.apache.org/www/synapse.apache.org/</url>
         </site>
     </distributionManagement>
 

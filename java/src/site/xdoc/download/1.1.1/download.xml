@@ -107,7 +107,7 @@
         mirrors (at the end of the mirrors list) that should be available.
       </p>
         
-  </select>
+  
 
       
       <form action="[location]" method="get" id="SelectMirror">

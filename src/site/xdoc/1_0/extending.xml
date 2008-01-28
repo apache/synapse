@@ -1,26 +1,16 @@
-<!--
-~ Licensed to the Apache Software Foundation (ASF) under one
-~ or more contributor license agreements. See the NOTICE file
-~ distributed with this work for additional information
-~ regarding copyright ownership. The ASF licenses this file
-~ to you under the Apache License, Version 2.0 (the
-~ "License"); you may not use this file except in compliance
-~ with the License. You may obtain a copy of the License at
-~
-~ http://www.apache.org/licenses/LICENSE-2.0
-~
-~ Unless required by applicable law or agreed to in writing,
-~ software distributed under the License is distributed on an
-~ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~ KIND, either express or implied. See the License for the
-~ specific language governing permissions and limitations
-~ under the License.
--->
-<html>
-<head>
-  <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
-  <title>Extending Synapse</title>
-  <style type="text/css">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=iso-8859-1" http-equiv="content-type"/>
+    <title>
+      Extending Synapse
+    </title>
+    <style type="text/css" xml:space="preserve">
     .command {
         border: 1px dashed #3c78b5;
         text-align: left;
@@ -115,37 +105,39 @@
         padding: 2px;
         margin: 18px 0px 4px 0px;
     }</style>
-</head>
-
-<body>
-<h1>Extending Synapse<br>
-</h1>
-
-<h2>Writing custom Mediator implementations</h2>
-
-<p>The primary interface of the Synapse API is the MessageContext interface
-defined below. This essentially defines the per-message context passed
-through the chain of mediators, for each and every message received and
-processed by Synapse. Each message instance is wrapped within a
-MessageContext instance, and the message context is set with the references
-to the SynapseConfiguration and SynapseEnvironments. The SynapseConfiguration
-holds the global configuration model that defines mediation rules, local
-registry entries and other and configuration, while the environment gives
-access to the underlying SOAP implementation used - Axis2. A typical mediator
-would need to manipulate the MessageContext by referring to the
-SynapseConfiguration. However it is strongly recommended that the
-SynapseConfiguration is not updated by mediator instances as it is shared by
-all messages, and may be updated by Synapse administration or configuration
-modules. Mediator instances may store local message properties into the
-MessageContext for later retrieval by successive mediators.<br>
-</p>
-
-<h4><a
-href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/MessageContext.java?view=markup">MessageContext
-Interface</a></h4>
-
-<p></p>
-<pre>package org.apache.synapse;
+  </head>
+  <body>
+    <h1>
+      Extending Synapse<br/>
+    </h1>
+    <h2>
+      Writing custom Mediator implementations
+    </h2>
+    <p>
+      The primary interface of the Synapse API is the MessageContext interface
+      defined below. This essentially defines the per-message context passed
+      through the chain of mediators, for each and every message received and
+      processed by Synapse. Each message instance is wrapped within a
+      MessageContext instance, and the message context is set with the
+      references to the SynapseConfiguration and SynapseEnvironments. The
+      SynapseConfiguration holds the global configuration model that defines
+      mediation rules, local registry entries and other and configuration, while
+      the environment gives access to the underlying SOAP implementation used -
+      Axis2. A typical mediator would need to manipulate the MessageContext by
+      referring to the SynapseConfiguration. However it is strongly recommended
+      that the SynapseConfiguration is not updated by mediator instances as it
+      is shared by all messages, and may be updated by Synapse administration or
+      configuration modules. Mediator instances may store local message
+      properties into the MessageContext for later retrieval by successive
+      mediators.<br/>
+    </p>
+    <h4>
+      <a
+      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/MessageContext.java?view=markup">MessageContext
+      Interface</a>
+    </h4>
+    <p/>
+<pre xml:space="preserve">package org.apache.synapse;
 
 import ...
 
@@ -217,21 +209,24 @@ public interface MessageContext {
     public ....get/set()...
 
 }</pre>
-
-<p>The MessageContext interface is based on the Axis2 <a>MessageContext</a>
-interface, and uses the Axis2 <a>EndpointReference</a> and SOAPEnvelope
-classes/interfaces. The purpose of this interface is to capture a message as
-it flows through the system. As you will see the message payload is
-represented using the SOAP infoset. Binary messages can be embedded in the
-Envelope using MTOM or SwA attachments using the AXIOM object model.</p>
-
-<h4><a
-href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
-interface</a></h4>
-
-<p>The second key interface for mediator writers is the Mediator
-interface:</p>
-<pre>package org.apache.synapse;
+    <p>
+      The MessageContext interface is based on the Axis2 <a>MessageContext</a>
+      interface, and uses the Axis2 <a>EndpointReference</a> and
+      SOAPEnvelope classes/interfaces. The purpose of this interface is to
+      capture a message as it flows through the system. As you will see the
+      message payload is represented using the SOAP infoset. Binary messages can
+      be embedded in the Envelope using MTOM or SwA attachments using the AXIOM
+      object model.
+    </p>
+    <h4>
+      <a
+      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
+      interface</a>
+    </h4>
+    <p>
+      The second key interface for mediator writers is the Mediator interface:
+    </p>
+<pre xml:space="preserve">package org.apache.synapse;
 
 import org.apache.synapse.MessageContext;
 
@@ -259,27 +254,32 @@ public interface <span style="font-weight: bold;">Mediator </span>{
      */
     public String getType();
 }</pre>
-
-<p>A mediator can read and/or modify the <a>SynapseMessage</a> in any
-suitable manner - adjusting the routing headers or changing the message body.
-If the mediate() method returns false, it signals to the Synapse processing
-model to stop further processing of the message. For example, if the mediator
-is a security agent it may decide that this message is dangerous and should
-not be processed further. This is generally the exception as mediators are
-usually designed to co-operate to process the message onwards.</p>
-
-<h3>Leaf and Node Mediators, List mediators and Filter mediators</h3>
-
-<p>Mediators may be Node mediators (i.e. these that can contain child
-mediators) or Leaf mediators (mediators that does not hold any other child
-mediators). A Node mediator  must implement the
-org.apache.synapse.api.ListMediator interface listed below, or extend from
-the org.apache.synapse.mediators.AbstractListMediator. </p>
-
-<h4><a
-href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
-ListMediator interface</a></h4>
-<pre>package org.apache.synapse.mediators;
+    <p>
+      A mediator can read and/or modify the <a>SynapseMessage</a> in
+      any suitable manner - adjusting the routing headers or changing the
+      message body. If the mediate() method returns false, it signals to the
+      Synapse processing model to stop further processing of the message. For
+      example, if the mediator is a security agent it may decide that this
+      message is dangerous and should not be processed further. This is
+      generally the exception as mediators are usually designed to co-operate to
+      process the message onwards.
+    </p>
+    <h3>
+      Leaf and Node Mediators, List mediators and Filter mediators
+    </h3>
+    <p>
+      Mediators may be Node mediators (i.e. these that can contain child
+      mediators) or Leaf mediators (mediators that does not hold any other child
+      mediators). A Node mediator  must implement the
+      org.apache.synapse.api.ListMediator interface listed below, or extend from
+      the org.apache.synapse.mediators.AbstractListMediator.
+    </p>
+    <h4>
+      <a
+      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
+      ListMediator interface</a>
+    </h4>
+<pre xml:space="preserve">package org.apache.synapse.mediators;
 
 import java.util.List;
 
@@ -293,7 +293,7 @@ public interface ListMediator extends Mediator {
     * @return true (as per the general contract of the Collection.add method)
     */
     public boolean addChild(Mediator m);
-    
+
     /**
     * Appends all of the mediators in the specified collection to the end of this mediator's (children)
     * list, in the order that they are returned by the specified collection's iterator
@@ -301,45 +301,47 @@ public interface ListMediator extends Mediator {
     * @return true if this list changed as a result of the call
     */
     public boolean addAll(List c);
-    
+
     /**
     * Returns the mediator at the specified position
     * @param pos index of mediator to return
     * @return the mediator at the specified position in this list
     */
     public Mediator getChild(int pos);
-    
+
     /**
     * Removes the first occurrence in this list of the specified mediator
     * @param m mediator to be removed from this list, if present
     * @return true if this list contained the specified mediator
     */
     public boolean removeChild(Mediator m);
-    
+
     /**
     * Removes the mediator at the specified position in this list
     * @param pos the index of the mediator to remove
     * @return the mediator previously at the specified position
     */
     public Mediator removeChild(int pos);
-    
+
     /**
     * Return the list of mediators of this List mediator instance
     * @return the child/sub mediator list
     */
     public List getList();
 }</pre>
-
-<p>A ListMediator implementation should call super.mediate(synCtx) to process
-its sub mediator sequence. A FilterMediator is a ListMediator which executes
-its sequence of sub mediators on successful outcome of a test condition. The
-Mediator instance which performs filtering should implement the
-FilterMediator interface. </p>
-
-<h4><a
-href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
-interface</a></h4>
-<pre>package org.apache.synapse.mediators;
+    <p>
+      A ListMediator implementation should call super.mediate(synCtx) to process
+      its sub mediator sequence. A FilterMediator is a ListMediator which
+      executes its sequence of sub mediators on successful outcome of a test
+      condition. The Mediator instance which performs filtering should implement
+      the FilterMediator interface.
+    </p>
+    <h4>
+      <a
+      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
+      interface</a>
+    </h4>
+<pre xml:space="preserve">package org.apache.synapse.mediators;
 
 import org.apache.synapse.MessageContext;
 
@@ -359,41 +361,45 @@ public interface <span style="font-weight: bold;">FilterMediator </span>extends 
      */
     public boolean test(MessageContext synCtx);
 }</pre>
-
-<h2>Writing custom Configuration implementations for mediators</h2>
-
-<p>You may write your own custom configurator for the Mediator implementation
-you write without relying on the Class mediator or Spring extension for its
-initialization. You could thus write a MediatorFactory implementation which
-defines how to digest a custom XML configuration element to be used to create
-and configure the custom mediator instance. A MediatorSerializer
-implementation defines how a configuration should be serialized back into an
-XML configuration. The custom MediatorFactory &amp; MediatorSerializer
-implementations and the mediator class/es must be bundled in a JAR file
-conforming to the J2SE Service Provider model (See the description for
-Extensions below for more details and examples) and placed into the
-SYNAPSE_HOME/lib folder, so that the Synapse runtime could find and load the
-definition. Essentially this means that a custom JAR file must bundle your
-class implementing the Mediator interface, and the MediatorFactory
-implementation class and contain two text files named
-"org.apache.synapse.config.xml.MediatorFactory" and
-"org.apache.synapse.config.xml.MediatorSerializer" which will contain the
-fully qualified name(s) of your MediatorFactory and MediatorSerializer
-implementation classes. You should also place any dependency JARs into the
-same lib folder so that the correct classpath references could be made. The
-MediatorFactory interface listing is given below, which you should implement,
-and its getTagQName() method must define the fully qualified element of
-interest for custom configuration. The Synapse initialization will call back
-to this MediatorFactory instance through the createMediator(OMElement elem)
-method passing in this XML element, so that an instance of the mediator could
-be created utilizing the custom XML specification and returned. See the
-ValidateMediator and the ValidateMediatorFactory classes under
-modules/extensions in the Synapse source distribution for examples. </p>
-
-<h4><a
-href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
-MediatorFactory interface</a></h4>
-<pre>package org.apache.synapse.config.xml;
+    <h2>
+      Writing custom Configuration implementations for mediators
+    </h2>
+    <p>
+      You may write your own custom configurator for the Mediator implementation
+      you write without relying on the Class mediator or Spring extension for
+      its initialization. You could thus write a MediatorFactory implementation
+      which defines how to digest a custom XML configuration element to be used
+      to create and configure the custom mediator instance. A MediatorSerializer
+      implementation defines how a configuration should be serialized back into
+      an XML configuration. The custom MediatorFactory &amp; MediatorSerializer
+      implementations and the mediator class/es must be bundled in a JAR file
+      conforming to the J2SE Service Provider model (See the description for
+      Extensions below for more details and examples) and placed into the
+      SYNAPSE_HOME/lib folder, so that the Synapse runtime could find and load
+      the definition. Essentially this means that a custom JAR file must bundle
+      your class implementing the Mediator interface, and the MediatorFactory
+      implementation class and contain two text files named
+      "org.apache.synapse.config.xml.MediatorFactory" and
+      "org.apache.synapse.config.xml.MediatorSerializer" which will contain the
+      fully qualified name(s) of your MediatorFactory and MediatorSerializer
+      implementation classes. You should also place any dependency JARs into the
+      same lib folder so that the correct classpath references could be made.
+      The MediatorFactory interface listing is given below, which you should
+      implement, and its getTagQName() method must define the fully qualified
+      element of interest for custom configuration. The Synapse initialization
+      will call back to this MediatorFactory instance through the
+      createMediator(OMElement elem) method passing in this XML element, so that
+      an instance of the mediator could be created utilizing the custom XML
+      specification and returned. See the ValidateMediator and the
+      ValidateMediatorFactory classes under modules/extensions in the Synapse
+      source distribution for examples.
+    </p>
+    <h4>
+      <a
+      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
+      MediatorFactory interface</a>
+    </h4>
+<pre xml:space="preserve">package org.apache.synapse.config.xml;
 
 import ...
 
@@ -415,13 +421,13 @@ public interface MediatorFactory {
      */
     public QName getTagQName();
 }</pre>
-
-<p></p>
-
-<h4><a
-href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
-MediatorSerializer interface</a></h4>
-<pre>package org.apache.synapse.config.xml;
+    <p/>
+    <h4>
+      <a
+      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
+      MediatorSerializer interface</a>
+    </h4>
+<pre xml:space="preserve">package org.apache.synapse.config.xml;
 
 import ...
 
@@ -441,31 +447,36 @@ public interface MediatorSerializer {
 
     /**
      * Return the class name of the mediator which can be serialized
-     * @return the class name 
+     * @return the class name
      */
     public String getMediatorClassName();
 }</pre>
-
-<h2>Configuring mediators</h2>
-
-<p>Mediators could access the Synapse registry to load resources and
-configure the local behaviour. Refer to the Spring mediator and Script
-mediator implementations for examples on how this could be achieved. </p>
-
-<h4>Loading of Extensions by the Synapse runtime</h4>
-
-<p>Synapse loads available extensions from the runtime classpath using the <a
-href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">J2SE
-Service Provider model</a>. This essentially iterates over the available JAR
-files, for  a META-INF/services directory within each file,  and looks for a
-text file with the name org.apache.synapse.config.xml.MediatorFactory which
-contains a list of fully qualified classname that implement the above
-interface, listing each class in a separate line. e.g. The built-in
-synapse-extensions.jar contains the following structure</p>
-<pre>synapse-extensions.jar
+    <h2>
+      Configuring mediators
+    </h2>
+    <p>
+      Mediators could access the Synapse registry to load resources and
+      configure the local behaviour. Refer to the Spring mediator and Script
+      mediator implementations for examples on how this could be achieved.
+    </p>
+    <h4>
+      Loading of Extensions by the Synapse runtime
+    </h4>
+    <p>
+      Synapse loads available extensions from the runtime classpath using the <a
+      href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">J2SE
+      Service Provider model</a>. This essentially iterates over the
+      available JAR files, for  a META-INF/services directory within each file,
+      and looks for a text file with the name
+      org.apache.synapse.config.xml.MediatorFactory which contains a list of
+      fully qualified classname that implement the above interface, listing each
+      class in a separate line. e.g. The built-in synapse-extensions.jar
+      contains the following structure
+    </p>
+<pre xml:space="preserve">synapse-extensions.jar
     /META-INF/services
         org.apache.synapse.config.xml.MediatorFactory
         org.apache.synapse.config.xml.MediatorSerializer
     /... the implementation classes as usual...</pre>
-</body>
+  </body>
 </html>

@@ -2,6 +2,7 @@
 body{
 padding:0px;
 margin:0px;
+width:1000px;
 }
 a{
 color:#557f95;
@@ -24,6 +25,7 @@ height:22px;
 background-color:#bcbcbc;
 text-indent:10px;
 margin-left:-15px;
+margin-right:-5px;
 margin-top:-5px;
 color:#000000;
 }
@@ -46,14 +48,14 @@ line-height:18px;
 padding-left:10px;
 padding-right:10px;
 }
-.page-external{
-/* Uncomment these lines to give a fixed width with centered positioning ....
+.composite{
+/* Uncomment these lines to give a fixed width with centered positioning ....*/
 position:absolute;
 left:50%;
 width:980px;
 margin-left:-490px;
 border:solid 1px #83b0c0;
-*/
+margin-top:5px;
 }
 
 /* header styles */
@@ -171,7 +173,7 @@ font-size:11px;
 background-color:#F3F3F3;
 border:1px solid #B4B4B4;
 margin-right:10px;
-margin-left:184px;
+margin-left:194px;
 margin-top:10px;
 padding-left:10px;
 }
@@ -218,3 +220,52 @@ color:#929292;
 margin-top:10px;
 margin-left:10px;
 }
+.command {
+        border: 1px dashed #3c78b5;
+        text-align: left;
+        background-color: #f0f0f0;
+        padding: 3px;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+    }
+    .consoleOutput {
+        border: 1px dashed #3c78b5;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+        background-color: #f0f0f0;
+        border-bottom: 1px dashed #3c78b5;
+        padding: 3px;
+        border-style: solid;
+    }
+    .info {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #090;
+        background-color: #dfd;
+        text-align:left;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+.data-table{
+        font-family:Verdana,Arial,Helvetica,sans-serif;
+        font-size:11px;
+        border:0px;
+        margin:0px;
+        border:solid 1px #cdcdcd;
+    }
+    .data-table th{
+        background-color:#eeeeee;
+        border-bottom:solid 1px #8d8d8d;
+        padding-top:5px;
+        padding-left:3px;
+        text-align:left;
+    }
+    .data-table td{
+        padding-top:4px;
+        padding-left:3px;
+        border-bottom:solid 1px #e1e1e1;
+    }

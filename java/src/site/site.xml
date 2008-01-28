@@ -22,7 +22,7 @@
 
     <bannerLeft>
         <name></name>
-        <href>ws.apache.org/synapse/</href>
+        <href>synapse.apache.org/</href>
     </bannerLeft>
 
     <bannerRight>
@@ -46,19 +46,22 @@
 
         <menu name="Apache Synapse">
             <item name="About" href="index.html"/>
-            <item name="Downloads">
-                <item name="Releases" href="download.cgi"/>
+            <item name="Downloads" href="download_index.html">
+                <item name="Releases" href="download.html"/>
                 <item name="Source Code" href="source-repository.html"/>
             </item>
-            <item name="Documentation">
-                <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
+            <item name="Documentation" href="docs_index.html">
                 <item name="Quick Start Guide" href="Synapse_QuickStart.html"/>
                 <item name="Samples" href="Synapse_Samples.html"/>
                 <item name="Extending Synapse" href="Synapse_Extending.html"/>
+                <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
                 <item name="Javadocs" href="apidocs/index.html"/>
             </item>
-            <item name="Project Information">
-                <item name="Project Information" href="project-info.html"/>
+            <item name="Previous Version" href="history.html">
+                <item name="Version 1.1" href="1_1/content.html"/>
+                <item name="Version 1_0" href="1_0/content.html"/>
+            </item>
+            <item name="Project Information" href="project-info.html">
                 <item name="Mailing Lists" href="mail-lists.html"/>
                 <item name="Issue Tracking" href="issue-tracking.html"/>
                 <item name="Dependencies" href="dependencies.html"/>

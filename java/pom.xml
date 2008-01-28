@@ -47,16 +47,16 @@
     <mailingLists>
         <mailingList>
             <name>Apache Synapse Developer List</name>
-            <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
-            <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
-            <post>synapse-dev@ws.apache.org</post>
+            <subscribe>dev-subscribe@synapse.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@synapse.apache.org</unsubscribe>
+            <post>dev@synapse.apache.org</post>
             <archive>http://mail-archives.apache.org/mod_mbox/ws-synapse-dev/</archive>
         </mailingList>
         <mailingList>
             <name>Apache Synapse User List</name>
-            <subscribe>synapse-user-subscribe@ws.apache.org</subscribe>
-            <unsubscribe>synapse-user-unsubscribe@ws.apache.org</unsubscribe>
-            <post>synapse-user@ws.apache.org</post>
+            <subscribe>user-subscribe@synapse.apache.org</subscribe>
+            <unsubscribe>user-unsubscribe@synapse.apache.org</unsubscribe>
+            <post>user@synapse.apache.org</post>
             <archive>http://mail-archives.apache.org/mod_mbox/ws-synapse-user/</archive>
         </mailingList>
     </mailingLists>
@@ -88,7 +88,6 @@
         <profile>
             <id>release</id>
             <build>
-
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -100,27 +99,6 @@
                                 <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
                             <finalName>synapse-${synapse.version}</finalName>
-                        </configuration>
-                    </plugin>
-
-                    <!--<plugin>-->
-                        <!--<artifactId>maven-site-plugin</artifactId>-->
-                        <!--<inherited>false</inherited>-->
-                    <!--</plugin>-->
-                    <!---->
-
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.1</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <attach>true</attach>
                         </configuration>
                     </plugin>
                 </plugins>

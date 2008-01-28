@@ -57,12 +57,13 @@
                 <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
                 <item name="Javadocs" href="apidocs/index.html"/>
             </item>
-            <item name="Previous Version" href="history.html">
+            <item name="Previous Versions" href="history.html">
                 <item name="Version 1.1" href="1_1/content.html"/>
-                <item name="Version 1_0" href="1_0/content.html"/>
+                <item name="Version 1.0" href="1_0/content.html"/>
             </item>
             <item name="Project Information" href="project-info.html">
                 <item name="Mailing Lists" href="mail-lists.html"/>
+                <item name="Building" href="building.html"/>
                 <item name="Issue Tracking" href="issue-tracking.html"/>
                 <item name="Dependencies" href="dependencies.html"/>
                 <item name="Dependency Convergence" href="dependency-convergence.html"/>

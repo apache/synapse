@@ -72,11 +72,11 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/webservices/synapse/trunk/java
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java
         </connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/webservices/synapse/trunk/java
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java
         </developerConnection>
-        <url>http://svn.apache.org/viewvc/webservices/synapse/trunk/java/</url>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
     </scm>
 
     <organization>

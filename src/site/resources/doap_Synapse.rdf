@@ -48,8 +48,8 @@ messages.</description>
     </release>
     <repository>
       <SVNRepository>
-        <location rdf:resource="http://svn.apache.org/repos/asf/webservices/synapse/trunk/java"/>
-        <browse rdf:resource="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/"/>
+        <location rdf:resource="http://svn.apache.org/repos/asf/synapse/trunk/java"/>
+        <browse rdf:resource="http://svn.apache.org/viewvc/synapse/trunk/java/"/>
       </SVNRepository>
     </repository>
     <maintainer>

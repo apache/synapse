@@ -19,23 +19,24 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.WSDLEndpoint;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.description.WSDL2Constants;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.WSDLEndpoint;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
+import java.io.File;
 
 /**
  * Creates an WSDL based endpoint from a XML configuration.
@@ -142,7 +143,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
                             String nsUri = wsdlOM.getNamespace().getNamespaceURI();
                             if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
                                 endpoint = new WSDL11EndpointBuilder().
-                                    createEndpointDefinitionFromWSDL(wsdlOM, serviceName, portName);
+                                    createEndpointDefinitionFromWSDL(wsdlURI.trim(),wsdlOM, serviceName, portName);
 
                             } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
                                 //endpoint = new WSDL20EndpointBuilder().
@@ -163,9 +164,16 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "definitions"));
             if (endpoint == null && definitionElement != null) {
                 wsdlEndpoint.setWsdlDoc(definitionElement);
-
+                String resolveRoot = System.getProperty(SynapseConstants.RESOLVE_ROOT);
+                String baseUri = "file:./";
+                if (resolveRoot != null) {
+                    baseUri = resolveRoot.trim();
+                }
+                if(!baseUri.endsWith(File.separator)){
+                    baseUri = baseUri + File.separator;
+                }
                 endpoint = new WSDL11EndpointBuilder().
-                        createEndpointDefinitionFromWSDL(definitionElement, serviceName, portName);
+                    createEndpointDefinitionFromWSDL(baseUri, definitionElement, serviceName, portName);
             }
 
             // check if a wsdl 2.0 document is supplied inline

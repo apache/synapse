@@ -20,27 +20,23 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
-import org.apache.synapse.mediators.ext.ClassMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * <pre>
  * &lt;aggregate&gt;
- *  &lt;corelateOn expression="XPATH-expression"/&gt;
- *  &lt;completeCondition timeout="time-in-seconds"&gt;
- *   &lt;messageCount min="int-min" max="int-max"/&gt;
- *  &lt;/completeCondition&gt;
- *  &lt;onComplete expression="XPATH-expression" sequence="sequence-ref"&gt;
- *   (mediator +)?
- *  &lt;/onComplete&gt;
- *  &lt;invalidate sequence="sequence-ref" timeout="time-in-seconds"&gt;
- *   (mediator +)?
- *  &lt;/invalidate&gt;
+ *   &lt;correlateOn expression="xpath"/&gt;?
+ *   &lt;completeCondition [timeout="time-in-seconds"]&gt;
+ *     &lt;messageCount min="int-min" max="int-max"/&gt;?
+ *   &lt;/completeCondition&gt;?
+ *   &lt;onComplete expression="xpath" [sequence="sequence-ref"]&gt;
+ *     (mediator +)?
+ *   &lt;/onComplete&gt;
  * &lt;/aggregate&gt;
+ * </pre>
  */
 public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
@@ -55,16 +51,16 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
         OMElement aggregator = fac.createOMElement("aggregate", synNS);
         saveTracingState(aggregator, mediator);
 
-        if (mediator.getCorelateExpression() != null) {
-            OMElement corelateOn = fac.createOMElement("corelateOn", synNS);
-            corelateOn.addAttribute("expression", mediator.getCorelateExpression().toString(), nullNS);
-            super.serializeNamespaces(corelateOn, mediator.getCorelateExpression());
+        if (mediator.getCorrelateExpression() != null) {
+            OMElement corelateOn = fac.createOMElement("correlateOn", synNS);
+            corelateOn.addAttribute("expression", mediator.getCorrelateExpression().toString(), nullNS);
+            super.serializeNamespaces(corelateOn, mediator.getCorrelateExpression());
             aggregator.addChild(corelateOn);
         }
 
         OMElement completeCond = fac.createOMElement("completeCondition", synNS);
-        if (mediator.getCompleteTimeout() != 0) {
-            completeCond.addAttribute("timeout", Long.toString(mediator.getCompleteTimeout()), nullNS);
+        if (mediator.getCompletionTimeoutMillis() != 0) {
+            completeCond.addAttribute("timeout", Long.toString(mediator.getCompletionTimeoutMillis() / 1000), nullNS);
         }
         OMElement messageCount = fac.createOMElement("messageCount", synNS);
         if (mediator.getMinMessagesToComplete() != 0) {
@@ -88,16 +84,6 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
                     onCompleteElem, mediator.getOnCompleteSequence().getList());
         }
         aggregator.addChild(onCompleteElem);
-
-        OMElement invalidateElem = fac.createOMElement("invalidate", synNS);
-        invalidateElem.addAttribute("timeout", Long.toString(mediator.getInvlidateToDestroyTime()), nullNS);
-        if (mediator.getInvalidMsgSequenceRef() != null) {
-            invalidateElem.addAttribute("sequence", mediator.getInvalidMsgSequenceRef(), nullNS);
-        } else if (mediator.getInvalidMsgSequence() != null) {
-            new SequenceMediatorSerializer().serializeChildren(
-                    invalidateElem, mediator.getInvalidMsgSequence().getList());
-        }
-        aggregator.addChild(invalidateElem);
 
         if (parent != null) {
             parent.addChild(aggregator);

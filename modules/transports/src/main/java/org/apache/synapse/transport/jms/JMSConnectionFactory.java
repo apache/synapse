@@ -227,7 +227,7 @@ public class JMSConnectionFactory implements ExceptionListener {
             } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(getConnectionFactoryType())) {
                 tConFac = (TopicConnectionFactory) conFactory;
             } else {
-                conFac = conFactory;
+                handleException("Unable to determine type of Connection Factory - i.e. Queue/Topic", null);
             }
 
             String user = (String) jndiProperties.get(Context.SECURITY_PRINCIPAL);
@@ -238,16 +238,12 @@ public class JMSConnectionFactory implements ExceptionListener {
                     connection = qConFac.createQueueConnection(user, pass);
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection(user, pass);
-                } else {
-                    connection = conFac.createConnection(user, pass);
                 }
             } else {
                 if (qConFac != null) {
                     connection = qConFac.createQueueConnection();
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection();
-                } else {
-                    connection = conFac.createConnection();
                 }
             }
             
@@ -473,24 +469,33 @@ public class JMSConnectionFactory implements ExceptionListener {
             JMSOutTransportInfo trpInfo = (JMSOutTransportInfo) o;
 
             Map trpProps = trpInfo.getProperties();
-            if (trpProps.get(JMSConstants.CONFAC_JNDI_NAME_PARAM).equals(
-                    jndiProperties.get(JMSConstants.CONFAC_JNDI_NAME_PARAM))
+            if (equals(trpProps.get(JMSConstants.CONFAC_JNDI_NAME_PARAM), jndiProperties.get(JMSConstants.CONFAC_JNDI_NAME_PARAM))
                 &&
-                trpProps.get(Context.INITIAL_CONTEXT_FACTORY).equals(
-                    jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY))
+                equals(trpProps.get(Context.INITIAL_CONTEXT_FACTORY), jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY))
                 &&
-                trpProps.get(Context.PROVIDER_URL).equals(
-                    jndiProperties.get(Context.PROVIDER_URL))
+                equals(trpProps.get(Context.PROVIDER_URL), jndiProperties.get(Context.PROVIDER_URL))
                 &&
-                trpProps.get(Context.SECURITY_PRINCIPAL).equals(
-                    jndiProperties.get(Context.SECURITY_PRINCIPAL))
+                equals(trpProps.get(Context.SECURITY_PRINCIPAL), jndiProperties.get(Context.SECURITY_PRINCIPAL))
                 &&
-                trpProps.get(Context.SECURITY_CREDENTIALS).equals(
-                    jndiProperties.get(Context.SECURITY_CREDENTIALS))) {
+                equals(trpProps.get(Context.SECURITY_CREDENTIALS), jndiProperties.get(Context.SECURITY_CREDENTIALS))) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     *     Prevents NullPointerException when s1 is null.
+     *     If both values are null this returns true 
+     */
+    private boolean equals(Object s1, Object s2) {
+        if(s1 == s2) {
+            return true;
+        } else if(s1 != null && s1.equals(s2)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // -------------------- getters and setters and trivial methods --------------------

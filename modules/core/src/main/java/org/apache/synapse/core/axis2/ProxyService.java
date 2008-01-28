@@ -19,8 +19,8 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -30,20 +30,23 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
-import java.net.*;
 
 /**
  * <proxy-service name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
@@ -259,7 +262,7 @@ public class ProxyService {
                         } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
-                                    new WSDL11ToAxisServiceBuilder(wsdlInputStream, null, null);
+                                    new WSDL11ToAxisServiceBuilder(wsdlInputStream);
                             isWSDL11 = true;
                         } else {
                             handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
@@ -273,24 +276,37 @@ public class ProxyService {
                         wsdlToAxisServiceBuilder.setBaseUri(
                                 wsdlURI != null ? wsdlURI.toString() : "");
 
-                        if (resourceMap != null) {
+                        if (trace()) {
+                            trace.info("Setting up custom resolvers");
+                        }
+                        // Set up the URIResolver
 
-                            if (trace()) {
-                                trace.info("Setting up custom resolvers");
-                            }
-                            // Set up the URIResolver
+                        if (resourceMap != null) {
+                            // if the resource map is available use it
                             wsdlToAxisServiceBuilder.setCustomResolver(
-                                new ResourceMapURIResolver(resourceMap, synCfg));
+                                new CustomURIResolver(resourceMap, synCfg));
                             // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
                             if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
                                 ((WSDL11ToAxisServiceBuilder)
                                     wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
-                                    new ResourceMapWSDLLocator(new InputSource(wsdlInputStream),
+                                    new CustomWSDLLocator(new InputSource(wsdlInputStream),
                                                           wsdlURI != null ? wsdlURI.toString() : "",
                                                           resourceMap, synCfg));
                             }
+                        } else {
+                            //if the resource map isn't available ,
+                            //then each import URIs will be resolved using base URI 
+                            wsdlToAxisServiceBuilder.setCustomResolver(
+                                new CustomURIResolver());
+                            // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
+                            if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
+                                ((WSDL11ToAxisServiceBuilder)
+                                    wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
+                                    new CustomWSDLLocator(new InputSource(wsdlInputStream),
+                                                          wsdlURI != null ? wsdlURI.toString() : ""));
+                            }
                         }
-                        
+
                         if (trace()) {
                             trace.info("Populating Axis2 service using WSDL");
                             if (trace.isTraceEnabled()) {
@@ -298,14 +314,6 @@ public class ProxyService {
                             }
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
-                        List schemaList = proxyService.getSchema();
-                        if (schemaList != null && schemaList.size() > 0) {
-                            // just pick the first schema's target namespace as Axis2's
-                            // HTTPTransportUtils code already contains a bug where it uses the
-                            // services' schema target NS for each operation
-                            proxyService.setSchemaTargetNamespace(
-                                proxyService.getSchema(0).getTargetNamespace());
-                        }
                         proxyService.setWsdlFound(true);
 
                         if (isWSDL11) {
@@ -482,6 +490,24 @@ public class ProxyService {
     public void start(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         if (axisConfig != null) {
+            
+            Parameter param = axisConfig.getParameter(SynapseConstants.SYNAPSE_ENV);
+            if (param != null && param.getValue() instanceof SynapseEnvironment)  {
+                SynapseEnvironment env = (SynapseEnvironment) param.getValue();
+                if (targetInLineInSequence != null) {
+                    targetInLineInSequence.init(env);
+                }
+                if (targetInLineOutSequence != null) {
+                    targetInLineOutSequence.init(env);
+                }
+                if (targetInLineFaultSequence != null) {
+                    targetInLineFaultSequence.init(env);
+                }
+            } else {
+                auditWarn("Unable to find the SynapseEnvironment. " +
+                    "Components of the proxy service may not be initialized");
+            }
+            
             axisConfig.getServiceForActivation(this.getName()).setActive(true);
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
@@ -498,6 +524,17 @@ public class ProxyService {
     public void stop(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         if (axisConfig != null) {
+
+            if (targetInLineInSequence != null) {
+                targetInLineInSequence.destroy();
+            }
+            if (targetInLineOutSequence != null) {
+                targetInLineOutSequence.destroy();
+            }
+            if (targetInLineFaultSequence != null) {
+                targetInLineFaultSequence.destroy();
+            }
+
             try {
                 AxisService as = axisConfig.getService(this.getName());
                 if (as != null) {

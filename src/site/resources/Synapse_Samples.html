@@ -215,6 +215,8 @@
         medium using VFS transport listener and sender</a></li>
       <li><a href="#Sample255">Sample 255: Switching from ftp transport
         listener to mail transport sender</a></li>
+      <li><a href="#Sample256">Sample 256: Proxy services with the mail
+        transport</a></li>
     </ul>
   </li>
   <li><a href="#Task">Introduction to synapse tasks</a> 
@@ -295,6 +297,13 @@
         <ul>
           <li><a href="#Sample420">Sample 420: Simple cache implemented on
             synapse for the actual service</a></li>
+        </ul>
+      </li>
+      <li><a href="#Callout">Synchronize web service invocation with Callout
+        mediator </a> 
+        <ul>
+          <li><a href="#Sample430">Sample 430: Simple Callout Mediator for
+            Synchronize web service invocation</a></li>
         </ul>
       </li>
     </ul>
@@ -2518,7 +2527,7 @@ and connection factory etc.</p>
         &lt;target&gt;
             &lt;endpoint&gt;
                 &lt;address uri="jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;amp;
-                   java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616"/&gt;
+                   java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue"/&gt;
             &lt;/endpoint&gt;
             &lt;inSequence&gt;
                 &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
@@ -2551,7 +2560,7 @@ service at http://localhost:9000/soap/SimpleStockQuoteService?wsdl. JMS URL
 for the service is mentioned as below:</p>
 <pre>jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=
 QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
-java.naming.provider.url=tcp://localhost:61616</pre>
+java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue</pre>
 
 <p>You may also notice that the simple stock quote proxy service exposed in
 Synapse is now available only in HTTP as we have specified transport for that
@@ -2817,7 +2826,7 @@ the client. To test this, use 'ant -Dmode=placeorder...' and you will notice
 the one way JMS message flowing through Synapse into the sample Axis2 server
 instance over http, and Axis2 acknowledging it with a http 202 Accepted
 response.</p>
-<pre>ant stockquote -Dmode=placeorder -Dtrpurl="jms:/JMStoHTTPStockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"</pre>
+<pre>ant stockquote -Dmode=placeorder -Dtrpurl="jms:/JMStoHTTPStockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue"</pre>
 <pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
 
 <p>The second example shows how Synapse could be made to respond with a http
@@ -2963,6 +2972,71 @@ directory given in transport.vfs.FileURI above.</p>
 <p>VFS transport listener will pick the file from the directory in the ftp
 server and send it to the Axis2 service. The file in the ftp directory will
 be deleted. The response will be sent to the given email address.</p>
+
+<h2><a name="Sample256">Sample 256: Proxy services with the mail transport
+</a></h2>
+<pre>&lt;!-- Using the mail transport --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy" transports="mailto"&gt;
+
+        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
+        &lt;parameter name="transport.mail.Protocol"&gt;pop3&lt;/parameter&gt;
+        &lt;parameter name="transport.PollInterval"&gt;5&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.host"&gt;pop.gmail.com&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.port"&gt;995&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.1&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.password"&gt;mailpassword&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.class"&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.fallback"&gt;false&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.port"&gt;995&lt;/parameter&gt;
+
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name="senderAddress" expression="get-property('transport', 'From')"/&gt;
+                &lt;log level="full"&gt;
+                    &lt;property name="Sender Address" expression="get-property('senderAddress')"/&gt;
+                &lt;/log&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;property name="Subject" value="Custom Subject for Response" scope="transport"/&gt;
+                &lt;header name="To" expression="fn:concat('mailto:', get-property('senderAddress'))"/&gt;
+                &lt;log level="full"&gt;
+                    &lt;property name="message" value="Response message"/&gt;
+                    &lt;property name="Sender Address" expression="get-property('senderAddress')"/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Using the mail transport with Proxy
+services</strong></p>
+
+<p><strong>Prerequisites:</strong><br>
+You will need access to an email account</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
+
+<p>Enable mail transport sender in the Synapse axis2.xml. See <a
+href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport
+sender</a> </p>
+
+<p>Start the Synapse configuration numbered 256: i.e. synapse -sample 256</p>
+
+<p>Send a plain/text email with the following body and any custom Subject
+from your mail account.</p>
+<pre>&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;&lt;/m0:getQuote&gt; </pre>
+
+<p>After a few seconds (e.g. 30s), you should receive a POX response in your email
+account with the stock quote reply.</p>
 
 <h1><a name="Task">Introduction to synapse tasks</a></h1>
 
@@ -3643,8 +3717,7 @@ company database and logs it.</p>
 
 <p></p>
 
-<h2><a name="Throttle">Throtteling messages (Throttle Mediator)</a></h2>
-<!-- TODO: any text to go in here??? -->
+<h2><a name="Throttle">Throttling messages (Throttle Mediator)</a></h2>
 
 <h2><a name="Sample370">Sample 370: Introduction to throttle mediator and
 concurrency throttling</a></h2>
@@ -4116,7 +4189,6 @@ Discounted price: 138.77458254967408</pre>
 
 <h2><a name="XQuery">Evaluating XQuery for mediation (XQuery
 Mediator)</a></h2>
-<!-- TODO: what goes in herer -->
 
 <h2><a name="Sample390">Sample 390: Introduction to the XQuery
 mediator</a></h2>
@@ -4163,7 +4235,7 @@ mediator</a></h2>
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
     &lt;/proxy&gt;
 
-&lt;/definitions&gt;                                  </pre>
+&lt;/definitions&gt; </pre>
 
 <p><b>Objective: Introduction transformation using XQuery mediator</b></p>
 
@@ -4240,7 +4312,6 @@ commission.xml document will be added and given as a new price .</p>
 
 <h2><a name="Splitter">Splitting messages in to parts and process in parallel
 (Iterate / Clone)</a></h2>
-<!-- TODO: splitter declaration -->
 
 <h2><a name="Sample400">Sample 400: Message splitting and aggregating the
 responses</a></h2>
@@ -4362,10 +4433,59 @@ only the first request is forwarded to the actual service, and the rest of
 the requests will be served by the cache inside Synapse. You could observe
 this by looking at the printed line of the axis2 server, as well as by
 observing a constant rate as the response to the client instead of the random
-rate, which changes by each and every 20 seconds.</p>
+rate, which changes by each and every 20 seconds.<br>
+</p>
+
+<h2><a name="Callout">Synchronize web service invocation with Callout
+mediator </a></h2>
+
+<p>The Callout mediator calls the given service URL with the request message
+which is given by the source attribute, waits for the response and attaches
+the received response to the destination which is given by the target
+attribute. Both the source and the target can be a key or an XPath. In the
+case of the source, this key refers to either a message context property or
+to a local entry. For the target, this key refers to a message context
+property only. </p>
+
+<h2><a name="Sample430">Sample 430: Simple Callout Mediator
+for synchronizing web service invocation</a></h2>
 
 <p>&#xa0;</p>
+<pre>  
+    &lt;!-- Simple callout  mediator --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;callout serviceURL="http://localhost:9000/soap/SimpleStockQuoteService"
+             action="urn:getQuote"&gt;
+        &lt;source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+        &lt;target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+    &lt;/callout&gt;
+    &lt;property name="RESPONSE" value="true"/&gt;
+    &lt;header name="To" action="remove"/&gt;
+    &lt;send/&gt;
+    &lt;drop/&gt;
+&lt;/definitions&gt; </pre>
 
-<p>&#xa0;</p>
+<div>
+<p><strong>Objective:</strong> Demonstrate the use of the Callout mediator
+for the synchronized web service invocation</p>
+
+<p><strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in
+sample Axis2 server and start it on port 9000.</p>
+
+<p>Start Synapse with the sample configuration 430 (i.e. synapse -sample
+430).</p>
+
+<p>In this sample, Callout mediator does the direct service invocation to the
+StockQuoteService using the client request, get the response and set it as
+the first child of the SOAP message body. Then using the send mediator, the
+message is sent back to the client. </p>
+
+<p>Invoke the client as follows. </p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+</div>
 </body>
 </html>

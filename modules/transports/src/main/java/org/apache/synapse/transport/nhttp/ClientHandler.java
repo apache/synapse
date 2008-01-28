@@ -18,12 +18,6 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
@@ -36,14 +30,7 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.ConnectionReuseStrategy;
-import org.apache.http.Header;
-import org.apache.http.HttpConnection;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
+import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.nio.ContentDecoder;
@@ -52,18 +39,16 @@ import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.BasicHttpProcessor;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpProcessor;
-import org.apache.http.protocol.RequestConnControl;
-import org.apache.http.protocol.RequestContent;
-import org.apache.http.protocol.RequestExpectContinue;
-import org.apache.http.protocol.RequestTargetHost;
-import org.apache.http.protocol.RequestUserAgent;
+import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.nhttp.util.WorkerPool;
 import org.apache.synapse.transport.nhttp.util.WorkerPoolFactory;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 
 /**
  * The client connection handler. An instance of this class is used by each IOReactor, to
@@ -140,8 +125,7 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
 
             HttpRequest request = axis2Req.getRequest();
-            request.setParams(
-                    new DefaultedHttpParams(request.getParams(), this.params));
+            request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
             this.httpProcessor.process(request, context);
 
             conn.submitRequest(request);
@@ -175,8 +159,7 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
 
             HttpRequest request = axis2Req.getRequest();
-            request.setParams(
-                    new DefaultedHttpParams(request.getParams(), this.params));
+            request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
             this.httpProcessor.process(request, context);
 
             conn.submitRequest(request);

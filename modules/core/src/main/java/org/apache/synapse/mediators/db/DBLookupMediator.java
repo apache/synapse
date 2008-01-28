@@ -24,6 +24,7 @@ import org.apache.synapse.MessageContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.Iterator;
 
 /**
@@ -38,8 +39,10 @@ public class DBLookupMediator extends AbstractDBMediator {
 
         // execute the prepared statement, and extract the first result row and
         // set as message context properties, any results that have been specified
+        Connection con = null;
         try {
             PreparedStatement ps = getPreparedStatement(stmnt, msgCtx);
+            con = ps.getConnection();
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -86,6 +89,12 @@ public class DBLookupMediator extends AbstractDBMediator {
         } catch (SQLException e) {
             handleException("Error executing statement : " + stmnt.getRawStatement() +
                 " against DataSource : " + getDSName(), e, msgCtx);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ignore) {}
+            }
         }
     }
 

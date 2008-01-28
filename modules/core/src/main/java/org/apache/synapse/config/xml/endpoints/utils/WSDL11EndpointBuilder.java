@@ -19,28 +19,35 @@
 
 package org.apache.synapse.config.xml.endpoints.utils;
 
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.CustomWSDLLocator;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.WSDLException;
 import javax.wsdl.Definition;
-import javax.wsdl.Service;
 import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLLocator;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import java.util.List;
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Builds the EndpointDefinition containing the details for an epr using a WSDL 1.1 document.
@@ -53,6 +60,7 @@ public class WSDL11EndpointBuilder {
      * Creates an EndpointDefinition for WSDL endpoint from an inline WSDL supplied in the WSDL
      * endpoint configuration.
      *
+     * @param baseUri base uri of the wsdl
      * @param wsdl OMElement representing the inline WSDL
      * @param service Service of the endpoint
      * @param port Port of the endpoint
@@ -60,19 +68,30 @@ public class WSDL11EndpointBuilder {
      * @return EndpointDefinition containing the information retrieved from the WSDL
      */
     public EndpointDefinition createEndpointDefinitionFromWSDL
-            (OMElement wsdl, String service, String port) {
+            (String baseUri, OMElement wsdl, String service, String port) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             wsdl.serialize(baos);
             InputStream in = new ByteArrayInputStream(baos.toByteArray());
             InputSource inputSource = new InputSource(in);
-            WSDLFactory fac = WSDLFactory.newInstance();
-            WSDLReader reader = fac.newWSDLReader();
-            Definition definition = reader.readWSDL(null, inputSource);
-
-            return createEndpointDefinitionFromWSDL(definition, service, port);
-
+            WSDLLocator wsdlLocator = new CustomWSDLLocator(inputSource,baseUri);
+            Document doc = null;
+            try {
+                doc = XMLUtils.newDocument(inputSource);
+            } catch (ParserConfigurationException e) {
+                handleException("Parser Configuration Error", e);
+            } catch (SAXException e) {
+                handleException("Parser SAX Error", e);
+            } catch (IOException e) {
+                handleException(WSDLException.INVALID_WSDL+ "IO Error",e);
+            }
+            if (doc != null) {
+                WSDLFactory fac = WSDLFactory.newInstance();
+                WSDLReader reader = fac.newWSDLReader();
+                Definition definition = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
+                return createEndpointDefinitionFromWSDL(definition, service, port);
+            }
         } catch (XMLStreamException e) {
             handleException("Error retrieving the WSDL definition from the inline WSDL.");
         } catch (WSDLException e) {
@@ -91,7 +110,7 @@ public class WSDL11EndpointBuilder {
      *
      * @return EndpointDefinition containing the information retrieved from the WSDL
      */
-    public EndpointDefinition createEndpointDefinitionFromWSDL
+    private EndpointDefinition createEndpointDefinitionFromWSDL
             (String wsdlURI, String service, String port) {
 
         try {
@@ -170,5 +189,10 @@ public class WSDL11EndpointBuilder {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

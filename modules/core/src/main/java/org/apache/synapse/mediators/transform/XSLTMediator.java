@@ -29,9 +29,12 @@ import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.ElementHelper;
+import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -42,6 +45,7 @@ import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.FixedByteArrayOutputStream;
 import org.apache.synapse.util.TextFileDataSource;
+import org.apache.axis2.AxisFault;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,6 +55,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -59,6 +64,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * The XSLT mediator performs an XSLT transformation requested, using
@@ -177,7 +183,7 @@ public class XSLTMediator extends AbstractMediator {
         }
 
         try {
-            performXLST(synCtx, traceOrDebugOn, traceOn);
+            performXSLT(synCtx, traceOrDebugOn, traceOn);
 
         } catch (Exception e) {
             handleException("Unable to perform XSLT transformation using : " + xsltKey +
@@ -200,7 +206,7 @@ public class XSLTMediator extends AbstractMediator {
      * @param traceOrDebugOn is trace or debug on?
      * @param traceOn is trace on?
      */
-    private void performXLST(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+    private void performXSLT(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
@@ -209,6 +215,8 @@ public class XSLTMediator extends AbstractMediator {
         ByteArrayOutputStream baosForTarget = new FixedByteArrayOutputStream(BYTE_ARRAY_SIZE);
         File tempTargetFile = null;
         File tempSourceFile = null;
+        boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
+        boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
         if (traceOrDebugOn) {
             trace.trace("Transformation source : " + sourceNode.toString());
@@ -314,9 +322,12 @@ public class XSLTMediator extends AbstractMediator {
                 try {
                     cachedTemplates = transFact.newTemplates(
                         SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
-
-                } catch (TransformerConfigurationException e) {
-                    handleException("Error creating XSLT transformer using : " + xsltKey, e, synCtx);
+                    if (cachedTemplates == null) {
+                        handleException("Error compiling the XSLT with key : " + xsltKey, synCtx);
+                    }
+                } catch (Exception e) {
+                    handleException("Error creating XSLT transformer using : "
+                        + xsltKey, e, synCtx);
                 }
             }
         }
@@ -396,8 +407,13 @@ public class XSLTMediator extends AbstractMediator {
                 // if we used a temporary file for the output of the transformation, read from it
                 if (tempTargetFile != null) {
                     try {
-                        StAXOMBuilder builder = new StAXOMBuilder(new FileInputStream(tempTargetFile));
-                        result = builder.getDocumentElement();
+                        XMLStreamReader reader = StAXUtils.createXMLStreamReader(
+                            new FileInputStream(tempTargetFile));
+                        if (isSoapEnvelope) {
+                            result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+                        } else {
+                            result = new StAXOMBuilder(reader).getDocumentElement();
+                        }                        
 
                     } catch (XMLStreamException e) {
                         handleException(
@@ -416,9 +432,13 @@ public class XSLTMediator extends AbstractMediator {
                 } else {
                     // read the Fixed byte array stream
                     try {
-                        StAXOMBuilder builder = new StAXOMBuilder(
+                        XMLStreamReader reader = StAXUtils.createXMLStreamReader(
                             new ByteArrayInputStream(baosForTarget.toByteArray()));
-                        result = builder.getDocumentElement();
+                        if (isSoapEnvelope) {
+                            result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+                        } else {
+                            result = new StAXOMBuilder(reader).getDocumentElement();
+                        }
 
                     } catch (XMLStreamException e) {
                         handleException(
@@ -450,11 +470,34 @@ public class XSLTMediator extends AbstractMediator {
                 synCtx.setProperty(targetPropertyName, result);
             } else {
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Replace source node with result");
+                    traceOrDebug(traceOn, "Replace " +
+                        (isSoapEnvelope ? "SOAP envelope" : isSoapBody ? "SOAP body" : "node")
+                        + " with result");
                 }
-                // replace the sourceNode with the result.
-                sourceNode.insertSiblingAfter(result);
-                sourceNode.detach();
+
+                if (isSoapEnvelope) {
+                    try {
+                        synCtx.setEnvelope((SOAPEnvelope) result);
+                    } catch (AxisFault ex) {
+                        handleException("Unable to replace SOAP envelope with result", ex, synCtx);
+                    }
+
+                } else if (isSoapBody) {
+                    for (Iterator iter = synCtx.getEnvelope().getBody().getChildElements();
+                        iter.hasNext(); ) {
+                        OMElement child = (OMElement) iter.next();
+                        child.detach();
+                    }
+
+                    for (Iterator iter = result.getChildElements(); iter.hasNext(); ) {
+                        OMElement child = (OMElement) iter.next();
+                        synCtx.getEnvelope().getBody().addChild(child);
+                    }
+
+                } else {
+                    sourceNode.insertSiblingAfter(result);
+                    sourceNode.detach();
+                }
             }
 
         } catch (TransformerException e) {

@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -34,33 +33,29 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
+ * <pre>
  * &lt;aggregate&gt;
- *  &lt;corelateOn expression="XPATH-expression"/&gt;
- *  &lt;completeCondition timeout="time-in-seconds"&gt;
- *   &lt;messageCount min="int-min" max="int-max"/&gt;
- *  &lt;/completeCondition&gt;
- *  &lt;onComplete expression="XPATH-expression" sequence="sequence-ref"&gt;
- *   (mediator +)?
- *  &lt;/onComplete&gt;
- *  &lt;invalidate sequence="sequence-ref" timeout="time-in-seconds"&gt;
- *   (mediator +)?
- *  &lt;/invalidate&gt;
+ *   &lt;correlateOn expression="xpath"/&gt;?
+ *   &lt;completeCondition [timeout="time-in-seconds"]&gt;
+ *     &lt;messageCount min="int-min" max="int-max"/&gt;?
+ *   &lt;/completeCondition&gt;?
+ *   &lt;onComplete expression="xpath" [sequence="sequence-ref"]&gt;
+ *     (mediator +)?
+ *   &lt;/onComplete&gt;
  * &lt;/aggregate&gt;
+ * </pre>
  */
 public class AggregateMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(AggregateMediatorFactory.class);
 
     private static final QName AGGREGATE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "aggregate");
-    private static final QName CORELATE_ON_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "corelateOn");
+    private static final QName CORELATE_ON_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "correlateOn");
     private static final QName COMPLETE_CONDITION_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "completeCondition");
     private static final QName MESSAGE_COUNT_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "messageCount");
     private static final QName ON_COMPLETE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onComplete");
-    private static final QName INVALIDATE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "invalidate");
-
-    private static final QName TIME_TO_LIVE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "timeToLive");
     private static final QName EXPRESSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
     private static final QName TIMEOUT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "timeout");
     private static final QName MIN_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "min");
@@ -71,11 +66,6 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
 
         AggregateMediator mediator = new AggregateMediator();
         processTraceState(mediator, elem);
-        // todo: need to fix
-        OMAttribute timeToLive = elem.getAttribute(TIME_TO_LIVE_Q);
-        if (timeToLive != null) {
-            mediator.setTimeToInvalidate(Long.parseLong(timeToLive.getAttributeValue()) * 1000);
-        }
 
         OMElement corelateOn = elem.getFirstChildWithName(CORELATE_ON_Q);
         if (corelateOn != null) {
@@ -84,7 +74,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
                 try {
                     AXIOMXPath xp = new AXIOMXPath(corelateExpr.getAttributeValue());
                     OMElementUtils.addNameSpaces(xp, corelateOn, log);
-                    mediator.setCorelateExpression(xp);
+                    mediator.setCorrelateExpression(xp);
                 } catch (JaxenException e) {
                     handleException("Unable to load the corelate XPATH expression", e);
                 }
@@ -95,7 +85,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
         if (completeCond != null) {
             OMAttribute completeTimeout = completeCond.getAttribute(TIMEOUT_Q);
             if (completeTimeout != null) {
-                mediator.setCompleteTimeout(
+                mediator.setCompletionTimeoutMillis(
                         Long.parseLong(completeTimeout.getAttributeValue()) * 1000);
             }
 
@@ -110,24 +100,6 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
                 if (max != null) {
                     mediator.setMaxMessagesToComplete(Integer.parseInt(max.getAttributeValue()));
                 }
-            }
-        }
-
-        OMElement invalidate = elem.getFirstChildWithName(INVALIDATE_Q);
-        if (invalidate != null) {
-            OMAttribute sequenceRef = invalidate.getAttribute(SEQUENCE_Q);
-            if (sequenceRef != null) {
-                mediator.setInvalidMsgSequenceRef(sequenceRef.getAttributeValue());
-            } else if (invalidate.getFirstElement() != null) {
-                mediator.setInvalidMsgSequence(
-                        (new SequenceMediatorFactory()).createAnonymousSequence(invalidate));
-            }
-
-            OMAttribute timeout = invalidate.getAttribute(TIMEOUT_Q);
-            if (timeout != null) {
-                mediator.setInvlidateToDestroyTime(Long.parseLong(timeout.getAttributeValue()));
-            } else {
-                mediator.setInvlidateToDestroyTime(300);
             }
         }
 

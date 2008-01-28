@@ -28,13 +28,18 @@ import org.apache.synapse.mediators.eip.splitter.IterateMediator;
  * IterateMediator instance to the following xml configuration
  *
  * <pre>
- *  &lt;iterate continueParent=(true | false) expression="XPATH expression"&gt;
- *   &lt;target to="TO address" [soapAction="urn:Action"] sequence="sequence ref"
- *                                                         endpoint="endpoint ref"&gt;
- *    &lt;sequence&gt; (mediator +) &lt;/sequence&gt;
- *    &lt;endpoint&gt; endpoint &lt;/endpoint&gt;
- *   &lt;/target&gt;
- *  &lt;/iterate&gt;
+ * &lt;iterate [continueParent=(true | false)] [preservePayload=(true | false)]
+ *          (attachPath="xpath")? expression="xpath"&gt;
+ *   &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"]
+ *          [endpoint="endpoint_ref"]&gt;
+ *     &lt;sequence&gt;
+ *       (mediator)+
+ *     &lt;/sequence&gt;?
+ *     &lt;endpoint&gt;
+ *       endpoint
+ *     &lt;/endpoint&gt;?
+ *   &lt;/target&gt;+
+ * &lt;/iterate&gt;
  * </pre>
  */
 public class IterateMediatorSerializer extends AbstractMediatorSerializer {

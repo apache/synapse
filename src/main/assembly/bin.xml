@@ -51,7 +51,6 @@
                 <include>synapse.bat</include>
                 <include>install-synapse-service.bat</include>
                 <include>uninstall-synapse-service.bat</include>
-                <include>run-synapse-service.bat</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -139,6 +138,10 @@
                 <include>Synapse_QuickStart.html</include>
                 <include>Synapse_Extending.html</include>
             </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/site/resources/images</directory>
+            <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>modules/samples/services</directory>
@@ -229,10 +232,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/core/src/main/resources</directory>
+            <directory>patches</directory>
             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
             <includes>
-                <include>patches.txt</include>
+                <include>*.jar</include>
+                <include>patches.txt</include>                
             </includes>
         </fileSet>
     </fileSets>

@@ -144,7 +144,7 @@ public class Aggregate extends TimerTask {
         }
 
         // else, has this aggregation reached its timeout?
-        if (System.currentTimeMillis() >= expiryTimeMillis) {
+        if (expiryTimeMillis > 0 && System.currentTimeMillis() >= expiryTimeMillis) {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, trace, log,
                     "Aggregation complete - the aggregation has timed out");

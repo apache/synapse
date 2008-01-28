@@ -28,9 +28,10 @@
 
 <section name="Previous version documentation">
 
-<p>The Apache Synapse team is proud to announce the aviailability of the 1.1.1 release on the 28th of
-January 2008. Apache Synapse is now a Top Level Project at Apache Software Foundation moving out from
-    Web Services project.</p>
+    <p>The Apache Synapse team is proud to announce the availability of the 1.1.1 release on the
+        28th of January 2008. As of December 2007, Apache Synapse has moved on to become a Top Level Project
+        (TLP) of the Apache Software Foundation, moving out from Web Services project.
+    </p>
 
 <table class="bodyTable">
   <tbody>

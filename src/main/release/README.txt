@@ -1,4 +1,4 @@
-Apache Synapse 1.1 build  (November 2007) - http://ws.apache.org/synapse/
+Apache Synapse 1.2-SNAPSHOT build  (January 2008) - http://ws.apache.org/synapse/
 ------------------------------------------------------------------------------------------
 
 -------------------
@@ -13,7 +13,6 @@ structure.
 			synapse.sh
 			synapse-daemon.sh
 			synapse.bat
-			run-synapse-service.bat
 			install-synapse-service.bat
 			uninstall-synapse-service.bat
 		/docs

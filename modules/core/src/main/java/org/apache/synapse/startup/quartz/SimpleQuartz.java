@@ -66,7 +66,7 @@ public class SimpleQuartz extends AbstractStartup {
     
     private String cron;
     private int repeatCount = -1;
-    private long repeatInterval;
+    private long repeatInterval; // in milliseconds
     private String className;
     private List pinnedServers;
     private Scheduler sch;

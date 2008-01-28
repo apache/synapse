@@ -107,7 +107,6 @@ public class SynapseCommodityServiceTest extends TestCase {
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         busTrsIn.getParameter("port").setValue("12101");
         startServer(businessConfigCtx);
-        System.out.println("");
     }
 
     protected void tearDown() throws java.lang.Exception {

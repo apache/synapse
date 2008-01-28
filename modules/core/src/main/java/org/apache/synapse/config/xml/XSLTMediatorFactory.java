@@ -39,6 +39,7 @@ import java.util.Iterator;
  * <pre>
  * &lt;xslt key="property-key" [source="xpath"] [target="string"]&gt;
  *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ *   &lt;feature name="string" value="true| false" /&gt;*
  * &lt;/transform&gt;
  * </pre>
  */

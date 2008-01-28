@@ -79,7 +79,7 @@ public class Axis2HttpRequest {
         try {
             this.pipe = new PipeImpl();
         } catch (IOException e) {
-            log.error("Error creating pipe to write message body");
+            log.error("Error creating pipe to write message body", e);
         }
     }
 

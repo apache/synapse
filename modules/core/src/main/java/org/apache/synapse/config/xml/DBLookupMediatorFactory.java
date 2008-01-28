@@ -27,30 +27,32 @@ import org.apache.synapse.mediators.db.DBLookupMediator;
 import javax.xml.namespace.QName;
 
 /**
- * <dblookup>
- *   <connection>
- *     <pool>
+ * <pre>
+ * &lt;dblookup&gt;
+ *   &lt;connection&gt;
+ *     &lt;pool&gt;
  *      (
- *       <driver/>
- *       <url/>
- *       <user/>
- *       <password/>
+ *       &lt;driver/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
  *     |
- *       <dsName/>
- *       <icClass/>
- *       <url/>
- *       <user/>
- *       <password/>
+ *       &lt;dsName/&gt;
+ *       &lt;icClass/&gt;
+ *       &lt;url/&gt;
+ *       &lt;user/&gt;
+ *       &lt;password/&gt;
  *     )
- *       <property name="name" value="value"/>*
- *     </pool>
- *   </connection>
- *   <statement>
- *     <sql>select something from table where something_else = ?</sql>
- *     <parameter [value="" | expression=""] type="int|string"/>*
- *     <result name="string" column="int|string"/>*
- *   </statement>+
- * </dblookup>
+ *       &lt;property name="name" value="value"/&gt;*
+ *     &lt;/pool&gt;
+ *   &lt;/connection&gt;
+ *   &lt;statement&gt;
+ *     &lt;sql&gt;select something from table where something_else = ?&lt;/sql&gt;
+ *     &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
+ *     &lt;result name="string" column="int|string"/&gt;*
+ *   &lt;/statement&gt;+
+ * &lt;/dblookup&gt;
+ * </pre>
  */
 public class DBLookupMediatorFactory extends AbstractDBMediatorFactory {
 

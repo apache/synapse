@@ -231,4 +231,20 @@ public final class SynapseConstants {
     
     /** Synapse server instance name */
     public static final String SYNAPSE_SERVER_NAME = "SynapseServerName";
+
+    public static final String SYNAPSE_DATASOURCES = "synapse.datasources";
+    
+    /** Root for relative path */
+    public static final String RESOLVE_ROOT = "resolve.root";
+
+    /* URL connection read timeout and connection timeout */
+
+    public static final int DEFAULT_READTIMEOUT = 100000;
+
+    public static final int DEFAULT_CONNECTTIMEOUT = 20000;
+
+    public static final String READTIMEOUT = "Connection.ReadTimeout";
+
+    public static final String CONNECTTIMEOUT = "Connection.ConnectTimeout";
+
 }

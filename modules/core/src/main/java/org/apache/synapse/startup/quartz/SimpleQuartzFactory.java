@@ -145,7 +145,9 @@ public class SimpleQuartzFactory implements StartupFactory {
                         "a simple trigger, but no interval specified");
                 } else if (repeatInterval != null && repeatInterval.getAttributeValue() != null) {
                     try {
-                        q.setInterval(Long.parseLong(repeatInterval.getAttributeValue()));
+                        long repeatIntervalInSeconds = Long.parseLong(repeatInterval.getAttributeValue());
+                        long repeatIntervalInMillis = repeatIntervalInSeconds * 1000;
+                        q.setInterval(repeatIntervalInMillis);
                     } catch (Exception e) {
                         handleException("Failed to parse trigger interval as a long value", e);
                     }

@@ -45,10 +45,16 @@ public class Statistics {
      * @param isFault - A boolean value that indicate whether falut has occured or not
      */
     public void update(long inTime, long outTime, boolean isFault) {
+
+        if (outTime < 0 || inTime < 0) {
+            return;
+        }
+
         count++;
         if (isFault) {
             faultCount++;
         }
+
         long responseTime = outTime - inTime;
         if (maxProcessingTime < responseTime) {
             maxProcessingTime = responseTime;

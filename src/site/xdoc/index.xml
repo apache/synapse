@@ -28,11 +28,16 @@
   
 <section name="Apache Synapse Enterprise Service Bus (ESB)">
   <p>
-      Apache Synapse is an extremely lightweight and easy-to-use Open Source Enterprise Service Bus
-      (ESB) available under the Apache Software License v2.0. Apache Synapse graduated from the
-      Apache Incubator on the 2nd of January 2007, and was accepted as a sub-project of the Apache
-      Web Services project. In December 2007, Apache Synapse became a top level project (TLP) of the
-      Apache Software Foundation
+       Apache Synapse is designed to be a simple, lightweight and high performance 
+       Enterprise Service Bus (ESB) from Apache. Based on a small asynchronous core, 
+       Apache Synapse has excellent support for XML and Web services - as well as binary and text formats. 
+       The Synapse engine is configured with a simple XML format and comes with a set of ready-to-use transports and mediators. 
+       We recommend you start by reading the QuickStart and then trying out the samples. Synapse is made available under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
+  </p><p>
+      <b>Latest News</b>
+  </p><p>
+      In December 2007, Apache Synapse became a top level project (TLP) of the
+      Apache Software Foundation.
   </p>
   <p>For more information, see:
   <ul>
@@ -42,20 +47,23 @@
   <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
   <li>The Developer mailing list:  <a href="mailto:dev-subscribe@synapse.apache.org">Subscribe</a></li>
   <li>The User mailing list:  <a href="mailto:user-subscribe@synapse.apache.org">Subscribe</a></li>
-  <li>The WS Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
+  <!--li>The Synapse Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li-->
   </ul>
   </p>
 </section>
 
 <section name="Introduction">
 <p>
-    Offering connectivity and integration with Legacy systems, XML based services as well as
-    SOAP Web services, Apache Synapse provides a simple to understand and use, but extremely
-    powerful and lightweight processing engine. Supporting fully non-blocking HTTP/S using the
-    powerful HttpCore NIO module, JMS v1.0 and higher, Apache VFS File Systems (s/ftp, file,
-    zip/jar/tar/gz, webdav, cifs..etc), POP3/IMAP/SMTP transports, Apache Synapse can process
-    SOAP 1.1/1.2, POX/REST, Text and Binary messages with support for any-to-any
-    conversion/transformation.
+    Apache Synapse is an ESB that has been designed to be simple to configure, very fast, and effective at solving many integration and gatewaying problems.
+    Synapse has support for HTTP, SOAP, SMTP, JMS, FTP and file system transports, as well as first class support for standards such as WS-Addressing, 
+    Web Services Security (WSS), Web Services Reliable Messaging (WSRM), efficient binary attachments (MTOM/XOP).
+    Synapse can transform messages using key standards such as XSLT, XPath and XQuery, or simply using Java. Synapse supports a number of useful
+    functions out-of-the-box without programming, but it also can be extended using popular programming languages such as Java, JavaScript, Ruby, and Groovy.
+</p>
+<p>
+    Synapse has a completely asynchronous core, and supports non-blocking HTTP and HTTPS using the
+    excellent <a href="http://hc.apache.org/httpcomponents-core/index.html">Apache HttpCore</a> NIO module. In addition, Synapse supports JMS v1.0 and higher, Apache VFS File Systems (FTP, SFTP, File (including zip/jar/tar/gz), Webdav, CIFS), POP3/IMAP/SMTP transports. Apache Synapse can process
+    SOAP 1.1/1.2, pure XML/REST, Text and Binary messages with support for any-to-any conversion and transformation.  
 </p>
 </section>
 	

@@ -13,12 +13,12 @@
 
   =======================================================================
 -->
-  <Project rdf:about="http://ws.apache.org/synapse">
+  <Project rdf:about="http://synapse.apache.org/">
     <created>2007-06-08</created>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
     <name>Apache Synapse</name>
-    <homepage rdf:resource="http://ws.apache.org/synapse" />
-    <asfext:pmc rdf:resource="http://webservices.apache.org" />
+    <homepage rdf:resource="http://synapse.apache.org/" />
+    <asfext:pmc rdf:resource="http://synapse.apache.org" />
     <shortdesc>Apache Synapse is a lightweight ESB engine and XML router.</shortdesc>
     <description>Apache Synapse is a simple and highly effective Web Services intermediary and SOA framework. It can be
 added to your existing network very simply either as a services gateway or as an HTTP proxy. Once Apache
@@ -31,8 +31,8 @@ Apache Axiom. in addition, the use of a completely asynchronous architecture and
 ensures that Synapse has very low overhead and can scale to support thousands of concurrent clients without dropping
 messages.</description>
     <bug-database rdf:resource="https://issues.apache.org/jira/browse/SYNAPSE" />
-    <mailing-list rdf:resource="http://ws.apache.org/synapse/mail-lists.html" />
-    <download-page rdf:resource="http://ws.apache.org/synapse/download.cgi" />
+    <mailing-list rdf:resource="http://synapse.apache.org/mail-lists.html" />
+    <download-page rdf:resource="http://synapse.apache.org/download.cgi" />
     <programming-language>Java</programming-language>
     <category rdf:resource="http://projects.apache.org/category/xml" />
     <category rdf:resource="http://www.apache.org/category/http"/>
@@ -41,9 +41,9 @@ messages.</description>
     
     <release>
       <Version>
-        <name>Apache Synapse 1.0</name>
-        <created>2007-06-08</created>
-        <revision>1.0</revision>
+        <name>Apache Synapse 1.1.1</name>
+        <created>2008-01-24</created>
+        <revision>1.1.1</revision>
       </Version>
     </release>
     <repository>

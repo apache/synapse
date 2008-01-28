@@ -142,7 +142,7 @@
     </p>
     <h4>
       <a
-      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/MessageContext.java?view=markup">MessageContext
+      href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/MessageContext.java?view=markup">MessageContext
       Interface</a>
     </h4>
     <p/>
@@ -229,7 +229,7 @@ public interface MessageContext {
     </p>
     <h4>
       <a
-      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
+      href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
       interface</a>
     </h4>
     <p>
@@ -285,7 +285,7 @@ public interface <span style="font-weight: bold;">Mediator </span>{
     </p>
     <h4>
       <a
-      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
+      href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
       ListMediator interface</a>
     </h4>
 <pre xml:space="preserve">package org.apache.synapse.mediators;
@@ -347,7 +347,7 @@ public interface ListMediator extends Mediator {
     </p>
     <h4>
       <a
-      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
+      href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
       interface</a>
     </h4>
 <pre xml:space="preserve">package org.apache.synapse.mediators;
@@ -405,7 +405,7 @@ public interface <span style="font-weight: bold;">FilterMediator </span>extends 
     </p>
     <h4>
       <a
-      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
+      href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
       MediatorFactory interface</a>
     </h4>
 <pre xml:space="preserve">package org.apache.synapse.config.xml;
@@ -433,7 +433,7 @@ public interface MediatorFactory {
     <p/>
     <h4>
       <a
-      href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
+      href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
       MediatorSerializer interface</a>
     </h4>
 <pre xml:space="preserve">package org.apache.synapse.config.xml;

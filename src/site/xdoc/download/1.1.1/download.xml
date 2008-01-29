@@ -100,9 +100,7 @@
       </table>
       <br/>
        <p>
-        [if-any logo] <a href="[link]"><img align="right" src="[logo]"
-        border="0" alt=""/></a>[end] The currently selected mirror is <b>[preferred]</b>.
-        If you encounter a problem with this mirror, please select another
+        [if-any logo]<a href="[link]"><img src="[logo]" alt="" /></a>[end] The currently selected mirror is <b>[preferred]</b>.        If you encounter a problem with this mirror, please select another
         mirror. If all mirrors are failing, there are <i>backup</i>
         mirrors (at the end of the mirrors list) that should be available.
       </p>

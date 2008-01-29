@@ -186,7 +186,8 @@ public class RMMsgCreator {
 				}
 				// Finally fall back to using an anonymous endpoint
 				if (offeredEndpoint==null) {
-					offeredEndpoint = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
+					//The replyTo has already been set to a MC anon with UUID and so will use that same one for the offered endpoint  
+					offeredEndpoint = rmsBean.getReplyToEndpointReference();
 				}
 				Endpoint endpoint = new Endpoint (offeredEndpoint, rmNamespaceValue, addressingNamespace);
 				offerPart.setEndpoint(endpoint);

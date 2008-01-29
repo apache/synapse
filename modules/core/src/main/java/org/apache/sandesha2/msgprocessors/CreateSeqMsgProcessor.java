@@ -54,6 +54,7 @@ import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -155,7 +156,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			
 			CreateSequenceResponse createSeqResPart = createSeqResponse.getCreateSequenceResponse();
 	
-				// OFFER PROCESSING
+			// OFFER PROCESSING
 			SequenceOffer offer = createSeqPart.getSequenceOffer();
 			if (offer != null) {
 				Accept accept = createSeqResPart.getAccept();
@@ -176,10 +177,37 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				
 				boolean offerAccepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
 	
+				RMSBean rMSBean = null;
+				//Before processing this offer any further we need to perform some extra checks 
+				//on the offered EP if WS-RM Spec 1.1 is being used
+				if(offerAccepted && Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmdBean.getRMVersion())){
+					Endpoint endpoint = offer.getEndpoint();
+					if (endpoint!=null) {
+						//Check to see if the offer endpoint has a value of WSA Anonymous
+						String addressingNamespace = (String) createSeqRMMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+						if(endpoint.equals(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace))){
+							//Don't accept the offer
+							if (log.isDebugEnabled())
+								log.debug("Offer Refused as it included a WSA Anonymous endpoint");	
+							offerAccepted = false;
+						} else {
+							rMSBean = new RMSBean();
+							//Set the offered EP
+							rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
+						}
+					} else {
+						//Don't accept the offer
+						if (log.isDebugEnabled())
+							log.debug("Offer Refused as it included a null endpoint");	
+						offerAccepted = false;
+					}
+				} else if (offerAccepted && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmdBean.getRMVersion())){
+					rMSBean = new RMSBean(); 
+				}
+				
 				if (offerAccepted) {
 					// Setting the CreateSequence table entry for the outgoing
 					// side.
-					RMSBean rMSBean = new RMSBean();
 					rMSBean.setSequenceID(offeredSequenceID);
 					String outgoingSideInternalSequenceId = SandeshaUtil
 							.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
@@ -206,12 +234,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// Setting sequence properties for the outgoing sequence.
 					// Only will be used by the server side response path. Will
 					// be wasted properties for the client side.
-						
-					Endpoint endpoint = offer.getEndpoint();
-					if (endpoint!=null) {
-						// setting the OfferedEndpoint
-						rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
-					}
 		
 					rmdBean.setOutboundInternalSequence(outgoingSideInternalSequenceId);
 					RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();

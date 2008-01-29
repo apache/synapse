@@ -7,7 +7,7 @@
   ~  to you under the Apache License, Version 2.0 (the
   ~  "License"); you may not use this file except in compliance
   ~  with the License.  You may obtain a copy of the License at
-  ~
+  ~ 
   ~   http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~  Unless required by applicable law or agreed to in writing,
@@ -1117,8 +1117,10 @@
         </developer>
         <developer>
             <name>Paul Fremantle</name>
+            <id>pzf</id>
             <email>paul AT wso2.com</email>
             <organization>WSO2</organization>
+            <url>http://pzf.fremantle.org/</url>
         </developer>
         <developer>
             <name>Eran Chinthaka</name>
@@ -1129,6 +1131,7 @@
         </developer>
         <developer>
             <name>Ant Elder</name>
+            <id>antelder</id>
             <email>ant.elder AT gmail.com</email>
             <organization>IBM</organization>
         </developer>
@@ -1165,26 +1168,30 @@
         </developer>
         <developer>
             <name>Jaliya Ekanayake</name>
+            <id>jaliya</id>
             <email>jnekanayake AT gmail.com</email>
         </developer>
         <developer>
             <name>Indika Kumara</name>
+            <id>indika</id>
             <email>indika@wso2.com</email>
             <organization>WSO2</organization>
         </developer>
         <developer>
             <name>Chathura Ekanayake</name>
+            <id>chathura_ce</id>
             <email>chathura@wso2.com</email>
             <organization>WSO2</organization>
         </developer>
         <developer>
             <name>Kasun Samarasinghe</name>
+            <id>kasun</id>
             <email>kasun2010@gmail.com</email>
             <organization>University of Colombo</organization>
         </developer>
         <developer>
             <name>Tijs Rademakers</name>
-		    <id>tijs</id>
+            <id>tijs</id>
             <email>t.rademakers@chello.nl</email>
             <organization>Atos Origin</organization>
         </developer>
@@ -1203,9 +1210,9 @@
         </developer>
         <developer>
             <name>Oleg Kalnichevski</name>
-            <id>oleg</id>
-            <email></email>
-            <organization></organization>
+            <id>olegk</id>
+            <email>OlegK AT apache.org</email>
+            <organization>Apache</organization>
         </developer>
     </developers>
 

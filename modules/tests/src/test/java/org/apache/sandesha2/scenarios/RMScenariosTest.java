@@ -98,7 +98,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 		runEcho(clientOptions, true, true, false,true,true);
 	}
 		
-	public void testSyncEcho() throws Exception {
+	public void testSyncEchoWithOffer() throws Exception {
 		// Test sync echo with an offer, and the 1.1 spec
 		Options clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
@@ -112,9 +112,11 @@ public class RMScenariosTest extends SandeshaTestCase {
 //		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 //		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
 //		runEcho(clientOptions, false, false, true,false,false);
+    }
 
+    public void testSyncEcho() throws Exception {
 		// Test sync echo with no offer, and the 1.1 spec
-		clientOptions = new Options();
+		Options clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		runEcho(clientOptions, false, false, true,true,true);
 	}

@@ -157,6 +157,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 			msgCtx.pause();
 			returnValue = InvocationResponse.SUSPEND;
 
+            // Rethrow the original exception if it is an AxisFault
+            if (e instanceof AxisFault)
+                throw (AxisFault)e;
+
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.outMsgError, e.toString());
 			throw new AxisFault(message, e);
 

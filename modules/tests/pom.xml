@@ -68,6 +68,7 @@
                  		<include>**/*Test.java</include>
                 	</includes>
                 	<forkMode>pertest</forkMode>
+                	<!--<argLine>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
     			</configuration>
 			</plugin>
         </plugins>

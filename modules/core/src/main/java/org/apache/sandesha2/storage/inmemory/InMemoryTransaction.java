@@ -84,7 +84,7 @@ public class InMemoryTransaction implements Transaction {
 					if(!enlistedBeans.isEmpty()) {
 						HashSet set = new HashSet();
 						set.add(this);
-						while(other != null && other != this) {
+						while(other != null) {
 							if(set.contains(other)) {
 								String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.deadlock, this.toString(), bean.toString());
 								SandeshaStorageException e = new SandeshaStorageException(message);

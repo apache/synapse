@@ -161,8 +161,6 @@ public class SequenceProcessor {
 			return InvocationResponse.ABORT;
 		}
 
-		// Pause the messages bean if not the right message to invoke.
-		
 		// updating the last activated time of the sequence.
 		bean.setLastActivatedTime(System.currentTimeMillis());
 		
@@ -292,9 +290,7 @@ public class SequenceProcessor {
 			RelatesTo relatesTo = msgCtx.getRelatesTo();
 			if(relatesTo != null) {
 				String messageId = relatesTo.getValue();
-				SenderBean matcher = new SenderBean();
-				matcher.setMessageID(messageId);
-				SenderBean sender = storageManager.getSenderBeanMgr().findUnique(matcher);
+				SenderBean sender = storageManager.getSenderBeanMgr().retrieve(messageId);
 				if(sender != null) {
 					if(log.isDebugEnabled()) log.debug("Deleting sender for sync-2-way message");
 					

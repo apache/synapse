@@ -98,7 +98,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		//we want to find valid sender beans
 		SenderBean findSenderBean = new SenderBean();
-		if(token!=null){
+		if(token!=null && identifier==null){
 			if(log.isDebugEnabled()) log.debug("token found " + token);
 			//this means we have to scope our search for sender beans that belong to sequences that own the same token
 			String data = secManager.getTokenRecoveryData(token);

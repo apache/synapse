@@ -66,5 +66,7 @@ public class UnsupportedScenariosTest extends RMScenariosTest {
 	public void testSyncEcho() throws Exception {
 		// Do nothing
 	}
-
+    public void testSyncEchoWithOffer() throws Exception {
+        // Do nothing
+    }
 }

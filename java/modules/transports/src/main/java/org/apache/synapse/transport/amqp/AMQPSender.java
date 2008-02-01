@@ -60,8 +60,6 @@ public class AMQPSender extends AbstractTransportSender {
         // If targetEPR is not null, determine the addressing info from it
         if (targetEPR != null) {
             amqpTransportInfo = new AMQPOutTransportInfo(targetEPR);
-            // do we have a definition for a connection factory to use for this address?
-
         }
         // If not try to get the addressing info from the transport description
         else if (outTransportInfo != null && outTransportInfo instanceof AMQPOutTransportInfo) {
@@ -86,7 +84,6 @@ public class AMQPSender extends AbstractTransportSender {
         }
 
         byte[] message = null;
-        String correlationId = null;
         try {
             message = createMessageData(msgCtx);
         } catch (AMQPSynapseException e) {
@@ -119,22 +116,6 @@ public class AMQPSender extends AbstractTransportSender {
         deliveryProps.setExchange(amqpTransportInfo.getExchangeName());
         deliveryProps.setRoutingKey(amqpTransportInfo.getRoutingKey());
 
-        /* For efficiency I assume that the reply to exchange and destination is already created
-        *  If the reply is for the same service, then this should be the queue that the service is listening to
-        *  Blindly creating these exchanges,queues and bindings is sub optimal and can be avoid if the administrator
-        *  creates the nessacery exchanges,queues and bindings before hand.
-        *
-        *  If the service hasn't specify and it's a request/reply MEP then a temporary queue
-        *  (which is auto-deleted) is created and bound to the amq.direct exchange.
-        */
-        if (msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_EXCHANGE_NAME) != null){
-            String replyExchangeName = (String) msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_EXCHANGE_NAME);
-            String replyRoutingKey = msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_ROUTING_KEY)!= null?(String) msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_ROUTING_KEY):null;
-
-            // for fannout exchange or some other custom exchange, the routing key maybe null
-            msgProps.setReplyTo(new ReplyTo(replyExchangeName,replyRoutingKey));
-        }
-
         // Content type
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
         MessageFormatter messageFormatter = null;
@@ -149,10 +130,10 @@ public class AMQPSender extends AbstractTransportSender {
         msgProps.setContentType(contentType);
 
         // Custom properties - SOAP ACTION
-        Map<String,Object> props = new HashMap();
+        Map<String,Object> props = new HashMap<String,Object>();
 
         if (msgCtx.isServerSide()) {
-            // set SOAP Action as a property on the JMS message
+            // set SOAP Action as a property on the message
             props.put(BaseConstants.SOAPACTION,(String)msgCtx.getProperty(BaseConstants.SOAPACTION));
 
         } else {
@@ -175,6 +156,7 @@ public class AMQPSender extends AbstractTransportSender {
 
                 if (AMQPConstants.AMQP_CORELATION_ID.equals(name)) {
                     msgProps.setCorrelationId((String) headerMap.get(AMQPConstants.AMQP_CORELATION_ID));
+                    // If it's request/response, then we need to fill in corelation id and reply to properties
                 }
                 else if (AMQPConstants.AMQP_DELIVERY_MODE.equals(name)) {
                     Object o = headerMap.get(AMQPConstants.AMQP_DELIVERY_MODE);
@@ -213,20 +195,46 @@ public class AMQPSender extends AbstractTransportSender {
                 }
             }
         }
-        // If it's request/response, then we need to fill in corelation id and reply to properties
-        if (waitForResponse && msgCtx.getProperty(AMQPConstants.AMQP_CORELATION_ID) == null) {
-            msgProps.setCorrelationId(UUIDGenerator.getUUID());
-            if (msgProps.getReplyTo() == null){
-                // We need to use a temp queue here.
-                String tempQueueName = "Queue_" + msgProps.getCorrelationId();
-                synchronized(session){
-                    session.queueDeclare(tempQueueName, null, null, Option.AUTO_DELETE,Option.EXCLUSIVE);
-                    session.queueBind(tempQueueName, "amq.direct", tempQueueName, null);
-                    session.sync();
-                }
-                msgProps.replyTo(new ReplyTo("amq.direct",tempQueueName));
-            }
-        }
+
+        /* For efficiency I assume that the reply to exchange and destination is already created
+         *  If the reply is for the same service, then this should be the queue that the service is listening to.
+         *  Blindly creating these exchanges,queues and bindings is sub optimal and can be avoid if the administrator
+         *  creates the nessacery exchanges,queues and bindings before hand.
+         *
+         *  If the service hasn't specify and it's a request/reply MEP then a temporary queue
+         *  (which is auto-deleted) is created and bound to the amq.direct exchange.
+         */
+         if (msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_EXCHANGE_NAME) != null){
+             String replyExchangeName = (String) msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_EXCHANGE_NAME);
+             String replyRoutingKey = msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_ROUTING_KEY)!= null?(String) msgCtx.getProperty(AMQPConstants.AMQP_REPLY_TO_ROUTING_KEY):null;
+
+             // for fannout exchange or some other custom exchange, the routing key maybe null
+             msgProps.setReplyTo(new ReplyTo(replyExchangeName,replyRoutingKey));
+         }
+
+         // If it's request/response, then we need to fill in reply to properties and correlation_id
+         if (waitForResponse){
+
+             if (waitForResponse && msgProps.getCorrelationId() == null) {
+                 if (msgCtx.getProperty(AMQPConstants.AMQP_CORELATION_ID) != null){
+                     msgProps.setCorrelationId((String)msgCtx.getProperty(AMQPConstants.AMQP_CORELATION_ID));
+                 }else{
+                     msgProps.setCorrelationId(UUIDGenerator.getUUID());
+                 }
+
+             }
+
+             if (msgProps.getReplyTo() == null){
+                 //We need to use a temp queue here.
+                 String tempQueueName = "Queue_" + msgProps.getCorrelationId();
+                 synchronized(session){
+                     session.queueDeclare(tempQueueName, null, null, Option.AUTO_DELETE,Option.EXCLUSIVE);
+                     session.queueBind(tempQueueName, "amq.direct", tempQueueName, null);
+                     session.sync();
+                 }
+                 msgProps.replyTo(new ReplyTo("amq.direct",tempQueueName));
+             }
+         }
     }
 
     private byte[] createMessageData(MessageContext msgContext){
@@ -265,7 +273,7 @@ public class AMQPSender extends AbstractTransportSender {
         session.messageSubscribe(msgProps.getReplyTo().getRoutingKey(),
                                  destination,
                                  Session.TRANSFER_CONFIRM_MODE_REQUIRED,
-                                 Session.TRANSFER_ACQUIRE_MODE_NO_ACQUIRE,
+                                 Session.TRANSFER_ACQUIRE_MODE_PRE_ACQUIRE,
                                  new MessagePartListenerAdapter(listener), null, Option.NO_OPTION);
 
         Message reply = listener.receive(timeout);

@@ -21,17 +21,31 @@ public class AMQPConstants
      */
     public static final long DEFAULT_AMQP_TIMEOUT = Options.DEFAULT_TIMEOUT_MILLISECONDS;
 
-    //-------------------------- services.xml parameters --------------------------------
-    /**
-     * The Parameter name indicating the amqp destination for requests
-     */
+    //-------------------------- axis2.xml parameters --------------------------------
+    /** Connection URL specified in the axis2.xml or services.xml */
     public static final String CONNECTION_URL_PARAM = "transport.amqp.ConnectionURL";
 
+    /** default exchange name specified axis2.xml */
     public static final String EXCHANGE_NAME_PARAM = "transport.amqp.ExchangeName";
 
+    /** default exchange type specified axis2.xml */
     public static final String EXCHANGE_TYPE_PARAM = "transport.amqp.ExchangeType";
 
-    public static final String ROUTING_KEY_PARAM = "transport.amqp.RoutingKey";
+    //-------------------------- services.xml parameters --------------------------------
+    /** routing key specified in the services.xml */
+    public static final String BINDING_ROUTING_KEY_ATTR = "routingKey";
+
+    /** exchange name specified in the services.xml */
+    public static final String BINDING_EXCHANGE_NAME_ATTR = "exchangeName";
+
+    /** exchange type specified in the services.xml */
+    public static final String BINDING_EXCHANGE_TYPE_ATTR = "exchangeType";
+
+    /** bindings specified in the services.xml */
+    public static final String BINDINGS_PARAM = "transport.amqp.Bindings";
+
+    /** bindings specified in the services.xml */
+    public static final String BINDINGS_PRIMARY_ATTR = "primary";
 
     /**
      * The Parameter name indicating the response AMQP destination
@@ -47,7 +61,7 @@ public class AMQPConstants
      * The Parameter name of an Axis2 service, indicating the AMQP connection
      * which should be used to listen for messages for it.
      */
-    public static final String CONNECTION_PARAM = "transport.amqp.Connection";
+    public static final String CONNECTION_NAME_PARAM = "transport.amqp.ConnectionName";
     /**
      * If reconnect timeout if connection error occurs in seconds
      */

@@ -206,10 +206,10 @@ public class SOAPFaultEnvelopeCreator {
 		
 		if (faultText==null) {
 			faultText = factory.createSOAPFaultText();
-      faultReason.addSOAPText(faultText);
+			faultReason.addSOAPText(faultText);
 		}
 		
-		if (data!=null && data.getReason()!=null)
+		if (data.getReason()!=null)
 			faultText.setText(data.getReason());
 
 		SOAPFaultDetail faultDetail = fault.getDetail();

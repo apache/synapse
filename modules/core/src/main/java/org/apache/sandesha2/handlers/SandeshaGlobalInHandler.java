@@ -114,6 +114,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					}
 				} catch(Exception e) {
 					// Do nothing, we failed to find a Sequence header
+					if (log.isDebugEnabled())
+						log.debug("Exception encountered accessing Sequence Header " + e.getMessage());
 				}
 				if(lastMessageHeader) {
 					SOAPBody body = env.getBody();

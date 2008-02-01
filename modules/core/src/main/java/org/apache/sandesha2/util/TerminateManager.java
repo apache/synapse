@@ -61,7 +61,7 @@ public class TerminateManager {
 
 	private static String CLEANED_AFTER_INVOCATION = "CleanedAfterInvocation";
 
-	public static HashMap receivingSideCleanMap = new HashMap();
+	private static HashMap receivingSideCleanMap = new HashMap();
 
 	public static void checkAndTerminate(ConfigurationContext configurationContext, StorageManager storageManager, RMSBean rmsBean)
 	throws SandeshaStorageException, AxisFault {

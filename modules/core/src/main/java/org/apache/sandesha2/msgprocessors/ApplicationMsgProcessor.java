@@ -420,11 +420,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				SandeshaUtil.startWorkersForSequence(msgContext.getConfigurationContext(), rmsBean);
 			}
 			
-			SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
-			if (env == null) {
-				SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(env))
-						.getDefaultEnvelope();
-				rmMsgCtx.setSOAPEnvelop(envelope);
+			
+			int SOAPVersion = Sandesha2Constants.SOAPVersion.v1_1;
+			if (!msgContext.isSOAP11())
+				SOAPVersion = Sandesha2Constants.SOAPVersion.v1_2;
+			if (msgContext.getEnvelope() == null) {
+				try {
+					msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(
+							SOAPVersion).getDefaultEnvelope());
+				} catch (AxisFault e) {
+					throw new SandeshaException(e.getMessage());
+				}
 			}
 	
 			SOAPBody soapBody = rmMsgCtx.getSOAPEnvelope().getBody();

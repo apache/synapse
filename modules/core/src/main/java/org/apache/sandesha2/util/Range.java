@@ -95,18 +95,6 @@ public class Range implements Serializable{
 		upperValue = Long.parseLong(parts[1]);
 	}
 
-	public boolean equals(Object o){
-		boolean returnValue = false;
-		if(o instanceof Range){
-			Range testRange = (Range)o;
-			if(testRange.lowerValue== this.lowerValue && testRange.upperValue == this.upperValue){
-				returnValue = true;
-			}
-		}
-		return returnValue;
-	}
-	
-	
 	/**
 	 * Value is considered to be "in range" if it is with the limits set by the
 	 * upper and lower values.
@@ -121,6 +109,29 @@ public class Range implements Serializable{
 	
 	public String toString(){
 		return "[" + lowerValue + "," + upperValue + "]";
+	}
+
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + (int) (lowerValue ^ (lowerValue >>> 32));
+		result = PRIME * result + (int) (upperValue ^ (upperValue >>> 32));
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Range other = (Range) obj;
+		if (lowerValue != other.lowerValue)
+			return false;
+		if (upperValue != other.upperValue)
+			return false;
+		return true;
 	}
 	
 }

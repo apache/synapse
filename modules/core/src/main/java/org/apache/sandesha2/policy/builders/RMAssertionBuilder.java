@@ -133,42 +133,36 @@ public class RMAssertionBuilder implements AssertionBuilder {
             	propertyBean.setEPRDecoratorClass(element.getText().trim());
             } else if (Sandesha2Constants.Assertions.ELEM_STORAGE_MGR
                     .equals(name)) {
-                if (element!=null) {
-                    //finding out storage managers.
-                	
-                	OMElement inmemoryStorageManagerElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_INMEMORY_STORAGE_MGR);
-                	if (inmemoryStorageManagerElem!=null) {
-                		String inMemoryStorageMgr = inmemoryStorageManagerElem.getText().trim();
-                		propertyBean.setInMemoryStorageManagerClass(inMemoryStorageMgr);
-                	}
-                	
-                	OMElement permanentStorageManagerElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_PERMANENT_STORAGE_MGR);
-                	if (permanentStorageManagerElem!=null) {
-                		String permanentStorageMgr = permanentStorageManagerElem.getText().trim();
-                		propertyBean.setPermanentStorageManagerClass(permanentStorageMgr);
-                	}
-                	
-                }
- 
+            	//finding out storage managers.
+
+            	OMElement inmemoryStorageManagerElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_INMEMORY_STORAGE_MGR);
+            	if (inmemoryStorageManagerElem!=null) {
+            		String inMemoryStorageMgr = inmemoryStorageManagerElem.getText().trim();
+            		propertyBean.setInMemoryStorageManagerClass(inMemoryStorageMgr);
+            	}
+
+            	OMElement permanentStorageManagerElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_PERMANENT_STORAGE_MGR);
+            	if (permanentStorageManagerElem!=null) {
+            		String permanentStorageMgr = permanentStorageManagerElem.getText().trim();
+            		propertyBean.setPermanentStorageManagerClass(permanentStorageMgr);
+            	} 
             }  else if (Sandesha2Constants.Assertions.ELEM_CONTEXT_MGR.equals(name)) {
                 propertyBean.setContextManagerClass (element.getText().trim());
 
             } else if(Sandesha2Constants.Assertions.ELEM_MAKE_CONNECTION.equals(name)) {
-                if (element!=null) {
-                	// Read the nested assertions
-                	
-                	OMElement enabledElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_ENABLED);
-                	if (enabledElem!=null) {
-                		String data = enabledElem.getText().trim();
-                		propertyBean.setEnableMakeConnection(Boolean.valueOf(data).booleanValue());
-                	}
-                	
-                	OMElement useRMAnonElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI);
-                	if (useRMAnonElem!=null) {
-                		String data = useRMAnonElem.getText().trim();
-                		propertyBean.setEnableRMAnonURI(Boolean.valueOf(data).booleanValue());
-                	}
-                }
+            	// Read the nested assertions
+
+            	OMElement enabledElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_ENABLED);
+            	if (enabledElem!=null) {
+            		String data = enabledElem.getText().trim();
+            		propertyBean.setEnableMakeConnection(Boolean.valueOf(data).booleanValue());
+            	}
+
+            	OMElement useRMAnonElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI);
+            	if (useRMAnonElem!=null) {
+            		String data = useRMAnonElem.getText().trim();
+            		propertyBean.setEnableRMAnonURI(Boolean.valueOf(data).booleanValue());
+            	}
             } else if (Sandesha2Constants.Assertions.ELEM_USE_SERIALIZATION.equals(name)) {
             	String value = element.getText().trim();
             	propertyBean.setUseMessageSerialization(Boolean.valueOf(value).booleanValue());

@@ -267,7 +267,10 @@ public class RMMsgCreator {
 
 		MessageContext terminateMessage = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,
 				terminateOperation);
-		
+
+		if (terminateMessage == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
+
 		if (terminateMessage.getMessageID()==null) {
 			terminateMessage.setMessageID(SandeshaUtil.getUUID());
 		}
@@ -279,9 +282,6 @@ public class RMMsgCreator {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
 
 		RMMsgContext terminateRMMessage = MsgInitializer.initializeMessage(terminateMessage);
-
-		if (terminateMessage == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
 
 		TerminateSequence terminateSequencePart = new TerminateSequence(rmNamespaceValue);
 		Identifier identifier = new Identifier(rmNamespaceValue);

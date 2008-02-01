@@ -185,7 +185,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					if (endpoint!=null) {
 						//Check to see if the offer endpoint has a value of WSA Anonymous
 						String addressingNamespace = (String) createSeqRMMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-						if(endpoint.equals(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace))){
+						String endpointAddress = endpoint.getEPR().getAddress();
+						if(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace).equals(endpointAddress)){
 							//Don't accept the offer
 							if (log.isDebugEnabled())
 								log.debug("Offer Refused as it included a WSA Anonymous endpoint");	
@@ -193,7 +194,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						} else {
 							rMSBean = new RMSBean();
 							//Set the offered EP
-							rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
+							rMSBean.setOfferedEndPoint(endpointAddress);
 						}
 					} else {
 						//Don't accept the offer

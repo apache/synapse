@@ -161,7 +161,9 @@ public class RMSequenceBean extends RMBean {
 	
 	public void setAcksToEndpointReference(EndpointReference acksToEndpointRef){
 		this.acksToEndpointRef = acksToEndpointRef;
-		acksToEPR = acksToEndpointRef.getAddress();
+		if(acksToEndpointRef != null){
+			acksToEPR = acksToEndpointRef.getAddress();
+		}
 	}
 
 	/**

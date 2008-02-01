@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -451,8 +452,7 @@ public class SandeshaUtil {
 			newMessageContext.setServerSide(referenceMessage.isServerSide());
 			
 			//this had to be set here to avoid a double invocation.
-			if (oldOptions!=null)
-				newOptions.setUseSeparateListener(oldOptions.isUseSeparateListener());
+			newOptions.setUseSeparateListener(oldOptions.isUseSeparateListener());
 			
 			return newMessageContext;
 
@@ -1135,10 +1135,10 @@ public class SandeshaUtil {
 		Map referenceParams = epr.getAllReferenceParameters();
 		
 		if (referenceParams != null) {
-			for (Iterator keys = referenceParams.keySet().iterator(); keys
+			for (Iterator entries = referenceParams.entrySet().iterator(); entries
 					.hasNext();) {
-				Object key = keys.next();
-				Object referenceParam = referenceParams.get(key);
+				Entry entry = (Entry)entries.next();
+				Object referenceParam = entry.getValue();
 
 				if (referenceParam instanceof OMElement) {
 					OMElement clonedElement = ((OMElement) referenceParam)

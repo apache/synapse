@@ -24,9 +24,13 @@ public class AMQPOutTransportInfo implements OutTransportInfo
         } else {
            Map props = URIParser.parse(address);
            conURL = (String)props.get(AMQPConstants.CONNECTION_URL_PARAM);
-           routingKey = (String)props.get(AMQPConstants.ROUTING_KEY_PARAM);
+           routingKey = (String)props.get(AMQPConstants.BINDING_ROUTING_KEY_ATTR);
            exchangeName = (String)props.get(AMQPConstants.EXCHANGE_NAME_PARAM);
         }
+    }
+
+    public String getAddress(){
+        return address;
     }
 
     public String getConnectionURL(){

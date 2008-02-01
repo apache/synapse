@@ -3,19 +3,25 @@ package org.apache.synapse.transport.amqp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.Topic;
+import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.ParameterIncludeImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.qpidity.api.Message;
 import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.jms.JMSConnectionFactory;
 import org.apache.synapse.transport.jms.JMSConstants;
 
 public class AMQPUtils extends BaseUtils
@@ -85,7 +91,7 @@ public class AMQPUtils extends BaseUtils
      */
     public static Map getTransportHeaders(Message message) {
         // create a Map to hold transport headers
-        Map map = new HashMap();
+        Map<String,Object> map = new HashMap<String,Object>();
 
         // correlation ID
         if (message.getMessageProperties().getCorrelationId() != null) {
@@ -131,4 +137,53 @@ public class AMQPUtils extends BaseUtils
 
         return map;
     }
+
+    /**
+     * Get the AMQP destination used by this service
+     *
+     * @param service the Axis Service
+     * @return the name of the JMS destination
+     */
+    public static List<AMQPBinding> getBindingsForService(AxisService service) {
+        Parameter bindingsParam = service.getParameter(AMQPConstants.BINDINGS_PARAM);
+        ParameterIncludeImpl pi = new ParameterIncludeImpl();
+        try {
+            pi.deserializeParameters((OMElement) bindingsParam.getValue());
+        } catch (AxisFault axisFault) {
+            log.error("Error reading parameters for AMQP binding definitions" +
+                    bindingsParam.getName(), axisFault);
+        }
+
+        Iterator params = pi.getParameters().iterator();
+        ArrayList<AMQPBinding> list = new ArrayList<AMQPBinding>();
+        if(params.hasNext())
+        {
+            while (params.hasNext())
+            {
+                Parameter p = (Parameter) params.next();
+                AMQPBinding binding = new AMQPBinding();
+                OMAttribute exchangeTypeAttr = p.getParameterElement().getAttribute(new QName(AMQPConstants.BINDING_EXCHANGE_TYPE_ATTR));
+                OMAttribute exchangeNameAttr = p.getParameterElement().getAttribute(new QName(AMQPConstants.BINDING_EXCHANGE_NAME_ATTR));
+                OMAttribute routingKeyAttr = p.getParameterElement().getAttribute(new QName(AMQPConstants.BINDING_ROUTING_KEY_ATTR));
+                OMAttribute primaryAttr = p.getParameterElement().getAttribute(new QName(AMQPConstants.BINDINGS_PRIMARY_ATTR));
+
+                if ( exchangeTypeAttr != null) {
+                    binding.setExchangeType(exchangeTypeAttr.getAttributeValue());
+                }else if ( exchangeNameAttr != null) {
+                    binding.setExchangeName(exchangeNameAttr.getAttributeValue());
+                }else if ( primaryAttr != null) {
+                    binding.setPrimary(true);
+                }
+                list.add(binding);
+            }
+        }else{
+            // go for the defaults
+            AMQPBinding binding = new AMQPBinding();
+            binding.setRoutingKey(service.getName());
+            list.add(binding);
+        }
+
+        return list;
+    }
+
 }

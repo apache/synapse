@@ -128,15 +128,15 @@ public class SenderBean extends RMBean {
 	 * be ignored within the match method.
 	 */
 	private int flags = 0;
-	private static final int SEND_FLAG         = 0x00000001;
-	private static final int SEND_COUNT_FLAG   = 0x00000010;
-	private static final int MSG_NUMBER_FLAG   = 0x00000100;
-	private static final int RESEND_FLAG       = 0x00001000;
-	private static final int TIME_TO_SEND_FLAG = 0x00010000;
-	private static final int MSG_TYPE_FLAG     = 0x00100000;
-	private static final int LAST_MSG_FLAG     = 0x01000000;
-	private static final int IN_MSG_NUM_FLAG   = 0x10000000;
-	private static final int TRANSPORT_FLAG    = 0x00000002;
+	public static final int SEND_FLAG         = 0x00000001;
+	public static final int SEND_COUNT_FLAG   = 0x00000010;
+	public static final int MSG_NUMBER_FLAG   = 0x00000100;
+	public static final int RESEND_FLAG       = 0x00001000;
+	public static final int TIME_TO_SEND_FLAG = 0x00010000;
+	public static final int MSG_TYPE_FLAG     = 0x00100000;
+	public static final int LAST_MSG_FLAG     = 0x01000000;
+	public static final int IN_MSG_NUM_FLAG   = 0x10000000;
+	public static final int TRANSPORT_FLAG    = 0x00000002;
 
 	public SenderBean() {
 

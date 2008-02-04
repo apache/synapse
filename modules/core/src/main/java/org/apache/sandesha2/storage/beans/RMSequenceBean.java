@@ -88,10 +88,10 @@ public class RMSequenceBean extends RMBean {
 	 * be ignored within the match method.
 	 */
 	private int flags = 0;
-	private static final int LAST_ACTIVATED_TIME_FLAG    = 0x00000001;
-	private static final int CLOSED_FLAG                 = 0x00000010;
-	private static final int TERMINATED_FLAG             = 0x00000100;
-	private static final int POLLING_MODE_FLAG           = 0x00001000;
+	public static final int LAST_ACTIVATED_TIME_FLAG    = 0x00000001;
+	public static final int CLOSED_FLAG                 = 0x00000010;
+	public static final int TERMINATED_FLAG             = 0x00000100;
+	public static final int POLLING_MODE_FLAG           = 0x00001000;
 
 	public RMSequenceBean() {
 

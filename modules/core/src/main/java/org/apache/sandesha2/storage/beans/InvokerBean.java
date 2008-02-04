@@ -61,7 +61,7 @@ public class InvokerBean extends RMBean {
 	 * be ignored within the match method.
 	 */
 	private int flags = 0;
-	private static final int MSG_NO_FLAG  = 0x00000001;	
+	public static final int MSG_NO_FLAG  = 0x00000001;	
 	
 	public InvokerBean() {
 

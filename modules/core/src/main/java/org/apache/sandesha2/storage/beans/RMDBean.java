@@ -81,8 +81,8 @@ public class RMDBean extends RMSequenceBean {
 	 * be ignored within the match method.
 	 */
 	private int rmdFlags = 0;
-	private static final int NEXT_MSG_NO_FLAG    = 0x00000001;
-	private static final int HIGHEST_IN_MSG_FLAG = 0x00000010;
+	public static final int NEXT_MSG_NO_FLAG    = 0x00000001;
+	public static final int HIGHEST_IN_MSG_FLAG = 0x00000010;
 
 	public RMDBean() {
 	}

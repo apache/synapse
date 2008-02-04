@@ -152,17 +152,17 @@ public class RMSBean extends RMSequenceBean {
 	 * be ignored within the match method.
 	 */
 	private int rmsFlags = 0;
-	private static final int LAST_SEND_ERROR_TIME_FLAG = 0x00000001;
-	private static final int LAST_OUT_MSG_FLAG         = 0x00000010;
-	private static final int HIGHEST_OUT_MSG_FLAG      = 0x00000100;
-	private static final int NEXT_MSG_NUM_FLAG         = 0x00001000;
-	private static final int TERMINATE_ADDED_FLAG      = 0x00010000;
-	private static final int TIMED_OUT_FLAG            = 0x00100000;
-	private static final int SEQ_CLOSED_CLIENT_FLAG    = 0x01000000;
-	private static final int ACKED_MESSAGES_FLAG       = 0x10000000;
-	private static final int TERM_PAUSER_FOR_CS        = 0x00000002;
-	private static final int EXPECTED_REPLIES          = 0x00000020;
-	private static final int SOAP_VERSION_FLAG         = 0x00000200;
+	public static final int LAST_SEND_ERROR_TIME_FLAG = 0x00000001;
+	public static final int LAST_OUT_MSG_FLAG         = 0x00000010;
+	public static final int HIGHEST_OUT_MSG_FLAG      = 0x00000100;
+	public static final int NEXT_MSG_NUM_FLAG         = 0x00001000;
+	public static final int TERMINATE_ADDED_FLAG      = 0x00010000;
+	public static final int TIMED_OUT_FLAG            = 0x00100000;
+	public static final int SEQ_CLOSED_CLIENT_FLAG    = 0x01000000;
+	public static final int ACKED_MESSAGES_FLAG       = 0x10000000;
+	public static final int TERM_PAUSER_FOR_CS        = 0x00000002;
+	public static final int EXPECTED_REPLIES          = 0x00000020;
+	public static final int SOAP_VERSION_FLAG         = 0x00000200;
 	
 	public RMSBean() {
 	}

@@ -528,7 +528,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 				rmsBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
 			}
-	
+
+      // Update the RMSBean 
+      storageManager.getRMSBeanMgr().update(rmsBean);
 			SenderBean createSeqEntry = new SenderBean();
 			createSeqEntry.setMessageContextRefKey(createSequenceMessageStoreKey);
 			createSeqEntry.setTimeToSend(System.currentTimeMillis());

@@ -3435,7 +3435,7 @@ Transfer-Encoding: chunked
                 &lt;/m0:request&gt;
             &lt;/m0:getQuote&gt;
         &lt;/property&gt;
-        &lt;trigger interval="5000"/&gt;
+        &lt;trigger interval="5"/&gt;
     &lt;/task&gt;
 
     &lt;in&gt;

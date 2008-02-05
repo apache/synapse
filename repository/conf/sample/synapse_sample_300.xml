@@ -30,7 +30,7 @@
                 </m0:request>
             </m0:getQuote>
         </property>
-        <trigger interval="5000"/>
+        <trigger interval="5"/>
     </task>
 
     <in>

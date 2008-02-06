@@ -166,31 +166,31 @@ directory. Run "ant" to build and deploy this service to the sample Axis2
 server. </p>
 
 <p></p>
-<pre>user@host:/opt/synapse-1.1.1/samples/axis2Server$ cd src/SimpleStockQuoteService/
-user@host:/opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService$ ant
+<pre>user@host:/opt/synapse-1.1.2/samples/axis2Server$ cd src/SimpleStockQuoteService/
+user@host:/opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService$ ant
 Buildfile: build.xml
 
 clean:
 
 init:
-    [mkdir] Created dir: /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp
-    [mkdir] Created dir: /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
-    [mkdir] Created dir: /opt/synapse-1.1.1/samples/axis2Server/repository/services
+    [mkdir] Created dir: /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp
+    [mkdir] Created dir: /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+    [mkdir] Created dir: /opt/synapse-1.1.2/samples/axis2Server/repository/services
 
 compile-all:
-    [javac] Compiling 9 source files to /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+    [javac] Compiling 9 source files to /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
 
 build-service:
-    [mkdir] Created dir: /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-    [mkdir] Created dir: /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-     [copy] Copying 1 file to /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-     [copy] Copying 1 file to /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-     [copy] Copying 9 files to /opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-      [jar] Building jar: /opt/synapse-1.1.1/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
+    [mkdir] Created dir: /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+    [mkdir] Created dir: /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+     [copy] Copying 1 file to /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+     [copy] Copying 1 file to /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+     [copy] Copying 9 files to /opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+      [jar] Building jar: /opt/synapse-1.1.2/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
 
 BUILD SUCCESSFUL
 Total time: 2 seconds
-user@host:/opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService$</pre>
+user@host:/opt/synapse-1.1.2/samples/axis2Server/src/SimpleStockQuoteService$</pre>
 
 <p>Now go to &lt;synapse-home&gt;/samples/axis2Server directory and start the
 server using the following command. This will start Axis2 server on port 9000
@@ -203,14 +203,14 @@ server using the following command. This will start Axis2 server on port 9000
 </div>
 
 <p>You will see the following messages on the console.</p>
-<pre>user@host:/opt/synapse-1.1.1/samples/axis2Server$ ./axis2server.sh
+<pre>user@host:/opt/synapse-1.1.2/samples/axis2Server$ ./axis2server.sh
  Using Bouncy castle JAR for Java 1.5
  Using JAVA_HOME:   /opt/jdk1.5_06
- Using AXIS2 Repository :   /opt/synapse-1.1.1/samples/axis2Server/repository
- Using AXIS2 Configuration :   /opt/synapse-1.1.1/samples/axis2Server/repository/conf/axis2.xml
+ Using AXIS2 Repository :   /opt/synapse-1.1.2/samples/axis2Server/repository
+ Using AXIS2 Configuration :   /opt/synapse-1.1.2/samples/axis2Server/repository/conf/axis2.xml
 2007-11-05 14:36:41,462 [-] [main]  INFO SimpleHTTPServer [SimpleAxisServer] Starting
-[SimpleAxisServer] Using the Axis2 Repository : /opt/synapse-1.1.1/samples/axis2Server/repository
-[SimpleAxisServer] Using the Axis2 Configuration File : /opt/synapse-1.1.1/samples/axis2Server/repository/conf/axis2.xml
+[SimpleAxisServer] Using the Axis2 Repository : /opt/synapse-1.1.2/samples/axis2Server/repository
+[SimpleAxisServer] Using the Axis2 Configuration File : /opt/synapse-1.1.2/samples/axis2Server/repository/conf/axis2.xml
 2007-11-05 14:36:43,864 [-] [main]  INFO HttpCoreNIOSender HTTPS Sender starting
 2007-11-05 14:36:43,891 [-] [main]  INFO HttpCoreNIOSender HTTP Sender starting
 2007-11-05 14:36:44,288 [-] [main]  INFO HttpCoreNIOListener HTTPS Listener starting on port : 9002
@@ -244,13 +244,13 @@ Synapse will be started on port 8080 (http) and 8443 (https - under JDK
 
 <p>Following messages will be displayed on the console to indicate the
 successfull startup of Synapse.</p>
-<pre>user@host:/opt/synapse-1.1.1/bin$ ./synapse.sh -sample 0
+<pre>user@host:/opt/synapse-1.1.2/bin$ ./synapse.sh -sample 0
  Using Bouncy castle JAR for Java 1.5
 Starting Synapse/Java ...
-Using SYNAPSE_HOME:    /opt/synapse-1.1.1
+Using SYNAPSE_HOME:    /opt/synapse-1.1.2
 Using JAVA_HOME:       /opt/jdk1.5_06
-Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse-1.1.1/repository/conf/sample/synapse_sample_0.xml
-2007-11-05 14:58:55,029 [-] [main]  INFO ServerManager Using the Axis2 Repository /opt/synapse-1.1.1/repository
+Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse-1.1.2/repository/conf/sample/synapse_sample_0.xml
+2007-11-05 14:58:55,029 [-] [main]  INFO ServerManager Using the Axis2 Repository /opt/synapse-1.1.2/repository
 2007-11-05 14:58:56,617 [-] [main]  INFO SynapseInitializationModule Initializing Synapse at : Mon Nov 05 14:58:56 LKT 2007
 2007-11-05 14:58:56,618 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Loading mediator extensions...
 2007-11-05 14:58:56,619 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Initializing the Synapse configuration ...
@@ -276,14 +276,14 @@ Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse-1.1.1/repository/conf/sample/s
 <p>Now the final step, running the client. Go to
 &lt;synapse-home&gt;/samples/axis2Client directory and type the following
 command</p>
-<pre>user@host:/opt/synapse-1.1.1/samples/axis2Client$ ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080 -Dmode=quote -Dsymbol=IBM
+<pre>user@host:/opt/synapse-1.1.2/samples/axis2Client$ ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080 -Dmode=quote -Dsymbol=IBM
 Buildfile: build.xml
 
 init:
-    [mkdir] Created dir: /opt/synapse-1.1.1/samples/axis2Client/target/classes
+    [mkdir] Created dir: /opt/synapse-1.1.2/samples/axis2Client/target/classes
 
 compile:
-    [javac] Compiling 10 source files to /opt/synapse-1.1.1/samples/axis2Client/target/classes
+    [javac] Compiling 10 source files to /opt/synapse-1.1.2/samples/axis2Client/target/classes
 
 stockquote:
      [java] Standard :: Stock price = $91.09641757880443

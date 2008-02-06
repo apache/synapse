@@ -1,4 +1,4 @@
-Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes - January 2008
+Apache Synapse Enterprise Service Bus (ESB) - 1.1.2 Release Notes - February 2008
 
 1. Overview
     The Apache Synapse ESB is a robust, lightweight and highly scalable and distributed
@@ -64,6 +64,9 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.1.1 Release Notes - January 2008
         synapse-user mailing list by sending email to synapse-user-subscribe@ws.apache.org
 
 10. New features
+    The 1.1.2 release
+        * This release is only to correct the artifacts uploaded to the Maven central repository
+
     The 1.1.1 release
         * Clustering support for the Cache/Throttle Mediators
         * Maintainance mode support for the HTTP transport

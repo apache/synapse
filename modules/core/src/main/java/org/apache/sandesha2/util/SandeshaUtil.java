@@ -74,7 +74,6 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -628,17 +627,10 @@ public class SandeshaUtil {
 		return bean;
 	}
 
-	public static RMDBean getRMDBeanFromSequenceId(StorageManager storageManager, String sequenceID) 
-	
-	throws SandeshaException {
-		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-		RMDBean bean = new RMDBean();
-		bean.setSequenceID(sequenceID);
-		
-		bean = rmdBeanMgr.findUnique(bean);
-
+	public static RMDBean getRMDBeanFromSequenceId(StorageManager storageManager, String sequenceID) throws SandeshaException {
+		RMDBean bean = storageManager.getRMDBeanMgr().retrieve(sequenceID);
 		return bean;
-  }
+	}
 	
 	public static long getLastMessageNumber(String internalSequenceID, StorageManager storageManager)throws SandeshaException {
 		RMSBean rMSBean = getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);

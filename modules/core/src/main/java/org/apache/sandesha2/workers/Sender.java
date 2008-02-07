@@ -64,6 +64,9 @@ public class Sender extends SandeshaThread {
 	// try and give them all a chance to invoke messages.
 	int nextIndex = 0;
 	boolean processedMessage = false;
+	long lastHousekeeping = 0;
+	
+	private static int HOUSEKEEPING_INTERVAL = 20000;
 	
 	public Sender () {
 		super(Sandesha2Constants.SENDER_SLEEP_TIME);
@@ -92,17 +95,19 @@ public class Sender extends SandeshaThread {
 				}
 				processedMessage = false;
 				
-				// At this point - delete any sequences that have timed out, or been terminated.
-				deleteTerminatedSequences(storageManager);
+				if(System.currentTimeMillis()-lastHousekeeping > HOUSEKEEPING_INTERVAL){
+					// At this point - delete any sequences that have timed out, or been terminated.
+					deleteTerminatedSequences(storageManager);
 
-				// Also clean up and sender beans that are not yet eligible for sending, but
-				// are blocking the transport threads.
-				unblockTransportThreads(storageManager);
-				
-				// Finally, check for messages that can only be serviced by polling, and warn
-				// the user if they are too old
-				checkForOrphanMessages(storageManager);
+					// Also clean up and sender beans that are not yet eligible for sending, but
+					// are blocking the transport threads.
+					unblockTransportThreads(storageManager);
 
+					// Finally, check for messages that can only be serviced by polling, and warn
+					// the user if they are too old
+					checkForOrphanMessages(storageManager);
+					lastHousekeeping = System.currentTimeMillis();
+				}
 				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, looped over all sequences, sleep " + sleep);
 				return sleep;
 			}

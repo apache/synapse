@@ -27,9 +27,9 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
@@ -37,6 +37,7 @@ import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
 import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.msgprocessors.MessagePendingProcessor;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -93,7 +94,6 @@ public class SandeshaInHandler extends AbstractHandler {
 
 		try {
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
-			transaction = storageManager.getTransaction();
 
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
@@ -109,11 +109,20 @@ public class SandeshaInHandler extends AbstractHandler {
 			else
 				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
-			// validating the message
-			MessageValidator.validateIncomingMessage(rmMsgCtx, storageManager);
+			if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.UNKNOWN) {
+				// checking if policies hv been set to enforceRM.
+				// If this is set and this message is not an RM message, validation
+				// will fail here.
+
+				SandeshaPolicyBean propertyBean = SandeshaUtil
+						.getPropertyBean(msgCtx.getAxisOperation());
+				if (propertyBean.isEnforceRM()) {
+					String message = SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.rmEnforceFailure, msgCtx.getMessageID());
+					throw new SandeshaException(message);
+				}
+			}
 			
-			// commit the current transaction
-			if(transaction != null && transaction.isActive()) transaction.commit();
 			transaction = storageManager.getTransaction();
 
 			// Process Ack headers in the message

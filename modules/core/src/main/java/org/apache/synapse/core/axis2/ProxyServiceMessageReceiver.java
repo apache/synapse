@@ -121,6 +121,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
             }
 
+            boolean inSequenceResult = true;
+
             // Using inSequence for the incoming message mediation
             if (proxy.getTargetInSequence() != null) {
 
@@ -128,7 +130,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 if (inSequence != null) {
                     traceOrDebug(traceOn, "Using sequence named : "
                         + proxy.getTargetInSequence() + " for incoming message mediation");
-                    inSequence.mediate(synCtx);
+                    inSequenceResult = inSequence.mediate(synCtx);
 
                 } else {
                     handleException("Unable to find in-sequence : " + proxy.getTargetInSequence(), synCtx);
@@ -137,26 +139,29 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             } else if (proxy.getTargetInLineInSequence() != null) {
                 traceOrDebug(traceOn, "Using the anonymous " +
                     "in-sequence of the proxy service for mediation");
-                proxy.getTargetInLineInSequence().mediate(synCtx);
+                inSequenceResult = proxy.getTargetInLineInSequence().mediate(synCtx);
             }
 
-            if (proxy.getTargetEndpoint() != null) {
-                Endpoint endpoint = synCtx.getEndpoint(proxy.getTargetEndpoint());
+            // if inSequence returns true, forward message to endpoint
+            if(inSequenceResult == true) {
+                if (proxy.getTargetEndpoint() != null) {
+                    Endpoint endpoint = synCtx.getEndpoint(proxy.getTargetEndpoint());
 
-                if (endpoint != null) {
-                    traceOrDebug(traceOn, "Forwarding message to the endpoint : "
-                        + proxy.getTargetEndpoint());
-                    endpoint.send(synCtx);
+                    if (endpoint != null) {
+                        traceOrDebug(traceOn, "Forwarding message to the endpoint : "
+                            + proxy.getTargetEndpoint());
+                        endpoint.send(synCtx);
 
-                } else {
-                    handleException("Unable to find the endpoint specified : " +
-                        proxy.getTargetEndpoint(), synCtx);
+                    } else {
+                        handleException("Unable to find the endpoint specified : " +
+                            proxy.getTargetEndpoint(), synCtx);
+                    }
+
+                } else if (proxy.getTargetInLineEndpoint() != null) {
+                    traceOrDebug(traceOn, "Forwarding the message to the anonymous " +
+                        "endpoint of the proxy service");
+                    proxy.getTargetInLineEndpoint().send(synCtx);
                 }
-
-            } else if (proxy.getTargetInLineEndpoint() != null) {
-                traceOrDebug(traceOn, "Forwarding the message to the anonymous " +
-                    "endpoint of the proxy service");
-                proxy.getTargetInLineEndpoint().send(synCtx);
             }
 
         } catch (SynapseException syne) {

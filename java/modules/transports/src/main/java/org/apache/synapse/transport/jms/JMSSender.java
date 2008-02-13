@@ -192,6 +192,10 @@ public class JMSSender extends AbstractTransportSender {
                 }
             }
 
+            if(session == null) {
+               handleException("Could not create JMS session");
+            }
+            
             // now we are going to use the JMS session, but if this was a session from a
             // defined JMS connection factory, we need to synchronize as sessions are not
             // thread safe

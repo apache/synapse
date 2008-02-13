@@ -79,7 +79,7 @@ public class HeaderMediator extends AbstractMediator {
 
         if (action == ACTION_SET) {
 
-            String value = (getValue() != null ? getValue() :
+            String value = (getExpression() == null ? getValue() :
                     Axis2MessageContext.getStringValue(expression, synCtx));
 
             if (traceOrDebugOn) {
@@ -100,10 +100,10 @@ public class HeaderMediator extends AbstractMediator {
                 } else if (SynapseConstants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(new EndpointReference(value));
                 } else {
-                    addCustomHeader(synCtx);
+                    addCustomHeader(synCtx, value);
                 }
             } else {
-                addCustomHeader(synCtx);
+                addCustomHeader(synCtx, value);
             }
 
         } else {
@@ -154,7 +154,7 @@ public class HeaderMediator extends AbstractMediator {
         return true;
     }
 
-    private void addCustomHeader(MessageContext synCtx) {
+    private void addCustomHeader(MessageContext synCtx, String value) {
         SOAPEnvelope env = synCtx.getEnvelope();
         if (env == null) {
             return;

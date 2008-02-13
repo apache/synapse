@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -191,6 +192,12 @@ public class FaultMediator extends AbstractMediator {
             synCtx.setTo(synCtx.getReplyTo());
         } else {
             synCtx.setTo(null);
+        }
+
+        // set original messageID as relatesTo
+        if(synCtx.getMessageID() != null) {
+            RelatesTo relatesTo = new RelatesTo(synCtx.getMessageID());
+            synCtx.setRelatesTo(new RelatesTo[] { relatesTo });
         }
 
         if (traceOrDebugOn) {

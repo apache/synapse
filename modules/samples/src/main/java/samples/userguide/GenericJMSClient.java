@@ -77,7 +77,8 @@ public class GenericJMSClient {
 
         BytesMessage bm = session.createBytesMessage();
         bm.writeBytes(payload);
-        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName), bm);
+        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName),
+                JMSConstants.DESTINATION_TYPE_QUEUE,  bm);
         connection.close();
     }
 
@@ -90,7 +91,8 @@ public class GenericJMSClient {
             connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
 
         TextMessage tm = session.createTextMessage(payload);
-        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName), tm);
+        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName),
+                JMSConstants.DESTINATION_TYPE_QUEUE, tm);
         connection.close();
     }
 

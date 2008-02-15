@@ -226,7 +226,7 @@ public class JMSSender extends AbstractTransportSender {
                 }
 
                 // send the outgoing message over JMS to the destination selected
-                JMSUtils.sendMessageToJMSDestination(session, destination, message);
+                JMSUtils.sendMessageToJMSDestination(session, destination, destinationType, message);
 
                 // if we are expecting a synchronous response back for the message sent out
                 if (waitForResponse) {

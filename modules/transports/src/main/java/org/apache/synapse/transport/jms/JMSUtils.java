@@ -418,7 +418,7 @@ public class JMSUtils extends BaseUtils {
      * @throws AxisFault on error
      */
     public static void sendMessageToJMSDestination(Session session,
-        Destination destination, Message message) throws AxisFault {
+        Destination destination, String destinationType, Message message) throws AxisFault {
 
         MessageProducer producer = null;
         try {
@@ -426,12 +426,12 @@ public class JMSUtils extends BaseUtils {
                 log.debug("Sending message to destination : " + destination);
             }
 
-            if (destination instanceof Queue) {
-                producer = ((QueueSession) session).createSender((Queue) destination);
-                ((QueueSender) producer).send(message);
-            } else {
+            if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(destinationType)) {
                 producer = ((TopicSession) session).createPublisher((Topic) destination);
                 ((TopicPublisher) producer).publish(message);
+            } else {                
+                producer = ((QueueSession) session).createSender((Queue) destination);
+                ((QueueSender) producer).send(message);
             }
 
             if (log.isDebugEnabled()) {

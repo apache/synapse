@@ -305,7 +305,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
 	}
 	
-	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) throws SandeshaException {
+	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) {
 		MessagePending messagePending = new MessagePending();
 		messagePending.setPending(true);
 		messagePending.toHeader(returnMessage.getEnvelope().getHeader());

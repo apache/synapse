@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 
 /**
  * Class which handles the UsesSequenceSTR header block
@@ -38,7 +37,7 @@ public class UsesSequenceSTR implements RMHeaderPart {
 		return this;
 	}
 
-	public void toHeader(SOAPHeader header) throws SandeshaException {
+	public void toHeader(SOAPHeader header) {
 		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = header.addHeaderBlock(
 				Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR,Sandesha2Constants.SPEC_2007_02.OM_NS_URI);
 		// This header _must_ always be understood

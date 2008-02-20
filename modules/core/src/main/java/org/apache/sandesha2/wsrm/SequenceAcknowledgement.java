@@ -56,7 +56,7 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 	
 	private OMElement originalSequenceAckElement;
 	
-	public SequenceAcknowledgement(String namespaceValue) throws SandeshaException {
+	public SequenceAcknowledgement(String namespaceValue) {
 		this.namespaceValue = namespaceValue;
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
 			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;

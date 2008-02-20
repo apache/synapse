@@ -133,8 +133,7 @@ public class SandeshaUtil {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static ArrayList getAckRangeArrayList(RangeString completedMessageRanges, String rmNamespaceValue)
-			throws SandeshaException {
+	public static ArrayList getAckRangeArrayList(RangeString completedMessageRanges, String rmNamespaceValue) {
 
 		ArrayList ackRanges = new ArrayList(); //the final ack ranges that we will build up
 

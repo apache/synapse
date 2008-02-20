@@ -19,7 +19,6 @@
 
 package org.apache.sandesha2.handlers;
 
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
 
@@ -29,7 +28,7 @@ import org.apache.axis2.handlers.AbstractHandler;
  */
 public class MessageContextCorrectionHandler extends AbstractHandler {
 
-    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) {
         msgContext.setProperty("IsAddressingProcessed", Boolean.FALSE);
         return InvocationResponse.CONTINUE;
     }

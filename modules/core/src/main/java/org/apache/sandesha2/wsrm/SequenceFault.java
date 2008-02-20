@@ -43,7 +43,7 @@ public class SequenceFault implements RMHeaderPart {
 	private String namespaceValue = null;
 	private OMNamespace omNamespace = null;
 
-	public SequenceFault(String namespaceValue) throws SandeshaException {
+	public SequenceFault(String namespaceValue) {
 		this.namespaceValue = namespaceValue;
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
 			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;

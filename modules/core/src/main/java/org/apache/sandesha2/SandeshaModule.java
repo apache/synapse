@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisDescription;
@@ -112,7 +111,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotInitInMemoryStorageManager,
 					e.toString());
-			log.debug(message,e);
+			if (log.isDebugEnabled()) log.debug(message,e);
 		}
 		
 		try {
@@ -122,7 +121,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotInitPersistentStorageManager,
 					e.toString());
-			log.debug(message,e);
+			if (log.isDebugEnabled()) log.debug(message,e);
 		}
 		
 		// Reset the security manager, and then load it
@@ -256,7 +255,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			Iterator ops = service.getOperations();
 			while(ops.hasNext()) {
 				AxisOperation op = (AxisOperation) ops.next();
-				log.debug("Examining operation " + op.getName() + ", mep " + op.getMessageExchangePattern());
+				if (log.isDebugEnabled()) log.debug("Examining operation " + op.getName() + ", mep " + op.getMessageExchangePattern());
 
 				String name = null;
 				QName qName = op.getName();
@@ -274,7 +273,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			}
 		} else if(axisDescription instanceof AxisOperation) {
 			AxisOperation op = (AxisOperation) axisDescription;
-			log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecificMEPConstant());
+			if (log.isDebugEnabled()) log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecificMEPConstant());
 
 			String name = null;
 			QName qName = op.getName();

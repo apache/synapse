@@ -48,7 +48,7 @@ public class AckRequested implements RMHeaderPart {
 	private OMNamespace omNamespace = null;
 	private OMElement originalAckRequestedElement;
 	
-	public AckRequested(String namespaceValue) throws SandeshaException {
+	public AckRequested(String namespaceValue) {
 		this.namespaceValue = namespaceValue;
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
 			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
@@ -96,7 +96,7 @@ public class AckRequested implements RMHeaderPart {
 		return originalAckRequestedElement;
 	}
 
-	public void toHeader(SOAPHeader header) throws SandeshaException {
+	public void toHeader(SOAPHeader header) {
 		if (identifier == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.ackRequestNullID));

@@ -68,7 +68,7 @@ public class SandeshaInHandler extends AbstractHandler {
 		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
-			log.debug(message);
+			if (log.isDebugEnabled()) log.debug(message);
 			throw new AxisFault(message);
 		}
 
@@ -84,7 +84,7 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (msgCtx.getAxisService() != null) {
 			Parameter unreliableParam = msgCtx.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
-				log.debug("Exit: SandeshaInHandler::invoke, Service has disabled RM " + returnValue);
+				if (log.isDebugEnabled()) log.debug("Exit: SandeshaInHandler::invoke, Service has disabled RM " + returnValue);
 				return returnValue;
 			}
 		}
@@ -98,7 +98,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);
-				log.debug(message);
+				if (log.isDebugEnabled()) log.debug(message);
 				throw new AxisFault(message);
 			}
 

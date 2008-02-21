@@ -186,6 +186,29 @@ public class XSLTMediatorTest extends TestCase {
         }
     }
 
+     public void testSynapse242() throws Exception {
+
+        // create a new switch mediator
+        transformMediator = new XSLTMediator();
+        // set XSLT transformation URL
+        transformMediator.setXsltKey("xslt-key");
+
+        Map props = new HashMap();
+        Entry prop = new Entry();
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load_2.xml"));
+        props.put("xslt-key", prop);
+
+        // invoke transformation, with static enveope
+        MessageContext synCtx = TestUtils.getTestContextForXSLTMediatorUsingFile("./../../repository/conf/sample/resources/transform/med_message.xml", props);
+        transformMediator.mediate(synCtx);
+
+         // validate result
+         OMContainer body = synCtx.getEnvelope().getBody();
+         assertTrue(body.getFirstOMChild().getNextOMSibling() instanceof OMElement);
+         assertTrue( ((OMElement)body.getFirstOMChild().getNextOMSibling()).getText().length() > 0);
+    }
+
 
     public void testTransformXSLTSmallMessages() throws Exception {
 

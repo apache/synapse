@@ -143,6 +143,11 @@ public class XSLTMediator extends AbstractMediator {
      */
     private boolean useDOMSourceAndResults = false;
 
+    /**
+     * Hold any TransformerException's encountered during transformation by the XSLT processor
+     */
+    private TransformerException transformerException = null;
+
     // todo - this is a hack to get the handler module case working - ruwan
     //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
     //            "//s12:Envelope/s12:Body/child::*[position()=1]";
@@ -206,7 +211,7 @@ public class XSLTMediator extends AbstractMediator {
      * @param traceOrDebugOn is trace or debug on?
      * @param traceOn is trace on?
      */
-    private void performXSLT(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+    private void performXSLT(MessageContext synCtx, final boolean traceOrDebugOn, final boolean traceOn) {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
@@ -351,7 +356,25 @@ public class XSLTMediator extends AbstractMediator {
             }
 
             try {
+                transformer.setErrorListener(new ErrorListener() {
+                    public void warning(TransformerException e) throws TransformerException {
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Warning encountered during transformation : " + e.getMessage());
+                        }
+                        log.warn("Transformation warning encountered", e);
+                    }
+                    public void error(TransformerException e) throws TransformerException {
+                        setTransformerException(e);
+                    }
+                    public void fatalError(TransformerException e) throws TransformerException {
+                        setTransformerException(e);
+                    }
+                });
                 transformer.transform(transformSrc, transformTgt);
+
+                if (transformerException != null) {
+                    throw transformerException;
+                }
 
             } catch (TransformerException x) {
                 // did we exceed the in-memory BYTE_ARRAY_SIZE? if so, use a file for output
@@ -661,6 +684,10 @@ public class XSLTMediator extends AbstractMediator {
 
     public void setTargetPropertyName(String targetPropertyName) {
         this.targetPropertyName = targetPropertyName;
+    }
+
+    public void setTransformerException(TransformerException transformerException) {
+        this.transformerException = transformerException;
     }
 }
 

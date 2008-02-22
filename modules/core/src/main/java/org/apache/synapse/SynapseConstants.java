@@ -64,6 +64,8 @@ public final class SynapseConstants {
     public static final String HEADER_ACTION = "Action";
     /** Refers to the ReplyTo header */
     public static final String HEADER_REPLY_TO = "ReplyTo";
+    /** Refers to the RelatesTo header */
+    public static final String HEADER_RELATES_TO = "RelatesTo";
     /** Refers to the MessageID header */
     public static final String HEADER_MESSAGE_ID = "MessageID";
     /** Message format: pox, soap11, soap12 */

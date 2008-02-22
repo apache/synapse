@@ -26,6 +26,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -99,6 +100,8 @@ public class HeaderMediator extends AbstractMediator {
                     synCtx.setFaultTo(new EndpointReference(value));
                 } else if (SynapseConstants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(new EndpointReference(value));
+                } else if (SynapseConstants.HEADER_RELATES_TO.equals(qName.getLocalPart())) {
+                    synCtx.setRelatesTo(new RelatesTo[] { new RelatesTo(value) });
                 } else {
                     addCustomHeader(synCtx, value);
                 }
@@ -125,6 +128,8 @@ public class HeaderMediator extends AbstractMediator {
                     synCtx.setFaultTo(null);
                 } else if (SynapseConstants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(null);
+                } else if (SynapseConstants.HEADER_RELATES_TO.equals(qName.getLocalPart())) {
+                    synCtx.setRelatesTo(null);
                 } else {
                     SOAPEnvelope envelope = synCtx.getEnvelope();
                     if (envelope != null) {

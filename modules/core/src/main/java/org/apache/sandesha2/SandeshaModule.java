@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisDescription;
@@ -67,6 +68,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			AxisModule module) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::init, " + configContext);
 
+		EndpointReference.addAnonymousEquivalentURI(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX);
 		AxisConfiguration config = configContext.getAxisConfiguration();
 
 		//storing the Sandesha module as a parameter.

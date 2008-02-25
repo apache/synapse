@@ -40,7 +40,7 @@ import java.util.Map;
  * This is useful for XML documents that can reference other documents (e.g. WSDL documents
  * importing XSD or other WSDL documents). A <code>ResourceMap</code> object contains a set of
  * (location, registry key) mappings. The <code>resolve</code> method can be used to
- * get retrieve the registry entry registered for a given location as an <code>InputSource</code>
+ * get retrieve the registry entry registered for a given location as an {@link InputSource}
  * object.
  */
 public class ResourceMap {

@@ -20,6 +20,7 @@
 package org.apache.sandesha2;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -498,7 +499,19 @@ public class RMMsgContext {
 		}
 	}
 	
+	private static HashSet bodyLocalNames = new HashSet();
+	static{
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE);
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE);
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE);
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE);
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE);
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE_RESPONSE);
+		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION);
+	}
+	
 	private void processBody(SOAPBody body) throws AxisFault{
+		if(bodyLocalNames.contains(body.getFirstElementLocalName())){
 		// The body messages
 		OMElement firstBodyElement = body.getFirstElement();
 		if(firstBodyElement != null) {
@@ -553,6 +566,7 @@ public class RMMsgContext {
 				makeConnection = new MakeConnection();
 				makeConnection.fromOMElement(firstBodyElement);
 			}
+		}
 		}
 	}
 	

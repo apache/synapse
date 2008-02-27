@@ -197,9 +197,9 @@ public class SequenceProcessor {
 			
 			// this is a duplicate message and the invocation type is EXACTLY_ONCE. We try to return
 			// ack messages at this point, as if someone is sending duplicates then they may have
-			// missed earlier acks. We also have special processing for sync 2-way with RM 1.0
-			if((replyTo==null || replyTo.hasAnonymousAddress()) &&
-			   (specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0))) {
+			// missed earlier acks. We also have special processing for sync 2-way when no make connection is 
+			// in use
+			if(replyTo==null || replyTo.isWSAddressingAnonymous()) {
 
 			  SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 			  SenderBean findSenderBean = new SenderBean ();

@@ -431,6 +431,20 @@ public class Axis2MessageContext implements MessageContext {
      * @return a String representation of the result of evaluation
      */
     public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx) {
+       // default xpath evaluated against the full envelope
+       return getStringValue(xpath, synCtx, false);
+    }
+
+    /**
+     * Evaluates the given XPath expression against the SOAPEnvelope of the
+     * current message and returns a String representation of the result
+     * @param xpath the expression to evaluate
+     * @param synCtx the source message which holds the SOAP envelope
+     * @param bodyRelative if true evaluate xpath against body content, if false evaluate xpath
+     * against full envelope
+     * @return a String representation of the result of evaluation
+     */
+    public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx, boolean bodyRelative) {
 
         synchronized(xpath) {
 
@@ -455,7 +469,14 @@ public class Axis2MessageContext implements MessageContext {
                     "extension function for XPath : " + xpath, je);
             }
             try {
-                Object result = xpath.evaluate(synCtx.getEnvelope());
+                Object result;
+                if(bodyRelative) {
+                    result = xpath.evaluate(synCtx.getEnvelope().getBody());
+
+                } else {
+                    result = xpath.evaluate(synCtx.getEnvelope());
+
+                }
                 if (result == null) {
                     return null;
                 }

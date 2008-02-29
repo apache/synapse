@@ -152,6 +152,9 @@ public class MessageHelper {
                 ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
         newMC.setProperty(Constants.Configuration.HTTP_METHOD,
             ori.getProperty(Constants.Configuration.HTTP_METHOD));
+        //coping the Message type from req to res to get the message formatters working correctly.
+        newMC.setProperty(Constants.Configuration.MESSAGE_TYPE,
+                ori.getProperty(Constants.Configuration.MESSAGE_TYPE));
 
         newMC.setDoingREST(ori.isDoingREST());
         newMC.setDoingMTOM(ori.isDoingMTOM());

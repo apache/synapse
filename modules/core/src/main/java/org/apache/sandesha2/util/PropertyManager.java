@@ -19,12 +19,9 @@
 
 package org.apache.sandesha2.util;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
@@ -74,79 +71,6 @@ public class PropertyManager {
 		propertyBean.setUseMessageSerialization(Sandesha2Constants.Properties.DefaultValues.UseMessageSerialization);
 		propertyBean.setEnforceRM(Sandesha2Constants.Properties.DefaultValues.enforceRM);
 		
-	}
-
-	public static SandeshaPolicyBean loadPropertiesFromPropertyFile(InputStream in) throws SandeshaException {
-		SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
-		try {
-			if (in == null)
-				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-						Sandesha2Constants.PROPERTY_FILE);
-
-			Properties properties = new Properties();
-			if (in != null) {
-				properties.load(in);
-			}
-
-			String expoBackoffStr = properties.getProperty(Sandesha2Constants.Properties.ExponentialBackoff);
-			loadExponentialBackoff(expoBackoffStr, propertyBean);
-
-			String retransmissionIntStr = properties.getProperty(Sandesha2Constants.Properties.RetransmissionInterval);
-			loadRetransmissionInterval(retransmissionIntStr, propertyBean);
-
-			String acknowledgementIntStr = properties
-					.getProperty(Sandesha2Constants.Properties.AcknowledgementInterval);
-			loadAcknowledgementInterval(acknowledgementIntStr, propertyBean);
-
-			String inactivityTimeoutStr = properties.getProperty(Sandesha2Constants.Properties.InactivityTimeout);
-			String inactivityTimeoutMeasure = properties
-					.getProperty(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
-			loadInactivityTimeout(inactivityTimeoutStr, inactivityTimeoutMeasure, propertyBean);
-
-			String sequenceRemovalTimeoutStr = properties.getProperty(Sandesha2Constants.Properties.SequenceRemovalTimeout);
-			String sequenceRemovalTimeoutMeasure = properties
-					.getProperty(Sandesha2Constants.Properties.SequenceRemovalTimeoutMeasure);
-			loadSequenceRemovalTimeout(sequenceRemovalTimeoutStr, sequenceRemovalTimeoutMeasure, propertyBean);
-
-			// String storageMgrClassStr = properties
-			// .getProperty(Sandesha2Constants.Properties.StorageManager);
-			// loadStoragemanagerClass(storageMgrClassStr,propertyBean);
-
-			String inMemoryStorageMgrClassStr = properties
-					.getProperty(Sandesha2Constants.Properties.InMemoryStorageManager);
-			loadInMemoryStoragemanagerClass(inMemoryStorageMgrClassStr, propertyBean);
-
-			String permanentStorageMgrClassStr = properties
-					.getProperty(Sandesha2Constants.Properties.PermanentStorageManager);
-			loadPermanentStoragemanagerClass(permanentStorageMgrClassStr, propertyBean);
-
-			String inOrderInvocation = properties.getProperty(Sandesha2Constants.Properties.InOrderInvocation);
-			loadInOrderInvocation(inOrderInvocation, propertyBean);
-
-			String enableMakeConnection = properties.getProperty(Sandesha2Constants.Properties.EnableMakeConnection);
-			loadEnableMakeConnection(enableMakeConnection, propertyBean);
-			
-			String useSerlialization = properties.getProperty(Sandesha2Constants.Properties.UseMessageSerialization);
-			loadUseSerialization(useSerlialization, propertyBean);
-			
-			String messageTypesToDrop = properties.getProperty(Sandesha2Constants.Properties.MessageTypesToDrop);
-			loadMessageTypesToDrop(messageTypesToDrop, propertyBean);
-
-			String securityManagerClassStr = properties
-			    .getProperty(Sandesha2Constants.Properties.SecurityManager);
-			loadSecurityManagerClass(securityManagerClassStr,propertyBean);
-			
-			String eprDecoratorParam = properties.getProperty(Sandesha2Constants.Properties.EPRDecorator);
-			loadEPRDecoratorClass(eprDecoratorParam,propertyBean);
-			
-			String contextManagerClassStr = properties.getProperty(Sandesha2Constants.Properties.ContextManager);
-			loadContextManagerClass(contextManagerClassStr,propertyBean);
-
-		} catch (IOException e) {
-			throw new SandeshaException(e);
-		}
-
-		return propertyBean;
 	}
 
 	public static SandeshaPolicyBean loadPropertiesFromModuleDesc(AxisModule desc) throws SandeshaException {
@@ -302,10 +226,6 @@ public class PropertyManager {
         //propertyBean and parent being the same object means that there is no policy in this level, this is simply the reflection of 
         //the parent.
         return null;               
-	}
-
-	public static void reloadFromPropertyFile(InputStream stream) throws SandeshaException {
-		loadPropertiesFromPropertyFile(stream);
 	}
 
 	/**
@@ -520,12 +440,4 @@ public class PropertyManager {
 			propertyBean.setSecurityManagerClass(securityManagerClassStr);
 		}
 	}
-
-	private static void loadContextManagerClass(String contextManagerClassStr, SandeshaPolicyBean propertyBean) {
-		if (contextManagerClassStr != null) {
-			contextManagerClassStr = contextManagerClassStr.trim();
-			propertyBean.setContextManagerClass(contextManagerClassStr);
-		}
-	}
-	
 }

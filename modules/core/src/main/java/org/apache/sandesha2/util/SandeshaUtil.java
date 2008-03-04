@@ -1277,7 +1277,7 @@ public class SandeshaUtil {
 	public static boolean isInOrder(MessageContext context) throws SandeshaException {
 		if (log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder");
 		
-		SandeshaPolicyBean policy = getPropertyBean(context.getAxisOperation());
+		SandeshaPolicyBean policy = getPropertyBean(context.getConfigurationContext().getAxisConfiguration());
 		boolean result = policy.isInOrder();
 		
 		if (log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder, " + result);

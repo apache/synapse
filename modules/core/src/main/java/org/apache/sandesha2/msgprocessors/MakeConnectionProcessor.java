@@ -51,6 +51,7 @@ import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.workers.SandeshaThread;
@@ -308,6 +309,14 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) {
 		MessagePending messagePending = new MessagePending();
 		messagePending.setPending(true);
+		if(returnMessage.getEnvelope().getHeader() == null){
+			int SOAPVersion = Sandesha2Constants.SOAPVersion.v1_1;
+			if (!returnMessage.isSOAP11())
+				SOAPVersion = Sandesha2Constants.SOAPVersion.v1_2;
+			//The header might not be there because of the persistence code if it doesn't exist we need to add one
+			SOAPAbstractFactory.getSOAPFactory(
+					SOAPVersion).createSOAPHeader(returnMessage.getEnvelope());
+		}
 		messagePending.toHeader(returnMessage.getEnvelope().getHeader());
 	}
 

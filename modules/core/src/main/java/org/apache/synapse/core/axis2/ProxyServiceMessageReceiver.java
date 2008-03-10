@@ -61,8 +61,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             if (traceOn && trace.isTraceEnabled()) {
                 String[] cids = mc.getAttachmentMap().getAllContentIDs();
                 if (cids != null && cids.length > 0) {
-                    for (int i = 0; i < cids.length; i++) {
-                        trace.trace("With attachment content ID : " + cids[i]);
+                    for (String cid : cids) {
+                        trace.trace("With attachment content ID : " + cid);
                     }
                 }
                 trace.trace("Envelope : " + mc.getEnvelope());
@@ -143,7 +143,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             }
 
             // if inSequence returns true, forward message to endpoint
-            if(inSequenceResult == true) {
+            if(inSequenceResult) {
                 if (proxy.getTargetEndpoint() != null) {
                     Endpoint endpoint = synCtx.getEndpoint(proxy.getTargetEndpoint());
 

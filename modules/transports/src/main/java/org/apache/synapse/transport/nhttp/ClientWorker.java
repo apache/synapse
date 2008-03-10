@@ -139,7 +139,14 @@ public class ClientWorker implements Runnable {
 
         SOAPEnvelope envelope = null;
         try {
-            String contentType = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue();
+
+            Header cType = response.getFirstHeader(HTTP.CONTENT_TYPE);
+
+            String contentType = "";
+            if (cType != null) {
+                contentType = cType.getValue();
+            }
+
             String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
             if (charSetEnc == null) {
                 charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;

@@ -240,9 +240,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         org.apache.axis2.Constants.VALUE_TRUE);
             }
 
-            // clear the message type property thats used by the message formatter later on
-            // to decide whether to write as SOAP/POX etc..
-            response.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
+             // copy the message type property thats used by the out message to the response message
+            response.setProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
+                axisOutMsgCtx.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE));
             
             // compare original received message (axisOutMsgCtx) soap version with the response
             // if they are different change to original version 

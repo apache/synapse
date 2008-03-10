@@ -44,7 +44,7 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
             final HttpParams params) {
         super(session, requestFactory, allocator, params);
         this.log = LogFactory.getLog(DefaultNHttpServerConnection.class);
-        this.headerlog = LogFactory.getLog("org.apache.axis2.transport.nhttp.headers");
+        this.headerlog = LogFactory.getLog("org.apache.synapse.transport.nhttp.headers");
     }
 
     public void submitResponse(final HttpResponse response) throws IOException, HttpException {

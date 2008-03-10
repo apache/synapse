@@ -48,7 +48,7 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
         }
         this.handler = handler;
         this.log = LogFactory.getLog(handler.getClass());
-        this.headerlog = LogFactory.getLog("org.apache.axis2.transport.nhttp.headers");
+        this.headerlog = LogFactory.getLog("org.apache.synapse.transport.nhttp.headers");
     }
     
     public void connected(final NHttpServerConnection conn) {

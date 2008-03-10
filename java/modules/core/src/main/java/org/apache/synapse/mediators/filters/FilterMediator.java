@@ -20,26 +20,30 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.mediators.ListMediator;
 import org.jaxen.JaxenException;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The filter mediator combines the regex and xpath filtering functionality. If an xpath
  * is set, it is evaluated; else the given regex is evaluated against the source xpath.
  */
-public class FilterMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
+public class FilterMediator extends AbstractListMediator implements
+    org.apache.synapse.mediators.FilterMediator {
 
     private AXIOMXPath source = null;
     private Pattern regex = null;
     private AXIOMXPath xpath = null;
+    private ListMediator elseMediator = null;
+    private boolean thenElementPresent = false;
+    private String thenKey = null;
+    private String elseKey = null;
 
     /**
      * Executes the list of sub/child mediators, if the filter condition is satisfied
@@ -62,23 +66,76 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
 
         boolean result = false;
         if (test(synCtx)) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, (xpath == null ?
-                    "Source : " + source + " against : " + regex.pattern() + " matches" :
-                    "XPath expression : "  + xpath + " evaluates to true") +
-                    " - executing child mediators");
+
+            if (thenKey != null) {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, (xpath == null ?
+                        "Source : " + source + " against : " + regex.pattern() + " matches" :
+                        "XPath expression : "  + xpath + " evaluates to true") +
+                        " - executing then sequence with key : " + thenKey);
+                }
+
+                Mediator seq = synCtx.getSequence(thenKey);
+                if (seq != null) {
+                    result = seq.mediate(synCtx);
+                } else {
+                    handleException("Couldn't find the referred then sequence with key : "
+                        + thenKey, synCtx);
+                }
+                
+            } else {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, (xpath == null ?
+                        "Source : " + source + " against : " + regex.pattern() + " matches" :
+                        "XPath expression : "  + xpath + " evaluates to true") +
+                        " - executing child mediators");
+                }
+
+                result = super.mediate(synCtx);
             }
-            result = super.mediate(synCtx);
 
         } else {
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, (xpath == null ?
-                    "Source : " + source + " against : " + regex.pattern() + " does not match" :
-                    "XPath expression : "  + xpath + " evaluates to false") +
-                    " - skipping child mediators");
+            if (elseKey != null) {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, (xpath == null ?
+                        "Source : " + source + " against : " + regex.pattern() + " does not match" :
+                        "XPath expression : "  + xpath + " evaluates to false") +
+                        " - executing the else sequence with key : " + elseKey);
+                }
+
+                Mediator elseSeq = synCtx.getSequence(elseKey);
+
+                if (elseSeq != null) {
+                    result = elseSeq.mediate(synCtx);
+                } else {
+                    handleException("Couldn't find the referred else sequence with key : "
+                        + elseKey, synCtx);
+                }
+                
+            } else if (elseMediator != null) {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, (xpath == null ?
+                        "Source : " + source + " against : " + regex.pattern() + " does not match" :
+                        "XPath expression : "  + xpath + " evaluates to false") +
+                        " - executing the else path child mediators");
+                }
+                result = elseMediator.mediate(synCtx);
+
+            } else {
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, (xpath == null ?
+                        "Source : " + source + " against : " + regex.pattern() + " does not match" :
+                        "XPath expression : "  + xpath + " evaluates to false and no else path") +
+                        " - skipping child mediators");
+                }
+                result = true;
             }
-            result = true;
         }
 
         if (traceOrDebugOn) {
@@ -155,4 +212,35 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
         this.xpath = xpath;
     }
 
+    public ListMediator getElseMediator() {
+        return elseMediator;
+    }
+
+    public void setElseMediator(ListMediator elseMediator) {
+        this.elseMediator = elseMediator;
+    }
+
+    public boolean isThenElementPresent() {
+        return thenElementPresent;
+    }
+
+    public void setThenElementPresent(boolean thenElementPresent) {
+        this.thenElementPresent = thenElementPresent;
+    }
+
+    public String getThenKey() {
+        return thenKey;
+    }
+
+    public void setThenKey(String thenKey) {
+        this.thenKey = thenKey;
+    }
+
+    public String getElseKey() {
+        return elseKey;
+    }
+
+    public void setElseKey(String elseKey) {
+        this.elseKey = elseKey;
+    }
 }

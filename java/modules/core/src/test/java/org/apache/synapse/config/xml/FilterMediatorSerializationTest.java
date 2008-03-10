@@ -46,4 +46,34 @@ public class FilterMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, filterMediatorSerializer));
     }
 
+    public void testFilterMediatorSerializationSenarioThree() throws Exception {
+        String inputXml = "<filter xmlns=\"http://ws.apache.org/ns/synapse\" source=\"get-property('To')\" regex=\".*/StockQuote.*\"><send/></filter>";
+        assertTrue(serialization(inputXml, filterMediatorFactory, filterMediatorSerializer));
+        assertTrue(serialization(inputXml, filterMediatorSerializer));
+    }
+
+    public void testFilterMediatorSerializationSenarioFour() throws Exception {
+        String inputXml = "<filter xmlns=\"http://ws.apache.org/ns/synapse\" source=\"get-property('To')\" regex=\".*/StockQuote.*\"><then><send/></then></filter>";
+        assertTrue(serialization(inputXml, filterMediatorFactory, filterMediatorSerializer));
+        assertTrue(serialization(inputXml, filterMediatorSerializer));
+    }
+
+    public void testFilterMediatorSerializationSenarioFive() throws Exception {
+        String inputXml = "<filter xmlns=\"http://ws.apache.org/ns/synapse\" source=\"get-property('To')\" regex=\".*/StockQuote.*\"><then><send/></then><else><drop/></else></filter>";
+        assertTrue(serialization(inputXml, filterMediatorFactory, filterMediatorSerializer));
+        assertTrue(serialization(inputXml, filterMediatorSerializer));
+    }
+
+    public void testFilterMediatorSerializationSenarioSix() throws Exception {
+        String inputXml = "<filter xmlns=\"http://ws.apache.org/ns/synapse\" source=\"get-property('To')\" regex=\".*/StockQuote.*\"><then sequence=\"test\"/></filter>";
+        assertTrue(serialization(inputXml, filterMediatorFactory, filterMediatorSerializer));
+        assertTrue(serialization(inputXml, filterMediatorSerializer));
+    }
+
+    public void testFilterMediatorSerializationSenarioSeven() throws Exception {
+        String inputXml = "<filter xmlns=\"http://ws.apache.org/ns/synapse\" source=\"get-property('To')\" regex=\".*/StockQuote.*\"><then sequence=\"test\"/><else sequence=\"test2\"/></filter>";
+        assertTrue(serialization(inputXml, filterMediatorFactory, filterMediatorSerializer));
+        assertTrue(serialization(inputXml, filterMediatorSerializer));
+    }
+
 }

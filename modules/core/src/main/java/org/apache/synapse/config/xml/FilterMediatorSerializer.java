@@ -20,8 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.FilterMediator;
 
@@ -29,6 +27,20 @@ import org.apache.synapse.mediators.filters.FilterMediator;
  * <pre>
  * &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
  *   mediator+
+ * &lt;/filter&gt;
+ * </pre>
+ *
+ * <p>or if the filter medaitor needs to support the else behavior as well (i.e. a set of mediators
+ * to be executed when the filter evaluates to false).</p>
+ *
+ * <pre>
+ * &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+ *   &lt;then [sequence="string"]&gt;
+ *      mediator+
+ *   &lt;/then&gt;
+ *   &lt;else [sequence="string"]&gt;
+ *      mediator+
+ *   &lt;/else&gt;
  * &lt;/filter&gt;
  * </pre>
  */
@@ -62,7 +74,35 @@ public class FilterMediatorSerializer extends AbstractListMediatorSerializer {
         }
 
         saveTracingState(filter, mediator);
-        serializeChildren(filter, mediator.getList());
+
+        if (mediator.isThenElementPresent()) {
+
+            OMElement thenElem = fac.createOMElement("then", synNS);
+            filter.addChild(thenElem);
+
+            if (mediator.getThenKey() != null) {
+                thenElem.addAttribute(
+                    fac.createOMAttribute("sequence", nullNS, mediator.getThenKey()));
+            } else {
+                serializeChildren(thenElem, mediator.getList());
+            }
+
+            if (mediator.getElseMediator() != null || mediator.getElseKey() != null) {
+
+                OMElement elseElem = fac.createOMElement("else", synNS);
+                filter.addChild(elseElem);
+
+                if (mediator.getElseKey() != null) {
+                    elseElem.addAttribute(
+                        fac.createOMAttribute("sequence", nullNS, mediator.getElseKey()));
+                } else {
+                    serializeChildren(elseElem, mediator.getElseMediator().getList());
+                }
+            }
+            
+        } else {
+            serializeChildren(filter, mediator.getList());
+        }
 
         if (parent != null) {
             parent.addChild(filter);

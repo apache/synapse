@@ -22,9 +22,11 @@ package org.apache.synapse.mediators.filters;
 import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.xml.AnonymousListMediator;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 import java.util.regex.Pattern;
 
@@ -134,6 +136,61 @@ public class FilterMediatorTest extends TestCase {
         filter.mediate(TestUtils.getTestContext(REQ));
 
         assertTrue(!filterConditionPassed);
+    }
+
+    public void testFilterConditionWithThenElseKey() throws Exception {
+        setFilterConditionPassed(false);
+
+        // create a new filter mediator
+        FilterMediator filter = new FilterMediator();
+
+        // set source xpath condition to //symbol
+        AXIOMXPath source = new AXIOMXPath("//wsx:symbol");
+        source.addNamespace("wsx", "http://www.webserviceX.NET/");
+        filter.setSource(source);
+
+        // set regex to MSFT
+        Pattern regex = Pattern.compile("MSFT");
+        filter.setRegex(regex);
+
+        MessageContext msgCtx = TestUtils.getTestContext(REQ);
+
+        SequenceMediator seq = new SequenceMediator();
+        seq.setName("refSeq");
+        seq.addChild(testMediator);
+
+        msgCtx.getConfiguration().addSequence("refSeq", testMediator);
+
+        filter.setElseKey("refSeq");
+        // test validate mediator, with static enveope
+        filter.mediate(msgCtx);
+
+        assertTrue(filterConditionPassed);
+    }
+
+    public void testFilterConditionWithThenElse() throws Exception {
+        setFilterConditionPassed(false);
+
+        // create a new filter mediator
+        FilterMediator filter = new FilterMediator();
+
+        // set source xpath condition to //symbol
+        AXIOMXPath source = new AXIOMXPath("//wsx:symbol");
+        source.addNamespace("wsx", "http://www.webserviceX.NET/");
+        filter.setSource(source);
+
+        // set regex to MSFT
+        Pattern regex = Pattern.compile("MSFT");
+        filter.setRegex(regex);
+
+        AnonymousListMediator seq = new AnonymousListMediator();
+        seq.addChild(testMediator);
+
+        filter.setElseMediator(seq);
+        // test validate mediator, with static enveope
+        filter.mediate(TestUtils.getTestContext(REQ));
+
+        assertTrue(filterConditionPassed);
     }
 
     public boolean isFilterConditionPassed() {

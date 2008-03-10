@@ -331,7 +331,7 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setResponse(boolean b) {
         response = b;
-        axis2MessageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
+        axis2MessageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, b);
     }
 
     public boolean isResponse() {
@@ -377,7 +377,8 @@ public class Axis2MessageContext implements MessageContext {
         } else {
             String serviceName = (String) getProperty(SynapseConstants.PROXY_SERVICE);
             if (serviceName != null && synCfg.getProxyService(serviceName) != null) {
-                serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
+                serviceLog = LogFactory.getLog(
+                    SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
                 return serviceLog;
             } else {
                 serviceLog = LogFactory.getLog(
@@ -444,7 +445,8 @@ public class Axis2MessageContext implements MessageContext {
      * against full envelope
      * @return a String representation of the result of evaluation
      */
-    public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx, boolean bodyRelative) {
+    public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx,
+        boolean bodyRelative) {
 
         synchronized(xpath) {
 
@@ -456,7 +458,8 @@ public class Axis2MessageContext implements MessageContext {
 
                 // set function context into XPath
                 SimpleFunctionContext fc = new XPathFunctionContext();
-                fc.registerFunction(SynapseConstants.SYNAPSE_NAMESPACE, "get-property", getPropertyFunc);
+                fc.registerFunction(SynapseConstants.SYNAPSE_NAMESPACE,
+                    "get-property", getPropertyFunc);
                 fc.registerFunction(null, "get-property", getPropertyFunc);
                 xpath.setFunctionContext(fc);
 
@@ -498,7 +501,8 @@ public class Axis2MessageContext implements MessageContext {
                             }
                             textValue.append(s);
                         } else if (o instanceof OMDocumentImpl) {
-                            textValue.append(((OMDocumentImpl) o).getOMDocumentElement().toString());
+                            textValue.append(
+                                ((OMDocumentImpl) o).getOMDocumentElement().toString());
                         }
                     }
                 } else {
@@ -532,31 +536,33 @@ public class Axis2MessageContext implements MessageContext {
         String separator = "\n";
 
         if (getTo() != null)
-            sb.append("To: " + getTo().getAddress());
+            sb.append("To: ").append(getTo().getAddress());
         else
             sb.append("To: ");
         if (getFrom() != null)
-            sb.append(separator + "From: " + getFrom().getAddress());
+            sb.append(separator).append("From: ").append(getFrom().getAddress());
         if (getWSAAction() != null)
-            sb.append(separator + "WSAction: " + getWSAAction());
+            sb.append(separator).append("WSAction: ").append(getWSAAction());
         if (getSoapAction() != null)
-            sb.append(separator + "SOAPAction: " + getSoapAction());
+            sb.append(separator).append("SOAPAction: ").append(getSoapAction());
         if (getReplyTo() != null)
-            sb.append(separator + "ReplyTo: " + getReplyTo().getAddress());
+            sb.append(separator).append("ReplyTo: ").append(getReplyTo().getAddress());
         if (getMessageID() != null)
-            sb.append(separator + "MessageID: " + getMessageID());
+            sb.append(separator).append("MessageID: ").append(getMessageID());
 
         SOAPHeader soapHeader = getEnvelope().getHeader();
         if (soapHeader != null) {
-            sb.append(separator + "Headers : ");
+            sb.append(separator).append("Headers : ");
             for (Iterator iter = soapHeader.examineAllHeaderBlocks(); iter.hasNext();) {
                 Object o = iter.next();
                 if (o instanceof SOAPHeaderBlock) {
                     SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
-                    sb.append(separator + headerBlock.getLocalName() + " : " + headerBlock.getText());
+                    sb.append(separator).append(
+                        headerBlock.getLocalName()).append(" : ").append(headerBlock.getText());
                 } else if (o instanceof OMElement) {
                     OMElement headerElem = (OMElement) o;
-                    sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+                    sb.append(separator).append(
+                        headerElem.getLocalName()).append(" : ").append(headerElem.getText());
                 }
             }
         }

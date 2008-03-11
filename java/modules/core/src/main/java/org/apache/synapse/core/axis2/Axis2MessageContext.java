@@ -20,9 +20,9 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
@@ -40,6 +40,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.GetPropertyFunction;
 import org.apache.synapse.mediators.MediatorFaultHandler;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.jaxen.SimpleFunctionContext;
 import org.jaxen.XPathFunctionContext;
@@ -424,6 +425,11 @@ public class Axis2MessageContext implements MessageContext {
         axis2MessageContext.setServerSide(value);
     }
 
+    public static String getStringValue(SynapseXPath xpath, MessageContext synCtx) {
+       // default xpath evaluated against the full envelope
+       return getStringValue(xpath.getAXIOMXPath(), synCtx, xpath.isBodyRelative());
+    }
+
     /**
      * Evaluates the given XPath expression against the SOAPEnvelope of the
      * current message and returns a String representation of the result
@@ -450,74 +456,90 @@ public class Axis2MessageContext implements MessageContext {
 
         synchronized(xpath) {
 
-        if (xpath != null) {
-            try {
-                // create an instance of a synapse:get-property() function and set it to the xpath
-                GetPropertyFunction getPropertyFunc = new GetPropertyFunction();
-                getPropertyFunc.setSynCtx(synCtx);
+            if (xpath != null) {
+                
+                try {
+                    // create an instance of a synapse:get-property()
+                    // function and set it to the xpath
+                    GetPropertyFunction getPropertyFunc = new GetPropertyFunction();
+                    getPropertyFunc.setSynCtx(synCtx);
 
-                // set function context into XPath
-                SimpleFunctionContext fc = new XPathFunctionContext();
-                fc.registerFunction(SynapseConstants.SYNAPSE_NAMESPACE,
-                    "get-property", getPropertyFunc);
-                fc.registerFunction(null, "get-property", getPropertyFunc);
-                xpath.setFunctionContext(fc);
+                    // set function context into XPath
+                    SimpleFunctionContext fc = new XPathFunctionContext();
+                    fc.registerFunction(SynapseConstants.SYNAPSE_NAMESPACE,
+                        "get-property", getPropertyFunc);
+                    fc.registerFunction(null, "get-property", getPropertyFunc);
+                    xpath.setFunctionContext(fc);
 
-                // register namespace for XPath extension function
-                xpath.addNamespace("synapse", SynapseConstants.SYNAPSE_NAMESPACE);
-                xpath.addNamespace("syn", SynapseConstants.SYNAPSE_NAMESPACE);
+                    // register namespace for XPath extension function
+                    xpath.addNamespace("synapse", SynapseConstants.SYNAPSE_NAMESPACE);
+                    xpath.addNamespace("syn", SynapseConstants.SYNAPSE_NAMESPACE);
 
-            } catch (JaxenException je) {
-                handleException("Error setting up the Synapse XPath " +
-                    "extension function for XPath : " + xpath, je);
-            }
-            try {
-                Object result;
-                if(bodyRelative) {
-                    result = xpath.evaluate(synCtx.getEnvelope().getBody());
-
-                } else {
-                    result = xpath.evaluate(synCtx.getEnvelope());
-
+                } catch (JaxenException je) {
+                    handleException("Error setting up the Synapse XPath " +
+                        "extension function for XPath : " + xpath, je);
                 }
-                if (result == null) {
-                    return null;
-                }
-                StringBuffer textValue = new StringBuffer();
-                if (result instanceof List) {
-                    List list = (List) result;
-                    Iterator iter = list.iterator();
-                    while (iter.hasNext()) {
-                        Object o = iter.next();
-                        if (o == null && list.size() == 1) {
-                            return null;
-                        }
-                        if (o instanceof OMTextImpl) {
-                            textValue.append(((OMTextImpl) o).getText());
-                        } else if (o instanceof OMElementImpl) {
-                            String s = ((OMElementImpl) o).getText();
-                            if (s.trim().length() == 0) {
-                                s = o.toString();
-                            }
-                            textValue.append(s);
-                        } else if (o instanceof OMDocumentImpl) {
-                            textValue.append(
-                                ((OMDocumentImpl) o).getOMDocumentElement().toString());
-                        }
+                
+                try {
+                    
+                    Object result;
+
+                    // if the xpath is provided as a body relative XPath
+                    if(bodyRelative) {
+                        result = xpath.evaluate(synCtx.getEnvelope().getBody());
+                    // if the XPath is relative to the envelope
+                    } else {
+                        result = xpath.evaluate(synCtx.getEnvelope());
                     }
-                } else {
-                    textValue.append(result.toString());
-                }
-                return textValue.toString();
+                    
+                    if (result == null) {
+                        return null;
+                    }
 
-            } catch (JaxenException je) {
-                handleException("Evaluation of the XPath expression " + xpath.toString() +
-                    " resulted in an error", je);
+                    StringBuffer textValue = new StringBuffer();
+                    if (result instanceof List) {
+
+                        List list = (List) result;
+                        for (Object o : list) {
+
+                            if (o == null && list.size() == 1) {
+                                return null;
+                            }
+
+                            if (o instanceof OMTextImpl) {
+                                textValue.append(((OMTextImpl) o).getText());
+                            } else if (o instanceof OMElementImpl) {
+
+                                String s = ((OMElementImpl) o).getText();
+
+                                if (s.trim().length() == 0) {
+                                    s = o.toString();
+                                }
+                                textValue.append(s);
+
+                            } else if (o instanceof OMDocumentImpl) {
+
+                                textValue.append(
+                                    ((OMDocumentImpl) o).getOMDocumentElement().toString());
+                            }
+                        }
+                        
+                    } else {
+                        textValue.append(result.toString());
+                    }
+                    
+                    return textValue.toString();
+
+                } catch (JaxenException je) {
+                    handleException("Evaluation of the XPath expression " + xpath.toString() +
+                        " resulted in an error", je);
+                }
+
+            } else {
+                handleException("Invalid (null) XPath expression");
             }
-        } else {
-            handleException("Invalid (null) XPath expression");
-        }
-        return null;
+            
+            return null;
         }
     }
 

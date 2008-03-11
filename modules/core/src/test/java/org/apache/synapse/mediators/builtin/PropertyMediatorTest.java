@@ -20,11 +20,11 @@
 package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.SynapseXPath;
 
 public class PropertyMediatorTest extends TestCase {
 
@@ -44,10 +44,10 @@ public class PropertyMediatorTest extends TestCase {
         propMediatorTwo.mediate(synCtx);
         assertTrue(
             "value".equals(Axis2MessageContext.getStringValue(
-                new AXIOMXPath("synapse:get-property('name')"), synCtx)));
+                new SynapseXPath("synapse:get-property('name')"), synCtx)));
         assertTrue(
             "valueTwo".equals(Axis2MessageContext.getStringValue(
-                new AXIOMXPath("synapse:get-property('nameTwo')"), synCtx)));
+                new SynapseXPath("synapse:get-property('nameTwo')"), synCtx)));
 
         PropertyMediator propMediatorThree = new PropertyMediator();
         propMediatorThree.setName("name");
@@ -55,10 +55,10 @@ public class PropertyMediatorTest extends TestCase {
         propMediatorThree.setAction(PropertyMediator.ACTION_REMOVE);
         propMediatorThree.mediate(synCtx) ;
         assertNull(Axis2MessageContext.getStringValue(
-                new AXIOMXPath("synapse:get-property('name')"), synCtx));
+                new SynapseXPath("synapse:get-property('name')"), synCtx));
         assertTrue(
                    "valueTwo".equals(Axis2MessageContext.getStringValue(
-                       new AXIOMXPath("synapse:get-property('nameTwo')"), synCtx)));
+                       new SynapseXPath("synapse:get-property('nameTwo')"), synCtx)));
                 
     }
 
@@ -80,7 +80,7 @@ public class PropertyMediatorTest extends TestCase {
 
         assertTrue(
             "value".equals(Axis2MessageContext.getStringValue(
-                new AXIOMXPath("synapse:get-property('name')"), synCtx)));
+                new SynapseXPath("synapse:get-property('name')"), synCtx)));
     }*/
 
     public void testMediatorPropertiesLiteral() throws Exception {
@@ -103,7 +103,7 @@ public class PropertyMediatorTest extends TestCase {
 
         // read property through a mediator property
         MediatorProperty medProp = new MediatorProperty();
-        medProp.setExpression(new AXIOMXPath("synapse:get-property('name')"));
+        medProp.setExpression(new SynapseXPath("synapse:get-property('name')"));
 
         assertTrue(
             "value".equals(medProp.getEvaluatedExpression(synCtx)));

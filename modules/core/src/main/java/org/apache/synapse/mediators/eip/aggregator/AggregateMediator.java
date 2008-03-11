@@ -19,7 +19,6 @@
 
 package org.apache.synapse.mediators.eip.aggregator;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
@@ -27,15 +26,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.eip.EIPUtils;
-import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.eip.EIPConstants;
+import org.apache.synapse.mediators.eip.EIPUtils;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * Aggregate a number of messages that are determined to be for a particular group, and combine
@@ -63,14 +63,14 @@ public class AggregateMediator extends AbstractMediator {
      * XPath that specifies a correlation expression that can be used to combine messages. An
      * example maybe //department@id="11"
      */
-    private AXIOMXPath correlateExpression = null;
+    private SynapseXPath correlateExpression = null;
     /**
      * An XPath expression that may specify a selected element to be aggregated from a group of
      * messages to create the aggregated message
      * e.g. //getQuote/return would pick up and aggregate the //getQuote/return elements from a
      * bunch of matching messages into one aggregated message
      */
-    private AXIOMXPath aggregationExpression = null;
+    private SynapseXPath aggregationExpression = null;
 
     /** This holds the reference sequence name of the */
     private String onCompleteSequenceRef = null;
@@ -83,7 +83,7 @@ public class AggregateMediator extends AbstractMediator {
 
     public AggregateMediator() {
         try {
-            aggregationExpression = new AXIOMXPath("s11:Body/child::*[position()=1] | " +
+            aggregationExpression = new SynapseXPath("s11:Body/child::*[position()=1] | " +
                 "s12:Body/child::*[position()=1]");
             aggregationExpression.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             aggregationExpression.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
@@ -318,11 +318,11 @@ public class AggregateMediator extends AbstractMediator {
         return newCtx;
     }
 
-    public AXIOMXPath getCorrelateExpression() {
+    public SynapseXPath getCorrelateExpression() {
         return correlateExpression;
     }
 
-    public void setCorrelateExpression(AXIOMXPath correlateExpression) {
+    public void setCorrelateExpression(SynapseXPath correlateExpression) {
         this.correlateExpression = correlateExpression;
     }
 
@@ -350,11 +350,11 @@ public class AggregateMediator extends AbstractMediator {
         this.maxMessagesToComplete = maxMessagesToComplete;
     }
 
-    public AXIOMXPath getAggregationExpression() {
+    public SynapseXPath getAggregationExpression() {
         return aggregationExpression;
     }
 
-    public void setAggregationExpression(AXIOMXPath aggregationExpression) {
+    public void setAggregationExpression(SynapseXPath aggregationExpression) {
         this.aggregationExpression = aggregationExpression;
     }
 

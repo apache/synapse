@@ -65,7 +65,7 @@ public class SynapseXPathFactory {
             }
             
         } catch (JaxenException e) {
-            handleException("Error in creating the AXIOMXPath from : " + xpathAttrib, e);
+            handleException("Error in creating the XPath from : " + xpathAttrib, e);
         }
 
         return xpath;

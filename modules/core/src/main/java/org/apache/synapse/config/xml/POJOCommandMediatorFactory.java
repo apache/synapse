@@ -21,10 +21,10 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -112,14 +112,14 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
         OMAttribute ctxNameAttr = propElem.getAttribute(ATT_CTXNAME);
         OMAttribute actionAttr  = propElem.getAttribute(ATT_ACTION);
 
-        AXIOMXPath xpath = null;
+        SynapseXPath xpath = null;
         try {
             if (exprAttr != null) {
-                xpath = new AXIOMXPath(exprAttr.getAttributeValue());
+                xpath = new SynapseXPath(exprAttr.getAttributeValue());
                 OMElementUtils.addNameSpaces(xpath, propElem, log);
             }
         } catch (JaxenException e) {
-            handleException("Error in building the expression as an AXIOMXPath" + e);
+            handleException("Error in building the expression as an SynapseXPath" + e);
         }
 
         // if there is a value attribute there is no action (action is implied as read value)

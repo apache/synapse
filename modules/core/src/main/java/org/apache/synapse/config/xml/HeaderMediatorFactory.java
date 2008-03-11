@@ -21,12 +21,10 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.transform.HeaderMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -103,7 +101,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
         } else if (exprn != null && exprn.getAttributeValue() != null) {
             try {
-                AXIOMXPath xp = new AXIOMXPath(exprn.getAttributeValue());
+                SynapseXPath xp = new SynapseXPath(exprn.getAttributeValue());
                 OMElementUtils.addNameSpaces(xp, elem, log);
                 headerMediator.setExpression(xp);
             } catch (JaxenException je) {

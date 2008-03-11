@@ -19,30 +19,27 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Collections;
-
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.util.UUIDGenerator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.UUIDGenerator;
 import org.jaxen.JaxenException;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class RMSequenceMediator extends AbstractMediator {
 
-    private AXIOMXPath correlation = null;
-    private AXIOMXPath lastMessage = null;
+    private SynapseXPath correlation = null;
+    private SynapseXPath lastMessage = null;
     private Boolean single = null;
     private String version = null;
 
@@ -215,19 +212,19 @@ public class RMSequenceMediator extends AbstractMediator {
         }
     }
 
-    public AXIOMXPath getCorrelation() {
+    public SynapseXPath getCorrelation() {
         return correlation;
     }
 
-    public void setCorrelation(AXIOMXPath correlation) {
+    public void setCorrelation(SynapseXPath correlation) {
         this.correlation = correlation;
     }
 
-    public AXIOMXPath getLastMessage() {
+    public SynapseXPath getLastMessage() {
         return lastMessage;
     }
 
-    public void setLastMessage(AXIOMXPath lastMessage) {
+    public void setLastMessage(SynapseXPath lastMessage) {
         this.lastMessage = lastMessage;
     }
 

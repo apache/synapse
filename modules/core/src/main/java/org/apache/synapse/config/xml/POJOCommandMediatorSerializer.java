@@ -20,9 +20,9 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
+import org.apache.synapse.util.SynapseXPath;
 
 import java.util.Iterator;
 
@@ -85,7 +85,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
                 prop.addAttribute(fac.createOMAttribute("context-name", nullNS,
                     mediator.getContextGetterProperties().get(propName)));
             } else if (mediator.getMessageGetterProperties().containsKey(propName)) {
-                AXIOMXPath xpath = mediator.getMessageGetterProperties().get(propName);
+                SynapseXPath xpath = mediator.getMessageGetterProperties().get(propName);
                 prop.addAttribute(fac.createOMAttribute("expression", nullNS, xpath.toString()));
                 serializeNamespaces(prop, xpath);
             }
@@ -96,7 +96,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             getMessageSetterProperties().keySet().iterator(); itr.hasNext(); ) {
 
             String propName = (String) itr.next();
-            AXIOMXPath exprn = mediator.getMessageSetterProperties().get(propName);
+            SynapseXPath exprn = mediator.getMessageSetterProperties().get(propName);
             OMElement prop = fac.createOMElement(PROP_Q);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
             prop.addAttribute(fac.createOMAttribute("expression", nullNS, exprn.toString()));
@@ -126,7 +126,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             if (mediator.getContextGetterProperties().containsKey(propName)) {
                 prop.addAttribute(fac.createOMAttribute("action", nullNS, "ReadAndUpdateContext"));
             } else if (mediator.getMessageGetterProperties().containsKey(propName)) {
-                AXIOMXPath exprn = mediator.getMessageGetterProperties().get(propName);
+                SynapseXPath exprn = mediator.getMessageGetterProperties().get(propName);
                 prop.addAttribute(fac.createOMAttribute("expression", nullNS, exprn.toString()));
                 serializeNamespaces(prop, exprn);
                 prop.addAttribute(fac.createOMAttribute("action", nullNS, "ReadContext"));
@@ -155,7 +155,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
             String propName = (String) itr.next();
             if (!isSerialized(propName, mediator)) {
-                AXIOMXPath exprn = mediator.getMessageGetterProperties().get(propName);
+                SynapseXPath exprn = mediator.getMessageGetterProperties().get(propName);
                 OMElement prop = fac.createOMElement(PROP_Q);
                 prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
                 prop.addAttribute(fac.createOMAttribute("expression", nullNS,

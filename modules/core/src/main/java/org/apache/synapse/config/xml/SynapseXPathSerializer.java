@@ -36,16 +36,15 @@ public class SynapseXPathSerializer {
 
     public static OMElement serializeXPath(SynapseXPath xpath, OMElement elem, String attribName) {
 
-        AXIOMXPath omXPath = xpath.getAXIOMXPath();
         OMNamespace nullNS = elem.getOMFactory()
             .createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
-        if (omXPath != null) {
+        if (xpath != null) {
             
             elem.addAttribute(elem.getOMFactory().createOMAttribute(
-                attribName, nullNS, omXPath.toString()));
+                attribName, nullNS, xpath.toString()));
 
-            serializeNamespaces(elem, omXPath);
+            serializeNamespaces(elem, xpath);
 
             if (xpath.isBodyRelative()) {
                 
@@ -55,7 +54,7 @@ public class SynapseXPathSerializer {
             }
             
         } else {
-            handleException("Couldn't find the AXIOMXPath in the SynapseXPath");
+            handleException("Couldn't find the xpath in the SynapseXPath");
         }
 
         return elem;

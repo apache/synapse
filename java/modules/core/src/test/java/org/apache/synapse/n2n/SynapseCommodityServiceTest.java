@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -32,15 +32,15 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.engine.MessageReceiver;
-import org.apache.axis2.AxisFault;
+import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.util.SynapseXPath;
 import org.apache.synapse.utils.Services;
 
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class SynapseCommodityServiceTest extends TestCase {
@@ -149,7 +149,7 @@ public class SynapseCommodityServiceTest extends TestCase {
 
         assertNotNull(response);
 
-        AXIOMXPath xPath = new AXIOMXPath("//return");
+        SynapseXPath xPath = new SynapseXPath("//return");
         xPath.addNamespace("ns","http://services.samples/xsd");
         OMElement returnEle = (OMElement) xPath.selectSingleNode(response);
 

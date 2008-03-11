@@ -20,17 +20,12 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jaxen.JaxenException;
+import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * This class will be used as a Helper class to get the properties loaded while building the

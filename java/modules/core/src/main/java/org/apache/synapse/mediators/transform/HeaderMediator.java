@@ -20,19 +20,17 @@
 package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -57,7 +55,7 @@ public class HeaderMediator extends AbstractMediator {
     /** Set the header (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
     private int action = ACTION_SET;
     /** An expression which should be evaluated, and the result set as the header value */
-    private AXIOMXPath expression = null;
+    private SynapseXPath expression = null;
 
     /**
      * Sets/Removes a SOAP header on the current message
@@ -218,11 +216,11 @@ public class HeaderMediator extends AbstractMediator {
         this.value = value;
     }
 
-    public AXIOMXPath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 
-    public void setExpression(AXIOMXPath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 }

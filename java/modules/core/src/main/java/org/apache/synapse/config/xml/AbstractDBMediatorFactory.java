@@ -21,10 +21,10 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.naming.Context;
@@ -105,7 +105,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         // get the 'pool' element and determine if we need to create a DataSource or
         // look up using JNDI
         try {
-            AXIOMXPath xpath = new AXIOMXPath("self::node()/syn:connection/syn:pool");
+            SynapseXPath xpath = new SynapseXPath("self::node()/syn:connection/syn:pool");
             xpath.addNamespace("syn", XMLConfigConstants.SYNAPSE_NAMESPACE);
             pool = (OMElement) xpath.selectSingleNode(elem);
 
@@ -292,10 +292,10 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
                 if (xpath != null || value != null) {
                     
-                    AXIOMXPath xp = null;
+                    SynapseXPath xp = null;
                     if (xpath != null) {
                         try {
-                            xp = new AXIOMXPath(xpath);
+                            xp = new SynapseXPath(xpath);
                             OMElementUtils.addNameSpaces(xp, paramElt, log);
 
                         } catch (JaxenException e) {

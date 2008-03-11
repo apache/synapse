@@ -19,17 +19,15 @@
 
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
+
+import javax.xml.namespace.QName;
 
 /**
  * Creates a property mediator through the supplied XML configuration
@@ -65,7 +63,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
             propMediator.setValue(value.getAttributeValue());
         } else if (expression != null) {
             try {
-                AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
+                SynapseXPath xp = new SynapseXPath(expression.getAttributeValue());
                 OMElementUtils.addNameSpaces(xp, elem, log);
                 propMediator.setExpression(xp);
 

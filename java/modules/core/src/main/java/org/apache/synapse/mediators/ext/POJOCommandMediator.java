@@ -22,12 +22,12 @@ package org.apache.synapse.mediators.ext;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.EIPUtils;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -62,7 +62,7 @@ public class POJOCommandMediator extends AbstractMediator {
      * 'dynamic' properties whose values are dynamically evaluated before each
      * invocation of the command, by evaluating an XPath against the current message
      */
-    private Map<String, AXIOMXPath> messageSetterProperties = new HashMap<String, AXIOMXPath>();
+    private Map<String, SynapseXPath> messageSetterProperties = new HashMap<String, SynapseXPath>();
 
     /**
      * 'dynamic' properties whose values are dynamically evaluated before each
@@ -80,7 +80,7 @@ public class POJOCommandMediator extends AbstractMediator {
      * 'messsage' properties whose values are set back to the current message, from the command
      * and as specified by the XPATH
      */
-    private Map<String, AXIOMXPath> messageGetterProperties = new HashMap<String, AXIOMXPath>();
+    private Map<String, SynapseXPath> messageGetterProperties = new HashMap<String, SynapseXPath>();
 
     /**
      * Implements the mediate method of the Mediator interface. This method will instantiate
@@ -137,7 +137,7 @@ public class POJOCommandMediator extends AbstractMediator {
         for (Iterator iter = messageSetterProperties.keySet().iterator(); iter.hasNext(); ) {
 
             String name = (String) iter.next();
-            AXIOMXPath xpath = messageSetterProperties.get(name);
+            SynapseXPath xpath = messageSetterProperties.get(name);
             String value = Axis2MessageContext.getStringValue(xpath, synCtx);
 
             setInstanceProperty(name, value, commandObject, synCtx);
@@ -183,7 +183,7 @@ public class POJOCommandMediator extends AbstractMediator {
         for (Iterator iter = messageGetterProperties.keySet().iterator(); iter.hasNext(); ) {
 
             String name = (String) iter.next();
-            AXIOMXPath xpath = messageGetterProperties.get(name);
+            SynapseXPath xpath = messageGetterProperties.get(name);
 
             Object resultValue = getInstanceProperty(name, commandObject, synCtx);
 
@@ -341,7 +341,7 @@ public class POJOCommandMediator extends AbstractMediator {
         this.staticSetterProperties.put(name, value);
     }
 
-    public void addMessageSetterProperty(String name, AXIOMXPath xpath) {
+    public void addMessageSetterProperty(String name, SynapseXPath xpath) {
         this.messageSetterProperties.put(name, xpath);
     }
     
@@ -353,7 +353,7 @@ public class POJOCommandMediator extends AbstractMediator {
         this.contextGetterProperties.put(name, value);
     }
 
-    public void addMessageGetterProperty(String name, AXIOMXPath xpath) {
+    public void addMessageGetterProperty(String name, SynapseXPath xpath) {
         this.messageGetterProperties.put(name, xpath);
     }
 
@@ -361,7 +361,7 @@ public class POJOCommandMediator extends AbstractMediator {
         return this.staticSetterProperties;
     }
 
-    public Map<String, AXIOMXPath> getMessageSetterProperties() {
+    public Map<String, SynapseXPath> getMessageSetterProperties() {
         return this.messageSetterProperties;
     }
 
@@ -373,7 +373,7 @@ public class POJOCommandMediator extends AbstractMediator {
         return this.contextGetterProperties;
     }
 
-    public Map<String, AXIOMXPath> getMessageGetterProperties() {
+    public Map<String, SynapseXPath> getMessageGetterProperties() {
         return this.messageGetterProperties;
     }
 }

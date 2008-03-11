@@ -21,10 +21,10 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.filters.FilterMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -77,7 +77,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
             } else {
 
                 try {
-                    filter.setXpath(new AXIOMXPath(attXpath.getAttributeValue()));
+                    filter.setXpath(new SynapseXPath(attXpath.getAttributeValue()));
                     OMElementUtils.addNameSpaces(filter.getXpath(), elem, log);
                 } catch (JaxenException e) {
                     handleException("Invalid XPath expression for attribute xpath : "
@@ -97,7 +97,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
             } else {
                 
                 try {
-                    filter.setSource(new AXIOMXPath(attSource.getAttributeValue()));
+                    filter.setSource(new SynapseXPath(attSource.getAttributeValue()));
                     OMElementUtils.addNameSpaces(filter.getSource(), elem, log);
                 } catch (JaxenException e) {
 

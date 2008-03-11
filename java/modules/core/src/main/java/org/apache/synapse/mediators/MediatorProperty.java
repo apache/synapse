@@ -19,10 +19,10 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
 
@@ -40,7 +40,7 @@ public class MediatorProperty {
 
     private String name;
     private String value;
-    private AXIOMXPath expression;
+    private SynapseXPath expression;
 
     public MediatorProperty() {}
 
@@ -60,11 +60,11 @@ public class MediatorProperty {
         this.value = value;
     }
 
-    public AXIOMXPath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 
-    public void setExpression(AXIOMXPath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 

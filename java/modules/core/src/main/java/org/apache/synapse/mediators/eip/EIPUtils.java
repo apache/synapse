@@ -21,10 +21,10 @@ package org.apache.synapse.mediators.eip;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.util.ArrayList;
@@ -42,11 +42,11 @@ public class EIPUtils {
      * Return the set of elements specified by the XPath over the given envelope
      *
      * @param envelope SOAPEnvelope from which the elements will be extracted
-     * @param expression AXIOMXPath expression describing the elements to be extracted
+     * @param expression SynapseXPath expression describing the elements to be extracted
      * @return List OMElements in the envelope matching the expression
      * @throws JaxenException if the XPath expression evaluation fails
      */
-    public static List getMatchingElements(SOAPEnvelope envelope, AXIOMXPath expression)
+    public static List getMatchingElements(SOAPEnvelope envelope, SynapseXPath expression)
         throws JaxenException {
 
         Object o = expression.evaluate(envelope);
@@ -65,11 +65,11 @@ public class EIPUtils {
      * Return the set of detached elements specified by the XPath over the given envelope
      *
      * @param envelope SOAPEnvelope from which the elements will be extracted
-     * @param expression AXIOMXPath expression describing the elements to be extracted
+     * @param expression SynapseXPath expression describing the elements to be extracted
      * @return List detached OMElements in the envelope matching the expression
      * @throws JaxenException if the XPath expression evaluation fails
      */
-    public static List getDetachedMatchingElements(SOAPEnvelope envelope, AXIOMXPath expression)
+    public static List getDetachedMatchingElements(SOAPEnvelope envelope, SynapseXPath expression)
         throws JaxenException {
 
         List elementList = new ArrayList();
@@ -93,10 +93,10 @@ public class EIPUtils {
      *
      * @param envelope   SOAPEnvelope to be enriched with the content
      * @param enricher   SOAPEnvelope from which the enriching element will be extracted
-     * @param expression AXIOMXPath describing the enriching element
+     * @param expression SynapseXPath describing the enriching element
      */
     public static void enrichEnvelope(SOAPEnvelope envelope, SOAPEnvelope enricher,
-        AXIOMXPath expression) throws JaxenException {
+        SynapseXPath expression) throws JaxenException {
 
         OMElement enrichingElement;
         List elementList = getMatchingElements(envelope, expression);

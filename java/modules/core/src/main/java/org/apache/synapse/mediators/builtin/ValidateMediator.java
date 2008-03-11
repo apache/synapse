@@ -20,35 +20,40 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import javax.xml.XMLConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Validate a message or an element against a schema
@@ -70,7 +75,7 @@ public class ValidateMediator extends AbstractListMediator {
      * If this is not specified, the validation will occur against the first child element of the
      * SOAP body
      */
-    private AXIOMXPath source = null;
+    private SynapseXPath source = null;
 
     /**
      * A Map containing features to be passed to the actual validator (Xerces)
@@ -102,7 +107,7 @@ public class ValidateMediator extends AbstractListMediator {
     public ValidateMediator() {
         // create the default XPath
         try {
-            this.source = new AXIOMXPath(DEFAULT_XPATH);
+            this.source = new SynapseXPath(DEFAULT_XPATH);
             this.source.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             this.source.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
@@ -380,7 +385,7 @@ public class ValidateMediator extends AbstractListMediator {
      * Set the given XPath as the source XPath
      * @param source an XPath to be set as the source
      */
-    public void setSource(AXIOMXPath source) {
+    public void setSource(SynapseXPath source) {
        this.source = source;
     }
 
@@ -388,7 +393,7 @@ public class ValidateMediator extends AbstractListMediator {
      * Get the source XPath which yields the source element for validation
      * @return the XPath which yields the source element for validation
      */
-    public AXIOMXPath getSource() {
+    public SynapseXPath getSource() {
         return source;
     }
 

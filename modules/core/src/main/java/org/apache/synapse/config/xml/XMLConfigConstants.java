@@ -78,4 +78,8 @@ public class XMLConfigConstants {
 
     public static final String ONREJECT = "onReject";
 	public static final String ONACCEPT = "onAccept";
+
+    public static final QName ATT_XPATH_RELATIVE = new QName("relative");
+    public static final String XPATH_BODY_RELATIVE = "body";
+    public static final String XPATH_ENVELOPE_RELATIVE = "envelope";
 }

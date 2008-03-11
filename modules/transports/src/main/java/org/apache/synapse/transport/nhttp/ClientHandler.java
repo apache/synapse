@@ -22,11 +22,13 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,6 +81,7 @@ public class ClientHandler implements NHttpClientHandler {
     private static final String REQUEST_SOURCE_CHANNEL = "request-source-channel";
     private static final String RESPONSE_SINK_CHANNEL = "request-sink-channel";
 
+    private static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
     private static final String CONTENT_TYPE = "Content-Type";
 
     /**
@@ -144,10 +147,16 @@ public class ClientHandler implements NHttpClientHandler {
      * @param attachment the attachment set previously
      */
     public void connected(final NHttpClientConnection conn, final Object attachment) {
+
+        if (log.isDebugEnabled() ) {
+            log.debug("ClientHandler connected : " + conn);
+        }
+
         try {
             HttpContext context = conn.getContext();
             Axis2HttpRequest axis2Req = (Axis2HttpRequest) attachment;
 
+            context.setAttribute(AXIS2_HTTP_REQUEST, axis2Req);
             context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
             context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
 
@@ -173,7 +182,10 @@ public class ClientHandler implements NHttpClientHandler {
     }
 
     public void closed(final NHttpClientConnection conn) {
-        log.trace("Connection closed");
+    	checkAxisRequestComplete(conn, "Abnormal connection close", null);
+        if (log.isTraceEnabled()) {
+            log.trace("Connection closed");
+        }
     }
 
     /**
@@ -184,6 +196,7 @@ public class ClientHandler implements NHttpClientHandler {
         if (log.isDebugEnabled()) {
             log.debug("Connection Timeout");
         }
+    	checkAxisRequestComplete(conn, "Connection timeout", null);
         shutdownConnection(conn);
     }
 
@@ -194,6 +207,7 @@ public class ClientHandler implements NHttpClientHandler {
      */
     public void exception(final NHttpClientConnection conn, final HttpException e) {
         log.error("HTTP protocol violation : " + e.getMessage());
+    	checkAxisRequestComplete(conn, null, e);
         shutdownConnection(conn);
     }
 
@@ -204,7 +218,60 @@ public class ClientHandler implements NHttpClientHandler {
      */
     public void exception(final NHttpClientConnection conn, final IOException e) {
         log.error("I/O error : " + e.getMessage(), e);
+    	checkAxisRequestComplete(conn, null, e);
         shutdownConnection(conn);
+    }
+
+    /**
+     * check to see if http request-response has completed, if not completed yet,
+     * notify an exception to the message-receiver
+     *
+     * @param conn the connection being checked for completion
+     * @param errorMessage the text for an error message to be returned to the MR on failure
+     * @param exceptionToRaise an Exception to be returned to the MR on failure
+     */
+    private void checkAxisRequestComplete(NHttpClientConnection conn,
+        String errorMessage, Exception exceptionToRaise) {
+
+        Axis2HttpRequest axis2Request = (Axis2HttpRequest)
+                conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
+
+        if (axis2Request == null) {
+            log.error("httpContext's AXIS2_HTTP_REQUEST attribute was null");
+
+        } else if (!axis2Request.isCompleted()) {
+
+            axis2Request.setCompleted(true);
+            if (errorMessage == null && exceptionToRaise == null) {
+                return; // no need to continue
+            }
+
+            MessageContext mc = axis2Request.getMsgContext();
+
+            if (mc.getAxisOperation() != null && mc.getAxisOperation().getMessageReceiver() != null) {
+
+                MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+                try {
+                    MessageContext nioFaultMessageContext = null;
+                    if (errorMessage != null) {
+                        nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
+                            mc, new AxisFault(errorMessage));
+                    } else if (exceptionToRaise != null) {
+                        nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
+                            /** this is not a mistake I do NOT want getMessage()*/
+                            mc, new AxisFault(exceptionToRaise.toString(), exceptionToRaise));
+                    }
+
+                    if (nioFaultMessageContext != null) {
+                        nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                        mr.receive(nioFaultMessageContext);
+                    }
+
+                } catch (AxisFault af) {
+                    log.error("Unable to report back failure to the message receiver", af);
+                }
+            }
+        }
     }
 
     /**
@@ -277,6 +344,11 @@ public class ClientHandler implements NHttpClientHandler {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
 
+        /*
+         * responsed received means the whole request has been complete sent to server or 
+         * server doesn't need the left data of request
+         */
+    	checkAxisRequestComplete(conn, null, null);
         switch (response.getStatusLine().getStatusCode()) {
             case HttpStatus.SC_ACCEPTED : {
                 if (log.isDebugEnabled()) {

@@ -65,6 +65,7 @@ public class Axis2HttpRequest {
     MessageFormatter messageFormatter = null;
     /** The OM Output format holder */
     OMOutputFormat format = null;
+    protected boolean completed = false; //added for request complete checking
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
         this.epr = epr;
@@ -203,13 +204,24 @@ public class Axis2HttpRequest {
             log.debug("start streaming outgoing http request");
         }
         OutputStream out = Channels.newOutputStream(pipe.sink());
-
-        messageFormatter.writeTo(msgContext, format, out, true);
+        try {
+            messageFormatter.writeTo(msgContext, format, out, true);
+        } catch (Exception e) {
+            /* close PipeImpl will manually raise exception
+               while streaming, so blocking status will be released */
+            if (e instanceof AxisFault) {
+                throw (AxisFault) e;
+            } else {
+                handleException("Error streaming message context", e);
+            }
+        }
+        finally {
             try {
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            handleException("Error closing outgoing message stream", e);
+                out.flush();
+                out.close();
+            } catch (IOException e) {
+                handleException("Error closing outgoing message stream", e);
+            }
         }
     }
 
@@ -217,5 +229,16 @@ public class Axis2HttpRequest {
     private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        if (completed && !isCompleted()) {
+            this.pipe.close();
+        }
+        this.completed = completed;
     }
 }

@@ -19,23 +19,23 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.MessageHelper;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.AxisFault;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.soap.SOAPBody;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.util.MessageHelper;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.util.List;
@@ -53,9 +53,9 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     private String action = null;
     private String requestKey = null;
     private String requestXPathString = null;
-    private AXIOMXPath requestXPath = null;
+    private SynapseXPath requestXPath = null;
     private String targetXPathString = null;
-    private AXIOMXPath targetXPath = null;
+    private SynapseXPath targetXPath = null;
     private String targetKey = null;
 
     public boolean mediate(MessageContext synCtx) {
@@ -215,18 +215,18 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         return requestXPathString;
     }
 
-    public void setRequestXPathString(String requestXPathString) throws JaxenException {
-        this.requestXPathString = requestXPathString;
-        this.requestXPath = new AXIOMXPath(requestXPathString);
+    public void setRequestXPath(SynapseXPath requestXPath) throws JaxenException {
+        this.requestXPathString = requestXPath.toString();
+        this.requestXPath = requestXPath;
     }
 
     public String getTargetXPathString() {
         return targetXPathString;
     }
 
-    public void setTargetXPathString(String targetXPathString) throws JaxenException {
-        this.targetXPathString = targetXPathString;
-        this.targetXPath = new AXIOMXPath(targetXPathString);
+    public void setTargetXPath(SynapseXPath targetXPath) throws JaxenException {
+        this.targetXPathString = targetXPath.toString();
+        this.targetXPath = targetXPath;
     }
 
     public String getTargetKey() {
@@ -237,7 +237,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         this.targetKey = targetKey;
     }
 
-    public AXIOMXPath getRequestXPath() {
+    public SynapseXPath getRequestXPath() {
         return requestXPath;
     }
 

@@ -23,12 +23,12 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.util.Collection;
@@ -106,7 +106,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
         serializeMediatorProperties(parent, props);
     }
 
-    protected void serializeNamespaces(OMElement elem, AXIOMXPath xpath) {
+    protected void serializeNamespaces(OMElement elem, SynapseXPath xpath) {
         Iterator iter = xpath.getNamespaces().keySet().iterator();
         while (iter.hasNext()) {
             String prefix = (String) iter.next();

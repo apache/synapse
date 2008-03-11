@@ -19,17 +19,15 @@
 
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.builtin.RMSequenceMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
+
+import javax.xml.namespace.QName;
 
 /**
  * Creates a RMSequence mediator through the supplied XML configuration
@@ -70,7 +68,7 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
             } else {
                 try {
-                    sequenceMediator.setCorrelation(new AXIOMXPath(correlation.getAttributeValue()));
+                    sequenceMediator.setCorrelation(new SynapseXPath(correlation.getAttributeValue()));
                 } catch (JaxenException e) {
                     String msg = "Invalid XPath expression for attribute correlation : "
                         + correlation.getAttributeValue();
@@ -107,7 +105,7 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
             } else {
                 try {
-                    sequenceMediator.setLastMessage(new AXIOMXPath(lastMessage.getAttributeValue()));
+                    sequenceMediator.setLastMessage(new SynapseXPath(lastMessage.getAttributeValue()));
                 } catch (JaxenException e) {
                     String msg = "Invalid XPath expression for attribute last-message : "
                         + lastMessage.getAttributeValue();

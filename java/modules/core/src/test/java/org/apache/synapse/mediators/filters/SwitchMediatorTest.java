@@ -20,14 +20,14 @@
 package org.apache.synapse.mediators.filters;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.SwitchCase;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.AnonymousListMediator;
+import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.SynapseXPath;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -83,7 +83,7 @@ public class SwitchMediatorTest extends TestCase {
         switchMediator = new SwitchMediator();
 
         // set xpath condition to select symbol
-        AXIOMXPath xpath = new AXIOMXPath("//wsx:symbol");
+        SynapseXPath xpath = new SynapseXPath("//wsx:symbol");
         xpath.addNamespace("wsx", "http://www.webserviceX.NET/");
         switchMediator.setSource(xpath);
         SwitchCase caseOne = new SwitchCase();

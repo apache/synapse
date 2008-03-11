@@ -19,15 +19,15 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
-import org.apache.synapse.mediators.builtin.DropMediator;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.builtin.DropMediator;
+import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -72,7 +72,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             OMAttribute corelateExpr = corelateOn.getAttribute(EXPRESSION_Q);
             if (corelateExpr != null) {
                 try {
-                    AXIOMXPath xp = new AXIOMXPath(corelateExpr.getAttributeValue());
+                    SynapseXPath xp = new SynapseXPath(corelateExpr.getAttributeValue());
                     OMElementUtils.addNameSpaces(xp, corelateOn, log);
                     mediator.setCorrelateExpression(xp);
                 } catch (JaxenException e) {
@@ -109,7 +109,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             OMAttribute aggregateExpr = onComplete.getAttribute(EXPRESSION_Q);
             if (aggregateExpr != null) {
                 try {
-                    AXIOMXPath xp = new AXIOMXPath(aggregateExpr.getAttributeValue());
+                    SynapseXPath xp = new SynapseXPath(aggregateExpr.getAttributeValue());
                     OMElementUtils.addNameSpaces(xp, onComplete, log);
                     mediator.setAggregationExpression(xp);
                 } catch (JaxenException e) {

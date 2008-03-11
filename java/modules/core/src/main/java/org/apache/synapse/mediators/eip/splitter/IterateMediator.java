@@ -19,26 +19,26 @@
 
 package org.apache.synapse.mediators.eip.splitter;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.eip.EIPUtils;
-import org.apache.synapse.mediators.eip.Target;
-import org.apache.synapse.mediators.eip.EIPConstants;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.util.MessageHelper;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.OperationContext;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.eip.EIPConstants;
+import org.apache.synapse.mediators.eip.EIPUtils;
+import org.apache.synapse.mediators.eip.Target;
+import org.apache.synapse.util.MessageHelper;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Splits a message using an XPath expression and creates a new message to hold
@@ -58,13 +58,13 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
     private boolean preservePayload = false;
 
     /** The XPath that will list the elements to be splitted */
-    private AXIOMXPath expression = null;
+    private SynapseXPath expression = null;
 
     /**
      * An XPath expression that specifies where the splitted elements should be attached when
      * the payload is being preserved
      */
-    private AXIOMXPath attachPath = null;
+    private SynapseXPath attachPath = null;
 
     /** The target for the newly splitted messages */
     private Target target = null;
@@ -230,19 +230,19 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         this.preservePayload = preservePayload;
     }
 
-    public AXIOMXPath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 
-    public void setExpression(AXIOMXPath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 
-    public AXIOMXPath getAttachPath() {
+    public SynapseXPath getAttachPath() {
         return attachPath;
     }
 
-    public void setAttachPath(AXIOMXPath attachPath) {
+    public void setAttachPath(SynapseXPath attachPath) {
         this.attachPath = attachPath;
     }
 

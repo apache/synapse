@@ -19,12 +19,12 @@
 
 package org.apache.synapse.mediators.ext;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.SynapseXPath;
 
 /**
  */
@@ -47,7 +47,7 @@ public class AnnotatedCommandMediatorTest extends AbstractMediatorTestCase {
         AnnotatedCommandMediator m = new AnnotatedCommandMediator();
         m.setCommand(AnnotatedCommand.class);
 
-        AXIOMXPath ax = m.afterFields.get(AnnotatedCommand.class.getDeclaredField("ReadAndUpdateField"));
+        SynapseXPath ax = m.afterFields.get(AnnotatedCommand.class.getDeclaredField("ReadAndUpdateField"));
         assertEquals(1, ax.getNamespaces().size());
         assertEquals("http://myns", ax.getNamespaces().values().iterator().next());
         assertEquals("myns", ax.getNamespaces().keySet().iterator().next());

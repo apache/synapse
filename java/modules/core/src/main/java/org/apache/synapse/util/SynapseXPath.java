@@ -20,16 +20,7 @@
 package org.apache.synapse.util;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
-import org.apache.axiom.om.impl.llom.OMDocumentImpl;
-import org.apache.synapse.mediators.GetPropertyFunction;
-import org.apache.synapse.SynapseConstants;
 import org.jaxen.JaxenException;
-import org.jaxen.SimpleFunctionContext;
-import org.jaxen.XPathFunctionContext;
-
-import java.util.List;
 
 /**
  * 

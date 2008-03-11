@@ -19,12 +19,12 @@
 
 package org.apache.synapse.mediators.filters;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.ListMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Matcher;
@@ -37,9 +37,9 @@ import java.util.regex.Pattern;
 public class FilterMediator extends AbstractListMediator implements
     org.apache.synapse.mediators.FilterMediator {
 
-    private AXIOMXPath source = null;
+    private SynapseXPath source = null;
     private Pattern regex = null;
-    private AXIOMXPath xpath = null;
+    private SynapseXPath xpath = null;
     private ListMediator elseMediator = null;
     private boolean thenElementPresent = false;
     private String thenKey = null;
@@ -188,11 +188,11 @@ public class FilterMediator extends AbstractListMediator implements
     }
 
 
-    public AXIOMXPath getSource() {
+    public SynapseXPath getSource() {
         return source;
     }
 
-    public void setSource(AXIOMXPath source) {
+    public void setSource(SynapseXPath source) {
         this.source = source;
     }
 
@@ -204,11 +204,11 @@ public class FilterMediator extends AbstractListMediator implements
         this.regex = regex;
     }
 
-    public AXIOMXPath getXpath() {
+    public SynapseXPath getXpath() {
         return xpath;
     }
 
-    public void setXpath(AXIOMXPath xpath) {
+    public void setXpath(SynapseXPath xpath) {
         this.xpath = xpath;
     }
 

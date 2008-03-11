@@ -21,7 +21,6 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -241,7 +240,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         return requestXPath;
     }
 
-    public AXIOMXPath getTargetXPath() {
+    public SynapseXPath getTargetXPath() {
         return targetXPath;
     }
 }

@@ -20,30 +20,31 @@
 package org.apache.synapse.util;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.impl.llom.OMElementImpl;
+import org.apache.axiom.om.impl.llom.OMDocumentImpl;
+import org.apache.synapse.mediators.GetPropertyFunction;
+import org.apache.synapse.SynapseConstants;
+import org.jaxen.JaxenException;
+import org.jaxen.SimpleFunctionContext;
+import org.jaxen.XPathFunctionContext;
+
+import java.util.List;
 
 /**
  * 
  */
-public class SynapseXPath {
+public class SynapseXPath extends AXIOMXPath {
 
-    private AXIOMXPath aXIOMXPath;
     private boolean bodyRelative;
 
-    public SynapseXPath(AXIOMXPath aXIOMXPath) {
-        this.aXIOMXPath = aXIOMXPath;
+    public SynapseXPath(String xpathString) throws JaxenException {
+        super(xpathString);
     }
 
-    public SynapseXPath(AXIOMXPath aXIOMXPath, boolean bodyRelative) {
-        this.aXIOMXPath = aXIOMXPath;
+    public SynapseXPath(String xpathString, boolean bodyRelative) throws JaxenException {
+        super(xpathString);
         this.bodyRelative = bodyRelative;
-    }
-
-    public AXIOMXPath getAXIOMXPath() {
-        return aXIOMXPath;
-    }
-
-    public void setAXIOMXPath(AXIOMXPath aXIOMXPath) {
-        this.aXIOMXPath = aXIOMXPath;
     }
 
     public boolean isBodyRelative() {

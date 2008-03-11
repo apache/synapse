@@ -427,7 +427,7 @@ public class Axis2MessageContext implements MessageContext {
 
     public static String getStringValue(SynapseXPath xpath, MessageContext synCtx) {
        // default xpath evaluated against the full envelope
-       return getStringValue(xpath.getAXIOMXPath(), synCtx, xpath.isBodyRelative());
+       return getStringValue(xpath, synCtx, xpath.isBodyRelative());
     }
 
     /**

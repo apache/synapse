@@ -21,7 +21,6 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -45,8 +44,8 @@ public class SynapseXPathFactory {
             
             if (xpathAttrib != null && xpathAttrib.getAttributeValue() != null) {
 
-                AXIOMXPath omXpath = new AXIOMXPath(xpathAttrib.getAttributeValue());
-                xpath = new SynapseXPath(omXpath);
+                xpath = new SynapseXPath(xpathAttrib.getAttributeValue());
+                OMElementUtils.addNameSpaces(xpath, elem, log);
 
                 OMAttribute relativeAttrb
                     = elem.getAttribute(XMLConfigConstants.ATT_XPATH_RELATIVE);

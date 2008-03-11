@@ -20,13 +20,13 @@
 package org.apache.synapse.mediators.filters;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.AnonymousListMediator;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.SynapseXPath;
 
 import java.util.regex.Pattern;
 
@@ -57,7 +57,7 @@ public class FilterMediatorTest extends TestCase {
         FilterMediator filter = new FilterMediator();
 
         // set xpath condition to IBM
-        AXIOMXPath xpath = new AXIOMXPath("//*[wsx:symbol='IBM']");
+        SynapseXPath xpath = new SynapseXPath("//*[wsx:symbol='IBM']");
         xpath.addNamespace("wsx", "http://www.webserviceX.NET/");
         filter.setXpath(xpath);
 
@@ -77,7 +77,7 @@ public class FilterMediatorTest extends TestCase {
         FilterMediator filter = new FilterMediator();
 
         // set xpath condition to MSFT
-        AXIOMXPath xpath = new AXIOMXPath("//*[wsx:symbol='MSFT']");
+        SynapseXPath xpath = new SynapseXPath("//*[wsx:symbol='MSFT']");
         xpath.addNamespace("wsx", "http://www.webserviceX.NET/");
         filter.setXpath(xpath);
 
@@ -97,7 +97,7 @@ public class FilterMediatorTest extends TestCase {
         FilterMediator filter = new FilterMediator();
 
         // set source xpath condition to //symbol
-        AXIOMXPath source = new AXIOMXPath("//wsx:symbol");
+        SynapseXPath source = new SynapseXPath("//wsx:symbol");
         source.addNamespace("wsx", "http://www.webserviceX.NET/");
         filter.setSource(source);
 
@@ -121,7 +121,7 @@ public class FilterMediatorTest extends TestCase {
         FilterMediator filter = new FilterMediator();
 
         // set source xpath condition to //symbol
-        AXIOMXPath source = new AXIOMXPath("//wsx:symbol");
+        SynapseXPath source = new SynapseXPath("//wsx:symbol");
         source.addNamespace("wsx", "http://www.webserviceX.NET/");
         filter.setSource(source);
 
@@ -145,7 +145,7 @@ public class FilterMediatorTest extends TestCase {
         FilterMediator filter = new FilterMediator();
 
         // set source xpath condition to //symbol
-        AXIOMXPath source = new AXIOMXPath("//wsx:symbol");
+        SynapseXPath source = new SynapseXPath("//wsx:symbol");
         source.addNamespace("wsx", "http://www.webserviceX.NET/");
         filter.setSource(source);
 
@@ -175,7 +175,7 @@ public class FilterMediatorTest extends TestCase {
         FilterMediator filter = new FilterMediator();
 
         // set source xpath condition to //symbol
-        AXIOMXPath source = new AXIOMXPath("//wsx:symbol");
+        SynapseXPath source = new SynapseXPath("//wsx:symbol");
         source.addNamespace("wsx", "http://www.webserviceX.NET/");
         filter.setSource(source);
 

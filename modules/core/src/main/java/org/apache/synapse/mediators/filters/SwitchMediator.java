@@ -19,11 +19,11 @@
 
 package org.apache.synapse.mediators.filters;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.util.SynapseXPath;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,7 +38,7 @@ import java.util.List;
 public class SwitchMediator extends AbstractMediator {
 
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
-    private AXIOMXPath source = null;
+    private SynapseXPath source = null;
     /** The list of switch cases    */
     private List cases = new ArrayList();
     /** The default switch case, if any */
@@ -144,7 +144,7 @@ public class SwitchMediator extends AbstractMediator {
      *
      * @return thje source XPath expression
      */
-    public AXIOMXPath getSource() {
+    public SynapseXPath getSource() {
         return source;
     }
 
@@ -153,7 +153,7 @@ public class SwitchMediator extends AbstractMediator {
      *
      * @param source the XPath expression to be used as the source
      */
-    public void setSource(AXIOMXPath source) {
+    public void setSource(SynapseXPath source) {
         this.source = source;
     }
 

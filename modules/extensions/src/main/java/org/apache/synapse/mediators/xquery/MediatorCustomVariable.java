@@ -22,7 +22,6 @@ import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
@@ -30,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -48,7 +48,7 @@ public class MediatorCustomVariable extends MediatorVariable {
     /**
      * The XPath expression which yeilds the element from given XMLDocument
      */
-    private AXIOMXPath expression;
+    private SynapseXPath expression;
 
     /**
      * The key to lookup the xml document from registry
@@ -72,7 +72,7 @@ public class MediatorCustomVariable extends MediatorVariable {
         super(name);
         // create the default XPath
         try {
-            this.expression = new AXIOMXPath(DEFAULT_XPATH);
+            this.expression = new SynapseXPath(DEFAULT_XPATH);
             this.expression.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             this.expression.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
@@ -164,7 +164,7 @@ public class MediatorCustomVariable extends MediatorVariable {
         throw new SynapseException(msg);
     }
 
-    public void setExpression(AXIOMXPath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 
@@ -176,7 +176,7 @@ public class MediatorCustomVariable extends MediatorVariable {
         return regKey;
     }
 
-    public AXIOMXPath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 }

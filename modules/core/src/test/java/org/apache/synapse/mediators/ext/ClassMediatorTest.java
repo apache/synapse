@@ -22,11 +22,10 @@ package org.apache.synapse.mediators.ext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.TestMessageContext;
-import org.apache.synapse.mediators.AbstractMediatorTestCase;
-import org.apache.synapse.config.xml.AbstractTestCase;
-import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.mediators.AbstractMediatorTestCase;
 
 /**
  * Tests the class mediator instantiation and setting of literal and
@@ -75,7 +74,7 @@ public class ClassMediatorTest extends AbstractMediatorTestCase {
 //        ClassMediator cm = new ClassMediator();
 //        MediatorProperty mp = new MediatorProperty();
 //        mp.setName("testProp");
-//        mp.setExpression(new AXIOMXPath("concat('XPath ','is ','FUN!')"));
+//        mp.setExpression(new SynapseXPath("concat('XPath ','is ','FUN!')"));
 //        cm.addProperty(mp);
 //        cm.setClazz(ClassMediatorTestMediator.class);
 //        cm.mediate(new TestMessageContext());

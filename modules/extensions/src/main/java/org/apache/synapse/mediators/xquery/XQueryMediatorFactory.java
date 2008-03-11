@@ -18,27 +18,21 @@
  */
 package org.apache.synapse.mediators.xquery;
 
-import org.apache.synapse.config.xml.AbstractMediatorFactory;
-import org.apache.synapse.config.xml.OMElementUtils;
-import org.apache.synapse.config.xml.MediatorPropertyFactory;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.Mediator;
-import org.apache.axiom.om.OMElement;
+import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.AbstractMediatorFactory;
+import org.apache.synapse.config.xml.MediatorPropertyFactory;
+import org.apache.synapse.config.xml.OMElementUtils;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import java.util.Iterator;
-import java.io.StringReader;
-
-import net.sf.saxon.javax.xml.xquery.XQItemType;
 
 /**
  * Creates a XQuery mediator from the given XML
@@ -83,7 +77,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
             String targetValue = attrTarget.getAttributeValue();
             if (targetValue != null) {
                 try {
-                    AXIOMXPath xp = new AXIOMXPath(targetValue.trim());
+                    SynapseXPath xp = new SynapseXPath(targetValue.trim());
                     OMElementUtils.addNameSpaces(xp, elem, log);
                     xQueryMediator.setTarget(xp);
                 } catch (JaxenException e) {
@@ -125,7 +119,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                         }
                         if (expr != null && !"".equals(expr)) {
                             try {
-                                AXIOMXPath xp = new AXIOMXPath(expr.trim());
+                                SynapseXPath xp = new SynapseXPath(expr.trim());
                                 OMElementUtils.addNameSpaces(xp, variableOM, log);
                                 ((MediatorCustomVariable) variable).setExpression(xp);
 

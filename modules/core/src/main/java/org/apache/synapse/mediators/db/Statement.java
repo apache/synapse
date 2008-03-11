@@ -19,8 +19,8 @@
 
 package org.apache.synapse.mediators.db;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.SynapseXPath;
 
 import java.sql.Types;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class Statement {
         return rawStatement;
     }
 
-    public void addParameter(String propertyName, AXIOMXPath xpath, String type){
+    public void addParameter(String propertyName, SynapseXPath xpath, String type){
         parameters.add(new Parameter(propertyName, xpath, type));
     }
 
@@ -64,10 +64,10 @@ public class Statement {
 
     public class Parameter {
         String propertyName = null;
-        AXIOMXPath xpath = null;
+        SynapseXPath xpath = null;
         int type = 0;
 
-        Parameter(String value, AXIOMXPath xpath, String type) {
+        Parameter(String value, SynapseXPath xpath, String type) {
 
             this.propertyName = value;
             this.xpath = xpath; 
@@ -112,7 +112,7 @@ public class Statement {
             return propertyName;
         }
 
-        public AXIOMXPath getXpath() {
+        public SynapseXPath getXpath() {
             return xpath;
         }
 

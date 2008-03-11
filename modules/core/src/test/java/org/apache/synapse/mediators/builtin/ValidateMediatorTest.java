@@ -22,22 +22,21 @@ package org.apache.synapse.mediators.builtin;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.mediators.TestMediator;
-import org.apache.synapse.mediators.TestMediateHandler;
-import org.apache.synapse.mediators.builtin.ValidateMediator;
-import org.apache.synapse.config.xml.ValidateMediatorFactory;
-import org.apache.synapse.config.Entry;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.xml.ValidateMediatorFactory;
+import org.apache.synapse.mediators.TestMediateHandler;
+import org.apache.synapse.mediators.TestMediator;
+import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.URL;
 
 public class ValidateMediatorTest extends TestCase {
 
@@ -152,7 +151,7 @@ public class ValidateMediatorTest extends TestCase {
         List keys = new ArrayList();
         keys.add("xsd-key");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
@@ -182,7 +181,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-1");
         keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:Outer");
+        SynapseXPath source = new SynapseXPath("//m0:Outer");
         source.addNamespace("m0", "http://services.samples/xsd2");
         validate.setSource(source);
 
@@ -216,7 +215,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-1");
         keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:Outer");
+        SynapseXPath source = new SynapseXPath("//m0:Outer");
         source.addNamespace("m0", "http://services.samples/xsd2");
         validate.setSource(source);
 
@@ -249,7 +248,7 @@ public class ValidateMediatorTest extends TestCase {
         List keys = new ArrayList();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
@@ -278,7 +277,7 @@ public class ValidateMediatorTest extends TestCase {
         List keys = new ArrayList();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
@@ -307,7 +306,7 @@ public class ValidateMediatorTest extends TestCase {
         List keys = new ArrayList();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
@@ -360,7 +359,7 @@ public class ValidateMediatorTest extends TestCase {
         List keys = new ArrayList();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
-        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 

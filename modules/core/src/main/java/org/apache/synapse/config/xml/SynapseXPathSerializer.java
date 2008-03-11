@@ -21,7 +21,6 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -60,7 +59,7 @@ public class SynapseXPathSerializer {
         return elem;
     }
 
-    private static void serializeNamespaces(OMElement elem, AXIOMXPath xpath) {
+    private static void serializeNamespaces(OMElement elem, SynapseXPath xpath) {
 
         for (Object o : xpath.getNamespaces().keySet()) {
             String prefix = (String) o;

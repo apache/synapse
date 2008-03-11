@@ -20,11 +20,13 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import java.sql.Types;
 import java.util.Iterator;
 
@@ -114,7 +116,8 @@ public abstract class AbstractDBMediatorSerializer extends AbstractMediatorSeria
 
             OMElement sqlElt = fac.createOMElement(
                 AbstractDBMediatorFactory.SQL_Q.getLocalPart(), synNS);
-            sqlElt.setText(statement.getRawStatement());
+            OMText sqlText = fac.createOMText(statement.getRawStatement(), XMLStreamConstants.CDATA);
+            sqlElt.addChild(sqlText);
             stmntElt.addChild(sqlElt);
 
             // serialize parameters of the statement

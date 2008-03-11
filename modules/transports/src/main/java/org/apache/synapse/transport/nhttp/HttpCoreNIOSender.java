@@ -449,30 +449,36 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                     request.getAttachment() instanceof Axis2HttpRequest) {
 
                     Axis2HttpRequest axis2Request = (Axis2HttpRequest) request.getAttachment();
-                    MessageContext mc = axis2Request.getMsgContext();
-                    MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+                    if (!axis2Request.isCompleted()) {
 
-                    try {
-                        // this fault is NOT caused by the endpoint while processing. so we have to
-                        // inform that this is a sending error (e.g. endpoint failure) and handle it
-                        // differently at the message receiver.
+                        axis2Request.setCompleted(true);
+                        MessageContext mc = axis2Request.getMsgContext();
+                        MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
 
-                        AxisFault axisFault;
-                        if (isTimeout) {
-                            // In case of a timeout there is no exception
-                            axisFault = new AxisFault("The connection timed out");
-                        } else {
-                            Exception exception = request.getException();
-                            /** this is not a mistake I do NOT want getMessage()*/
-                            axisFault = new AxisFault(exception.toString(), exception);
+                        if (mr != null) {
+                            try {
+                                // this fault is NOT caused by the endpoint while processing. so we have to
+                                // inform that this is a sending error (e.g. endpoint failure) and handle it
+                                // differently at the message receiver.
+
+                                AxisFault axisFault;
+                                if (isTimeout) {
+                                    // In case of a timeout there is no exception
+                                    axisFault = new AxisFault("The connection timed out");
+                                } else {
+                                    Exception exception = request.getException();
+                                    /** this is not a mistake I do NOT want getMessage()*/
+                                    axisFault = new AxisFault(exception.toString(), exception);
+                                }
+                                MessageContext nioFaultMessageContext =
+                                    MessageContextBuilder.createFaultMessageContext(mc, axisFault);
+                                nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                                mr.receive(nioFaultMessageContext);
+
+                            } catch (AxisFault af) {
+                                log.error("Unable to report back failure to the message receiver", af);
+                            }
                         }
-                        MessageContext nioFaultMessageContext =
-                            MessageContextBuilder.createFaultMessageContext(mc, axisFault);
-                        nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
-                        mr.receive(nioFaultMessageContext);
-                        
-                    } catch (AxisFault af) {
-                        log.error("Unable to report back failure to the message receiver", af);
                     }
                 }
             }

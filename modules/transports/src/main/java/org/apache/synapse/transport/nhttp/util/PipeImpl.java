@@ -98,4 +98,23 @@ public class PipeImpl {
     public WritableByteChannel sink() {
         return sink;
     }
+
+    /**
+     * if blocked on pipe's channel, closeing will release the blocking status
+     */
+    public void close() {
+        try {
+            if (pipedOut != null) {
+                pipedOut.close();
+            }
+        } catch (IOException e) {}
+
+        try {
+            source.close();
+        } catch (IOException e) {}
+
+        try {
+            sink.close();
+        } catch (IOException e) {}
+    }
 }

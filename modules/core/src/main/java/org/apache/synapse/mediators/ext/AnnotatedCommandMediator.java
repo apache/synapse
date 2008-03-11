@@ -19,13 +19,6 @@
 
 package org.apache.synapse.mediators.ext;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -33,16 +26,23 @@ import org.apache.synapse.mediators.annotations.Namespaces;
 import org.apache.synapse.mediators.annotations.ReadAndUpdate;
 import org.apache.synapse.mediators.annotations.ReadFromMessage;
 import org.apache.synapse.mediators.annotations.UpdateMessage;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  */
 public class AnnotatedCommandMediator extends POJOCommandMediator {
 
-    protected Map<Field, AXIOMXPath> beforeFields;
-    protected Map<Method, AXIOMXPath> beforeMethods;
-    protected Map<Field, AXIOMXPath> afterFields;
-    protected Map<Method, AXIOMXPath> afterMethods;
+    protected Map<Field, SynapseXPath> beforeFields;
+    protected Map<Method, SynapseXPath> beforeMethods;
+    protected Map<Field, SynapseXPath> afterFields;
+    protected Map<Method, SynapseXPath> afterMethods;
     
     @Override
     public boolean mediate(MessageContext synCtx) {
@@ -82,7 +82,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
         
         
         for (Field f : beforeFields.keySet()) {
-            AXIOMXPath xpath = beforeFields.get(f);
+            SynapseXPath xpath = beforeFields.get(f);
             Object v;
             if (f.getType().equals(String.class)) {
                 v = Axis2MessageContext.getStringValue(xpath, synCtx);
@@ -97,7 +97,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
         }
 
         for (Method m : beforeMethods.keySet()) {
-            AXIOMXPath xpath = beforeMethods.get(m);
+            SynapseXPath xpath = beforeMethods.get(m);
             Object v;
             if (m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(String.class)) {
                 v = Axis2MessageContext.getStringValue(xpath, synCtx);
@@ -158,28 +158,28 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
      */
     protected void introspectClass(Class<?> commandClass) {
 
-        beforeFields = new HashMap<Field, AXIOMXPath>();
-        afterFields = new HashMap<Field, AXIOMXPath>();
-        beforeMethods = new HashMap<Method, AXIOMXPath>();
-        afterMethods = new HashMap<Method, AXIOMXPath>();
+        beforeFields = new HashMap<Field, SynapseXPath>();
+        afterFields = new HashMap<Field, SynapseXPath>();
+        beforeMethods = new HashMap<Method, SynapseXPath>();
+        afterMethods = new HashMap<Method, SynapseXPath>();
 
         for (Field f : commandClass.getDeclaredFields()) {
 
             ReadFromMessage readFromMessage = f.getAnnotation(ReadFromMessage.class);
             if (readFromMessage != null) {
-                AXIOMXPath axiomXpath = createAxiomXPATH(readFromMessage.value(), f.getAnnotation(Namespaces.class));
+                SynapseXPath axiomXpath = createSynapseXPATH(readFromMessage.value(), f.getAnnotation(Namespaces.class));
                 beforeFields.put(f, axiomXpath);
             }
 
             UpdateMessage updateMessage = f.getAnnotation(UpdateMessage.class);
             if (updateMessage != null) {
-                AXIOMXPath axiomXpath = createAxiomXPATH(updateMessage.value(), f.getAnnotation(Namespaces.class));
+                SynapseXPath axiomXpath = createSynapseXPATH(updateMessage.value(), f.getAnnotation(Namespaces.class));
                 afterFields.put(f, axiomXpath);
             }
 
             ReadAndUpdate readAndUpdate = f.getAnnotation(ReadAndUpdate.class);
             if (readAndUpdate != null) {
-                AXIOMXPath axiomXpath = createAxiomXPATH(readAndUpdate.value(), f.getAnnotation(Namespaces.class));
+                SynapseXPath axiomXpath = createSynapseXPATH(readAndUpdate.value(), f.getAnnotation(Namespaces.class));
                 beforeFields.put(f, axiomXpath);
                 afterFields.put(f, axiomXpath);
             }
@@ -189,13 +189,13 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
 
             ReadFromMessage readFromMessage = m.getAnnotation(ReadFromMessage.class);
             if (readFromMessage != null) {
-                AXIOMXPath axiomXpath = createAxiomXPATH(readFromMessage.value(), m.getAnnotation(Namespaces.class));
+                SynapseXPath axiomXpath = createSynapseXPATH(readFromMessage.value(), m.getAnnotation(Namespaces.class));
                 beforeMethods.put(m, axiomXpath);
             }
 
             UpdateMessage updateMessage = m.getAnnotation(UpdateMessage.class);
             if (updateMessage != null) {
-                AXIOMXPath axiomXpath = createAxiomXPATH(updateMessage.value(), m.getAnnotation(Namespaces.class));
+                SynapseXPath axiomXpath = createSynapseXPATH(updateMessage.value(), m.getAnnotation(Namespaces.class));
                 afterMethods.put(m, axiomXpath);
             }
 
@@ -203,14 +203,14 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
     }
 
     /**
-     * Create an AXIOMXPath from an xpath string 
+     * Create an SynapseXPath from an xpath string
      */
-    protected AXIOMXPath createAxiomXPATH(String xpath, Namespaces nsAnnotation) {
+    protected SynapseXPath createSynapseXPATH(String xpath, Namespaces nsAnnotation) {
         
         Map<String, String> namespaces = getNamespaces(nsAnnotation);     
         try {
 
-            AXIOMXPath axiomXPath = new AXIOMXPath(xpath);
+            SynapseXPath axiomXPath = new SynapseXPath(xpath);
             
             for (String prefix : namespaces.keySet()) {
                 axiomXPath.addNamespace(prefix, namespaces.get(prefix));
@@ -219,7 +219,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             return axiomXPath;
 
         } catch (JaxenException e) {
-            throw new RuntimeException("Error creating AXIOMXPath: " + xpath, e);
+            throw new RuntimeException("Error creating SynapseXPath: " + xpath, e);
         }
     }
 

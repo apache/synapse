@@ -21,9 +21,9 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.xml.sax.SAXException;
 
@@ -83,7 +83,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
         if (attSource != null) {
             try {
-                AXIOMXPath xp = new AXIOMXPath(attSource.getAttributeValue());
+                SynapseXPath xp = new SynapseXPath(attSource.getAttributeValue());
                 validateMediator.setSource(xp);
                 OMElementUtils.addNameSpaces(xp, elem, log);
             } catch (JaxenException e) {

@@ -30,11 +30,11 @@ import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
+import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -44,8 +44,8 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.FixedByteArrayOutputStream;
+import org.apache.synapse.util.SynapseXPath;
 import org.apache.synapse.util.TextFileDataSource;
-import org.apache.axis2.AxisFault;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,8 +54,8 @@ import javax.activation.FileDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -63,8 +63,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * The XSLT mediator performs an XSLT transformation requested, using
@@ -103,7 +103,7 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * The (optional) XPath expression which yields the source element for a transformation
      */
-    private AXIOMXPath source = null;
+    private SynapseXPath source = null;
 
     /**
      * The name of the message context property to store the transformation result  
@@ -157,7 +157,7 @@ public class XSLTMediator extends AbstractMediator {
     public XSLTMediator() {
         // create the default XPath
         try {
-            this.source = new AXIOMXPath(DEFAULT_XPATH);
+            this.source = new SynapseXPath(DEFAULT_XPATH);
             this.source.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             this.source.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
@@ -553,11 +553,11 @@ public class XSLTMediator extends AbstractMediator {
         return null;
     }
 
-    public AXIOMXPath getSource() {
+    public SynapseXPath getSource() {
         return source;
     }
 
-    public void setSource(AXIOMXPath source) {
+    public void setSource(SynapseXPath source) {
         this.source = source;
     }
 

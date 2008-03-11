@@ -21,10 +21,10 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.AnnotatedCommandMediator;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -81,9 +81,9 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
                         "A POJO command mediator property must specify the name attribute");
                 } else {
                     if (child.getAttribute(ATT_EXPRN) != null) {
-                        AXIOMXPath xpath = null;
+                        SynapseXPath xpath = null;
                         try {
-                            xpath = new AXIOMXPath(
+                            xpath = new SynapseXPath(
                                 child.getAttribute(ATT_EXPRN).getAttributeValue());
                             OMElementUtils.addNameSpaces(xpath, child, log);
                             pojoMediator.addMessageSetterProperty(propName, xpath);

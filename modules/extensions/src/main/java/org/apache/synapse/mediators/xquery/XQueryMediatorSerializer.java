@@ -18,20 +18,18 @@
  */
 package org.apache.synapse.mediators.xquery;
 
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.Mediator;
+import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.List;
-
-import net.sf.saxon.javax.xml.xquery.XQItemType;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
+import java.util.List;
 
 /**
  * Serialize the given XQuery mediator into a XML
@@ -67,7 +65,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
 
         saveTracingState(xquery, queryMediator);
 
-        AXIOMXPath targetXPath = queryMediator.getTarget();
+        SynapseXPath targetXPath = queryMediator.getTarget();
         if (targetXPath != null &&
             !XQueryMediator.DEFAULT_XPATH.toString().equals(targetXPath.toString())) {
             xquery.addAttribute(fac.createOMAttribute(
@@ -144,7 +142,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                             customElement.addAttribute(fac.createOMAttribute(
                                 "key", nullNS, regkey));
                         }
-                        AXIOMXPath expression = variable.getExpression();
+                        SynapseXPath expression = variable.getExpression();
                         if (expression != null && !XQueryMediator.DEFAULT_XPATH.toString().
                             equals(expression.toString())) {
                             customElement.addAttribute(fac.createOMAttribute(

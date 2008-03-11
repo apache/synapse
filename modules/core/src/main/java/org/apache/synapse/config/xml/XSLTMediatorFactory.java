@@ -21,13 +21,9 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.config.xml.OMElementUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.config.xml.AbstractMediatorFactory;
-import org.apache.synapse.config.xml.MediatorPropertyFactory;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -68,7 +64,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         if (attSource != null) {
             try {
                 transformMediator.setSourceXPathString(attSource.getAttributeValue());
-                AXIOMXPath xp = new AXIOMXPath(attSource.getAttributeValue());
+                SynapseXPath xp = new SynapseXPath(attSource.getAttributeValue());
                 OMElementUtils.addNameSpaces(xp, elem, log);
                 transformMediator.setSource(xp);
 

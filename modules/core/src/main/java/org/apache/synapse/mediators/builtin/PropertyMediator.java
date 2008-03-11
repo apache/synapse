@@ -19,15 +19,11 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.util.SynapseXPath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +44,7 @@ public class PropertyMediator extends AbstractMediator {
     /** The Value to be set*/
     private String value = null;
     /** The XPath expr. to get value  */
-    private AXIOMXPath expression = null;
+    private SynapseXPath expression = null;
     /** The scope for which decide properties where to go*/
     private String scope = null;
     /** The Action - set or remove */
@@ -194,11 +190,11 @@ public class PropertyMediator extends AbstractMediator {
         this.value = value;
     }
 
-    public AXIOMXPath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 
-    public void setExpression(AXIOMXPath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 

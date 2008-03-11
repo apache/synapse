@@ -21,9 +21,8 @@ package org.apache.synapse.core.axis2;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.util.SynapseXPath;
 
 public class Axis2MessageContextTest extends TestCase {
     String nsSoapEnv = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -35,7 +34,7 @@ public class Axis2MessageContextTest extends TestCase {
 
 
     public void testMessageContextGetStringValueBody() throws Exception {
-        AXIOMXPath axiomXpath = new AXIOMXPath("ns1:a/ns1:c");
+        SynapseXPath axiomXpath = new SynapseXPath("ns1:a/ns1:c");
         axiomXpath.addNamespace("ns1", nsNamespace1);
         MessageContext synCtx = TestUtils.getTestContext(sampleBody);
 
@@ -44,7 +43,7 @@ public class Axis2MessageContextTest extends TestCase {
     }
 
     public void testMessageContextGetStringValueEnvelope() throws Exception {
-        AXIOMXPath axiomXpath = new AXIOMXPath("/s11:Envelope/s11:Body/ns1:a/ns1:c");
+        SynapseXPath axiomXpath = new SynapseXPath("/s11:Envelope/s11:Body/ns1:a/ns1:c");
         axiomXpath.addNamespace("s11", nsSoapEnv);
         axiomXpath.addNamespace("ns1", nsNamespace1);
 

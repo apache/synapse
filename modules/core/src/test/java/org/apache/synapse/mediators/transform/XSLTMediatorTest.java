@@ -20,22 +20,19 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.config.Entry;
+import org.apache.axiom.om.OMContainer;
+import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.SynapseXPath;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 import java.net.URL;
-import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XSLTMediatorTest extends TestCase {
 
@@ -59,7 +56,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator = new XSLTMediator();
 
         // set xpath condition to select source
-        AXIOMXPath xpath = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath xpath = new SynapseXPath("//m0:CheckPriceRequest");
         xpath.addNamespace("m0", "http://services.samples/xsd");
         transformMediator.setSource(xpath);
 
@@ -238,7 +235,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator = new XSLTMediator();
 
         // set xpath condition to select source
-        AXIOMXPath xpath = new AXIOMXPath("//m0:CheckPriceRequest");
+        SynapseXPath xpath = new SynapseXPath("//m0:CheckPriceRequest");
         xpath.addNamespace("m0", "http://services.samples/xsd");
         transformMediator.setSource(xpath);
 

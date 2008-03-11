@@ -20,10 +20,10 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
 
@@ -54,7 +54,7 @@ public class HeaderMediatorTest extends TestCase {
 
         HeaderMediator headerMediator = new HeaderMediator();
         headerMediator.setQName(new QName(SynapseConstants.HEADER_TO));
-        headerMediator.setExpression(new AXIOMXPath("concat('http://','server','/path')"));
+        headerMediator.setExpression(new SynapseXPath("concat('http://','server','/path')"));
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext("<empty/>");

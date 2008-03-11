@@ -22,17 +22,14 @@ package org.apache.synapse.mediators.transform;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
@@ -63,11 +60,11 @@ public class FaultMediator extends AbstractMediator {
     /** The fault code QName to be used */
     private QName faultCodeValue = null;
     /** An XPath expression that will give the fault code QName at runtime */
-    private AXIOMXPath faultCodeExpr = null;
+    private SynapseXPath faultCodeExpr = null;
     /** The fault reason to be used */
     private String faultReasonValue = null;
     /** An XPath expression that will give the fault reason string at runtime */
-    private AXIOMXPath faultReasonExpr = null;
+    private SynapseXPath faultReasonExpr = null;
     /** The fault node URI to be used */
     private URI faultNode = null;
     /** The fault role URI to be used - if applicable */
@@ -322,11 +319,11 @@ public class FaultMediator extends AbstractMediator {
         }
     }
 
-    public AXIOMXPath getFaultCodeExpr() {
+    public SynapseXPath getFaultCodeExpr() {
         return faultCodeExpr;
     }
 
-    public void setFaultCodeExpr(AXIOMXPath faultCodeExpr) {
+    public void setFaultCodeExpr(SynapseXPath faultCodeExpr) {
         this.faultCodeExpr = faultCodeExpr;
     }
 
@@ -338,11 +335,11 @@ public class FaultMediator extends AbstractMediator {
         this.faultReasonValue = faultReasonValue;
     }
 
-    public AXIOMXPath getFaultReasonExpr() {
+    public SynapseXPath getFaultReasonExpr() {
         return faultReasonExpr;
     }
 
-    public void setFaultReasonExpr(AXIOMXPath faultReasonExpr) {
+    public void setFaultReasonExpr(SynapseXPath faultReasonExpr) {
         this.faultReasonExpr = faultReasonExpr;
     }
 

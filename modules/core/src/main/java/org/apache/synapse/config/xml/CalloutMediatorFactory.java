@@ -19,10 +19,11 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAttribute;
+import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -63,8 +64,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         if (sourceElt != null) {
             if (sourceElt.getAttribute(ATT_XPATH) != null) {
                 try {
-                    callout.setRequestXPathString(sourceElt.getAttributeValue(ATT_XPATH));
-                    OMElementUtils.addNameSpaces(callout.getRequestXPath(), sourceElt, log);
+                    callout.setRequestXPath(SynapseXPathFactory.getSynapseXPath(sourceElt, ATT_XPATH));
                 } catch (JaxenException e) {
                     handleException("Invalid source XPath : " + sourceElt.getAttributeValue(ATT_XPATH));
                 }
@@ -80,8 +80,8 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         if (targetElt != null) {
             if (targetElt.getAttribute(ATT_XPATH) != null) {
                 try {
-                    callout.setTargetXPathString(targetElt.getAttributeValue(ATT_XPATH));
-                    OMElementUtils.addNameSpaces(callout.getTargetXPath(), targetElt, log);
+                    callout.setTargetXPath(
+                        SynapseXPathFactory.getSynapseXPath(targetElt, ATT_XPATH));
                 } catch (JaxenException e) {
                     handleException("Invalid target XPath : " + targetElt.getAttributeValue(ATT_XPATH));
                 }

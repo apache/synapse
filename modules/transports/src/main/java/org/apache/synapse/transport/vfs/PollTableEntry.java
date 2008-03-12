@@ -18,6 +18,9 @@
 */
 package org.apache.synapse.transport.vfs;
 
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+
 /**
  * Holds information about an entry in the VFS transport poll table used by the
  * VFS Transport Listener
@@ -64,6 +67,8 @@ public class PollTableEntry {
     private String moveAfterErrors;
     /** where to move the file after total failure */
     private String moveAfterFailure;
+    /** moved file will have this formatted timestamp prefix */    
+    private DateFormat moveTimestampFormat;
 
     private int maxRetryCount;
     private long reconnectTimeout;
@@ -219,5 +224,12 @@ public class PollTableEntry {
     public void setReconnectTimeout(long reconnectTimeout) {
       this.reconnectTimeout = reconnectTimeout;
     }
-    
+
+    public DateFormat getMoveTimestampFormat() {
+        return moveTimestampFormat;
+    }
+
+    public void setMoveTimestampFormat(DateFormat moveTimestampFormat) {
+        this.moveTimestampFormat = moveTimestampFormat;
+    }
 }

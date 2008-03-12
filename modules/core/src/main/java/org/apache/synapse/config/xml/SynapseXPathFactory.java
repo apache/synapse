@@ -36,47 +36,26 @@ public class SynapseXPathFactory {
 
     private static final Log log = LogFactory.getLog(SynapseXPathFactory.class);
 
-    public static SynapseXPath getSynapseXPath(OMElement elem, QName attribName) {
+    public static SynapseXPath getSynapseXPath(OMElement elem, QName attribName)
+        throws JaxenException {
 
         SynapseXPath xpath = null;
         OMAttribute xpathAttrib = elem.getAttribute(attribName);
-        try {
-            
-            if (xpathAttrib != null && xpathAttrib.getAttributeValue() != null) {
 
-                xpath = new SynapseXPath(xpathAttrib.getAttributeValue());
-                OMElementUtils.addNameSpaces(xpath, elem, log);
+        if (xpathAttrib != null && xpathAttrib.getAttributeValue() != null) {
 
-                OMAttribute relativeAttrb
-                    = elem.getAttribute(XMLConfigConstants.ATT_XPATH_RELATIVE);
+            xpath = new SynapseXPath(xpathAttrib.getAttributeValue());
+            OMElementUtils.addNameSpaces(xpath, elem, log);
 
-                if (relativeAttrb != null && relativeAttrb.getAttributeValue() != null) {
-
-                    String relativity = relativeAttrb.getAttributeValue();
-
-                    if (XMLConfigConstants.XPATH_BODY_RELATIVE.equals(relativity)) {
-                        xpath.setBodyRelative(true);
-                    }
-                }
-
-            } else {
-                handleException("Couldn't find the XPath attribute with the QName : "
-                    + attribName.toString() + " in the element : " + elem.toString());
-            }
-            
-        } catch (JaxenException e) {
-            handleException("Error in creating the XPath from : " + xpathAttrib, e);
-        }
+        } else {
+            handleException("Couldn't find the XPath attribute with the QName : "
+                + attribName.toString() + " in the element : " + elem.toString());
+        }       
 
         return xpath;
     }
 
     private static void handleException(String message) {
-        log.error(message);
-        throw new SynapseException(message);
-    }
-
-    private static void handleException(String message, Throwable e) {
         log.error(message);
         throw new SynapseException(message);
     }

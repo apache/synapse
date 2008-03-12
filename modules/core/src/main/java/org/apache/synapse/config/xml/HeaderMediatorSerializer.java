@@ -74,9 +74,9 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
                     "value", nullNS, mediator.getValue()));
 
             } else if (mediator.getExpression() != null) {
-                header.addAttribute(fac.createOMAttribute(
-                    "expression", nullNS, mediator.getExpression().toString()));
-                super.serializeNamespaces(header, mediator.getExpression());
+
+                SynapseXPathSerializer.serializeXPath(
+                    mediator.getExpression(), header, "expression");
 
             } else {
                 handleException("Value or expression required for a set header mediator");

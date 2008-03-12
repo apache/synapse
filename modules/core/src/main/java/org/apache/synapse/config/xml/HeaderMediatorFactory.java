@@ -101,9 +101,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
         } else if (exprn != null && exprn.getAttributeValue() != null) {
             try {
-                SynapseXPath xp = new SynapseXPath(exprn.getAttributeValue());
-                OMElementUtils.addNameSpaces(xp, elem, log);
-                headerMediator.setExpression(xp);
+                headerMediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN));
             } catch (JaxenException je) {
                 String msg = "Invalid XPath expression : " + exprn.getAttributeValue();
                 log.error(msg);

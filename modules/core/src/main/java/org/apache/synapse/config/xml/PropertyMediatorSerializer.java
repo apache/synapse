@@ -54,9 +54,7 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
                     "value", nullNS, mediator.getValue()));
 
         } else if (mediator.getExpression() != null) {
-            property.addAttribute(fac.createOMAttribute(
-                    "expression", nullNS, mediator.getExpression().toString()));
-            super.serializeNamespaces(property, mediator.getExpression());
+            SynapseXPathSerializer.serializeXPath(mediator.getExpression(), property, "expression");
 
         } else if (mediator.getAction() == PropertyMediator.ACTION_SET) {
             handleException("Invalid property mediator. Value or expression is required if action is SET");

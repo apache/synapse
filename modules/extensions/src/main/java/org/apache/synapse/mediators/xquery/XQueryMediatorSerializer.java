@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.SynapseXPathSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.util.SynapseXPath;
 
@@ -66,11 +67,9 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
         saveTracingState(xquery, queryMediator);
 
         SynapseXPath targetXPath = queryMediator.getTarget();
-        if (targetXPath != null &&
-            !XQueryMediator.DEFAULT_XPATH.toString().equals(targetXPath.toString())) {
-            xquery.addAttribute(fac.createOMAttribute(
-                "target", nullNS, targetXPath.toString()));
-            serializeNamespaces(xquery, targetXPath);
+        if (targetXPath != null && !XQueryMediator.DEFAULT_XPATH.equals(targetXPath.toString())) {
+
+            SynapseXPathSerializer.serializeXPath(targetXPath, xquery, "target");
         }
 
         List pros = queryMediator.getDataSourceProperties();
@@ -143,11 +142,11 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                                 "key", nullNS, regkey));
                         }
                         SynapseXPath expression = variable.getExpression();
-                        if (expression != null && !XQueryMediator.DEFAULT_XPATH.toString().
-                            equals(expression.toString())) {
-                            customElement.addAttribute(fac.createOMAttribute(
-                                "expression", nullNS, expression.toString()));
-                            serializeNamespaces(customElement, expression);
+                        if (expression != null &&
+                            !XQueryMediator.DEFAULT_XPATH.equals(expression.toString())) {
+
+                            SynapseXPathSerializer.serializeXPath(
+                                expression, customElement, "expression");
                         }
                         String type = null;
                         int varibelType = variable.getType();

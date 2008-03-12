@@ -56,17 +56,15 @@ public class FilterMediatorSerializer extends AbstractListMediatorSerializer {
         OMElement filter = fac.createOMElement("filter", synNS);
 
         if (mediator.getSource() != null && mediator.getRegex() != null) {
-            filter.addAttribute(fac.createOMAttribute(
-                "source", nullNS, mediator.getSource().toString()));
-            super.serializeNamespaces(filter, mediator.getSource());
+
+            SynapseXPathSerializer.serializeXPath(mediator.getSource(), filter, "source");
 
             filter.addAttribute(fac.createOMAttribute(
                 "regex", nullNS, mediator.getRegex().pattern()));
 
         } else if (mediator.getXpath() != null) {
-            filter.addAttribute(fac.createOMAttribute(
-                "xpath", nullNS, mediator.getXpath().toString()));
-            super.serializeNamespaces(filter, mediator.getXpath());
+
+            SynapseXPathSerializer.serializeXPath(mediator.getXpath(), filter, "xpath");
 
         } else {
             handleException("Invalid filter mediator. " +

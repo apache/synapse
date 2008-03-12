@@ -172,8 +172,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
 
             Statement.Parameter param = (Statement.Parameter) pi.next();
             String value = (param.getPropertyName() != null ?
-                param.getPropertyName() :
-                Axis2MessageContext.getStringValue(param.getXpath(), msgCtx));
+                param.getPropertyName() : param.getXpath().getStringValue(msgCtx));
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Setting as parameter : " + column + " value : " + value +

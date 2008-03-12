@@ -24,10 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.AbstractMediatorFactory;
-import org.apache.synapse.config.xml.MediatorPropertyFactory;
-import org.apache.synapse.config.xml.OMElementUtils;
-import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.*;
 import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
@@ -77,9 +74,8 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
             String targetValue = attrTarget.getAttributeValue();
             if (targetValue != null) {
                 try {
-                    SynapseXPath xp = new SynapseXPath(targetValue.trim());
-                    OMElementUtils.addNameSpaces(xp, elem, log);
-                    xQueryMediator.setTarget(xp);
+                    xQueryMediator.setTarget(SynapseXPathFactory.getSynapseXPath(elem,
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "target")));
                 } catch (JaxenException e) {
                     handleException("Invalid XPath specified for the target attribute : " +
                         targetValue);
@@ -119,9 +115,8 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                         }
                         if (expr != null && !"".equals(expr)) {
                             try {
-                                SynapseXPath xp = new SynapseXPath(expr.trim());
-                                OMElementUtils.addNameSpaces(xp, variableOM, log);
-                                ((MediatorCustomVariable) variable).setExpression(xp);
+                                ((MediatorCustomVariable) variable).setExpression(
+                                    SynapseXPathFactory.getSynapseXPath(variableOM, ATT_EXPR_Q));
 
                             } catch (JaxenException e) {
                                 handleException("Invalid XPath specified for" +

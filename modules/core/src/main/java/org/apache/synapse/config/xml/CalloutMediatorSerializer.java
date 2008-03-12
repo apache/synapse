@@ -56,9 +56,7 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
         OMElement target = fac.createOMElement("target", synNS, callout);
         if (mediator.getTargetXPathString() != null) {
-            target.addAttribute(fac.createOMAttribute(
-                "xpath", nullNS, mediator.getTargetXPathString()));
-            serializeNamespaces(target, mediator.getTargetXPath());
+            SynapseXPathSerializer.serializeXPath(mediator.getTargetXPath(), target, "xpath");
         } else if (mediator.getTargetKey() != null) {
             target.addAttribute(fac.createOMAttribute(
                 "key", nullNS, mediator.getTargetKey()));

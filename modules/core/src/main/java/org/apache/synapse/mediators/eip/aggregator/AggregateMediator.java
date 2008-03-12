@@ -121,7 +121,7 @@ public class AggregateMediator extends AbstractMediator {
             // if a correlateExpression is provided and there is a coresponding
             // element in the current message prepare to correlate the messages on that
             if (correlateExpression != null
-                && correlateExpression.evaluate(synCtx.getEnvelope()) != null) {
+                && correlateExpression.evaluate(synCtx) != null) {
 
                 if (activeAggregates.containsKey(correlateExpression.toString())) {
                     aggregate = activeAggregates.get(correlateExpression.toString());

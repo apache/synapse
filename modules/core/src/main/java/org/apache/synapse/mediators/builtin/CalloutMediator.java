@@ -100,7 +100,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
             if (result != null) {
                 if (targetXPath != null) {
-                    Object o = targetXPath.evaluate(synCtx.getEnvelope());
+                    Object o = targetXPath.evaluate(synCtx);
 
                     if (o != null && o instanceof OMElement) {
                         OMNode tgtNode = (OMElement) o;
@@ -149,8 +149,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         } else if (requestXPath != null) {
             try {
                 Object o = null;
-                o = requestXPath.evaluate(
-                    MessageHelper.cloneMessageContext(synCtx).getEnvelope());
+                o = requestXPath.evaluate(MessageHelper.cloneMessageContext(synCtx));
 
                 if (o instanceof OMElement) {
                     return (OMElement) o;

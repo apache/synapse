@@ -88,9 +88,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
         OMAttribute expression = elem.getAttribute(ATT_EXPRN);
         if (expression != null) {
             try {
-                SynapseXPath xp = new SynapseXPath(expression.getAttributeValue());
-                OMElementUtils.addNameSpaces(xp, elem, log);
-                mediator.setExpression(xp);
+                mediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN));
             } catch (JaxenException e) {
                 handleException("Unable to build the IterateMediator. " + "Invalid XPATH " +
                     expression.getAttributeValue(), e);

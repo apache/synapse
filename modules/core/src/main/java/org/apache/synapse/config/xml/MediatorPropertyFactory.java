@@ -51,7 +51,9 @@ public class MediatorPropertyFactory {
 
         List propertyList = new ArrayList();
 
-        Iterator iter = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property"));
+        Iterator iter = elem.getChildrenWithName(
+            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property"));
+
         while (iter.hasNext()) {
 
             OMElement propEle = (OMElement) iter.next();
@@ -72,26 +74,33 @@ public class MediatorPropertyFactory {
 
             // if a value is specified, use it, else look for an expression
             if (attValue != null) {
-                if (attValue.getAttributeValue() == null || attValue.getAttributeValue().trim().length() == 0) {
-                    String msg = "Entry attribute value (if specified) is required for a Log property";
+
+                if (attValue.getAttributeValue() == null ||
+                    attValue.getAttributeValue().trim().length() == 0) {
+                    
+                    String msg = "Entry attribute value (if specified) " +
+                        "is required for a Log property";
                     log.error(msg);
                     throw new SynapseException(msg);
+
                 } else {
                     prop.setValue(attValue.getAttributeValue());
                 }
 
             } else if (attExpr != null) {
 
-                if (attExpr.getAttributeValue() == null || attExpr.getAttributeValue().trim().length() == 0) {
-                    String msg = "Entry attribute expression (if specified) is required for a mediator property";
+                if (attExpr.getAttributeValue() == null ||
+                    attExpr.getAttributeValue().trim().length() == 0) {
+
+                    String msg = "Entry attribute expression (if specified) " +
+                        "is required for a mediator property";
                     log.error(msg);
                     throw new SynapseException(msg);
 
                 } else {
                     try {
-                        SynapseXPath xp = new SynapseXPath(attExpr.getAttributeValue());
-                        OMElementUtils.addNameSpaces(xp, propEle, log);
-                        prop.setExpression(xp);
+                        prop.setExpression(SynapseXPathFactory.getSynapseXPath(
+                            propEle, MediatorProperty.ATT_EXPR_Q));
 
                     } catch (JaxenException e) {
                         String msg = "Invalid XPapth expression : " + attExpr.getAttributeValue();
@@ -101,7 +110,8 @@ public class MediatorPropertyFactory {
                 }
 
             } else {
-                String msg = "Entry attribute value OR expression must be specified for a mediator property";
+                String msg = "Entry attribute value OR expression must " +
+                    "be specified for a mediator property";
                 log.error(msg);
                 throw new SynapseException(msg);
             }

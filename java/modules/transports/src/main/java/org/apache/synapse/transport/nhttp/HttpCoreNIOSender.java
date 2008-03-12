@@ -333,7 +333,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
         // return http 500 when a SOAP fault is returned
-        if (msgContext.getEnvelope().getBody().hasFault()) {
+        if (msgContext.getEnvelope().getBody().hasFault() || msgContext.isProcessingFault()) {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
 

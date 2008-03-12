@@ -51,9 +51,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     private String serviceURL = null;
     private String action = null;
     private String requestKey = null;
-    private String requestXPathString = null;
     private SynapseXPath requestXPath = null;
-    private String targetXPathString = null;
     private SynapseXPath targetXPath = null;
     private String targetKey = null;
 
@@ -112,7 +110,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                         tgtNode.detach();
                     } else {
                         handleException("Evaluation of target XPath expression : " +
-                            targetXPathString + " did not yeild an OMNode", synCtx);
+                            targetXPath.toString() + " did not yeild an OMNode", synCtx);
                     }
                 } if (targetKey != null) {
                     synCtx.setProperty(targetKey, result);
@@ -157,10 +155,10 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                     return (OMElement) ((List) o).get(0);  // Always fetches *only* the first
                 } else {
                     handleException("The evaluation of the XPath expression : "
-                        + requestXPathString + " did not result in an OMElement", synCtx);
+                        + requestXPath.toString() + " did not result in an OMElement", synCtx);
                 }
             } catch (JaxenException e) {
-                handleException("Error evaluating XPath expression : " + requestXPathString, e, synCtx);
+                handleException("Error evaluating XPath expression : " + requestXPath.toString(), e, synCtx);
             }
         }
         return null;
@@ -209,21 +207,11 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         this.requestKey = requestKey;
     }
 
-    public String getRequestXPathString() {
-        return requestXPathString;
-    }
-
     public void setRequestXPath(SynapseXPath requestXPath) throws JaxenException {
-        this.requestXPathString = requestXPath.toString();
         this.requestXPath = requestXPath;
     }
 
-    public String getTargetXPathString() {
-        return targetXPathString;
-    }
-
     public void setTargetXPath(SynapseXPath targetXPath) throws JaxenException {
-        this.targetXPathString = targetXPath.toString();
         this.targetXPath = targetXPath;
     }
 

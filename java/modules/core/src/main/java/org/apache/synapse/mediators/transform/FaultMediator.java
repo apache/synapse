@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.transform;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
@@ -53,6 +54,8 @@ public class FaultMediator extends AbstractMediator {
     public static final int SOAP11 = 1;
     /** Make a SOAP 1.2 fault */
     public static final int SOAP12 = 2;
+    /** Make a POX fault */
+    public static final int POX = 3;
     /** Holds the SOAP version to be used to make the fault, if specified */
     private int soapVersion;
 
@@ -90,25 +93,101 @@ public class FaultMediator extends AbstractMediator {
                 return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
             case SOAP12:
                 return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+            case POX:
+                return makePOXFault(synCtx, traceOrDebugOn, traceOn);
 
             default : {
-                // determine from current message's SOAP envelope namespace
-                SOAPEnvelope envelop = synCtx.getEnvelope();
-                if (envelop != null) {
-                    if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
-                        envelop.getNamespace().getNamespaceURI())) {
-                        soapVersion = SOAP12;
-                        return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+                // if this is a POX or REST message then make a POX fault
+                if (synCtx.isDoingPOX() || synCtx.isDoingGET()) {
+                    
+                    return makePOXFault(synCtx, traceOrDebugOn, traceOn);
+
+                } else {
+                    
+                    // determine from current message's SOAP envelope namespace
+                    SOAPEnvelope envelop = synCtx.getEnvelope();
+                    if (envelop != null) {
+                        
+                        if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
+                            envelop.getNamespace().getNamespaceURI())) {
+
+                            soapVersion = SOAP12;
+                            return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+
+                        } else {
+                            soapVersion = SOAP11;
+                            return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                        }
+                        
                     } else {
-                        soapVersion = SOAP11;
+                        // default to SOAP 11
                         return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
                     }
-                } else {
-                    // default to SOAP 11
-                    return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
                 }
             }
         }
+    }
+
+    private boolean makePOXFault(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+
+        OMFactory fac = synCtx.getEnvelope().getOMFactory();
+        OMElement faultPayload = fac.createOMElement(new QName("Exception"));
+
+        if (faultDetail != null) {
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Setting the fault detail : "
+                    + faultDetail + " as athe POX Fault");
+            }
+
+            faultPayload.setText(faultDetail);
+
+        } else if (faultReasonValue != null) {
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Setting the fault reason : "
+                    + faultReasonValue + " as athe POX Fault");
+            }
+
+            faultPayload.setText(faultReasonValue);
+
+        } else if (faultReasonExpr != null) {
+
+            String faultReason = faultReasonExpr.getStringValue(synCtx);
+            faultPayload.setText(faultReason);
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Setting the fault detail : "
+                    + faultDetail + " as athe POX Fault");
+            }
+        }
+
+        SOAPBody body = synCtx.getEnvelope().getBody();
+        if (body != null) {
+
+            if (body.getFirstElement() != null) {
+                body.getFirstElement().detach();
+            }
+            
+            body.addChild(faultPayload);
+        }
+
+        synCtx.setFaultResponse(true);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProcessingFault(true);
+
+        if (traceOrDebugOn) {
+            String msg =
+                "Original SOAP Message : " + synCtx.getEnvelope().toString() +
+                "POXFault Message created : " + faultPayload.toString();
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace(msg);
+            }
+            if (log.isTraceEnabled()) {
+                log.trace(msg);
+            }
+        }
+
+        return true;
     }
 
     /**

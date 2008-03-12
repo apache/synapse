@@ -64,9 +64,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         if (attSource != null) {
             try {
                 transformMediator.setSourceXPathString(attSource.getAttributeValue());
-                SynapseXPath xp = new SynapseXPath(attSource.getAttributeValue());
-                OMElementUtils.addNameSpaces(xp, elem, log);
-                transformMediator.setSource(xp);
+                transformMediator.setSource(SynapseXPathFactory.getSynapseXPath(elem, ATT_SOURCE));
 
             } catch (JaxenException e) {
                 handleException("Invalid XPath specified for the source attribute : " +

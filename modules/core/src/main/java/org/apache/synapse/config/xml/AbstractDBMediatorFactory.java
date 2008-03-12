@@ -295,8 +295,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
                     SynapseXPath xp = null;
                     if (xpath != null) {
                         try {
-                            xp = new SynapseXPath(xpath);
-                            OMElementUtils.addNameSpaces(xp, paramElt, log);
+                            xp = SynapseXPathFactory.getSynapseXPath(paramElt, ATT_EXPRN);
 
                         } catch (JaxenException e) {
                             handleException("Invalid XPath specified for the source attribute : " +

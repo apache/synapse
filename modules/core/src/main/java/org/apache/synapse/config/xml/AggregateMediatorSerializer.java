@@ -53,8 +53,8 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
         if (mediator.getCorrelateExpression() != null) {
             OMElement corelateOn = fac.createOMElement("correlateOn", synNS);
-            corelateOn.addAttribute("expression", mediator.getCorrelateExpression().toString(), nullNS);
-            super.serializeNamespaces(corelateOn, mediator.getCorrelateExpression());
+            SynapseXPathSerializer.serializeXPath(
+                mediator.getCorrelateExpression(), corelateOn, "expression");
             aggregator.addChild(corelateOn);
         }
 
@@ -74,8 +74,8 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
         OMElement onCompleteElem = fac.createOMElement("onComplete", synNS);
         if (mediator.getAggregationExpression() != null) {
-            onCompleteElem.addAttribute("expression", mediator.getAggregationExpression().toString(), nullNS);
-            super.serializeNamespaces(onCompleteElem, mediator.getAggregationExpression());
+            SynapseXPathSerializer.serializeXPath(
+                mediator.getAggregationExpression(), onCompleteElem, "expression");
         }
         if (mediator.getOnCompleteSequenceRef() != null) {
             onCompleteElem.addAttribute("sequence", mediator.getOnCompleteSequenceRef(), nullNS);

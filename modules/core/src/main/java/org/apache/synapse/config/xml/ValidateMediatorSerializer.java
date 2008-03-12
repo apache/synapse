@@ -50,9 +50,7 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
         saveTracingState(validate, mediator);
 
         if (mediator.getSource() != null) {
-            validate.addAttribute(fac.createOMAttribute(
-                    "source", nullNS, mediator.getSource().toString()));
-            serializeNamespaces(validate, mediator.getSource());
+            SynapseXPathSerializer.serializeXPath(mediator.getSource(), validate, "source");
         }
 
         Iterator iterator = mediator.getSchemaKeys().iterator();

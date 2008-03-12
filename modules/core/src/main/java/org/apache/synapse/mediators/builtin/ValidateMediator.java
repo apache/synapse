@@ -317,7 +317,7 @@ public class ValidateMediator extends AbstractListMediator {
     private OMNode getValidateSource(MessageContext synCtx) {
 
         try {
-            Object o = source.evaluate(synCtx.getEnvelope());
+            Object o = source.evaluate(synCtx);
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {

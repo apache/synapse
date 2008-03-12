@@ -20,10 +20,6 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.llom.OMDocumentImpl;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -33,17 +29,15 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.GetPropertyFunction;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.util.SynapseXPath;
-import org.jaxen.JaxenException;
-import org.jaxen.SimpleFunctionContext;
-import org.jaxen.XPathFunctionContext;
 
 import java.util.*;
 
@@ -423,134 +417,6 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setServerSide(boolean value) {
         axis2MessageContext.setServerSide(value);
-    }
-
-    public static String getStringValue(SynapseXPath xpath, MessageContext synCtx) {
-       // default xpath evaluated against the full envelope
-       return getStringValue(xpath, synCtx, xpath.isBodyRelative());
-    }
-
-    /**
-     * Evaluates the given XPath expression against the SOAPEnvelope of the
-     * current message and returns a String representation of the result
-     * @param xpath the expression to evaluate
-     * @param synCtx the source message which holds the SOAP envelope
-     * @return a String representation of the result of evaluation
-     */
-    public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx) {
-       // default xpath evaluated against the full envelope
-       return getStringValue(xpath, synCtx, false);
-    }
-
-    /**
-     * Evaluates the given XPath expression against the SOAPEnvelope of the
-     * current message and returns a String representation of the result
-     * @param xpath the expression to evaluate
-     * @param synCtx the source message which holds the SOAP envelope
-     * @param bodyRelative if true evaluate xpath against body content, if false evaluate xpath
-     * against full envelope
-     * @return a String representation of the result of evaluation
-     */
-    public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx,
-        boolean bodyRelative) {
-
-        synchronized(xpath) {
-
-            if (xpath != null) {
-                
-                try {
-                    // create an instance of a synapse:get-property()
-                    // function and set it to the xpath
-                    GetPropertyFunction getPropertyFunc = new GetPropertyFunction();
-                    getPropertyFunc.setSynCtx(synCtx);
-
-                    // set function context into XPath
-                    SimpleFunctionContext fc = new XPathFunctionContext();
-                    fc.registerFunction(SynapseConstants.SYNAPSE_NAMESPACE,
-                        "get-property", getPropertyFunc);
-                    fc.registerFunction(null, "get-property", getPropertyFunc);
-                    xpath.setFunctionContext(fc);
-
-                    // register namespace for XPath extension function
-                    xpath.addNamespace("synapse", SynapseConstants.SYNAPSE_NAMESPACE);
-                    xpath.addNamespace("syn", SynapseConstants.SYNAPSE_NAMESPACE);
-
-                } catch (JaxenException je) {
-                    handleException("Error setting up the Synapse XPath " +
-                        "extension function for XPath : " + xpath, je);
-                }
-                
-                try {
-                    
-                    Object result;
-
-                    // if the xpath is provided as a body relative XPath
-                    if(bodyRelative) {
-                        result = xpath.evaluate(synCtx.getEnvelope().getBody());
-                    // if the XPath is relative to the envelope
-                    } else {
-                        result = xpath.evaluate(synCtx.getEnvelope());
-                    }
-                    
-                    if (result == null) {
-                        return null;
-                    }
-
-                    StringBuffer textValue = new StringBuffer();
-                    if (result instanceof List) {
-
-                        List list = (List) result;
-                        for (Object o : list) {
-
-                            if (o == null && list.size() == 1) {
-                                return null;
-                            }
-
-                            if (o instanceof OMTextImpl) {
-                                textValue.append(((OMTextImpl) o).getText());
-                            } else if (o instanceof OMElementImpl) {
-
-                                String s = ((OMElementImpl) o).getText();
-
-                                if (s.trim().length() == 0) {
-                                    s = o.toString();
-                                }
-                                textValue.append(s);
-
-                            } else if (o instanceof OMDocumentImpl) {
-
-                                textValue.append(
-                                    ((OMDocumentImpl) o).getOMDocumentElement().toString());
-                            }
-                        }
-                        
-                    } else {
-                        textValue.append(result.toString());
-                    }
-                    
-                    return textValue.toString();
-
-                } catch (JaxenException je) {
-                    handleException("Evaluation of the XPath expression " + xpath.toString() +
-                        " resulted in an error", je);
-                }
-
-            } else {
-                handleException("Invalid (null) XPath expression");
-            }
-            
-            return null;
-        }
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public String toString() {

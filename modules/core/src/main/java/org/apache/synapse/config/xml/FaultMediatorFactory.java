@@ -57,6 +57,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";
+    private static final String POX = "pox";
 
     public Mediator createMediator(OMElement elem) {
 
@@ -68,7 +69,9 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                 faultMediator.setSoapVersion(FaultMediator.SOAP11);
             } else if (SOAP12.equals(version.getAttributeValue())) {
                 faultMediator.setSoapVersion(FaultMediator.SOAP12);
-            }else {
+            } else if (POX.equals(version.getAttributeValue())) {
+                faultMediator.setSoapVersion(FaultMediator.POX);
+            } else {
                 String msg = "Invalid SOAP version";
                 log.error(msg);
                 throw new SynapseException(msg);

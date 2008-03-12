@@ -34,6 +34,8 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 import java.util.*;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * The "vfs" transport is a polling based transport - i.e. it gets kicked off at
@@ -298,7 +300,12 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
             }
 
             if (moveToDirectory != null) {
-                String destName = moveToDirectory + File.separator + fileObject.getName().getBaseName();
+                String prefix = "";
+                if(entry.getMoveTimestampFormat() != null) {
+                    Date now = new Date();
+                    prefix = entry.getMoveTimestampFormat().format(now);
+                }
+                String destName = moveToDirectory + File.separator + prefix + fileObject.getName().getBaseName();
                 if (log.isDebugEnabled()) {
                     log.debug("Moving to file :" + destName);
                 }
@@ -507,6 +514,13 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
             String moveDirectoryAfterFailure = BaseUtils.getOptionalServiceParam(
                 service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
             entry.setMoveAfterFailure(moveDirectoryAfterFailure);
+
+            String moveFileTimestampFormat = BaseUtils.getOptionalServiceParam(
+                service, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
+            if(moveFileTimestampFormat != null) {
+                DateFormat moveTimestampFormat = new SimpleDateFormat(moveFileTimestampFormat);
+                entry.setMoveTimestampFormat(moveTimestampFormat);
+            }
 
             String strMaxRetryCount = BaseUtils.getOptionalServiceParam(
                 service, VFSConstants.MAX_RETRY_COUNT);

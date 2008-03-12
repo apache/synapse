@@ -36,7 +36,8 @@ import javax.xml.namespace.QName;
  */
 public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName TAG_NAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "callout");
+    private static final QName TAG_NAME
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "callout");
     private static final QName ATT_URL = new QName("serviceURL");
     private static final QName ATT_ACTION = new QName("action");
     private static final QName Q_SOURCE = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "source");
@@ -64,14 +65,17 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         if (sourceElt != null) {
             if (sourceElt.getAttribute(ATT_XPATH) != null) {
                 try {
-                    callout.setRequestXPath(SynapseXPathFactory.getSynapseXPath(sourceElt, ATT_XPATH));
+                    callout.setRequestXPath(
+                        SynapseXPathFactory.getSynapseXPath(sourceElt, ATT_XPATH));
                 } catch (JaxenException e) {
-                    handleException("Invalid source XPath : " + sourceElt.getAttributeValue(ATT_XPATH));
+                    handleException("Invalid source XPath : "
+                        + sourceElt.getAttributeValue(ATT_XPATH));
                 }
             } else if (sourceElt.getAttribute(ATT_KEY) != null) {
                 callout.setRequestKey(sourceElt.getAttributeValue(ATT_KEY));
             } else {
-                handleException("A 'xpath' or 'key' attribute is required for the Callout 'source'");
+                handleException("A 'xpath' or 'key' attribute " +
+                    "is required for the Callout 'source'");
             }
         } else {
             handleException("The message 'source' must be specified for a Callout mediator");
@@ -83,12 +87,14 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
                     callout.setTargetXPath(
                         SynapseXPathFactory.getSynapseXPath(targetElt, ATT_XPATH));
                 } catch (JaxenException e) {
-                    handleException("Invalid target XPath : " + targetElt.getAttributeValue(ATT_XPATH));
+                    handleException("Invalid target XPath : "
+                        + targetElt.getAttributeValue(ATT_XPATH));
                 }
             } else if (targetElt.getAttribute(ATT_KEY) != null) {
                 callout.setTargetKey(targetElt.getAttributeValue(ATT_KEY));
             } else {
-                handleException("A 'xpath' or 'key' attribute is required for the Callout 'target'");
+                handleException("A 'xpath' or 'key' attribute " +
+                    "is required for the Callout 'target'");
             }
         } else {
             handleException("The message 'target' must be specified for a Callout mediator");

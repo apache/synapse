@@ -92,9 +92,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
                 prop.addAttribute(fac.createOMAttribute("value", nullNS, mp.getValue()));
 
             } else if (mp.getExpression() != null) {
-                prop.addAttribute(fac.createOMAttribute("expression", nullNS,
-                    mp.getExpression().toString()));
-                serializeNamespaces(prop, mp.getExpression());
+                SynapseXPathSerializer.serializeXPath(mp.getExpression(), prop, "expression");
 
             } else {
                 handleException("Mediator property must have a literal value or be an expression");
@@ -104,17 +102,6 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
     protected void serializeProperties(OMElement parent, Collection props) {
         serializeMediatorProperties(parent, props);
-    }
-
-    protected void serializeNamespaces(OMElement elem, SynapseXPath xpath) {
-        Iterator iter = xpath.getNamespaces().keySet().iterator();
-        while (iter.hasNext()) {
-            String prefix = (String) iter.next();
-            String uri = xpath.getNamespaceContext().translateNamespacePrefixToUri(prefix);
-            if (!XMLConfigConstants.SYNAPSE_NAMESPACE.equals(uri)) {
-                elem.declareNamespace(uri, prefix);
-            }
-        }
     }
 
     protected void handleException(String msg) {

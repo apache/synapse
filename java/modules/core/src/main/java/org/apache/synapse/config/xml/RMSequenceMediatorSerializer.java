@@ -54,18 +54,16 @@ public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
         if (mediator.isSingle()) {
             sequence.addAttribute(fac.createOMAttribute("single", nullNS, String.valueOf(mediator.isSingle())));
         } else if (mediator.getCorrelation() != null) {
-            sequence.addAttribute(fac.createOMAttribute("correlation", nullNS, 
-                    mediator.getCorrelation().toString()));
-            super.serializeNamespaces(sequence, mediator.getCorrelation());
+            SynapseXPathSerializer.serializeXPath(
+                mediator.getCorrelation(), sequence, "correlation");
         } else {
             handleException("Invalid RMSequence mediator. Specify a single message sequence " 
                     + "or a correlation attribute.");
         }
         
         if (mediator.getLastMessage() != null) {
-            sequence.addAttribute(fac.createOMAttribute(
-                "last-message", nullNS, mediator.getLastMessage().toString()));
-            super.serializeNamespaces(sequence, mediator.getLastMessage());
+            SynapseXPathSerializer.serializeXPath(
+                mediator.getLastMessage(), sequence, "last-message");
         }
         
         if (mediator.getVersion() != null) {

@@ -94,6 +94,7 @@ public class EIPUtils {
      * @param envelope   SOAPEnvelope to be enriched with the content
      * @param enricher   SOAPEnvelope from which the enriching element will be extracted
      * @param expression SynapseXPath describing the enriching element
+     * @throws JaxenException on failing of processing the xpath
      */
     public static void enrichEnvelope(SOAPEnvelope envelope, SOAPEnvelope enricher,
         SynapseXPath expression) throws JaxenException {

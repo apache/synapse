@@ -58,10 +58,9 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         saveTracingState(xslt,mediator);
 
         if (mediator.getSource() != null &&
-            !XSLTMediator.DEFAULT_XPATH.toString().equals(mediator.getSource().toString())) {
-            xslt.addAttribute(fac.createOMAttribute(
-                "source", nullNS, mediator.getSource().toString()));
-            serializeNamespaces(xslt, mediator.getSource());
+            !XSLTMediator.DEFAULT_XPATH.equals(mediator.getSource().toString())) {
+
+            SynapseXPathSerializer.serializeXPath(mediator.getSource(), xslt, "source");
         }
         if (mediator.getTargetPropertyName() != null) {
             xslt.addAttribute(fac.createOMAttribute(

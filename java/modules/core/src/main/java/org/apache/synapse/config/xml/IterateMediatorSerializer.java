@@ -76,13 +76,11 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
         }
 
         if (itrMed.getAttachPath() != null && !".".equals(itrMed.getAttachPath().toString())) {
-            itrElem.addAttribute("attachPath", itrMed.getAttachPath().toString(), nullNS);
-            serializeNamespaces(itrElem, itrMed.getAttachPath());
+            SynapseXPathSerializer.serializeXPath(itrMed.getAttachPath(), itrElem, "attachPath");
         }
         
         if (itrMed.getExpression() != null) {
-            itrElem.addAttribute("expression", itrMed.getExpression().toString(), nullNS);
-            serializeNamespaces(itrElem, itrMed.getExpression());
+            SynapseXPathSerializer.serializeXPath(itrMed.getExpression(), itrElem, "expression");
         } else {
             handleException("Missing expression of the IterateMediator which is required.");
         }

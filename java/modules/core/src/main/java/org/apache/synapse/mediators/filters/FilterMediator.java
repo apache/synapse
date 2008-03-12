@@ -166,7 +166,7 @@ public class FilterMediator extends AbstractListMediator implements
             }
 
         } else if (source != null && regex != null) {
-            String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
+            String sourceString = source.getStringValue(synCtx);
             if (sourceString == null) {
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Source String : " + source + " evaluates to null");

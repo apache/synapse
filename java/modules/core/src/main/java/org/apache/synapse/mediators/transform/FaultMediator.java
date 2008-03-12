@@ -213,7 +213,7 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultCodeValue != null) {
             fault_code = faultCodeValue;
         } else {
-            fault_code = QName.valueOf(Axis2MessageContext.getStringValue(faultCodeExpr, synCtx));
+            fault_code = QName.valueOf(faultCodeExpr.getStringValue(synCtx));
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
@@ -237,7 +237,7 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultReasonValue != null) {
             reasonString = faultReasonValue;
         } else {
-            reasonString = Axis2MessageContext.getStringValue(faultReasonExpr, synCtx);
+            reasonString = faultReasonExpr.getStringValue(synCtx);
         }
 
         SOAPFaultReason reason = factory.createSOAPFaultReason();

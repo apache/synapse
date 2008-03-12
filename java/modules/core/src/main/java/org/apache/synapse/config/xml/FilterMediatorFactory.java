@@ -77,8 +77,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
             } else {
 
                 try {
-                    filter.setXpath(new SynapseXPath(attXpath.getAttributeValue()));
-                    OMElementUtils.addNameSpaces(filter.getXpath(), elem, log);
+                    filter.setXpath(SynapseXPathFactory.getSynapseXPath(elem, ATT_XPATH));
                 } catch (JaxenException e) {
                     handleException("Invalid XPath expression for attribute xpath : "
                         + attXpath.getAttributeValue(), e);
@@ -97,8 +96,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
             } else {
                 
                 try {
-                    filter.setSource(new SynapseXPath(attSource.getAttributeValue()));
-                    OMElementUtils.addNameSpaces(filter.getSource(), elem, log);
+                    filter.setSource(SynapseXPathFactory.getSynapseXPath(elem, ATT_SOURCE));
                 } catch (JaxenException e) {
 
                     handleException("Invalid XPath expression for attribute source : "

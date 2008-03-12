@@ -53,9 +53,7 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
         saveTracingState(switchMed, mediator);
 
         if (mediator.getSource() != null) {
-            switchMed.addAttribute(fac.createOMAttribute(
-                    "source", nullNS, mediator.getSource().toString()));
-            super.serializeNamespaces(switchMed, mediator.getSource());
+            SynapseXPathSerializer.serializeXPath(mediator.getSource(), switchMed, "source");
 
         } else {
             handleException("Invalid switch mediator. Source required");

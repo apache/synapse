@@ -38,6 +38,8 @@ public class VFSConstants {
     public static final String REPLY_FILE_URI = "transport.vfs.ReplyFileURI";
     public static final String REPLY_FILE_NAME = "transport.vfs.ReplyFileName";
 
+    public static final String TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT = "transport.vfs.MoveTimestampFormat";
+
     public static final String DEFAULT_RESPONSE_FILE = "response.xml";
     
     public static final String MAX_RETRY_COUNT = "transport.vfs.MaxRetryCount";

@@ -969,6 +969,18 @@ File     vfs:file:///home/user/directory
         </tr>
         <tr>
           <td/>
+          <td>
+            Optional
+          </td>
+          <td>
+            transport.vfs.MoveTimestampFormat
+          </td>
+          <td>
+            Timestamp prefix format for processed file name. java.text.SimpleDateFormat compatible string. e.g. yyMMddHHmmss&apos;-&apos;
+          </td>
+        </tr>
+        <tr>
+          <td/>
           <td/>
           <td/>
           <td/>

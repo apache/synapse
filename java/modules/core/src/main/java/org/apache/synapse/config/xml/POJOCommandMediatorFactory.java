@@ -115,8 +115,7 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
         SynapseXPath xpath = null;
         try {
             if (exprAttr != null) {
-                xpath = new SynapseXPath(exprAttr.getAttributeValue());
-                OMElementUtils.addNameSpaces(xpath, propElem, log);
+                xpath = SynapseXPathFactory.getSynapseXPath(propElem, ATT_EXPRN);
             }
         } catch (JaxenException e) {
             handleException("Error in building the expression as an SynapseXPath" + e);

@@ -100,9 +100,8 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                 faultMediator.setFaultCodeValue(new QName(namespaceURI, name, prefix));
             } else if (expression != null) {
                 try {
-                    SynapseXPath xp = new SynapseXPath(expression.getAttributeValue());
-                    OMElementUtils.addNameSpaces(xp, code, log);
-                    faultMediator.setFaultCodeExpr(xp);
+                    faultMediator.setFaultCodeExpr(
+                        SynapseXPathFactory.getSynapseXPath(code, ATT_EXPRN));
                 } catch (JaxenException je) {
                     String msg = "Invalid fault code expression : " + je.getMessage();
                     log.error(msg);
@@ -129,10 +128,8 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                 faultMediator.setFaultReasonValue(value.getAttributeValue());
             } else if (expression != null) {
                 try {
-                    SynapseXPath xp = new SynapseXPath(expression.getAttributeValue());
-                    OMElementUtils.addNameSpaces(xp, reason, log);
-                    faultMediator.setFaultReasonExpr(xp);
-
+                    faultMediator.setFaultReasonExpr(
+                        SynapseXPathFactory.getSynapseXPath(reason, ATT_EXPRN));
                 } catch (JaxenException je) {
                     String msg = "Invalid fault reason expression : " + je.getMessage();
                     log.error(msg);

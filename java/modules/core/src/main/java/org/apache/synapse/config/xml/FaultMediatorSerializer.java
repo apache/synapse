@@ -69,9 +69,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
                     mediator.getFaultCodeValue().getPrefix());
 
         } else if (mediator.getFaultCodeExpr() != null) {
-            code.addAttribute(fac.createOMAttribute(
-                "expression", nullNS, mediator.getFaultCodeExpr().toString()));
-            super.serializeNamespaces(code, mediator.getFaultCodeExpr());
+            SynapseXPathSerializer.serializeXPath(mediator.getFaultCodeExpr(), code, "expression");
 
         } else {
             handleException("Fault code is required for a fault mediator");
@@ -83,9 +81,9 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
                 "value", nullNS, mediator.getFaultReasonValue()));
 
         } else if (mediator.getFaultReasonExpr() != null) {
-            reason.addAttribute(fac.createOMAttribute(
-                "expression", nullNS, mediator.getFaultReasonExpr().toString()));
-            super.serializeNamespaces(code, mediator.getFaultReasonExpr());
+
+            SynapseXPathSerializer.serializeXPath(
+                mediator.getFaultReasonExpr(), reason, "expression");
 
         } else {
             handleException("Fault reason is required for a fault mediator");

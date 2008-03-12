@@ -68,7 +68,8 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
             } else {
                 try {
-                    sequenceMediator.setCorrelation(new SynapseXPath(correlation.getAttributeValue()));
+                    sequenceMediator.setCorrelation(
+                        SynapseXPathFactory.getSynapseXPath(elem, ATT_CORR));
                 } catch (JaxenException e) {
                     String msg = "Invalid XPath expression for attribute correlation : "
                         + correlation.getAttributeValue();
@@ -76,7 +77,6 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
-            OMElementUtils.addNameSpaces(sequenceMediator.getCorrelation(), elem, log);
         }
 
         if (single != null) {
@@ -105,7 +105,8 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
             } else {
                 try {
-                    sequenceMediator.setLastMessage(new SynapseXPath(lastMessage.getAttributeValue()));
+                    sequenceMediator.setLastMessage(
+                        SynapseXPathFactory.getSynapseXPath(elem, ATT_LASTMSG));
                 } catch (JaxenException e) {
                     String msg = "Invalid XPath expression for attribute last-message : "
                         + lastMessage.getAttributeValue();
@@ -113,7 +114,6 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
-            OMElementUtils.addNameSpaces(sequenceMediator.getLastMessage(), elem, log);
         }
 
         if (sequenceMediator.isSingle() && sequenceMediator.getLastMessage() != null) {

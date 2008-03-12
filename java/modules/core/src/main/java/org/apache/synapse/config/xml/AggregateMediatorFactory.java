@@ -72,9 +72,8 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             OMAttribute corelateExpr = corelateOn.getAttribute(EXPRESSION_Q);
             if (corelateExpr != null) {
                 try {
-                    SynapseXPath xp = new SynapseXPath(corelateExpr.getAttributeValue());
-                    OMElementUtils.addNameSpaces(xp, corelateOn, log);
-                    mediator.setCorrelateExpression(xp);
+                    mediator.setCorrelateExpression(
+                        SynapseXPathFactory.getSynapseXPath(corelateOn, EXPRESSION_Q));
                 } catch (JaxenException e) {
                     handleException("Unable to load the corelate XPATH expression", e);
                 }
@@ -109,9 +108,8 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             OMAttribute aggregateExpr = onComplete.getAttribute(EXPRESSION_Q);
             if (aggregateExpr != null) {
                 try {
-                    SynapseXPath xp = new SynapseXPath(aggregateExpr.getAttributeValue());
-                    OMElementUtils.addNameSpaces(xp, onComplete, log);
-                    mediator.setAggregationExpression(xp);
+                    mediator.setAggregationExpression(
+                        SynapseXPathFactory.getSynapseXPath(onComplete, EXPRESSION_Q));
                 } catch (JaxenException e) {
                     handleException("Unable to load the aggregating XPATH", e);
                 }

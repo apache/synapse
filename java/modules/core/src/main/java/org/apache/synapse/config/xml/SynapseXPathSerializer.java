@@ -45,13 +45,6 @@ public class SynapseXPathSerializer {
 
             serializeNamespaces(elem, xpath);
 
-            if (xpath.isBodyRelative()) {
-                
-                elem.addAttribute(elem.getOMFactory().createOMAttribute(
-                    XMLConfigConstants.ATT_XPATH_RELATIVE.getLocalPart(),
-                    nullNS, XMLConfigConstants.XPATH_BODY_RELATIVE));
-            }
-            
         } else {
             handleException("Couldn't find the xpath in the SynapseXPath");
         }

@@ -62,9 +62,8 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
             throw new SynapseException(msg);
         } else {
             try {
-                SynapseXPath sourceXPath = new SynapseXPath(source.getAttributeValue());
-                org.apache.synapse.config.xml.OMElementUtils.addNameSpaces(sourceXPath, elem, log);
-                switchMediator.setSource(sourceXPath);
+
+                switchMediator.setSource(SynapseXPathFactory.getSynapseXPath(elem, ATT_SOURCE));
 
             } catch (JaxenException e) {
                 String msg = "Invalid XPath for attribute 'source' : " + source.getAttributeValue();

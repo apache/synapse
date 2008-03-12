@@ -43,22 +43,20 @@ public class PropertyMediatorTest extends TestCase {
         propMediator.mediate(synCtx);
         propMediatorTwo.mediate(synCtx);
         assertTrue(
-            "value".equals(Axis2MessageContext.getStringValue(
-                new SynapseXPath("synapse:get-property('name')"), synCtx)));
+            "value".equals((new SynapseXPath(
+                "synapse:get-property('name')")).getStringValue(synCtx)));
         assertTrue(
-            "valueTwo".equals(Axis2MessageContext.getStringValue(
-                new SynapseXPath("synapse:get-property('nameTwo')"), synCtx)));
+            "valueTwo".equals((new SynapseXPath(
+                "synapse:get-property('nameTwo')")).getStringValue(synCtx)));
 
         PropertyMediator propMediatorThree = new PropertyMediator();
         propMediatorThree.setName("name");
         propMediatorThree.setValue("value");
         propMediatorThree.setAction(PropertyMediator.ACTION_REMOVE);
         propMediatorThree.mediate(synCtx) ;
-        assertNull(Axis2MessageContext.getStringValue(
-                new SynapseXPath("synapse:get-property('name')"), synCtx));
-        assertTrue(
-                   "valueTwo".equals(Axis2MessageContext.getStringValue(
-                       new SynapseXPath("synapse:get-property('nameTwo')"), synCtx)));
+        assertNull((new SynapseXPath("synapse:get-property('name')")).getStringValue(synCtx));
+        assertTrue("valueTwo".equals((new SynapseXPath(
+            "synapse:get-property('nameTwo')")).getStringValue(synCtx)));
                 
     }
 

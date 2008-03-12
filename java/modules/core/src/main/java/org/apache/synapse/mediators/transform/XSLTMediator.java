@@ -349,7 +349,7 @@ public class XSLTMediator extends AbstractMediator {
                             transformer.setParameter(prop.getName(), prop.getValue());
                         } else {
                             transformer.setParameter(prop.getName(),
-                                Axis2MessageContext.getStringValue(prop.getExpression(), synCtx));
+                                prop.getExpression().getStringValue(synCtx));
                         }
                     }
                 }

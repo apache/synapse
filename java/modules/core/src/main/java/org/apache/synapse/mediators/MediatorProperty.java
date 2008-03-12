@@ -69,7 +69,7 @@ public class MediatorProperty {
     }
 
     public String getEvaluatedExpression(MessageContext synCtx) {
-        return Axis2MessageContext.getStringValue(expression, synCtx);
+        return expression.getStringValue(synCtx);
     }
 
 }

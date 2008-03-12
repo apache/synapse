@@ -34,11 +34,11 @@ public class Axis2MessageContextTest extends TestCase {
 
 
     public void testMessageContextGetStringValueBody() throws Exception {
-        SynapseXPath axiomXpath = new SynapseXPath("ns1:a/ns1:c");
+        SynapseXPath axiomXpath = new SynapseXPath("$body/ns1:a/ns1:c");
         axiomXpath.addNamespace("ns1", nsNamespace1);
         MessageContext synCtx = TestUtils.getTestContext(sampleBody);
 
-        String result = Axis2MessageContext.getStringValue(axiomXpath, synCtx, true);
+        String result = axiomXpath.getStringValue(synCtx);
         assertEquals("second", result);
     }
 
@@ -49,7 +49,7 @@ public class Axis2MessageContextTest extends TestCase {
 
         MessageContext synCtx = TestUtils.getTestContext(sampleBody);
 
-        String result = Axis2MessageContext.getStringValue(axiomXpath, synCtx, false);
+        String result = axiomXpath.getStringValue(synCtx);
         assertEquals("second", result);
     }
 

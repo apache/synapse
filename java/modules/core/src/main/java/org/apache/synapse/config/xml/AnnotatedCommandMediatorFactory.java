@@ -83,9 +83,7 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
                     if (child.getAttribute(ATT_EXPRN) != null) {
                         SynapseXPath xpath = null;
                         try {
-                            xpath = new SynapseXPath(
-                                child.getAttribute(ATT_EXPRN).getAttributeValue());
-                            OMElementUtils.addNameSpaces(xpath, child, log);
+                            xpath = SynapseXPathFactory.getSynapseXPath(child, ATT_EXPRN);
                             pojoMediator.addMessageSetterProperty(propName, xpath);
                         } catch (JaxenException e) {
                             handleException("Error instantiating XPath expression : " +

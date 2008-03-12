@@ -42,6 +42,8 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final String SOAP12 = "soap12";
 
+    private static final String POX = "pox";
+
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof FaultMediator)) {
@@ -55,9 +57,12 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
         if(mediator.getSoapVersion()==FaultMediator.SOAP11) {
            fault.addAttribute(fac.createOMAttribute(
                 "version", nullNS, SOAP11));
-        }else if(mediator.getSoapVersion()==FaultMediator.SOAP12) {
+        } else if(mediator.getSoapVersion()==FaultMediator.SOAP12) {
            fault.addAttribute(fac.createOMAttribute(
                 "version", nullNS, SOAP12));
+        } else if(mediator.getSoapVersion()==FaultMediator.POX) {
+           fault.addAttribute(fac.createOMAttribute(
+                "version", nullNS, POX));
         }
 
         OMElement code = fac.createOMElement("code", synNS, fault);

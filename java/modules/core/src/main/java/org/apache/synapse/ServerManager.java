@@ -47,6 +47,8 @@ public class ServerManager {
     private String axis2Repolocation;
     private ListenerManager listenerManager;
     private ConfigurationContext configctx;
+    private static final int DEFAULT_HTTP_PORT = 8080;
+    private static final int ALTERNATIVE_HTTP_PORT = 8008;
 
     /**
      * To ensure that there is a only one Manager
@@ -173,7 +175,7 @@ public class ServerManager {
 
         if (trsIn != null) {
 
-            int port = 8080;
+            int port = DEFAULT_HTTP_PORT;
             String bindAddress = null;
 
             String strPort = System.getProperty("port");
@@ -209,8 +211,8 @@ public class ServerManager {
                     break;
                 } catch (Exception e) {
                     log.warn("Port " + port + " already in use. Trying alternate");
-                    if (port == 8080) {
-                        port = 8008;
+                    if (port == DEFAULT_HTTP_PORT) {
+                        port = ALTERNATIVE_HTTP_PORT;
                     } else {
                         port++;
                     }

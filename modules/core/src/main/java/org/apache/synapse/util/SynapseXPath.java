@@ -76,7 +76,15 @@ public class SynapseXPath extends AXIOMXPath {
         ((ThreadSafeDelegatingVariableContext)
             getVariableContext()).setDelegate(new SynapseVariableContext(synCtx));
 
-        return evaluate(synCtx.getEnvelope());
+        return super.evaluate(synCtx.getEnvelope());
+    }
+
+    public Object evaluate(SOAPEnvelope env) throws JaxenException {
+
+        ((ThreadSafeDelegatingVariableContext)
+            getVariableContext()).setDelegate(new SynapseVariableContext(env));
+
+        return super.evaluate(env);
     }
 
     /**

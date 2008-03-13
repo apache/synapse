@@ -24,7 +24,6 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -86,7 +85,7 @@ public class SynapseVariableContext implements VariableContext {
                         org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
                     if (headers != null && headers instanceof Map) {
-                        Map headersMap = (HashMap) headers;
+                        Map headersMap = (Map) headers;
                         return headersMap.get(localName);
                     }
                 }

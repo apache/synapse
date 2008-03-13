@@ -18,9 +18,13 @@
  */
 package org.apache.synapse.util;
 
-import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Jaxen variable context for the XPath variables implicitly exposed by Synapse.
@@ -33,24 +37,59 @@ import org.jaxen.VariableContext;
  * </dl>
  */
 public class SynapseVariableContext implements VariableContext {
-    private final SOAPEnvelope envelope;
-    
-    public SynapseVariableContext(SOAPEnvelope envelope) {
-        this.envelope = envelope;
+
+    private final MessageContext synCtx;
+
+    public SynapseVariableContext(MessageContext synCtx) {
+        this.synCtx = synCtx;
     }
     
-    public Object getVariableValue(String namespaceURI, String prefix, String localName) throws UnresolvableException {
+    public Object getVariableValue(String namespaceURI, String prefix, String localName)
+        throws UnresolvableException {
+
         if (namespaceURI == null) {
-            if (localName.equals("body")) {
-                return envelope.getBody();
-            } else if (localName.equals("header")) {
-                return envelope.getHeader();
+            
+            if (synCtx.getEnvelope() != null) {
+                
+                if (localName.equals("body")) {
+                    return synCtx.getEnvelope().getBody();
+                } else if (localName.equals("header")) {
+                    return synCtx.getEnvelope().getHeader();
+                }
+            
+            }
+
+            if (prefix != null && !"".equals(prefix)) {
+
+                if ("ctx".equals(prefix)) {
+
+                    return synCtx.getProperty(localName);
+
+                } else if ("axis2".equals(prefix)) {
+
+                    return ((Axis2MessageContext)
+                        synCtx).getAxis2MessageContext().getProperty(localName);
+
+                } else if ("trp".equals(prefix)) {
+
+                    org.apache.axis2.context.MessageContext axis2MessageContext =
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    Object headers = axis2MessageContext.getProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+                    if (headers != null && headers instanceof Map) {
+                        Map headersMap = (HashMap) headers;
+                        return headersMap.get(localName);
+                    }
+                }
             }
         }
+
         StringBuilder message = new StringBuilder("No such variable \"");
         if (namespaceURI != null) {
             message.append('{').append(namespaceURI).append('}');
         }
+        
         message.append(localName).append('"');
         throw new UnresolvableException(message.toString());
     }

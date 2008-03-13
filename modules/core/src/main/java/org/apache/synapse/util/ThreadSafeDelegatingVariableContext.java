@@ -16,12 +16,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.util;
 
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
 public class ThreadSafeDelegatingVariableContext implements VariableContext {
+    
     private final ThreadLocal<VariableContext> delegate = new ThreadLocal<VariableContext>();
     
     public void setDelegate(VariableContext delegate) {
@@ -30,6 +32,7 @@ public class ThreadSafeDelegatingVariableContext implements VariableContext {
 
     public Object getVariableValue(String namespaceURI, String prefix, String localName)
             throws UnresolvableException {
+        
         return delegate.get().getVariableValue(namespaceURI, prefix, localName);
     }
 }

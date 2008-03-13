@@ -18,13 +18,14 @@
  */
 package org.apache.synapse.util;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Jaxen variable context for the XPath variables implicitly exposed by Synapse.
@@ -39,9 +40,16 @@ import java.util.HashMap;
 public class SynapseVariableContext implements VariableContext {
 
     private final MessageContext synCtx;
+    private final SOAPEnvelope env;
 
     public SynapseVariableContext(MessageContext synCtx) {
         this.synCtx = synCtx;
+        this.env = synCtx.getEnvelope();
+    }
+
+    public SynapseVariableContext(SOAPEnvelope env) {
+        this.synCtx = null;
+        this.env = env;
     }
     
     public Object getVariableValue(String namespaceURI, String prefix, String localName)
@@ -49,17 +57,17 @@ public class SynapseVariableContext implements VariableContext {
 
         if (namespaceURI == null) {
             
-            if (synCtx.getEnvelope() != null) {
+            if (env != null) {
                 
                 if (localName.equals("body")) {
-                    return synCtx.getEnvelope().getBody();
+                    return env.getBody();
                 } else if (localName.equals("header")) {
-                    return synCtx.getEnvelope().getHeader();
+                    return env.getHeader();
                 }
             
             }
 
-            if (prefix != null && !"".equals(prefix)) {
+            if (prefix != null && !"".equals(prefix) && synCtx != null) {
 
                 if ("ctx".equals(prefix)) {
 

@@ -46,6 +46,7 @@ public class SynapseXPath extends AXIOMXPath {
 
     public SynapseXPath(String xpathString) throws JaxenException {
         super(xpathString);
+        setVariableContext(new ThreadSafeDelegatingVariableContext());
     }
 
     public Object evaluate(MessageContext synCtx) throws JaxenException {
@@ -72,21 +73,10 @@ public class SynapseXPath extends AXIOMXPath {
                 "extension function for XPath : " + this.toString(), je);
         }
 
+        ((ThreadSafeDelegatingVariableContext)
+            getVariableContext()).setDelegate(new SynapseVariableContext(synCtx));
+
         return evaluate(synCtx.getEnvelope());
-    }
-
-    public Object evaluate(SOAPEnvelope env) throws JaxenException {
-
-        SimpleVariableContext varContext = new SimpleVariableContext();
-        if (this.toString().indexOf("$body") != -1) {
-            varContext.setVariableValue("body", env.getBody());
-        }
-        if (this.toString().indexOf("$header") != -1) {
-            varContext.setVariableValue("header", env.getHeader());
-        }
-        setVariableContext(varContext);
-
-        return super.evaluate(env);
     }
 
     /**

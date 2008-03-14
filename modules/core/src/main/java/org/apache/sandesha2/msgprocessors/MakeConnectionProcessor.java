@@ -260,20 +260,23 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			WorkerLock lock = sender.getWorkerLock();
 			
 			String workId = matchingMessage.getMessageID();
-			while (lock.isWorkPresent(workId)) {
-				try {
-					//wait on the lock.
-					lock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			SenderWorker worker = null;
+			synchronized(lock){
+				while (lock.isWorkPresent(workId)) {
+					try {
+						//wait on the lock.
+						lock.wait();
+					} catch (InterruptedException e) {
+							e.printStackTrace();
+					}
 				}
+				
+				worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
+				worker.setLock(lock);
+				worker.setWorkId(workId);
+				
+				lock.addWork(workId, worker);
 			}
-			
-			SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
-			worker.setLock(lock);
-			worker.setWorkId(workId);
-
-			lock.addWork(workId, worker);
 			
 			setTransportProperties (returnMessage, pollMessage);
 			

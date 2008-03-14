@@ -258,7 +258,7 @@ public class GetPropertyFunction implements Function {
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
             if (headers != null && headers instanceof Map) {
-                Map headersMap = (HashMap) headers;
+                Map headersMap = (Map) headers;
                 return headersMap.get(key);
             }
 

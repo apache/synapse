@@ -168,23 +168,22 @@ public class FaultMediator extends AbstractMediator {
             if (body.getFirstElement() != null) {
                 body.getFirstElement().detach();
             }
+
+            synCtx.setFaultResponse(true);
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProcessingFault(true);
+
+            if (traceOrDebugOn) {
+                String msg = "Original SOAP Message : " + synCtx.getEnvelope().toString() +
+                    "POXFault Message created : " + faultPayload.toString();
+                if (traceOn && trace.isTraceEnabled()) {
+                    trace.trace(msg);
+                }
+                if (log.isTraceEnabled()) {
+                    log.trace(msg);
+                }
+            }
             
             body.addChild(faultPayload);
-        }
-
-        synCtx.setFaultResponse(true);
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProcessingFault(true);
-
-        if (traceOrDebugOn) {
-            String msg =
-                "Original SOAP Message : " + synCtx.getEnvelope().toString() +
-                "POXFault Message created : " + faultPayload.toString();
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace(msg);
-            }
-            if (log.isTraceEnabled()) {
-                log.trace(msg);
-            }
         }
 
         return true;

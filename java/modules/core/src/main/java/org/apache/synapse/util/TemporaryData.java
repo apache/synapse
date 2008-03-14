@@ -1,0 +1,220 @@
+package org.apache.synapse.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+/**
+ * Class representing some temporary data in the form of a byte stream.
+ * <p>
+ * Data is stored by writing to the output stream obtained using
+ * {@link #getOutputStream()}. It can then be read back using
+ * the input stream obtained from {@link #getInputStream()}.
+ * The data is first stored into a fixed size buffer. Once this
+ * buffer overflows, it is transferred to a temporary file. The buffer
+ * is divided into a given number of fixed size chunks that are allocated
+ * on demand. Since a temporary file may be created it is mandatory to
+ * call {@link #release()} to discard the temporary data.
+ */
+public class TemporaryData {
+    class OutputStreamImpl extends OutputStream {
+        private FileOutputStream fileOutputStream;
+        
+        public void write(byte[] b, int off, int len) throws IOException {
+            if (fileOutputStream != null) {
+                fileOutputStream.write(b, off, len);
+            } else if (len > (chunks.length-chunkIndex)*chunkSize - chunkOffset) {
+                // The buffer will overflow. Switch to a temporary file.
+                temporaryFile = File.createTempFile(tempPrefix, tempSuffix);
+                fileOutputStream = new FileOutputStream(temporaryFile);
+                // Write the buffer to the temporary file.
+                for (int i=0; i<chunkIndex; i++) {
+                    fileOutputStream.write(chunks[i]);
+                }
+                if (chunkOffset > 0) {
+                    fileOutputStream.write(chunks[chunkIndex], 0, chunkOffset);
+                }
+                // Release references to the buffer so that it can be garbage collected.
+                chunks = null;
+                // Finally, write the new data to the temporary file.
+                fileOutputStream.write(b, off, len);
+            } else {
+                // The data will fit into the buffer.
+                while (len > 0) {
+                    byte[] chunk;
+                    if (chunkOffset == 0) {
+                        // We will write the first byte to the current chunk. Allocate it.
+                        chunk = new byte[chunkSize];
+                        chunks[chunkIndex] = chunk;
+                    } else {
+                        // The chunk has already been allocated.
+                        chunk = chunks[chunkIndex];
+                    }
+                    // Determine number of bytes that can be copied to the current chunk.
+                    int c = Math.min(len, chunkSize-chunkOffset);
+                    // Copy data to the chunk.
+                    System.arraycopy(b, off, chunk, chunkOffset, c);
+                    // Update variables.
+                    len -= c;
+                    off += c;
+                    chunkOffset += c;
+                    if (chunkOffset == chunkSize) {
+                        chunkIndex++;
+                        chunkOffset = 0;
+                    }
+                }
+            }
+        }
+
+        public void write(byte[] b) throws IOException {
+            write(b, 0, b.length);
+        }
+
+        public void write(int b) throws IOException {
+            write(new byte[] { (byte)b }, 0, 1);
+        }
+
+        public void flush() throws IOException {
+            if (fileOutputStream != null) {
+                fileOutputStream.flush();
+            }
+        }
+
+        public void close() throws IOException {
+            if (fileOutputStream != null) {
+                fileOutputStream.close();
+            }
+        }
+    }
+    
+    class InputStreamImpl extends InputStream {
+        private int currentChunkIndex;
+        private int currentChunkOffset;
+        
+        public int available() throws IOException {
+            return (chunkIndex-currentChunkIndex)*chunkSize + chunkOffset - currentChunkOffset;
+        }
+
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (len == 0) {
+                return 0;
+            }
+            int read = 0;
+            while (len > 0 && !(currentChunkIndex == chunkIndex && currentChunkOffset == chunkOffset)) {
+                int c;
+                if (currentChunkIndex == chunkIndex) {
+                    // The current chunk is the last one => take into account the offset
+                    c = Math.min(len, chunkOffset-currentChunkOffset);
+                } else {
+                    c = Math.min(len, chunkSize-currentChunkOffset);
+                }
+                // Copy the data.
+                System.arraycopy(chunks[currentChunkIndex], currentChunkOffset, b, off, c);
+                // Update variables
+                len -= c;
+                off += c;
+                currentChunkOffset += c;
+                read += c;
+                if (currentChunkOffset == chunkSize) {
+                    currentChunkIndex++;
+                    currentChunkOffset = 0;
+                }
+            }
+            if (read == 0) {
+                // We didn't read anything (and the len argument was not 0) => we reached the end of the buffer.
+                return -1;
+            } else {
+                return read;
+            }
+        }
+
+        public int read(byte[] b) throws IOException {
+            return read(b, 0, b.length);
+        }
+
+        public int read() throws IOException {
+            byte[] b = new byte[1];
+            return read(b) == -1 ? -1 : (int)b[0] & 0xFF;
+        }
+
+        public long skip(long n) throws IOException {
+            int available = available();
+            int c = n < available ? (int)n : available;
+            int newOffset = currentChunkOffset + c;
+            int chunkDelta = newOffset/chunkSize;
+            currentChunkIndex += chunkDelta;
+            currentChunkOffset = newOffset - (chunkDelta*chunkSize);
+            return c;
+        }
+        
+        public void close() throws IOException {
+        }
+    }
+    
+    /**
+     * Size of the chunks that will be allocated in the buffer.
+     */
+    final int chunkSize;
+    
+    /**
+     * The prefix to be used in generating the name of the temporary file.
+     */
+    final String tempPrefix;
+    
+    /**
+     * The suffix to be used in generating the name of the temporary file.
+     */
+    final String tempSuffix;
+    
+    /**
+     * Array of <code>byte[]</code> representing the chunks of the buffer.
+     * A chunk is only allocated when the first byte is written to it.
+     * This attribute is set to <code>null</code> when the buffer overflows and
+     * is written out to a temporary file.
+     */
+    byte[][] chunks;
+    
+    /**
+     * Index of the chunk the next byte will be written to.
+     */
+    int chunkIndex;
+    
+    /**
+     * Offset into the chunk where the next byte will be written.
+     */
+    int chunkOffset;
+    
+    /**
+     * The handle of the temporary file. This is only set when the memory buffer
+     * overflows and is written out to a temporary file.
+     */
+    File temporaryFile;
+    
+    public TemporaryData(int numberOfChunks, int chunkSize, String tempPrefix, String tempSuffix) {
+        this.chunkSize = chunkSize;
+        this.tempPrefix = tempPrefix;
+        this.tempSuffix = tempSuffix;
+        chunks = new byte[numberOfChunks][];
+    }
+
+    public OutputStream getOutputStream() {
+        return new OutputStreamImpl();
+    }
+    
+    public InputStream getInputStream() throws IOException {
+        if (temporaryFile != null) {
+            return new FileInputStream(temporaryFile);
+        } else {
+            return new InputStreamImpl();
+        }
+    }
+    
+    public void release() {
+        if (temporaryFile != null) {
+            temporaryFile.delete();
+        }
+    }
+}

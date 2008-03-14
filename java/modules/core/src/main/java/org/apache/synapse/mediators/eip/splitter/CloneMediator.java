@@ -156,9 +156,9 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
     }
 
     public void init(SynapseEnvironment se) {
-        Iterator<Target> iter = targets.iterator();
-        while (iter.hasNext()) {
-            SequenceMediator seq = iter.next().getSequence();
+
+        for (Target target : targets) {
+            SequenceMediator seq = target.getSequence();
             if (seq != null) {
                 seq.init(se);
             }
@@ -166,9 +166,9 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
     }
 
     public void destroy() {
-        Iterator<Target> iter = targets.iterator();
-        while (iter.hasNext()) {
-            SequenceMediator seq = iter.next().getSequence();
+        
+        for (Target target : targets) {
+            SequenceMediator seq = target.getSequence();
             if (seq != null) {
                 seq.destroy();
             }

@@ -19,17 +19,15 @@
 
 package org.apache.synapse.mediators.ext;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The class mediator delegates the mediation to a single instance of a specified
@@ -47,7 +45,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
     /** The reference to the actual class that implments the Mediator interface */
     private Mediator mediator = null;
     /** A list of simple properties that would be set on the class before being used */
-    private Map properties = new HashMap();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
 	 * Don't use a new instance... do one instance of the object per instance of
@@ -74,7 +72,8 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 			traceOrDebug(traceOn, "invoking : " + mediator.getClass() + ".mediate()");
 		}
 
-        boolean result = true;
+        boolean result;
+
         try {
 			result = mediator.mediate(synCtx);
         } catch (Exception e) {
@@ -86,6 +85,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Class mediator");
         }
+        
         return result;
     }
 

@@ -58,19 +58,19 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
      * Holds Proxy services defined through Synapse
      */
-	private Map proxyServices = new HashMap();
+	private Map<String, ProxyService> proxyServices = new HashMap<String, ProxyService>();
 
     /**
      * This holds a Map of ManagedLifecycle objects
      */
-    private Map startups = new HashMap();
+    private Map<String, Startup> startups = new HashMap<String, Startup>();
 
     /**
 	 * The local registry is a simple HashMap and provides the ability to
 	 * override definitions of a remote registry for entries defined locally
 	 * with the same key
 	 */
-	private Map localRegistry = new HashMap();
+	private Map<String, Object> localRegistry = new HashMap<String, Object>();
 
     /** Holds the synapse properties */
     private Properties properties = new Properties();
@@ -121,15 +121,17 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *
 	 * @return Map of SequenceMediators defined in the local configuration
 	 */
-	public Map getDefinedSequences() {
-		Map definedSequences = new HashMap();
-		Iterator itr = localRegistry.values().iterator();
-		while (itr.hasNext()) {
-			Object o = itr.next();
-			if (o instanceof SequenceMediator) {
-				definedSequences.put(((SequenceMediator) o).getName(), o);
-			}
-		}
+	public Map<String, SequenceMediator> getDefinedSequences() {
+
+        Map<String, SequenceMediator> definedSequences = new HashMap<String, SequenceMediator>();
+
+        for (Object o : localRegistry.values()) {
+
+            if (o instanceof SequenceMediator) {
+                SequenceMediator seq = (SequenceMediator) o;
+                definedSequences.put(seq.getName(), seq);
+            }
+        }
 		return definedSequences;
 	}
 
@@ -146,7 +148,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 			return (Mediator) o;
 		}
 
-		Entry entry = null;
+		Entry entry;
 		if (o != null && o instanceof Entry) {
 			entry = (Entry) o;
 		} else {
@@ -231,10 +233,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * 
      * @return Map of locally cached entries
      */
-    public Map getCachedEntries() {
-        Map cachedEntries = new HashMap();
-        for (Iterator itr = localRegistry.values().iterator(); itr.hasNext();) {
-            Object o = itr.next();
+    public Map<String, Entry> getCachedEntries() {
+
+        Map<String, Entry> cachedEntries = new HashMap<String, Entry>();
+        for (Object o : localRegistry.values()) {
+
             if (o != null && o instanceof Entry) {
                 Entry entry = (Entry) o;
                 if (entry.isDynamic() && entry.isCached()) {
@@ -252,16 +255,18 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *
 	 * @return Map of Entries defined in the local configuraion
 	 */
-	public Map getDefinedEntries() {
-		Map definedEntries = new HashMap();
-		Iterator itr = localRegistry.values().iterator();
-		while (itr.hasNext()) {
-			Object o = itr.next();
-			if (o instanceof Entry
-					&& ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
-				definedEntries.put(((Entry) o).getKey(), o);
-			}
-		}
+	public Map<String, Entry> getDefinedEntries() {
+
+        Map<String, Entry> definedEntries = new HashMap<String, Entry>();
+        for (Object o : localRegistry.values()) {
+
+            if (o instanceof Entry
+                && ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
+
+                Entry entry = (Entry) o;
+                definedEntries.put(entry.getKey(), entry);
+            }
+        }
 		return definedEntries;
 	}
 
@@ -347,8 +352,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * cached in the configuration
      */
     public void clearCache() {
-        for (Iterator itr = localRegistry.values().iterator(); itr.hasNext();) {
-            Object o = itr.next();
+
+        for (Object o : localRegistry.values()) {
+            
             if (o != null && o instanceof Entry) {
                 Entry entry = (Entry) o;
                 if (entry.isDynamic() && entry.isCached()) {
@@ -388,16 +394,18 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *
 	 * @return Map of Endpoints defined in the local configuration
 	 */
-	public Map getDefinedEndpoints() {
-		Map definedEndpoints = new HashMap();
-		Iterator itr = localRegistry.values().iterator();
-		while (itr.hasNext()) {
-			Object o = itr.next();
-			if (o instanceof Endpoint) {
-				definedEndpoints.put(((Endpoint) o).getName(), o);
-			}
-		}
-		return definedEndpoints;
+	public Map<String, Endpoint> getDefinedEndpoints() {
+
+        Map<String, Endpoint> definedEndpoints = new HashMap<String, Endpoint>();
+        for (Object o : localRegistry.values()) {
+
+            if (o instanceof Endpoint) {
+                Endpoint ep = (Endpoint) o;
+                definedEndpoints.put(ep.getName(), ep);
+            }
+        }
+
+        return definedEndpoints;
 	}
 
 	/**
@@ -408,12 +416,13 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * @return the endpoint definition
 	 */
 	public Endpoint getEndpoint(String key) {
-		Object o = localRegistry.get(key);
+        
+        Object o = localRegistry.get(key);
 		if (o != null && o instanceof Endpoint) {
 			return (Endpoint) o;
 		}
 
-		Entry entry = null;
+		Entry entry;
 		if (o != null && o instanceof Entry) {
 			entry = (Entry) o;
 		} else {
@@ -463,7 +472,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * @return the Proxy service
 	 */
 	public ProxyService getProxyService(String name) {
-		return (ProxyService) proxyServices.get(name);
+		return proxyServices.get(name);
 	}
 
 	/**
@@ -498,7 +507,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *
 	 * @return the proxy services defined
 	 */
-	public Collection getProxyServices() {
+	public Collection<ProxyService> getProxyServices() {
 		return proxyServices.values();
 	}
 
@@ -533,7 +542,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Set the Axis2 AxisConfiguration to the SynapseConfiguration
 	 *
-	 * @param axisConfig
+	 * @param axisConfig AxisConfiguration to be set
 	 */
 	public void setAxisConfiguration(AxisConfiguration axisConfig) {
 		this.axisConfiguration = axisConfig;
@@ -600,7 +609,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *
      * @return collection of startup objects registered
      */
-    public Collection getStartups() {
+    public Collection<Startup> getStartups() {
         return startups.values();
     }
 
@@ -611,7 +620,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @return Startup object with the specified name or null
      */
     public Startup getStartup(String id) {
-        return (Startup) startups.get(id);
+        return startups.get(id);
     }
 
     /**
@@ -709,36 +718,30 @@ public class SynapseConfiguration implements ManagedLifecycle {
         synapseTimer = null;
 
         // stop and shutdown all the proxy services
-        for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
-            Object o = it.next();
-            if (o instanceof ProxyService) {
-                ProxyService p = (ProxyService) o;
-                if (p.getTargetInLineInSequence() != null) {
-                    p.getTargetInLineInSequence().destroy();
-                }
-                if (p.getTargetInLineOutSequence() != null) {
-                    p.getTargetInLineOutSequence().destroy();
-                }
+        for (ProxyService p : getProxyServices()) {
+
+            if (p.getTargetInLineInSequence() != null) {
+                p.getTargetInLineInSequence().destroy();
+            }
+
+            if (p.getTargetInLineOutSequence() != null) {
+                p.getTargetInLineOutSequence().destroy();
             }
         }
 
         // destroy the managed mediators
-        Map sequences = getDefinedSequences();
-        for (Iterator it = sequences.entrySet().iterator(); it.hasNext();) {
-            Object o = it.next();
-            if (o instanceof ManagedLifecycle) {
-                ManagedLifecycle m = (ManagedLifecycle) o;
-                m.destroy();
+        for (SequenceMediator seq : getDefinedSequences().values()) {
+            if (seq != null) {
+                seq.destroy();
             }
         }
 
         // destroy the startups
         if (startups != null) {
-            for (Iterator it = startups.values().iterator(); it.hasNext();) {
-                Object o = it.next();
-                if (o instanceof ManagedLifecycle) {
-                    ManagedLifecycle m = (ManagedLifecycle) o;
-                    m.destroy();
+            
+            for (Startup stp : startups.values()) {
+                if (stp != null) {
+                    stp.destroy();
                 }
             }
         }
@@ -763,26 +766,21 @@ public class SynapseConfiguration implements ManagedLifecycle {
         }
         
         // initialize all the proxy services
-        for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
-            Object o = it.next();
-            if (o instanceof ProxyService) {
-                ProxyService p = (ProxyService) o;
+        for (ProxyService p : getProxyServices()) {
+            
                 if (p.getTargetInLineInSequence() != null) {
                     p.getTargetInLineInSequence().init(se);
                 }
+            
                 if (p.getTargetInLineOutSequence() != null) {
                     p.getTargetInLineOutSequence().init(se);
                 }
-            }
         }
 
         // initialize managed mediators
-        Map sequences = getDefinedSequences();
-        for (Iterator it = sequences.values().iterator(); it.hasNext();) {
-            Object o = it.next();
-            if (o instanceof ManagedLifecycle) {
-                ManagedLifecycle m = (ManagedLifecycle) o;
-                m.init(se);
+        for (SequenceMediator seq : getDefinedSequences().values()) {
+            if (seq != null) {
+                seq.init(se);
             }
         }
     }

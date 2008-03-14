@@ -41,7 +41,7 @@ public interface ListMediator extends Mediator {
      * @param c the list of mediators to be added
      * @return true if this list changed as a result of the call
      */
-    public boolean addAll(List c);
+    public boolean addAll(List<Mediator> c);
 
     /**
      * Returns the mediator at the specified position

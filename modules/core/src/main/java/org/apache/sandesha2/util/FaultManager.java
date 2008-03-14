@@ -727,9 +727,10 @@ public class FaultManager {
 		if (Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED.equals(soapFaultSubcode)) {
 			processCreateSequenceRefusedFault(rmMsgCtx, fault);
 		} else if (Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE.equals(soapFaultSubcode) ||
-				Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED.equals(soapFaultSubcode) ) {
+				Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED.equals(soapFaultSubcode) || 
+				Sandesha2Constants.SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER.equals(soapFaultSubcode)) {
 			processSequenceUnknownFault(rmMsgCtx, fault, identifier);
-		}
+		} 
 		
 		// If the operation is an Sandesha In Only operation, or the fault is a recognised fault,
 		// then stop the message from being processed further.

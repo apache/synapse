@@ -19,22 +19,21 @@
 
 package org.apache.synapse.core.axis2;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.util.Utils;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.rampart.handler.WSSHandlerConstants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.UUIDGenerator;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.rampart.handler.WSSHandlerConstants;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
@@ -77,6 +76,11 @@ public class Axis2Sender {
             messageContext.getTransportOut() != null &&
             !messageContext.getTransportOut().getName().startsWith(Constants.TRANSPORT_HTTP)) {
                 return;
+        }
+
+        // fault processing code
+        if (messageContext.isDoingREST() && messageContext.isFault()) {
+            POXUtils.convertSOAPFaultToPOX(messageContext);
         }
 
         AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());

@@ -37,10 +37,9 @@ import org.apache.synapse.config.SynapseConfigurationBuilder;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This is the Synapse Module implementation class, which would initialize Synapse when it is
@@ -87,7 +86,8 @@ public class SynapseInitializationModule implements Module {
         // Dynamically initialize the Synapse Service and deploy it into Axis2
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();
         AxisService synapseService = new AxisService(SynapseConstants.SYNAPSE_SERVICE_NAME);
-        AxisOperation mediateOperation = new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
+        AxisOperation mediateOperation = new InOutAxisOperation(
+            SynapseConstants.SYNAPSE_OPERATION_NAME);
         mediateOperation.setMessageReceiver(new SynapseMessageReceiver());
         synapseService.addOperation(mediateOperation);
         List transports = new ArrayList();
@@ -96,13 +96,13 @@ public class SynapseInitializationModule implements Module {
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
 
-        log.info("Initializing Sandesha 2...");
-        AxisModule sandeshaAxisModule = configurationContext.getAxisConfiguration().
-            getModule(SynapseConstants.SANDESHA2_MODULE_NAME);
-        if (sandeshaAxisModule != null) {
-            Module sandesha2 = sandeshaAxisModule.getModule();
-            sandesha2.init(configurationContext, sandeshaAxisModule);
-        }
+//        log.info("Initializing Sandesha 2...");
+//        AxisModule sandeshaAxisModule = configurationContext.getAxisConfiguration().
+//            getModule(SynapseConstants.SANDESHA2_MODULE_NAME);
+//        if (sandeshaAxisModule != null) {
+//            Module sandesha2 = sandeshaAxisModule.getModule();
+//            sandesha2.init(configurationContext, sandeshaAxisModule);
+//        }
 
         // this server name is given by system property SynapseServerName
         // otherwise take host-name
@@ -124,21 +124,20 @@ public class SynapseInitializationModule implements Module {
         log.info("Synapse server name : " + thisServerName);
         
         log.info("Deploying Proxy services...");
-        Iterator iter = synCfg.getProxyServices().iterator();
-        while (iter.hasNext()) {
-            ProxyService proxy = (ProxyService) iter.next();
+        
+        for (ProxyService proxy : synCfg.getProxyServices()) {
 
             // start proxy service if either,
             // pinned server name list is empty
             // or pinned server list has this server name
             List pinnedServers = proxy.getPinnedServers();
-            if(pinnedServers != null && !pinnedServers.isEmpty()) {
-              if(!pinnedServers.contains(thisServerName)) {
-                log.info("Server name not in pinned servers list. Not deploying Proxy service : " + proxy.getName());
-                continue;
-              }
+            if (pinnedServers != null && !pinnedServers.isEmpty()) {
+                if (!pinnedServers.contains(thisServerName)) {
+                    log.info("Server name not in pinned servers list. Not deploying Proxy service : " + proxy.getName());
+                    continue;
+                }
             }
-            
+
             proxy.buildAxisService(synCfg, axisCfg);
             log.info("Deployed Proxy service : " + proxy.getName());
             if (!proxy.isStartOnLoad()) {

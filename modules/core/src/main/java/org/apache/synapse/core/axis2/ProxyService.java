@@ -127,7 +127,7 @@ public class ProxyService {
     /**
      * A list of any service parameters (e.g. JMS parameters etc)
      */
-    private Map parameters = new HashMap();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
     /**
      * The key for the base WSDL
      */
@@ -148,7 +148,7 @@ public class ProxyService {
     /**
      * The keys for any supplied policies that would apply at the service level
      */
-    private List serviceLevelPolicies = new ArrayList();
+    private List<String> serviceLevelPolicies = new ArrayList<String>();
     /**
      * Should WS RM be engaged on this service
      */
@@ -317,19 +317,20 @@ public class ProxyService {
                         proxyService.setWsdlFound(true);
 
                         if (isWSDL11) {
+
                             // workaround to support WSDL 2.0 generation when only a WSDL 1.1
                             // is supplied
                             Collection endpoints = proxyService.getEndpoints().values();
-                            Iterator iter = endpoints.iterator();
-                            while (iter.hasNext()) {
-                                AxisEndpoint endpoint = (AxisEndpoint) iter.next();
+                            for (Object ep : endpoints) {
+
+                                AxisEndpoint endpoint = (AxisEndpoint) ep;
                                 Iterator children = endpoint.getBinding().getChildren();
+
                                 while (children.hasNext()) {
                                     AxisBindingOperation axisBindingOperation =
                                         (AxisBindingOperation) children.next();
                                     axisBindingOperation.setProperty(
-                                        WSDL2Constants.ATTR_WHTTP_IGNORE_UNCITED,
-                                        new Boolean(false));
+                                        WSDL2Constants.ATTR_WHTTP_IGNORE_UNCITED, Boolean.FALSE);
                                 }
                             }
                         }
@@ -377,9 +378,8 @@ public class ProxyService {
         if (trace() && parameters.size() > 0) {
             trace.info("Setting service parameters : " + parameters);
         }
-        Iterator iter = parameters.keySet().iterator();
-        while (iter.hasNext()) {
-            String name = (String) iter.next();
+        for (Object o : parameters.keySet()) {
+            String name = (String) o;
             Object value = parameters.get(name);
 
             Parameter p = new Parameter();
@@ -390,10 +390,11 @@ public class ProxyService {
                 proxyService.addParameter(p);
             } catch (AxisFault af) {
                 handleException("Error setting parameter : " + name + "" +
-                        "to proxy service as a Parameter", af);
+                    "to proxy service as a Parameter", af);
             }
         }
 
+        Iterator iter;
         // if service level policies are specified, apply them
         if (!serviceLevelPolicies.isEmpty()) {
 
@@ -709,7 +710,7 @@ public class ProxyService {
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsState
+     * @param statisticsState statistics state
      */
     public void setStatisticsState(int statisticsState) {
         this.statisticsState = statisticsState;
@@ -727,7 +728,7 @@ public class ProxyService {
     /**
      * Set the tracing State variable
      *
-     * @param traceState
+     * @param traceState tracing state
      */
     public void setTraceState(int traceState) {
         this.traceState = traceState;

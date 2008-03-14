@@ -25,7 +25,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,7 +36,7 @@ public abstract class AbstractListMediator extends AbstractMediator
     implements ListMediator, ManagedLifecycle {
 
     /** the list of child mediators held. These are executed sequentially */
-    protected List mediators = new ArrayList();
+    protected List<Mediator> mediators = new ArrayList<Mediator>();
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -52,12 +51,11 @@ public abstract class AbstractListMediator extends AbstractMediator
                 traceOrDebug(isTraceOn(synCtx), "Sequence <" + getType() + "> :: mediate()");
             }
 
-            for (Iterator it = mediators.iterator(); it.hasNext();) {
-                Mediator m = (Mediator) it.next();
+            for (Mediator mediator : mediators) {
 
                 // ensure correct trace state after each invocation of a mediator
                 synCtx.setTracingState(myEffectiveTraceState);
-                if (!m.mediate(synCtx)) {
+                if (!mediator.mediate(synCtx)) {
                     return false;
                 }
             }
@@ -75,12 +73,12 @@ public abstract class AbstractListMediator extends AbstractMediator
         return mediators.add(m);
     }
 
-    public boolean addAll(List c) {
+    public boolean addAll(List<Mediator> c) {
         return mediators.addAll(c);
     }
 
     public Mediator getChild(int pos) {
-        return (Mediator) mediators.get(pos);
+        return mediators.get(pos);
     }
 
     public boolean removeChild(Mediator m) {
@@ -88,7 +86,7 @@ public abstract class AbstractListMediator extends AbstractMediator
     }
 
     public Mediator removeChild(int pos) {
-        return (Mediator) mediators.remove(pos);
+        return mediators.remove(pos);
     }
 
     /**
@@ -96,15 +94,16 @@ public abstract class AbstractListMediator extends AbstractMediator
      * @param se synapse environment
      */
     public void init(SynapseEnvironment se) {
+
         if (log.isDebugEnabled()) {
             log.debug("Initializing child mediators");
         }
 
-        for (Iterator it = mediators.iterator(); it.hasNext();) {
-            Mediator m = (Mediator) it.next();
+        for (Object mediator : mediators) {
+            Mediator m = (Mediator) mediator;
 
             if (m instanceof ManagedLifecycle) {
-            	((ManagedLifecycle) m).init(se);
+                ((ManagedLifecycle) m).init(se);
             }
         } 
     }
@@ -117,11 +116,10 @@ public abstract class AbstractListMediator extends AbstractMediator
             log.debug("Destroying child mediators");
         }
 
-        for (Iterator it = mediators.iterator(); it.hasNext();) {
-            Mediator m = (Mediator) it.next();
+        for (Mediator mediator : mediators) {
 
-            if (m instanceof ManagedLifecycle) {
-            	((ManagedLifecycle) m).destroy();
+            if (mediator instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) mediator).destroy();
             }
         } 
     }

@@ -20,20 +20,18 @@ package org.apache.synapse;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.util.ClasspathURLStreamHandler;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.util.ClasspathURLStreamHandler;
 
 import java.io.File;
 import java.net.*;
-import java.util.Iterator;
-import java.util.Collection;
 
 /**
  * To manage the Synapse Server  instances. This class is responsible for
@@ -96,17 +94,18 @@ public class ServerManager {
             // decide on HTTP port to execute
             selectPort(configctx);
 
-            Iterator iter = configctx.getAxisConfiguration().
-                    getTransportsIn().keySet().iterator();
-            while (iter.hasNext()) {
-                String trp = (String) iter.next();
+            for (Object o : configctx.getAxisConfiguration().getTransportsIn().keySet()) {
+                
+                String trp = (String) o;
                 TransportInDescription trsIn = (TransportInDescription)
-                        configctx.getAxisConfiguration().getTransportsIn().get(trp);
+                    configctx.getAxisConfiguration().getTransportsIn().get(trp);
                 listenerManager.addListener(trsIn, false);
+                
                 String msg = "Starting transport " + trsIn.getName();
                 if (trsIn.getParameter("port") != null) {
                     msg += " on port " + trsIn.getParameter("port").getValue();
                 }
+                
                 log.info(msg);
             }
 
@@ -127,17 +126,17 @@ public class ServerManager {
                 log.fatal(message + "Synapse Environment");
                 throw new SynapseException(message + "Synapse Environment");
             } else {
+
                 ((SynapseEnvironment) synEnv.getValue()).setInitialized(true);
+
                 // initialize the startups
-                Collection startups = ((SynapseConfiguration) synCfg.getValue()).getStartups();
-                for (Iterator it = startups.iterator(); it.hasNext();) {
-                    Object o = it.next();
-                    if (o instanceof ManagedLifecycle) {
-                        ManagedLifecycle m = (ManagedLifecycle) o;
-                        m.init((SynapseEnvironment) synEnv.getValue());
+                for (Startup stp : ((SynapseConfiguration) synCfg.getValue()).getStartups()) {
+                    if (stp != null) {
+                        stp.init((SynapseEnvironment) synEnv.getValue());
                     }
                 }
             }
+            
             log.info("Ready for processing");
 
         } catch (Throwable t) {
@@ -182,7 +181,7 @@ public class ServerManager {
             if (strPort != null) {
                 // port is specified as a VM parameter
                 try {
-                    port = new Integer(strPort).intValue();
+                    port = Integer.parseInt(strPort);
                 } catch (NumberFormatException e) {
                     // user supplied parameter is not a valid integer. so use the port in configuration.
                     log.error("System property 'port' does not provide a valid integer");
@@ -221,6 +220,7 @@ public class ServerManager {
                         try {
                             sock.close();
                         } catch (Exception e) {
+                            // do nothing
                         }
                     }
                 }

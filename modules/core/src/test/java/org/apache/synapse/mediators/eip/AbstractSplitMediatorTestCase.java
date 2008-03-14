@@ -1,17 +1,16 @@
 package org.apache.synapse.mediators.eip;
 
-import org.apache.synapse.mediators.AbstractMediatorTestCase;
-import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.CloneMediatorFactory;
-import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.synapse.mediators.AbstractMediatorTestCase;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
  * Preperation of the split mediator test cases 

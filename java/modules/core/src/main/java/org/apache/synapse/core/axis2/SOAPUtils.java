@@ -98,8 +98,8 @@ public class SOAPUtils {
         if(log.isDebugEnabled()) {
             log.debug("convert SOAP11 to SOAP12");
         }
-        // get a clone otherwise affects original message context
-        SOAPEnvelope oldEnvelope = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope());
+
+        SOAPEnvelope oldEnvelope = axisOutMsgCtx.getEnvelope();
 
         SOAPFactory soap12Factory = OMAbstractFactory.getSOAP12Factory();
         SOAPEnvelope newEnvelope  = soap12Factory.getDefaultEnvelope();
@@ -233,11 +233,12 @@ public class SOAPUtils {
      */
     public static void convertSOAP12toSOAP11(
         org.apache.axis2.context.MessageContext axisOutMsgCtx) throws AxisFault {
+        
         if (log.isDebugEnabled()) {
             log.debug("convert SOAP12 to SOAP11");
         }
-        // get a clone otherwise affects original message context
-        SOAPEnvelope oldEnvelope = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope());
+
+        SOAPEnvelope oldEnvelope = axisOutMsgCtx.getEnvelope();
 
         SOAPFactory soap11Factory = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope newEnvelope  = soap11Factory.getDefaultEnvelope();
@@ -347,6 +348,7 @@ public class SOAPUtils {
             } // while (itr.hasNext())
 
         } // if (oldEnvelope.getBody() != null)
+        
         axisOutMsgCtx.setEnvelope(newEnvelope);
     }
 

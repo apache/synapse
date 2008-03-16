@@ -36,6 +36,10 @@ public class ThreadSafeDelegatingFunctionContext implements FunctionContext {
         this.delegate.set(delegate);
     }
 
+    public FunctionContext getDelegate() {
+        return this.delegate.get();
+    }
+
     public Function getFunction(String namespaceURI, String prefix, String localName)
         throws UnresolvableException {
 

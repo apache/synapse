@@ -27,7 +27,7 @@ import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;

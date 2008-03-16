@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.util.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.util.Collection;

@@ -17,15 +17,20 @@
  *  under the License.
  */
 
-package org.apache.synapse.util;
+package org.apache.synapse.util.xpath;
 
+import org.jaxen.SimpleVariableContext;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
 public class ThreadSafeDelegatingVariableContext implements VariableContext {
     
     private final ThreadLocal<VariableContext> delegate = new ThreadLocal<VariableContext>();
-    
+
+    public void setDelegate() {
+        this.delegate.set(new SimpleVariableContext());
+    }
+
     public void setDelegate(VariableContext delegate) {
         this.delegate.set(delegate);
     }

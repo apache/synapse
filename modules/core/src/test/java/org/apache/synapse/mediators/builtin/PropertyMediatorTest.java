@@ -21,10 +21,9 @@ package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 public class PropertyMediatorTest extends TestCase {
 

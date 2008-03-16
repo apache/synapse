@@ -24,7 +24,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 /**
  */

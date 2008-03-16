@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.util.ArrayList;

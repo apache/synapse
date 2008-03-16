@@ -37,7 +37,7 @@ import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;

@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 

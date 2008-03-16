@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;

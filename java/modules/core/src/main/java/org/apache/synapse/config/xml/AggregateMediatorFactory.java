@@ -27,7 +27,6 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
-import org.apache.synapse.util.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;

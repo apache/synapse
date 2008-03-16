@@ -20,7 +20,7 @@
 package org.apache.synapse.mediators.db;
 
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import java.sql.Types;
 import java.util.ArrayList;

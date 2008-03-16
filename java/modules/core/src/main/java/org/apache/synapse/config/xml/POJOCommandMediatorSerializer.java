@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
-import org.apache.synapse.util.SynapseXPath;
 
 import java.util.Iterator;
 

@@ -23,7 +23,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -22,7 +22,7 @@ package org.apache.synapse.core.axis2;
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 public class Axis2MessageContextTest extends TestCase {
     String nsSoapEnv = "http://schemas.xmlsoap.org/soap/envelope/";

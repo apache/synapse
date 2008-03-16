@@ -39,12 +39,11 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.FixedByteArrayOutputStream;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.TextFileDataSource;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
@@ -536,9 +535,9 @@ public class XSLTMediator extends AbstractMediator {
      * @return the OMNode against which the transformation should be performed
      */
     private OMNode getTransformSource(MessageContext synCtx) {
-
+                                
         try {
-            Object o = source.evaluate(synCtx.getEnvelope());
+            Object o = source.evaluate(synCtx);
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {

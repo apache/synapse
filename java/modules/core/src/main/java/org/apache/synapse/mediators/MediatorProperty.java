@@ -21,8 +21,7 @@ package org.apache.synapse.mediators;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
 

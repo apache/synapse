@@ -21,9 +21,8 @@ package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SwitchCase;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import java.util.ArrayList;
 import java.util.Iterator;

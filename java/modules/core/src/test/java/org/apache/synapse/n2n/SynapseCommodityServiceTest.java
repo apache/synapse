@@ -36,7 +36,7 @@ import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.utils.Services;
 
 import java.util.HashMap;

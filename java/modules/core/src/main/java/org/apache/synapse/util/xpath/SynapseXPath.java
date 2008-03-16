@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.jaxen.JaxenException;
+import org.jaxen.*;
 
 import java.util.List;
 
@@ -105,12 +105,28 @@ public class SynapseXPath extends AXIOMXPath {
      */
     public Object evaluate(MessageContext synCtx) throws JaxenException {
 
-        ((ThreadSafeDelegatingVariableContext)
-            getVariableContext()).setDelegate(new SynapseXPathVariableContext(synCtx));
-        ((ThreadSafeDelegatingFunctionContext)
-            getFunctionContext()).setDelegate(new SynapseXPathFunctionContext(synCtx, true));
+        // retrieves the variable context and the function context to restore after
+        VariableContext varCtx = ((ThreadSafeDelegatingVariableContext)
+                getVariableContext()).getDelegate();
+        FunctionContext funCtx = ((ThreadSafeDelegatingFunctionContext)
+            getFunctionContext()).getDelegate();
 
-        return super.evaluate(synCtx.getEnvelope());
+        try {
+
+            // set the synapse variable and function contexts before evaluation
+            ((ThreadSafeDelegatingVariableContext)
+                getVariableContext()).setDelegate(new SynapseXPathVariableContext(synCtx));
+            ((ThreadSafeDelegatingFunctionContext)
+                getFunctionContext()).setDelegate(new SynapseXPathFunctionContext(synCtx, true));
+
+            return super.evaluate(synCtx.getEnvelope());
+
+        } finally {
+
+            // restore the variable and function contexts
+            ((ThreadSafeDelegatingVariableContext) getVariableContext()).setDelegate(varCtx);
+            ((ThreadSafeDelegatingFunctionContext) getFunctionContext()).setDelegate(funCtx);
+        }
     }
 
     /**
@@ -128,10 +144,23 @@ public class SynapseXPath extends AXIOMXPath {
      */
     public Object evaluate(SOAPEnvelope env) throws JaxenException {
 
-        ((ThreadSafeDelegatingVariableContext)
-            getVariableContext()).setDelegate(new SynapseXPathVariableContext(env));
+        // retrieves the variable context to restore after
+        VariableContext varCtx = ((ThreadSafeDelegatingVariableContext)
+                getVariableContext()).getDelegate();
 
-        return super.evaluate(env);
+        try {
+
+            // set the synapse variable context before evaluation
+            ((ThreadSafeDelegatingVariableContext)
+                getVariableContext()).setDelegate(new SynapseXPathVariableContext(env));
+
+            return super.evaluate(env);
+
+        } finally {
+
+            // restore the variable context            
+            ((ThreadSafeDelegatingVariableContext) getVariableContext()).setDelegate(varCtx);
+        }
     }
 
     /**

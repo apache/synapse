@@ -35,6 +35,10 @@ public class ThreadSafeDelegatingVariableContext implements VariableContext {
         this.delegate.set(delegate);
     }
 
+    public VariableContext getDelegate() {
+        return this.delegate.get();
+    }
+
     public Object getVariableValue(String namespaceURI, String prefix, String localName)
             throws UnresolvableException {
         

@@ -26,7 +26,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import java.net.URL;
 import java.util.ArrayList;

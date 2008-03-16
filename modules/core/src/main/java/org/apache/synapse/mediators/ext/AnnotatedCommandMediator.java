@@ -21,12 +21,11 @@ package org.apache.synapse.mediators.ext;
 
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.annotations.Namespaces;
 import org.apache.synapse.mediators.annotations.ReadAndUpdate;
 import org.apache.synapse.mediators.annotations.ReadFromMessage;
 import org.apache.synapse.mediators.annotations.UpdateMessage;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.lang.reflect.Field;

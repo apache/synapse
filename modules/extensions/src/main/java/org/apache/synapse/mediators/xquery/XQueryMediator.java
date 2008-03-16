@@ -33,7 +33,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.util.SynapseXPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -600,7 +600,7 @@ public class XQueryMediator extends AbstractMediator {
      */
     public OMNode getTargetNode(MessageContext synCtx) {
         try {
-            Object o = target.evaluate(synCtx.getEnvelope());
+            Object o = target.evaluate(synCtx);
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {

@@ -1359,7 +1359,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     <h4>
       <a name="makefault" id="makefault">Makefault</a>
     </h4>
-<pre xml:space="preserve"> &lt;makefault [version="soap11|soap12"]&gt;
+<pre xml:space="preserve"> &lt;makefault [version="soap11|soap12|pox"]&gt;
    &lt;code (value="literal" | expression="xpath")/&gt;
    &lt;reason (value="literal" | expression="xpath")&gt;
    &lt;node&gt;?
@@ -1372,8 +1372,8 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       invoked to send a fault message created this way. The fault message "to"
       header is set to the "faultTo" of the original message if such a header
       existed on the original message. If a 'version' attribute is specified,
-      the created fault message will be created as a selected SOAP 1.1 or SOAP
-      1.2 fault.
+      the created fault message will be created as a selected SOAP 1.1, SOAP
+      1.2 or POX fault.
     </p>
     <p/>
     <h4>

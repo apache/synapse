@@ -634,7 +634,7 @@ File     vfs:file:///home/user/directory
    &lt;/publishWSDL&gt;?
    &lt;enableSec/&gt;?
    &lt;enableRM/&gt;?
-   &lt;policy key="string"&gt;...&lt;/policy&gt;?       // optional service level policies such as (e.g. WS-Security and/or WS-RM policies)
+   &lt;policy key="string" [type="(in | out)"]/&gt;?       // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)
    &lt;parameter name="string"&gt;                 // optional service parameters such as (e.g. transport.jms.ConnectionFactory)
       string | xml
    &lt;/parameter&gt;

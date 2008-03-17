@@ -56,7 +56,8 @@ import org.apache.synapse.core.axis2.ProxyService;
  *    </publishWSDL>?
  *    <enableSec/>?
  *    <enableRM/>?
- *    <policy key="string">?
+ *    <policy key="string"/>?
+ *    <policy key="string" type=(in | out)/>?
  *       // optional service parameters
  *    <parameter name="string">
  *       text | xml
@@ -251,8 +252,18 @@ public class ProxyServiceFactory {
             if (o instanceof OMElement) {
                 OMElement policy = (OMElement) o;
                 OMAttribute key = policy.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+                OMAttribute type = policy.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "type"));
+
                 if (key != null) {
-                    proxy.addServiceLevelPolicy(key.getAttributeValue());
+                    if (type == null) {
+                        proxy.addServiceLevelPolicy(key.getAttributeValue());
+                    } else if ("in".equals(type.getAttributeValue())) {
+                        proxy.addInMessagePolicy(key.getAttributeValue());
+                    } else if ("out".equals(type.getAttributeValue())) {
+                        proxy.addOutMessagePolicy(key.getAttributeValue());
+                    } else {
+                        handleException("Undefined policy type for the policy with key : " + key.getAttributeValue());
+                    }
                 } else {
                     handleException("Policy element does not specify the policy key");
                 }

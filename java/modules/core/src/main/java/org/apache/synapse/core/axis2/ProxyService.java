@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -149,6 +150,14 @@ public class ProxyService {
      * The keys for any supplied policies that would apply at the service level
      */
     private List<String> serviceLevelPolicies = new ArrayList<String>();
+    /**
+     * The keys for any supplied policies that would apply at the in message level
+     */
+    private List<String> inMessagePolicies = new ArrayList<String>();
+    /**
+     * The keys for any supplied policies that would apply at the out message level
+     */
+    private List<String> outMessagePolicies = new ArrayList<String>();
     /**
      * Should WS RM be engaged on this service
      */
@@ -401,24 +410,7 @@ public class ProxyService {
             if (trace()) {
                 trace.info("Setting service level policies : " + serviceLevelPolicies);
             }
-            Policy svcEffectivePolicy = null;
-            iter = serviceLevelPolicies.iterator();
-
-            while (iter.hasNext()) {
-                String policyKey = (String) iter.next();
-                synCfg.getEntryDefinition(policyKey);
-                Object policyProp = synCfg.getEntry(policyKey);
-                if (policyProp != null) {
-                    if (svcEffectivePolicy == null) {
-                        svcEffectivePolicy = PolicyEngine.getPolicy(
-                            SynapseConfigUtils.getStreamSource(policyProp).getInputStream());
-                    } else {
-                        svcEffectivePolicy = svcEffectivePolicy.merge(
-                            PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
-                                policyProp).getInputStream()));
-                    }
-                }
-            }
+            Policy svcEffectivePolicy = getEffectivePolicyFromList(serviceLevelPolicies, synCfg);
             PolicyInclude pi = proxyService.getPolicyInclude();
             if (pi != null && svcEffectivePolicy != null) {
                 if (trace()) {
@@ -427,6 +419,92 @@ public class ProxyService {
                     }
                 }
                 pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
+            }
+        }
+
+        if (!inMessagePolicies.isEmpty()) {
+
+            if (trace()) {
+                trace.info("Setting IN Message policies : " + inMessagePolicies);
+            }
+
+            Policy svcEffectivePolicy = getEffectivePolicyFromList(inMessagePolicies, synCfg);
+
+            for (Iterator itr = proxyService.getOperations(); itr.hasNext();) { //Object obj : proxyService.getOperationsNameList()) {
+
+                Object obj = itr.next();
+                if (obj instanceof AxisOperation && !(obj instanceof OutOnlyAxisOperation)) {
+
+                    AxisMessage inMessage = ((AxisOperation) obj).getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+                    if (inMessage != null) {
+
+                        PolicyInclude pi = inMessage.getPolicyInclude();
+
+                        if (pi != null && svcEffectivePolicy != null) {
+
+                            if (trace()) {
+                                if (trace.isTraceEnabled()) {
+                                    trace.trace("Effective policy applied : " + svcEffectivePolicy);
+                                }
+                            }
+
+                            pi.addPolicyElement(PolicyInclude.AXIS_MESSAGE_POLICY, svcEffectivePolicy);
+                        }
+                        
+                    } else {
+
+                        if (trace()) {
+                            if (trace.isTraceEnabled()) {
+                                trace.trace("Effective policy for the in message can not be applied for " +
+                                        "the operation : " + obj + ". Unable to find the in mesage");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!outMessagePolicies.isEmpty()) {
+            
+            if (trace()) {
+                trace.info("Setting OUT Message policies : " + outMessagePolicies);
+            }
+            
+            Policy svcEffectivePolicy = getEffectivePolicyFromList(outMessagePolicies, synCfg);
+
+            for (Iterator itr = proxyService.getOperations(); itr.hasNext();) { //Object obj : proxyService.getOperationsNameList()) {
+
+                Object obj = itr.next();
+                if (obj instanceof AxisOperation && !(obj instanceof InOnlyAxisOperation)) {
+
+                    AxisMessage outMessage = ((AxisOperation) obj).getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+
+                    if (outMessage != null) {
+
+                        PolicyInclude pi = outMessage.getPolicyInclude();
+
+                        if (pi != null && svcEffectivePolicy != null) {
+
+                            if (trace()) {
+                                if (trace.isTraceEnabled()) {
+                                    trace.trace("Effective policy applied : " + svcEffectivePolicy);
+                                }
+                            }
+
+                            pi.addPolicyElement(PolicyInclude.AXIS_MESSAGE_POLICY, svcEffectivePolicy);
+                        }
+                        
+                    } else {
+
+                        if (trace()) {
+                            if (trace.isTraceEnabled()) {
+                                trace.trace("Effective policy for the out message can not be applied for " +
+                                        "the operation : " + obj + ". Unable to find the out mesage");
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -456,7 +534,6 @@ public class ProxyService {
             handleException("Error adding Proxy service to the Axis2 engine", axisFault);
         }
 
-        // todo: need to remove this and engage modules by looking at policies
         // should RM be engaged on this service?
         if (wsRMEnabled) {
             auditInfo("WS-Reliable messaging is enabled for service : " + name);
@@ -482,6 +559,29 @@ public class ProxyService {
 
         auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
         return proxyService;
+    }
+
+    private Policy getEffectivePolicyFromList(List<String> policyKeyList,
+        SynapseConfiguration synCfg) {
+
+        Policy svcEffectivePolicy = null;
+
+        for (String policyKey : policyKeyList) {
+            synCfg.getEntryDefinition(policyKey);
+            Object policyProp = synCfg.getEntry(policyKey);
+            if (policyProp != null) {
+                if (svcEffectivePolicy == null) {
+                    svcEffectivePolicy = PolicyEngine.getPolicy(
+                        SynapseConfigUtils.getStreamSource(policyProp).getInputStream());
+                } else {
+                    svcEffectivePolicy = svcEffectivePolicy.merge(
+                        PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
+                            policyProp).getInputStream()));
+                }
+            }
+        }
+
+        return svcEffectivePolicy;
     }
 
     /**
@@ -618,7 +718,7 @@ public class ProxyService {
         parameters.put(name, value);
     }
 
-    public Map getParameterMap() {
+    public Map<String, Object> getParameterMap() {
         return this.parameters;
     }
 
@@ -658,7 +758,7 @@ public class ProxyService {
         this.wsdlKey = wsdlKey;
     }
 
-    public List getServiceLevelPolicies() {
+    public List<String> getServiceLevelPolicies() {
         return serviceLevelPolicies;
     }
 
@@ -806,4 +906,27 @@ public class ProxyService {
         this.resourceMap = resourceMap;
     }
 
+    public List<String> getInMessagePolicies() {
+        return inMessagePolicies;
+    }
+
+    public void setInMessagePolicies(List<String> inMessagePolicies) {
+        this.inMessagePolicies = inMessagePolicies;
+    }
+
+    public void addInMessagePolicy(String messagePolicy) {
+        this.inMessagePolicies.add(messagePolicy);
+    }
+
+    public List<String> getOutMessagePolicies() {
+        return outMessagePolicies;
+    }
+
+    public void setOutMessagePolicies(List<String> outMessagePolicies) {
+        this.outMessagePolicies = outMessagePolicies;
+    }
+
+    public void addOutMessagePolicy(String messagePolicy) {
+        this.outMessagePolicies.add(messagePolicy);
+    }
 }

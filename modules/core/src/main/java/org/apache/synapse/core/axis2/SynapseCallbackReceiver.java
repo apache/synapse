@@ -30,6 +30,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -211,9 +212,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             response.setServiceContext(null);
             response.setOperationContext(axisOutMsgCtx.getOperationContext());
-            response.getAxisMessage().setParent(
-                axisOutMsgCtx.getOperationContext().getAxisOperation());
-            response.setAxisService(axisOutMsgCtx.getAxisService());
+            response.setAxisMessage(axisOutMsgCtx.getAxisOperation().getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
 
             // set properties on response
             response.setServerSide(true);

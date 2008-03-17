@@ -19,16 +19,7 @@
 
 package org.apache.synapse.config.xml;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -37,6 +28,10 @@ import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <proxy name="string" [transports="(http |https |jms )+|all"]>
@@ -183,22 +178,28 @@ public class ProxyServiceSerializer {
             proxy.addChild(wsdl);
         }
 
-        // TODO still schemas are not used
-        // Iterator iter = service.getSchemas();
-        // ....
-
-        Iterator iter = service.getServiceLevelPolicies().iterator();
-        while (iter.hasNext()) {
-            String policyKey = (String) iter.next();
+        for (String policyKey : service.getServiceLevelPolicies()) {
             OMElement policy = fac.createOMElement("policy", synNS);
             policy.addAttribute(fac.createOMAttribute(
                     "key", nullNS, policyKey));
             proxy.addChild(policy);
         }
 
-        iter = service.getParameterMap().keySet().iterator();
-        while (iter.hasNext()) {
-            String propertyName = (String) iter.next();
+        for (String inPolicyKey : service.getInMessagePolicies()) {
+            OMElement policy = fac.createOMElement("policy", synNS);
+            policy.addAttribute(fac.createOMAttribute("key", nullNS, inPolicyKey));
+            policy.addAttribute(fac.createOMAttribute("type", nullNS, "in"));
+            proxy.addChild(policy);
+        }
+
+        for (String outPolicyKey : service.getOutMessagePolicies()) {
+            OMElement policy = fac.createOMElement("policy", synNS);
+            policy.addAttribute(fac.createOMAttribute("key", nullNS, outPolicyKey));
+            policy.addAttribute(fac.createOMAttribute("type", nullNS, "out"));
+            proxy.addChild(policy);
+        }
+
+        for (String propertyName : service.getParameterMap().keySet()) {
             OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
                     "name", nullNS, propertyName));

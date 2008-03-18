@@ -18,67 +18,22 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.http.impl.DefaultHttpRequestFactory;
-import org.apache.http.impl.nio.DefaultNHttpServerConnection;
+import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
+import org.apache.http.nio.NHttpServerIOTarget;
 import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
-import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 
-public class PlainServerIOEventDispatch implements IOEventDispatch {
+public class PlainServerIOEventDispatch extends DefaultServerIOEventDispatch {
 
-    private static final String NHTTP_CONN = "SYNAPSE.NHTTP_CONN";
-    
-    private final NHttpServiceHandler handler;
-    private final HttpParams params;
-    
     public PlainServerIOEventDispatch(final NHttpServiceHandler handler, final HttpParams params) {
-        super();
-        if (handler == null) {
-            throw new IllegalArgumentException("HTTP service handler may not be null");
-        }
-        if (params == null) {
-            throw new IllegalArgumentException("HTTP parameters may not be null");
-        }
-        // Decorate service handler with logging capabilities
-        this.handler = new LoggingNHttpServiceHandler(handler);
-        this.params = params;
+        super(LoggingUtils.decorate(handler), params);
     }
     
-    public void connected(final IOSession session) {
-        // Decorate I/O session with logging capabilities
-        LoggingNHttpServerConnection conn = new LoggingNHttpServerConnection(
-                new LoggingIOSession(session), 
-                new DefaultHttpRequestFactory(),
-                new HeapByteBufferAllocator(),
-                this.params); 
-        session.setAttribute(NHTTP_CONN, conn);
-        this.handler.connected(conn);
+    @Override
+    protected NHttpServerIOTarget createConnection(final IOSession session) {
+        return LoggingUtils.decorate(
+                super.createConnection(LoggingUtils.decorate(session, "server")));
     }
-
-    public void disconnected(final IOSession session) {
-        DefaultNHttpServerConnection conn = (DefaultNHttpServerConnection) session.getAttribute(
-                NHTTP_CONN);
-        this.handler.closed(conn);
-    }
-
-    public void inputReady(final IOSession session) {
-        DefaultNHttpServerConnection conn = (DefaultNHttpServerConnection) session.getAttribute(
-                NHTTP_CONN);
-        conn.consumeInput(this.handler);
-    }
-
-    public void outputReady(final IOSession session) {
-        DefaultNHttpServerConnection conn = (DefaultNHttpServerConnection) session.getAttribute(
-                NHTTP_CONN);
-        conn.produceOutput(this.handler);
-    }
-
-    public void timeout(final IOSession session) {
-        DefaultNHttpServerConnection conn = (DefaultNHttpServerConnection) session.getAttribute(
-                NHTTP_CONN);
-        this.handler.timeout(conn);
-    }
-
+    
 }

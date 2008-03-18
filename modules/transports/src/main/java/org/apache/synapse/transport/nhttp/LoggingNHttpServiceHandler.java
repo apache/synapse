@@ -41,14 +41,25 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
     private final Log headerlog;
     private final NHttpServiceHandler handler;
     
-    public LoggingNHttpServiceHandler(final NHttpServiceHandler handler) {
+    public LoggingNHttpServiceHandler(
+            final Log log, 
+            final Log headerlog, 
+            final NHttpServiceHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("HTTP service handler may not be null");
         }
         this.handler = handler;
-        this.log = LogFactory.getLog(handler.getClass());
-        this.headerlog = LogFactory.getLog("org.apache.synapse.transport.nhttp.headers");
+        if (log != null) {
+            this.log = log;
+        } else {
+            this.log = LogFactory.getLog(handler.getClass());
+        }
+        if (log != null) {
+            this.headerlog = headerlog;
+        } else {
+            this.headerlog = LogFactory.getLog(LoggingUtils.HEADER_LOG_ID);
+        }
     }
     
     public void connected(final NHttpServerConnection conn) {

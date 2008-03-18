@@ -23,6 +23,7 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,22 +36,26 @@ import org.apache.http.nio.reactor.SessionBufferStatus;
  */
 public class LoggingIOSession implements IOSession {
 
-    private static int COUNT = 0;
+    private static AtomicLong COUNT = new AtomicLong(0);
     
     private final Log log;
     private final IOSession session;
     private final ByteChannel channel;
-    private final int id;
+    private final String id;
     
-    public LoggingIOSession(final IOSession session) {
+    public LoggingIOSession(final Log log, final IOSession session, final String id) {
         super();
         if (session == null) {
             throw new IllegalArgumentException("I/O session may not be null");
         }
         this.session = session;
         this.channel = new LoggingByteChannel();
-        this.id = ++COUNT;
-        this.log = LogFactory.getLog(session.getClass());
+        this.id = id + "-" + COUNT.incrementAndGet();
+        if (log != null) {
+            this.log = log;
+        } else {
+            this.log = LogFactory.getLog(session.getClass());
+        }
     }
 
     public int getStatus() {

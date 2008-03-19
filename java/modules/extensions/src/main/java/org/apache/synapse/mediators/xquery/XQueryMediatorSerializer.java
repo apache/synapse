@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.xquery;
 import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -66,10 +67,11 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
 
         saveTracingState(xquery, queryMediator);
 
-        SynapseXPath targetXPath = queryMediator.getTarget();
+        AXIOMXPath targetXPath = queryMediator.getTarget();
         if (targetXPath != null && !XQueryMediator.DEFAULT_XPATH.equals(targetXPath.toString())) {
 
-            SynapseXPathSerializer.serializeXPath(targetXPath, xquery, "target");
+            xquery.addAttribute(fac.createOMAttribute("target", nullNS, targetXPath.toString()));
+            serializeNamespaces(xquery, targetXPath);
         }
 
         List pros = queryMediator.getDataSourceProperties();
@@ -141,12 +143,13 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                             customElement.addAttribute(fac.createOMAttribute(
                                 "key", nullNS, regkey));
                         }
-                        SynapseXPath expression = variable.getExpression();
+                        AXIOMXPath expression = variable.getExpression();
                         if (expression != null &&
                             !XQueryMediator.DEFAULT_XPATH.equals(expression.toString())) {
 
-                            SynapseXPathSerializer.serializeXPath(
-                                expression, customElement, "expression");
+                            customElement.addAttribute(fac.createOMAttribute(
+                                    "expression", nullNS, expression.toString()));
+                            serializeNamespaces(customElement, expression);
                         }
                         String type = null;
                         int varibelType = variable.getType();

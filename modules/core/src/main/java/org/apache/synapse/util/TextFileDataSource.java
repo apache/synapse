@@ -49,6 +49,15 @@ public class TextFileDataSource implements OMDataSource {
                 "Unable to get an InputStream for DataSource : " + ds.getName(), e);
         }
     }
+    
+    public TextFileDataSource(TemporaryData temporaryData) {
+        try {
+            this.is = temporaryData.getInputStream();
+        } catch (IOException e) {
+            throw new SynapseException(
+                "Unable to get an InputStream for temporary data", e);
+        }
+    }
 
     public void serialize(OutputStream out, OMOutputFormat format) throws XMLStreamException {
         try {

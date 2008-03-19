@@ -28,15 +28,18 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.clustering.ClusterManager;
 
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * SendMediator sends a message using specified semantics. If it contains an endpoint it will
  * send the message to that endpoint. Once a message is sent to the endpoint further sending
  * behaviors are completely governed by that endpoint. If there is no endpoint available,
  * SendMediator will send the message to the implicitly stated destination.
- * */
+ */
 public class SendMediator extends AbstractMediator {
 
     private Endpoint endpoint = null;
@@ -67,7 +70,7 @@ public class SendMediator extends AbstractMediator {
             if (traceOrDebugOn) {
                 StringBuffer sb = new StringBuffer();
                 sb.append("Sending " + (synCtx.isResponse() ? "response" : "request")
-                    + " message using implicit message properties..");
+                        + " message using implicit message properties..");
                 sb.append("\nSending To: " + (synCtx.getTo() != null ?
                         synCtx.getTo().getAddress() : "null"));
                 sb.append("\nSOAPAction: " + (synCtx.getWSAAction() != null ?
@@ -80,20 +83,78 @@ public class SendMediator extends AbstractMediator {
             }
 
             if (synCtx.isResponse()) {
+
                 Axis2MessageContext axis2MsgCtx = (Axis2MessageContext) synCtx;
                 OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
-                Object o = opCtx.getProperty("endpointList");
+                Object o = opCtx.getProperty(SALoadbalanceEndpoint.ENDPOINT_LIST);
+
                 if (o != null && o instanceof List) {
+
+                    boolean isClusteringEnable = false;
+
+                    // get Axis2 MessageContext and ConfigurationContext
+                    org.apache.axis2.context.MessageContext axisMC =
+                            axis2MsgCtx.getAxis2MessageContext();
+                    ConfigurationContext cc = axisMC.getConfigurationContext();
+
+                    //The heck for clustering environment
+
+                    ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+                    if (clusterManager != null &&
+                            clusterManager.getContextManager() != null) {
+                        isClusteringEnable = true;
+                    }
                     // we are in the response of the first message of a server initiated session
                     // so update all session maps
-                    List endpointList = (List) o;
-                    Object e = endpointList.remove(0);
-                    if (e != null && e instanceof SALoadbalanceEndpoint) {
-                        SALoadbalanceEndpoint saLoadbalanceEndpoint = (SALoadbalanceEndpoint) e;
-                        saLoadbalanceEndpoint.updateSession(synCtx, endpointList);
+                    List epList = (List) o;
+
+
+                    if (isClusteringEnable) {
+                        // if this is a clustering env.
+                        // Only keeps endpoint names , because , it is heavy task to
+                        // replicate endpoint itself
+                        Object epNames = opCtx.getProperty(SALoadbalanceEndpoint.ENDPOINT_NAME_LIST);
+                        if (epNames != null && epNames instanceof List) {
+
+                            List epNameList = (List) epNames;
+                            Object obj = epNameList.remove(0);
+                            if (obj != null && obj instanceof String) {
+
+                                for (Iterator it = epList.iterator(); it.hasNext();) {
+                                    Object epObj = it.next();
+
+                                    if (epObj != null && epObj instanceof Endpoint) {
+                                        String name = ((Endpoint) epObj).getName();
+
+                                        if (name != null && name.equals(obj)) {
+                                            Endpoint ep = ((Endpoint) epObj);
+
+                                            if (ep instanceof SALoadbalanceEndpoint) {
+                                                SALoadbalanceEndpoint salEP
+                                                        = (SALoadbalanceEndpoint) ep;
+                                                salEP.updateSession(synCtx, epNameList,
+                                                        isClusteringEnable);
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                    } else {
+                        Object e = epList.remove(0);
+
+                        if (e != null) {
+                            if (e instanceof SALoadbalanceEndpoint) {
+                                SALoadbalanceEndpoint salEP = (SALoadbalanceEndpoint) e;
+                                salEP.updateSession(synCtx, epList, isClusteringEnable);
+                            }
+                        }
                     }
                 }
             }
+
             synCtx.getEnvironment().send(null, synCtx);
 
         } else {
@@ -103,6 +164,7 @@ public class SendMediator extends AbstractMediator {
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Send mediator");
         }
+
         return true;
     }
 

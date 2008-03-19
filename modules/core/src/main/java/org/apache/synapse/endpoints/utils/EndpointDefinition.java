@@ -29,33 +29,61 @@ import org.apache.synapse.SynapseConstants;
  */
 public class EndpointDefinition {
 
-    /** The simple address this endpoint resolves to - if explicitly specified */
+    /**
+     * The simple address this endpoint resolves to - if explicitly specified
+     */
     private String address = null;
-    /** Should messages be sent in an WS-RM Sequence ? */
+    /**
+     * Should messages be sent in an WS-RM Sequence ?
+     */
     private boolean reliableMessagingOn = false;
-    /** Should messages be sent using WS-A? */
+    /**
+     * Should messages be sent using WS-A?
+     */
     private boolean addressingOn = false;
-    /** Should messages be sent using WS-Security? */
+    /**
+     * Should messages be sent using WS-Security?
+     */
     private boolean securityOn = false;
-    /** The "key" for any WS-RM Policy overrides to be used */
+    /**
+     * The "key" for any WS-RM Policy overrides to be used
+     */
     private String wsRMPolicyKey = null;
-    /** The "key" for any Rampart Security Policy to be used */
+    /**
+     * The "key" for any Rampart Security Policy to be used
+     */
     private String wsSecPolicyKey = null;
-    /** use a separate listener - implies addressing is on **/
-	private boolean useSeparateListener = false;
-	/** force REST (POST) on **/
-	private boolean forcePOX = false;
-    /** force REST (GET) on **/
+    /**
+     * use a separate listener - implies addressing is on *
+     */
+    private boolean useSeparateListener = false;
+    /**
+     * force REST (POST) on *
+     */
+    private boolean forcePOX = false;
+    /**
+     * force REST (GET) on *
+     */
     private boolean forceGET = false;
-    /** force SOAP11 on **/
-	private boolean forceSOAP11 = false;
-    /** force SOAP11 on **/
-	private boolean forceSOAP12 = false;
-    /** use MTOM **/
+    /**
+     * force SOAP11 on *
+     */
+    private boolean forceSOAP11 = false;
+    /**
+     * force SOAP11 on *
+     */
+    private boolean forceSOAP12 = false;
+    /**
+     * use MTOM *
+     */
     private boolean useMTOM = false;
-    /** use SWA **/
+    /**
+     * use SWA *
+     */
     private boolean useSwa = false;
-    /** Endpoint message format. pox/soap11/soap12 */
+    /**
+     * Endpoint message format. pox/soap11/soap12
+     */
     private String format = null;
 
     /**
@@ -63,20 +91,27 @@ public class EndpointDefinition {
      * the timeout duration is not set, default is set to 0 seconds. note that if the user has
      * not set any timeout configuration, default timeout action is set to NONE, which won't do
      * anything for timeouts.
-    */
+     */
     private long timeoutDuration = 0;
 
-    /** action to perform when a timeout occurs (NONE | DISCARD | DISCARD_AND_FAULT) **/
+    /**
+     * action to perform when a timeout occurs (NONE | DISCARD | DISCARD_AND_FAULT) *
+     */
     private int timeoutAction = SynapseConstants.NONE;
 
-    /** To decide to whether statistics should have collected or not */
+    /**
+     * To decide to whether statistics should have collected or not
+     */
     private int statisticsState = SynapseConstants.STATISTICS_UNSET;
 
-    /** The variable that indicate tracing on or off for the current mediator */
+    /**
+     * The variable that indicate tracing on or off for the current mediator
+     */
     private int traceState = SynapseConstants.TRACING_UNSET;
 
     /**
      * This should return the absolute EPR address referenced by the named endpoint. This may be possibly computed.
+     *
      * @return an absolute address to be used to reference the named endpoint
      */
     public String getAddress() {
@@ -85,6 +120,7 @@ public class EndpointDefinition {
 
     /**
      * Set an absolute URL as the address for this named endpoint
+     *
      * @param address the absolute address to be used
      */
     public void setAddress(String address) {
@@ -93,6 +129,7 @@ public class EndpointDefinition {
 
     /**
      * Is RM turned on on this endpoint?
+     *
      * @return true if on
      */
     public boolean isReliableMessagingOn() {
@@ -101,6 +138,7 @@ public class EndpointDefinition {
 
     /**
      * Request that RM be turned on/off on this endpoint
+     *
      * @param reliableMessagingOn
      */
     public void setReliableMessagingOn(boolean reliableMessagingOn) {
@@ -109,6 +147,7 @@ public class EndpointDefinition {
 
     /**
      * Is WS-A turned on on this endpoint?
+     *
      * @return true if on
      */
     public boolean isAddressingOn() {
@@ -117,6 +156,7 @@ public class EndpointDefinition {
 
     /**
      * Request that WS-A be turned on/off on this endpoint
+     *
      * @param addressingOn
      */
     public void setAddressingOn(boolean addressingOn) {
@@ -125,6 +165,7 @@ public class EndpointDefinition {
 
     /**
      * Is WS-Security turned on on this endpoint?
+     *
      * @return true if on
      */
     public boolean isSecurityOn() {
@@ -133,6 +174,7 @@ public class EndpointDefinition {
 
     /**
      * Request that WS-Sec be turned on/off on this endpoint
+     *
      * @param securityOn
      */
     public void setSecurityOn(boolean securityOn) {
@@ -141,6 +183,7 @@ public class EndpointDefinition {
 
     /**
      * Return the Rampart Security configuration policys' 'key' to be used (See Rampart)
+     *
      * @return the ORampart Security configuration policys' 'key' to be used (See Rampart)
      */
     public String getWsSecPolicyKey() {
@@ -149,6 +192,7 @@ public class EndpointDefinition {
 
     /**
      * Set the Rampart Security configuration policys' 'key' to be used (See Rampart)
+     *
      * @param wsSecPolicyKey the Rampart Security configuration policys' 'key' to be used (See Rampart)
      */
     public void setWsSecPolicyKey(String wsSecPolicyKey) {
@@ -157,6 +201,7 @@ public class EndpointDefinition {
 
     /**
      * Get the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     *
      * @return the WS-RM configuration policys' 'key' to be used (See Sandesha2)
      */
     public String getWsRMPolicyKey() {
@@ -165,26 +210,28 @@ public class EndpointDefinition {
 
     /**
      * Set the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     *
      * @param wsRMPolicyKey the WS-RM configuration policys' 'key' to be used (See Sandesha2)
      */
     public void setWsRMPolicyKey(String wsRMPolicyKey) {
         this.wsRMPolicyKey = wsRMPolicyKey;
     }
 
-	public void setUseSeparateListener(boolean b) {
-		this.useSeparateListener = b;
-	}
-	public boolean isUseSeparateListener() {
-		return useSeparateListener;
-	}
+    public void setUseSeparateListener(boolean b) {
+        this.useSeparateListener = b;
+    }
 
-	public void setForcePOX(boolean forcePOX) {
-		this.forcePOX = forcePOX;
-	}
+    public boolean isUseSeparateListener() {
+        return useSeparateListener;
+    }
 
-	public boolean isForcePOX() {
-		return forcePOX;
-	}
+    public void setForcePOX(boolean forcePOX) {
+        this.forcePOX = forcePOX;
+    }
+
+    public boolean isForcePOX() {
+        return forcePOX;
+    }
 
     public boolean isForceGET() {
         return forceGET;
@@ -195,20 +242,20 @@ public class EndpointDefinition {
     }
 
     public void setForceSOAP11(boolean forceSOAP11) {
-		this.forceSOAP11 = forceSOAP11;
-	}
+        this.forceSOAP11 = forceSOAP11;
+    }
 
-	public boolean isForceSOAP11() {
-		return forceSOAP11;
-	}
+    public boolean isForceSOAP11() {
+        return forceSOAP11;
+    }
 
     public void setForceSOAP12(boolean forceSOAP12) {
-		this.forceSOAP12 = forceSOAP12;
-	}
+        this.forceSOAP12 = forceSOAP12;
+    }
 
-	public boolean isForceSOAP12() {
-		return forceSOAP12;
-	}
+    public boolean isForceSOAP12() {
+        return forceSOAP12;
+    }
 
     public boolean isUseMTOM() {
         return useMTOM;
@@ -241,16 +288,16 @@ public class EndpointDefinition {
     public void setTimeoutAction(int timeoutAction) {
         this.timeoutAction = timeoutAction;
     }
-    
+
     public String getFormat() {
         return format;
-	}
+    }
 
-	public void setFormat(String format) {
-		this.format = format;
-	}
+    public void setFormat(String format) {
+        this.format = format;
+    }
 
-	/**
+    /**
      * To check whether statistics should have collected or not
      *
      * @return Returns the int value that indicate statistics is enabled or not.
@@ -262,7 +309,7 @@ public class EndpointDefinition {
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsState   Indicates whether statictics is enable or not
+     * @param statisticsState Indicates whether statictics is enable or not
      */
     public void setStatisticsState(int statisticsState) {
         this.statisticsState = statisticsState;

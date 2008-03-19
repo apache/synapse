@@ -19,14 +19,17 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.OMElement;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 
 import java.util.Stack;
 
@@ -56,15 +59,13 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
      */
     private long suspendOnFailDuration = -1;
 
-    /**
-     * Time to recover a failed endpoint. Value of this is calculated when endpoint is set as
-     * failed by adding suspendOnFailDuration to current time.
-     */
-    private long recoverOn = Long.MAX_VALUE;
-
-    private boolean active = true;
     private Endpoint parentEndpoint = null;
     private EndpointDefinition endpoint = null;
+
+    /**
+     * The endpoint context , place holder for keep any runtime states related to the endpoint
+     */
+    private final EndpointContext endpointContext = new EndpointContext();
 
     /**
      * Sends the message through this endpoint. This method just handles statistics related functions
@@ -81,7 +82,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
 
         if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Address Endpoint");
+            traceOrDebug(traceOn, "Start : WSDL Endpoint");
 
             if (traceOn && trace.isTraceEnabled()) {
                 trace.trace("Message : " + synCtx.getEnvelope());
@@ -92,39 +93,69 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         if (endpoint.getAddress() != null) {
 
             eprAddress = endpoint.getAddress();
+
+            boolean isClusteringEnable = false;
+            // get Axis2 MessageContext and ConfigurationContext
+            org.apache.axis2.context.MessageContext axisMC =
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            ConfigurationContext cc = axisMC.getConfigurationContext();
+
+            //The check for clustering environment
+
+            ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+            if (clusterManager != null &&
+                    clusterManager.getContextManager() != null) {
+                isClusteringEnable = true;
+            }
+
             String endPointName = this.getName();
             if (endPointName == null) {
+
+                if (traceOrDebugOn && isClusteringEnable) {
+                    log.warn("In a clustering environment , the endpoint  name should be specified" +
+                            "even for anonymous endpoints. Otherwise , the clustering would not be " +
+                            "functioned correctly if there are more than one anonymous endpoints. ");
+                }
                 endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+            }
+
+            if (isClusteringEnable) {
+                // if this is a cluster environment , then set configuration context
+                // to endpoint context
+                if (endpointContext.getConfigurationContext() == null) {
+                    endpointContext.setConfigurationContext(cc);
+                    endpointContext.setContextID(endPointName);
+                }
             }
 
             // Setting Required property to collect the End Point statistics
             boolean statisticsEnable =
-                (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
-            
+                    (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
+
             if (statisticsEnable) {
                 EndPointStatisticsStack endPointStatisticsStack = null;
                 Object statisticsStackObj =
-                    synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
+                        synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
                 if (statisticsStackObj == null) {
                     endPointStatisticsStack = new EndPointStatisticsStack();
                     synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
-                        endPointStatisticsStack);
+                            endPointStatisticsStack);
                 } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
                     endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
                 }
                 if (endPointStatisticsStack != null) {
                     boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                     endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
-                        !synCtx.isResponse(), statisticsEnable, isFault);
+                            !synCtx.isResponse(), statisticsEnable, isFault);
                 }
             }
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Sending message to WSDL endpoint : " +
-                    endPointName + " resolves to address = " + eprAddress);
+                        endPointName + " resolves to address = " + eprAddress);
                 traceOrDebug(traceOn, "SOAPAction: " + (synCtx.getSoapAction() != null ?
-                    synCtx.getSoapAction() : "null"));
+                        synCtx.getSoapAction() : "null"));
                 traceOrDebug(traceOn, "WSA-Action: " + (synCtx.getWSAAction() != null ?
-                    synCtx.getWSAAction() : "null"));
+                        synCtx.getWSAAction() : "null"));
 
                 if (traceOn && trace.isTraceEnabled()) {
                     trace.trace("Envelope : \n" + synCtx.getEnvelope());
@@ -145,7 +176,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
-        setActive(false, synCtx);        
+        setActive(false, synCtx);
 
         if (parentEndpoint != null) {
             parentEndpoint.onChildEndpointFail(this, synCtx);
@@ -217,13 +248,13 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
      * @return true if endpoint is active. false otherwise.
      */
     public boolean isActive(MessageContext synMessageContext) {
-
+        boolean active = endpointContext.isActive();
         if (!active) {
+            long recoverOn = endpointContext.getRecoverOn();
             if (System.currentTimeMillis() > recoverOn) {
-                active = true;
+                endpointContext.setActive(true);
             }
         }
-
         return active;
     }
 
@@ -238,13 +269,15 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
 
         if (!active) {
             if (suspendOnFailDuration != -1) {
-                recoverOn = System.currentTimeMillis() + suspendOnFailDuration;
+                // Calculating a new value by adding suspendOnFailDuration to current time.
+                // as the endpoint is set as failed
+                endpointContext.setRecoverOn(System.currentTimeMillis() + suspendOnFailDuration);
             } else {
-                recoverOn = Long.MAX_VALUE;
+                endpointContext.setRecoverOn(Long.MAX_VALUE);
             }
         }
 
-        this.active = active;
+        endpointContext.setActive(true);
     }
 
     public void setParentEndpoint(Endpoint parentEndpoint) {
@@ -262,18 +295,20 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     /**
      * Should this mediator perform tracing? True if its explicitly asked to
      * trace, or its parent has been asked to trace and it does not reject it
+     *
      * @param msgCtx the current message
      * @return true if tracing should be performed
      */
     protected boolean isTraceOn(MessageContext msgCtx) {
         return
-            (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
-            (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
+                (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
+                        (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
     }
 
     /**
      * Is tracing or debug logging on?
+     *
      * @param isTraceOn is tracing known to be on?
      * @return true, if either tracing or debug logging is on
      */
@@ -283,8 +318,9 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
 
     /**
      * Perform Trace and Debug logging of a message @INFO (trace) and DEBUG (log)
+     *
      * @param traceOn is runtime trace on for this message?
-     * @param msg the message to log/trace
+     * @param msg     the message to log/trace
      */
     protected void traceOrDebug(boolean traceOn, String msg) {
         if (traceOn) {

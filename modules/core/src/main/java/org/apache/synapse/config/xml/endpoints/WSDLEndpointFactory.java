@@ -79,14 +79,14 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
         WSDLEndpoint wsdlEndpoint = new WSDLEndpoint();
 
-        if (!anonymousEndpoint) {
-            OMAttribute name = epConfig.getAttribute(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
+//        if (!anonymousEndpoint) {
+        OMAttribute name = epConfig.getAttribute(new QName(
+                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
-            if (name != null) {
-                wsdlEndpoint.setName(name.getAttributeValue());
-            }
+        if (name != null) {
+            wsdlEndpoint.setName(name.getAttributeValue());
         }
+//        }
 
         OMElement wsdlElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));

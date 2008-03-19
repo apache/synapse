@@ -19,13 +19,16 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 
 import java.util.Stack;
 
@@ -46,12 +49,6 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     private String name = null;
 
     /**
-     * Determines if this endpoint is active or not. This variable have to be loaded always from the
-     * memory as multiple threads could access it.
-     */
-    private volatile boolean active = true;
-
-    /**
      * Stores the endpoint details for this endpoint. Details include EPR, WS-Addressing information,
      * WS-Security information, etc.
      */
@@ -70,10 +67,10 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     private long suspendOnFailDuration = -1;
 
     /**
-     * Time to recover a failed endpoint. Value of this is calculated when endpoint is set as
-     * failed by adding suspendOnFailDuration to current time.
+     * The endpoint context , place holder for keep any runtime states related to the endpoint
      */
-    private long recoverOn = Long.MAX_VALUE;
+    private final EndpointContext endpointContext = new EndpointContext();
+
 
     public EndpointDefinition getEndpoint() {
         return endpoint;
@@ -100,13 +97,17 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
      */
     public boolean isActive(MessageContext synMessageContext) {
 
+        boolean active = endpointContext.isActive();
         if (!active) {
+
+            long recoverOn = endpointContext.getRecoverOn();
             if (System.currentTimeMillis() > recoverOn) {
-                active = true;
-                recoverOn = 0;
+
+                endpointContext.setActive(true);
+                endpointContext.setRecoverOn(0);
+
             }
         }
-
         return active;
     }
 
@@ -124,13 +125,15 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
         if (!active) {
             if (suspendOnFailDuration != -1) {
-                recoverOn = System.currentTimeMillis() + suspendOnFailDuration;
+                // Calculating a new value by adding suspendOnFailDuration to current time.
+                // as the endpoint is set as failed
+                endpointContext.setRecoverOn(System.currentTimeMillis() + suspendOnFailDuration);
             } else {
-                recoverOn = Long.MAX_VALUE;
+                endpointContext.setRecoverOn(Long.MAX_VALUE);
             }
         }
 
-        this.active = active;
+        this.endpointContext.setActive(active);
     }
 
     /**
@@ -155,9 +158,38 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             }
         }
 
+        boolean isClusteringEnable = false;
+        // get Axis2 MessageContext and ConfigurationContext
+        org.apache.axis2.context.MessageContext axisMC =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        ConfigurationContext cc = axisMC.getConfigurationContext();
+
+        //The check for clustering environment
+
+        ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+        if (clusterManager != null &&
+                clusterManager.getContextManager() != null) {
+            isClusteringEnable = true;
+        }
+
         String endPointName = this.getName();
         if (endPointName == null) {
+
+            if (traceOrDebugOn && isClusteringEnable) {
+                log.warn("In a clustering environment , the endpoint  name should be specified" +
+                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
+                        "functioned correctly if there are more than one anonymous endpoints. ");
+            }
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+        }
+
+        if (isClusteringEnable) {
+
+            // if this is a cluster environment , then set configuration context to endpoint context
+            if (endpointContext.getConfigurationContext() == null) {
+                endpointContext.setConfigurationContext(cc);
+                endpointContext.setContextID(endPointName); // The context ID
+            }
         }
 
         // Setting Required property to collect the End Point statistics
@@ -165,29 +197,29 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         if (statisticsEnable) {
             EndPointStatisticsStack endPointStatisticsStack = null;
             Object statisticsStackObj =
-                synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
+                    synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
             if (statisticsStackObj == null) {
                 endPointStatisticsStack = new EndPointStatisticsStack();
                 synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
-                    endPointStatisticsStack);
+                        endPointStatisticsStack);
             } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
                 endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
             }
             if (endPointStatisticsStack != null) {
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                 endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
-                    !synCtx.isResponse(), statisticsEnable, isFault);
+                        !synCtx.isResponse(), statisticsEnable, isFault);
             }
         }
 
         if (endpoint.getAddress() != null) {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Sending message to endpoint : " +
-                    endPointName + " resolves to address = " + endpoint.getAddress());
+                        endPointName + " resolves to address = " + endpoint.getAddress());
                 traceOrDebug(traceOn, "SOAPAction: " + (synCtx.getSoapAction() != null ?
-                    synCtx.getSoapAction() : "null"));
+                        synCtx.getSoapAction() : "null"));
                 traceOrDebug(traceOn, "WSA-Action: " + (synCtx.getWSAAction() != null ?
-                    synCtx.getWSAAction() : "null"));
+                        synCtx.getWSAAction() : "null"));
 
                 if (traceOn && trace.isTraceEnabled()) {
                     trace.trace("Envelope : \n" + synCtx.getEnvelope());
@@ -239,18 +271,20 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     /**
      * Should this mediator perform tracing? True if its explicitly asked to
      * trace, or its parent has been asked to trace and it does not reject it
+     *
      * @param msgCtx the current message
      * @return true if tracing should be performed
      */
     protected boolean isTraceOn(MessageContext msgCtx) {
         return
-            (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
-            (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
+                (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
+                        (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
     }
 
     /**
      * Is tracing or debug logging on?
+     *
      * @param isTraceOn is tracing known to be on?
      * @return true, if either tracing or debug logging is on
      */
@@ -260,8 +294,9 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
     /**
      * Perform Trace and Debug logging of a message @INFO (trace) and DEBUG (log)
+     *
      * @param traceOn is runtime trace on for this message?
-     * @param msg the message to log/trace
+     * @param msg     the message to log/trace
      */
     protected void traceOrDebug(boolean traceOn, String msg) {
         if (traceOn) {

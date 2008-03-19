@@ -31,7 +31,6 @@ import java.util.ArrayList;
 public class RoundRobin implements LoadbalanceAlgorithm {
 
     private ArrayList endpoints = null;
-    private int currentEPR = 0;
 
     public RoundRobin(ArrayList endpoints) {
         this.endpoints = endpoints;
@@ -41,24 +40,25 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * Choose an active endpoint using the round robin algorithm. If there are no active endpoints
      * available, returns null.
      *
-     * @param synapseMessageContext MessageContext instance which holds all per-message properties 
+     * @param synapseMessageContext MessageContext instance which holds all per-message properties
      * @return endpoint to send the next message
      */
-    public Endpoint getNextEndpoint(MessageContext synapseMessageContext) {
+    public Endpoint getNextEndpoint(MessageContext synapseMessageContext, AlgorithmContext algorithmContext) {
 
         Endpoint nextEndpoint;
         int attempts = 0;
-
+        int currentEPR = algorithmContext.getCurrentEndpointIndex();
         do {
             // two successive clients could get the same endpoint if not synchronized.
-            synchronized(this) {
+            synchronized (this) {
                 nextEndpoint = (Endpoint) endpoints.get(currentEPR);
 
-                if(currentEPR == endpoints.size() - 1) {
+                if (currentEPR == endpoints.size() - 1) {
                     currentEPR = 0;
                 } else {
                     currentEPR++;
                 }
+                algorithmContext.setCurrentEPR(currentEPR);
             }
 
             attempts++;
@@ -71,7 +71,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         return nextEndpoint;
     }
 
-    public void reset() {
-        currentEPR = 0;
+    public void reset(AlgorithmContext algorithmContext) {
+        algorithmContext.setCurrentEPR(0);
     }
 }

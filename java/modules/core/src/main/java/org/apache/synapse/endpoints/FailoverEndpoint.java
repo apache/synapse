@@ -19,8 +19,14 @@
 
 package org.apache.synapse.endpoints;
 
+import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 
 import java.util.List;
 
@@ -34,19 +40,13 @@ import java.util.List;
  */
 public class FailoverEndpoint implements Endpoint {
 
+    private static final Log log = LogFactory.getLog(FailoverEndpoint.class);
+
     /**
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
      * of indirect endpoints.
      */
     private String name = null;
-
-    /**
-     * Determine whether this endpoint is active or not. This is active if all child endpoints of
-     * this endpoint is active. This is always loaded from the memory as it could be accessed from
-     * multiple threads simultaneously.
-     */
-    private volatile boolean active = true;
-
     /**
      * List of child endpoints. Failover sending is done among these. Any object implementing the
      * Endpoint interface can be a child.
@@ -65,7 +65,49 @@ public class FailoverEndpoint implements Endpoint {
      */
     private Endpoint parentEndpoint = null;
 
+    /**
+     * The endpoint context , place holder for keep any runtime states related to the endpoint
+     */
+    private final EndpointContext endpointContext = new EndpointContext();
+
     public void send(MessageContext synMessageContext) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Start : Failover Endpoint");
+        }
+
+        boolean isClusteringEnable = false;
+        // get Axis2 MessageContext and ConfigurationContext
+        org.apache.axis2.context.MessageContext axisMC =
+                ((Axis2MessageContext) synMessageContext).getAxis2MessageContext();
+        ConfigurationContext cc = axisMC.getConfigurationContext();
+
+        //The check for clustering environment 
+
+        ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+        if (clusterManager != null &&
+                clusterManager.getContextManager() != null) {
+            isClusteringEnable = true;
+        }
+
+        String endPointName = this.getName();
+        if (endPointName == null) {
+
+            if (log.isDebugEnabled() && isClusteringEnable) {
+                log.warn("In a clustering environment , the endpoint  name should be specified" +
+                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
+                        "functioned correctly if there are more than one anonymous endpoints. ");
+            }
+            endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+        }
+
+        if (isClusteringEnable) {
+            // if this is a cluster environment , then set configuration context to endpoint context
+            if (endpointContext.getConfigurationContext() == null) {
+                endpointContext.setConfigurationContext(cc);
+                endpointContext.setContextID(endPointName);
+            }
+        }
 
         // We have to build the envelop if we are supporting failover.
         // Failover should sent the original message multiple times if failures occur. So we have to
@@ -118,16 +160,15 @@ public class FailoverEndpoint implements Endpoint {
      * endpoint's state to active and returns true.
      *
      * @param synMessageContext MessageContext of the current message. This is not used here.
-     *
      * @return true if active. false otherwise.
      */
     public boolean isActive(MessageContext synMessageContext) {
-
+        boolean active = endpointContext.isActive();
         if (!active) {
             for (int i = 0; i < endpoints.size(); i++) {
                 Endpoint endpoint = (Endpoint) endpoints.get(i);
                 if (endpoint.isActive(synMessageContext)) {
-                    active = true;
+                    endpointContext.setActive(true);
 
                     // don't break the loop though we found one active endpoint. calling isActive()
                     // on all child endpoints will update their active state. so this is a good
@@ -141,7 +182,7 @@ public class FailoverEndpoint implements Endpoint {
 
     public void setActive(boolean active, MessageContext synMessageContext) {
         // setting a volatile boolean value is thread safe.
-        this.active = active;
+        this.endpointContext.setActive(active);
     }
 
     public List getEndpoints() {

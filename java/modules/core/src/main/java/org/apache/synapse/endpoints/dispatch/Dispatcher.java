@@ -19,8 +19,8 @@
 
 package org.apache.synapse.endpoints.dispatch;
 
-import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.endpoints.Endpoint;
 
 /**
  * Defines the behavior of session dispatchers. There can be two dispatcher types. Server initiated
@@ -39,24 +39,24 @@ public interface Dispatcher {
      * @param synCtx client -> esb message context.
      * @return Endpoint Endpoint associated with this session.
      */
-    public Endpoint getEndpoint(MessageContext synCtx);
-    
+    public Endpoint getEndpoint(MessageContext synCtx, DispatcherContext dispatcherContext);
+
     /**
      * Updates the session maps. This will be called in the first client -> synapse -> server flow
      * for client initiated sessions. For server initiated sessions, this will be called in the first
      * server -> synapse -> client flow.
      *
-     * @param synCtx SynapseMessageContext
+     * @param synCtx   SynapseMessageContext
      * @param endpoint Selected endpoint for this session.
      */
-    public void updateSession(MessageContext synCtx, Endpoint endpoint);
+    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext, Endpoint endpoint);
 
     /**
      * Removes the session belonging to the given message context.
      *
-     * @param synCtx MessageContext containing an session ID.         
+     * @param synCtx MessageContext containing an session ID.
      */
-    public void unbind(MessageContext synCtx);
+    public void unbind(MessageContext synCtx, DispatcherContext dispatcherContext);
 
     /**
      * Determine whether the session supported by the implementing dispatcher is initiated by the

@@ -19,15 +19,14 @@
 
 package org.apache.synapse.endpoints.dispatch;
 
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.MessageContext;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.endpoints.Endpoint;
 
 import javax.xml.namespace.QName;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
 
 /**
  * This dispatcher is implemented to demonstrate a sample client session. It will detect sessions
@@ -37,27 +36,23 @@ import java.util.Collections;
  */
 public class SimpleClientSessionDispatcher implements Dispatcher {
 
-    /**
-     * Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
-     * multiple threads (e.g. multiple clients different sessions).
-     */
-    private final Map sessionMap = Collections.synchronizedMap(new HashMap());
+    private static final Log log = LogFactory.getLog(SimpleClientSessionDispatcher.class);
 
-    public Endpoint getEndpoint(MessageContext synCtx) {
+    public Endpoint getEndpoint(MessageContext synCtx, DispatcherContext dispatcherContext) {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
         if (header != null) {
             OMElement sgcIDElm = header.getFirstChildWithName(
-                new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
 
             if (sgcIDElm != null) {
                 String sgcID = sgcIDElm.getText();
 
                 if (sgcID != null) {
-                    Object o = sessionMap.get(sgcID);
+                    Object o = dispatcherContext.getEndpoint(sgcID);
 
-                    if (o != null) {
+                    if (o != null && o instanceof Endpoint) {
                         return (Endpoint) o;
                     }
                 }
@@ -67,42 +62,46 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
         return null;
     }
 
-    public void updateSession(MessageContext synCtx, Endpoint endpoint) {
+    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext, Endpoint endpoint) {
+
+        if (endpoint == null || dispatcherContext == null) {
+            return;
+        }
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
         if (header != null) {
             OMElement csIDElm = header.getFirstChildWithName(
-                new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
 
             if (csIDElm != null) {
                 String csID = csIDElm.getText();
 
                 if (csID != null) {
-                    // synchronized to avoid possible replacement of sessions
-                    synchronized (sessionMap) {
-                        if (!sessionMap.containsKey(csID)) {
-                            sessionMap.put(csID, endpoint);
-                        }
-                    }
+                    dispatcherContext.setEndpoint(csID, endpoint);
                 }
             }
         }
     }
 
-    public void unbind(MessageContext synCtx) {
+
+    public void unbind(MessageContext synCtx, DispatcherContext dispatcherContext) {
+
+        if (dispatcherContext == null) {
+            return;
+        }
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
         if (header != null) {
             OMElement csIDElm = header.getFirstChildWithName(
-                new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
 
             if (csIDElm != null) {
                 String csID = csIDElm.getText();
 
                 if (csID != null) {
-                    sessionMap.remove(csID);
+                    dispatcherContext.removeSession(csID);
                 }
             }
         }

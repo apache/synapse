@@ -77,14 +77,14 @@ public class AddressEndpointFactory implements EndpointFactory {
 
         AddressEndpoint addressEndpoint = new AddressEndpoint();
 
-        if (!anonymousEndpoint) {
-            OMAttribute name = epConfig.getAttribute(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
+//        if (!anonymousEndpoint) {
+        OMAttribute name = epConfig.getAttribute(new QName(
+                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
-            if (name != null) {
-                addressEndpoint.setName(name.getAttributeValue());
-            }
+        if (name != null) {
+            addressEndpoint.setName(name.getAttributeValue());
         }
+//        }
 
         OMElement addressElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));

@@ -34,10 +34,10 @@ public interface LoadbalanceAlgorithm {
      * @param synapseMessageContext SynapseMessageContext of the current message
      * @return Next node for directing the message
      */
-    public Endpoint getNextEndpoint(MessageContext synapseMessageContext);
+    public Endpoint getNextEndpoint(MessageContext synapseMessageContext, AlgorithmContext algorithmContext);
 
     /**
      * Resets the algorithm to its initial position. Initial position depends on the implementation.
      */
-    public void reset();
+    public void reset(AlgorithmContext algorithmContext);
 }

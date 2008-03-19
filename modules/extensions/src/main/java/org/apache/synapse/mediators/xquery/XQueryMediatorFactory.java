@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.xquery;
 import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -73,11 +74,11 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
             String targetValue = attrTarget.getAttributeValue();
             if (targetValue != null) {
                 try {
-                    xQueryMediator.setTarget(SynapseXPathFactory.getSynapseXPath(elem,
-                        new QName(XMLConfigConstants.NULL_NAMESPACE, "target")));
+                    AXIOMXPath xpath = new AXIOMXPath(attrTarget.getAttributeValue());
+                    OMElementUtils.addNameSpaces(xpath, elem, log);
+                    xQueryMediator.setTarget(xpath);
                 } catch (JaxenException e) {
-                    handleException("Invalid XPath specified for the target attribute : " +
-                        targetValue);
+                    handleException("Invalid XPath specified for the target attribute : " + targetValue);
                 }
             }
         }
@@ -114,8 +115,9 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                         }
                         if (expr != null && !"".equals(expr)) {
                             try {
-                                ((MediatorCustomVariable) variable).setExpression(
-                                    SynapseXPathFactory.getSynapseXPath(variableOM, ATT_EXPR_Q));
+                                AXIOMXPath xpath = new AXIOMXPath(expr);
+                                OMElementUtils.addNameSpaces(xpath, variableOM, log);
+                                ((MediatorCustomVariable) variable).setExpression(xpath);
 
                             } catch (JaxenException e) {
                                 handleException("Invalid XPath specified for" +

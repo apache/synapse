@@ -29,7 +29,7 @@ public class ThreadSafeDelegatingFunctionContext implements FunctionContext {
     private final ThreadLocal<FunctionContext> delegate = new ThreadLocal<FunctionContext>();
 
     public ThreadSafeDelegatingFunctionContext() {
-        this.delegate.set(new XPathFunctionContext());
+        this.delegate.set(new XPathFunctionContext(true));
     }
 
     public void setDelegate(FunctionContext delegate) {

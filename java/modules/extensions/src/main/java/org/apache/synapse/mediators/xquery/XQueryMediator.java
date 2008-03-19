@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.util.ElementHelper;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.MessageContext;
@@ -33,7 +34,6 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -87,7 +87,7 @@ public class XQueryMediator extends AbstractMediator {
     /**
      * The (optional) XPath expression which yeilds the target element to attached the result
      */
-    private SynapseXPath target = null;
+    private AXIOMXPath target = null;
 
     /**
      * The list of variables for binding to the DyanamicContext in order to available for querying
@@ -122,7 +122,7 @@ public class XQueryMediator extends AbstractMediator {
     public XQueryMediator() {
         // create the default XPath
         try {
-            this.target = new SynapseXPath(DEFAULT_XPATH);
+            this.target = new AXIOMXPath(DEFAULT_XPATH);
             this.target.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             this.target.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
@@ -600,7 +600,7 @@ public class XQueryMediator extends AbstractMediator {
      */
     public OMNode getTargetNode(MessageContext synCtx) {
         try {
-            Object o = target.evaluate(synCtx);
+            Object o = target.evaluate(synCtx.getEnvelope());
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {
@@ -664,11 +664,11 @@ public class XQueryMediator extends AbstractMediator {
         return variables;
     }
 
-    public SynapseXPath getTarget() {
+    public AXIOMXPath getTarget() {
         return target;
     }
 
-    public void setTarget(SynapseXPath target) {
+    public void setTarget(AXIOMXPath target) {
         this.target = target;
     }
 

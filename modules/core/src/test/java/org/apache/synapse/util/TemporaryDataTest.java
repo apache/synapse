@@ -19,11 +19,14 @@
 
 package org.apache.synapse.util;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
+
+import org.apache.commons.io.IOUtils;
 
 import junit.framework.TestCase;
 
@@ -76,5 +79,27 @@ public class TemporaryDataTest extends TestCase {
     
     public void testRandomReadWriteWithTemporaryFile() throws IOException {
         doTestRandomReadWrite(100000);
+    }
+    
+    public void testMarkReset() throws IOException {
+        byte[] sourceData1 = new byte[2000];
+        byte[] sourceData2 = new byte[2000];
+        random.nextBytes(sourceData1);
+        random.nextBytes(sourceData2);
+        TemporaryData tmp = new TemporaryData(16, 512, "test", ".dat");
+        OutputStream out = tmp.getOutputStream();
+        out.write(sourceData1);
+        out.write(sourceData2);
+        out.close();
+        DataInputStream in = new DataInputStream(tmp.getInputStream());
+        byte[] data1 = new byte[sourceData1.length];
+        byte[] data2 = new byte[sourceData2.length];
+        in.readFully(data1);
+        in.mark(sourceData2.length);
+        in.readFully(data2);
+        in.reset();
+        in.readFully(data2);
+        assertTrue(Arrays.equals(sourceData1, data1));
+        assertTrue(Arrays.equals(sourceData2, data2));
     }
 }

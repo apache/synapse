@@ -27,7 +27,6 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -35,6 +34,7 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.io.IOUtils;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -42,14 +42,13 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.util.FixedByteArrayOutputStream;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.TextFileDataSource;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.activation.FileDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -214,11 +213,10 @@ public class XSLTMediator extends AbstractMediator {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
-        OutputStream osForTarget = null;
+        TemporaryData tempSourceData = null;
         InputStream  isForSource = null;
-        ByteArrayOutputStream baosForTarget = new FixedByteArrayOutputStream(BYTE_ARRAY_SIZE);
-        File tempTargetFile = null;
-        File tempSourceFile = null;
+        TemporaryData tempTargetData = null;
+        OutputStream osForTarget = null;
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
@@ -255,53 +253,31 @@ public class XSLTMediator extends AbstractMediator {
             }
 
             try {
-                // create a byte array output stream and serialize the source node into it
-                ByteArrayOutputStream baosForSource = new FixedByteArrayOutputStream(BYTE_ARRAY_SIZE);
-                XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().
-                    createXMLStreamWriter(baosForSource);
-
-                sourceNode.serialize(xsWriterForSource);
-                isForSource = new ByteArrayInputStream(baosForSource.toByteArray());
+                // Serialize the source node into a buffer or temporary file
+                tempSourceData = new TemporaryData(1024, BYTE_ARRAY_SIZE/1024, "xs_", ".xml");
+                OutputStream osForSource = tempSourceData.getOutputStream();
+                try {
+                    XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().
+                        createXMLStreamWriter(osForSource);
+    
+                    sourceNode.serialize(xsWriterForSource);
+                }
+                finally {
+                    osForSource.close();
+                }
+                isForSource = tempSourceData.getInputStream();
                 transformSrc = new StreamSource(isForSource);
-                transformTgt = new StreamResult(baosForTarget);
 
             } catch (XMLStreamException e) {
-                handleException("Error creating a StreamResult for the transformation", e, synCtx);
-
-            } catch (SynapseException x) {
-
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Error creating a StreamResult using a byte array" +
-                        " - attempting using temporary files for serialization");
-                }
-
-                OutputStream osForSource = null;
-
-                try {
-                    // create a output stream and serialize the source node into it
-                    tempSourceFile = File.createTempFile("xs_", ".xml");
-                    tempTargetFile = File.createTempFile("xt_", ".xml");
-
-                    osForSource = new FileOutputStream(tempSourceFile);
-                    osForTarget = new FileOutputStream(tempTargetFile);
-
-                    XMLStreamWriter xsWriterForSource =
-                        XMLOutputFactory.newInstance().createXMLStreamWriter(osForSource);
-
-                    sourceNode.serialize(xsWriterForSource);
-                    transformSrc = new StreamSource(tempSourceFile);
-                    transformTgt = new StreamResult(osForTarget);
-
-                } catch (XMLStreamException e) {
-                    handleException("Error creating a StreamResult for the transformation", e, synCtx);
-                } catch (IOException e) {
-                    handleException("Error using a temporary file/s for the transformation", e, synCtx);
-                } finally {
-                    try {
-                        osForSource.close();
-                    } catch (IOException ignore) {}
-                }
+                handleException("Error creating a StreamSource for the transformation", e, synCtx);
+            
+            } catch (IOException e) {
+                handleException("I/O error while creating a StreamSource for the transformation", e, synCtx);
             }
+            
+            tempTargetData = new TemporaryData(1024, BYTE_ARRAY_SIZE/1024, "xt_", ".xml");
+            osForTarget = tempTargetData.getOutputStream();
+            transformTgt = new StreamResult(osForTarget);
         }
 
         if (transformTgt == null) {
@@ -354,53 +330,38 @@ public class XSLTMediator extends AbstractMediator {
                 }
             }
 
-            try {
-                transformer.setErrorListener(new ErrorListener() {
-                    public void warning(TransformerException e) throws TransformerException {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Warning encountered during transformation : " + e.getMessage());
-                        }
-                        log.warn("Transformation warning encountered", e);
+            transformer.setErrorListener(new ErrorListener() {
+                public void warning(TransformerException e) throws TransformerException {
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "Warning encountered during transformation : " + e.getMessage());
                     }
-                    public void error(TransformerException e) throws TransformerException {
-                        setTransformerException(e);
-                    }
-                    public void fatalError(TransformerException e) throws TransformerException {
-                        setTransformerException(e);
-                    }
-                });
-                transformer.transform(transformSrc, transformTgt);
-
-                if (transformerException != null) {
-                    throw transformerException;
+                    log.warn("Transformation warning encountered", e);
                 }
-
-            } catch (TransformerException x) {
-                // did we exceed the in-memory BYTE_ARRAY_SIZE? if so, use a file for output
-                try {
-                    tempTargetFile = File.createTempFile("xt_", ".xml");
-                    osForTarget  = new FileOutputStream(tempTargetFile);
-                    transformTgt = new StreamResult(osForTarget);
-
-                    // retry transformation again
-                    isForSource.reset();
-                    transformer.reset();
-                    transformer.transform(transformSrc, transformTgt);
-
-                } catch (IOException e) {
-                    handleException("Error using a temporary file/s for the transformation", e, synCtx);
+                public void error(TransformerException e) throws TransformerException {
+                    setTransformerException(e);
                 }
+                public void fatalError(TransformerException e) throws TransformerException {
+                    setTransformerException(e);
+                }
+            });
+            transformer.transform(transformSrc, transformTgt);
+
+            if (transformerException != null) {
+                throw transformerException;
             }
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Transformation completed - processing result");
             }
 
-            if (tempSourceFile != null) {
-                boolean deleted = tempSourceFile.delete();
-                if (!deleted) {
-                    tempSourceFile.deleteOnExit();
-                }
+            if (isForSource != null) {
+                IOUtils.closeQuietly(isForSource);
+                isForSource = null;
+            }
+            
+            if (tempSourceData != null) {
+                tempSourceData.release();
+                tempSourceData = null;
             }
 
             // get the result OMElement
@@ -426,50 +387,24 @@ public class XSLTMediator extends AbstractMediator {
 
             } else {
 
-                // if we used a temporary file for the output of the transformation, read from it
-                if (tempTargetFile != null) {
-                    try {
-                        XMLStreamReader reader = StAXUtils.createXMLStreamReader(
-                            new FileInputStream(tempTargetFile));
-                        if (isSoapEnvelope) {
-                            result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-                        } else {
-                            result = new StAXOMBuilder(reader).getDocumentElement();
-                        }                        
+                try {
+                    XMLStreamReader reader = StAXUtils.createXMLStreamReader(
+                        tempTargetData.getInputStream());
+                    if (isSoapEnvelope) {
+                        result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+                    } else {
+                        result = new StAXOMBuilder(reader).getDocumentElement();
+                    }                        
 
-                    } catch (XMLStreamException e) {
-                        handleException(
-                            "Error building result element from XSLT transformation", e, synCtx);
+                } catch (XMLStreamException e) {
+                    handleException(
+                        "Error building result element from XSLT transformation", e, synCtx);
 
-                    } catch (Exception e) {
-                        result = handleNonXMLResult(tempTargetFile, traceOrDebugOn, traceOn);
+                } catch (Exception e) {
+                    result = handleNonXMLResult(tempTargetData, traceOrDebugOn, traceOn);
 
-                    } finally {
-                        boolean deleted = tempTargetFile.delete();
-                        if (!deleted) {
-                            tempTargetFile.deleteOnExit();
-                        }
-                    }
-
-                } else {
-                    // read the Fixed byte array stream
-                    try {
-                        XMLStreamReader reader = StAXUtils.createXMLStreamReader(
-                            new ByteArrayInputStream(baosForTarget.toByteArray()));
-                        if (isSoapEnvelope) {
-                            result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-                        } else {
-                            result = new StAXOMBuilder(reader).getDocumentElement();
-                        }
-
-                    } catch (XMLStreamException e) {
-                        handleException(
-                            "Error building result element from XSLT transformation", e, synCtx);
-
-                    } catch (Exception e) {
-                        result = handleNonXMLResult(baosForTarget.toString(), traceOrDebugOn, traceOn);
-                    }
                 }
+
             }
 
             if (result == null) {
@@ -603,12 +538,12 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * If the transformation results in a non-XML payload, use standard wrapper elements
      * to wrap the text payload so that other mediators could still process the result
-     * @param file the text payload file
+     * @param tempData the text payload
      * @param traceOrDebugOn is tracing on debug logging on?
      * @param traceOn is tracing on?
      * @return an OMElement wrapping the text payload
      */
-    private OMElement handleNonXMLResult(File file, boolean traceOrDebugOn, boolean traceOn) {
+    private OMElement handleNonXMLResult(TemporaryData tempData, boolean traceOrDebugOn, boolean traceOn) {
 
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMElement wrapper = null;
@@ -617,41 +552,12 @@ public class XSLTMediator extends AbstractMediator {
             traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
         }
         if (traceOn && trace.isTraceEnabled()) {
-            trace.trace("Wrapping text transformation result from : " + file);
+            trace.trace("Wrapping text transformation result");
         }
 
-        if (file != null) {
-            TextFileDataSource txtFileDS = new TextFileDataSource(new FileDataSource(file));
+        if (tempData != null) {
+            TextFileDataSource txtFileDS = new TextFileDataSource(tempData);
             wrapper = new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
-        }
-
-        return wrapper;
-    }
-
-    /**
-     * If the transformation results in a non-XML payload, use standard wrapper elements
-     * to wrap the text payload so that other mediators could still process the result
-     * @param textPayload the text payload to wrap
-     * @param traceOrDebugOn is tracing on debug logging on?
-     * @param traceOn is tracing on?
-     * @return an OMElement wrapping the text payload
-     */
-    private OMElement handleNonXMLResult(String textPayload, boolean traceOrDebugOn, boolean traceOn) {
-
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMElement wrapper = null;
-
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
-        }
-        if (traceOn && trace.isTraceEnabled()) {
-            trace.trace("Wrapping text transformation result : " + textPayload);
-        }
-
-        if (textPayload != null) {
-            OMTextImpl textData = (OMTextImpl) fac.createOMText(textPayload);
-            wrapper = fac.createOMElement(BaseConstants.DEFAULT_TEXT_WRAPPER, null);
-            wrapper.addChild(textData);
         }
 
         return wrapper;

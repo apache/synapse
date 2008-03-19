@@ -47,6 +47,8 @@ import javax.activation.DataSource;
 import javax.activation.MailcapCommandMap;
 import javax.activation.CommandMap;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -339,9 +341,15 @@ public class MailTransportSender extends AbstractTransportSender {
                 }
             } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
                 if (firstChild instanceof OMSourcedElementImpl) {
+                    // Note: this code will be replaced by something more efficient later
                     baos = new ByteArrayOutputStream();
                     try {
-                        firstChild.serializeAndConsume(baos);
+                        XMLStreamReader reader = firstChild.getXMLStreamReader();
+                        while (reader.hasNext()) {
+                            if (reader.next() == XMLStreamReader.CHARACTERS) {
+                                baos.write(reader.getText().getBytes());
+                            }
+                        }
                     } catch (XMLStreamException e) {
                         handleException("Error serializing 'text' payload from OMSourcedElement", e);
                     }

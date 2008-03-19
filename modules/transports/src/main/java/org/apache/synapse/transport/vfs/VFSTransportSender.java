@@ -40,6 +40,8 @@ import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 
 import javax.activation.DataHandler;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
@@ -214,7 +216,12 @@ public class VFSTransportSender extends AbstractTransportSender {
                     OutputStream os = responseFile.getContent().getOutputStream();
                     try {
                         if (firstChild instanceof OMSourcedElementImpl) {
-                            firstChild.serializeAndConsume(os);
+                            XMLStreamReader reader = firstChild.getXMLStreamReader();
+                            while (reader.hasNext()) {
+                                if (reader.next() == XMLStreamReader.CHARACTERS) {
+                                    os.write(reader.getText().getBytes());
+                                }
+                            }
                         } else {
                             os.write(firstChild.getText().getBytes());
                         }

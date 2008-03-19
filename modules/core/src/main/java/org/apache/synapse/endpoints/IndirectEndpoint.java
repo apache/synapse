@@ -19,19 +19,22 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
  * This class represents the endpoints referred by keys. It does not store the actual referred
  * endpoint as a private variable as it could expire. Therefore, it only stores the key and gets the
  * actual endpoint from the synapse configuration.
- *
+ * <p/>
  * As this is also an instance of endpoint, this can be used any place, where a normal endpoint is used.
  */
 public class IndirectEndpoint implements Endpoint {
@@ -49,13 +52,49 @@ public class IndirectEndpoint implements Endpoint {
      * from it.
      */
     private MessageContext currentMsgCtx = null;
+    private final EndpointContext endpointContext = new EndpointContext();
 
     public void send(MessageContext synMessageContext) {
+
         // get the actual endpoint and send
         Endpoint endpoint = synMessageContext.getEndpoint(key);
         if (endpoint == null) {
             handleException("Reference to non-existent endpoint for key : " + key);
         }
+
+        boolean isClusteringEnable = false;
+        // get Axis2 MessageContext and ConfigurationContext
+        org.apache.axis2.context.MessageContext axisMC =
+                ((Axis2MessageContext) synMessageContext).getAxis2MessageContext();
+        ConfigurationContext cc = axisMC.getConfigurationContext();
+
+        //The check for clustering environment
+
+        ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+        if (clusterManager != null &&
+                clusterManager.getContextManager() != null) {
+            isClusteringEnable = true;
+        }
+
+        String endPointName = this.getName();
+        if (endPointName == null) {
+
+            if (log.isDebugEnabled() && isClusteringEnable) {
+                log.warn("In a clustering environment , the endpoint  name should be specified" +
+                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
+                        "functioned correctly if there are more than one anonymous endpoints. ");
+            }
+            endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+        }
+
+        if (isClusteringEnable) {
+            // if this is a cluster environment , then set configuration context to endpoint context
+            if (endpointContext.getConfigurationContext() == null) {
+                endpointContext.setConfigurationContext(cc);
+                endpointContext.setContextID(endPointName);
+            }
+        }
+
 
         if (endpoint.isActive(synMessageContext)) {
             endpoint.send(synMessageContext);
@@ -65,12 +104,12 @@ public class IndirectEndpoint implements Endpoint {
             // if not, inform to the next fault handler.
             if (parentEndpoint != null) {
                 auditWarn("Endpoint : " + endpoint.getName() + " is currently inactive" +
-                    " - invoking parent endpoint", synMessageContext);
+                        " - invoking parent endpoint", synMessageContext);
                 parentEndpoint.onChildEndpointFail(this, synMessageContext);
 
             } else {
                 auditWarn("Endpoint : " + endpoint.getName() + " is currently inactive" +
-                    " - invoking fault handler / assuming failure", synMessageContext);
+                        " - invoking fault handler / assuming failure", synMessageContext);
 
                 Object o = synMessageContext.getFaultStack().pop();
                 if (o != null) {
@@ -101,7 +140,6 @@ public class IndirectEndpoint implements Endpoint {
      * this returns if its referred endpoint is active or not.
      *
      * @param synMessageContext MessageContext of the current message.
-     *
      * @return true if the referred endpoint is active. false otherwise.
      */
     public boolean isActive(MessageContext synMessageContext) {
@@ -117,8 +155,7 @@ public class IndirectEndpoint implements Endpoint {
      * Activating or deactivating an IndirectEndpoint is the activating or deactivating its
      * referref endpoint. Therefore, this sets the active state of its referred endpoint.
      *
-     * @param active true if active. false otherwise.
-     *
+     * @param active            true if active. false otherwise.
      * @param synMessageContext MessageContext of the current message.
      */
     public void setActive(boolean active, MessageContext synMessageContext) {
@@ -134,7 +171,7 @@ public class IndirectEndpoint implements Endpoint {
         this.parentEndpoint = parentEndpoint;
     }
 
-    public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {        
+    public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
 
         // if this is a child of some other endpoint, inform parent about the failure.
         // if not, inform to the next fault handler.
@@ -163,7 +200,7 @@ public class IndirectEndpoint implements Endpoint {
         }
     }
 
-    public boolean shouldTrace(MessageContext synCtx){
+    public boolean shouldTrace(MessageContext synCtx) {
         Endpoint endpoint = synCtx.getEndpoint(key);
         EndpointDefinition endptDefn = null;
         if (endpoint instanceof AddressEndpoint) {
@@ -176,8 +213,8 @@ public class IndirectEndpoint implements Endpoint {
 
         if (endptDefn != null) {
             return (endptDefn.getTraceState() == SynapseConstants.TRACING_ON) ||
-                   (endptDefn.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                        synCtx.getTracingState() == SynapseConstants.TRACING_ON);
+                    (endptDefn.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                            synCtx.getTracingState() == SynapseConstants.TRACING_ON);
         }
         return false;
     }

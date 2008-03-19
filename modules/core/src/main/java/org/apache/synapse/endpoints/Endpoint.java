@@ -45,7 +45,7 @@ public interface Endpoint {
      * But it is good practice to first try addressing the issue. If it can't be addressed propagate the
      * exception to parent endpoint by calling parent endpoint's onChildEndpointFail(...) method.
      *
-     * @param endpoint The child endpoint which caused the exception.
+     * @param endpoint          The child endpoint which caused the exception.
      * @param synMessageContext MessageContext that was used in the failed attempt.
      */
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext);
@@ -54,7 +54,7 @@ public interface Endpoint {
      * Sets the parent endpoint for the current endpoint.
      *
      * @param parentEndpoint parent endpoint containing this endpoint. It should handle the onChildEndpointFail(...)
-     * callback.
+     *                       callback.
      */
     public void setParentEndpoint(Endpoint parentEndpoint);
 
@@ -78,9 +78,8 @@ public interface Endpoint {
      * endpoints.
      *
      * @param synMessageContext MessageContext for the current message. This is required for
-     * IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
-     * Endpoint implementations may ignore this parameter.
-     *
+     *                          IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
+     *                          Endpoint implementations may ignore this parameter.
      * @return true if the endpoint is in active state. false otherwise.
      */
     public boolean isActive(MessageContext synMessageContext);
@@ -90,11 +89,10 @@ public interface Endpoint {
      * set as inactive. But endpoints may be eventually set as active by the endpoint refresher to
      * avoid ignoring endpoints forever.
      *
-     * @param active true if active. false otherwise.
-     *
+     * @param active            true if active. false otherwise.
      * @param synMessageContext MessageContext for the current message. This is required for
-     * IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
-     * Endpoint implementations may ignore this parameter.
+     *                          IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
+     *                          Endpoint implementations may ignore this parameter.
      */
     public void setActive(boolean active, MessageContext synMessageContext);
 }

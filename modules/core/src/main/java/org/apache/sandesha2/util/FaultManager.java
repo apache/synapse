@@ -995,10 +995,18 @@ public class FaultManager {
             Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
             if (callback instanceof Callback)
             {
-                ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
+                try {
+                    ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
+                } catch (AxisFault axisFault) {
+                    throw new SandeshaStorageException(axisFault);
+                }
                 ((Callback)callback).onError(fault);
             } else if(callback instanceof AxisCallback) {
-                ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
+                try {
+                    ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
+                } catch (AxisFault axisFault) {
+                    throw new SandeshaStorageException(axisFault);
+                }
                 ((AxisCallback)callback).onError(fault);
             }
         }

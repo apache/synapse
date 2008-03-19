@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Class representing some temporary data in the form of a byte stream.
  * <p>
@@ -20,6 +23,8 @@ import java.io.OutputStream;
  * call {@link #release()} to discard the temporary data.
  */
 public class TemporaryData {
+    private static final Log log = LogFactory.getLog(TemporaryData.class);
+    
     class OutputStreamImpl extends OutputStream {
         private FileOutputStream fileOutputStream;
         
@@ -29,6 +34,10 @@ public class TemporaryData {
             } else if (len > (chunks.length-chunkIndex)*chunkSize - chunkOffset) {
                 // The buffer will overflow. Switch to a temporary file.
                 temporaryFile = File.createTempFile(tempPrefix, tempSuffix);
+                if (log.isDebugEnabled()) {
+                    log.debug("Using temporary file " + temporaryFile);
+                }
+                temporaryFile.deleteOnExit();
                 fileOutputStream = new FileOutputStream(temporaryFile);
                 // Write the buffer to the temporary file.
                 for (int i=0; i<chunkIndex; i++) {
@@ -93,6 +102,8 @@ public class TemporaryData {
     class InputStreamImpl extends InputStream {
         private int currentChunkIndex;
         private int currentChunkOffset;
+        private int markChunkIndex;
+        private int markChunkOffset;
         
         public int available() throws IOException {
             return (chunkIndex-currentChunkIndex)*chunkSize + chunkOffset - currentChunkOffset;
@@ -138,6 +149,20 @@ public class TemporaryData {
         public int read() throws IOException {
             byte[] b = new byte[1];
             return read(b) == -1 ? -1 : (int)b[0] & 0xFF;
+        }
+
+        public boolean markSupported() {
+            return true;
+        }
+
+        public void mark(int readlimit) {
+            markChunkIndex = currentChunkIndex;
+            markChunkOffset = currentChunkOffset;
+        }
+
+        public void reset() throws IOException {
+            currentChunkIndex = markChunkIndex;
+            currentChunkOffset = markChunkOffset;
         }
 
         public long skip(long n) throws IOException {
@@ -214,6 +239,13 @@ public class TemporaryData {
     
     public void release() {
         if (temporaryFile != null) {
+            temporaryFile.delete();
+        }
+    }
+
+    protected void finalize() throws Throwable {
+        if (temporaryFile != null) {
+            log.warn("Cleaning up unreleased temporary file " + temporaryFile);
             temporaryFile.delete();
         }
     }

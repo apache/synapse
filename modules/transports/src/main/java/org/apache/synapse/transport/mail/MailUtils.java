@@ -79,8 +79,7 @@ public class MailUtils extends BaseUtils {
                              contType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) != -1)) {
                             // this part is a SOAP 11 or 12 payload, treat this as the message
                             return mbp.getInputStream();
-                        } else if (mbp != null && (contType.indexOf("plain/text") != -1
-                                || contType.indexOf("text/plain") != -1)) {
+                        } else if (mbp != null && contType.indexOf("text/plain") != -1) {
                             firstTextPart = mbp;
                         }
                     }

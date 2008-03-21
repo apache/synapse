@@ -24,7 +24,6 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -36,6 +35,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.PolicyInfo;
 import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
@@ -65,7 +65,8 @@ import java.util.*;
  *    </publishWSDL>?
  *    <enableSec/>?
  *    <enableRM/>?
- *    <policy key="string">?
+ *    <policy key="string" [type=("in" |"out")] [operationName="string"]
+ *      [operationNamespace="string"]>?
  *       // optional service parameters
  *    <parameter name="string">
  *       text | xml
@@ -146,6 +147,11 @@ public class ProxyService {
      * by the service WSDL to be located in the registry.
      */
     private ResourceMap resourceMap;
+    /**
+     * Policies to be set to the service, this can include service level, operation level,
+     * message level or hybrid level policies as well.
+     */
+    private List<PolicyInfo> policies = new ArrayList<PolicyInfo>();
     /**
      * The keys for any supplied policies that would apply at the service level
      */
@@ -312,7 +318,7 @@ public class ProxyService {
                                 ((WSDL11ToAxisServiceBuilder)
                                     wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
                                     new CustomWSDLLocator(new InputSource(wsdlInputStream),
-                                                          wsdlURI != null ? wsdlURI.toString() : ""));
+                                            wsdlURI != null ? wsdlURI.toString() : ""));
                             }
                         }
 
@@ -403,107 +409,63 @@ public class ProxyService {
             }
         }
 
-        Iterator iter;
-        // if service level policies are specified, apply them
-        if (!serviceLevelPolicies.isEmpty()) {
+        if (!policies.isEmpty()) {
 
-            if (trace()) {
-                trace.info("Setting service level policies : " + serviceLevelPolicies);
-            }
-            Policy svcEffectivePolicy = getEffectivePolicyFromList(serviceLevelPolicies, synCfg);
-            PolicyInclude pi = proxyService.getPolicyInclude();
-            if (pi != null && svcEffectivePolicy != null) {
-                if (trace()) {
-                    if (trace.isTraceEnabled()) {
-                        trace.trace("Effective policy applied : " + svcEffectivePolicy);
+            for (PolicyInfo pi : policies) {
+
+                if (pi.isServicePolicy()) {
+
+                    proxyService.getPolicyInclude().addPolicyElement(
+                            PolicyInclude.AXIS_SERVICE_POLICY,
+                            getPolicyFromKey(pi.getPolicyKey(), synCfg));
+
+                } else if (pi.isOperationPolicy()) {
+
+                    AxisOperation op = proxyService.getOperation(pi.getOperation());
+                    if (op != null) {
+                        op.getPolicyInclude().addPolicyElement(PolicyInclude.AXIS_OPERATION_POLICY,
+                                getPolicyFromKey(pi.getPolicyKey(), synCfg));
+                    } else {
+                        handleException("Couldn't find the operation specified " +
+                                "by the QName : " + pi.getOperation());
                     }
-                }
-                pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
-            }
-        }
+                    
+                } else if (pi.isMessagePolicy()) {
 
-        if (!inMessagePolicies.isEmpty()) {
+                    if (pi.getOperation() != null) {
 
-            if (trace()) {
-                trace.info("Setting IN Message policies : " + inMessagePolicies);
-            }
-
-            Policy svcEffectivePolicy = getEffectivePolicyFromList(inMessagePolicies, synCfg);
-
-            for (Iterator itr = proxyService.getOperations(); itr.hasNext();) { //Object obj : proxyService.getOperationsNameList()) {
-
-                Object obj = itr.next();
-                if (obj instanceof AxisOperation && !(obj instanceof OutOnlyAxisOperation)) {
-
-                    AxisMessage inMessage = ((AxisOperation) obj).getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-
-                    if (inMessage != null) {
-
-                        PolicyInclude pi = inMessage.getPolicyInclude();
-
-                        if (pi != null && svcEffectivePolicy != null) {
-
-                            if (trace()) {
-                                if (trace.isTraceEnabled()) {
-                                    trace.trace("Effective policy applied : " + svcEffectivePolicy);
-                                }
-                            }
-
-                            pi.addPolicyElement(PolicyInclude.AXIS_MESSAGE_POLICY, svcEffectivePolicy);
+                        AxisOperation op = proxyService.getOperation(pi.getOperation());
+                        if (op != null) {
+                            op.getMessage(pi.getMessageLable()).getPolicyInclude().addPolicyElement(
+                                    PolicyInclude.MESSAGE_POLICY,
+                                    getPolicyFromKey(pi.getPolicyKey(), synCfg));
+                        } else {
+                            handleException("Couldn't find the operation " +
+                                    "specified by the QName : " + pi.getOperation());
                         }
                         
                     } else {
+                        // operation is not specified and hence apply to all the applicable messages
+                        for (Iterator itr = proxyService.getOperations(); itr.hasNext();) {
+                            Object obj = itr.next();
+                            if (obj instanceof AxisOperation) {
+                                // check whether the policy is applicable
+                                if (!((obj instanceof OutOnlyAxisOperation && pi.getType()
+                                        == PolicyInfo.MESSAGE_TYPE_IN) ||
+                                        (obj instanceof InOnlyAxisOperation
+                                        && pi.getType() == PolicyInfo.MESSAGE_TYPE_OUT))) {
 
-                        if (trace()) {
-                            if (trace.isTraceEnabled()) {
-                                trace.trace("Effective policy for the in message can not be applied for " +
-                                        "the operation : " + obj + ". Unable to find the in mesage");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!outMessagePolicies.isEmpty()) {
-            
-            if (trace()) {
-                trace.info("Setting OUT Message policies : " + outMessagePolicies);
-            }
-            
-            Policy svcEffectivePolicy = getEffectivePolicyFromList(outMessagePolicies, synCfg);
-
-            for (Iterator itr = proxyService.getOperations(); itr.hasNext();) { //Object obj : proxyService.getOperationsNameList()) {
-
-                Object obj = itr.next();
-                if (obj instanceof AxisOperation && !(obj instanceof InOnlyAxisOperation)) {
-
-                    AxisMessage outMessage = ((AxisOperation) obj).getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
-
-                    if (outMessage != null) {
-
-                        PolicyInclude pi = outMessage.getPolicyInclude();
-
-                        if (pi != null && svcEffectivePolicy != null) {
-
-                            if (trace()) {
-                                if (trace.isTraceEnabled()) {
-                                    trace.trace("Effective policy applied : " + svcEffectivePolicy);
+                                    AxisMessage message = ((AxisOperation)
+                                            obj).getMessage(pi.getMessageLable());
+                                    message.getPolicyInclude().addPolicyElement(
+                                            PolicyInclude.AXIS_MESSAGE_POLICY,
+                                            getPolicyFromKey(pi.getPolicyKey(), synCfg));
                                 }
                             }
-
-                            pi.addPolicyElement(PolicyInclude.AXIS_MESSAGE_POLICY, svcEffectivePolicy);
-                        }
-                        
-                    } else {
-
-                        if (trace()) {
-                            if (trace.isTraceEnabled()) {
-                                trace.trace("Effective policy for the out message can not be applied for " +
-                                        "the operation : " + obj + ". Unable to find the out mesage");
-                            }
                         }
                     }
+                } else {
+                    handleException("Undefined Policy type");
                 }
             }
         }
@@ -513,7 +475,7 @@ public class ProxyService {
         msgRcvr.setName(name);
         msgRcvr.setProxy(this);
 
-        iter = proxyService.getOperations();
+        Iterator iter = proxyService.getOperations();
         while (iter.hasNext()) {
             AxisOperation op = (AxisOperation) iter.next();
             op.setMessageReceiver(msgRcvr);
@@ -561,27 +523,10 @@ public class ProxyService {
         return proxyService;
     }
 
-    private Policy getEffectivePolicyFromList(List<String> policyKeyList,
-        SynapseConfiguration synCfg) {
+    private Policy getPolicyFromKey(String key, SynapseConfiguration synCfg) {
 
-        Policy svcEffectivePolicy = null;
-
-        for (String policyKey : policyKeyList) {
-            synCfg.getEntryDefinition(policyKey);
-            Object policyProp = synCfg.getEntry(policyKey);
-            if (policyProp != null) {
-                if (svcEffectivePolicy == null) {
-                    svcEffectivePolicy = PolicyEngine.getPolicy(
-                        SynapseConfigUtils.getStreamSource(policyProp).getInputStream());
-                } else {
-                    svcEffectivePolicy = svcEffectivePolicy.merge(
-                        PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
-                            policyProp).getInputStream()));
-                }
-            }
-        }
-
-        return svcEffectivePolicy;
+        return PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
+                synCfg.getEntry(key)).getInputStream());
     }
 
     /**
@@ -928,5 +873,17 @@ public class ProxyService {
 
     public void addOutMessagePolicy(String messagePolicy) {
         this.outMessagePolicies.add(messagePolicy);
+    }
+
+    public List<PolicyInfo> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(List<PolicyInfo> policies) {
+        this.policies = policies;
+    }
+
+    public void addPolicyInfo(PolicyInfo pi) {
+        this.policies.add(pi);
     }
 }

@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.PolicyInfo;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -178,24 +179,26 @@ public class ProxyServiceSerializer {
             proxy.addChild(wsdl);
         }
 
-        for (String policyKey : service.getServiceLevelPolicies()) {
+        for (PolicyInfo pi : service.getPolicies()) {
             OMElement policy = fac.createOMElement("policy", synNS);
-            policy.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, policyKey));
-            proxy.addChild(policy);
-        }
+            if (pi.getPolicyKey() != null) {
+                policy.addAttribute(fac.createOMAttribute("key", nullNS, pi.getPolicyKey()));
+            } else {
+                handleException("Policy without a key has been found");
+            }
 
-        for (String inPolicyKey : service.getInMessagePolicies()) {
-            OMElement policy = fac.createOMElement("policy", synNS);
-            policy.addAttribute(fac.createOMAttribute("key", nullNS, inPolicyKey));
-            policy.addAttribute(fac.createOMAttribute("type", nullNS, "in"));
-            proxy.addChild(policy);
-        }
+            if (pi.getOperation() != null) {
+                policy.addAttribute(fac.createOMAttribute("operationName", nullNS, pi.getOperation().getLocalPart()));
+                if (pi.getOperation().getNamespaceURI() != null) {
+                    policy.addAttribute(fac.createOMAttribute(
+                            "operationNamespace", nullNS, pi.getOperation().getNamespaceURI()));
+                }
+            }
 
-        for (String outPolicyKey : service.getOutMessagePolicies()) {
-            OMElement policy = fac.createOMElement("policy", synNS);
-            policy.addAttribute(fac.createOMAttribute("key", nullNS, outPolicyKey));
-            policy.addAttribute(fac.createOMAttribute("type", nullNS, "out"));
+            if (pi.getType() != 0) {
+                policy.addAttribute(fac.createOMAttribute("type", nullNS, pi.getMessageLable().toLowerCase()));
+            }
+
             proxy.addChild(policy);
         }
 

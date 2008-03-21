@@ -212,7 +212,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             response.setServiceContext(null);
             response.setOperationContext(axisOutMsgCtx.getOperationContext());
-            response.setAxisMessage(axisOutMsgCtx.getAxisOperation().getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
+            response.setAxisMessage(axisOutMsgCtx.getAxisOperation().getMessage(
+                    WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
 
             // set properties on response
             response.setServerSide(true);

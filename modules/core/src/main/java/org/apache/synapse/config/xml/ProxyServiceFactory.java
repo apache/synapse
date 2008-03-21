@@ -19,15 +19,6 @@
 
 package org.apache.synapse.config.xml;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -37,6 +28,15 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.util.PolicyInfo;
+
+import javax.xml.namespace.QName;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Creates a ProxyService instance using the XML fragment specification
@@ -79,8 +79,8 @@ public class ProxyServiceFactory {
             proxy = new ProxyService(name.getAttributeValue());
         }
 
-        OMAttribute statistics = elem.getAttribute(
-                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+        OMAttribute statistics = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                XMLConfigConstants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
@@ -92,7 +92,8 @@ public class ProxyServiceFactory {
             }
         }
 
-        OMAttribute trans = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "transports"));
+        OMAttribute trans = elem.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "transports"));
         if (trans != null) {
             String transports = trans.getAttributeValue();
             if (transports == null || ProxyService.ALL_TRANSPORTS.equals(transports)) {
@@ -110,7 +111,8 @@ public class ProxyServiceFactory {
             }
         }
 
-        OMAttribute pinnedServers = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "pinnedServers"));
+        OMAttribute pinnedServers = elem.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "pinnedServers"));
         if (pinnedServers != null) {
             String pinnedServersValue = pinnedServers.getAttributeValue();
             if (pinnedServersValue == null) {
@@ -128,7 +130,8 @@ public class ProxyServiceFactory {
             }
         }
         
-        OMAttribute trace = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
+        OMAttribute trace = elem.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
         if (trace != null) {
             String traceValue = trace.getAttributeValue();
             if (traceValue != null) {
@@ -162,64 +165,80 @@ public class ProxyServiceFactory {
         if (target != null) {
             boolean isTargetOk = false;
             SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
-            OMAttribute inSequence = target.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "inSequence"));
+            OMAttribute inSequence = target.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "inSequence"));
             if (inSequence != null) {
                 proxy.setTargetInSequence(inSequence.getAttributeValue());
                 isTargetOk = true;
             } else {
-                OMElement inSequenceElement = target.getFirstChildWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "inSequence"));
+                OMElement inSequenceElement = target.getFirstChildWithName(
+                        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "inSequence"));
                 if (inSequenceElement != null) {
-                    proxy.setTargetInLineInSequence(mediatorFactory.createAnonymousSequence(inSequenceElement));
+                    proxy.setTargetInLineInSequence(
+                            mediatorFactory.createAnonymousSequence(inSequenceElement));
                     isTargetOk = true;
                 }
             }
-            OMAttribute outSequence = target.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "outSequence"));
+            OMAttribute outSequence = target.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "outSequence"));
             if (outSequence != null) {
                 proxy.setTargetOutSequence(outSequence.getAttributeValue());
             } else {
-                OMElement outSequenceElement = target.getFirstChildWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "outSequence"));
+                OMElement outSequenceElement = target.getFirstChildWithName(
+                        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "outSequence"));
                 if (outSequenceElement != null) {
-                    proxy.setTargetInLineOutSequence(mediatorFactory.createAnonymousSequence(outSequenceElement));
+                    proxy.setTargetInLineOutSequence(
+                            mediatorFactory.createAnonymousSequence(outSequenceElement));
                 } else {
                     handleException("Target for the proxy service must declare an out sequence");
                 }
             }
-            OMAttribute faultSequence = target.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "faultSequence"));
+            OMAttribute faultSequence = target.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "faultSequence"));
             if (faultSequence != null) {
                 proxy.setTargetFaultSequence(faultSequence.getAttributeValue());
             } else {
-                OMElement faultSequenceElement = target.getFirstChildWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "faultSequence"));
+                OMElement faultSequenceElement = target.getFirstChildWithName(
+                        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "faultSequence"));
                 if (faultSequenceElement != null) {
-                    proxy.setTargetInLineFaultSequence(mediatorFactory.createAnonymousSequence(faultSequenceElement));
+                    proxy.setTargetInLineFaultSequence(
+                            mediatorFactory.createAnonymousSequence(faultSequenceElement));
                 }
             }
-            OMAttribute tgtEndpt = target.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "endpoint"));
+            OMAttribute tgtEndpt = target.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "endpoint"));
             if (tgtEndpt != null) {
                 proxy.setTargetEndpoint(tgtEndpt.getAttributeValue());
                 isTargetOk = true;
             } else {
-                OMElement endpointElement = target.getFirstChildWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
+                OMElement endpointElement = target.getFirstChildWithName(
+                        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
                 if (endpointElement != null) {
-                    EndpointFactory fac = EndpointAbstractFactory.getEndpointFactroy(endpointElement);
+                    EndpointFactory fac
+                            = EndpointAbstractFactory.getEndpointFactroy(endpointElement);
                     proxy.setTargetInLineEndpoint(fac.createEndpoint(endpointElement, true));
                     isTargetOk = true;
                 }
             }
             if(!isTargetOk) {
-                handleException("Target of the proxy service must declare either an inSequence or endpoint or both");
+                handleException("Target of the proxy service must declare " +
+                        "either an inSequence or endpoint or both");
             }
         } else {
             handleException("Target is required for a Proxy service definition");
         }
 
         // read the WSDL, Schemas and Policies and set to the proxy service
-        OMElement wsdl = elem.getFirstChildWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "publishWSDL"));
+        OMElement wsdl = elem.getFirstChildWithName(
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "publishWSDL"));
         if (wsdl != null) {
-            OMAttribute wsdlkey = wsdl.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+            OMAttribute wsdlkey = wsdl.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
             if (wsdlkey != null) {
                 proxy.setWSDLKey(wsdlkey.getAttributeValue());
             } else {
-                OMAttribute wsdlURI = wsdl.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "uri"));
+                OMAttribute wsdlURI = wsdl.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "uri"));
                 if (wsdlURI != null) {
                     try {
                         proxy.setWsdlURI(new URI(wsdlURI.getAttributeValue()));
@@ -229,11 +248,13 @@ public class ProxyServiceFactory {
                         handleException(msg, e);
                     }
                 } else {
-                    OMElement wsdl11 = wsdl.getFirstChildWithName(new QName(WSDLConstants.WSDL1_1_NAMESPACE, "definitions"));
+                    OMElement wsdl11 = wsdl.getFirstChildWithName(
+                            new QName(WSDLConstants.WSDL1_1_NAMESPACE, "definitions"));
                     if (wsdl11 != null) {
                         proxy.setInLineWSDL(wsdl11);
                     } else {
-                        OMElement wsdl20 = wsdl.getFirstChildWithName(new QName(WSDLConstants.WSDL2_0_NAMESPACE, "descriptions"));
+                        OMElement wsdl20 = wsdl.getFirstChildWithName(
+                                new QName(WSDLConstants.WSDL2_0_NAMESPACE, "descriptions"));
                         if (wsdl20 != null) {
                             proxy.setInLineWSDL(wsdl20);
                         }
@@ -243,27 +264,47 @@ public class ProxyServiceFactory {
             proxy.setResourceMap(ResourceMapFactory.createResourceMap(wsdl));
         }
 
-//        OMElement schema = elem.getFirstChildWithName(
-//                new QName(Constants.SYNAPSE_NAMESPACE, "schema"));
         Iterator policies = elem.getChildrenWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "policy"));
         while (policies.hasNext()) {
             Object o = policies.next();
             if (o instanceof OMElement) {
                 OMElement policy = (OMElement) o;
-                OMAttribute key = policy.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
-                OMAttribute type = policy.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "type"));
+                OMAttribute key = policy.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+                OMAttribute type = policy.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "type"));
+                OMAttribute operationName = policy.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "operationName"));
+                OMAttribute operationNS = policy.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "operationNamespace"));
 
                 if (key != null) {
-                    if (type == null) {
-                        proxy.addServiceLevelPolicy(key.getAttributeValue());
-                    } else if ("in".equals(type.getAttributeValue())) {
-                        proxy.addInMessagePolicy(key.getAttributeValue());
-                    } else if ("out".equals(type.getAttributeValue())) {
-                        proxy.addOutMessagePolicy(key.getAttributeValue());
-                    } else {
-                        handleException("Undefined policy type for the policy with key : " + key.getAttributeValue());
+
+                    PolicyInfo pi = new PolicyInfo(key.getAttributeValue());
+
+                    if (type != null && type.getAttributeValue() != null) {
+                        if ("in".equals(type.getAttributeValue())) {
+                            pi.setType(PolicyInfo.MESSAGE_TYPE_IN);
+                        } else if ("out".equals(type.getAttributeValue())) {
+                            pi.setType(PolicyInfo.MESSAGE_TYPE_OUT);
+                        } else {
+                            handleException("Undefined policy type for the policy with key : "
+                                    + key.getAttributeValue());
+                        }
                     }
+
+                    if (operationName != null && operationName.getAttributeValue() != null) {
+                        if (operationNS != null && operationNS.getAttributeValue() != null) {
+                            pi.setOperation(new QName(operationNS.getAttributeValue(),
+                                    operationName.getAttributeValue()));
+                        } else {
+                            pi.setOperation(new QName(operationName.getAttributeValue()));
+                        }
+                    }
+
+                    proxy.addPolicyInfo(pi);
+
                 } else {
                     handleException("Policy element does not specify the policy key");
                 }
@@ -278,7 +319,8 @@ public class ProxyServiceFactory {
             Object o = props.next();
             if (o instanceof OMElement) {
                 OMElement prop = (OMElement) o;
-                OMAttribute pname = prop.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+                OMAttribute pname = prop.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
                 OMElement propertyValue = prop.getFirstElement();
                 if (pname != null) {
                     if (propertyValue != null) {

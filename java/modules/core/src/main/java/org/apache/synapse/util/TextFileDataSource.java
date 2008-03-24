@@ -34,20 +34,23 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
+import java.nio.charset.Charset;
 
 public class TextFileDataSource extends OMDataSourceExtBase {
 
     private static final byte[] empty =
         "<text xmlns=\"http://ws.apache.org/commons/ns/payload\"/>".getBytes();
     private final TemporaryData temporaryData;
+    private final Charset charset;
 
-    public TextFileDataSource(TemporaryData temporaryData) {
+    public TextFileDataSource(TemporaryData temporaryData, Charset charset) {
         this.temporaryData = temporaryData;
+        this.charset = charset;
     }
     
-    public static OMSourcedElement createOMSourcedElement(TemporaryData temporaryData) {
+    public static OMSourcedElement createOMSourcedElement(TemporaryData temporaryData, Charset charset) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
-        TextFileDataSource txtFileDS = new TextFileDataSource(temporaryData);
+        TextFileDataSource txtFileDS = new TextFileDataSource(temporaryData, charset);
         return new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
     }
 
@@ -85,7 +88,7 @@ public class TextFileDataSource extends OMDataSourceExtBase {
         catch (IOException ex) {
             throw new XMLStreamException(ex);
         }
-        return new WrappedTextNodeStreamReader(BaseConstants.DEFAULT_TEXT_WRAPPER, new InputStreamReader(is));
+        return new WrappedTextNodeStreamReader(BaseConstants.DEFAULT_TEXT_WRAPPER, new InputStreamReader(is, charset));
     }
 
     public Object getObject() {
@@ -108,6 +111,6 @@ public class TextFileDataSource extends OMDataSourceExtBase {
     }
 
     public OMDataSourceExt copy() {
-        return new TextFileDataSource(temporaryData);
+        return new TextFileDataSource(temporaryData, charset);
     }
 }

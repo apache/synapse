@@ -20,20 +20,22 @@
 package org.apache.synapse.util;
 
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMSourcedElement;
 
 public class TextFileDataSourceTest extends TestCase {
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
     public void testWithXMLChars() throws Exception {
         TemporaryData tmp = new TemporaryData(4, 1024, "tmp_", ".dat");
         OutputStream out = tmp.getOutputStream();
         String testString = "Test string with ampersand (&)";
-        out.write(testString.getBytes("UTF-8"));
+        out.write(testString.getBytes(UTF8.name()));
         out.close();
-        OMSourcedElement element = TextFileDataSource.createOMSourcedElement(tmp);
+        OMSourcedElement element = TextFileDataSource.createOMSourcedElement(tmp, UTF8);
         assertEquals(testString, element.getText());
     }
 }

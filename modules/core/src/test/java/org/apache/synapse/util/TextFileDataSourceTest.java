@@ -19,22 +19,25 @@
 
 package org.apache.synapse.util;
 
-import org.apache.axiom.attachments.ByteArrayDataSource;
+import java.io.OutputStream;
+
+import junit.framework.TestCase;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDataSource;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.util.TextFileDataSource;
-
-import junit.framework.TestCase;
 
 public class TextFileDataSourceTest extends TestCase {
 
     public void testWithXMLChars() throws Exception {
+        TemporaryData tmp = new TemporaryData(4, 1024, "tmp_", ".dat");
+        OutputStream out = tmp.getOutputStream();
         String testString = "Test string with ampersand (&)";
-        OMDataSource dataSource
-            = new TextFileDataSource(new ByteArrayDataSource(testString.getBytes("UTF-8")));
+        out.write(testString.getBytes("UTF-8"));
+        out.close();
+        OMDataSource dataSource = new TextFileDataSource(tmp);
         OMFactory omFactory = OMAbstractFactory.getOMFactory();
         OMSourcedElementImpl element
             = new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, omFactory, dataSource);

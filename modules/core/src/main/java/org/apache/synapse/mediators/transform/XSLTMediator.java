@@ -21,12 +21,10 @@ package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
-import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -40,7 +38,6 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.TextFileDataSource;
@@ -511,9 +508,6 @@ public class XSLTMediator extends AbstractMediator {
      */
     private OMElement handleNonXMLResult(TemporaryData tempData, boolean traceOrDebugOn, boolean traceOn) {
 
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMElement wrapper = null;
-
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
         }
@@ -521,12 +515,7 @@ public class XSLTMediator extends AbstractMediator {
             trace.trace("Wrapping text transformation result");
         }
 
-        if (tempData != null) {
-            TextFileDataSource txtFileDS = new TextFileDataSource(tempData);
-            wrapper = new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
-        }
-
-        return wrapper;
+        return TextFileDataSource.createOMSourcedElement(tempData);
     }
 
     /**

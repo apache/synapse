@@ -23,11 +23,7 @@ import java.io.OutputStream;
 
 import junit.framework.TestCase;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMDataSource;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.axiom.om.OMSourcedElement;
 
 public class TextFileDataSourceTest extends TestCase {
 
@@ -37,10 +33,7 @@ public class TextFileDataSourceTest extends TestCase {
         String testString = "Test string with ampersand (&)";
         out.write(testString.getBytes("UTF-8"));
         out.close();
-        OMDataSource dataSource = new TextFileDataSource(tmp);
-        OMFactory omFactory = OMAbstractFactory.getOMFactory();
-        OMSourcedElementImpl element
-            = new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, omFactory, dataSource);
+        OMSourcedElement element = TextFileDataSource.createOMSourcedElement(tmp);
         assertEquals(testString, element.getText());
     }
 }

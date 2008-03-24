@@ -54,6 +54,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -357,7 +358,8 @@ public class XSLTMediator extends AbstractMediator {
                 }
                 
                 if ("text".equals(outputMethod)) {
-                    result = handleNonXMLResult(tempTargetData, traceOrDebugOn, traceOn);
+                    result = handleNonXMLResult(tempTargetData, Charset.forName(encoding),
+                                                traceOrDebugOn, traceOn);
                 } else {
                     try {
                         XMLStreamReader reader = StAXUtils.createXMLStreamReader(
@@ -509,12 +511,13 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * If the transformation results in a non-XML payload, use standard wrapper elements
      * to wrap the text payload so that other mediators could still process the result
-     * @param tempData the text payload
+     * @param tempData the encoded text payload
+     * @param charset the encoding of the payload
      * @param traceOrDebugOn is tracing on debug logging on?
      * @param traceOn is tracing on?
      * @return an OMElement wrapping the text payload
      */
-    private OMElement handleNonXMLResult(TemporaryData tempData, boolean traceOrDebugOn, boolean traceOn) {
+    private OMElement handleNonXMLResult(TemporaryData tempData, Charset charset, boolean traceOrDebugOn, boolean traceOn) {
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
@@ -523,7 +526,7 @@ public class XSLTMediator extends AbstractMediator {
             trace.trace("Wrapping text transformation result");
         }
 
-        return TextFileDataSource.createOMSourcedElement(tempData);
+        return TextFileDataSource.createOMSourcedElement(tempData, charset);
     }
 
     /**

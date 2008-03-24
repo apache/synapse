@@ -239,6 +239,9 @@ public class TemporaryData {
     
     public void release() {
         if (temporaryFile != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Deleting temporary file " + temporaryFile);
+            }
             temporaryFile.delete();
         }
     }

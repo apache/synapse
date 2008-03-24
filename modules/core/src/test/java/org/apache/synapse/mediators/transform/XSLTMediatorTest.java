@@ -22,12 +22,18 @@ package org.apache.synapse.mediators.transform;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -274,4 +280,25 @@ public class XSLTMediatorTest extends TestCase {
         }
     }
 
+    public void testTextEncoding() throws Exception {
+        Entry xsltEntry = new Entry();
+        xsltEntry.setType(Entry.URL_SRC);
+        xsltEntry.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/encoding_test.xslt"));
+        
+        SynapseConfiguration cfg = new SynapseConfiguration();
+        cfg.addEntry("xslt-key", xsltEntry);
+        
+        transformMediator = new XSLTMediator();
+        transformMediator.setXsltKey("xslt-key");
+        
+        MessageContext mc = new TestMessageContext();
+        mc.setConfiguration(cfg);
+        mc.setEnvelope(new StAXSOAPModelBuilder(StAXUtils.createXMLStreamReader(new FileInputStream("./../../repository/conf/sample/resources/transform/encoding_test.xml"))).getSOAPEnvelope());
+        
+        transformMediator.mediate(mc);
+        
+        OMElement resultElement = mc.getEnvelope().getBody().getFirstElement();
+        assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, resultElement.getQName());
+        assertEquals("\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre", resultElement.getText());
+    }
 }

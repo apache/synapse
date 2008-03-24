@@ -48,10 +48,9 @@ import org.apache.commons.io.IOUtils;
  *   <li>END_DOCMENT</li>
  * </ul>
  * The class is implemented as a simple state machine, where the state is identified
- * by the current event type and with the following transitions triggered by
- * {@link #next()}:
+ * by the current event type. The initial state is <tt>START_DOCUMENT</tt> and the
+ * following transitions are triggered by {@link #next()}:
  * <ul>
- *   <li>-1 &rarr; START_DOCUMENT</li>
  *   <li>START_DOCUMENT &rarr; START_ELEMENT</li>
  *   <li>START_ELEMENT &rarr; END_ELEMENT (if character stream is empty)</li>
  *   <li>START_ELEMENT &rarr; CHARACTERS (if character stream is not empty)</li>
@@ -92,7 +91,7 @@ public class WrappedTextNodeStreamReader implements XMLStreamReader {
     /**
      * The type of the current XML event.
      */
-    private int eventType = -1;
+    private int eventType = START_DOCUMENT;
     
     /**
      * The character data for the current event. This is only set if the current
@@ -154,9 +153,6 @@ public class WrappedTextNodeStreamReader implements XMLStreamReader {
         // Determine next event type based on current event type. If current event type
         // is START_ELEMENT or CHARACTERS, pull new data from the reader.
         switch (eventType) {
-            case -1:
-                eventType = START_DOCUMENT;
-                break;
             case START_DOCUMENT:
                 eventType = START_ELEMENT;
                 break;

@@ -34,7 +34,6 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
-import org.apache.commons.io.IOUtils;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -46,19 +45,17 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.TextFileDataSource;
 import org.jaxen.JaxenException;
+import org.springframework.xml.transform.StaxSource;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -213,8 +210,6 @@ public class XSLTMediator extends AbstractMediator {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
-        TemporaryData tempSourceData = null;
-        InputStream  isForSource = null;
         TemporaryData tempTargetData = null;
         OutputStream osForTarget = null;
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
@@ -252,28 +247,9 @@ public class XSLTMediator extends AbstractMediator {
                 traceOrDebug(traceOn, "Using byte array serialization for transformation");
             }
 
-            try {
-                // Serialize the source node into a buffer or temporary file
-                tempSourceData = new TemporaryData(1024, BYTE_ARRAY_SIZE/1024, "xs_", ".xml");
-                OutputStream osForSource = tempSourceData.getOutputStream();
-                try {
-                    XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().
-                        createXMLStreamWriter(osForSource);
-    
-                    sourceNode.serialize(xsWriterForSource);
-                }
-                finally {
-                    osForSource.close();
-                }
-                isForSource = tempSourceData.getInputStream();
-                transformSrc = new StreamSource(isForSource);
-
-            } catch (XMLStreamException e) {
-                handleException("Error creating a StreamSource for the transformation", e, synCtx);
-            
-            } catch (IOException e) {
-                handleException("I/O error while creating a StreamSource for the transformation", e, synCtx);
-            }
+            // We use Spring's StaxSource for the transformation source. Once we depend
+            // on JDK 1.6, we can replace this by StAXSource from JAXP 1.4.
+            transformSrc = new StaxSource(((OMElement)sourceNode).getXMLStreamReader());
             
             tempTargetData = new TemporaryData(1024, BYTE_ARRAY_SIZE/1024, "xt_", ".xml");
             osForTarget = tempTargetData.getOutputStream();
@@ -352,16 +328,6 @@ public class XSLTMediator extends AbstractMediator {
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Transformation completed - processing result");
-            }
-
-            if (isForSource != null) {
-                IOUtils.closeQuietly(isForSource);
-                isForSource = null;
-            }
-            
-            if (tempSourceData != null) {
-                tempSourceData.release();
-                tempSourceData = null;
             }
 
             // get the result OMElement

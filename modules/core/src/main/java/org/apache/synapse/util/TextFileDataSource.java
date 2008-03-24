@@ -19,48 +19,31 @@
 
 package org.apache.synapse.util;
 
-import org.apache.axiom.om.OMDataSource;
+import org.apache.axiom.om.OMDataSourceExt;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
+import org.apache.axiom.om.ds.OMDataSourceExtBase;
 import org.apache.axiom.om.impl.serialize.StreamingOMSerializer;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.transport.base.BaseConstants;
 
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 
-public class TextFileDataSource implements OMDataSource {
+public class TextFileDataSource extends OMDataSourceExtBase {
 
     private static final byte[] empty =
         "<text xmlns=\"http://ws.apache.org/commons/ns/payload\"/>".getBytes();
-    private InputStream is = null;
+    private final TemporaryData temporaryData;
 
-    public TextFileDataSource(DataSource ds) {
-        try {
-            this.is = ds.getInputStream();
-        } catch (IOException e) {
-            throw new SynapseException(
-                "Unable to get an InputStream for DataSource : " + ds.getName(), e);
-        }
-    }
-    
     public TextFileDataSource(TemporaryData temporaryData) {
-        try {
-            this.is = temporaryData.getInputStream();
-        } catch (IOException e) {
-            throw new SynapseException(
-                "Unable to get an InputStream for temporary data", e);
-        }
+        this.temporaryData = temporaryData;
     }
 
     public void serialize(OutputStream out, OMOutputFormat format) throws XMLStreamException {
         try {
+            InputStream is = temporaryData.getInputStream();
             byte[] buf = new byte[4096];
             int len;
             while ((len = is.read(buf)) > 0) {
@@ -85,6 +68,36 @@ public class TextFileDataSource implements OMDataSource {
     }
 
     public XMLStreamReader getReader() throws XMLStreamException {
+        InputStream is;
+        try {
+            is = temporaryData.getInputStream();
+        }
+        catch (IOException ex) {
+            throw new XMLStreamException(ex);
+        }
         return new WrappedTextNodeStreamReader(BaseConstants.DEFAULT_TEXT_WRAPPER, new InputStreamReader(is));
+    }
+
+    public Object getObject() {
+        return temporaryData;
+    }
+
+    public boolean isDestructiveRead() {
+        return false;
+    }
+
+    public boolean isDestructiveWrite() {
+        return false;
+    }
+    
+    public byte[] getXMLBytes(String encoding) throws UnsupportedEncodingException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void close() {
+    }
+
+    public OMDataSourceExt copy() {
+        return new TextFileDataSource(temporaryData);
     }
 }

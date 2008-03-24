@@ -19,9 +19,13 @@
 
 package org.apache.synapse.util;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDataSourceExt;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.OMSourcedElement;
 import org.apache.axiom.om.ds.OMDataSourceExtBase;
+import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.impl.serialize.StreamingOMSerializer;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.transport.base.BaseConstants;
@@ -39,6 +43,12 @@ public class TextFileDataSource extends OMDataSourceExtBase {
 
     public TextFileDataSource(TemporaryData temporaryData) {
         this.temporaryData = temporaryData;
+    }
+    
+    public static OMSourcedElement createOMSourcedElement(TemporaryData temporaryData) {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        TextFileDataSource txtFileDS = new TextFileDataSource(temporaryData);
+        return new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
     }
 
     public void serialize(OutputStream out, OMOutputFormat format) throws XMLStreamException {

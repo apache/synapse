@@ -350,24 +350,32 @@ public class XSLTMediator extends AbstractMediator {
 
             } else {
 
-                try {
-                    XMLStreamReader reader = StAXUtils.createXMLStreamReader(
-                        tempTargetData.getInputStream());
-                    if (isSoapEnvelope) {
-                        result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-                    } else {
-                        result = new StAXOMBuilder(reader).getDocumentElement();
-                    }                        
-
-                } catch (XMLStreamException e) {
-                    handleException(
-                        "Error building result element from XSLT transformation", e, synCtx);
-
-                } catch (Exception e) {
-                    result = handleNonXMLResult(tempTargetData, traceOrDebugOn, traceOn);
-
+                String outputMethod = transformer.getOutputProperty(OutputKeys.METHOD);
+                String encoding = transformer.getOutputProperty(OutputKeys.ENCODING);
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "output method: " + outputMethod + "; encoding: " + encoding);
                 }
-
+                
+                if ("text".equals(outputMethod)) {
+                    result = handleNonXMLResult(tempTargetData, traceOrDebugOn, traceOn);
+                } else {
+                    try {
+                        XMLStreamReader reader = StAXUtils.createXMLStreamReader(
+                            tempTargetData.getInputStream());
+                        if (isSoapEnvelope) {
+                            result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+                        } else {
+                            result = new StAXOMBuilder(reader).getDocumentElement();
+                        }                        
+    
+                    } catch (XMLStreamException e) {
+                        handleException(
+                            "Error building result element from XSLT transformation", e, synCtx);
+    
+                    } catch (IOException e) {
+                        handleException("Error reading temporary data", e, synCtx);
+                    }
+                }
             }
 
             if (result == null) {

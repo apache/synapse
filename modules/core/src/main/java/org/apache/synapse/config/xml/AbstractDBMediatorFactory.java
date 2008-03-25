@@ -151,20 +151,17 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
         try {
             Context ctx = new InitialContext(props);
-            if (ctx != null) {
-                Object ds = ctx.lookup(dsName);
-                if (ds != null && ds instanceof DataSource) {
-                    return (DataSource) ds;
-                } else {
-                    handleException("DataSource : " + dsName + " not found when looking up" +
-                        " using JNDI properties : " + props);
-                }
+            Object ds = ctx.lookup(dsName);
+            if (ds != null && ds instanceof DataSource) {
+                return (DataSource) ds;
             } else {
-                handleException("Error getting InitialContext using JNDI properties : " + props);
+                handleException("DataSource : " + dsName + " not found when looking up" +
+                        " using JNDI properties : " + props);
             }
+
         } catch (NamingException e) {
             handleException("Error looking up DataSource : " + dsName +
-                " using JNDI properties : " + props, e);
+                    " using JNDI properties : " + props, e);
         }
         return null;
     }

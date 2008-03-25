@@ -20,12 +20,12 @@
 package org.apache.synapse.mediators.db;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
 import javax.sql.DataSource;
@@ -60,13 +60,16 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * Destroys the mediator. If we are using our custom DataSource, then shut down the connections
      */
     public void destroy() {
-        if (getDataSource() instanceof BasicDataSource) {
+        if (this.dataSource instanceof BasicDataSource) {
             try {
-                ((BasicDataSource) getDataSource()).close();
+                ((BasicDataSource) this.dataSource).close();
                 log.info("Successfully shut down DB connection pool for URL : " + getDSName());
             } catch (SQLException e) {
                 log.warn("Error shutting down DB connection pool for URL : " + getDSName());
             }
+        } else if (this.dataSource instanceof PerUserPoolDataSource) {
+            ((PerUserPoolDataSource) this.dataSource).close();
+            log.info("Successfully shut down DB connection pool for URL : " + getDSName());
         }
     }
 

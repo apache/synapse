@@ -43,6 +43,7 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.transport.http.util.RESTUtil;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -133,8 +134,8 @@ public class ServerWorker implements Runnable {
         MessageContext msgContext = new MessageContext();
         msgContext.setMessageID(UUIDGenerator.getUUID());
 
-        // There is a discrepency in what I thought, Axis2 spawns a nes threads to
-        // send a message is this is TRUE - and I want it to be the other way
+        // There is a discrepency in what I thought, Axis2 spawns a new threads to
+        // send a message if this is TRUE - and I want it to be the other way
         msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
         msgContext.setConfigurationContext(cfgCtx);
         if (isHttps) {
@@ -151,7 +152,7 @@ public class ServerWorker implements Runnable {
             msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
         }
         msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
-        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
+        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID()); // TODO check if this is valid?
         msgContext.setServerSide(true);
         msgContext.setProperty(
             Constants.Configuration.TRANSPORT_IN_URL, request.getRequestLine().getUri());
@@ -162,6 +163,7 @@ public class ServerWorker implements Runnable {
             headers.put(headerArr[i].getName(), headerArr[i].getValue());
         }
         msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
+
         // find the remote party IP address and set it to the message context
         if (conn instanceof HttpInetConnection) {
             HttpInetConnection inetConn = (HttpInetConnection) conn;
@@ -201,7 +203,6 @@ public class ServerWorker implements Runnable {
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
             serverHandler.commitResponse(conn, response);
 
-            // make sure that the output stream is flushed and closed properly
             try {
                 is.close();
             } catch (IOException ignore) {}
@@ -229,9 +230,6 @@ public class ServerWorker implements Runnable {
                 (contentType != null ? contentType.getValue() : null),
                 (soapAction != null  ? soapAction.getValue()  : null),
                 request.getRequestLine().getUri());
-            if (metrics != null) {
-                metrics.incrementMessagesReceived();
-            }
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);
         }
@@ -423,17 +421,9 @@ public class ServerWorker implements Runnable {
 
             } else {
                 try {
-                    
-                    HTTPTransportUtils.processHTTPGetRequest(
-                            msgContext, os,
-                            (request.getFirstHeader(SOAPACTION) != null ?
-                                    request.getFirstHeader(SOAPACTION).getValue() : null),
-                            request.getRequestLine().getUri(),
-                            cfgCtx,
-                            parameters);
-                    if (metrics != null) {
-                        metrics.incrementMessagesReceived();
-                    }
+                    Header contentType = request.getFirstHeader(HTTP.CONTENT_TYPE);
+                    RESTUtil.processURLRequest(msgContext, os,
+                            contentType != null ? contentType.getValue() :  null);
                     // do not let the output stream close (as by default below) since
                     // we are serving this GET request through the Synapse engine
                     return;
@@ -455,10 +445,6 @@ public class ServerWorker implements Runnable {
 
 
     private void handleException(String msg, Exception e) {
-
-        if (metrics != null) {
-            metrics.incrementFaultsReceiving();
-        }
         
         if (e == null) {
             log.error(msg);
@@ -517,18 +503,8 @@ public class ServerWorker implements Runnable {
     }
 
     /**
-     * Copied from transport.http of Axis2
-     *
-     * Returns the ip address to be used for the replyto epr
-     * CAUTION:
-     * This will go through all the available network interfaces and will try to return an ip address.
-     * First this will try to get the first IP which is not loopback address (127.0.0.1). If none is found
-     * then this will return this will return 127.0.0.1.
-     * This will <b>not<b> consider IPv6 addresses.
-     * <p/>
-     * TODO:
-     * - Improve this logic to genaralize it a bit more
-     * - Obtain the ip to be used here from the Call API
+     * Whatever this method returns as the IP is ignored by the actual http/s listener when
+     * its getServiceEPR is invoked. This was originally copied from axis2
      *
      * @return Returns String.
      * @throws java.net.SocketException

@@ -81,6 +81,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
     private int state = BaseConstants.STOPPED;
+    /** The ServerHandler */
+    private ServerHandler handler = null;
 
     /**
      * configure and start the IO reactor on the specified port
@@ -109,7 +111,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             log.error("Error starting the IOReactor", e);
         }
 
-        NHttpServiceHandler handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
+        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
         IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;
@@ -205,7 +207,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         String name;
         try {
             name = jmxAgentName + ":Type=Transport,ConnectorName=" +
-                "nio-http" + (sslContext == null ? "" : "s");
+                "nio-http" + (sslContext == null ? "" : "s") + "-listener";
             TransportView tBean = new TransportView(this, null);
             registerMBean(mbs, tBean, name);
         } catch (Exception e) {
@@ -327,6 +329,14 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     /**
+     * Returns the number of active threads processing messages
+     * @return number of active threads processing messages
+     */
+    public int getActiveThreadCount() {
+        return handler.getActiveCount();
+    }
+
+    /**
      * Stop accepting new connections, and wait the maximum specified time for in-flight
      * requests to complete before a controlled shutdown for maintenence
      *
@@ -415,14 +425,23 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     public long getMessagesSent() {
+        if (metrics != null) {
+            return metrics.getMessagesSent();
+        }
         return -1;
     }
 
     public long getFaultsSending() {
+        if (metrics != null) {
+            return metrics.getFaultsSending();
+        }
         return -1;
     }
 
     public long getBytesSent() {
+        if (metrics != null) {
+            return metrics.getBytesSent();
+        }
         return -1;
     }
 

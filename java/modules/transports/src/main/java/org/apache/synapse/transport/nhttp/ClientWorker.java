@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.Header;
 import org.apache.http.protocol.HTTP;
+import org.apache.synapse.transport.base.MetricsCollector;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;
@@ -56,10 +57,10 @@ public class ClientWorker implements Runnable {
     private MessageContext responseMsgCtx = null;
     /** the InputStream out of which the response body should be read */
     private InputStream in = null;
-    /** the original request message context */
-    private MessageContext outMsgCtx = null;
     /** the HttpResponse received */
     private HttpResponse response = null;
+    /** the metrics collector */
+    private MetricsCollector metrics = null;
 
     /**
      * Create the thread that would process the response message received for the outgoing message
@@ -69,12 +70,12 @@ public class ClientWorker implements Runnable {
      * @param outMsgCtx the original outgoing message context (i.e. corresponding request)
      */
     public ClientWorker(ConfigurationContext cfgCtx, InputStream in,
-        HttpResponse response, MessageContext outMsgCtx) {
+        HttpResponse response, MessageContext outMsgCtx, final MetricsCollector metrics) {
 
         this.cfgCtx = cfgCtx;
         this.in = in;
-        this.outMsgCtx = outMsgCtx;
         this.response = response;
+        this.metrics = metrics;
 
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().

@@ -112,7 +112,7 @@ public class NHttpConfiguration {
         return getProperty(C_IO_WORKERS, IO_WORKER_COUNT);
     }
 
-    public int getBufferZise() {
+    public int getBufferSize() {
         return getProperty(G_BUFFER_SIZE, BUFFER_SIZE);
     }
 

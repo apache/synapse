@@ -45,6 +45,7 @@ import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.nhttp.util.WorkerPool;
 import org.apache.synapse.transport.nhttp.util.WorkerPoolFactory;
+import org.apache.synapse.transport.base.MetricsCollector;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -74,6 +75,8 @@ public class ClientHandler implements NHttpClientHandler {
     private NHttpConfiguration cfg = null;
 
     private WorkerPool workerPool = null;
+    /** the metrics collector */
+    private MetricsCollector metrics = null;
 
     private static final String REQUEST_BUFFER = "request-buffer";
     private static final String RESPONSE_BUFFER = "response-buffer";
@@ -90,12 +93,13 @@ public class ClientHandler implements NHttpClientHandler {
      * @param cfgCtx the Axis2 configuration context
      * @param params the Http protocol parameters to adhere to
      */
-    public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params) {
+    public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params, final MetricsCollector metrics) {
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
+        this.metrics = metrics;
 
         this.cfg = NHttpConfiguration.getInstance();
         workerPool = WorkerPoolFactory.getWorkerPool(
@@ -111,7 +115,7 @@ public class ClientHandler implements NHttpClientHandler {
     }
 
     /**
-     * Submit a new request over an already established connection, which has been 
+     * Submit a new request over an already established connection, which has been
      * 'kept alive'
      * @param conn the connection to use to send the request, which has been kept open
      * @param axis2Req the new request
@@ -161,8 +165,8 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
 
             // allocate temporary buffers to process this request
-            context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
-            context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
+            context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
+            context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
 
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
@@ -196,7 +200,10 @@ public class ClientHandler implements NHttpClientHandler {
         if (log.isDebugEnabled()) {
             log.debug("Connection Timeout");
         }
-    	checkAxisRequestComplete(conn, "Connection timeout", null);
+        if (metrics != null) {
+            metrics.incrementTimeoutsSending();
+        }
+        checkAxisRequestComplete(conn, "Connection timeout", null);
         shutdownConnection(conn);
     }
 
@@ -209,6 +216,9 @@ public class ClientHandler implements NHttpClientHandler {
         log.error("HTTP protocol violation : " + e.getMessage());
     	checkAxisRequestComplete(conn, null, e);
         shutdownConnection(conn);
+        if (metrics != null) {
+            metrics.incrementFaultsSending();
+        }
     }
 
     /**
@@ -220,6 +230,9 @@ public class ClientHandler implements NHttpClientHandler {
         log.error("I/O error : " + e.getMessage(), e);
     	checkAxisRequestComplete(conn, null, e);
         shutdownConnection(conn);
+        if (metrics != null) {
+            metrics.incrementFaultsSending();
+        }
     }
 
     /**
@@ -289,10 +302,16 @@ public class ClientHandler implements NHttpClientHandler {
             while (decoder.read(inbuf) > 0) {
                 inbuf.flip();
                 sink.write(inbuf);
+                if (metrics != null) {
+                    metrics.incrementBytesReceived(inbuf.position());
+                }
                 inbuf.compact();
             }
 
             if (decoder.isCompleted()) {
+                if (metrics != null) {
+                    metrics.incrementMessagesReceived();
+                }
                 if (sink != null) sink.close();
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
@@ -325,9 +344,15 @@ public class ClientHandler implements NHttpClientHandler {
                 outbuf.flip();
                 encoder.write(outbuf);
                 outbuf.compact();
+                if (metrics != null) {
+                    metrics.incrementBytesSent(outbuf.position());
+                }
             }
 
             if (encoder.isCompleted()) {
+                if (metrics != null) {
+                    metrics.incrementMessagesSent();
+                }
                 source.close();
             }
 
@@ -345,7 +370,7 @@ public class ClientHandler implements NHttpClientHandler {
         HttpResponse response = conn.getHttpResponse();
 
         /*
-         * responsed received means the whole request has been complete sent to server or 
+         * responsed received means the whole request has been complete sent to server or
          * server doesn't need the left data of request
          */
     	checkAxisRequestComplete(conn, null, null);
@@ -479,7 +504,7 @@ public class ClientHandler implements NHttpClientHandler {
 
             workerPool.execute(
                 new ClientWorker(cfgCtx, Channels.newInputStream(responsePipe.source()), response,
-                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
+                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT), metrics));
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);
@@ -519,4 +544,7 @@ public class ClientHandler implements NHttpClientHandler {
         return httpProcessor;
     }
 
+    public int getActiveCount() {
+        return workerPool.getActiveCount();
+    }
 }

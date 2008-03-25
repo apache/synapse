@@ -43,71 +43,104 @@ public class TransportView implements TransportViewMBean {
 
     // JMX Attributes
     public long getMessagesReceived() {
-        if (listener instanceof ManagementSupport) {
+        if (listener != null && listener instanceof ManagementSupport) {
             return ((ManagementSupport) listener).getMessagesReceived();
+        } else if (sender != null && sender instanceof ManagementSupport) {
+            return ((ManagementSupport) sender).getMessagesReceived();
         }
         return -1;
     }
 
     public long getFaultsReceiving() {
-        if (listener instanceof ManagementSupport) {
+        if (listener != null && listener instanceof ManagementSupport) {
             return ((ManagementSupport) listener).getFaultsReceiving();
+        } else if (sender != null && sender instanceof ManagementSupport) {
+            return ((ManagementSupport) sender).getFaultsReceiving();
         }
         return -1;
     }
 
     public long getBytesReceived() {
-        if (listener instanceof ManagementSupport) {
+        if (listener != null && listener instanceof ManagementSupport) {
             return ((ManagementSupport) listener).getBytesReceived();
+        } else if (sender != null && sender instanceof ManagementSupport) {
+            return ((ManagementSupport) sender).getBytesReceived();
         }
         return -1;
     }
 
     public long getMessagesSent() {
-        if (sender instanceof ManagementSupport) {
+        if (listener != null && listener instanceof ManagementSupport) {
+            return ((ManagementSupport) listener).getMessagesSent();
+        } else if (sender != null && sender instanceof ManagementSupport) {
             return ((ManagementSupport) sender).getMessagesSent();
         }
         return -1;
     }
 
     public long getFaultsSending() {
-        if (sender instanceof ManagementSupport) {
+        if (listener != null && listener instanceof ManagementSupport) {
+            return ((ManagementSupport) listener).getFaultsSending();
+        } else if (sender != null && sender instanceof ManagementSupport) {
             return ((ManagementSupport) sender).getFaultsSending();
         }
         return -1;
     }
 
     public long getBytesSent() {
-        if (sender instanceof ManagementSupport) {
+        if (listener != null && listener instanceof ManagementSupport) {
+            return ((ManagementSupport) listener).getBytesSent();
+        } else if (sender != null && sender instanceof ManagementSupport) {
             return ((ManagementSupport) sender).getBytesSent();
+        }
+        return -1;
+    }
+
+    public int getActiveThreadCount() {
+        if (listener != null && listener instanceof ManagementSupport) {
+            return ((ManagementSupport) listener).getActiveThreadCount();
+        } else if (sender != null && sender instanceof ManagementSupport) {
+            return ((ManagementSupport) sender).getActiveThreadCount();
         }
         return -1;
     }
 
     // JMX Operations
     public void start() throws Exception{
-        listener.start();
+        if (listener != null) {
+            listener.start();
+        }
     }
 
     public void stop() throws Exception {
-        listener.stop();
+        if (listener != null) {
+            listener.stop();
+        } else if (sender != null) {
+            sender.stop();
+        }
     }
 
     public void pause() throws Exception {
         if (listener instanceof ManagementSupport) {
             ((ManagementSupport) listener).pause();
+        } else if (sender instanceof ManagementSupport) {
+            ((ManagementSupport) sender).pause();
         }
     }
 
     public void resume() throws Exception {
         if (listener instanceof ManagementSupport) {
             ((ManagementSupport) listener).resume();
+        } else if (sender instanceof ManagementSupport) {
+            ((ManagementSupport) sender).resume();
         }
     }
 
     public void maintenenceShutdown(long seconds) throws Exception {
         if (listener instanceof ManagementSupport) {
             ((ManagementSupport) listener).maintenenceShutdown(seconds * 1000);
+        } else if (sender instanceof ManagementSupport) {
+            ((ManagementSupport) sender).maintenenceShutdown(seconds * 1000);
         }
     }
 

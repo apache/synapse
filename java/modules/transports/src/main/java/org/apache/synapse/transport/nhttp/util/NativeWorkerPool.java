@@ -48,25 +48,29 @@ public class NativeWorkerPool implements WorkerPool {
             queueLength == -1 ?
                 new LinkedBlockingQueue() :
                 new LinkedBlockingQueue(queueLength),
-            new BackportThreadFactory(new ThreadGroup(threadGroupName), threadGroupId));
+            new NativeThreadFactory(new ThreadGroup(threadGroupName), threadGroupId));
     }
 
     public void execute(Runnable task) {
         executor.execute(task);
     }
 
+    public int getActiveCount() {
+        return ((ThreadPoolExecutor) executor).getActiveCount();
+    }
+
     /**
      * This is a simple ThreadFactory implementation using java.util.concurrent
      * Creates threads with the given name prefix
      */
-    public class BackportThreadFactory implements
+    public class NativeThreadFactory implements
         ThreadFactory {
 
         final ThreadGroup group;
         final AtomicInteger count;
         final String namePrefix;
 
-        public BackportThreadFactory(final ThreadGroup group, final String namePrefix) {
+        public NativeThreadFactory(final ThreadGroup group, final String namePrefix) {
             super();
             this.count = new AtomicInteger(1);
             this.group = group;

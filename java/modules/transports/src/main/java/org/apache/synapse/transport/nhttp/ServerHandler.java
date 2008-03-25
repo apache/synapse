@@ -110,8 +110,8 @@ public class ServerHandler implements NHttpServiceHandler {
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
         // allocate temporary buffers to process this request
-        context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
-        context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
+        context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
+        context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
 
         try {
             PipeImpl requestPipe  = new PipeImpl(); // the pipe used to process the request
@@ -142,15 +142,9 @@ public class ServerHandler implements NHttpServiceHandler {
         } catch (IOException e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
-            if (metrics != null) {
-               metrics.incrementFaultsReceiving();
-            }
         } catch (Exception e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
-            if (metrics != null) {
-                metrics.incrementFaultsReceiving();
-            }
         }
     }
 
@@ -176,16 +170,15 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
             if (decoder.isCompleted()) {
+                if (metrics != null) {
+                    metrics.incrementMessagesReceived();
+                }
                 sink.close();
             }
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);
         }
-    }
-
-    public void responseReady(NHttpServerConnection conn) {
-        // New API method - should not require
     }
 
     /**
@@ -208,9 +201,15 @@ public class ServerHandler implements NHttpServiceHandler {
                 outbuf.flip();
                 encoder.write(outbuf);
                 outbuf.compact();
+                if (metrics != null) {
+                    metrics.incrementBytesSent(outbuf.position());
+                }
             }
 
             if (encoder.isCompleted()) {
+                if (metrics != null) {
+                    metrics.incrementMessagesSent();
+                }
                 source.close();
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
@@ -267,6 +266,12 @@ public class ServerHandler implements NHttpServiceHandler {
         }
     }
 
+    public void responseReady(NHttpServerConnection conn) {
+        if (log.isTraceEnabled()) {
+            log.trace("Ready to send response");
+        }
+    }
+
     public void closed(final NHttpServerConnection conn) {
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
@@ -284,11 +289,16 @@ public class ServerHandler implements NHttpServiceHandler {
         ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
         HttpResponse response = responseFactory.newHttpResponse(
             ver, HttpStatus.SC_BAD_REQUEST, context);
+
         byte[] msg = EncodingUtils.getAsciiBytes("Malformed HTTP request: " + e.getMessage());
         ByteArrayEntity entity = new ByteArrayEntity(msg);
         entity.setContentType("text/plain; charset=US-ASCII");
         response.setEntity(entity);
         commitResponse(conn, response);
+
+        if (metrics != null) {
+            metrics.incrementFaultsReceiving();
+        }        
     }
 
     /**
@@ -306,6 +316,9 @@ public class ServerHandler implements NHttpServiceHandler {
             }
         } else {
             log.error("I/O error: " + e.getMessage());
+            if (metrics != null) {
+                metrics.incrementFaultsReceiving();
+            }
         }
         shutdownConnection(conn);
     }
@@ -340,5 +353,9 @@ public class ServerHandler implements NHttpServiceHandler {
         httpProcessor.addInterceptor(new ResponseContent());
         httpProcessor.addInterceptor(new ResponseConnControl());
         return httpProcessor;
+    }
+
+    public int getActiveCount() {
+        return workerPool.getActiveCount();
     }
 }

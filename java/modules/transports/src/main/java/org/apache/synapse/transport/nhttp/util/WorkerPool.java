@@ -21,4 +21,5 @@ package org.apache.synapse.transport.nhttp.util;
 
 public interface WorkerPool {
     public void execute(Runnable task);
+    public int getActiveCount();
 }

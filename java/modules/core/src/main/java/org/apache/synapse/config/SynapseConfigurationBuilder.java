@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.DataSourceRegistrar;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
@@ -31,7 +32,7 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Builds a Synapse Configuration model with a given input
@@ -70,11 +71,13 @@ public class SynapseConfigurationBuilder {
 
         // build the Synapse configuration parsing the XML config file
         try {
+            Properties synapseProperties = loadSynapseProperties();
+            DataSourceRegistrar.registerDataSources(synapseProperties);
             SynapseConfiguration synCfg
-                = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
+                    = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
             log.info("Loaded Synapse configuration from : " + configFile);
             synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
-            loadSynapseProperties(synCfg);
+            synCfg.setProperties(synapseProperties);
             return synCfg;
 
         } catch (FileNotFoundException fnf) {
@@ -85,18 +88,21 @@ public class SynapseConfigurationBuilder {
         return null;
     }
 
-    private static void loadSynapseProperties(SynapseConfiguration synCfg) {
+    private static Properties loadSynapseProperties() {
         String props = System.getProperty(SynapseConstants.SYNAPSE_PROPERTIES);
         if (props == null) {
             props = SynapseConstants.DEFAULT_PROP_PATH;
         }
         try {
-            synCfg.getProperties().load(Thread.currentThread().getContextClassLoader().getResourceAsStream(props));
+            Properties properties = new Properties();
+            properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(props));
+            return properties;
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to load synapse properties : Using the default tunning parameters for Synapse");
             }
         }
+        return null;
     }
 
     private static void handleException(String msg, Exception e) {

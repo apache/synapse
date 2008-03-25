@@ -28,6 +28,7 @@ public interface TransportViewMBean {
     public long getFaultsSending();
     public long getBytesReceived();
     public long getBytesSent();
+    public int  getActiveThreadCount();
 
     // JMX Operations
     public void start() throws Exception;

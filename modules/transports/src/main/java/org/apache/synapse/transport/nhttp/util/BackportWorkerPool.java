@@ -55,6 +55,10 @@ public class BackportWorkerPool implements WorkerPool{
         executor.execute(task);
     }
 
+    public int getActiveCount() {
+        return ((ThreadPoolExecutor) executor).getActiveCount();
+    }
+
     /**
      * This is a simple ThreadFactory implementation using java.util.concurrent
      * Creates threads with the given name prefix

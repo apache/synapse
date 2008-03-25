@@ -29,6 +29,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.ClasspathURLStreamHandler;
+import org.apache.synapse.util.RMIRegistryController;
 
 import java.io.File;
 import java.net.*;
@@ -151,6 +152,9 @@ public class ServerManager {
      */
     public void stop() {
         try {
+
+            RMIRegistryController.getInstance().removeLocalRegistry();
+            
             if (listenerManager != null) {
                 listenerManager.stop();
                 listenerManager.destroy();

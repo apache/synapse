@@ -34,7 +34,6 @@ import org.jaxen.JaxenException;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -116,7 +115,7 @@ public class AggregateMediator extends AbstractMediator {
         }
 
         try {
-            Aggregate aggregate = null;
+            Aggregate aggregate;
 
             // if a correlateExpression is provided and there is a coresponding
             // element in the current message prepare to correlate the messages on that
@@ -127,9 +126,12 @@ public class AggregateMediator extends AbstractMediator {
                     aggregate = activeAggregates.get(correlateExpression.toString());
 
                 } else {
+
                     if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Creating new Aggregator - expires in : " +
-                            (completionTimeoutMillis / 1000) + "secs");
+                        traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                (completionTimeoutMillis > 0 ? "expires in : "
+                                        + (completionTimeoutMillis / 1000) + "secs" :
+                                        "without expiry time"));
                     }
 
                     aggregate = new Aggregate(
@@ -137,8 +139,10 @@ public class AggregateMediator extends AbstractMediator {
                         completionTimeoutMillis,
                         minMessagesToComplete,
                         maxMessagesToComplete, this);
-                    synCtx.getConfiguration().getSynapseTimer().
-                        schedule(aggregate, completionTimeoutMillis);
+                    if (completionTimeoutMillis > 0) {
+                        synCtx.getConfiguration().getSynapseTimer().
+                                schedule(aggregate, completionTimeoutMillis);
+                    }
                     activeAggregates.put(correlateExpression.toString(), aggregate);
                 }
 
@@ -149,7 +153,7 @@ public class AggregateMediator extends AbstractMediator {
                 // which thus can be used to uniquely group messages into aggregates
 
                 Object o = synCtx.getProperty(EIPConstants.AGGREGATE_CORRELATION);
-                String correlation = null;
+                String correlation;
 
                 if (o != null && o instanceof String) {
                     correlation = (String) o;
@@ -159,17 +163,22 @@ public class AggregateMediator extends AbstractMediator {
 
                     } else {
                         if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Creating new Aggregator - expires in : " +
-                                (completionTimeoutMillis / 1000) + "secs");
+                            traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                    (completionTimeoutMillis > 0 ? "expires in : "
+                                            + (completionTimeoutMillis / 1000) + "secs" :
+                                            "without expiry time"));
                         }
                         
                         aggregate = new Aggregate(
-                            correlation,
-                            completionTimeoutMillis,
-                            minMessagesToComplete,
+                                correlation,
+                                completionTimeoutMillis,
+                                minMessagesToComplete,
                             maxMessagesToComplete, this);
-                        synCtx.getConfiguration().getSynapseTimer().
-                            schedule(aggregate, completionTimeoutMillis);
+
+                        if (completionTimeoutMillis > 0) {
+                            synCtx.getConfiguration().getSynapseTimer().
+                                    schedule(aggregate, completionTimeoutMillis);
+                        }
                         activeAggregates.put(correlation, aggregate);
                     }
 
@@ -239,7 +248,7 @@ public class AggregateMediator extends AbstractMediator {
      * itself
      * @param aggregate the timed out Aggregate that holds collected messages and properties
      */
-    public void completeAggregate(Aggregate aggregate) {
+    public synchronized void completeAggregate(Aggregate aggregate) {
 
         if (log.isDebugEnabled()) {
             log.debug("Aggregation completed or timed out");
@@ -254,7 +263,7 @@ public class AggregateMediator extends AbstractMediator {
             return;
         }
 
-        activeAggregates.remove(aggregate);
+        activeAggregates.remove(aggregate.getCorrelation());
 
         if ((correlateExpression != null &&
             !correlateExpression.toString().equals(aggregate.getCorrelation())) ||
@@ -284,10 +293,9 @@ public class AggregateMediator extends AbstractMediator {
     private MessageContext getAggregatedMessage(Aggregate aggregate) {
 
         MessageContext newCtx = null;
-        Iterator<MessageContext> itr = aggregate.getMessages().iterator();
 
-        while (itr.hasNext()) {
-            MessageContext synCtx = itr.next();
+        for (MessageContext synCtx : aggregate.getMessages()) {
+            
             if (newCtx == null) {
                 newCtx = synCtx;
 
@@ -299,19 +307,19 @@ public class AggregateMediator extends AbstractMediator {
                 try {
                     if (log.isDebugEnabled()) {
                         log.debug("Merging message : " + synCtx.getEnvelope() + " using XPath : " +
-                            aggregationExpression);
+                                aggregationExpression);
                     }
 
                     EIPUtils.enrichEnvelope(
-                        newCtx.getEnvelope(), synCtx.getEnvelope(), aggregationExpression);
+                            newCtx.getEnvelope(), synCtx.getEnvelope(), aggregationExpression);
 
                     if (log.isDebugEnabled()) {
-                        log.debug("Merged result : " + newCtx.getEnvelope());    
+                        log.debug("Merged result : " + newCtx.getEnvelope());
                     }
 
                 } catch (JaxenException e) {
                     handleException("Error merging aggregation results using XPath : " +
-                        aggregationExpression.toString(), e, synCtx);
+                            aggregationExpression.toString(), e, synCtx);
                 }
             }
         }

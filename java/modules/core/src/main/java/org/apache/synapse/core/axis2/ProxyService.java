@@ -289,7 +289,8 @@ public class ProxyService {
                         }
 
                         wsdlToAxisServiceBuilder.setBaseUri(
-                                wsdlURI != null ? wsdlURI.toString() : "");
+                                wsdlURI != null ? wsdlURI.toString() :
+                                        System.getProperty(SynapseConstants.SYNAPSE_HOME));
 
                         if (trace()) {
                             trace.info("Setting up custom resolvers");

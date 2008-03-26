@@ -60,7 +60,9 @@ public class Aggregate extends TimerTask {
      * @param max the maximum number of messages to be aggregated
      * @param mediator
      */
-    public Aggregate(String corelation, long timeoutMillis, int min, int max, AggregateMediator mediator) {
+    public Aggregate(String corelation, long timeoutMillis, int min,
+        int max, AggregateMediator mediator) {
+        
         this.correlation = corelation;
         if (timeoutMillis > 0) {
             expiryTimeMillis = System.currentTimeMillis() + timeoutMillis;
@@ -80,7 +82,7 @@ public class Aggregate extends TimerTask {
      * @param synCtx message to be added into this aggregation group
      * @return true if the message was added or false if not
      */
-    public boolean addMessage(MessageContext synCtx) {
+    public synchronized boolean addMessage(MessageContext synCtx) {
         if (maxCount <= 0 || (maxCount > 0 && messages.size() < maxCount)) {
             messages.add(synCtx);
             return true;
@@ -92,9 +94,15 @@ public class Aggregate extends TimerTask {
     /**
      * Has this aggregation group completed?
      *
+     * @param traceOn is tracing on
+     * @param traceOrDebugOn is trace or debug on
+     * @param trace trace log to be used
+     * @param log log to be used
+     *
      * @return boolean true if aggregation is complete
      */
-    public boolean isComplete(boolean traceOn, boolean traceOrDebugOn, Log trace, Log log) {
+    public synchronized boolean isComplete(boolean traceOn, boolean traceOrDebugOn,
+        Log trace, Log log) {
 
         // if any messages have been collected, check if the completion criteria is met
         if (!messages.isEmpty()) {
@@ -104,7 +112,8 @@ public class Aggregate extends TimerTask {
             Object prop = mc.getProperty(EIPConstants.MESSAGE_SEQUENCE);
             
             if (prop != null && prop instanceof String) {
-                String[] msgSequence = prop.toString().split(EIPConstants.MESSAGE_SEQUENCE_DELEMITER);
+                String[] msgSequence = prop.toString().split(
+                        EIPConstants.MESSAGE_SEQUENCE_DELEMITER);
                 int total = Integer.parseInt(msgSequence[1]);
 
                 if (traceOrDebugOn) {
@@ -129,7 +138,8 @@ public class Aggregate extends TimerTask {
         if (minCount > 0 && messages.size() >= minCount) {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, trace, log,
-                    "Aggregation complete - the minimum : " + minCount + " messages has been reached");
+                    "Aggregation complete - the minimum : " + minCount
+                            + " messages has been reached");
             }
             return true;
         }
@@ -137,7 +147,8 @@ public class Aggregate extends TimerTask {
         if (maxCount > 0 && messages.size() >= maxCount) {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, trace, log,
-                    "Aggregation complete - the maximum : " + maxCount + " messages has been reached");
+                    "Aggregation complete - the maximum : " + maxCount
+                            + " messages has been reached");
             }
 
             return true;

@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -254,7 +255,7 @@ public class ProxyServiceFactory {
                         proxy.setInLineWSDL(wsdl11);
                     } else {
                         OMElement wsdl20 = wsdl.getFirstChildWithName(
-                                new QName(WSDLConstants.WSDL2_0_NAMESPACE, "descriptions"));
+                                new QName(WSDL2Constants.WSDL_NAMESPACE, "description"));
                         if (wsdl20 != null) {
                             proxy.setInLineWSDL(wsdl20);
                         }

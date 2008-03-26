@@ -41,6 +41,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * available, returns null.
      *
      * @param synapseMessageContext MessageContext instance which holds all per-message properties
+     * @param  algorithmContext The context in which holds run time states related to the algorithm
      * @return endpoint to send the next message
      */
     public Endpoint getNextEndpoint(MessageContext synapseMessageContext, AlgorithmContext algorithmContext) {

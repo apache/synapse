@@ -44,7 +44,7 @@ import java.util.Stack;
  */
 public class WSDLEndpoint extends FaultHandler implements Endpoint {
 
-    private static final Log log = LogFactory.getLog(AddressEndpoint.class);
+    private static final Log log = LogFactory.getLog(WSDLEndpoint.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     private String name = null;
@@ -252,6 +252,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         if (!active) {
             long recoverOn = endpointContext.getRecoverOn();
             if (System.currentTimeMillis() > recoverOn) {
+                active = true;
                 endpointContext.setActive(true);
             }
         }

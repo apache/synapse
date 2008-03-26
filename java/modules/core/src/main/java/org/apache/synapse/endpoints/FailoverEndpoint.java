@@ -168,6 +168,7 @@ public class FailoverEndpoint implements Endpoint {
             for (int i = 0; i < endpoints.size(); i++) {
                 Endpoint endpoint = (Endpoint) endpoints.get(i);
                 if (endpoint.isActive(synMessageContext)) {
+                    active = true;
                     endpointContext.setActive(true);
 
                     // don't break the loop though we found one active endpoint. calling isActive()

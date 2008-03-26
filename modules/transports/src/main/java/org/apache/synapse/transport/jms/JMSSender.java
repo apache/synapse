@@ -75,7 +75,7 @@ public class JMSSender extends AbstractTransportSender {
     /**
      * Get corresponding JMS connection factory defined within the transport sender for the
      * transport-out information - usually constructed from a targetEPR
-     * 
+     *
      * @param trpInfo the transport-out information
      * @return the corresponding JMS connection factory, if any
      */
@@ -86,7 +86,7 @@ public class JMSSender extends AbstractTransportSender {
             return (JMSConnectionFactory) connectionFactories.get(jmsConnectionFactoryName);
           }
         }
-      
+
         Iterator cfNames = connectionFactories.keySet().iterator();
         while (cfNames.hasNext()) {
             String cfName = (String) cfNames.next();
@@ -135,7 +135,7 @@ public class JMSSender extends AbstractTransportSender {
                         QueueConnectionFactory qConFac = null;
                         TopicConnectionFactory tConFac = null;
                         ConnectionFactory conFac = null;
-                        
+
                         if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(jmsOut.getDestinationType())) {
                             qConFac = (QueueConnectionFactory) jmsOut.getConnectionFactory();
                         } else if (JMSConstants.DESTINATION_TYPE_TOPIC.equals(jmsOut.getDestinationType())) {
@@ -172,6 +172,7 @@ public class JMSSender extends AbstractTransportSender {
                     }
                 }
                 destination = jmsOut.getDestination();
+                replyDestination = jmsOut.getReplyDestination();
 
             } else if (outTransportInfo != null && outTransportInfo instanceof JMSOutTransportInfo) {
 
@@ -195,7 +196,7 @@ public class JMSSender extends AbstractTransportSender {
             if(session == null) {
                handleException("Could not create JMS session");
             }
-            
+
             // now we are going to use the JMS session, but if this was a session from a
             // defined JMS connection factory, we need to synchronize as sessions are not
             // thread safe
@@ -211,10 +212,16 @@ public class JMSSender extends AbstractTransportSender {
                 }
 
                 String destinationType = jmsOut.getDestinationType();
-                
+
                 // if the destination does not exist, see if we can create it
                 destination = JMSUtils.createDestinationIfRequired(
                     destination, destinationType, targetAddress, session);
+
+                if(jmsOut.getReplyDestinationName() != null) {
+                    replyDestination = JMSUtils.createReplyDestinationIfRequired(
+                        replyDestination, jmsOut.getReplyDestinationName(),
+                        jmsOut.getReplyDestinationType(), targetAddress, session);
+                }
 
                 // should we wait for a synchronous response on this same thread?
                 boolean waitForResponse = waitForSynchronousResponse(msgCtx);
@@ -236,7 +243,8 @@ public class JMSSender extends AbstractTransportSender {
                     try {
                         correlationId = message.getJMSMessageID();
                     } catch(JMSException ignore) {}
-                    waitForResponseAndProcess(session, replyDestination, msgCtx, correlationId);
+                        waitForResponseAndProcess(session, replyDestination,
+                                jmsOut.getReplyDestinationType(), msgCtx, correlationId);
                 }
             }
 
@@ -259,11 +267,11 @@ public class JMSSender extends AbstractTransportSender {
      * @throws AxisFault on error
      */
     private void waitForResponseAndProcess(Session session, Destination replyDestination,
-        MessageContext msgCtx, String correlationId) throws AxisFault {
+        String replyDestinationType, MessageContext msgCtx, String correlationId) throws AxisFault {
 
         try {
             MessageConsumer consumer = null;
-            if (replyDestination instanceof Queue) {
+            if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(replyDestinationType)) {
                 if (correlationId != null) {
                     consumer = ((QueueSession) session).createReceiver((Queue) replyDestination,
                         "JMSCorrelationID = '" + correlationId + "'");
@@ -273,7 +281,7 @@ public class JMSSender extends AbstractTransportSender {
             } else {
                 if (correlationId != null) {
                     consumer = ((TopicSession) session).createSubscriber((Topic) replyDestination,
-                        correlationId, false);
+                        "JMSCorrelationID = '" + correlationId + "'", false);
                 } else {
                     consumer = ((TopicSession) session).createSubscriber((Topic) replyDestination);
                 }

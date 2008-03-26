@@ -411,6 +411,29 @@ public class JMSUtils extends BaseUtils {
     }
 
     /**
+     * If reply destination does not exist, try to create it
+     */
+    public static Destination createReplyDestinationIfRequired(Destination destination,
+        String replyDestinationName, String destinationType, String targetAddress, Session session) throws AxisFault {
+        if (destination == null) {
+            if (targetAddress != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Creating JMS Reply Destination : " + replyDestinationName);
+                }
+
+                try {
+                    destination = createDestination(session, replyDestinationName, destinationType);
+                } catch (JMSException e) {
+                    handleException("Error creating reply destination : " + replyDestinationName, e);
+                }
+            } else {
+                handleException("Cannot send reply to null reply JMS Destination");
+            }
+        }
+        return destination;
+    }
+
+    /**
      * Send the given message to the Destination using the given session
      * @param session the session to use to send
      * @param destination the Destination

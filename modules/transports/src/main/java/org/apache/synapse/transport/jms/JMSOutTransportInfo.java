@@ -51,6 +51,12 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     private Destination destination = null;
     /** the Destination queue or topic for the outgoing message i.e. JMSConstants.DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC */
     private String destinationType = JMSConstants.DESTINATION_TYPE_QUEUE;
+    /** the Reply Destination queue or topic for the outgoing message */
+    private Destination replyDestination = null;
+    /** the Reply Destination name */
+    private String replyDestinationName = null;
+    /** the Reply Destination queue or topic for the outgoing message i.e. JMSConstants.DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC */
+    private String replyDestinationType = JMSConstants.DESTINATION_TYPE_QUEUE;
     /** the EPR properties when the out-transport info is generated from a target EPR */
     private Hashtable properties = null;
     /** the target EPR string where applicable */
@@ -91,7 +97,17 @@ public class JMSOutTransportInfo implements OutTransportInfo {
         } else {
             properties = JMSUtils.getProperties(targetEPR);
             String destinationType = (String) properties.get(JMSConstants.DEST_PARAM_TYPE);
-            setDestinationType(destinationType);
+            if(destinationType != null) {
+                setDestinationType(destinationType);
+            }
+            String replyDestinationType = (String) properties.get(JMSConstants.REPLY_PARAM_TYPE);
+            if(replyDestinationType != null) {
+                setReplyDestinationType(replyDestinationType);
+            }
+            String replyDestinationName = (String) properties.get(JMSConstants.REPLY_PARAM);
+            if(replyDestinationName != null) {
+                setReplyDestinationName(replyDestinationName);
+            }
         }
     }
 
@@ -109,6 +125,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             }
             connectionFactory = getConnectionFactory(context, properties);
             destination = getDestination(context, targetEPR);
+            replyDestination = getReplyDestination(context, targetEPR);
         }
     }
 
@@ -151,6 +168,30 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             }
         } catch (NamingException e) {
             handleException("Cannot locate destination : " + destinationName + " using " + url, e);
+        }
+        return null;
+    }
+
+    /**
+     * Get the JMS reply destination specified by the given URL from the context
+     *
+     * @param context the Context to lookup
+     * @param url     URL
+     * @return the JMS destination, or null if it does not exist
+     */
+    private Destination getReplyDestination(Context context, String url) {
+        String replyDestinationName = (String) properties.get(JMSConstants.REPLY_PARAM);
+        if(replyDestinationName == null) {
+            return null;
+        }
+        try {
+            return (Destination) context.lookup(replyDestinationName);
+        } catch (NameNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot locate destination : " + replyDestinationName + " using " + url);
+            }
+        } catch (NamingException e) {
+            handleException("Cannot locate destination : " + replyDestinationName + " using " + url, e);
         }
         return null;
     }
@@ -217,5 +258,28 @@ public class JMSOutTransportInfo implements OutTransportInfo {
         this.destinationType = destinationType;
       }
     }
-    
+
+    public Destination getReplyDestination() {
+        return replyDestination;
+    }
+
+    public void setReplyDestination(Destination replyDestination) {
+        this.replyDestination = replyDestination;
+    }
+
+    public String getReplyDestinationType() {
+        return replyDestinationType;
+    }
+
+    public void setReplyDestinationType(String replyDestinationType) {
+        this.replyDestinationType = replyDestinationType;
+    }
+
+    public String getReplyDestinationName() {
+        return replyDestinationName;
+    }
+
+    public void setReplyDestinationName(String replyDestinationName) {
+        this.replyDestinationName = replyDestinationName;
+    }
 }

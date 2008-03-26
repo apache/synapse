@@ -55,7 +55,8 @@ public class DataSourceRegistrar {
     /**
      * Register data sources in the JNDI context
      * Given properties should contains all the properties need for construct JNDI naming references
-     * @param dsProperties  The source properties
+     *
+     * @param dsProperties The source properties
      */
     public static void registerDataSources(Properties dsProperties) {
 
@@ -258,7 +259,7 @@ public class DataSourceRegistrar {
 
             //set default properties for reference
             setDefaultParameters(ref, dsProperties, prefix);
-            
+
             try {
                 initialContext.rebind(dataSourceName, ref);
             } catch (NamingException e) {
@@ -275,9 +276,10 @@ public class DataSourceRegistrar {
 
     /**
      * Helper method to set all default parameter for naming reference of data source
+     *
      * @param reference  The naming reference instance
      * @param properties The properties which contains required parameter value
-     * @param prefix The key prefix for which is used to get data from given properties
+     * @param prefix     The key prefix for which is used to get data from given properties
      */
     private static void setDefaultParameters(Reference reference, Properties properties, String prefix) {
 

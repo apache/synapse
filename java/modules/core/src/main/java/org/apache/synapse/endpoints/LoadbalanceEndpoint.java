@@ -42,7 +42,8 @@ import java.util.List;
  * available, this will call next FaultHandler for the message context.
  */
 public class LoadbalanceEndpoint implements Endpoint {
-    private static final Log log = LogFactory.getLog(FailoverEndpoint.class);
+
+    private static final Log log = LogFactory.getLog(LoadbalanceEndpoint.class);
     /**
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
      * of indirect endpoints.
@@ -188,6 +189,7 @@ public class LoadbalanceEndpoint implements Endpoint {
             for (int i = 0; i < endpoints.size(); i++) {
                 Endpoint endpoint = (Endpoint) endpoints.get(i);
                 if (endpoint.isActive(synMessageContext)) {
+                    active = true;
                     endpointContext.setActive(true);
 
                     // don't break the loop though we found one active endpoint. calling isActive()

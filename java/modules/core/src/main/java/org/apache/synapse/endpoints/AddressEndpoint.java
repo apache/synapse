@@ -102,7 +102,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
             long recoverOn = endpointContext.getRecoverOn();
             if (System.currentTimeMillis() > recoverOn) {
-
+                active = true;
                 endpointContext.setActive(true);
                 endpointContext.setRecoverOn(0);
 

@@ -399,7 +399,7 @@
             <dependency>
                 <groupId>com.caucho</groupId>
                 <artifactId>hessian</artifactId>
-                <version>3.1.3</version>
+                <version>${hessian.version}</version>
             </dependency>
 
             <dependency>
@@ -1003,7 +1003,7 @@
         <dependency>
             <groupId>com.caucho</groupId>
             <artifactId>hessian</artifactId>
-            <version>3.1.3</version>
+            <version>${hessian.version}</version>
         </dependency>
 
     </dependencies>
@@ -1140,6 +1140,7 @@
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>
+        <hessian.version>3.0.20</hessian.version>
         <servlet-api.version>2.3</servlet-api.version>
         <qpid.version>1.0-incubating-M3-615355</qpid.version>
 

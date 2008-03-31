@@ -74,6 +74,8 @@ public class FaultMediator extends AbstractMediator {
     private URI faultRole = null;
     /** The fault detail to be used */
     private String faultDetail = null;
+    /** An XPath expression that will give the fault code QName at runtime */    
+    private SynapseXPath faultDetailExpr = null;
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -137,16 +139,27 @@ public class FaultMediator extends AbstractMediator {
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Setting the fault detail : "
-                    + faultDetail + " as athe POX Fault");
+                    + faultDetail + " as the POX Fault");
             }
 
             faultPayload.setText(faultDetail);
 
+        } else if (faultDetailExpr != null) {
+
+            String faultDetail = faultDetailExpr.getStringValue(synCtx);
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Setting the fault detail : "
+                        + faultDetail + " as the POX Fault");
+            }
+
+            faultPayload.setText(faultDetail);
+            
         } else if (faultReasonValue != null) {
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Setting the fault reason : "
-                    + faultReasonValue + " as athe POX Fault");
+                    + faultReasonValue + " as the POX Fault");
             }
 
             faultPayload.setText(faultReasonValue);
@@ -157,8 +170,8 @@ public class FaultMediator extends AbstractMediator {
             faultPayload.setText(faultReason);
 
             if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting the fault detail : "
-                    + faultDetail + " as athe POX Fault");
+                traceOrDebug(traceOn, "Setting the fault reason : "
+                    + faultReason + " as the POX Fault");
             }
         }
 
@@ -224,7 +237,7 @@ public class FaultMediator extends AbstractMediator {
         setFaultResaon(synCtx, factory, fault);
         setFaultNode(factory, fault);
         setFaultRole(factory, fault);
-        setFaultDetail(factory, fault);
+        setFaultDetail(synCtx, factory, fault);
 
         // set the all headers of original SOAP Envelope to the Fault Envelope
         if (synCtx.getEnvelope() != null) {
@@ -348,10 +361,14 @@ public class FaultMediator extends AbstractMediator {
         }
     }
 
-    private void setFaultDetail(SOAPFactory factory, SOAPFault fault) {
+    private void setFaultDetail(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
         if (faultDetail != null) {
             SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
             soapFaultDetail.setText(faultDetail);
+            fault.setDetail(soapFaultDetail);
+        } else if (faultDetailExpr != null) {
+            SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
+            soapFaultDetail.setText(faultDetailExpr.getStringValue(synCtx));
             fault.setDetail(soapFaultDetail);
         } else if (fault.getDetail() != null) {
             // work around for a rampart issue in the following thread
@@ -390,9 +407,7 @@ public class FaultMediator extends AbstractMediator {
                 this.faultCodeValue = faultCodeValue;
 
             } else {
-                String msg = "Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue;
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue);
             }
         }
     }
@@ -427,9 +442,7 @@ public class FaultMediator extends AbstractMediator {
 
     public void setFaultNode(URI faultNode) {
         if (soapVersion == SOAP11) {
-            String msg = "A fault node does not apply to a SOAP 1.1 fault";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("A fault node does not apply to a SOAP 1.1 fault");
         }
         this.faultNode = faultNode;
     }
@@ -448,5 +461,18 @@ public class FaultMediator extends AbstractMediator {
 
     public void setFaultDetail(String faultDetail) {
         this.faultDetail = faultDetail;
+    }
+
+    public SynapseXPath getFaultDetailExpr() {
+        return faultDetailExpr;
+    }
+
+    public void setFaultDetailExpr(SynapseXPath faultDetailExpr) {
+        this.faultDetailExpr = faultDetailExpr;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

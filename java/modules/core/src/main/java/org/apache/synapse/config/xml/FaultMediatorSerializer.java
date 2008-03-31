@@ -105,7 +105,10 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
             role.setText(mediator.getFaultRole().toString());
         }
 
-        if (mediator.getFaultDetail() != null) {
+        if (mediator.getFaultDetailExpr() != null) {
+            OMElement detail = fac.createOMElement("detail", synNS, fault);
+            SynapseXPathSerializer.serializeXPath(mediator.getFaultDetailExpr(), detail, "expression");            
+        } else if (mediator.getFaultDetail() != null) {
             OMElement detail = fac.createOMElement("detail", synNS, fault);
             detail.setText(mediator.getFaultDetail());
         }

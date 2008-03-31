@@ -103,11 +103,11 @@ public class HessianMessageFormatter implements MessageFormatter {
 
                 SOAPFault fault = msgCtxt.getEnvelope().getBody().getFault();
                 SOAPFaultDetail soapFaultDetail = fault.getDetail();
-                String hessianFault;
+                String hessianFault = "";
 
                 if (soapFaultDetail != null) {
-					hessianFault = soapFaultDetail.getFirstElement().toStringWithConsume();
-				} else {
+					hessianFault = soapFaultDetail.toStringWithConsume();
+				} else if (fault.getReason() != null) {
 					hessianFault = fault.getReason().toStringWithConsume();
 				}
 

@@ -207,6 +207,11 @@
         check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
     </transportReceiver>
 
+     <!--Uncomment this for FIX transport support
+    <transportReceiver name="fix" class="org.apache.synapse.transport.fix.FIXTransportListener">
+        <parameter name="non-blocking">true</parameter>
+    </transportReceiver>-->
+
     <!-- ================================================= -->
     <!-- Transport Outs -->
     <!-- ================================================= -->
@@ -270,6 +275,11 @@
         <parameter name="mail.smtp.user">synapse.demo.0</parameter>
         <parameter name="mail.smtp.password">mailpassword</parameter>
         <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
+    </transportSender>-->
+
+    <!--Uncomment this for FIX transport support
+    <transportSender name="fix" class="org.apache.synapse.transport.fix.FIXTransportSender">
+	    <parameter name="non-blocking">true</parameter>
     </transportSender>-->
 
     <!-- ================================================= -->

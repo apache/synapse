@@ -71,9 +71,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
             } else if (POX.equals(version.getAttributeValue())) {
                 faultMediator.setSoapVersion(FaultMediator.POX);
             } else {
-                String msg = "Invalid SOAP version";
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Invalid SOAP version");
             }
         }
 
@@ -84,20 +82,17 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
             if (value != null) {
                 String strValue = value.getAttributeValue();
-                String prefix, name;
+                String prefix = null;
+                String name = null;
                 if (strValue.indexOf(":") != -1) {
                     prefix = strValue.substring(0, strValue.indexOf(":"));
                     name = strValue.substring(strValue.indexOf(":")+1);
                 } else {
-                    String msg = "A QName is expected for fault code as prefix:name";
-                    log.error(msg);
-                    throw new SynapseException(msg);
+                    handleException("A QName is expected for fault code as prefix:name");
                 }
                 String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, code);
                 if (namespaceURI == null) {
-                    String msg = "Invalid namespace prefix '" + prefix + "' in code attribute";
-                    log.error(msg);
-                    throw new SynapseException(msg);
+                    handleException("Invalid namespace prefix '" + prefix + "' in code attribute");
                 }
                 faultMediator.setFaultCodeValue(new QName(namespaceURI, name, prefix));
             } else if (expression != null) {
@@ -105,20 +100,14 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                     faultMediator.setFaultCodeExpr(
                         SynapseXPathFactory.getSynapseXPath(code, ATT_EXPRN));
                 } catch (JaxenException je) {
-                    String msg = "Invalid fault code expression : " + je.getMessage();
-                    log.error(msg);
-                    throw new SynapseException(msg, je);
+                    handleException("Invalid fault code expression : " + je.getMessage(), je);
                 }
             } else {
-                String msg = "A 'value' or 'expression' attribute must specify the fault code";
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("A 'value' or 'expression' attribute must specify the fault code");
             }
 
         } else {
-            String msg = "The fault code is a required attribute for the makefault mediator";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("The fault code is a required attribute for the makefault mediator");
         }
 
         OMElement reason = elem.getFirstChildWithName(REASON_Q);
@@ -133,20 +122,14 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                     faultMediator.setFaultReasonExpr(
                         SynapseXPathFactory.getSynapseXPath(reason, ATT_EXPRN));
                 } catch (JaxenException je) {
-                    String msg = "Invalid fault reason expression : " + je.getMessage();
-                    log.error(msg);
-                    throw new SynapseException(msg, je);
+                    handleException("Invalid fault reason expression : " + je.getMessage(), je);
                 }
             } else {
-                String msg = "A 'value' or 'expression' attribute must specify the fault code";
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("A 'value' or 'expression' attribute must specify the fault code");
             }
 
         } else {
-            String msg = "The fault reason is a required attribute for the makefault mediator";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("The fault reason is a required attribute for the makefault mediator");
         }
 
         // after successfully creating the mediator
@@ -158,9 +141,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
             try {
                 faultMediator.setFaultNode(new URI(node.getText()));
             } catch (URISyntaxException e) {
-                String msg = "Invalid URI specified for fault node : " + node.getText();
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Invalid URI specified for fault node : " + node.getText(), e);
             }
         }
 
@@ -169,15 +150,24 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
             try {
                 faultMediator.setFaultRole(new URI(role.getText()));
             } catch (URISyntaxException e) {
-                String msg = "Invalid URI specified for fault role : " + role.getText();
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Invalid URI specified for fault role : " + role.getText(), e);
             }
         }
 
         OMElement detail = elem.getFirstChildWithName(DETAIL_Q);
-        if (detail != null && detail.getText() != null) {
-            faultMediator.setFaultDetail(detail.getText());
+        if (detail != null) {
+            OMAttribute detailExpr = detail.getAttribute(ATT_EXPRN);
+            if (detailExpr != null && detailExpr.getAttributeValue() != null) {
+                try {
+                    faultMediator.setFaultDetailExpr(
+                            SynapseXPathFactory.getSynapseXPath(detail, ATT_EXPRN));
+                } catch (JaxenException e) {
+                    handleException("Unable to build the XPath for fault detail " +
+                            "from the expression : " + detailExpr.getAttributeValue(), e);
+                }
+            } else if (detail.getText() != null) {
+                faultMediator.setFaultDetail(detail.getText());
+            }
         }
 
         return faultMediator;

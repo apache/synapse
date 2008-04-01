@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.synapse.config.Entry;
 
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * This is the interface to a Registry from Synapse.
@@ -30,7 +31,15 @@ import java.util.Map;
 public interface Registry {
 
     /**
+     * Initializes the registry with given properties
+     *
+     * @param properties The configuration properties
+     */
+    public void init(Properties properties);
+
+    /**
      * Perform an actual lookup for for an XML resource as an OMNode for the given key
+     *
      * @param key the key for the registry lookup
      * @return the XML content from the registry as an OMNode
      */
@@ -39,29 +48,24 @@ public interface Registry {
     /**
      * This is the publicly used interface to the registry. It will fetch
      * the content from the registry and cache if required.
-     * @see AbstractRegistry
      *
      * @param entry the registry Entry
      * @return the value from the registry or local cache
+     * @see AbstractRegistry
      */
     public Object getResource(Entry entry);
 
     /**
      * Get the registry entry for the given key
+     *
      * @param key the registry key
      * @return The registry entry for the given key
      */
     public RegistryEntry getRegistryEntry(String key);
 
     /**
-     * Set a configuration property on the registry. Could be used to initialize a registry
-     * @param name property name
-     * @param value simple String value
-     */
-    public void addConfigProperty(String name, String value);
-
-    /**
      * Returns the child elements of a given registry entry
+     *
      * @param entry - parent registry entry
      * @return Array of child registry entries of the given parent registry entry
      */
@@ -69,6 +73,7 @@ public interface Registry {
 
     /**
      * Returns all descendant entries of the given registry entry
+     *
      * @param entry - parent registry entry
      * @return Array of decendant registry entries of the given registry entry
      */
@@ -76,13 +81,45 @@ public interface Registry {
 
     /**
      * Return the name of the implementation class
+     *
      * @return name of the registry provider implementation class name
      */
     public String getProviderClass();
 
     /**
      * Return the list of configuration properties set on this instance
+     *
      * @return a Map of configuration properties
      */
-    public Map getConfigProperties();
+    public Properties getConfigurationProperties();
+
+    /**
+     * Deletes a resource in the given path
+     *
+     * @param path The path the of resource
+     */
+    public void delete(String path);
+
+    /**
+     * Creates a new resource in the given path
+     *
+     * @param path        The new resource path
+     * @param isDirectory Whether resource is a collection or not
+     */
+    public void newResource(String path, boolean isDirectory);
+
+    /**
+     * Updates the value of a resource
+     *
+     * @param path  The resource to be updated
+     * @param value The value to be set
+     */
+    public void updateResource(String path, Object value);
+
+    /**
+     * Updates the registry enrty (metadata about a resource)
+     *
+     * @param entry The registry entry
+     */
+    public void updateRegistryEntry(RegistryEntry entry);
 }

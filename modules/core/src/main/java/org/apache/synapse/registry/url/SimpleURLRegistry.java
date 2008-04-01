@@ -28,6 +28,7 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.registry.AbstractRegistry;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.registry.RegistryEntry;
+import org.apache.synapse.registry.RegistryEntryImpl;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,6 +36,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * A Simple HTTP GET based registry which will work with a Web Server / WebDAV
@@ -47,13 +49,14 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     private static final Log log = LogFactory.getLog(SimpleURLRegistry.class);
 
     private static final int MAX_KEYS = 200;
+    private String root ="";
 
     public OMNode lookup(String key) {
 
         log.info("==> Repository fetch of resource with key : " + key);
         URLConnection urlc = null;
         try {
-            URL url = SynapseConfigUtils.getURLFromPath(getRoot() + key);
+            URL url = SynapseConfigUtils.getURLFromPath(root + key);
             if (url == null) {
                 return null;
             }
@@ -70,13 +73,13 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             return builder.getDocumentElement();
 
         } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + getRoot() + key, e);
+            handleException("Invalid URL reference " + root + key, e);
         } catch (FileNotFoundException fnf) {
             return null;
         } catch (IOException e) {
-            handleException("IO Error reading from URL " + getRoot() + key, e);
+            handleException("IO Error reading from URL " + root + key, e);
         } catch (XMLStreamException e) {
-            handleException("XML Error reading from URL " + getRoot() + key, e);
+            handleException("XML Error reading from URL " + root + key, e);
         }
         return null;
     }
@@ -86,7 +89,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             log.debug("Perform RegistryEntry lookup for key : " + key);
         }
         try {
-            URL url = SynapseConfigUtils.getURLFromPath(getRoot() + key);
+            URL url = SynapseConfigUtils.getURLFromPath(root + key);
             if (url == null) {
                 return null;
             }
@@ -94,7 +97,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             urlc.setReadTimeout(30000);
             urlc.setRequestProperty("Connection", "Close");
 
-            URLRegistryEntry wre = new URLRegistryEntry();
+            RegistryEntryImpl wre = new RegistryEntryImpl();
             wre.setKey(key);
             wre.setName(url.getFile());
             wre.setType(new URI(urlc.getContentType()));
@@ -105,23 +108,24 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
                 wre.setCachableDuration(
                         urlc.getExpiration() - System.currentTimeMillis());
             } else {
-                wre.setCachableDuration(getCachableDuration());
+                wre.setCachableDuration(getCachableDuration(key));
             }
             return wre;
 
         } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + getRoot() + key, e);
+            handleException("Invalid URL reference " + root + key, e);
         } catch (IOException e) {
-            handleException("IO Error reading from URL " + getRoot() + key, e);
+            handleException("IO Error reading from URL " + root + key, e);
         } catch (URISyntaxException e) {
-            handleException("URI Syntax error reading from URL " + getRoot() + key, e);
+            handleException("URI Syntax error reading from URL " + root + key, e);
         }
         return null;
     }
 
-    public void addConfigProperty(String name, String value) {
-
-        if (name.equals("root")) {
+    public void init(Properties properties) {
+        super.init(properties);
+        String value = properties.getProperty("root");
+        if (value != null) {
 
             // if the root is folder, it should always end with '/'
             // therefore, property keys do not have to begin with '/', which could be misleading
@@ -135,21 +139,32 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             } catch (MalformedURLException e) {
                 // don't do any thing if this is not a valid URL
             }
-        }
-
-        super.addConfigProperty(name, value);
-    }
-
-    public String getRoot() {
-        String root = (String) properties.get("root");
-        if (root == null) {
-            return "";
+            root = value;
         } else {
-            return root;
+            handleException("");
         }
+
     }
 
-    public long getCachableDuration() {
+
+    public void delete(String path) {
+       //TODO
+    }
+
+    public void newResource(String path, boolean isDirectory) {
+        //TODO
+    }
+
+    public void updateResource(String path, Object value) {
+        //TODO
+    }
+
+    public void updateRegistryEntry(RegistryEntry entry) {
+        //TODO
+    }
+
+
+    public long getCachableDuration(String rootPath) {
         String cachableDuration = (String) properties.get("cachableDuration");
         return cachableDuration == null ? 1500 : Long.parseLong(cachableDuration);
     }
@@ -157,11 +172,11 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     public RegistryEntry[] getChildren(RegistryEntry entry) {
         URL url;
         if (entry == null) {
-            URLRegistryEntry urlEntry = new URLRegistryEntry();
-            urlEntry.setKey("");
-            entry = urlEntry;
+            RegistryEntryImpl entryImpl = new RegistryEntryImpl();
+            entryImpl.setKey("");
+            entry = entryImpl;
         }
-        url = SynapseConfigUtils.getURLFromPath(getRoot() + entry.getKey());
+        url = SynapseConfigUtils.getURLFromPath(root + entry.getKey());
         if (url == null) {
             return null;
         }
@@ -179,18 +194,18 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
                 ArrayList entryList = new ArrayList();
                 String key = "";
                 while ((key = reader.readLine()) != null) {
-                    URLRegistryEntry registryEntry = new URLRegistryEntry();
+                    RegistryEntryImpl registryEntryImpl = new RegistryEntryImpl();
                     if (entry.getKey().equals("")) {
-                        registryEntry.setKey(key);
+                        registryEntryImpl.setKey(key);
                     } else {
                         if (entry.getKey().endsWith("/")) {
-                            registryEntry.setKey(entry.getKey() + key);
+                            registryEntryImpl.setKey(entry.getKey() + key);
                         } else {
-                            registryEntry.setKey(entry.getKey() + "/" + key);
+                            registryEntryImpl.setKey(entry.getKey() + "/" + key);
                         }
                     }
 
-                    entryList.add(registryEntry);
+                    entryList.add(registryEntryImpl);
                 }
 
                 RegistryEntry[] entries = new RegistryEntry[entryList.size()];
@@ -252,4 +267,10 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
 }

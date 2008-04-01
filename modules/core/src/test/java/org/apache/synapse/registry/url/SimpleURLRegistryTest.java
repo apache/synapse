@@ -26,6 +26,7 @@ import org.apache.synapse.registry.Registry;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Properties;
 
 public class SimpleURLRegistryTest extends TestCase {
 
@@ -39,8 +40,10 @@ public class SimpleURLRegistryTest extends TestCase {
 
     public void testRegistry() throws Exception {
         Registry reg = new SimpleURLRegistry();
-        reg.addConfigProperty("root", "file:./");
-        reg.addConfigProperty("cachableDuration", "1500");
+        Properties props = new Properties();
+        props.put("root", "file:./");
+        props.put("cachableDuration", "1500");
+        reg.init(props);
         Entry prop = new Entry();
         prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey(FILE);
@@ -59,8 +62,8 @@ public class SimpleURLRegistryTest extends TestCase {
         // the renewed cache should be valid for another 1.5 secs
         // change the file now and change next cache duration
         writeToFile(TEXT_2);
-        reg.addConfigProperty("cachableDuration", "100");
-
+        props.put("cachableDuration", "100");
+        reg.init(props);
         // still cached content should be available and valid
         assertEquals(TEXT_1, reg.getResource(prop).toString());
 

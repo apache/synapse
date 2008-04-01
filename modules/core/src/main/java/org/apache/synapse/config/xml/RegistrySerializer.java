@@ -54,10 +54,10 @@ public class RegistrySerializer {
             handleException("Invalid registry. Provider is required");
         }
 
-        Iterator iter = registry.getConfigProperties().keySet().iterator();
+        Iterator iter = registry.getConfigurationProperties().keySet().iterator();
         while (iter.hasNext()) {
             String name = (String) iter.next();
-            String value = (String) registry.getConfigProperties().get(name);
+            String value = (String) registry.getConfigurationProperties().get(name);
             OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
                 "name", nullNS, name));

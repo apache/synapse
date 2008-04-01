@@ -28,6 +28,7 @@ import org.apache.synapse.registry.Registry;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Create an instance of the given registry, and sets properties on it.
@@ -51,7 +52,7 @@ public class RegistryFactory {
             try {
                 Class provider = Class.forName(prov.getAttributeValue());
                 Registry registry = (Registry) provider.newInstance();
-                setProperties(registry, elem);
+                registry.init(getProperties(elem));
                 return registry;
 
             } catch (ClassNotFoundException e) {
@@ -71,8 +72,9 @@ public class RegistryFactory {
         return null;
     }
 
-    private static void setProperties(Registry reg, OMElement elem) {
+    private static Properties getProperties(OMElement elem) {
         Iterator params = elem.getChildrenWithName(PARAMETER_Q);
+        Properties props =new Properties();
         while (params.hasNext()) {
             Object o = params.next();
             if (o instanceof OMElement) {
@@ -81,7 +83,7 @@ public class RegistryFactory {
                 String propertyValue = prop.getText();
                 if (pname != null) {
                     if (propertyValue != null) {
-                        reg.addConfigProperty(pname.getAttributeValue(), propertyValue.trim());
+                        props.setProperty(pname.getAttributeValue(), propertyValue.trim());
                     }
                 } else {
                     handleException("Invalid registry property - property should have a name ");
@@ -90,6 +92,7 @@ public class RegistryFactory {
                 handleException("Invalid registry property");
             }
         }
+        return props;
     }
 
     private static void handleException(String msg) {

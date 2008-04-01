@@ -318,11 +318,14 @@ public class SequenceProcessor {
 		
 		boolean sendAck = false;
 		
+		// Need to special case 2005/02 LastMessage messages for replay model.
+		boolean lastMessageMessage = lastMessage && (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.LAST_MESSAGE) && bean.getOutboundInternalSequence()!=null;
+		
 		boolean ackBackChannel = SpecSpecificConstants.sendAckInBackChannel (rmMsgCtx.getMessageType());
 		// If we are processing an inOnly message we must ack the back channel otherwise the connection stays open
 		if (!ackBackChannel && mep == WSDLConstants.MEP_CONSTANT_IN_ONLY) ackBackChannel = true;
 		EndpointReference acksTo = bean.getAcksToEndpointReference();
-		if (acksTo.hasAnonymousAddress() && backchannelFree && ackBackChannel) {
+		if (acksTo.hasAnonymousAddress() && backchannelFree && ackBackChannel && !lastMessageMessage) {
 			boolean responseWritten = TransportUtils.isResponseWritten(msgCtx);
 			if (!responseWritten) {				
 				sendAck = true;

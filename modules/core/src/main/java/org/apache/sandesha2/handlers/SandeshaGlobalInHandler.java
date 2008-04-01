@@ -28,6 +28,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -201,6 +202,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         boolean msgNoPresentInList = 
           serverCompletedMessageRanges.isMessageNumberInRanges(msgNo);
           
+        if((rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.LAST_MESSAGE) && bean.getOutboundInternalSequence()!=null){
+        	rmMsgCtx.setProperty(Constants.Configuration.DISABLE_RESPONSE_ACK, Boolean.TRUE);
+        }
+        
         if (!msgNoPresentInList) {
           serverCompletedMessageRanges.addRange(new Range(msgNo));
           

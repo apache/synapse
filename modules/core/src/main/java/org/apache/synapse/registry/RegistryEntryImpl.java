@@ -17,14 +17,14 @@
  *  under the License.
  */
 
-package org.apache.synapse.registry.url;
+package org.apache.synapse.registry;
 
 import org.apache.synapse.registry.RegistryEntry;
 
 import java.net.URI;
 import java.util.Date;
 
-public class URLRegistryEntry implements RegistryEntry {
+public class RegistryEntryImpl implements RegistryEntry {
 
     private String key = null;
     private String name = null;

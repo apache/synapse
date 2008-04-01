@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implements the core Registry lookup algorithm
@@ -39,7 +40,7 @@ public abstract class AbstractRegistry implements Registry {
     private static final Log log = LogFactory.getLog(AbstractRegistry.class);
 
     /** The list of configuration properties */
-    protected Map properties = new HashMap();
+    protected Properties properties = new Properties();
 
     /**
      * Get the resource for the given key from this registry
@@ -155,11 +156,11 @@ public abstract class AbstractRegistry implements Registry {
         return this.getClass().getName();
     }
 
-    public Map getConfigProperties() {
+    public Properties getConfigurationProperties() {
         return properties;
     }
 
-    public void addConfigProperty(String name, String value) {
-        properties.put(name, value);
+    public void init(Properties properties) {
+        this.properties =properties;
     }
 }

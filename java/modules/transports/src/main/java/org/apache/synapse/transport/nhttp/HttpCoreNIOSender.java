@@ -370,10 +370,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // if this is a dummy message to handle http 202 case with non-blocking IO
         // set the status code to 202 and the message body to an empty byte array (see below)
-        if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED) &&
+        if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED) &&
                 msgContext.getProperty(
                     Sandesha2Constants.MessageContextProperties.SEQUENCE_ID) == null) {
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
+        } else if (msgContext.isPropertyTrue(NhttpConstants.SC_OK)) {
+            response.setStatusCode(HttpStatus.SC_OK);
         }
 
         // set any transport headers

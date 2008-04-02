@@ -467,13 +467,13 @@ public class ClientHandler implements NHttpClientHandler {
                             log.debug("Received an unexpected response with a POX/REST payload");
                         }
                     } else {
-                        log.error("Received an unexpected response - of content type : " +
+                        log.warn("Received an unexpected response - of content type : " +
                             contentType.getValue() + " and status code : " +
                             response.getStatusLine().getStatusCode() + " with reason : " +
                             response.getStatusLine().getReasonPhrase());
                     }
                 } else {
-                    log.error("Received an unexpected response - of unknown content type " +
+                    log.warn("Received an unexpected response - of unknown content type " +
                         " with status code : " +
                         response.getStatusLine().getStatusCode() + " and reason : " +
                         response.getStatusLine().getReasonPhrase());

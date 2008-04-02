@@ -18,28 +18,28 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.soap.*;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.builder.BuilderUtil;
-import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
-import org.apache.axiom.soap.*;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.axiom.om.OMException;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
 import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.base.MetricsCollector;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -171,7 +171,7 @@ public class ClientWorker implements Runnable {
                 contentType);
             } catch (OMException e) {
                 // handle non SOAP and POX/REST payloads (probably text/html)
-                log.error("Unexpected response received", e);
+                log.warn("Unexpected response received : " + e.getMessage());
                 SOAPFactory factory = new SOAP11Factory();
                 envelope = factory.getDefaultFaultEnvelope();
                 SOAPFaultDetail detail = factory.createSOAPFaultDetail();

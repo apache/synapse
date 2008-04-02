@@ -19,13 +19,11 @@
 
 package org.apache.synapse.format.hessian;
 
-import com.caucho.hessian.io.HessianOutput;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.soap.SOAPFault;
-import org.apache.axiom.soap.SOAPFaultDetail;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
@@ -35,7 +33,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.activation.DataHandler;
-import javax.xml.stream.XMLStreamException;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,24 +99,31 @@ public class HessianMessageFormatter implements MessageFormatter {
             try {
 
                 SOAPFault fault = msgCtxt.getEnvelope().getBody().getFault();
-                SOAPFaultDetail soapFaultDetail = fault.getDetail();
-                String hessianFault = "";
+                String hessianFaultDetail = "";
+                String hessianFaultMessage = "";
+                String hessianFaultCode = "500";
 
-                if (soapFaultDetail != null) {
-					hessianFault = soapFaultDetail.toStringWithConsume();
-				} else if (fault.getReason() != null) {
-					hessianFault = fault.getReason().toStringWithConsume();
+                if (fault.getDetail() != null) {
+					hessianFaultDetail = fault.getDetail().getText();
 				}
 
-                HessianOutput faultOutput = new HessianOutput(out);
-				faultOutput.writeString(hessianFault);
+                if (fault.getReason() != null) {
+					hessianFaultMessage = fault.getReason().getText();
+				}
+
+                if (fault.getCode() != null) {
+                    hessianFaultCode = fault.getCode().getText();
+                }
+
+                BufferedOutputStream faultOutStream = new BufferedOutputStream(out);
+                HessianUtils.writeFault(
+                        hessianFaultCode, hessianFaultMessage, hessianFaultDetail, faultOutStream);
+                faultOutStream.flush();
+                faultOutStream.close();
 
             } catch (IOException e) {
 				handleException("Unalbe to write the fault as a hessian message", e);
-			} catch (XMLStreamException e) {
-                handleException("Error in retrieving the fault information to " +
-                        "write the hessian message", e);
-            }
+			}
 
             // if the message is not a fault extract the Hessian bytes and write it to the wire
         } else {

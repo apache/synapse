@@ -74,9 +74,21 @@ public class HessianUtils {
         }
     }
 
+    public static void startReply(OutputStream os) throws IOException {
+        os.write('r');
+        os.write(1);
+        os.write(0);
+    }
+
+    public static void completeReply(OutputStream os) throws IOException {
+        os.write('z');
+    }
+
     public static void writeFault(String code, String message, String detail, OutputStream os)
             throws IOException {
-        
+
+        startReply(os);
+
         os.write('f');
         writeString("code", os);
         writeString(code, os);
@@ -88,6 +100,9 @@ public class HessianUtils {
             writeString("detail", os);
             writeString(detail, os);
         }
+        
         os.write('z');
+
+        completeReply(os);
     }
 }

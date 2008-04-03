@@ -21,7 +21,7 @@ package org.apache.synapse.transport.nhttp;
 
 public class NhttpConstants {
     public static final String SC_ACCEPTED = "SC_ACCEPTED";
-    public static final String SC_OK = "SC_OK";
+    public static final String HTTP_SC = "HTTP_SC";
     public static final String SENDING_FAULT = "sending_fault";
     public static final String FORCE_HTTP_1_0 = "FORCE_HTTP_1.0";
 

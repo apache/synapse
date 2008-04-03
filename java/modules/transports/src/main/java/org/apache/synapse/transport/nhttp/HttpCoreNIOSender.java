@@ -374,8 +374,17 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 msgContext.getProperty(
                     Sandesha2Constants.MessageContextProperties.SEQUENCE_ID) == null) {
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
-        } else if (msgContext.isPropertyTrue(NhttpConstants.SC_OK)) {
-            response.setStatusCode(HttpStatus.SC_OK);
+        } else {
+            Object statusCode = msgContext.getProperty(NhttpConstants.HTTP_SC);
+            if (statusCode != null) {
+                try {
+                    response.setStatusCode(Integer.parseInt(
+                            msgContext.getProperty(NhttpConstants.HTTP_SC).toString()));
+                } catch (NumberFormatException e) {
+                    log.warn("Unable to set the HTTP Status Code from " +
+                            "the property HHTP_SC with value : " + statusCode);
+                }
+            }
         }
 
         // set any transport headers

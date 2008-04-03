@@ -78,12 +78,13 @@ public class OMElementUtils {
 
         OMElement currentElem = elem;
 
-        while (currentElem != null) {              
+        while (currentElem != null) {
             Iterator it = currentElem.getAllDeclaredNamespaces();
             while (it.hasNext()) {
 
                 OMNamespace n = (OMNamespace) it.next();
-                if (n != null) {
+                // assume the behavior of attributes as unqualified from default
+                if (n != null && !"".equals(n.getPrefix())) {
 
                     try {
                         xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());

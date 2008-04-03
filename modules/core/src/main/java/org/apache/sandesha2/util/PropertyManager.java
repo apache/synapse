@@ -22,10 +22,12 @@ package org.apache.sandesha2.util;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.PolicySubject;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -147,43 +149,46 @@ public class PropertyManager {
 	public static SandeshaPolicyBean loadPropertiesFromModuleDescPolicy(AxisModule desc,
 			SandeshaPolicyBean parentPropertyBean) throws SandeshaException {
 
-		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
-
-		if (policy == null) {
-			return null; // no pilicy is available in the module description
-		}
-        
-        Iterator iterator = policy.getAlternatives();
-        if (! iterator.hasNext()) {
-            throw new SandeshaException("No Policy Alternative found");
-        }
-
-        List assertionList = (List) iterator.next();
-        Assertion assertion = null;
-        
         boolean found = false;
-        
-        for (Iterator assertions = assertionList.iterator(); assertions.hasNext();) {
-            assertion = (Assertion) assertions.next();
-            
-            if (assertion instanceof SandeshaPolicyBean) {
-                found = true;
-                break;
-            }
-        }
-        
-        if (! found) {
-            // no RMAssertion found
+        Assertion assertion = null;
+
+        PolicySubject policySubject = desc.getPolicySubject();
+        if (policySubject == null) {
             return null;
         }
-        
+        Collection policyComponents = policySubject.getAttachPolicyComponents();
+        if (policyComponents == null) {
+            return null;
+        }
+        Iterator policies = policyComponents.iterator();
+        while (!found && policies.hasNext()) {
+            Policy policy = (Policy) policies.next();
+            Iterator iterator = policy.getAlternatives();
+            while (!found && iterator.hasNext()) {
+                List assertionList = (List) iterator.next();
+                Iterator assertions = assertionList.iterator();
+                while (!found && assertions.hasNext()) {
+                    assertion = (Assertion) assertions.next();
+                    if (assertion instanceof SandeshaPolicyBean) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // no RMAssertion found
+        if (!found) {
+            return null;
+        }
+
         SandeshaPolicyBean propertyBean = (SandeshaPolicyBean) assertion;
         propertyBean.setParent(parentPropertyBean);
 
-		return propertyBean;
-	}
+        return propertyBean;
+    }
 
-	public static SandeshaPolicyBean loadPropertiesFromAxisDescription(AxisDescription desc,
+    public static SandeshaPolicyBean loadPropertiesFromAxisDescription(AxisDescription desc,
 			SandeshaPolicyBean parentPropertyBean) throws SandeshaException {
 		
         Policy policy = desc.getPolicyInclude().getEffectivePolicy();

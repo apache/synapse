@@ -186,6 +186,10 @@ public class ClientWorker implements Runnable {
             }
             responseMsgCtx.setServerSide(true);
             responseMsgCtx.setEnvelope(envelope);
+            // copy the HTTP status code as a message context property with the key HTTP_SC to be
+            // used at the sender to set the propper status code when passing the message
+            responseMsgCtx.setProperty(NhttpConstants.HTTP_SC,
+                    this.response.getStatusLine().getStatusCode());
 
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);

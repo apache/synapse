@@ -78,7 +78,7 @@ public class HeaderMediator extends AbstractMediator {
         if (action == ACTION_SET) {
 
             String value = (getExpression() == null ? getValue() :
-                expression.getStringValue(synCtx));
+                    expression.stringValueOf(synCtx));
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Set SOAP header : " + qName + " to : " + value);

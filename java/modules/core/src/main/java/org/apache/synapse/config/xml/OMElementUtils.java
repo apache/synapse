@@ -27,6 +27,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import java.util.Iterator;
@@ -88,6 +89,41 @@ public class OMElementUtils {
 
                     try {
                         xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
+                    } catch (JaxenException je) {
+                        String msg = "Error adding declared name space with prefix : "
+                            + n.getPrefix() + "and uri : " + n.getNamespaceURI()
+                            + " to the XPath : " + xpath;
+                        log.error(msg);
+                        throw new SynapseException(msg, je);
+                    }
+                }
+            }
+
+            OMContainer parent = currentElem.getParent();
+            //if the parent is a document element or parent is null ,then return
+            if (parent == null || parent instanceof OMDocument) {
+                return;
+            }
+            if (parent instanceof OMElement) {
+                currentElem = (OMElement) parent;
+            }
+        }
+    }
+
+    public static void addNameSpaces(SynapseXPath xpath, OMElement elem, Log log) {
+
+        OMElement currentElem = elem;
+
+        while (currentElem != null) {
+            Iterator it = currentElem.getAllDeclaredNamespaces();
+            while (it.hasNext()) {
+
+                OMNamespace n = (OMNamespace) it.next();
+                // assume the behavior of attributes as unqualified from default
+                if (n != null && !"".equals(n.getPrefix())) {
+
+                    try {
+                        xpath.addNamespace(n);
                     } catch (JaxenException je) {
                         String msg = "Error adding declared name space with prefix : "
                             + n.getPrefix() + "and uri : " + n.getNamespaceURI()

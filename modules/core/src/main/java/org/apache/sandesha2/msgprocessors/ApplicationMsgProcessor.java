@@ -576,7 +576,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					try {
 						worker.run();
 					} catch(Exception e)  {
-					log.error("Caught exception running SandeshaWorker", e);
+						
+						log.debug("Caught exception running SandeshaWorker", e);
 					}
 				}
 		

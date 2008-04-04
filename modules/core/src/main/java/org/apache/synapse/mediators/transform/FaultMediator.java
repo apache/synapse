@@ -146,7 +146,7 @@ public class FaultMediator extends AbstractMediator {
 
         } else if (faultDetailExpr != null) {
 
-            String faultDetail = faultDetailExpr.getStringValue(synCtx);
+            String faultDetail = faultDetailExpr.stringValueOf(synCtx);
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Setting the fault detail : "
@@ -166,7 +166,7 @@ public class FaultMediator extends AbstractMediator {
 
         } else if (faultReasonExpr != null) {
 
-            String faultReason = faultReasonExpr.getStringValue(synCtx);
+            String faultReason = faultReasonExpr.stringValueOf(synCtx);
             faultPayload.setText(faultReason);
 
             if (traceOrDebugOn) {
@@ -304,7 +304,7 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultCodeValue != null) {
             fault_code = faultCodeValue;
         } else {
-            fault_code = QName.valueOf(faultCodeExpr.getStringValue(synCtx));
+            fault_code = QName.valueOf(faultCodeExpr.stringValueOf(synCtx));
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
@@ -328,7 +328,7 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultReasonValue != null) {
             reasonString = faultReasonValue;
         } else {
-            reasonString = faultReasonExpr.getStringValue(synCtx);
+            reasonString = faultReasonExpr.stringValueOf(synCtx);
         }
 
         SOAPFaultReason reason = factory.createSOAPFaultReason();
@@ -368,7 +368,7 @@ public class FaultMediator extends AbstractMediator {
             fault.setDetail(soapFaultDetail);
         } else if (faultDetailExpr != null) {
             SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
-            soapFaultDetail.setText(faultDetailExpr.getStringValue(synCtx));
+            soapFaultDetail.setText(faultDetailExpr.stringValueOf(synCtx));
             fault.setDetail(soapFaultDetail);
         } else if (fault.getDetail() != null) {
             // work around for a rampart issue in the following thread

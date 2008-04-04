@@ -19,6 +19,7 @@
 
 package org.apache.synapse.util.xpath;
 
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
@@ -31,6 +32,7 @@ import org.apache.synapse.SynapseException;
 import org.jaxen.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>XPath that has been used inside Synapse xpath processing. This has a extension function named
@@ -71,9 +73,11 @@ import java.util.List;
  * @see org.apache.synapse.util.xpath.SynapseXPathFunctionContext
  * @see org.apache.synapse.util.xpath.SynapseXPathVariableContext
  */
-public class SynapseXPath extends AXIOMXPath {
+public class SynapseXPath implements XPath {
 
     private static final Log log = LogFactory.getLog(SynapseXPath.class);
+
+    private AXIOMXPath xpath;
 
     /**
      * <p>Initializes the <code>SynapseXPath</code> with the given <code>xpathString</code> as the
@@ -83,50 +87,9 @@ public class SynapseXPath extends AXIOMXPath {
      * @throws JaxenException in case of an initialization failure
      */
     public SynapseXPath(String xpathString) throws JaxenException {
-        super(xpathString);
-        setVariableContext(new ThreadSafeDelegatingVariableContext());
-        setFunctionContext(new ThreadSafeDelegatingFunctionContext());
-    }
-
-    /**
-     * <p>Evaluates the XPath over the specified MessageContext. This overides the evaluate method
-     * of the <code>BaseXPath</code> and provides a better acceess to the message context
-     * properties and transport information</p>
-     *
-     * @param synCtx context to be evaluated for the XPath
-     * @return evaluated value of the xpath over the given message context
-     * @throws JaxenException in case of a failure in evaluation
-     *
-     * @see org.jaxen.BaseXPath#evaluate(Object)
-     * @see org.apache.synapse.util.xpath.SynapseXPathFunctionContext#getFunction(
-     * String, String, String)
-     * @see org.apache.synapse.util.xpath.SynapseXPathVariableContext#getVariableValue(
-     * String, String, String)
-     */
-    public Object evaluate(MessageContext synCtx) throws JaxenException {
-
-        // retrieves the variable context and the function context to restore after
-        VariableContext varCtx = ((ThreadSafeDelegatingVariableContext)
-                getVariableContext()).getDelegate();
-        FunctionContext funCtx = ((ThreadSafeDelegatingFunctionContext)
-            getFunctionContext()).getDelegate();
-
-        try {
-
-            // set the synapse variable and function contexts before evaluation
-            ((ThreadSafeDelegatingVariableContext)
-                getVariableContext()).setDelegate(new SynapseXPathVariableContext(synCtx));
-            ((ThreadSafeDelegatingFunctionContext)
-                getFunctionContext()).setDelegate(new SynapseXPathFunctionContext(synCtx, true));
-
-            return super.evaluate(synCtx.getEnvelope());
-
-        } finally {
-
-            // restore the variable and function contexts
-            ((ThreadSafeDelegatingVariableContext) getVariableContext()).setDelegate(varCtx);
-            ((ThreadSafeDelegatingFunctionContext) getFunctionContext()).setDelegate(funCtx);
-        }
+        xpath = new AXIOMXPath(xpathString);
+        xpath.setVariableContext(new ThreadSafeDelegatingVariableContext());
+        xpath.setFunctionContext(new ThreadSafeDelegatingFunctionContext());
     }
 
     /**
@@ -134,7 +97,7 @@ public class SynapseXPath extends AXIOMXPath {
      * of the <code>BaseXPath</code> and provides a better acceess to the envelope using the XPath
      * variables for <code>SOAPBody</code> and <code>SOAPHeader</code>.</p>
      *
-     * @param env message to be evaluated to get the result
+     * @param o object to be evaluated to get the result (MessageContext | SOAPEnvelope | OMElement)
      * @return evaluated value of the xpath over the given message
      * @throws JaxenException in case of a failure in evaluation
      *
@@ -142,25 +105,87 @@ public class SynapseXPath extends AXIOMXPath {
      * @see org.apache.synapse.util.xpath.SynapseXPathVariableContext#getVariableValue(
      * String, String, String) 
      */
-    public Object evaluate(SOAPEnvelope env) throws JaxenException {
+    public Object evaluate(Object o) throws JaxenException {
+        setContexts(o);
+        return xpath.evaluate(getEvaluationObject(o));
+    }
 
-        // retrieves the variable context to restore after
-        VariableContext varCtx = ((ThreadSafeDelegatingVariableContext)
-                getVariableContext()).getDelegate();
+    /**
+     * @deprecated
+     */
+    public String valueOf(Object o) throws JaxenException {
+        return xpath.valueOf(o);
+    }
 
-        try {
+    public String stringValueOf(Object o) throws JaxenException {
 
-            // set the synapse variable context before evaluation
-            ((ThreadSafeDelegatingVariableContext)
-                getVariableContext()).setDelegate(new SynapseXPathVariableContext(env));
-
-            return super.evaluate(env);
-
-        } finally {
-
-            // restore the variable context            
-            ((ThreadSafeDelegatingVariableContext) getVariableContext()).setDelegate(varCtx);
+        if (o instanceof MessageContext) {
+            return stringValueOf((MessageContext) o);
+        } else {
+            setContexts(o);
+            return xpath.stringValueOf(getEvaluationObject(o));
         }
+    }
+
+    public boolean booleanValueOf(Object o) throws JaxenException {
+        setContexts(o);
+        return xpath.booleanValueOf(getEvaluationObject(o));
+    }
+
+    public Number numberValueOf(Object o) throws JaxenException {
+        setContexts(o);
+        return xpath.numberValueOf(getEvaluationObject(o));
+    }
+
+    public List selectNodes(Object o) throws JaxenException {
+        setContexts(o);
+        return xpath.selectNodes(getEvaluationObject(o));
+    }
+
+    public Object selectSingleNode(Object o) throws JaxenException {
+
+        return xpath.selectSingleNode(o);
+    }
+
+    public void addNamespace(String prefix, String nsURI) throws JaxenException {
+        xpath.addNamespace(prefix, nsURI);
+    }
+
+    public void setNamespaceContext(NamespaceContext namespaceContext) {
+        xpath.setNamespaceContext(namespaceContext);
+    }
+
+    public void setFunctionContext(FunctionContext functionContext) {
+        throw new UnsupportedOperationException("Setting the function context directly is " +
+                "prohibited, use ((ThreadSafeFunctionContext) " +
+                "getFunctionContext()).setDelegate() instead");
+    }
+
+    public void setVariableContext(VariableContext variableContext) {
+        
+        throw new UnsupportedOperationException("Setting the variable context directly is " +
+                "prohibited, use ((ThreadSafeVariableContext) " +
+                "getVariableContext()).setDelegate() instead");
+    }
+
+    public NamespaceContext getNamespaceContext() {
+        return xpath.getNamespaceContext();
+    }
+
+    public FunctionContext getFunctionContext() {
+        return xpath.getFunctionContext();
+    }
+
+    public VariableContext getVariableContext() {
+        return xpath.getVariableContext();
+    }
+
+    public Navigator getNavigator() {
+        return xpath.getNavigator();
+    }
+
+    public String toString() {
+        return xpath.toString();
     }
 
     /**
@@ -170,7 +195,7 @@ public class SynapseXPath extends AXIOMXPath {
      * @param synCtx the source message which holds the MessageContext against full context
      * @return a String representation of the result of evaluation
      */
-    public String getStringValue(MessageContext synCtx) {
+    public String stringValueOf(MessageContext synCtx) {
 
         try {
 
@@ -222,9 +247,62 @@ public class SynapseXPath extends AXIOMXPath {
         return null;
     }
 
+    public void addNamespace(OMNamespace ns) throws JaxenException {
+        xpath.addNamespace(ns.getPrefix(), ns.getNamespaceURI());
+    }
+
+    public Map getNamespaces() {
+        return xpath.getNamespaces();
+    }
+
+    private Object getEvaluationObject(Object obj) {
+        if (obj instanceof MessageContext) {
+            return ((MessageContext) obj).getEnvelope();
+        } else {
+            return obj;
+        }
+    }
+
+    private void setContexts(Object obj) {
+
+        if (obj instanceof MessageContext) {
+            setContexts((MessageContext) obj);
+        } else if (obj instanceof SOAPEnvelope) {
+            setContexts((SOAPEnvelope) obj);
+        } else {
+            
+            ((ThreadSafeDelegatingVariableContext)
+                    xpath.getVariableContext()).setDelegate(new SimpleVariableContext());
+
+            ((ThreadSafeDelegatingFunctionContext)
+                    xpath.getFunctionContext()).setDelegate(new XPathFunctionContext(true));
+        }
+    }
+
+    private void setContexts(SOAPEnvelope env) {
+
+        ((ThreadSafeDelegatingVariableContext)
+                xpath.getVariableContext()).setDelegate(
+                new SynapseXPathVariableContext(env));
+
+        ((ThreadSafeDelegatingFunctionContext)
+                xpath.getFunctionContext()).setDelegate(
+                new XPathFunctionContext(true));
+    }
+
+    private void setContexts(MessageContext synCtx) {
+
+        ((ThreadSafeDelegatingVariableContext)
+                xpath.getVariableContext()).setDelegate(
+                new SynapseXPathVariableContext(synCtx));
+
+        ((ThreadSafeDelegatingFunctionContext)
+                xpath.getFunctionContext()).setDelegate(
+                new SynapseXPathFunctionContext(synCtx, true));
+    }
+
     private void handleException(String msg, Throwable e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
-
 }

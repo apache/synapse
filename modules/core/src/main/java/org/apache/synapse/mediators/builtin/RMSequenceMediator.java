@@ -154,7 +154,7 @@ public class RMSequenceMediator extends AbstractMediator {
     private String getCorrelationValue(MessageContext smc) {
         OMElement node = null;
         try {
-            node = (OMElement) getCorrelation().selectSingleNode(smc.getEnvelope());
+            node = (OMElement) getCorrelation().selectSingleNode(smc);
 
             if (node != null) {
                 return node.getText();
@@ -183,7 +183,7 @@ public class RMSequenceMediator extends AbstractMediator {
             return false;
         } else {
             try {
-                return getLastMessage().booleanValueOf(smc.getEnvelope());
+                return getLastMessage().booleanValueOf(smc);
             } catch (JaxenException e) {
                 handleException("Error evaluating XPath expression to determine if last message : " +
                     getLastMessage(), e, smc);

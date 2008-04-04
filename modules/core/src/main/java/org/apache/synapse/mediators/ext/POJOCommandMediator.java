@@ -137,7 +137,7 @@ public class POJOCommandMediator extends AbstractMediator {
 
             String name = (String) iter.next();
             SynapseXPath xpath = messageSetterProperties.get(name);
-            String value = xpath.getStringValue(synCtx);
+            String value = xpath.stringValueOf(synCtx);
 
             setInstanceProperty(name, value, commandObject, synCtx);
         }

@@ -68,7 +68,7 @@ public class SwitchMediator extends AbstractMediator {
         setEffectiveTraceState(synCtx);
         int myEffectiveTraceState = synCtx.getTracingState();
 
-        String sourceText = source.getStringValue(synCtx);
+        String sourceText = source.stringValueOf(synCtx);
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "XPath : " + source + " evaluates to : " + sourceText);
         }

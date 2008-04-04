@@ -38,6 +38,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.util.UUIDGenerator;
+import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
 
 import java.util.concurrent.ExecutorService;
@@ -235,6 +236,37 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 		}
 
         return mc;
+    }
+
+    /**
+     * Factory method to create the TemporaryData object as per on the parameters specified in the
+     * synapse.properties file, so that the TemporaryData parameters like threashold chunk size
+     * can be customized by using the properties file. This can be extended to enforce further
+     * policies if required in the future.
+     *
+     * @return created TemporaryData object as per in the synapse.properties file
+     */
+    public TemporaryData createTemporaryData() {
+
+        String chkSize = synapseConfig.getProperty(SynapseConstants.CHUNK_SIZE);
+        String chukNumber = synapseConfig.getProperty(SynapseConstants.THRESHOLD_CHUNKS);
+        int numberOfChunks = SynapseConstants.DEFAULT_THRESHOLD_CHUNKS;
+        int chunkSize = SynapseConstants.DEFAULT_CHUNK_SIZE;
+
+        if (chkSize != null) {
+            chunkSize = Integer.parseInt(chkSize);
+        }
+
+        if (chukNumber != null) {
+            numberOfChunks = Integer.parseInt(chukNumber);
+        }
+
+        String tempPrefix = synapseConfig.getProperty(SynapseConstants.TEMP_FILE_PREFIX,
+                SynapseConstants.DEFAULT_TEMPFILE_PREFIX);
+        String tempSuffix = synapseConfig.getProperty(SynapseConstants.TEMP_FILE_SUFIX,
+                SynapseConstants.DEFAULT_TEMPFILE_SUFIX);
+
+        return new TemporaryData(numberOfChunks, chunkSize, tempPrefix, tempSuffix);
     }
 
     /**

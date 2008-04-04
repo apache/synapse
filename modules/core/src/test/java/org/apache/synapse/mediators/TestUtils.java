@@ -52,6 +52,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(testConfig));        
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
@@ -119,6 +120,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
+        SynapseEnvironment testEnv = new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig);
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
@@ -128,6 +130,7 @@ public class TestUtils {
             }
         }
         synCtx.setConfiguration(testConfig);
+        synCtx.setEnvironment(testEnv);
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();
@@ -153,6 +156,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();

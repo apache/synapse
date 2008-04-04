@@ -1,14 +1,9 @@
 package org.apache.synapse.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.*;
 
 /**
  * Class representing some temporary data in the form of a byte stream.
@@ -23,36 +18,46 @@ import org.apache.commons.logging.LogFactory;
  * call {@link #release()} to discard the temporary data.
  */
 public class TemporaryData {
+    
     private static final Log log = LogFactory.getLog(TemporaryData.class);
     
     class OutputStreamImpl extends OutputStream {
+        
         private FileOutputStream fileOutputStream;
         
         public void write(byte[] b, int off, int len) throws IOException {
+
             if (fileOutputStream != null) {
                 fileOutputStream.write(b, off, len);
             } else if (len > (chunks.length-chunkIndex)*chunkSize - chunkOffset) {
+
                 // The buffer will overflow. Switch to a temporary file.
                 temporaryFile = File.createTempFile(tempPrefix, tempSuffix);
                 if (log.isDebugEnabled()) {
                     log.debug("Using temporary file " + temporaryFile);
                 }
                 temporaryFile.deleteOnExit();
+
                 fileOutputStream = new FileOutputStream(temporaryFile);
                 // Write the buffer to the temporary file.
                 for (int i=0; i<chunkIndex; i++) {
                     fileOutputStream.write(chunks[i]);
                 }
+
                 if (chunkOffset > 0) {
                     fileOutputStream.write(chunks[chunkIndex], 0, chunkOffset);
                 }
+
                 // Release references to the buffer so that it can be garbage collected.
                 chunks = null;
                 // Finally, write the new data to the temporary file.
                 fileOutputStream.write(b, off, len);
+
             } else {
+
                 // The data will fit into the buffer.
                 while (len > 0) {
+
                     byte[] chunk;
                     if (chunkOffset == 0) {
                         // We will write the first byte to the current chunk. Allocate it.
@@ -62,10 +67,12 @@ public class TemporaryData {
                         // The chunk has already been allocated.
                         chunk = chunks[chunkIndex];
                     }
+
                     // Determine number of bytes that can be copied to the current chunk.
                     int c = Math.min(len, chunkSize-chunkOffset);
                     // Copy data to the chunk.
                     System.arraycopy(b, off, chunk, chunkOffset, c);
+
                     // Update variables.
                     len -= c;
                     off += c;
@@ -100,6 +107,7 @@ public class TemporaryData {
     }
     
     class InputStreamImpl extends InputStream {
+
         private int currentChunkIndex;
         private int currentChunkOffset;
         private int markChunkIndex;
@@ -110,11 +118,15 @@ public class TemporaryData {
         }
 
         public int read(byte[] b, int off, int len) throws IOException {
+
             if (len == 0) {
                 return 0;
             }
+
             int read = 0;
-            while (len > 0 && !(currentChunkIndex == chunkIndex && currentChunkOffset == chunkOffset)) {
+            while (len > 0 && !(currentChunkIndex == chunkIndex
+                    && currentChunkOffset == chunkOffset)) {
+
                 int c;
                 if (currentChunkIndex == chunkIndex) {
                     // The current chunk is the last one => take into account the offset
@@ -122,8 +134,10 @@ public class TemporaryData {
                 } else {
                     c = Math.min(len, chunkSize-currentChunkOffset);
                 }
+
                 // Copy the data.
                 System.arraycopy(chunks[currentChunkIndex], currentChunkOffset, b, off, c);
+
                 // Update variables
                 len -= c;
                 off += c;
@@ -134,6 +148,7 @@ public class TemporaryData {
                     currentChunkOffset = 0;
                 }
             }
+
             if (read == 0) {
                 // We didn't read anything (and the len argument was not 0) => we reached the end of the buffer.
                 return -1;
@@ -166,6 +181,7 @@ public class TemporaryData {
         }
 
         public long skip(long n) throws IOException {
+
             int available = available();
             int c = n < available ? (int)n : available;
             int newOffset = currentChunkOffset + c;

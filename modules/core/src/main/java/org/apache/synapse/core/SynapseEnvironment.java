@@ -20,9 +20,10 @@
 package org.apache.synapse.core;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.statistics.StatisticsCollector;
+import org.apache.synapse.util.TemporaryData;
 
 import java.util.concurrent.ExecutorService;
 
@@ -69,6 +70,13 @@ public interface SynapseEnvironment {
      * @return a MessageContext
      */
     public MessageContext createMessageContext();
+
+    /**
+     * Creates a new <code>TemporaryData</code> instance for the temp storage requirements
+     *
+     * @return a TemporaryData created from the parameters provided in the synapse.properties
+     */
+    public TemporaryData createTemporaryData();
 
     /**
      * This method returns the StatisticsCollector.

@@ -46,7 +46,7 @@ public class TestMessageContext implements MessageContext {
 
     private SynapseConfiguration synCfg = null;
 
-    private SynapseEnvironment synEnv = null;
+    private SynapseEnvironment synEnv;
 
     SOAPEnvelope envelope = null;
 

@@ -24,10 +24,13 @@ import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.transport.base.BaseConstants;
@@ -68,7 +71,7 @@ public class XSLTMediatorTest extends TestCase {
 
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
-        List list = new ArrayList();
+        List<MediatorProperty> list = new ArrayList<MediatorProperty>();
         MediatorProperty mp = new MediatorProperty();
         mp.setName("parama1");
         mp.setValue("value1");
@@ -293,6 +296,7 @@ public class XSLTMediatorTest extends TestCase {
         
         MessageContext mc = new TestMessageContext();
         mc.setConfiguration(cfg);
+        mc.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), cfg));
         mc.setEnvelope(new StAXSOAPModelBuilder(StAXUtils.createXMLStreamReader(new FileInputStream("./../../repository/conf/sample/resources/transform/encoding_test.xml"))).getSOAPEnvelope());
         
         transformMediator.mediate(mc);

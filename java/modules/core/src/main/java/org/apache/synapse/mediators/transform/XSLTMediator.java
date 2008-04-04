@@ -77,8 +77,6 @@ import java.util.List;
  */
 public class XSLTMediator extends AbstractMediator {
 
-    /** Maximum size of a byte array stream attempted in-memory before file serialization is used */
-    private static final int BYTE_ARRAY_SIZE = 8192;
     /**
      * The feature for which deciding swiching between DOM and Stream during the
      * transformation process
@@ -106,12 +104,12 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * Any parameters which should be passed into the XSLT transformation
      */
-    private List properties = new ArrayList();
+    private List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
 
     /**
      * Any features which should be set to the TransformerFactory by explicitly
      */
-    private List explicitFeatures = new ArrayList();
+    private List<MediatorProperty> explicitFeatures = new ArrayList<MediatorProperty>();
 
     /**
      * The Template instance used to create a Transformer object. This is  thread-safe
@@ -141,9 +139,9 @@ public class XSLTMediator extends AbstractMediator {
      */
     private TransformerException transformerException = null;
 
-    // todo - this is a hack to get the handler module case working - ruwan
-    //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-    //            "//s12:Envelope/s12:Body/child::*[position()=1]";
+    /**
+     * Default XPath for the selection of the element for the evaluation of the XSLT over
+     */
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
             "s12:Body/child::*[position()=1]";
 
@@ -204,12 +202,13 @@ public class XSLTMediator extends AbstractMediator {
      * @param traceOrDebugOn is trace or debug on?
      * @param traceOn is trace on?
      */
-    private void performXSLT(MessageContext synCtx, final boolean traceOrDebugOn, final boolean traceOn) {
+    private void performXSLT(MessageContext synCtx, final boolean traceOrDebugOn,
+        final boolean traceOn) {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
         TemporaryData tempTargetData = null;
-        OutputStream osForTarget = null;
+        OutputStream osForTarget;
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
@@ -217,7 +216,7 @@ public class XSLTMediator extends AbstractMediator {
             trace.trace("Transformation source : " + sourceNode.toString());
         }
 
-        Source transformSrc = null;
+        Source transformSrc;
         Result transformTgt = null;
 
         if (useDOMSourceAndResults) {
@@ -249,7 +248,7 @@ public class XSLTMediator extends AbstractMediator {
             // on JDK 1.6, we can replace this by StAXSource from JAXP 1.4.
             transformSrc = new StaxSource(((OMElement)sourceNode).getXMLStreamReader());
             
-            tempTargetData = new TemporaryData(1024, BYTE_ARRAY_SIZE/1024, "xt_", ".xml");
+            tempTargetData = synCtx.getEnvironment().createTemporaryData();
             osForTarget = tempTargetData.getOutputStream();
             transformTgt = new StreamResult(osForTarget);
         }
@@ -291,33 +290,39 @@ public class XSLTMediator extends AbstractMediator {
             Transformer transformer = cachedTemplates.newTransformer();
             if (!properties.isEmpty()) {
                 // set the parameters which will pass to the Transformation
-                for (int i = 0; i < properties.size(); i++) {
-                    MediatorProperty prop = (MediatorProperty) properties.get(i);
+                for (MediatorProperty prop : properties) {
                     if (prop != null) {
                         if (prop.getValue() != null) {
                             transformer.setParameter(prop.getName(), prop.getValue());
                         } else {
                             transformer.setParameter(prop.getName(),
-                                prop.getExpression().stringValueOf(synCtx));
+                                    prop.getExpression().stringValueOf(synCtx));
                         }
                     }
                 }
             }
 
             transformer.setErrorListener(new ErrorListener() {
+
                 public void warning(TransformerException e) throws TransformerException {
+
                     if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Warning encountered during transformation : " + e.getMessage());
+                        traceOrDebug(traceOn, "Warning encountered during transformation : "
+                                + e.getMessage());
                     }
+
                     log.warn("Transformation warning encountered", e);
                 }
+                
                 public void error(TransformerException e) throws TransformerException {
                     setTransformerException(e);
                 }
+                
                 public void fatalError(TransformerException e) throws TransformerException {
                     setTransformerException(e);
                 }
             });
+            
             transformer.transform(transformSrc, transformTgt);
 
             if (transformerException != null) {
@@ -331,6 +336,7 @@ public class XSLTMediator extends AbstractMediator {
             // get the result OMElement
             OMElement result = null;
             if (transformTgt instanceof DOMResult) {
+
                 Node node = ((DOMResult) transformTgt).getNode();
                 if (node == null) {
                     if (traceOrDebugOn) {
@@ -338,6 +344,7 @@ public class XSLTMediator extends AbstractMediator {
                     }
                     return;
                 }
+
                 Node resultNode = node.getFirstChild();
                 if (resultNode == null) {
                     if (traceOrDebugOn) {
@@ -353,8 +360,10 @@ public class XSLTMediator extends AbstractMediator {
 
                 String outputMethod = transformer.getOutputProperty(OutputKeys.METHOD);
                 String encoding = transformer.getOutputProperty(OutputKeys.ENCODING);
+
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "output method: " + outputMethod + "; encoding: " + encoding);
+                    traceOrDebug(traceOn, "output method: " + outputMethod
+                            + "; encoding: " + encoding);
                 }
                 
                 if ("text".equals(outputMethod)) {
@@ -517,7 +526,8 @@ public class XSLTMediator extends AbstractMediator {
      * @param traceOn is tracing on?
      * @return an OMElement wrapping the text payload
      */
-    private OMElement handleNonXMLResult(TemporaryData tempData, Charset charset, boolean traceOrDebugOn, boolean traceOn) {
+    private OMElement handleNonXMLResult(TemporaryData tempData, Charset charset,
+        boolean traceOrDebugOn, boolean traceOn) {
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
@@ -537,7 +547,7 @@ public class XSLTMediator extends AbstractMediator {
         return explicitFeatures;
     }
 
-    public void addAllProperties(List list) {
+    public void addAllProperties(List<MediatorProperty> list) {
         properties.addAll(list);
     }
 

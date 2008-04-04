@@ -249,4 +249,21 @@ public final class SynapseConstants {
 
     public static final String CONNECTTIMEOUT = "Connection.ConnectTimeout";
 
+    /** chunk size and chunk length configuration parameters */
+    public static final int DEFAULT_THRESHOLD_CHUNKS = 8;
+
+    public static final int DEFAULT_CHUNK_SIZE = 1024;
+
+    public static final String DEFAULT_TEMPFILE_PREFIX = "tmp_";
+
+    public static final String DEFAULT_TEMPFILE_SUFIX = ".dat";
+
+    public static final String THRESHOLD_CHUNKS = "synapse.temp_data.chunk.threshold";
+    
+    public static final String CHUNK_SIZE = "synapse.temp_data.chunk.size";
+
+    public static final String TEMP_FILE_PREFIX = "synapse.tempfile.prefix";
+    
+    public static final String TEMP_FILE_SUFIX = "synapse.tempfile.sufix";
+
 }

@@ -27,7 +27,7 @@ public class ThreadSafeDelegatingVariableContext implements VariableContext {
     
     private final ThreadLocal<VariableContext> delegate = new ThreadLocal<VariableContext>();
 
-    public void setDelegate() {
+    public ThreadSafeDelegatingVariableContext() {
         this.delegate.set(new SimpleVariableContext());
     }
 

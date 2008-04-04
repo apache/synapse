@@ -40,13 +40,13 @@ public class SynapseXPathTest extends TestCase {
     public void testAbsoluteXPath() throws Exception {
         SynapseXPath xpath = new SynapseXPath("//test");
         MessageContext ctx =  TestUtils.getTestContext("<test>" + message + "</test>");
-        assertEquals(xpath.getStringValue(ctx), message);
+        assertEquals(xpath.stringValueOf(ctx), message);
     }
 
     public void testBodyRelativeXPath() throws Exception {
         SynapseXPath xpath = new SynapseXPath("$body/test");
         MessageContext ctx =  TestUtils.getTestContext("<test>" + message + "</test>");
-        assertEquals(xpath.getStringValue(ctx), message);
+        assertEquals(xpath.stringValueOf(ctx), message);
     }
 
     public void testHeaderRelativeXPath() throws Exception {
@@ -57,7 +57,7 @@ public class SynapseXPathTest extends TestCase {
         SOAPHeaderBlock block = ctx.getEnvelope().getHeader().addHeaderBlock("test",
             fac.createOMNamespace("http://test", "t"));
         block.setText(message);
-        assertEquals(xpath.getStringValue(ctx), message);
+        assertEquals(xpath.stringValueOf(ctx), message);
     }
 
     public void testContextProperties() throws Exception {

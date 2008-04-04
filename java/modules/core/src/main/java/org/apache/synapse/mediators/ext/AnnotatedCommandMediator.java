@@ -84,7 +84,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             SynapseXPath xpath = beforeFields.get(f);
             Object v;
             if (f.getType().equals(String.class)) {
-                v = xpath.getStringValue(synCtx);
+                v = xpath.stringValueOf(synCtx);
             } else {
                 throw new UnsupportedOperationException("non-String types not supportted yet");
             }
@@ -99,7 +99,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             SynapseXPath xpath = beforeMethods.get(m);
             Object v;
             if (m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(String.class)) {
-                v = xpath.getStringValue(synCtx);
+                v = xpath.stringValueOf(synCtx);
             } else {
                 throw new UnsupportedOperationException("non-String types not supportted yet");
             }

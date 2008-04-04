@@ -159,13 +159,13 @@ public class FilterMediator extends AbstractListMediator implements
 
         if (xpath != null) {
             try {
-                return xpath.booleanValueOf(synCtx.getEnvelope());
+                return xpath.booleanValueOf(synCtx);
             } catch (JaxenException e) {
                 handleException("Error evaluating XPath expression : " + xpath, e, synCtx);
             }
 
         } else if (source != null && regex != null) {
-            String sourceString = source.getStringValue(synCtx);
+            String sourceString = source.stringValueOf(synCtx);
             if (sourceString == null) {
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Source String : " + source + " evaluates to null");

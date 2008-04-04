@@ -75,7 +75,7 @@ public class PropertyMediator extends AbstractMediator {
 
         if (action == ACTION_SET) {
 
-            String resultValue = (value != null ? value : expression.getStringValue(synCtx));
+            String resultValue = (value != null ? value : expression.stringValueOf(synCtx));
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Setting property : " + name + " at scope : " +

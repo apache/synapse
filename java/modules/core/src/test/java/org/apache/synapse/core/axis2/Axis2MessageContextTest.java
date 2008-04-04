@@ -38,7 +38,7 @@ public class Axis2MessageContextTest extends TestCase {
         axiomXpath.addNamespace("ns1", nsNamespace1);
         MessageContext synCtx = TestUtils.getTestContext(sampleBody);
 
-        String result = axiomXpath.getStringValue(synCtx);
+        String result = axiomXpath.stringValueOf(synCtx);
         assertEquals("second", result);
     }
 
@@ -49,7 +49,7 @@ public class Axis2MessageContextTest extends TestCase {
 
         MessageContext synCtx = TestUtils.getTestContext(sampleBody);
 
-        String result = axiomXpath.getStringValue(synCtx);
+        String result = axiomXpath.stringValueOf(synCtx);
         assertEquals("second", result);
     }
 

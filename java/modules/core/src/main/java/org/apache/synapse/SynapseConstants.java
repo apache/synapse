@@ -39,6 +39,8 @@ public final class SynapseConstants {
     public static final String MAIN_SEQUENCE_KEY  = "main";
     /** The name of the fault sequence to execute on failures during mediation */
     public static final String FAULT_SEQUENCE_KEY = "fault";
+    /** The name of the mandatory sequence to execute before the begining of the actual mediation */
+    public static final String MANDATORY_SEQUENCE_KEY = "pre-mediate";
 
     /** The name of the Synapse service (used for message mediation) */
     public static final String SYNAPSE_SERVICE_NAME ="__SynapseService";

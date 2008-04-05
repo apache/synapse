@@ -91,6 +91,25 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         proxyServiceStatisticsStack);
             }
 
+            Mediator mandatorySeq = synCtx.getConfiguration().getSequence(
+                    SynapseConstants.MANDATORY_SEQUENCE_KEY);
+
+            if (mandatorySeq != null) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Start mediating the message in the " +
+                        "pre-mediate state using the mandatory sequence");
+                }
+
+                if(!mandatorySeq.mediate(synCtx)) {
+                    if(log.isDebugEnabled()) {
+                        log.debug("Request message for the proxy service " + name + " dropped in " +
+                                "the pre-mediation state by the mandatory sequence : \n" + synCtx);
+                    }
+                    return;
+                }
+            }
+
             // setup fault sequence - i.e. what happens when something goes wrong with this message
             if (proxy.getTargetFaultSequence() != null) {
 

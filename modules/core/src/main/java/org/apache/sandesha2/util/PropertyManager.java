@@ -156,7 +156,7 @@ public class PropertyManager {
         if (policySubject == null) {
             return null;
         }
-        Collection policyComponents = policySubject.getAttachPolicyComponents();
+        Collection policyComponents = policySubject.getAttachedPolicyComponents();
         if (policyComponents == null) {
             return null;
         }

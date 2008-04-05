@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -56,16 +57,16 @@ public class Axis2MessageContext implements MessageContext {
     private SynapseEnvironment synEnv = null;
 
     /** Synapse Message Context properties */
-    private Map properties = new HashMap();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Local entries fetched from the configuration or from the registry for the transactional
      * resource access
      */
-    private Map localEntries = new HashMap();
+    private Map<String, Object> localEntries = new HashMap<String, Object>();
 
     /** Fault Handler stack which will be popped and called the handleFault in error states */
-    private Stack faultStack = new Stack();
+    private Stack<FaultHandler> faultStack = new Stack<FaultHandler>();
 
     /** The Axis2 MessageContext reference */
     private org.apache.axis2.context.MessageContext axis2MessageContext = null;
@@ -386,7 +387,7 @@ public class Axis2MessageContext implements MessageContext {
 
     /**
      * Set the service log
-     * @param serviceLog
+     * @param serviceLog log to be used on a per-service basis
      */
     public void setServiceLog(Log serviceLog) {
         this.serviceLog = serviceLog;
@@ -399,8 +400,9 @@ public class Axis2MessageContext implements MessageContext {
     public void setAxis2MessageContext(org.apache.axis2.context.MessageContext axisMsgCtx) {
         this.axis2MessageContext = axisMsgCtx;
         Boolean resp = (Boolean) axisMsgCtx.getProperty(SynapseConstants.ISRESPONSE_PROPERTY);
-        if (resp != null)
-            response = resp.booleanValue();
+        if (resp != null) {
+            response = resp;
+        }
     }
 
     public void setPaused(boolean value) {
@@ -420,43 +422,64 @@ public class Axis2MessageContext implements MessageContext {
     }
 
     public String toString() {
+        
         StringBuffer sb = new StringBuffer();
         String separator = "\n";
 
-        if (getTo() != null)
-            sb.append("To: ").append(getTo().getAddress());
-        else
-            sb.append("To: ");
-        if (getFrom() != null)
-            sb.append(separator).append("From: ").append(getFrom().getAddress());
-        if (getWSAAction() != null)
-            sb.append(separator).append("WSAction: ").append(getWSAAction());
-        if (getSoapAction() != null)
-            sb.append(separator).append("SOAPAction: ").append(getSoapAction());
-        if (getReplyTo() != null)
-            sb.append(separator).append("ReplyTo: ").append(getReplyTo().getAddress());
-        if (getMessageID() != null)
-            sb.append(separator).append("MessageID: ").append(getMessageID());
+        if (getTo() != null) {
+            sb.append("To : ").append(getTo().getAddress());
+        } else {
+            sb.append("To : ");
+        }
+
+        if (getFrom() != null) {
+            sb.append(separator).append("From : ").append(getFrom().getAddress());
+        }
+
+        if (getWSAAction() != null) {
+            sb.append(separator).append("WSAction : ").append(getWSAAction());
+        }
+
+        if (getSoapAction() != null) {
+            sb.append(separator).append("SOAPAction : ").append(getSoapAction());
+        }
+
+        if (getReplyTo() != null) {
+            sb.append(separator).append("ReplyTo : ").append(getReplyTo().getAddress());
+        }
+
+        if (getMessageID() != null) {
+            sb.append(separator).append("MessageID : ").append(getMessageID());
+        }
 
         SOAPHeader soapHeader = getEnvelope().getHeader();
         if (soapHeader != null) {
+            
             sb.append(separator).append("Headers : ");
             for (Iterator iter = soapHeader.examineAllHeaderBlocks(); iter.hasNext();) {
+
                 Object o = iter.next();
                 if (o instanceof SOAPHeaderBlock) {
+
                     SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
-                    sb.append(separator).append(
+                    sb.append(separator).append("\t").append(
                         headerBlock.getLocalName()).append(" : ").append(headerBlock.getText());
+
                 } else if (o instanceof OMElement) {
+
                     OMElement headerElem = (OMElement) o;
-                    sb.append(separator).append(
+                    sb.append(separator).append("\t").append(
                         headerElem.getLocalName()).append(" : ").append(headerElem.getText());
                 }
             }
         }
 
+        SOAPBody soapBody = getEnvelope().getBody();
+        if (soapBody != null) {
+            sb.append(separator).append("Body : ").append(soapBody.toString());
+        }
+
         return sb.toString();
     }
-
 
 }

@@ -107,6 +107,29 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             StatisticsUtils.processSequenceStatistics(synCtx);
         }
 
+        Mediator mandatorySeq = synCtx.getConfiguration().getSequence(
+                SynapseConstants.MANDATORY_SEQUENCE_KEY);
+
+        // the mandatory sequence is optional and hence check for the existance before mediation
+        if (mandatorySeq != null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Start mediating the message in the " +
+                        "pre-mediate state using the mandatory sequence");
+            }
+
+            if(!mandatorySeq.mediate(synCtx)) {
+                if(log.isDebugEnabled()) {
+                    log.debug((synCtx.isResponse() ? "Response" : "Request") + " message for the "
+                            + (synCtx.getProperty(SynapseConstants.PROXY_SERVICE) != null ?
+                            "proxy service " + synCtx.getProperty(SynapseConstants.PROXY_SERVICE) :
+                            "message mediation") + " dropped in the " +
+                            "pre-mediation state by the mandatory sequence : \n" + synCtx);
+                }
+                return false;
+            }
+        }
+
         // if this is a response to a proxy service
         if (synCtx.getProperty(SynapseConstants.PROXY_SERVICE) != null) {
 

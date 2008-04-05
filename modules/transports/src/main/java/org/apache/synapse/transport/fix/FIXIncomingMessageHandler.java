@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 /**
  * FIXIncomingMessageHandler is responsible for handling all incoming FIX messages. This is where the
@@ -60,13 +61,11 @@ public class FIXIncomingMessageHandler implements Application {
     private Log log;
     /** A boolean value indicating the type of the FIX application */
     private boolean acceptor;
-    private boolean loggedOn;
     /** A Map of counters with one counter per session */
     private Map<SessionID, Integer> countersMap;
-
     private Queue<MessageContext> outgoingMessages;
-
     private boolean allNewApproach;
+    private Semaphore semaphore;
 
     public FIXIncomingMessageHandler(ConfigurationContext cfgCtx, WorkerPool workerPool,
                              AxisService service, boolean acceptor) {
@@ -77,6 +76,7 @@ public class FIXIncomingMessageHandler implements Application {
         this.acceptor = acceptor;
         countersMap = new HashMap<SessionID, Integer>();
         outgoingMessages = new LinkedBlockingQueue<MessageContext>();
+        semaphore = new Semaphore(0);
         getResponseHandlingApproach();
     }
 
@@ -97,8 +97,8 @@ public class FIXIncomingMessageHandler implements Application {
         }
     }
 
-    public boolean isLoggedOn() {
-        return loggedOn;
+    public void acquire() throws InterruptedException {
+        semaphore.acquire();
     }
 
     private void handleException(String msg, Exception e) {
@@ -118,7 +118,6 @@ public class FIXIncomingMessageHandler implements Application {
      */
     public void onCreate(SessionID sessionID) {
         log.info("New FIX session created: " + sessionID.toString());
-        loggedOn = false;
     }
 
     /**
@@ -132,7 +131,7 @@ public class FIXIncomingMessageHandler implements Application {
     public void onLogon(SessionID sessionID) {
         countersMap.put(sessionID, 0);
         log.info("FIX session logged on: " + sessionID.toString());
-        loggedOn = true;
+        semaphore.release();
     }
 
     /**
@@ -148,7 +147,6 @@ public class FIXIncomingMessageHandler implements Application {
                 getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
         trpSender.logOutIncomingSession(sessionID);
         log.info("FIX session logged out: " + sessionID.toString());
-        loggedOn = false;
     }
 
     /**

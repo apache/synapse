@@ -181,12 +181,15 @@ public class FIXSessionFactory {
             initiatorStore.put(fixEPR, initiator);
             applicationStore.put(fixEPR, messageHandler);
             initiator.start();
-            while (!((FIXIncomingMessageHandler)messageHandler).isLoggedOn()) { /* wait till logon */ }
+
+            FIXIncomingMessageHandler fixMessageHandler = (FIXIncomingMessageHandler) messageHandler;
+            log.info("Waiting for logon procedure to complete...");
+            fixMessageHandler.acquire();
 
         } catch (ConfigError e) {
             throw new AxisFault("Error in the specified FIX configuration. Unable to initialize a " +
                     "FIX initiator.", e);
-        }
+        } catch (InterruptedException ignore) { }
     }
 
     /**

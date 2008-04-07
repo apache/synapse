@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<!-- Introduction to dblookp mediator -->
+<!-- Reusable database connection pool -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="myFaultHandler">

@@ -21,7 +21,6 @@ package org.apache.synapse.config.xml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,25 +37,23 @@ public class SwitchCase {
     private static final Log log = LogFactory.getLog(SwitchCase.class);
 
     /**
-     * The regular expression pattern to be used
+     * The regular expression pattern to be checked
      */
     private Pattern regex = null;
+    
     /**
-     * The list mediator for which responsible message mediation
+     * The list mediator which is responsible on message mediation of the case
      */
     private AnonymousListMediator caseMediator;
 
     /**
      * To delegate message mediation to list mediator
      *
-     * @param synCtx
+     * @param synCtx message context to be mediated
      * @return boolean value
      */
     public boolean mediate(MessageContext synCtx) {
-        if (caseMediator != null) {
-            return caseMediator.mediate(synCtx);
-        }
-        return true;
+        return caseMediator != null ? caseMediator.mediate(synCtx) : true;
     }
 
     /**
@@ -69,9 +66,9 @@ public class SwitchCase {
     }
 
     /**
-     * To set the list mediator
+     * To set the set of case mediators
      *
-     * @param caseMediator
+     * @param caseMediator anonymous sequence to be used for the case mediation
      */
     public void setCaseMediator(AnonymousListMediator caseMediator) {
         this.caseMediator = caseMediator;
@@ -89,7 +86,7 @@ public class SwitchCase {
     /**
      * To set the regular expression pattern
      *
-     * @param regex
+     * @param regex Regular Expression to be matched
      */
     public void setRegex(Pattern regex) {
         this.regex = regex;
@@ -98,7 +95,7 @@ public class SwitchCase {
     /**
      * To evaluate regular expression pattern to a get switch case
      *
-     * @param value
+     * @param value value to be tested over the regular expression of match
      * @return boolean value
      */
     public boolean matches(String value) {
@@ -106,7 +103,7 @@ public class SwitchCase {
         if (value == null) {
 
             log.warn("Provided character sequence for switch case condition is 'null'." +
-                    "Switch case would not be executed.");
+                    " Switch case will not be executed.");
 
             return false;
         }
@@ -114,8 +111,8 @@ public class SwitchCase {
         Matcher matcher = regex.matcher(value);
         if (matcher == null) {
 
-            log.warn("Mather for the provided character sequence and for the pattern ' " + regex + " '" +
-                    "cannot be found.Switch case would not be executed.");
+            log.warn("Matcher for the provided character sequence and the pattern ' "
+                    + regex + " '" + " cannot be found. Switch case will not be executed.");
 
             return false;
         }

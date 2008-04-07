@@ -353,6 +353,7 @@
                   <a href="#Sample362">Sample 362: Action of dbreport and
                   dblookup mediators together</a>
                 </li>
+                <li><a href="#Sample363">Sample 363: Reusable database connection pools</a></li>
               </ul>
             </li>
             <li>
@@ -4144,6 +4145,189 @@ end
     </p>
 <pre xml:space="preserve">INFO LogMediator text = ** Reporting to the Database **<br/><br/>...<br/><br/>INFO LogMediator text = ** Looking up from the Database **<br/><br/>...<br/><br/>INFO LogMediator text = Stock price - 153.47886496064808</pre>
     <p/>
+      <h2><a name="Sample363" id="Sample363">Sample 363: Reusable database connection pools</a></h2>
+
+      <div>
+      <p>Prior to run this sample please follows the 'Setting up Synapse
+      DataSources' section the sample setup guide.</p>
+      <pre>&lt;!-- Reusable database connection pool --&gt;
+      &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+          &lt;sequence name="myFaultHandler"&gt;
+              &lt;makefault&gt;
+                  &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                  &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
+              &lt;/makefault&gt;
+
+              &lt;property name="RESPONSE" value="true"/&gt;
+              &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+              &lt;send/&gt;
+              &lt;drop/&gt;
+          &lt;/sequence&gt;
+
+          &lt;sequence name="main" onError="myFaultHandler"&gt;
+              &lt;in&gt;
+                  &lt;log level="custom"&gt;
+                      &lt;property name="text"
+                                value="** Looking up from the Database **"/&gt;
+                  &lt;/log&gt;
+                  &lt;dblookup&gt;
+                      &lt;connection&gt;
+                          &lt;pool&gt;
+                              &lt;dsName&gt;lookupdb&lt;/dsName&gt;
+                              &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt;
+                              &lt;url&gt;rmi://localhost:2199&lt;/url&gt;
+                              &lt;user&gt;synapse&lt;/user&gt;
+                              &lt;password&gt;synapse&lt;/password&gt;
+                          &lt;/pool&gt;
+                      &lt;/connection&gt;
+                      &lt;statement&gt;
+                          &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
+                          &lt;parameter expression="//m0:getQuote/m0:request/m0:symbol"
+                                     xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                          &lt;result name="company_id" column="id"/&gt;
+                      &lt;/statement&gt;
+                  &lt;/dblookup&gt;
+
+                  &lt;switch source="get-property('company_id')"&gt;
+                      &lt;case regex="c1"&gt;
+                          &lt;log level="custom"&gt;
+                              &lt;property name="text"
+                                        expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                          &lt;/log&gt;
+                          &lt;send&gt;
+                              &lt;endpoint&gt;
+                                  &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                              &lt;/endpoint&gt;
+                          &lt;/send&gt;
+                      &lt;/case&gt;
+                      &lt;case regex="c2"&gt;
+                          &lt;log level="custom"&gt;
+                              &lt;property name="text"
+                                        expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                          &lt;/log&gt;
+                          &lt;send&gt;
+                              &lt;endpoint&gt;
+                                  &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                              &lt;/endpoint&gt;
+                          &lt;/send&gt;
+                      &lt;/case&gt;
+                      &lt;case regex="c3"&gt;
+                          &lt;log level="custom"&gt;
+                              &lt;property name="text"
+                                        expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                          &lt;/log&gt;
+                          &lt;send&gt;
+                              &lt;endpoint&gt;
+                                  &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                              &lt;/endpoint&gt;
+                          &lt;/send&gt;
+                      &lt;/case&gt;
+                      &lt;default&gt;
+                          &lt;log level="custom"&gt;
+                              &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
+                          &lt;/log&gt;
+                          &lt;makefault&gt;
+                              &lt;code value="tns:Receiver"
+                                    xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                              &lt;reason value="** Unrecognized Company ID **"/&gt;
+                          &lt;/makefault&gt;
+                          &lt;property name="RESPONSE" value="true"/&gt;
+                          &lt;header name="To" action="remove"/&gt;
+                          &lt;send/&gt;
+                          &lt;drop/&gt;
+                      &lt;/default&gt;
+                  &lt;/switch&gt;
+                  &lt;drop/&gt;
+              &lt;/in&gt;
+
+              &lt;out&gt;
+                  &lt;log level="custom"&gt;
+                      &lt;property name="text"
+                                value="** Reporting to the Database **"/&gt;
+                  &lt;/log&gt;
+                  &lt;dbreport&gt;
+                      &lt;connection&gt;
+                          &lt;pool&gt;
+                              &lt;dsName&gt;reportdb&lt;/dsName&gt;
+                              &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt;
+                              &lt;url&gt;rmi://localhost:2199&lt;/url&gt;
+                              &lt;user&gt;synapse&lt;/user&gt;
+                              &lt;password&gt;synapse&lt;/password&gt;
+                          &lt;/pool&gt;
+                      &lt;/connection&gt;
+                      &lt;statement&gt;
+                          &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt;
+                          &lt;parameter expression="//m0:return/m0:last/child::text()"
+                                     xmlns:m0="http://services.samples/xsd" type="DOUBLE"/&gt;
+                          &lt;parameter expression="//m0:return/m0:symbol/child::text()"
+                                     xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                      &lt;/statement&gt;
+                  &lt;/dbreport&gt;
+                  &lt;log level="custom"&gt;
+                      &lt;property name="text"
+                                value="** Looking up from the Database **"/&gt;
+                  &lt;/log&gt;
+                  &lt;dblookup&gt;
+                      &lt;connection&gt;
+                          &lt;pool&gt;
+                              &lt;dsName&gt;reportdb&lt;/dsName&gt;
+                              &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt;
+                              &lt;url&gt;rmi://localhost:2199&lt;/url&gt;
+                              &lt;user&gt;synapse&lt;/user&gt;
+                              &lt;password&gt;synapse&lt;/password&gt;
+                          &lt;/pool&gt;
+                      &lt;/connection&gt;
+                      &lt;statement&gt;
+                          &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
+                          &lt;parameter expression="//m0:return/m0:symbol/child::text()"
+                                     xmlns:m0="http://services.samples/xsd" type="VARCHAR"/&gt;
+                          &lt;result name="stock_price" column="price"/&gt;
+                      &lt;/statement&gt;
+                  &lt;/dblookup&gt;
+                  &lt;log level="custom"&gt;
+                      &lt;property name="text"
+                                expression="fn:concat('Stock price - ',get-property('stock_price'))"/&gt;
+                  &lt;/log&gt;
+                  &lt;send/&gt;
+
+              &lt;/out&gt;
+
+          &lt;/sequence&gt;
+
+      &lt;/definitions&gt;</pre>
+      </div>
+
+      <div>
+      <p><strong>Objective: Demonstrate the use reusable database connection
+      pools</strong></p>
+
+      <p><strong>Prerequisites:</strong> Setting up DataBase and DataSources
+      according to the sample setup guide.</p>
+
+      <p>Start the Synapse configuration numbered 363: i.e. synapse -sample 3623</p>
+
+      <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+      already done </p>
+
+      <p></p>
+
+      <p>Runs the client as follows</p>
+      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+
+      <p>Then the console output </p>
+      <pre>INFO LogMediator text = ** Looking up from the Database **
+      ...
+      ID - c1
+      ...
+      INFO LogMediator text = ** Reporting to the Database **
+      INFO LogMediator text = ** Looking up from the Database **
+      INFO LogMediator text = Stock price - 183.3635460215262
+       </pre>
+
+      <p></p>
+      </div>
+      
     <h2>
       <a name="Throttle" id="Throttle">Throttling messages (Throttle
       Mediator)</a>

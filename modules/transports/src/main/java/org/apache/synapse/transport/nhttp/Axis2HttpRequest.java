@@ -24,9 +24,9 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
+import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.TransportUtils;
 import org.apache.http.*;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
@@ -72,11 +72,8 @@ public class Axis2HttpRequest {
         this.httpHost = httpHost;
         this.msgContext = msgContext;
         this.format = NhttpUtils.getOMOutputFormat(msgContext);
-        try {
-            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-        } catch (AxisFault axisFault) {
-            log.error("Cannot find a suitable MessageFormatter : " + axisFault.getMessage());
-        }
+        this.messageFormatter =
+                MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         try {
             this.pipe = new PipeImpl();
         } catch (IOException e) {

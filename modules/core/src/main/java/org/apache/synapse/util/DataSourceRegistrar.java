@@ -26,11 +26,11 @@ import org.apache.synapse.SynapseException;
 import javax.naming.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Hashtable;
 import java.util.Properties;
+import java.io.File;
 
 /**
- *
+ * Utility class to handle data source registration
  */
 public class DataSourceRegistrar {
 
@@ -198,6 +198,10 @@ public class DataSourceRegistrar {
         String user = getProperty(dsProperties, prefix + USER, "synapse");
         String password = getProperty(dsProperties, prefix + PASSWORD, "synapse");
         String dataSourceName = getProperty(dsProperties, prefix + DSNAME, dsName);
+
+        //populates context tree
+        populateContextTree(initialContext, dataSourceName);
+
         String dsType = getProperty(dsProperties, prefix + "type", "BasicDataSource");
 
         if ("BasicDataSource".equals(dsType)) {
@@ -290,6 +294,38 @@ public class DataSourceRegistrar {
         reference.add(new StringRefAddr("defaultMaxActive", maxActive));
         reference.add(new StringRefAddr("defaultMaxIdle", maxIdle));
         reference.add(new StringRefAddr("defaultMaxWait", maxWait));
+    }
+
+    /**
+     * Helper method to create context tree for a given path
+     *
+     * @param initialContext The root context
+     * @param path           The path of the resource
+     */
+    private static void populateContextTree(InitialContext initialContext, String path) {
+
+        if (path.indexOf(File.separator) != -1) {
+            String[] paths = path.split(File.separator);
+
+            if (paths != null && paths.length != 0) {
+                Context context = initialContext;
+
+                for (int i = 0; i < paths.length; i++) {
+
+                    try {
+
+                        context = context.createSubcontext(paths[i]);
+                        if (context == null) {
+                            handleException("sub context cannot be null");
+                        }
+
+                    } catch (NamingException e) {
+                        log.warn("Skipping creating sub context due to an error ' " + e.getMessage()+ " '");
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     /**

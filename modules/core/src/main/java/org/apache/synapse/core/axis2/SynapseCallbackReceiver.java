@@ -40,6 +40,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.nhttp.util.ResponseAcceptEncodingProcessor;
 
 import java.util.*;
 
@@ -209,6 +210,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             }
             MessageContext axisOutMsgCtx =
                     ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext();
+
+            //Processes 'Accept-Encoding'
+            ResponseAcceptEncodingProcessor.process(response, axisOutMsgCtx);
 
             response.setServiceContext(null);
             response.setOperationContext(axisOutMsgCtx.getOperationContext());

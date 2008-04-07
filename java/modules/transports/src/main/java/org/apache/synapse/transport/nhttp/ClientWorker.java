@@ -29,6 +29,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -166,9 +167,9 @@ public class ClientWorker implements Runnable {
             responseMsgCtx.setServerSide(false);
             try {
                 envelope = TransportUtils.createSOAPMessage(
-                responseMsgCtx,
-                in,
-                contentType);
+                        responseMsgCtx,
+                        HTTPTransportUtils.handleGZip(responseMsgCtx, in),
+                        contentType);
             } catch (OMException e) {
                 // handle non SOAP and POX/REST payloads (probably text/html)
                 log.warn("Unexpected response received : " + e.getMessage());

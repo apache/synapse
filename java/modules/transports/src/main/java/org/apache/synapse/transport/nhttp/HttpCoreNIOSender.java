@@ -47,7 +47,6 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.TransportSender;
-import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,6 +68,7 @@ import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.TransportView;
 import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -358,7 +358,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         HttpResponse response = worker.getResponse();
 
         OMOutputFormat format = NhttpUtils.getOMOutputFormat(msgContext);
-        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        MessageFormatter messageFormatter =
+                MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         response.setHeader(
             HTTP.CONTENT_TYPE,
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
@@ -422,8 +423,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     }
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {
+
         OMOutputFormat format = NhttpUtils.getOMOutputFormat(msgContext);
-        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        MessageFormatter messageFormatter =
+                MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         OutputStream out = (OutputStream) msgContext.getProperty(MessageContext.TRANSPORT_OUT);
 
         if (msgContext.isServerSide()) {

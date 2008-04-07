@@ -35,9 +35,15 @@ import java.util.regex.Pattern;
 
 public class SwitchCase {
 
-    /** The regular expression pattern to be used */
+    private static final Log log = LogFactory.getLog(SwitchCase.class);
+
+    /**
+     * The regular expression pattern to be used
+     */
     private Pattern regex = null;
-    /** The list mediator for which responsible message mediation  */
+    /**
+     * The list mediator for which responsible message mediation
+     */
     private AnonymousListMediator caseMediator;
 
     /**
@@ -96,11 +102,24 @@ public class SwitchCase {
      * @return boolean value
      */
     public boolean matches(String value) {
-        Matcher matcher = regex.matcher(value);
-        if(matcher == null){
+
+        if (value == null) {
+
+            log.warn("Provided character sequence for switch case condition is 'null'." +
+                    "Switch case would not be executed.");
+
             return false;
         }
-        boolean retVal = matcher.matches();
-        return retVal;
+
+        Matcher matcher = regex.matcher(value);
+        if (matcher == null) {
+
+            log.warn("Mather for the provided character sequence and for the pattern ' " + regex + " '" +
+                    "cannot be found.Switch case would not be executed.");
+
+            return false;
+        }
+
+        return matcher.matches();
     }
 }

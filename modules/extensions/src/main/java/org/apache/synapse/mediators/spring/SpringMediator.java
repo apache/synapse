@@ -21,6 +21,9 @@ package org.apache.synapse.mediators.spring;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.Entry;
@@ -37,7 +40,7 @@ import org.springframework.core.io.InputStreamResource;
  * refers to a Spring bean name, and also either a Spring configuration defined to Synapse
  * or an inlined Spring configuration.
  */
-public class SpringMediator extends AbstractMediator {
+public class SpringMediator extends AbstractMediator implements ManagedLifecycle {
 
     /**
      * The Spring bean ref to be used
@@ -152,4 +155,35 @@ public class SpringMediator extends AbstractMediator {
     public String getType() {
         return "SpringMediator";
     }
+
+
+  public void init(SynapseEnvironment se) {
+        if (log.isDebugEnabled()) {
+            log.debug("Creating Spring ApplicationContext from key : " + configKey);
+        }
+
+        MessageContext synCtx = se.createMessageContext();
+        GenericApplicationContext appContext = new GenericApplicationContext();
+        XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
+        xbdr.setValidating(false);
+
+        Object springConfig = synCtx.getEntry(configKey);
+        if(springConfig == null) {
+          String errorMessage = "Cannot look up Spring configuration " + configKey;
+          log.error(errorMessage);
+          throw new SynapseException(errorMessage);
+        }
+
+        xbdr.loadBeanDefinitions(
+            new InputStreamResource(
+                SynapseConfigUtils.getStreamSource(springConfig).getInputStream()));
+        appContext.refresh();
+        if (log.isDebugEnabled()) {
+            log.debug("Spring ApplicationContext from key : " + configKey + " created");
+        }
+        this.appContext = appContext;
+  }
+
+  public void destroy() {
+  }
 }

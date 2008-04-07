@@ -85,7 +85,7 @@ public interface MessageContext {
      * to the current context
      * @param entries the set of local entries to be set
      */
-    public void setContextEntries(Map entries);
+    public void setContextEntries(Map<String, Object> entries);
 
     /**
      * Return the main sequence from the configuration, or the local message context
@@ -171,25 +171,46 @@ public interface MessageContext {
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;
 
     // --- SOAP Message related methods ------
-    /** Get the faultTo EPR if available */
+    /**
+     * Get the faultTo EPR if available
+     * @return FaultTo epr if available
+     */
     public EndpointReference getFaultTo();
 
-    /** Set the faultTo EPR */
+    /**
+     * Set the faultTo EPR
+     * @param reference epr representing the FaultTo address
+     */
     public void setFaultTo(EndpointReference reference);
 
-    /** Get the from EPR if available */
+    /**
+     * Get the from EPR if available
+     * @return From epr if available
+     */
     public EndpointReference getFrom();
 
-    /** Set the from EPR */
+    /**
+     * Set the from EPR
+     * @param reference epr representing the From address
+     */
     public void setFrom(EndpointReference reference);
 
-    /** Get the message id if available */
+    /**
+     * Get the message id if available
+     * @return message id if available
+     */
     public String getMessageID();
 
-    /** Set the message id */
+    /**
+     * Set the message id
+     * @param string message id to be set
+     */
     public void setMessageID(String string);
 
-    /** Get the relatesTo of this message */
+    /**
+     * Get the relatesTo of this message
+     * @return RelatesTo of the message if available
+     */
     public RelatesTo getRelatesTo();
 
     /**
@@ -198,13 +219,22 @@ public interface MessageContext {
      */
     public void setRelatesTo(RelatesTo[] reference);
 
-    /** Set the replyTo EPR */
+    /**
+     * Get the replyTo EPR if available
+     * @return ReplyTo epr of the message if available
+     */
     public EndpointReference getReplyTo();
 
-    /** Get the replyTo EPR if available */
+    /**
+     * Set the replyTo EPR
+     * @param reference epr representing the ReplyTo address
+     */
     public void setReplyTo(EndpointReference reference);
 
-    /** Get the To EPR */
+    /**
+     * Get the To EPR
+     * @return To epr of the message if available
+     */
     public EndpointReference getTo();
 
      /**
@@ -238,8 +268,8 @@ public interface MessageContext {
     public void setSoapAction(String string);
 
     /**
-     * Set the message if
-     * @param messageID
+     * Set the message
+     * @param messageID message id to be set
      */
     public void setWSAMessageID(String messageID);
 

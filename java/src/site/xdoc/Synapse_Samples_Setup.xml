@@ -635,5 +635,59 @@ synapse.sh -sample &lt;n&gt;</pre>
       the required database driver jars to the Synapse classpath.
     </p>
     <p/>
-  </body>
+        <h2>Setting up Synapse DataSources</h2>
+
+<div>
+<p>Definition of the reusable database connection pool or datasources can be
+done using synapse.properties file. It is possible to configure any number of
+datasources. Currently only supports two type of datasources and those are
+based on apache dbcp datasources. Those types are BasicDataSource and
+PerUserPoolDataSource (based on apache dhcp).Following configuration includes
+both two definition. This configuration is related with sample 363.</p>
+
+
+<p>Configuration is somewhat similar to the log4j appender configuration.</p>
+
+
+<p>It is need set up two databases , Please follows the above (Setting up
+Derby Database server) section and setup database for
+'jdbc:derby://localhost:1527/lookupdb' and
+'jdbc:derby://localhost:1527/reportdb' using user name and password as
+'synapse'.</p>
+
+<div>
+<p><strong>synapse.properties configuration <br />
+</strong></p>
+<pre>#datasources
+synapse.datasources =lookupds,reportds
+#JNDI naming initial context factory , provider URL and port
+synapse.datasources.icFactory=com.sun.jndi.rmi.registry.RegistryContextFactory
+synapse.datasources.providerUrl=rmi://localhost:2199
+synapse.datasources.providerPort=2199
+
+synapse.datasources.lookupds.type =BasicDataSource
+# name which uses when registering datasource in the context tree. If this isn't available then uses #datasource identifier (Ex lookupds)
+synapse.datasources.lookupds.dsName=lookupdb
+
+synapse.datasources.lookupds.driverClassName=org.apache.derby.jdbc.ClientDriver
+synapse.datasources.lookupds.url=jdbc:derby://localhost:1527/lookupdb;create=false
+synapse.datasources.lookupds.username=synapse
+synapse.datasources.lookupds.password=synapse
+synapse.datasources.lookupds.maxActive=100
+synapse.datasources.lookupds.maxIdle=20
+synapse.datasources.lookupds.maxWait=10000
+
+synapse.datasources.reportds.type =PerUserPoolDataSource
+synapse.datasources.lookupds.cpdsadapter.factory=org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS
+synapse.datasources.lookupds.cpdsadapter.className=org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS
+synapse.datasources.lookupds.cpdsadapter.name=cpds
+synapse.datasources.reportds.dsName=reportdb
+
+synapse.datasources.reportds.driverClassName=org.apache.derby.jdbc.ClientDriver
+synapse.datasources.reportds.url=jdbc:derby://localhost:1527/reportdb;create=false
+synapse.datasources.reportds.username=synapse
+synapse.datasources.reportds.password=synapse</pre>
+</div>
+</div>
+</body>
 </document>

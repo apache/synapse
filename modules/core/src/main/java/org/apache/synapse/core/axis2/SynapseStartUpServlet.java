@@ -53,8 +53,8 @@ public class SynapseStartUpServlet extends HttpServlet {
         String synapseHome = resolveSynapseHome(servletConfig);
         //Setting the all required system properties
         if (synapseHome != null) {
-            if (synapseHome.endsWith("/")) {
-                synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
+            if (synapseHome.endsWith(File.separator)) {
+                synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf(File.separator));
             }
             System.setProperty(SynapseConstants.SYNAPSE_HOME, synapseHome);
             //setting axis2 repository location
@@ -114,8 +114,11 @@ public class SynapseStartUpServlet extends HttpServlet {
         // If synapse.home has provided as init-param,the it will take as synapse home
         String synapseHomeAsParam = servletConfig.getInitParameter(SynapseConstants.SYNAPSE_HOME);
         if (synapseHomeAsParam != null) {
-            if (synapseHomeAsParam.endsWith("/")) {
-                return synapseHomeAsParam.substring(0, synapseHomeAsParam.lastIndexOf("/"));
+            if (synapseHomeAsParam.endsWith(File.separator)) {
+                return synapseHomeAsParam.substring(0,
+                        synapseHomeAsParam.lastIndexOf(File.separator));
+            } else {
+                return synapseHomeAsParam;
             }
         }
         //if synapse.home has set as a system property , then use it
@@ -128,8 +131,9 @@ public class SynapseStartUpServlet extends HttpServlet {
             if (webinfPath != null) {
                 synapseHome = webinfPath.substring(0, webinfPath.lastIndexOf("WEB-INF"));
                 if (synapseHome != null) {
-                    if (synapseHome.endsWith("/")) {
-                        synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
+                    if (synapseHome.endsWith(File.separator)) {
+                        synapseHome = synapseHome.substring(0,
+                                synapseHome.lastIndexOf(File.separator));
                     }
                 }
             }

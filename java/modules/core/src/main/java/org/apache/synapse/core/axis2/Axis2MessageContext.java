@@ -48,8 +48,6 @@ import java.util.*;
  */
 public class Axis2MessageContext implements MessageContext {
 
-    private static final Log log = LogFactory.getLog(Axis2MessageContext.class);
-
     /** Holds the reference to the Synapse Message Context */
     private SynapseConfiguration synCfg = null;
 
@@ -103,7 +101,7 @@ public class Axis2MessageContext implements MessageContext {
         return localEntries;
     }
 
-    public void setContextEntries(Map entries) {
+    public void setContextEntries(Map<String, Object> entries) {
         this.localEntries = entries;
     }
 
@@ -332,10 +330,8 @@ public class Axis2MessageContext implements MessageContext {
 
     public boolean isResponse() {
         Object o = properties.get(SynapseConstants.RESPONSE);
-        if (o != null && o instanceof String && ((String) o).equalsIgnoreCase("true")) {
-            return true;
-        }
-        return response;
+        return o != null && o instanceof String &&
+                ((String) o).equalsIgnoreCase("true") || response;
     }
 
     public void setFaultResponse(boolean b) {

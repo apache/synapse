@@ -66,8 +66,8 @@ public class MessageFormatterDecoratorFactory {
             return formatter;
 
         } catch (AxisFault axisFault) {
-            String msg = "Cannot find a suitable MessageFormatter" + axisFault.getMessage();
-            log.error(msg);
+            String msg = "Cannot find a suitable MessageFormatter : " + axisFault.getMessage();
+            log.error(msg, axisFault);
         }
 
         return null;

@@ -72,18 +72,10 @@
                                               tofile="target/test_repos/axis2Client/conf/axis2.xml"/>
                                         <copy file="../../repository/conf/axis2.xml"
                                               tofile="target/test_repos/synapse/conf/axis2.xml"/>
-                                        <copy file="../core/src/main/resources/synapseIdentity.jks"
-                                              tofile="target/test_repos/synapse/conf/synapseIdentity.jks"/>
-                                        <copy file="../core/src/main/resources/axis2Identity.jks"
-                                              tofile="target/test_repos/synapse/conf/axis2Identity.jks"/>
                                         <copy file="../core/src/main/resources/trust.jks"
                                               tofile="target/test_repos/synapse/conf/trust.jks"/>
                                         <copy file="../core/src/main/resources/identity.jks"
                                               tofile="target/test_repos/synapse/conf/identity.jks"/>
-                                        <copy file="../core/src/main/resources/axis2Trust.jks"
-                                              tofile="target/test_repos/synapse/conf/axis2Trust.jks"/>
-                                        <copy file="../core/src/main/resources/synapseTrust.jks"
-                                              tofile="target/test_repos/synapse/conf/synapseTrust.jks"/>
                                         <copy file="../core/src/test/resources/keystore.jks"
                                               tofile="target/test_repos/synapse/conf/keystore.jks"/>
 

@@ -118,9 +118,17 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
         GenericApplicationContext appContext = new GenericApplicationContext();
         XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
         xbdr.setValidating(false);
+
+        Object springConfig = synCtx.getEntry(configKey);
+        if(springConfig == null) {
+          String errorMessage = "Cannot look up Spring configuration " + configKey;
+          log.error(errorMessage);
+          throw new SynapseException(errorMessage);
+        }
+
         xbdr.loadBeanDefinitions(
             new InputStreamResource(
-                SynapseConfigUtils.getStreamSource(synCtx.getEntry(configKey)).getInputStream()));
+                SynapseConfigUtils.getStreamSource(springConfig).getInputStream()));
         appContext.refresh();
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Spring ApplicationContext from key : " + configKey + " created");
@@ -158,30 +166,8 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
 
 
   public void init(SynapseEnvironment se) {
-        if (log.isDebugEnabled()) {
-            log.debug("Creating Spring ApplicationContext from key : " + configKey);
-        }
-
         MessageContext synCtx = se.createMessageContext();
-        GenericApplicationContext appContext = new GenericApplicationContext();
-        XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
-        xbdr.setValidating(false);
-
-        Object springConfig = synCtx.getEntry(configKey);
-        if(springConfig == null) {
-          String errorMessage = "Cannot look up Spring configuration " + configKey;
-          log.error(errorMessage);
-          throw new SynapseException(errorMessage);
-        }
-
-        xbdr.loadBeanDefinitions(
-            new InputStreamResource(
-                SynapseConfigUtils.getStreamSource(springConfig).getInputStream()));
-        appContext.refresh();
-        if (log.isDebugEnabled()) {
-            log.debug("Spring ApplicationContext from key : " + configKey + " created");
-        }
-        this.appContext = appContext;
+        buildAppContext(synCtx, log.isDebugEnabled(), false);
   }
 
   public void destroy() {

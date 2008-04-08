@@ -20,8 +20,10 @@
 package org.apache.synapse.util;
 
 import junit.framework.TestCase;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -40,24 +42,31 @@ public class SynapseXPathTest extends TestCase {
     public void testAbsoluteXPath() throws Exception {
         SynapseXPath xpath = new SynapseXPath("//test");
         MessageContext ctx =  TestUtils.getTestContext("<test>" + message + "</test>");
-        assertEquals(xpath.stringValueOf(ctx), message);
+        assertEquals(message, xpath.stringValueOf(ctx));
     }
 
     public void testBodyRelativeXPath() throws Exception {
         SynapseXPath xpath = new SynapseXPath("$body/test");
         MessageContext ctx =  TestUtils.getTestContext("<test>" + message + "</test>");
-        assertEquals(xpath.stringValueOf(ctx), message);
+        assertEquals(message, xpath.stringValueOf(ctx));
+        Object node = xpath.selectSingleNode(ctx);
+        assertTrue(node instanceof OMElement);
+        assertEquals(message, ((OMElement)node).getText());
     }
 
     public void testHeaderRelativeXPath() throws Exception {
-        SynapseXPath xpath = new SynapseXPath("$header/t:test");
-        xpath.addNamespace("t", "http://test");
         MessageContext ctx =  TestUtils.getTestContext("<test>" + message + "</test>");
         OMFactory fac = ctx.getEnvelope().getOMFactory();
-        SOAPHeaderBlock block = ctx.getEnvelope().getHeader().addHeaderBlock("test",
-            fac.createOMNamespace("http://test", "t"));
-        block.setText(message);
-        assertEquals(xpath.stringValueOf(ctx), message);
+        OMNamespace ns = fac.createOMNamespace("http://test", "t");
+        ctx.getEnvelope().getHeader().addHeaderBlock("test", ns).setText(message);
+        ctx.getEnvelope().getHeader().addHeaderBlock("test2", ns);
+        
+        SynapseXPath xpath = new SynapseXPath("$header/t:test");
+        xpath.addNamespace(ns);
+        assertEquals(message, xpath.stringValueOf(ctx));
+        
+        xpath = new SynapseXPath("$header/*");
+        assertEquals(2, xpath.selectNodes(ctx).size());
     }
 
     public void testContextProperties() throws Exception {
@@ -68,12 +77,13 @@ public class SynapseXPathTest extends TestCase {
     }
 
     public void testAxis2ContextProperties() throws Exception {
-        SynapseXPath xpath = new SynapseXPath("$axis2:test");
         HashMap props = new HashMap();
         Axis2MessageContext synCtx = TestUtils.getAxis2MessageContext("<test/>", props);
         synCtx.getAxis2MessageContext().setProperty("test", message);
-        synCtx.setProperty("test", message);
-        assertEquals(xpath.evaluate(synCtx), message);
+        synCtx.getAxis2MessageContext().setProperty("test2", "1234");
+        assertEquals(message, new SynapseXPath("$axis2:test").evaluate(synCtx));
+        assertEquals(1234, new SynapseXPath("$axis2:test2").numberValueOf(synCtx).intValue());
+        assertTrue(new SynapseXPath("$axis2:test2 = 1234").booleanValueOf(synCtx));
     }
     
 }

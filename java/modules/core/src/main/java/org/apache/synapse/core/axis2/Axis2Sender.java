@@ -34,6 +34,7 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.UUIDGenerator;
+import org.apache.synapse.util.POXUtils;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method

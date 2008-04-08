@@ -43,9 +43,9 @@ import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.util.PipeImpl;
-import org.apache.synapse.transport.nhttp.util.WorkerPool;
-import org.apache.synapse.transport.nhttp.util.WorkerPoolFactory;
 import org.apache.synapse.transport.base.MetricsCollector;
+import org.apache.synapse.transport.base.threads.WorkerPool;
+import org.apache.synapse.transport.base.threads.WorkerPoolFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -343,10 +343,10 @@ public class ClientHandler implements NHttpClientHandler {
             } else {
                 outbuf.flip();
                 encoder.write(outbuf);
-                outbuf.compact();
                 if (metrics != null) {
                     metrics.incrementBytesSent(outbuf.position());
                 }
+                outbuf.compact();
             }
 
             if (encoder.isCompleted()) {

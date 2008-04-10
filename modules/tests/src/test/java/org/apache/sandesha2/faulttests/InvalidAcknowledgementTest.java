@@ -269,7 +269,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		bean.setReSend(true);
 		bean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 		bean.setMessageNumber(messageNo);
-		
+		bean.setMessageContextRefKey("fakeKey");
 		return bean;
 	}
 }

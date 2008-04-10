@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
@@ -67,7 +66,7 @@ public class InMemoryStorageManager extends StorageManager {
     private PollingManager pollingManager = null;
     private ConcurrentHashMap transactions = new ConcurrentHashMap();
     private boolean useSerialization = false;
-    private HashMap storageMap = new HashMap();
+    private ConcurrentHashMap storageMap = new ConcurrentHashMap();
     
 	public InMemoryStorageManager(ConfigurationContext context)
 	throws SandeshaException

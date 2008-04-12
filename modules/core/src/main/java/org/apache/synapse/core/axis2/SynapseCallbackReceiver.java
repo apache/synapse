@@ -263,6 +263,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         new RelatesTo[]{new RelatesTo(axisOutMsgCtx.getMessageID())});
             }
 
+            response.setReplyTo(axisOutMsgCtx.getReplyTo());
+            response.setFaultTo(axisOutMsgCtx.getFaultTo());
+
             // create the synapse message context for the response
             Axis2MessageContext synapseInMessageContext =
                     new Axis2MessageContext(

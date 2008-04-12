@@ -98,6 +98,8 @@ public class ServerWorker implements Runnable {
      * response, if one would be created.
      * @param cfgCtx the Axis2 configuration context
      * @param conn the underlying http connection
+     * @param isHttps whether https or not
+     * @param metrics metrics for the transport
      * @param serverHandler the handler of the server side messages
      * @param request the http request received (might still be in the process of being streamed)
      * @param is the stream input stream to read the request body
@@ -152,7 +154,7 @@ public class ServerWorker implements Runnable {
             msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
         }
         msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
-        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID()); // TODO check if this is valid?
+        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID()); // TODO check if this is valid
         msgContext.setServerSide(true);
         msgContext.setProperty(
             Constants.Configuration.TRANSPORT_IN_URL, request.getRequestLine().getUri());
@@ -174,9 +176,9 @@ public class ServerWorker implements Runnable {
             }
         }
 
-        // this is required to support Sandesha 2
         msgContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL,
                 new HttpCoreRequestResponseTransport(msgContext));
+        
         return msgContext;
     }
 
@@ -194,11 +196,18 @@ public class ServerWorker implements Runnable {
             handleException("Unsupported method : " + method, null);
         }
 
+        // here the RequestResponseTransport place an important role when it comes to
+        // dual channel invocation. This is becasue we need to ACK to the request once the request
+        // is received to synapse. Otherwise we will not be able to support the single channel
+        // invocation within the actual service and synapse for a dual channel request from the
+        // client. This condition is a bit complex but cannot simplify any further.
         if (msgContext != null && msgContext.getOperationContext() != null &&
-            !Constants.VALUE_TRUE.equals(
-                msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN)) &&
-            !"SKIP".equals(
-                msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN))) {
+                ((!Constants.VALUE_TRUE.equals(msgContext.getOperationContext().getProperty(
+                        Constants.RESPONSE_WRITTEN)) && !"SKIP".equals(
+                        msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN)))
+                        || (((RequestResponseTransport) msgContext.getProperty(
+                        RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
+                        == RequestResponseTransport.RequestResponseTransportStatus.ACKED))) {
 
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
             serverHandler.commitResponse(conn, response);
@@ -408,7 +417,8 @@ public class ServerWorker implements Runnable {
                     try {
                         response.addHeader(CONTENT_TYPE, TEXT_HTML);
                         serverHandler.commitResponse(conn, response);
-                        os.write(HTTPTransportReceiver.printServiceHTML(serviceName, cfgCtx).getBytes());
+                        os.write(HTTPTransportReceiver.printServiceHTML(
+                                serviceName, cfgCtx).getBytes());
 
                     } catch (IOException e) {
                         handleException("Error writing service HTML to client", e);
@@ -507,7 +517,7 @@ public class ServerWorker implements Runnable {
      * its getServiceEPR is invoked. This was originally copied from axis2
      *
      * @return Returns String.
-     * @throws java.net.SocketException
+     * @throws java.net.SocketException if the socket can not be accessed
      */
     private static String getIpAddress() throws SocketException {
         Enumeration e = NetworkInterface.getNetworkInterfaces();

@@ -93,7 +93,9 @@ public class ClientHandler implements NHttpClientHandler {
      * @param cfgCtx the Axis2 configuration context
      * @param params the Http protocol parameters to adhere to
      */
-    public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params, final MetricsCollector metrics) {
+    public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params,
+        final MetricsCollector metrics) {
+        
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
@@ -261,7 +263,8 @@ public class ClientHandler implements NHttpClientHandler {
 
             MessageContext mc = axis2Request.getMsgContext();
 
-            if (mc.getAxisOperation() != null && mc.getAxisOperation().getMessageReceiver() != null) {
+            if (mc.getAxisOperation() != null &&
+                    mc.getAxisOperation().getMessageReceiver() != null) {
 
                 MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
                 try {
@@ -276,7 +279,8 @@ public class ClientHandler implements NHttpClientHandler {
                     }
 
                     if (nioFaultMessageContext != null) {
-                        nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                        nioFaultMessageContext.setProperty(
+                                NhttpConstants.SENDING_FAULT, Boolean.TRUE);
                         mr.receive(nioFaultMessageContext);
                     }
 
@@ -295,7 +299,8 @@ public class ClientHandler implements NHttpClientHandler {
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        WritableByteChannel sink = (WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL);
+        WritableByteChannel sink
+                = (WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL);
         ByteBuffer inbuf = (ByteBuffer) context.getAttribute(REQUEST_BUFFER);
 
         try {
@@ -333,7 +338,8 @@ public class ClientHandler implements NHttpClientHandler {
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         HttpContext context = conn.getContext();
 
-        ReadableByteChannel source = (ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL);
+        ReadableByteChannel source
+                = (ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL);
         ByteBuffer outbuf = (ByteBuffer) context.getAttribute(RESPONSE_BUFFER);
 
         try {
@@ -366,6 +372,7 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection being processed
      */
     public void responseReceived(final NHttpClientConnection conn) {
+
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
 
@@ -387,41 +394,51 @@ public class ClientHandler implements NHttpClientHandler {
                 // nhttp. For example, JMS would not send a reply message for one-way
                 // operations.
                 MessageContext outMsgCtx =
-                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT);
+                        (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT);
                 MessageReceiver mr = outMsgCtx.getAxisOperation().getMessageReceiver();
 
-                try {
-                    MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
-                        getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
-                    if (responseMsgCtx == null) {
-                        // to support Sandesha.. however, this means that we received a 202 accepted
-                        // for an out-only , for which we do not need a dummy message anyway
-                        return;
+                // the following check is to support the dual channel invocation. Hence the
+                // response will be sent as a new request to the client over a different channel
+                // client sends back a 202 Accepted response to synapse and we need to neglect that 
+                // 202 Accepted message
+                if (!outMsgCtx.isPropertyTrue(NhttpConstants.IGNORE_SC_ACCEPTED)) {
+
+                    try {
+                        MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
+                                getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+                        if (responseMsgCtx == null) {
+                            // to support Sandesha.. however, this means that we received a
+                            // 202 accepted for an out-only , for which we do not need a
+                            // dummy message anyway
+                            return;
+                        }
+                        responseMsgCtx.setServerSide(true);
+                        responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
+                        responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN,
+                                outMsgCtx.getProperty(MessageContext.TRANSPORT_IN));
+                        responseMsgCtx.setTransportIn(outMsgCtx.getTransportIn());
+                        responseMsgCtx.setTransportOut(outMsgCtx.getTransportOut());
+
+                        responseMsgCtx.setAxisMessage(outMsgCtx.getAxisOperation().
+                                getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
+                        responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
+                        responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
+                        responseMsgCtx.setTo(null);
+
+                        if (!outMsgCtx.isDoingREST() && !outMsgCtx.isSOAP11()) {
+                            responseMsgCtx.setEnvelope(new SOAP12Factory().getDefaultEnvelope());
+                        } else {
+                            responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                        }
+                        responseMsgCtx.setProperty(AddressingConstants.
+                                DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+                        responseMsgCtx.setProperty(NhttpConstants.SC_ACCEPTED, Boolean.TRUE);
+                        mr.receive(responseMsgCtx);
+
+                    } catch (org.apache.axis2.AxisFault af) {
+                        log.error("Unable to report back " +
+                                "202 Accepted state to the message receiver", af);
                     }
-                    responseMsgCtx.setServerSide(true);
-                    responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
-                    responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN,
-                        outMsgCtx.getProperty(MessageContext.TRANSPORT_IN));
-                    responseMsgCtx.setTransportIn(outMsgCtx.getTransportIn());
-                    responseMsgCtx.setTransportOut(outMsgCtx.getTransportOut());
-
-                    responseMsgCtx.setAxisMessage(outMsgCtx.getAxisOperation().
-                        getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
-                    responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
-                    responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
-                    responseMsgCtx.setTo(null);
-
-                    if (!outMsgCtx.isDoingREST() && !outMsgCtx.isSOAP11()) {
-                        responseMsgCtx.setEnvelope(new SOAP12Factory().getDefaultEnvelope());
-                    } else {
-                        responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
-                    }
-                    responseMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
-                    responseMsgCtx.setProperty(NhttpConstants.SC_ACCEPTED, Boolean.TRUE);
-                    mr.receive(responseMsgCtx);
-
-                } catch (org.apache.axis2.AxisFault af) {
-                    log.error("Unable to report back 202 Accepted state to the message receiver", af);
                 }
 
                 return;
@@ -429,21 +446,27 @@ public class ClientHandler implements NHttpClientHandler {
             case HttpStatus.SC_INTERNAL_SERVER_ERROR : {
                 Header contentType = response.getFirstHeader(CONTENT_TYPE);
                 if (contentType != null) {
-                    if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0) ||
-                     contentType.getValue().indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
+
+                    if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0)
+                            || contentType.getValue().indexOf(
+                            SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
+
                         if (log.isDebugEnabled()) {
                             log.debug("Received an internal server error with a SOAP payload");
                         }
+
                     } else {
                         if (log.isDebugEnabled()) {
                             log.debug("Received an internal server error with a POX/REST payload");
                         }
                     }
+                    
                     processResponse(conn, context, response);
                     return;
                 }
+                
                 log.error("Received an internal server error : " +
-                    response.getStatusLine().getReasonPhrase());
+                        response.getStatusLine().getReasonPhrase());
                 return;
             }
             case HttpStatus.SC_OK : {
@@ -457,11 +480,14 @@ public class ClientHandler implements NHttpClientHandler {
 
                 Header contentType = response.getFirstHeader(CONTENT_TYPE);
                 if (contentType != null) {
-                    if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0) ||
-                     contentType.getValue().indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
+                    if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0)
+                            || contentType.getValue().indexOf(
+                            SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
+
                         if (log.isDebugEnabled()) {
                             log.debug("Received an unexpected response with a SOAP payload");
                         }
+
                     } else if (contentType.getValue().indexOf("html") == -1) {
                         if (log.isDebugEnabled()) {
                             log.debug("Received an unexpected response with a POX/REST payload");
@@ -478,6 +504,7 @@ public class ClientHandler implements NHttpClientHandler {
                         response.getStatusLine().getStatusCode() + " and reason : " +
                         response.getStatusLine().getReasonPhrase());
                 }
+                
                 processResponse(conn, context, response);
             }
         }
@@ -489,7 +516,8 @@ public class ClientHandler implements NHttpClientHandler {
      * @param context
      * @param response
      */
-    private void processResponse(final NHttpClientConnection conn, HttpContext context, HttpResponse response) {
+    private void processResponse(final NHttpClientConnection conn, HttpContext context,
+        HttpResponse response) {
 
         try {
             PipeImpl responsePipe = new PipeImpl();

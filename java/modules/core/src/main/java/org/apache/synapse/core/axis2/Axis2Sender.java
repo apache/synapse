@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
@@ -33,8 +35,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
-import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.POXUtils;
+import org.apache.synapse.util.UUIDGenerator;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
@@ -84,8 +86,6 @@ public class Axis2Sender {
             POXUtils.convertSOAPFaultToPOX(messageContext);
         }
 
-        AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
-
         try {
             messageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check if addressing is already engaged for this message.
@@ -96,6 +96,34 @@ public class Axis2Sender {
                 StatisticsUtils.processProxyServiceStatistics(smc);
                 StatisticsUtils.processAllSequenceStatistics(smc);
             }
+
+            if (AddressingHelper.isReplyRedirected(messageContext) &&
+                    !messageContext.getReplyTo().hasNoneAddress()) {
+
+                messageContext.setTo(messageContext.getReplyTo());
+                messageContext.setReplyTo(null);
+                messageContext.setWSAAction("");
+                messageContext.setSoapAction("");
+                messageContext.setProperty(
+                        NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);                
+                messageContext.setProperty(
+                        AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+            }
+            
+            if (messageContext.getEnvelope().hasFault()
+                    && AddressingHelper.isFaultRedirected(messageContext)
+                    && !messageContext.getFaultTo().hasNoneAddress()) {
+
+                messageContext.setTo(messageContext.getFaultTo());
+                messageContext.setFaultTo(null);
+                messageContext.setWSAAction("");
+                messageContext.setSoapAction("");
+                messageContext.setProperty(
+                        NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
+                messageContext.setProperty(
+                        AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+            }
+            
             Axis2FlexibleMEPClient.removeAddressingHeaders(messageContext);
             messageContext.setMessageID(UUIDGenerator.getUUID());
 
@@ -106,7 +134,8 @@ public class Axis2Sender {
                     OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
                 fac.createSOAPHeader(messageContext.getEnvelope());
             }
-            ae.send(messageContext);
+            
+            AxisEngine.send(messageContext);
 
         } catch (AxisFault e) {
             handleException("Unexpected error sending message back", e);

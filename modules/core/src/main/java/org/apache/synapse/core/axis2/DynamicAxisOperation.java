@@ -19,10 +19,8 @@
 
 package org.apache.synapse.core.axis2;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.util.TargetResolver;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
@@ -30,10 +28,14 @@ import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.description.*;
+import org.apache.axis2.description.ClientUtils;
+import org.apache.axis2.description.OutInAxisOperation;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.util.TargetResolver;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.SynapseConstants;
 
 import javax.xml.namespace.QName;
@@ -188,8 +190,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             responseMessageContext.setOptions(options);
 			addMessageContext(responseMessageContext);
 
-            AxisEngine engine = new AxisEngine(msgctx.getConfigurationContext());
-			engine.send(msgctx);
+            AxisEngine.send(msgctx);
 
             // did the engine receive a immediate synchronous response?
             // e.g. sometimes the transport sender may listen for a syncronous reply
@@ -234,8 +235,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 
                     if (resenvelope != null) {
                         responseMessageContext.setEnvelope(resenvelope);
-                        engine = new AxisEngine(msgctx.getConfigurationContext());
-                        engine.receive(responseMessageContext);
+                        AxisEngine.receive(responseMessageContext);
                         if (responseMessageContext.getReplyTo() != null) {
                             sc.setTargetEPR(responseMessageContext.getReplyTo());
                         }
@@ -245,5 +245,6 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                 }
             }
         }
-	}
+        
+    }
 }

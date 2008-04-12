@@ -22,22 +22,22 @@ package samples.userguide;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.Constants;
-import org.apache.axis2.transport.http.HttpTransportProperties;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.rampart.RampartMessageData;
-import org.apache.neethi.PolicyEngine;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyEngine;
+import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.util.UUIDGenerator;
 import samples.common.StockQuoteHandler;
 
-import java.net.URL;
 import java.io.File;
+import java.net.URL;
 
 /**
  * See build.xml for options
@@ -58,8 +58,9 @@ public class StockQuoteClient {
             executeClient();
 
             if ("placeorder".equals(InnerStruct.MODE)) {
-                System.out.println("Order placed for " + InnerStruct.QUANTITY + " shares of stock " +
-                        InnerStruct.SYMBOL + " at a price of $ " + InnerStruct.PRICE);
+                System.out.println("Order placed for " + InnerStruct.QUANTITY
+                        + " shares of stock " + InnerStruct.SYMBOL
+                        + " at a price of $ " + InnerStruct.PRICE);
             } else {
                 if ("customquote".equals(InnerStruct.MODE)) {
                     System.out.println("Custom :: Stock price = $" +
@@ -67,6 +68,16 @@ public class StockQuoteClient {
                 } else if ("quote".equals(InnerStruct.MODE)) {
                     System.out.println("Standard :: Stock price = $" +
                             StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
+                } else if ("dualquote".equals(InnerStruct.MODE)) {
+                    while (true) {
+                        if (InnerStruct.COMPLETED) {
+                            System.out.println("Standard dual channel :: Stock price = $" +
+                                    StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
+                            System.exit(0);
+                        } else {
+                            Thread.sleep(100);
+                        }
+                    }
                 } else if ("fullquote".equals(InnerStruct.MODE)) {
                     System.out.println("Full :: Average price = $" +
                             StockQuoteHandler.parseFullQuoteResponse(InnerStruct.RESULT));
@@ -105,7 +116,7 @@ public class StockQuoteClient {
 
         Options options = new Options();
         OMElement payload = null;
-        ServiceClient serviceClient = null;
+        ServiceClient serviceClient;
 
         if (repo != null && !"null".equals(repo)) {
             configContext =
@@ -131,7 +142,7 @@ public class StockQuoteClient {
         } else if ("marketactivity".equals(mode)) {
             payload = StockQuoteHandler.createMarketActivityRequest();
             options.setAction("urn:getMarketActivity");
-        } else if ("quote".equals(mode)) {
+        } else if ("quote".equals(mode) || "dualquote".equals(mode)) {
             payload = StockQuoteHandler.createStandardQuoteRequest(
                     symbol, Integer.parseInt(itr));
             options.setAction("urn:getQuote");
@@ -141,6 +152,9 @@ public class StockQuoteClient {
         if (addUrl != null && !"null".equals(addUrl)) {
             serviceClient.engageModule("addressing");
             options.setTo(new EndpointReference(addUrl));
+            if ("dualquote".equals(mode)) {
+                options.setUseSeparateListener(true);
+            }
         }
         if (trpUrl != null && !"null".equals(trpUrl)) {
             options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);
@@ -174,7 +188,8 @@ public class StockQuoteClient {
             System.out.println("Using WS-RM");
             serviceClient.engageModule("sandesha2");
             options.setProperty("Sandesha2LastMessage", "true");
-            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
+            options.setProperty(
+                    SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
         }
 
         serviceClient.setOptions(options);
@@ -188,9 +203,10 @@ public class StockQuoteClient {
             serviceClient.fireAndForget(payload);
             Thread.sleep(5000);
 
+        } else if ("dualquote".equals(mode)) {
+            serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback());
         } else {
-            OMElement result = serviceClient.sendReceive(payload);
-            InnerStruct.RESULT = result;
+            InnerStruct.RESULT = serviceClient.sendReceive(payload);
             if (Boolean.parseBoolean(wsrm)) {
                 // give some time for RM to terminate normally
                 Thread.sleep(5000);
@@ -202,24 +218,25 @@ public class StockQuoteClient {
             }
         }
 
-        try {
-            if (configContext != null) {
-                configContext.terminate();
-            }
+//        try {
+//            if (configContext != null) {
+//                configContext.terminate();
+//            }
             // the above statement was used on reccomendation by Chamikara as I remember, but
             // since using Axis2 1.3 - this causes some unexpected classloading issue on the
             // Axis2 server side - which cannot be described. This using the below as suggested
             // by Deepal
 //            serviceClient.cleanup();
-        } catch (Exception ignore) {
-        }
+//        } catch (Exception ignore) {
+//        }
     }
 
-    private static class InnerStruct {
+    public static class InnerStruct {
         static String MODE = null;
         static String SYMBOL = null;
         static int QUANTITY = 0;
         static double PRICE = 0;
+        static boolean COMPLETED = false;
         static OMElement RESULT = null;
     }
 

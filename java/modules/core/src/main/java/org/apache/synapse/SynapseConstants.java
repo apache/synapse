@@ -81,6 +81,9 @@ public final class SynapseConstants {
     /** System date */
     public static final String SYSTEM_DATE = "SYSTEM_DATE";
 
+    public static final String ADDRESSING_VERSION_FINAL = "final";
+    public static final String ADDRESSING_VERSION_SUBMISSION = "submission";
+
     /** The Axis2 client options property name for the Rampart policy */
     public static final String RAMPART_POLICY = "rampartPolicy";
     /** The Axis2 client options property name for the Sandesha policy */

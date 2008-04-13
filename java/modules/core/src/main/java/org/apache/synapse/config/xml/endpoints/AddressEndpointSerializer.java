@@ -50,9 +50,9 @@ import org.apache.commons.logging.LogFactory;
  *      ...
  *    </Policy>+
  *
- *    <enableRM/>+
- *    <enableSec/>+
- *    <enableAddressing/>+
+ *    <enableRM/>?
+ *    <enableSec/>?
+ *    <enableAddressing [version=("fianl" | "submission")]/>?
  *
  *    <timeout>
  *      <duration>duration in milliseconds</duration>
@@ -156,6 +156,10 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         }
         if (endpt.isAddressingOn()) {
             OMElement addressing = fac.createOMElement("enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            if (endpt.getAddressingVersion() != null) {
+                addressing.addAttribute(fac.createOMAttribute(
+                        "version", null, endpt.getAddressingVersion()));
+            }
             if (endpt.isUseSeparateListener()) {
                 addressing.addAttribute(fac.createOMAttribute(
                         "separateListener", null, "true"));

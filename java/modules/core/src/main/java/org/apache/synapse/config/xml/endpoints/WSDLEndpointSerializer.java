@@ -19,16 +19,14 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Serializes an WSDL based endpoint to an XML configuration.
@@ -42,8 +40,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class WSDLEndpointSerializer implements EndpointSerializer {
 
-    private static Log log = LogFactory.getLog(WSDLEndpointSerializer.class);
-
     private OMFactory fac = null;
 
     public OMElement serializeEndpoint(Endpoint endpoint) {
@@ -53,7 +49,8 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement = fac.createOMElement(
+                "endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) endpoint;
         String name = wsdlEndpoint.getName();
@@ -140,10 +137,16 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
         if (statisticsValue != null) {
             wsdlElement.addAttribute(fac.createOMAttribute(
-                    org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
+                    org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME,
+                    null, statisticsValue));
         }
         if (endpointDefinition.isAddressingOn()) {
-            OMElement addressing = fac.createOMElement("enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement addressing = fac.createOMElement("enableAddressing",
+                    SynapseConstants.SYNAPSE_OMNAMESPACE);
+            if (endpointDefinition.getAddressingVersion() != null) {
+                addressing.addAttribute(fac.createOMAttribute(
+                        "version", null, endpointDefinition.getAddressingVersion()));
+            }
             if (endpointDefinition.isUseSeparateListener()) {
                 addressing.addAttribute(fac.createOMAttribute(
                         "separateListener", null, "true"));
@@ -170,25 +173,23 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
 
         if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {
-            OMElement timeout = fac.createOMElement("timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement timeout = fac.createOMElement(
+                    "timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
             wsdlElement.addChild(timeout);
 
-            OMElement duration = fac.createOMElement("duration", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement duration = fac.createOMElement(
+                    "duration", SynapseConstants.SYNAPSE_OMNAMESPACE);
             duration.setText(Long.toString(endpointDefinition.getTimeoutDuration() / 1000));
             timeout.addChild(duration);
 
             OMElement action = fac.createOMElement("action", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
                 action.setText("discard");
-            } else if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD_AND_FAULT) {
+            } else if (endpointDefinition.getTimeoutAction()
+                    == SynapseConstants.DISCARD_AND_FAULT) {
                 action.setText("fault");
             }
             timeout.addChild(action);
         }
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

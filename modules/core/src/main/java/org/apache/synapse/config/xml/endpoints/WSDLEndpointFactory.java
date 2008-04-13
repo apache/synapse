@@ -46,7 +46,7 @@ import java.io.File;
  *   <wsdl20:description>...</wsdl20:description>?
  *   <enableRM [policy="key"]/>?
  *   <enableSec [policy="key"]/>?
- *   <enableAddressing/>?
+ *   <enableAddressing [version=("final" | "submission")]/>?
  *   <suspendDurationOnFailure>suspend-duration</suspendDurationOnFailure>?
  *   <timeout>
  *     <duration>timeout-duration</duration>
@@ -114,17 +114,14 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
             EndpointDefinition endpoint = null;
 
-            // get the service name and port name. at this point we should not worry about the presence
-            // of those parameters. they are handled by corresponding WSDL builders.
-            String serviceName = wsdlElement.getAttributeValue
-                    (new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,"service"));
+            // get the service name and port name. at this point we should not worry about
+            // the presence of those parameters. they are handled by corresponding WSDL builders.
+            String serviceName = wsdlElement.getAttributeValue(new QName("service"));
 
-            String portName = wsdlElement.getAttributeValue
-                    (new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,"port"));
+            String portName = wsdlElement.getAttributeValue(new QName("port"));
 
             // check if wsdl is supplied as a URI
-            String wsdlURI = wsdlElement.getAttributeValue
-                    (new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,"uri"));
+            String wsdlURI = wsdlElement.getAttributeValue(new QName("uri"));
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
@@ -142,12 +139,14 @@ public class WSDLEndpointFactory implements EndpointFactory {
                         if (ns != null) {
                             String nsUri = wsdlOM.getNamespace().getNamespaceURI();
                             if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
+
                                 endpoint = new WSDL11EndpointBuilder().
-                                    createEndpointDefinitionFromWSDL(wsdlURI.trim(),wsdlOM, serviceName, portName);
+                                        createEndpointDefinitionFromWSDL(
+                                                wsdlURI.trim(),wsdlOM, serviceName, portName);
 
                             } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
                                 //endpoint = new WSDL20EndpointBuilder().
-                                //        createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
+                                // createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
 
                                 handleException("WSDL 2.0 Endpoints are currently not supported");
                             }
@@ -172,8 +171,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 if(!baseUri.endsWith(File.separator)){
                     baseUri = baseUri + File.separator;
                 }
-                endpoint = new WSDL11EndpointBuilder().
-                    createEndpointDefinitionFromWSDL(baseUri, definitionElement, serviceName, portName);
+                endpoint = new WSDL11EndpointBuilder().createEndpointDefinitionFromWSDL(
+                        baseUri, definitionElement, serviceName, portName);
             }
 
             // check if a wsdl 2.0 document is supplied inline
@@ -186,18 +185,21 @@ public class WSDLEndpointFactory implements EndpointFactory {
             if (endpoint != null) {
                 // for now, QOS information has to be provided explicitly.
                 extractQOSInformation(endpoint, wsdlElement);
-                OMAttribute statistics = epConfig.getAttribute(
-                        new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
-                                org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+                OMAttribute statistics = epConfig.getAttribute(new QName(
+                        org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
+                        org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
                 if (statistics != null) {
                     String statisticsValue = statistics.getAttributeValue();
                     if (statisticsValue != null) {
-                        if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE.equals(
-                                statisticsValue)) {
-                            endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                        } else if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE.equals(
-                                statisticsValue)) {
-                            endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+
+                        if (org.apache.synapse.config.xml.XMLConfigConstants.
+                                STATISTICS_ENABLE.equals(statisticsValue)) {
+                            endpoint.setStatisticsState(
+                                    org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                        } else if (org.apache.synapse.config.xml.XMLConfigConstants.
+                                STATISTICS_DISABLE.equals(statisticsValue)) {
+                            endpoint.setStatisticsState(
+                                    org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                         }
                     }
                 }
@@ -220,7 +222,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
         throw new SynapseException(msg, e);
     }
 
-    private void extractQOSInformation(EndpointDefinition endpointDefinition, OMElement wsdlElement) {
+    private void extractQOSInformation(EndpointDefinition endpointDefinition,
+        OMElement wsdlElement) {
 
         OMAttribute format = wsdlElement.getAttribute(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "format"));
@@ -261,9 +264,24 @@ public class WSDLEndpointFactory implements EndpointFactory {
         }
 
         OMElement wsAddr = wsdlElement.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableAddressing"));
+                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
+                "enableAddressing"));
         if (wsAddr != null) {
+
             endpointDefinition.setAddressingOn(true);
+
+            OMAttribute version = wsAddr.getAttribute(new QName("version"));
+            if (version != null && version.getAttributeValue() != null) {
+                if (SynapseConstants.ADDRESSING_VERSION_FINAL.equals(version.getAttributeValue()) ||
+                        SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(
+                                version.getAttributeValue())) {
+                    endpointDefinition.setAddressingVersion(version.getAttributeValue());
+                } else {
+                    handleException("Unknown value for the addressing version. Possible values " +
+                            "for the addressing version are 'final' and 'submission' only.");
+                }
+            }
+            
             String useSepList = wsAddr.getAttributeValue(new QName(
                     "separateListener"));
             if (useSepList != null) {
@@ -300,7 +318,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
         if (timeout != null) {
             OMElement duration = timeout.getFirstChildWithName(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "duration"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
+                    "duration"));
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {

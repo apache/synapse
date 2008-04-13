@@ -47,7 +47,7 @@ import javax.xml.namespace.QName;
  *
  *      <enableRM [policy="key"]/>?
  *      <enableSec [policy="key"]/>?
- *      <enableAddressing/>?
+ *      <enableAddressing [version=("final" | "submission")]/>?
  *      <suspendDurationOnFailure>suspend-duration</suspendDurationOnFailure>?
  *   </address>
  * </endpoint>
@@ -127,34 +127,33 @@ public class AddressEndpointFactory implements EndpointFactory {
     }
 
     /**
-     * Creates an EndpointDefinition instance using the XML fragment specification. Configuration for
-     * EndpointDefinition always resides inside a configuration of an AddressEndpoint. This factory
-     * extracts the details related to the EPR provided for address endpoint.
+     * Creates an EndpointDefinition instance using the XML fragment specification. Configuration
+     * for EndpointDefinition always resides inside a configuration of an AddressEndpoint. This
+     * factory extracts the details related to the EPR provided for address endpoint.
      *
      * @param elem XML configuration element
      * @return EndpointDefinition object containing the endpoint details.
      */
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
 
-        OMAttribute address = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "uri"));
-        OMAttribute format = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "format"));
-        OMAttribute optimize = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "optimize"));
+        OMAttribute address = elem.getAttribute(new QName("uri"));
+        OMAttribute format = elem.getAttribute(new QName("format"));
+        OMAttribute optimize = elem.getAttribute(new QName("optimize"));
 
         EndpointDefinition endpoint = new EndpointDefinition();
         OMAttribute statistics = elem.getAttribute(
                 new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
                         org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
-                if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE.equals(
-                        statisticsValue)) {
+
+                if (org.apache.synapse.config.xml.XMLConfigConstants.
+                        STATISTICS_ENABLE.equals(statisticsValue)) {
                     endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                } else if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE.equals(
-                        statisticsValue)) {
+                } else if (org.apache.synapse.config.xml.XMLConfigConstants.
+                        STATISTICS_DISABLE.equals(statisticsValue)) {
                     endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
@@ -185,7 +184,8 @@ public class AddressEndpointFactory implements EndpointFactory {
                 endpoint.setFormat(SynapseConstants.FORMAT_SOAP12);
                 
             } else {
-                handleException("unknown value -\""+forceValue+"\". Attribute 'format' accepts only 'pox', 'get', 'soap11', 'soap12'");
+                handleException("unknown value -\""+forceValue+"\". Attribute 'format' accepts " +
+                        "only 'pox', 'get', 'soap11', 'soap12'");
             }
         }
 
@@ -199,11 +199,25 @@ public class AddressEndpointFactory implements EndpointFactory {
         }
 
         OMElement wsAddr = elem.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableAddressing"));
+                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
+                "enableAddressing"));
+
         if (wsAddr != null) {
             endpoint.setAddressingOn(true);
-            String useSepList = wsAddr.getAttributeValue(new QName(
-                    "separateListener"));
+
+            OMAttribute version = wsAddr.getAttribute(new QName("version"));
+            if (version != null && version.getAttributeValue() != null) {
+                if (SynapseConstants.ADDRESSING_VERSION_FINAL.equals(version.getAttributeValue()) ||
+                        SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(
+                                version.getAttributeValue())) {
+                    endpoint.setAddressingVersion(version.getAttributeValue());
+                } else {
+                    handleException("Unknown value for the addressing version. Possible values " +
+                            "for the addressing version are 'final' and 'submission' only.");
+                }
+            }
+            
+            String useSepList = wsAddr.getAttributeValue(new QName("separateListener"));
             if (useSepList != null) {
                 if (useSepList.trim().toLowerCase().startsWith("tr")
                         || useSepList.trim().startsWith("1")) {
@@ -236,7 +250,9 @@ public class AddressEndpointFactory implements EndpointFactory {
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
         if (timeout != null) {
             OMElement duration = timeout.getFirstChildWithName(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "duration"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
+                    "duration"));
+
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {

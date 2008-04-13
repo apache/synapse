@@ -24,8 +24,9 @@ import org.apache.synapse.SynapseConstants;
 
 /**
  * Endpoint definition contains the information about an web services endpoint. It is used by leaf
- * level endpoints to keep these information (e.g. AddressEndpoint and WSDLEndpoint). An EndpointDefinition
- * object is used by only one endpoint and they cannot be looked up in the registry.
+ * level endpoints to keep these information (e.g. AddressEndpoint and WSDLEndpoint). An
+ * EndpointDefinition object is used by only one endpoint and they cannot be looked up in the
+ * registry.
  */
 public class EndpointDefinition {
 
@@ -41,6 +42,10 @@ public class EndpointDefinition {
      * Should messages be sent using WS-A?
      */
     private boolean addressingOn = false;
+    /**
+     * The addressing namespace version
+     */
+    private String addressingVersion = null;
     /**
      * Should messages be sent using WS-Security?
      */
@@ -110,7 +115,8 @@ public class EndpointDefinition {
     private int traceState = SynapseConstants.TRACING_UNSET;
 
     /**
-     * This should return the absolute EPR address referenced by the named endpoint. This may be possibly computed.
+     * This should return the absolute EPR address referenced by the named endpoint. This may be
+     * possibly computed.
      *
      * @return an absolute address to be used to reference the named endpoint
      */
@@ -164,6 +170,24 @@ public class EndpointDefinition {
     }
 
     /**
+     * Get the addressing namespace version
+     *
+     * @return the adressing version
+     */
+    public String getAddressingVersion() {
+        return addressingVersion;
+    }
+
+    /**
+     * Set the addressing namespace version
+     *
+     * @param addressingVersion
+     */
+    public void setAddressingVersion(String addressingVersion) {
+        this.addressingVersion = addressingVersion;
+    }
+
+    /**
      * Is WS-Security turned on on this endpoint?
      *
      * @return true if on
@@ -193,7 +217,7 @@ public class EndpointDefinition {
     /**
      * Set the Rampart Security configuration policys' 'key' to be used (See Rampart)
      *
-     * @param wsSecPolicyKey the Rampart Security configuration policys' 'key' to be used (See Rampart)
+     * @param wsSecPolicyKey the Rampart Security configuration policys' 'key' to be used
      */
     public void setWsSecPolicyKey(String wsSecPolicyKey) {
         this.wsSecPolicyKey = wsSecPolicyKey;

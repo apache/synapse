@@ -83,6 +83,7 @@ public class Axis2FlexibleMEPClient {
         boolean wsRMEnabled         = false;
         String wsRMPolicyKey        = null;
         boolean wsAddressingEnabled = false;
+        String wsAddressingVersion  = null;
 
         if (endpoint != null) {
             separateListener    = endpoint.isUseSeparateListener();
@@ -91,6 +92,7 @@ public class Axis2FlexibleMEPClient {
             wsRMEnabled         = endpoint.isReliableMessagingOn();
             wsRMPolicyKey       = endpoint.getWsRMPolicyKey();
             wsAddressingEnabled = endpoint.isAddressingOn() || wsSecurityEnabled || wsRMEnabled;
+            wsAddressingVersion = endpoint.getAddressingVersion();
         }
 
         if (log.isDebugEnabled()) {
@@ -178,9 +180,22 @@ public class Axis2FlexibleMEPClient {
         }
 
         if (wsAddressingEnabled) {
+            
+            if (wsAddressingVersion != null &&
+                    SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(wsAddressingVersion)) {
+
+                axisOutMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,
+                        AddressingConstants.Submission.WSA_NAMESPACE);
+
+            } else if (wsAddressingVersion != null &&
+                    SynapseConstants.ADDRESSING_VERSION_FINAL.equals(wsAddressingVersion)) {
+
+                axisOutMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,
+                        AddressingConstants.Final.WSA_NAMESPACE);
+            }
+            
             axisOutMsgCtx.setProperty
                     (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
-
         } else {
             axisOutMsgCtx.setProperty
                     (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);

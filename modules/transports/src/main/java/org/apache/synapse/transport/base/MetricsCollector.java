@@ -89,7 +89,7 @@ public class MetricsCollector {
         timeoutsReceiving++;
     }
 
-    public synchronized void incrementBytesReceived(int size) {
+    public synchronized void incrementBytesReceived(long size) {
         bytesReceived += size;
     }
 
@@ -105,7 +105,7 @@ public class MetricsCollector {
         timeoutsSending++;
     }
 
-    public synchronized void incrementBytesSent(int size) {
+    public synchronized void incrementBytesSent(long size) {
         bytesSent += size;
     }
 }

@@ -22,6 +22,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
 import org.apache.synapse.transport.base.AbstractTransportListener;
 import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.ManagementSupport;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.commons.logging.LogFactory;
 
 import javax.jms.JMSException;
@@ -50,7 +52,7 @@ import java.util.*;
  * <parameter name="transport.jms.Destination" locked="true">
  * dynamicTopics/something.TestTopic</parameter>
  */
-public class JMSListener extends AbstractTransportListener {
+public class JMSListener extends AbstractTransportListener implements ManagementSupport {
 
     public static final String TRANSPORT_NAME = Constants.TRANSPORT_JMS;
 
@@ -234,5 +236,62 @@ public class JMSListener extends AbstractTransportListener {
         }
     }
     
+    // -- jmx/management methods--
+    /**
+     * Pause the listener - Stop accepting/processing new messages, but continues processing existing
+     * messages until they complete. This helps bring an instance into a maintenence mode
+     * @throws AxisFault on error
+     */
+    public void pause() throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        try {
+            Iterator iter = connectionFactories.values().iterator();
+            while (iter.hasNext()) {
+                JMSConnectionFactory conFac = (JMSConnectionFactory) iter.next();
+                conFac.pause();
+            }
+            state = BaseConstants.PAUSED;
+            log.info("Listener paused");
+        } catch (AxisJMSException e) {
+            log.error("At least one connection factory could not be paused", e);
+        }
+    }
 
+    /**
+     * Resume the lister - Brings the lister into active mode back from a paused state
+     * @throws AxisFault on error
+     */
+    public void resume() throws AxisFault {
+        if (state != BaseConstants.PAUSED) return;
+        try {
+            Iterator iter = connectionFactories.values().iterator();
+            while (iter.hasNext()) {
+                JMSConnectionFactory conFac = (JMSConnectionFactory) iter.next();
+                conFac.resume();
+            }
+            state = BaseConstants.STARTED;
+            log.info("Listener resumed");
+        } catch (AxisJMSException e) {
+            log.error("At least one connection factory could not be resumed", e);
+        }
+    }
+
+    /**
+     * Stop processing new messages, and wait the specified maximum time for in-flight
+     * requests to complete before a controlled shutdown for maintenence
+     *
+     * @param millis a number of milliseconds to wait until pending requests are allowed to complete
+     * @throws AxisFault on error
+     */
+    public void maintenenceShutdown(long millis) throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        try {
+            long start = System.currentTimeMillis();
+            stop();
+            state = BaseConstants.STOPPED;
+            log.info("Listener shutdown in : " + (System.currentTimeMillis() - start) / 1000 + "s");
+        } catch (Exception e) {
+            handleException("Error shutting down the listener for maintenence", e);
+        }
+    }
 }

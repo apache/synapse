@@ -21,6 +21,7 @@ package org.apache.synapse.transport.vfs;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.AbstractPollingTransportListener;
+import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -89,7 +90,8 @@ import java.text.SimpleDateFormat;
  * ftp://ftpuser:password@asankha/somefile.csv?passive=true
  * ftp://vfs:apache@vfs.netfirms.com/somepath/somefile.xml?passive=true
  */
-public class VFSTransportListener extends AbstractPollingTransportListener {
+public class VFSTransportListener extends AbstractPollingTransportListener 
+    implements ManagementSupport {
 
     public static final String TRANSPORT_NAME = "vfs";
 
@@ -201,9 +203,11 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                         try {
                             processFile(entry, fileObject);
                             entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+                            metrics.incrementMessagesReceived();
                             
                         } catch (AxisFault e) {
                             entry.setLastPollState(PollTableEntry.FAILED);
+                            metrics.incrementFaultsReceiving();
                         }
 
                         moveOrDeleteAfterProcessing(entry, fileObject);
@@ -230,12 +234,14 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                                 successCount++;
                                 // tell moveOrDeleteAfterProcessing() file was success
                                 entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+                                metrics.incrementMessagesReceived();
 
                             } catch (Exception e) {
                                 logException("Error processing File URI : " + children[i].getName(), e);
                                 failCount++;
                                 // tell moveOrDeleteAfterProcessing() file failed
                                 entry.setLastPollState(PollTableEntry.FAILED);
+                                metrics.incrementFaultsReceiving();
                              }
 
                             moveOrDeleteAfterProcessing(entry, children[i]);
@@ -346,6 +352,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
             FileContent content = file.getContent();
             String fileName = file.getName().getBaseName();
             String filePath = file.getName().getPath();
+
+            metrics.incrementBytesReceived(content.getSize());
 
             Map transportHeaders = new HashMap();
             transportHeaders.put(VFSConstants.FILE_PATH, filePath);

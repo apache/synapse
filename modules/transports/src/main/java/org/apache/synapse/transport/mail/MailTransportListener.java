@@ -30,11 +30,13 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.base.AbstractPollingTransportListener;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.ManagementSupport;
 
 import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeBodyPart;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +51,8 @@ import java.util.*;
  * (e.g. with imap). When checking for new mail, the transport ignores messages already flaged as
  * SEEN and DELETED
  */
-public class MailTransportListener extends AbstractPollingTransportListener {
+public class MailTransportListener extends AbstractPollingTransportListener
+    implements ManagementSupport {
 
     public static final String DELETE = "DELETE";
     public static final String MOVE = "MOVE";
@@ -192,8 +195,10 @@ public class MailTransportListener extends AbstractPollingTransportListener {
                             try {
                                 processMail(messages[i], entry);
                                 entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+                                metrics.incrementMessagesReceived();
                             } catch (Exception e) {
                                 entry.setLastPollState(PollTableEntry.FAILED);
+                                metrics.incrementFaultsReceiving();
                             }
 
                             moveOrDeleteAfterProcessing(entry, store, folder, messages[i]);
@@ -236,6 +241,25 @@ public class MailTransportListener extends AbstractPollingTransportListener {
      */
     private void processMail(Message message, PollTableEntry entry)
         throws MessagingException, IOException {
+
+        if (message instanceof MimeMessage) {
+            MimeMessage mimeMessage = (MimeMessage) message;
+            if (mimeMessage.getContent() instanceof Multipart) {
+                Multipart mp = (Multipart) mimeMessage.getContent();
+                for (int i=0; i<mp.getCount(); i++) {
+                    MimeBodyPart mbp = (MimeBodyPart) mp.getBodyPart(i);
+                    int size = mbp.getSize();
+                    if (size != -1) {
+                        metrics.incrementBytesReceived(size);
+                    }
+                }
+            } else {
+                int size = mimeMessage.getSize();
+                if (size != -1) {
+                    metrics.incrementBytesReceived(size);
+                }
+            }
+        }
 
         // populate transport headers using the mail headers
         Map trpHeaders = new HashMap();

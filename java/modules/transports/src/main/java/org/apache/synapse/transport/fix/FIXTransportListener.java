@@ -25,6 +25,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.base.AbstractTransportListener;
+import org.apache.synapse.transport.base.ManagementSupport;
 
 /**
  * The FIX transport listener implementation. A FIX Transport Listner will hold

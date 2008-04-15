@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
@@ -37,6 +38,7 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.util.TargetResolver;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import javax.xml.namespace.QName;
 
@@ -123,8 +125,8 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 			outMsgCtx.setTransportOut(transportOut);
 
 			if (options.getTransportIn() == null && outMsgCtx.getTransportIn() == null) {
-				outMsgCtx.setTransportIn(
-                    ClientUtils.inferInTransport(cfgCtx.getAxisConfiguration(), options, outMsgCtx));
+				outMsgCtx.setTransportIn(ClientUtils.inferInTransport(
+                        cfgCtx.getAxisConfiguration(), options, outMsgCtx));
 			} else if (outMsgCtx.getTransportIn() == null) {
 				outMsgCtx.setTransportIn(options.getTransportIn());
 			}
@@ -134,41 +136,36 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 
             if (options.isUseSeparateListener()) {
 
-                /* TODO - review and finalise this - asankha 22 feb 2007
-				// options.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 				options.setTransportIn(outMsgCtx.getConfigurationContext()
-						.getAxisConfiguration().getTransportIn(
-								new QName(Constants.TRANSPORT_HTTP)));
+						.getAxisConfiguration().getTransportIn(Constants.TRANSPORT_HTTP));
 
-				SynapseCallbackReceiver callbackReceiver = (SynapseCallbackReceiver) axisOp
-						.getMessageReceiver();
-				callbackReceiver.addCallback(outMsgCtx.getMessageID(), callback);
-				EndpointReference replyToFromTransport = outMsgCtx
-						.getConfigurationContext().getListenerManager()
-						.getEPRforService(sc.getAxisService().getKey(),
-								axisOp.getKey().getLocalPart(),
-								outMsgCtx.getTransportOut().getKey().getLocalPart());
+				SynapseCallbackReceiver callbackReceiver =
+                        (SynapseCallbackReceiver) axisOp.getMessageReceiver();
+                
+                ((Axis2MessageContext)((AsyncCallback)
+                        axisCallback).getSynapseOutMsgCtx()).getAxis2MessageContext().setProperty(
+                        NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
+                callbackReceiver.addCallback(outMsgCtx.getMessageID(), axisCallback);
+                
+                EndpointReference replyToFromTransport = outMsgCtx.getConfigurationContext()
+                        .getListenerManager().getEPRforService(sc.getAxisService().getName(),
+                        axisOp.getName().getLocalPart(), outMsgCtx.getTransportOut().getName());
 
 				if (outMsgCtx.getReplyTo() == null) {
 					outMsgCtx.setReplyTo(replyToFromTransport);
 				} else {
-					outMsgCtx.getReplyTo().setAddress(
-							replyToFromTransport.getAddress());
+					outMsgCtx.getReplyTo().setAddress(replyToFromTransport.getAddress());
 				}
-				// if dont do this , this guy will wait till its gets HTTP 202
-				// in the case
-				// HTTP
-				outMsgCtx.addFeature(MessageContext.TRANSPORT_NON_BLOCKING,
-						Boolean.TRUE);
-				AxisEngine engine = new AxisEngine(cfgCtx);
+
+                outMsgCtx.setProperty(NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
 				outMsgCtx.getConfigurationContext().registerOperationContext(
 						outMsgCtx.getMessageID(), oc);
-				engine.send(outMsgCtx);
+
+                AxisEngine.send(outMsgCtx);
 
 				// Options object reused so soapAction needs to be removed so
 				// that soapAction+wsa:Action on response don't conflict
 				options.setAction("");
-                */
 
 			} else {
 
@@ -186,7 +183,8 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             // envelope does not contain addressing headers
             MessageContext responseMessageContext = new MessageContext();
             responseMessageContext.setMessageID(msgctx.getMessageID());
-            responseMessageContext.setProperty(SynapseConstants.RELATES_TO_FOR_POX, msgctx.getMessageID());
+            responseMessageContext.setProperty(
+                    SynapseConstants.RELATES_TO_FOR_POX, msgctx.getMessageID());
             responseMessageContext.setOptions(options);
 			addMessageContext(responseMessageContext);
 
@@ -240,7 +238,8 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                             sc.setTargetEPR(responseMessageContext.getReplyTo());
                         }
                     } else {
-                        throw new AxisFault(Messages.getMessage("blockingInvocationExpectsResponse"));
+                        throw new AxisFault(
+                                Messages.getMessage("blockingInvocationExpectsResponse"));
                     }
                 }
             }

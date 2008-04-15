@@ -20,6 +20,7 @@ package org.apache.synapse.transport.base;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.AxisFault;
 
 import java.util.TimerTask;
 import java.util.Timer;
@@ -65,6 +66,14 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
                     if (log.isDebugEnabled()) {
                         log.debug("Transport " + transportName +
                                 " onPoll() trigger : already executing poll..");
+                    }
+                    return;
+                }
+
+                if (state == BaseConstants.PAUSED) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Transport " + transportName +
+                                " onPoll() trigger : Transport is currently paused..");
                     }
                     return;
                 }
@@ -124,5 +133,41 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
 
     public void setPollInterval(int pollInterval) {
         this.pollInterval = pollInterval;
+    }
+
+    // -- jmx/management methods--
+    /**
+     * Pause the listener - Stop accepting/processing new messages, but continues processing existing
+     * messages until they complete. This helps bring an instance into a maintenence mode
+     * @throws org.apache.axis2.AxisFault on error
+     */
+    public void pause() throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        state = BaseConstants.PAUSED;
+        log.info("Listener paused");
+    }
+
+    /**
+     * Resume the lister - Brings the lister into active mode back from a paused state
+     * @throws AxisFault on error
+     */
+    public void resume() throws AxisFault {
+        if (state != BaseConstants.PAUSED) return;
+        state = BaseConstants.STARTED;
+        log.info("Listener resumed");
+    }
+
+    /**
+     * Stop processing new messages, and wait the specified maximum time for in-flight
+     * requests to complete before a controlled shutdown for maintenence
+     *
+     * @param millis a number of milliseconds to wait until pending requests are allowed to complete
+     * @throws AxisFault on error
+     */
+    public void maintenenceShutdown(long millis) throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        stop();
+        state = BaseConstants.STOPPED;
+        log.info("Listener shutdown");
     }
 }

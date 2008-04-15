@@ -632,4 +632,26 @@ public class JMSConnectionFactory implements ExceptionListener {
         } // wasError
 
     }
+
+    /**
+     * Temporarily pause receiving new messages
+     */
+    public void pause() {
+        try {
+            connection.stop();
+        } catch (JMSException e) {
+            handleException("Error pausing JMS connection for factory : " + name, e);
+        }
+    }
+
+    /**
+     * Resume frm temporarily pause
+     */
+    public void resume() {
+        try {
+            connection.start();
+        } catch (JMSException e) {
+            handleException("Error resuming JMS connection for factory : " + name, e);
+        }
+    }
 }

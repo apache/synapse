@@ -330,26 +330,12 @@ public class ProxyService {
                             }
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
-                        proxyService.setWsdlFound(true);
 
-                        if (isWSDL11) {
-
-                            // workaround to support WSDL 2.0 generation when only a WSDL 1.1
-                            // is supplied
-                            Collection endpoints = proxyService.getEndpoints().values();
-                            for (Object ep : endpoints) {
-
-                                AxisEndpoint endpoint = (AxisEndpoint) ep;
-                                Iterator children = endpoint.getBinding().getChildren();
-
-                                while (children.hasNext()) {
-                                    AxisBindingOperation axisBindingOperation =
-                                        (AxisBindingOperation) children.next();
-                                    axisBindingOperation.setProperty(
-                                        WSDL2Constants.ATTR_WHTTP_IGNORE_UNCITED, Boolean.FALSE);
-                                }
-                            }
-                        }
+                        // this is to clear the bindinigs and ports already in the WSDL so that the
+                        // service will generate the bindings on calling the printWSDL otherwise
+                        // the WSDL which will be shown is same as the original WSDL except for the
+                        // service name
+                        proxyService.getEndpoints().clear();
 
                     } else {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");

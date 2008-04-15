@@ -37,6 +37,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axiom.om.OMElement;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.util.*;
 
 public abstract class AbstractTransportListener implements TransportListener {
@@ -55,8 +57,8 @@ public abstract class AbstractTransportListener implements TransportListener {
     private TransportInDescription  transportIn  = null;
     /** transport out description */
     private TransportOutDescription transportOut = null;
-    /** is this transport started? */
-    protected boolean started = false;
+    /** state of the listener */
+    protected int state = BaseConstants.STOPPED;
     /** is this transport non-blocking? */
     protected boolean isNonBlocking = false;
     /** the axis observer that gets notified of service life cycle events*/
@@ -66,6 +68,8 @@ public abstract class AbstractTransportListener implements TransportListener {
     protected WorkerPool workerPool = null;
     /** use the thread pool available in the axis2 configuration context */
     protected boolean useAxis2ThreadPool = false;
+    /** Metrics collector for this transport */
+    protected MetricsCollector metrics = new MetricsCollector();
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -104,7 +108,7 @@ public abstract class AbstractTransportListener implements TransportListener {
 
     public void destroy() {
         try {
-            if (started) {
+            if (state == BaseConstants.STARTED) {
                 try {
                     stop();
                 } catch (AxisFault ignore) {
@@ -112,21 +116,21 @@ public abstract class AbstractTransportListener implements TransportListener {
                 }
             }
         } finally {
-            started = false;
+            state = BaseConstants.STOPPED;
         }
     }
 
     public void stop() throws AxisFault {
-        if (started) {
-            started = false;
+        if (state == BaseConstants.STARTED) {
+            state = BaseConstants.STOPPED;
             // cancel receipt of service lifecycle events
             cfgCtx.getAxisConfiguration().getObserversList().remove(axisObserver);
         }
     }
 
     public void start() throws AxisFault {
-        if (!started) {
-            started = true;
+        if (state != BaseConstants.STARTED) {
+            state = BaseConstants.STARTED;
             // register to receive updates on services for lifetime management
             cfgCtx.getAxisConfiguration().addObservers(axisObserver);
         }
@@ -284,4 +288,97 @@ public abstract class AbstractTransportListener implements TransportListener {
         public void serviceGroupUpdate(AxisEvent event, AxisServiceGroup serviceGroup) {}
     }
 
+    // -- jmx/management methods--
+    /**
+     * Pause the listener - Stop accepting/processing new messages, but continues processing existing
+     * messages until they complete. This helps bring an instance into a maintenence mode
+     * @throws AxisFault on error
+     */
+    public void pause() throws AxisFault {}
+    /**
+     * Resume the lister - Brings the lister into active mode back from a paused state
+     * @throws AxisFault on error
+     */
+    public void resume() throws AxisFault {}
+    
+    /**
+     * Stop processing new messages, and wait the specified maximum time for in-flight
+     * requests to complete before a controlled shutdown for maintenence
+     *
+     * @param millis a number of milliseconds to wait until pending requests are allowed to complete
+     * @throws AxisFault on error
+     */
+    public void maintenenceShutdown(long millis) throws AxisFault {}
+
+    /**
+     * Returns the number of active threads processing messages
+     * @return number of active threads processing messages
+     */
+    public int getActiveThreadCount() {
+        return workerPool.getActiveCount();
+    }
+
+    public long getMessagesReceived() {
+        if (metrics != null) {
+            return metrics.getMessagesReceived();
+        }
+        return -1;
+    }
+
+    public long getFaultsReceiving() {
+        if (metrics != null) {
+            return metrics.getFaultsReceiving();
+        }
+        return -1;
+    }
+
+    public long getBytesReceived() {
+        if (metrics != null) {
+            return metrics.getBytesReceived();
+        }
+        return -1;
+    }
+
+    public long getMessagesSent() {
+        if (metrics != null) {
+            return metrics.getMessagesSent();
+        }
+        return -1;
+    }
+
+    public long getFaultsSending() {
+        if (metrics != null) {
+            return metrics.getFaultsSending();
+        }
+        return -1;
+    }
+
+    public long getBytesSent() {
+        if (metrics != null) {
+            return metrics.getBytesSent();
+        }
+        return -1;
+    }
+
+    /**
+     * Utility method to allow transports to register MBeans
+     * @param mbs the MBeanServer
+     * @param mbeanInstance bean instance
+     * @param objectName name
+     */
+    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
+        try {
+            ObjectName name = new ObjectName(objectName);
+            Set set = mbs.queryNames(name, null);
+            if (set != null && set.isEmpty()) {
+                mbs.registerMBean(mbeanInstance, name);
+            } else {
+                mbs.unregisterMBean(name);
+                mbs.registerMBean(mbeanInstance, name);
+            }
+        } catch (Exception e) {
+            log.warn("Error registering a MBean with objectname ' " + objectName +
+                " ' for JMX management", e);
+        }
+    }
 }

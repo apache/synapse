@@ -23,7 +23,10 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.Options;
@@ -265,6 +268,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             response.setReplyTo(axisOutMsgCtx.getReplyTo());
             response.setFaultTo(axisOutMsgCtx.getFaultTo());
+
+            if (axisOutMsgCtx.isPropertyTrue(NhttpConstants.IGNORE_SC_ACCEPTED)) {
+                response.setProperty(NhttpConstants.FORCE_SC_ACCEPTED, Constants.VALUE_TRUE);
+            }
 
             // create the synapse message context for the response
             Axis2MessageContext synapseInMessageContext =

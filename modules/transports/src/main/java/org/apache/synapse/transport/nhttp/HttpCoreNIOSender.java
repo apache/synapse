@@ -40,6 +40,7 @@ import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
@@ -243,6 +244,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         // remove unwanted HTTP headers (if any from the current message)
         removeUnwantedHeaders(msgContext);
 
+        if (AddressingHelper.isReplyRedirected(msgContext)
+                && !msgContext.getReplyTo().hasNoneAddress()) {
+
+            msgContext.setProperty(NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
+        }
+
         EndpointReference epr = NhttpUtils.getDestinationEPR(msgContext);
         if (epr != null) {
             if (!AddressingConstants.Final.WSA_NONE_URI.equals(epr.getAddress())) {
@@ -251,6 +258,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 handleException("Cannot send message to " + AddressingConstants.Final.WSA_NONE_URI);
             }
         } else {
+
             if (msgContext.getProperty(Constants.OUT_TRANSPORT_INFO) != null) {
                 if (msgContext.getProperty(Constants.OUT_TRANSPORT_INFO) instanceof ServerWorker) {
                     sendAsyncResponse(msgContext);

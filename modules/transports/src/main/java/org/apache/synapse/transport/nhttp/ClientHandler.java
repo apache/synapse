@@ -406,7 +406,8 @@ public class ClientHandler implements NHttpClientHandler {
                     try {
                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
-                        if (responseMsgCtx == null) {
+                        if (responseMsgCtx == null
+                                || outMsgCtx.getOperationContext().isComplete()) {
                             // to support Sandesha.. however, this means that we received a
                             // 202 accepted for an out-only , for which we do not need a
                             // dummy message anyway

@@ -196,7 +196,7 @@ public class ServerWorker implements Runnable {
             handleException("Unsupported method : " + method, null);
         }
 
-        // here the RequestResponseTransport place an important role when it comes to
+        // here the RequestResponseTransport plays an important role when it comes to
         // dual channel invocation. This is becasue we need to ACK to the request once the request
         // is received to synapse. Otherwise we will not be able to support the single channel
         // invocation within the actual service and synapse for a dual channel request from the
@@ -207,7 +207,8 @@ public class ServerWorker implements Runnable {
                         msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN)))
                         || (((RequestResponseTransport) msgContext.getProperty(
                         RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
-                        == RequestResponseTransport.RequestResponseTransportStatus.ACKED))) {
+                        == RequestResponseTransport.RequestResponseTransportStatus.ACKED)
+                        || msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED))) {
 
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
             serverHandler.commitResponse(conn, response);

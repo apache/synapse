@@ -296,6 +296,14 @@
               <a href="#Sample256">Sample 256: Proxy services with the mail
               transport</a>
             </li>
+	    <li>
+              <a href="#Sample257">Sample 257: Proxy services with the FIX
+              transport</a>
+            </li>
+	    <li>
+              <a href="#Sample258">Sample 258: Switching from HTTP to FIX
+              </a>
+            </li>
           </ul>
         </li>
         <li>
@@ -3417,6 +3425,142 @@ Transfer-Encoding: chunked
       After a few seconds (e.g. 30s), you should receive a POX response in your
       email account with the stock quote reply.
     </p>
+
+    <h2>
+      <a name="Sample257" id="Sample257">Sample 257: Proxy services with the
+      FIX transport </a>
+    </h2>
+<pre xml:space="preserve">&lt;!-- Using the FIX transport --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="FIXProxy" transports="fix"&gt;
+
+        &lt;parameter name="transport.fix.AcceptorConfigURL"&gt;file:/home/synapse_user/fix-config/fix-synapse.cfg&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:/home/synapse_user/fix-config/synapse-sender,cfg&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.AcceptorMessageStore"&gt;file&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;
+
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/&gt;
+            &lt;/endpoint&gt;
+	    &lt;inSequence&gt;
+		&lt;log level="full"/&gt;
+	    &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;log level="full"/&gt;
+		&lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt; </pre>
+    <p>
+      <strong>Objective: Using the FIX (Financial Information eXchange) transport with Proxy services</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong><br/> 
+       You will need the two sample FIX applications that come with Quickfix/J
+       (Banzai and Executor). Configure the two applications to establish
+       sessions with Synapse. See <a href="Synapse_Samples_Setup.xml#fixsamplesconfig">
+       Configuring Sample FIX Applications</a>
+    </p>
+    <p>
+      Start Banzai and Executor
+    </p>
+    <p>
+      Enable FIX transport in the Synapse axis2.xml. See <a
+      href="Synapse_Samples_Setup.xml#fixtransport">Setting up FIX transport
+      </a>
+    </p>
+    <p>
+      Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.xml#fixsamples">
+      Configuring Synapse for FIX Samples</a>
+    </p>
+    <p>
+      Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_257.xml file 
+      and make sure that transport.fix.AcceptorConfigURL property points to the
+      fix-synapse.cfg file you created. Also make sure that transport.fix.
+      InitiatorConfigURL property points to the synapse-sender.cfg file you
+      created. Once done you can start the Synapse configuration numbered 257:
+      i.e. synapse -sample 257. Note that Synapse creates a new FIX session with
+      Banzai at this point.
+    </p>
+    <p>
+      Send an order request from Banzai to Synapse.
+    </p>
+    <p>
+      Synapse will create a session with Executor and forward the order request. The
+      responses coming from the Executor will be sent back to Banzai. It will take a
+      couple of seconds for the responses to arrive for the first request since Synapse
+      has to establish a session with the Executor. But all the subsequent messages
+      will pass through almost instantaneously.
+    </p>
+    <h2>
+      <a name="Sample258" id="Sample258">Sample 258: Switching from HTTP to FIX </a>
+    </h2>
+<pre xml:space="preserve">
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="FIXProxy"&gt;
+
+        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:/home/synapse_user/fix-config/synapse-sender,cfg&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.SendAllToInSequence"&gt;false&lt;/parameter&gt;
+
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/&gt;
+            &lt;/endpoint&gt;
+	    &lt;inSequence&gt;
+	    	&lt;property name="transport.fix.ServiceName" value="FIXProxy" scope="axis2-client"/&gt;
+			&lt;log level="full"/&gt;
+	    &lt;/inSequence&gt;
+        &lt;outSequence&gt;
+            &lt;log level="full"/&gt;
+			&lt;send/&gt;
+        &lt;/outSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt; </pre>
+    <p>
+      <strong>Objective: Demonstrate switching from HTTP to FIX</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong><br/> 
+       You will need the Executor sample application that comes with Quickfix/J.
+       Configure Executor to establish a session with Synapse. See <a href=
+       "Synapse_Samples_Setup.xml#fixsamplesconfig">Configuring Sample FIX 
+       Applications</a>
+    </p>
+    <p>
+      Start Executor.
+    </p>
+    <p>
+      Enable FIX transport sender in the Synapse axis2.xml. See <a
+      href="Synapse_Samples_Setup.xml#fixtransport">Setting up FIX transport
+      </a>
+    </p>
+    <p>
+      Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.xml#fixsamples">
+      Configuring Synapse for FIX Samples</a>. There is no need to create the fix-synapse.cfg
+      file for this sample. Having only the synapse-sender.cfg file is sufficient.
+    </p>
+    <p>
+      Go to the SYNAPSE_HOME/repository/conf/sample/synapse_sample_258.xml 
+      file and make sure that transport.fix.InitiatorConfigURL property
+      points to the synapse-sender.cfg file you created. Once done you can
+      start the Synapse configuration numbered 258: i.e. synapse -sample 258
+    </p>
+    <p>
+      Invoke the FIX Client as follows. This command sends a FIX message
+      embedded in a SOAP message over HTTP.
+      <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8080/soap/FIXProxy</pre>
+    </p>
+    <p>
+      Synapse will create a session with Executor and forward the order request. The
+      first response coming from the Executor will be sent back over HTTP. Executor 
+      generally sends two responses for each incoming order request. But since the
+      response has to be forwarded over HTTP only one can be sent back to the client. 
+    </p>
+
     <h1>
       <a name="Task" id="Task">Introduction to synapse tasks</a>
     </h1>

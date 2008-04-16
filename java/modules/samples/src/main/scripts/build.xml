@@ -61,6 +61,12 @@
         ant optimizeclient [-Dopt_mode=mtom | swa]
             [-Dopt_url=http://localhost:8080/soap/MTOMSwASampleService]
             [-Dopt_file=./../../repository/conf/sample/resources/mtom/asf-logo.gif]
+
+    ant fixclient
+        A client which could post a FIX message (of type Order-Single) embedded into a SOAP message.
+
+	example:
+        ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8080/soap/FIXProxy
     </echo>
     </target>
 
@@ -83,6 +89,7 @@
     <property name="opt_url" value=""/>
     <property name="opt_file" value=""/>
     <property name="class.dir" value="target/classes"/>
+    <property name="qty" value=""/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
@@ -133,6 +140,22 @@
             <sysproperty key="jms_type"    value="${jms_type}"/>
             <sysproperty key="jms_payload" value="${jms_payload}"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+        </java>
+    </target>
+
+    <target name="fixclient" depends="compile">
+        <java classname="samples.userguide.FIXClient"
+             classpathref="javac.classpath" fork="true">
+
+            <sysproperty key="symbol" value="${symbol}"/>
+            <sysproperty key="mode"   value="${mode}"/>
+            <sysproperty key="addurl" value="${addurl}"/>
+            <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="qty"    value="${qty}"/>
+            <sysproperty key="repository" value="${repository}"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+
         </java>
     </target>
 

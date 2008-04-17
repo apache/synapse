@@ -31,6 +31,7 @@ import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import javax.activation.DataHandler;
 import java.io.BufferedOutputStream;
@@ -45,7 +46,7 @@ import java.util.Iterator;
  * axis2/synapse and this formats the HessianDataSource to a hessian message
  *
  * @see org.apache.axis2.transport.MessageFormatter
- * @see org.apache.synapse.format.hessian.HessianDataSource
+ * @see org.apache.synapse.util.SynapseBinaryDataSource
  */
 public class HessianMessageFormatter implements MessageFormatter {
 
@@ -139,7 +140,7 @@ public class HessianMessageFormatter implements MessageFormatter {
 
                     OMText tempNode = (OMText) hessianElement;
                     if (tempNode.getDataHandler() != null && ((DataHandler) tempNode
-                            .getDataHandler()).getDataSource() instanceof HessianDataSource) {
+                            .getDataHandler()).getDataSource() instanceof SynapseBinaryDataSource) {
 
                         hessianOMText = tempNode;
                     }
@@ -150,10 +151,10 @@ public class HessianMessageFormatter implements MessageFormatter {
 
                 try {
 
-                    HessianDataSource hessianDataSource = (HessianDataSource) (
+                    SynapseBinaryDataSource synapseBinaryDataSource = (SynapseBinaryDataSource) (
                             (DataHandler) hessianOMText.getDataHandler()).getDataSource();
 
-                    InputStream inputStream = hessianDataSource.getInputStream();
+                    InputStream inputStream = synapseBinaryDataSource.getInputStream();
                     BufferedOutputStream outputStream = new BufferedOutputStream(out);
 
                     byte[] buffer = new byte[1024];

@@ -19,23 +19,21 @@
 
 package org.apache.synapse.config;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.SynapseBinaryDataSource;
 import org.xml.sax.InputSource;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.activation.DataHandler;
+import java.io.*;
 import java.net.*;
 
 public class SynapseConfigUtils {
@@ -53,17 +51,27 @@ public class SynapseConfigUtils {
         if (o == null) {
             handleException("Cannot convert null to a StreamSource");
 
-        } else if (o instanceof OMNode) {
-            OMNode omNode = (OMNode) o;
+        } else if (o instanceof OMElement) {
+            OMElement omElement = (OMElement) o;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
-                omNode.serialize(baos);
+                omElement.serialize(baos);
                 return new StreamSource(new ByteArrayInputStream(baos.toByteArray()));
             } catch (XMLStreamException e) {
                 handleException("Error converting to a StreamSource", e);
             }
 
+        } else if (o instanceof OMText) {
+            DataHandler dataHandler = (DataHandler) ((OMText) o).getDataHandler();
+            if (dataHandler != null) {
+                try {
+                    return new StreamSource(dataHandler.getInputStream());
+                } catch (IOException e) {
+                    handleException("Error in reading content as a stream ");
+                }
+            }
         } else {
+
             handleException("Cannot convert object to a StreamSource");
         }
         return null;
@@ -84,6 +92,15 @@ public class SynapseConfigUtils {
                 handleException("Error converting to a StreamSource", e);
             }
 
+        } else if (o instanceof OMText) {
+            DataHandler dataHandler = (DataHandler) ((OMText) o).getDataHandler();
+            if (dataHandler != null) {
+                try {
+                    return dataHandler.getInputStream();
+                } catch (IOException e) {
+                    handleException("Error in reading content as a stream ");
+                }
+            }
         } else if (o instanceof URI) {
             try {
                 return ((URI) (o)).toURL().openStream();
@@ -115,13 +132,13 @@ public class SynapseConfigUtils {
                     String path = url.getPath();
                     if (log.isDebugEnabled()) {
                         log.debug("Can not open a connection to the URL with a path :" +
-                            path);
+                                path);
                     }
                     String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
-                                " URL using the synapse.home : " + synapseHome);
+                                    " URL using the synapse.home : " + synapseHome);
                         }
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
@@ -132,7 +149,7 @@ public class SynapseConfigUtils {
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Faild to resolve an absolute path of the " +
-                                    " URL using the synapse.home : " + synapseHome);
+                                        " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL " + url.getPath() + e);
                         }
@@ -144,11 +161,11 @@ public class SynapseConfigUtils {
             }
             URLConnection urlc = url.openConnection();
             XMLToObjectMapper xmlToObject =
-                getXmlToObjectMapper(urlc.getContentType());
-
+                    getXmlToObjectMapper(urlc.getContentType());
+            InputStream inputStream = urlc.getInputStream();
             try {
                 XMLStreamReader parser = XMLInputFactory.newInstance().
-                    createXMLStreamReader(urlc.getInputStream());
+                        createXMLStreamReader(inputStream);
                 StAXOMBuilder builder = new StAXOMBuilder(parser);
                 OMElement omElem = builder.getDocumentElement();
 
@@ -164,7 +181,12 @@ public class SynapseConfigUtils {
 
             } catch (XMLStreamException e) {
                 log.warn("Content at URL : " + url + " is non XML..");
-                return urlc.getContent();
+                return readNonXML(url);
+            } catch (OMException e) {
+                log.warn("Content at URL : " + url + " is non XML..");
+                return readNonXML(url);
+            } finally {
+                inputStream.close();
             }
 
         } catch (IOException e) {
@@ -174,13 +196,40 @@ public class SynapseConfigUtils {
     }
 
     /**
+     * Helper method to handle non-XMl resources
+     *
+     * @param url The resource url
+     * @return The content as an OMNode
+     */
+    public static OMNode readNonXML(URL url) {
+
+        try {
+            // Open a new connection
+            URLConnection newConnection = url.openConnection();
+
+            BufferedInputStream newInputStream = new BufferedInputStream(
+                    newConnection.getInputStream());
+
+            OMFactory omFactory = OMAbstractFactory.getOMFactory();
+            return omFactory.createOMText(
+                    new DataHandler(new SynapseBinaryDataSource(newInputStream,
+                            newConnection.getContentType())), true);
+
+        } catch (IOException e) {
+            return null;
+        }
+
+    }
+
+    /**
      * Return an OMElement from a URL source
      *
      * @param urlStr a URL string
      * @return an OMElement of the resource
      * @throws IOException for invalid URL's or IO errors
      */
-    public static OMElement getOMElementFromURL(String urlStr) throws IOException {
+    public static OMNode getOMElementFromURL(String urlStr) throws IOException {
+
         URL url = getURLFromPath(urlStr);
         if (url == null) {
             return null;
@@ -189,22 +238,24 @@ public class SynapseConfigUtils {
         conn.setReadTimeout(getReadTimeout());
         conn.setConnectTimeout(getConnectionTimeout());
         conn.setRequestProperty("Connection", "close"); // if http is being used
-        InputStream urlInStream = conn.getInputStream();
-
-        if (urlInStream != null) {
+        BufferedInputStream urlInStream = new BufferedInputStream(
+                conn.getInputStream());
+        try {
+            StAXOMBuilder builder = new StAXOMBuilder(urlInStream);
+            OMElement doc = builder.getDocumentElement();
+            doc.build();
+            return doc;
+        } catch (Exception e) {
+            log.warn("Error parsing resource at URL : " + url +
+                    " as XML");
+            Object content = readNonXML(url);
+            if (content instanceof OMNode) {
+                return (OMNode) content;
+            }
+        } finally {
             try {
-                StAXOMBuilder builder = new StAXOMBuilder(urlInStream);
-                OMElement doc = builder.getDocumentElement();
-                doc.build();
-                return doc;
-            } catch (Exception e) {
-                handleException("Error parsing resource at URL : " + url +
-                    " as XML", e);
-            } finally {
-                try {
-                    urlInStream.close();
-                } catch (IOException ignore) {
-                }
+                urlInStream.close();
+            } catch (IOException ignore) {
             }
         }
         return null;
@@ -228,7 +279,8 @@ public class SynapseConfigUtils {
             conn.setReadTimeout(getReadTimeout());
             conn.setConnectTimeout(getConnectionTimeout());
             conn.setRequestProperty("Connection", "close"); // if http is being used
-            InputStream urlInStream = conn.getInputStream();
+            BufferedInputStream urlInStream = new BufferedInputStream(
+                    conn.getInputStream());
             return new InputSource(urlInStream);
         } catch (MalformedURLException e) {
             handleException("Invalid URL ' " + uri + " '", e);
@@ -309,7 +361,7 @@ public class SynapseConfigUtils {
                 } catch (IOException ignored) {
                     if (log.isDebugEnabled()) {
                         log.debug("Can not open a connection to the URL with a path :" +
-                            path);
+                                path);
                     }
                     String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
@@ -318,18 +370,18 @@ public class SynapseConfigUtils {
                         }
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
-                                " URL using the synapse.home : " + synapseHome);
+                                    " URL using the synapse.home : " + synapseHome);
                         }
                         try {
                             url = new URL(url.getProtocol() + ":" + synapseHome + "/" +
-                                url.getPath());
+                                    url.getPath());
                             url.openStream();
                         } catch (MalformedURLException e) {
                             handleException("Invalid URL reference " + url.getPath() + e);
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Faild to resolve an absolute path of the " +
-                                    " URL using the synapse.home : " + synapseHome);
+                                        " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL : " + url.getPath() + e);
                         }

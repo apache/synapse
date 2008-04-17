@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.format.hessian;
+package org.apache.synapse.util;
 
 import org.apache.synapse.util.TemporaryData;
 
@@ -29,7 +29,7 @@ import java.io.*;
  *
  * @see javax.activation.DataSource
  */
-public class HessianDataSource implements DataSource {
+public class SynapseBinaryDataSource implements DataSource {
 
     /** Content type of the DataSource */
     private String contentType;
@@ -42,41 +42,40 @@ public class HessianDataSource implements DataSource {
      * data is stored in a byte[] or in a temp file format inorder to be able to get the stream any
      * number of time, otherwise the stream can only be read once
      *
-	 * @param contentType message content type
-	 * @param inputstream contains the Hessian message for later retrieval
-	 * @throws IOException failure in reading from the InputStream
-	 */
-	public HessianDataSource(String contentType, InputStream inputstream) throws IOException {
+     * @param inputstream contains the Hessian message for later retrieval
+     * @param contentType message content type
+     * @throws IOException failure in reading from the InputStream
+     */
+    public SynapseBinaryDataSource(InputStream inputstream, String contentType) throws IOException {
 
-		this.contentType = contentType;
+        this.contentType = contentType;
         this.data = new TemporaryData(4, 1024, "tmp_", ".dat");
 
         OutputStream out = this.data.getOutputStream();
         byte[] buffer = new byte[1024];
         int c;
-        while ((c=inputstream.read(buffer)) != -1) {
+        while ((c = inputstream.read(buffer)) != -1) {
             out.write(buffer, 0, c);
         }
         out.flush();
         out.close();
         inputstream.close();
-	}
+    }
 
-	public String getContentType() {
-		return contentType;
-	}
+    public String getContentType() {
+        return contentType;
+    }
 
-	public InputStream getInputStream() throws IOException {
-		return data.getInputStream();
-	}
+    public InputStream getInputStream() throws IOException {
+        return data.getInputStream();
+    }
 
-	public String getName() {
-		return HessianConstants.HESSIAN_DATA_SOURCE_NAME;
-	}
+    public String getName() {
+        return this.getClass().getName();
+    }
 
-	public OutputStream getOutputStream() throws IOException {
-		throw new UnsupportedOperationException("OutputStream can " +
-                "not be retrieved from a HessianDataSource");
-	}
+    public OutputStream getOutputStream() throws IOException {
+        return data.getOutputStream();
+    }
 
 }

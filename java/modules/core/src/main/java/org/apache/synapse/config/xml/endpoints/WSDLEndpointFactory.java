@@ -132,17 +132,18 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
                 try {
-                    OMElement wsdlOM = SynapseConfigUtils.getOMElementFromURL(
-                        new URL(wsdlURI).toString());
-                    if (wsdlOM != null) {
-                        OMNamespace ns = wsdlOM.getNamespace();
+                    OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(
+                            new URL(wsdlURI).toString());
+                    if (wsdlOM != null && wsdlOM instanceof OMElement) {
+                        OMElement omElement = (OMElement) wsdlOM;
+                        OMNamespace ns = omElement.getNamespace();
                         if (ns != null) {
-                            String nsUri = wsdlOM.getNamespace().getNamespaceURI();
+                            String nsUri = omElement.getNamespace().getNamespaceURI();
                             if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
 
                                 endpoint = new WSDL11EndpointBuilder().
                                         createEndpointDefinitionFromWSDL(
-                                                wsdlURI.trim(),wsdlOM, serviceName, portName);
+                                                wsdlURI.trim(), omElement, serviceName, portName);
 
                             } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
                                 //endpoint = new WSDL20EndpointBuilder().
@@ -154,7 +155,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     }
                 } catch (Exception e) {
                     handleException("Couldn't create endpoint from the given WSDL URI : "
-                        + e.getMessage(), e);
+                            + e.getMessage(), e);
                 }
             }
 

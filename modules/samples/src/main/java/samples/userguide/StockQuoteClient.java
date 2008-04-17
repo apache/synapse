@@ -143,6 +143,8 @@ public class StockQuoteClient {
             payload = StockQuoteHandler.createMarketActivityRequest();
             options.setAction("urn:getMarketActivity");
         } else if ("quote".equals(mode) || "dualquote".equals(mode)) {
+            serviceClient.engageModule("addressing");
+            options.setUseSeparateListener(true);
             payload = StockQuoteHandler.createStandardQuoteRequest(
                     symbol, Integer.parseInt(itr));
             options.setAction("urn:getQuote");

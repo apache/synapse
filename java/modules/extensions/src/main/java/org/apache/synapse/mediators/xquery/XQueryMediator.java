@@ -22,6 +22,7 @@ import net.sf.saxon.javax.xml.xquery.*;
 import net.sf.saxon.xqj.SaxonXQDataSource;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.util.ElementHelper;
@@ -42,7 +43,10 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import javax.activation.DataHandler;
 import java.io.StringReader;
+import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +86,7 @@ public class XQueryMediator extends AbstractMediator {
 //    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
 //                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
-        "s12:Body/child::*[position()=1]";
+            "s12:Body/child::*[position()=1]";
 
     /**
      * The (optional) XPath expression which yeilds the target element to attached the result
@@ -162,7 +166,7 @@ public class XQueryMediator extends AbstractMediator {
             return true;
 
         } catch (Exception e) {
-            handleException("Unable to execute the query " + querySource, e);
+            handleException("Unable to execute the query ", e);
         }
         return false;
     }
@@ -211,7 +215,7 @@ public class XQueryMediator extends AbstractMediator {
 
                 //creating connection
                 if (cachedConnection == null
-                    || (cachedConnection != null && cachedConnection.isClosed())) {
+                        || (cachedConnection != null && cachedConnection.isClosed())) {
                     //get the Connection to XML DataBase
                     if (traceOrDebugOn) {
                         traceOrDebug(traceOn, "Creating a connection from the XQDataSource ");
@@ -220,36 +224,87 @@ public class XQueryMediator extends AbstractMediator {
                 }
 
                 // prepare the expression to execute query
-                if (reLoad || querySource == null || cachedPreparedExpression == null
-                    || (cachedPreparedExpression != null && cachedPreparedExpression.isClosed())) {
+                if (reLoad || cachedPreparedExpression == null
+                        || (cachedPreparedExpression != null
+                        && cachedPreparedExpression.isClosed())) {
 
-                    Object o = synCtx.getEntry(queryKey);
-                    if (o instanceof OMElement) {
-                        querySource = ((OMElement) (o)).getText();
-                    } else if (o instanceof String) {
-                        querySource = (String) o;
-                    }
+                    if (querySource != null && !"".equals(querySource)) {
 
-                    if (querySource != null) {
+                        if (cachedPreparedExpression == null) {
 
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Picked up the xquery source " + querySource
-                                + "from the key " + queryKey);
-                            traceOrDebug(traceOn, "Prepare an expression for the query ");
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Using in-lined query source - " + querySource);
+                                traceOrDebug(traceOn, "Prepare an expression for the query ");
+                            }
+
+                            //create an XQPreparedExpression using the query source
+                            cachedPreparedExpression = cachedConnection.prepareExpression(querySource);
+                            // need binding because the expression just has recreated
+                            needBind = true;
                         }
-
-                        //create an XQPreparedExpression using the query source
-                        cachedPreparedExpression = cachedConnection.prepareExpression(querySource);
-                        // need binding because the expression just has recreated
-                        needBind = true;
 
                     } else {
 
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Couldn't find the xquery source with a key "
-                                + queryKey);
+                        Object o = synCtx.getEntry(queryKey);
+                        if (o == null) {
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Couldn't find the xquery source with a key "
+                                        + queryKey);
+                            }
+                            return;
                         }
-                        return;
+
+                        String sourceCode = null;
+                        InputStream inputStream = null;
+                        if (o instanceof OMElement) {
+                            sourceCode = ((OMElement) (o)).getText();
+                        } else if (o instanceof String) {
+                            sourceCode = (String) o;
+                        } else if (o instanceof OMText) {
+                            DataHandler dataHandler = (DataHandler) ((OMText) o).getDataHandler();
+                            if (dataHandler != null) {
+                                try {
+                                    inputStream = dataHandler.getInputStream();
+                                    if (inputStream == null) {
+                                        if (traceOrDebugOn) {
+                                            traceOrDebug(traceOn, "Couldn't get" +
+                                                    " the stream from the xquery source with a key "
+                                                    + queryKey);
+                                        }
+                                        return;
+                                    }
+
+                                } catch (IOException e) {
+                                    handleException("Error in reading content as a stream ");
+                                }
+                            }
+                        }
+
+                        if ((sourceCode == null || "".equals(sourceCode)) && inputStream == null) {
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Couldn't find the xquery source with a key "
+                                        + queryKey);
+                            }
+                            return;
+                        }
+
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Picked up the xquery source from the " +
+                                    "key " + queryKey);
+                            traceOrDebug(traceOn, "Prepare an expression for the query ");
+                        }
+
+                        if (sourceCode != null) {
+                            //create an XQPreparedExpression using the query source
+                            cachedPreparedExpression =
+                                    cachedConnection.prepareExpression(sourceCode);
+                        } else {
+                            //create an XQPreparedExpression using the query source stream
+                            cachedPreparedExpression =
+                                    cachedConnection.prepareExpression(inputStream);
+                        }
+                        // need binding because the expression just has recreated
+                        needBind = true;
                     }
                 }
 
@@ -307,11 +362,11 @@ public class XQueryMediator extends AbstractMediator {
 
                     //If the result is XML
                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||
-                        XQItemType.XQITEMKIND_ELEMENT == itemKind ||
-                        XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
+                            XQItemType.XQITEMKIND_ELEMENT == itemKind ||
+                            XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
                         StAXOMBuilder builder = new StAXOMBuilder(
-                            XMLInputFactory.newInstance().createXMLStreamReader(
-                                new StringReader(xqItem.getItemAsString())));
+                                XMLInputFactory.newInstance().createXMLStreamReader(
+                                        new StringReader(xqItem.getItemAsString())));
                         OMElement resultOM = builder.getDocumentElement();
                         if (resultOM != null) {
                             //replace the target node from the result
@@ -319,7 +374,7 @@ public class XQueryMediator extends AbstractMediator {
                             destination.detach();
                         }
                     } else if (XQItemType.XQBASETYPE_INTEGER == baseType ||
-                        XQItemType.XQBASETYPE_INT == baseType) {
+                            XQItemType.XQBASETYPE_INT == baseType) {
                         //replace the text value of the target node by the result ,If the result is
                         // a basic type
                         ((OMElement) destination).setText(String.valueOf(xqItem.getInt()));
@@ -346,7 +401,7 @@ public class XQueryMediator extends AbstractMediator {
             handleException("Error during the querying " + e.getMessage(), e);
         } catch (XMLStreamException e) {
             handleException("Error during retrieving  the Doument Node as  the result "
-                + e.getMessage(), e);
+                    + e.getMessage(), e);
         }
     }
 
@@ -372,12 +427,12 @@ public class XQueryMediator extends AbstractMediator {
 
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Binding a variable to the DynamicContext with a name : "
-                        + name + " and a value : " + value);
+                            + name + " and a value : " + value);
                 }
 
                 switch (type) {
                     //Binding the basic type As-Is and XML element as an InputSource
-                    case(XQItemType.XQBASETYPE_BOOLEAN): {
+                    case (XQItemType.XQBASETYPE_BOOLEAN): {
                         boolean booleanValue = false;
                         if (value instanceof String) {
                             booleanValue = Boolean.parseBoolean((String) value);
@@ -389,14 +444,14 @@ public class XQueryMediator extends AbstractMediator {
                         xqDynamicContext.bindBoolean(name, booleanValue, null);
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_INTEGER): {
+                    case (XQItemType.XQBASETYPE_INTEGER): {
                         int intValue = -1;
                         if (value instanceof String) {
                             try {
                                 intValue = Integer.parseInt((String) value);
                             } catch (NumberFormatException e) {
                                 handleException("Incompatible value '" + value + "' " +
-                                    "for the Integer", e);
+                                        "for the Integer", e);
                             }
                         } else if (value instanceof Integer) {
                             intValue = ((Integer) value).intValue();
@@ -408,7 +463,7 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_INT): {
+                    case (XQItemType.XQBASETYPE_INT): {
                         int intValue = -1;
                         if (value instanceof String) {
                             try {
@@ -426,14 +481,14 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_LONG): {
+                    case (XQItemType.XQBASETYPE_LONG): {
                         long longValue = -1;
                         if (value instanceof String) {
                             try {
                                 longValue = Long.parseLong((String) value);
                             } catch (NumberFormatException e) {
                                 handleException("Incompatible value '" + value + "' " +
-                                    "for the long ", e);
+                                        "for the long ", e);
                             }
                         } else if (value instanceof Long) {
                             longValue = ((Long) value).longValue();
@@ -445,14 +500,14 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_SHORT): {
+                    case (XQItemType.XQBASETYPE_SHORT): {
                         short shortValue = -1;
                         if (value instanceof String) {
                             try {
                                 shortValue = Short.parseShort((String) value);
                             } catch (NumberFormatException e) {
                                 handleException("Incompatible value '" + value + "' " +
-                                    "for the short ", e);
+                                        "for the short ", e);
                             }
                         } else if (value instanceof Short) {
                             shortValue = ((Short) value).shortValue();
@@ -464,14 +519,14 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_DOUBLE): {
+                    case (XQItemType.XQBASETYPE_DOUBLE): {
                         double doubleValue = -1;
                         if (value instanceof String) {
                             try {
                                 doubleValue = Double.parseDouble((String) value);
                             } catch (NumberFormatException e) {
                                 handleException("Incompatible value '" + value + "' " +
-                                    "for the double ", e);
+                                        "for the double ", e);
                             }
                         } else if (value instanceof Double) {
                             doubleValue = ((Double) value).doubleValue();
@@ -483,14 +538,14 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_FLOAT): {
+                    case (XQItemType.XQBASETYPE_FLOAT): {
                         float floatValue = -1;
                         if (value instanceof String) {
                             try {
                                 floatValue = Float.parseFloat((String) value);
                             } catch (NumberFormatException e) {
                                 handleException("Incompatible value '" + value + "' " +
-                                    "for the float ", e);
+                                        "for the float ", e);
                             }
                         } else if (value instanceof Float) {
                             floatValue = ((Float) value).floatValue();
@@ -502,14 +557,14 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_BYTE): {
+                    case (XQItemType.XQBASETYPE_BYTE): {
                         byte byteValue = -1;
                         if (value instanceof String) {
                             try {
                                 byteValue = Byte.parseByte((String) value);
                             } catch (NumberFormatException e) {
                                 handleException("Incompatible value '" + value + "' " +
-                                    "for the byte ", e);
+                                        "for the byte ", e);
                             }
                         } else if (value instanceof Byte) {
                             byteValue = ((Byte) value).byteValue();
@@ -521,7 +576,7 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQBASETYPE_STRING): {
+                    case (XQItemType.XQBASETYPE_STRING): {
                         if (value instanceof String) {
                             xqDynamicContext.bindObject(name, value, null);
                         } else {
@@ -529,60 +584,60 @@ public class XQueryMediator extends AbstractMediator {
                         }
                         break;
                     }
-                    case(XQItemType.XQITEMKIND_DOCUMENT): {
+                    case (XQItemType.XQITEMKIND_DOCUMENT): {
                         if (value instanceof OMNode) {
                             if (useDOMSource) {
                                 xqDynamicContext.
-                                    bindObject(name,
-                                        new DOMSource(((Element) ElementHelper.
-                                            importOMElement((OMElement) value,
-                                                DOOMAbstractFactory.getOMFactory())).
-                                            getOwnerDocument()), null);
+                                        bindObject(name,
+                                                new DOMSource(((Element) ElementHelper.
+                                                        importOMElement((OMElement) value,
+                                                                DOOMAbstractFactory.getOMFactory())).
+                                                        getOwnerDocument()), null);
                             } else {
                                 xqDynamicContext.bindDocument(name,
-                                    new InputSource(SynapseConfigUtils.getInputStream(
-                                        value)));
+                                        new InputSource(SynapseConfigUtils.getInputStream(
+                                                value)));
                             }
                         }
                         break;
                     }
-                    case(XQItemType.XQITEMKIND_ELEMENT): {
+                    case (XQItemType.XQITEMKIND_ELEMENT): {
                         if (value instanceof OMNode) {
                             if (useDOMSource) {
                                 xqDynamicContext.
-                                    bindObject(name,
-                                        new DOMSource(((Element) ElementHelper.
-                                            importOMElement((OMElement) value,
-                                                DOOMAbstractFactory.getOMFactory())).
-                                            getOwnerDocument()), null);
+                                        bindObject(name,
+                                                new DOMSource(((Element) ElementHelper.
+                                                        importOMElement((OMElement) value,
+                                                                DOOMAbstractFactory.getOMFactory())).
+                                                        getOwnerDocument()), null);
                             } else {
                                 xqDynamicContext.bindDocument(name,
-                                    new InputSource(
-                                        SynapseConfigUtils.getInputStream(value)));
+                                        new InputSource(
+                                                SynapseConfigUtils.getInputStream(value)));
                             }
                         }
                         break;
                     }
-                    case(XQItemType.XQITEMKIND_DOCUMENT_ELEMENT): {
+                    case (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT): {
                         if (value instanceof OMNode) {
                             if (useDOMSource) {
                                 xqDynamicContext.
-                                    bindObject(name,
-                                        new DOMSource(((Element) ElementHelper.
-                                            importOMElement((OMElement) value,
-                                                DOOMAbstractFactory.getOMFactory())).
-                                            getOwnerDocument()), null);
+                                        bindObject(name,
+                                                new DOMSource(((Element) ElementHelper.
+                                                        importOMElement((OMElement) value,
+                                                                DOOMAbstractFactory.getOMFactory())).
+                                                        getOwnerDocument()), null);
                             } else {
                                 xqDynamicContext.bindDocument(name,
-                                    new InputSource(SynapseConfigUtils.getInputStream(
-                                        value)));
+                                        new InputSource(SynapseConfigUtils.getInputStream(
+                                                value)));
                             }
                         }
                         break;
                     }
                     default: {
                         handleException("Unsupported  type for the binding type" + type +
-                            " in the variable name " + name);
+                                " in the variable name " + name);
                         break;
                     }
                 }
@@ -609,15 +664,15 @@ public class XQueryMediator extends AbstractMediator {
                     return (OMNode) nodeObject;
                 } else {
                     handleException("The evaluation of the XPath expression "
-                        + target + " must target in an OMNode");
+                            + target + " must target in an OMNode");
                 }
             } else {
                 handleException("The evaluation of the XPath expression "
-                    + target + " must target in an OMNode");
+                        + target + " must target in an OMNode");
             }
         } catch (JaxenException e) {
             handleException("Error evaluating XPath " + target +
-                " on message" + synCtx.getEnvelope());
+                    " on message" + synCtx.getEnvelope());
         }
         return null;
     }

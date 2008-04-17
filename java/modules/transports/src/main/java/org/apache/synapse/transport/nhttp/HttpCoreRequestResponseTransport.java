@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,8 +53,11 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
             log.debug("Acking one-way request");
         }
         // need to skip the ACK till we get the ACK from the actual service for the out-only MEP
-        if (AddressingHelper.isReplyRedirected(msgContext) &&
-                    !msgContext.getReplyTo().hasNoneAddress()) {
+        if ((AddressingHelper.isReplyRedirected(msgContext) &&
+                    !msgContext.getReplyTo().hasNoneAddress()) ||
+                WSDL2Constants.MEP_URI_IN_ONLY.equals(msgContext.getOperationContext()
+                        .getAxisOperation().getMessageExchangePattern())) {
+            
             status = RequestResponseTransportStatus.ACKED;
             msgContext.getOperationContext().setProperty(
                     Constants.RESPONSE_WRITTEN, Constants.VALUE_FALSE);

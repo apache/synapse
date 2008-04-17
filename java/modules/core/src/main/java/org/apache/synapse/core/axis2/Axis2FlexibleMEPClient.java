@@ -39,6 +39,7 @@ import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
@@ -211,8 +212,10 @@ public class Axis2FlexibleMEPClient {
             axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
 
-        boolean outOnlyMessage = "true".equals(
-            synapseOutMessageContext.getProperty(SynapseConstants.OUT_ONLY));
+        boolean outOnlyMessage = "true".equals(synapseOutMessageContext.getProperty(
+                SynapseConstants.OUT_ONLY)) || WSDL2Constants.MEP_URI_IN_ONLY.equals(
+                originalInMsgCtx.getOperationContext()
+                        .getAxisOperation().getMessageExchangePattern());
 
         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
         AxisOperation axisAnonymousOperation = anoymousService.getOperation(

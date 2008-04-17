@@ -180,10 +180,14 @@ public class SynapseConfigUtils {
                 }
 
             } catch (XMLStreamException e) {
-                log.warn("Content at URL : " + url + " is non XML..");
+                if (log.isDebugEnabled()) {
+                    log.debug("Content at URL : " + url + " is non XML..");
+                }
                 return readNonXML(url);
             } catch (OMException e) {
-                log.warn("Content at URL : " + url + " is non XML..");
+                if (log.isDebugEnabled()) {
+                    log.debug("Content at URL : " + url + " is non XML..");
+                }
                 return readNonXML(url);
             } finally {
                 inputStream.close();
@@ -246,8 +250,10 @@ public class SynapseConfigUtils {
             doc.build();
             return doc;
         } catch (Exception e) {
-            log.warn("Error parsing resource at URL : " + url +
-                    " as XML");
+            if (log.isDebugEnabled()) {
+                log.info("Content at URL : " + url + " is non XML..");
+            }
+
             Object content = readNonXML(url);
             if (content instanceof OMNode) {
                 return (OMNode) content;

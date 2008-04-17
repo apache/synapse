@@ -20,19 +20,21 @@
 package org.apache.synapse.mediators.bsf;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
 import org.apache.bsf.xml.XMLHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 
 import javax.script.*;
+import javax.activation.DataHandler;
 import java.util.TreeMap;
 import java.util.Map;
 import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
@@ -280,6 +282,7 @@ public class ScriptMediator extends AbstractMediator {
 
     /**
      * Prepares the mediator for the invocation of an external script
+     *
      * @throws ScriptException
      */
     protected synchronized void prepareExternalScript(MessageContext synCtx) throws ScriptException {
@@ -295,34 +298,83 @@ public class ScriptMediator extends AbstractMediator {
                 Object o = synCtx.getEntry(key);
                 if (o instanceof OMElement) {
                     scriptSourceCode = ((OMElement) (o)).getText();
+                    scriptEngine.eval(scriptSourceCode);
                 } else if (o instanceof String) {
                     scriptSourceCode = (String) o;
+                    scriptEngine.eval(scriptSourceCode);
+                } else if (o instanceof OMText) {
+
+                    DataHandler dataHandler = (DataHandler) ((OMText) o).getDataHandler();
+                    if (dataHandler != null) {
+                        BufferedReader reader = null;
+                        try {
+                            reader = new BufferedReader(
+                                    new InputStreamReader(dataHandler.getInputStream()));
+                            scriptEngine.eval(reader);
+
+                        } catch (IOException e) {
+                            handleException("Error in reading script as a stream ", e, synCtx);
+                        } finally {
+
+                            if (reader != null) {
+                                try {
+                                    reader.close();
+                                } catch (IOException e) {
+                                    handleException("Error in closing input stream ", e, synCtx);
+                                }
+                            }
+
+                        }
+                    }
                 }
 
-                scriptEngine.eval(scriptSourceCode);
             }
         }
 
         // load <include /> scripts; reload each script if needed
-    	for(Iterator iter = includes.keySet().iterator(); iter.hasNext();) {
-    		String includeKey = (String) iter.next();
-    		String includeSourceCode = (String) includes.get(includeKey);
+        for (Iterator iter = includes.keySet().iterator(); iter.hasNext();) {
+            String includeKey = (String) iter.next();
+            String includeSourceCode = (String) includes.get(includeKey);
             Entry includeEntry = synCtx.getConfiguration().getEntryDefinition(includeKey);
             boolean includeEntryNeedsReload = (entry != null) && entry.isDynamic()
-            			&& (!entry.isCached() || entry.isExpired());
+                    && (!entry.isCached() || entry.isExpired());
             synchronized (resourceLock) {
                 if (includeSourceCode == null || needsReload) {
                     Object o = synCtx.getEntry(includeKey);
                     if (o instanceof OMElement) {
-                    	includeSourceCode = ((OMElement) (o)).getText();
+                        includeSourceCode = ((OMElement) (o)).getText();
+                        scriptEngine.eval(includeSourceCode);
                     } else if (o instanceof String) {
-                    	includeSourceCode = (String) o;
+                        includeSourceCode = (String) o;
+                        scriptEngine.eval(includeSourceCode);
+                    } else if (o instanceof OMText) {
+
+                        DataHandler dataHandler = (DataHandler) ((OMText) o).getDataHandler();
+                        if (dataHandler != null) {
+                            BufferedReader reader = null;
+                            try {
+                                reader = new BufferedReader(
+                                        new InputStreamReader(dataHandler.getInputStream()));
+                                scriptEngine.eval(reader);
+
+                            } catch (IOException e) {
+                                handleException("Error in reading script as a stream ", e, synCtx);
+                            } finally {
+
+                                if (reader != null) {
+                                    try {
+                                        reader.close();
+                                    } catch (IOException e) {
+                                        handleException("Error in closing input" +
+                                                " stream ", e, synCtx);
+                                    }
+                                }
+                            }
+                        }
                     }
-                    includes.put(includeKey, includeSourceCode);
-                    scriptEngine.eval(includeSourceCode);
                 }
             }
-    	}
+        }
     }
 
     protected void initScriptEngine() {

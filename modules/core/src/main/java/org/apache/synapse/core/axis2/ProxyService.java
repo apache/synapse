@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -236,7 +237,10 @@ public class ProxyService {
         } else if (wsdlURI != null) {
             try {
                 URL url = wsdlURI.toURL();
-                wsdlElement = SynapseConfigUtils.getOMElementFromURL(url.toString());
+                OMNode node = SynapseConfigUtils.getOMElementFromURL(url.toString());
+                if (node instanceof OMElement) {
+                    wsdlElement = (OMElement) node;
+                }
             } catch (MalformedURLException e) {
                 handleException("Malformed URI for wsdl", e);
             } catch (IOException e) {

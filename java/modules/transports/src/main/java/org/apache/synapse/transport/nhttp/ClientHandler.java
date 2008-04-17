@@ -406,8 +406,8 @@ public class ClientHandler implements NHttpClientHandler {
                     try {
                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
-                        if (responseMsgCtx == null
-                                || outMsgCtx.getOperationContext().isComplete()) {
+                        if (responseMsgCtx == null ||
+                                outMsgCtx.getOptions().isUseSeparateListener()) {
                             // to support Sandesha.. however, this means that we received a
                             // 202 accepted for an out-only , for which we do not need a
                             // dummy message anyway
@@ -437,8 +437,8 @@ public class ClientHandler implements NHttpClientHandler {
                         mr.receive(responseMsgCtx);
 
                     } catch (org.apache.axis2.AxisFault af) {
-                        log.error("Unable to report back " +
-                                "202 Accepted state to the message receiver", af);
+                        log.debug("Unable to report back " +
+                                "202 Accepted state to the message receiver");
                     }
                 }
 

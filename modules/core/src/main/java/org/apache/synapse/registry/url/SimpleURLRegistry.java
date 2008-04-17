@@ -20,6 +20,7 @@
 package org.apache.synapse.registry.url;
 
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,39 +50,77 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     private static final Log log = LogFactory.getLog(SimpleURLRegistry.class);
 
     private static final int MAX_KEYS = 200;
-    private String root ="";
+    private String root = "";
 
     public OMNode lookup(String key) {
 
         log.info("==> Repository fetch of resource with key : " + key);
-        URLConnection urlc = null;
+
+        URL url = SynapseConfigUtils.getURLFromPath(root + key);
+        if (url == null) {
+            return null;
+        }
+
+        BufferedInputStream inputStream;
         try {
-            URL url = SynapseConfigUtils.getURLFromPath(root + key);
-            if (url == null) {
-                return null;
+            URLConnection connection = url.openConnection();
+            connection.connect();
+            inputStream = new BufferedInputStream(connection.getInputStream());
+        } catch (IOException e) {
+            return null;
+        }
+
+        OMNode result = null;
+
+        if (inputStream != null) {
+
+            try {
+
+                XMLStreamReader parser = XMLInputFactory.newInstance().
+                        createXMLStreamReader(inputStream);
+                StAXOMBuilder builder = new StAXOMBuilder(parser);
+                result = builder.getDocumentElement();
+
+            } catch (OMException ignored) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("The resource at the provided URL isn't " +
+                            "well-formed XML,So,takes it as a text");
+                }
+
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("Error in closing the input stream. ", e);
+                }
+                result = SynapseConfigUtils.readNonXML(url);
+
+            } catch (XMLStreamException ignored) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("The resource at the provided URL isn't " +
+                            "well-formed XML,So,takes it as a text");
+                }
+
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("Error in closing the input stream. ", e);
+                }
+                result = SynapseConfigUtils.readNonXML(url);
+
+            } finally {
+
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("Error in closing the input stream.", e);
+                }
+
             }
-            urlc = url.openConnection();
-            urlc.connect();
-        } catch (IOException e) {
-            return null;
-        }
 
-        try {
-            XMLStreamReader parser = XMLInputFactory.newInstance().
-                    createXMLStreamReader(urlc.getInputStream());
-            StAXOMBuilder builder = new StAXOMBuilder(parser);
-            return builder.getDocumentElement();
-
-        } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + root + key, e);
-        } catch (FileNotFoundException fnf) {
-            return null;
-        } catch (IOException e) {
-            handleException("IO Error reading from URL " + root + key, e);
-        } catch (XMLStreamException e) {
-            handleException("XML Error reading from URL " + root + key, e);
         }
-        return null;
+        return result;
     }
 
     public RegistryEntry getRegistryEntry(String key) {
@@ -148,7 +187,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
 
     public void delete(String path) {
-       //TODO
+        //TODO
     }
 
     public void newResource(String path, boolean isDirectory) {

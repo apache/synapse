@@ -25,6 +25,7 @@ import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import javax.activation.DataHandler;
 import java.io.IOException;
@@ -35,7 +36,7 @@ import java.io.InputStream;
  * and this builds the HessianDataSource to represent the hessian message inside the SOAP info-set
  *
  * @see org.apache.axis2.builder.Builder
- * @see org.apache.synapse.format.hessian.HessianDataSource
+ * @see org.apache.synapse.util.SynapseBinaryDataSource
  */
 public class HessianMessageBuilder implements Builder {
 
@@ -70,7 +71,7 @@ public class HessianMessageBuilder implements Builder {
 
             // add Hessian data inside a data handler
             DataHandler dataHandler = new DataHandler(
-                    new HessianDataSource(contentType, inputStream));
+                    new SynapseBinaryDataSource(inputStream,contentType));
             OMText textData = factory.createOMText(dataHandler, true);
             element.addChild(textData);
 

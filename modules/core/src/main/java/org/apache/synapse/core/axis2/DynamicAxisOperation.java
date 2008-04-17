@@ -157,7 +157,6 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 					outMsgCtx.getReplyTo().setAddress(replyToFromTransport.getAddress());
 				}
 
-                outMsgCtx.setProperty(NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
 				outMsgCtx.getConfigurationContext().registerOperationContext(
 						outMsgCtx.getMessageID(), oc);
 

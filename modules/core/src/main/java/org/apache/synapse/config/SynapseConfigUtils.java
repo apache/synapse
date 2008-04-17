@@ -220,9 +220,9 @@ public class SynapseConfigUtils {
                             newConnection.getContentType())), true);
 
         } catch (IOException e) {
-            return null;
+            handleException("Error when getting a stream from resource's content", e);
         }
-
+        return null;
     }
 
     /**

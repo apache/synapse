@@ -396,8 +396,26 @@ public class MailTransportSender extends AbstractTransportSender {
             }
             Transport.send(message);
 
+            // update metrics
+            metrics.incrementMessagesSent();
+            if (mimeMultiPart != null) {
+                for (int i=0; i<mimeMultiPart.getCount(); i++) {
+                    MimeBodyPart mbp = (MimeBodyPart) mimeMultiPart.getBodyPart(i);
+                    int size = mbp.getSize();
+                    if (size != -1) {
+                        metrics.incrementBytesSent(size);
+                    }
+                }
+            } else {
+                int size = message.getSize();
+                if (size != -1) {
+                    metrics.incrementBytesSent(size);
+                }
+            }
+
         } catch (MessagingException e) {
             handleException("Error creating mail message or sending it to the configured server", e);
+            metrics.incrementFaultsSending();
             
         } finally {
             try {

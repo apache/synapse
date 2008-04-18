@@ -20,6 +20,8 @@ package org.apache.synapse.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 
@@ -40,23 +42,51 @@ public class DataSourceRegistrar {
     /**
      * The  static constants only for constructing key prefix for each property
      */
-    private static final String ICFACTORY = "icFactory";
-    private static final String PROVIDER_URL = "providerUrl";
-    private static final String PROVIDER_PORT = "providerPort";
+    private static final String PROP_ICFACTORY = "icFactory";
+    private static final String PROP_PROVIDER_URL = "providerUrl";
+    private static final String PROP_PROVIDER_PORT = "providerPort";
     private static final String DOT_STRING = ".";
-    private static final String USER_NAME = "username";
-    private static final String PASSWORD = "password";
-    private static final String DRIVER_CLS_NAME = "driverClassName";
-    private static final String DSNAME = "dsName";
-    private static final String URL = "url";
-    private static final String MAX_ACTIVE = "maxActive";
-    private static final String MAX_IDLE = "maxIdle";
-    private static final String MAX_WAIT = "maxWait";
-    private static final String DATA_SOURCE_NAME = "dataSourceName";
-    private static final String DRIVER = "driver";
-    private static final String USER = "user";
-    private static final String CPDSADAPTER = "cpdsadapter";
-    private static final String JNDI_ENV = "jndiEnvironment";
+    private static final String PROP_USER_NAME = "username";
+    private static final String PROP_PASSWORD = "password";
+    private static final String PROP_DRIVER_CLS_NAME = "driverClassName";
+    private static final String PROP_DSNAME = "dsName";
+    private static final String PROP_URL = "url";
+    private static final String PROP_DRIVER = "driver";
+    private static final String PROP_USER = "user";
+
+    private static final String PROP_CPDSADAPTER = "cpdsadapter";
+    private static final String PROP_JNDI_ENV = "jndiEnvironment";
+    private static final String PROP_DEFAULTMAXACTIVE = "defaultMaxActive";
+    private static final String PROP_DEFAULTMAXIDLE = "defaultMaxIdle";
+    private static final String PROP_DEFAULTMAXWAIT = "defaultMaxWait";
+    private static final String PROP_DATA_SOURCE_NAME = "dataSourceName";
+
+    private final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
+    private final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
+    private final static String PROP_TESTONBORROW = "testOnBorrow";
+    private final static String PROP_TESTONRETURN = "testOnReturn";
+    private final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS =
+            "timeBetweenEvictionRunsMillis";
+    private final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
+    private final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
+    private final static String PROP_TESTWHILEIDLE = "testWhileIdle";
+    private final static String PROP_VALIDATIONQUERY = "validationQuery";
+    private final static String PROP_MAXACTIVE = "maxActive";
+    private final static String PROP_MAXIDLE = "maxIdle";
+    private final static String PROP_MAXWAIT = "maxWait";
+
+    private final static String PROP_MINIDLE = "minIdle";
+    private final static String PROP_INITIALSIZE = "initialSize";
+    private final static String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
+    private final static String PROP_DEFAULTCATALOG = "defaultCatalog";
+    private final static String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED =
+            "accessToUnderlyingConnectionAllowed";
+    private final static String PROP_REMOVEABANDONED = "removeAbandoned";
+    private final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
+    private final static String PROP_LOGABANDONED = "logAbandoned";
+    private final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
+    private final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
+    private final static String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 
     /**
      * Register data sources in the JNDI context
@@ -101,7 +131,7 @@ public class DataSourceRegistrar {
         Hashtable props = new Hashtable();
         Properties jndiEvn = new Properties();  //This is needed for PerUserPoolDatasource
 
-        String namingFactory = getProperty(dsProperties, rootPrefix + ICFACTORY,
+        String namingFactory = getProperty(dsProperties, rootPrefix + PROP_ICFACTORY,
                 "com.sun.jndi.rmi.registry.RegistryContextFactory");
 
         props.put(Context.INITIAL_CONTEXT_FACTORY, namingFactory);
@@ -128,7 +158,7 @@ public class DataSourceRegistrar {
         // default port for RMI registry
         int port = 2199;
         String providerPort =
-                getProperty(dsProperties, rootPrefix + PROVIDER_PORT, String.valueOf(port));
+                getProperty(dsProperties, rootPrefix + PROP_PROVIDER_PORT, String.valueOf(port));
         try {
             port = Integer.parseInt(providerPort);
         } catch (NumberFormatException ignored) {
@@ -137,13 +167,13 @@ public class DataSourceRegistrar {
         // Create a RMI local registry
         RMIRegistryController.getInstance().createLocalRegistry(port);
 
-        String providerUrl = getProperty(dsProperties, rootPrefix + PROVIDER_URL,
+        String providerUrl = getProperty(dsProperties, rootPrefix + PROP_PROVIDER_URL,
                 "rmi://" + providerHost + ":" + providerPort);
 
         props.put(Context.PROVIDER_URL, providerUrl);
         jndiEvn.put(Context.PROVIDER_URL, providerUrl);
 
-        log.info("DataSources will be registered in the JNDI context with provider URL : " +
+        log.info("DataSources will be registered in the JNDI context with provider PROP_URL : " +
                 providerUrl);
 
         try {
@@ -186,38 +216,50 @@ public class DataSourceRegistrar {
         // Prefix for getting particular data source's properties
         String prefix = buffer.toString();
 
-        String driver = getProperty(dsProperties, prefix + DRIVER_CLS_NAME, null);
+        String driver = getProperty(dsProperties, prefix + PROP_DRIVER_CLS_NAME, null);
         if (driver == null) {
-            handleException(prefix + DRIVER_CLS_NAME + " cannot be found.");
+            handleException(prefix + PROP_DRIVER_CLS_NAME + " cannot be found.");
         }
 
-        String url = getProperty(dsProperties, prefix + URL, null);
+        String url = getProperty(dsProperties, prefix + PROP_URL, null);
         if (url == null) {
-            handleException(prefix + URL + " cannot be found.");
+            handleException(prefix + PROP_URL + " cannot be found.");
         }
 
         // get other required properties
-        String user = getProperty(dsProperties, prefix + USER_NAME, "synapse");
-        String password = getProperty(dsProperties, prefix + PASSWORD, "synapse");
-        String dataSourceName = getProperty(dsProperties, prefix + DSNAME, dsName);
+        String user = getProperty(dsProperties, prefix + PROP_USER_NAME, "synapse");
+        String password = getProperty(dsProperties, prefix + PROP_PASSWORD, "synapse");
+        String dataSourceName = getProperty(dsProperties, prefix + PROP_DSNAME, dsName);
 
         //populates context tree
         populateContextTree(initialContext, dataSourceName);
 
         String dsType = getProperty(dsProperties, prefix + "type", "BasicDataSource");
 
+        String maxActive = getProperty(dsProperties, prefix + PROP_MAXACTIVE,
+                String.valueOf(GenericObjectPool.DEFAULT_MAX_ACTIVE));
+        String maxIdle = getProperty(dsProperties, prefix + PROP_MAXIDLE,
+                String.valueOf(GenericObjectPool.DEFAULT_MAX_IDLE));
+        String maxWait = getProperty(dsProperties, prefix + PROP_MAXWAIT,
+                String.valueOf(GenericObjectPool.DEFAULT_MAX_WAIT));
+
         if ("BasicDataSource".equals(dsType)) {
 
             Reference ref = new Reference("javax.sql.DataSource",
                     "org.apache.commons.dbcp.BasicDataSourceFactory", null);
 
-            ref.add(new StringRefAddr(DRIVER_CLS_NAME, driver));
-            ref.add(new StringRefAddr(URL, url));
-            ref.add(new StringRefAddr(USER_NAME, user));
-            ref.add(new StringRefAddr(PASSWORD, password));
+            ref.add(new StringRefAddr(PROP_DRIVER_CLS_NAME, driver));
+            ref.add(new StringRefAddr(PROP_URL, url));
+            ref.add(new StringRefAddr(PROP_USER_NAME, user));
+            ref.add(new StringRefAddr(PROP_PASSWORD, password));
+            ref.add(new StringRefAddr(PROP_MAXACTIVE, maxActive));
+            ref.add(new StringRefAddr(PROP_MAXIDLE, maxIdle));
+            ref.add(new StringRefAddr(PROP_MAXWAIT, maxWait));
 
+            //set BasicDataSource specific parameters
+            setBasicDataSourceParameters(ref, dsProperties, prefix);
             //set default properties for reference
-            setDefaultParameters(ref, dsProperties, prefix);
+            setCommonParameters(ref, dsProperties, prefix);
 
             try {
                 initialContext.rebind(dataSourceName, ref);
@@ -230,23 +272,23 @@ public class DataSourceRegistrar {
         } else if ("PerUserPoolDataSource".equals(dsType)) {
 
             // Construct DriverAdapterCPDS reference
-            String className = getProperty(dsProperties, prefix + CPDSADAPTER +
+            String className = getProperty(dsProperties, prefix + PROP_CPDSADAPTER +
                     DOT_STRING + "className",
                     "org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS");
-            String factory = getProperty(dsProperties, prefix + CPDSADAPTER +
+            String factory = getProperty(dsProperties, prefix + PROP_CPDSADAPTER +
                     DOT_STRING + "factory",
                     "org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS");
-            String name = getProperty(dsProperties, prefix + CPDSADAPTER +
+            String name = getProperty(dsProperties, prefix + PROP_CPDSADAPTER +
                     DOT_STRING + "name",
                     "cpds");
 
             Reference cpdsRef =
                     new Reference(className, factory, null);
 
-            cpdsRef.add(new StringRefAddr(DRIVER, driver));
-            cpdsRef.add(new StringRefAddr(URL, url));
-            cpdsRef.add(new StringRefAddr(USER, user));
-            cpdsRef.add(new StringRefAddr(PASSWORD, password));
+            cpdsRef.add(new StringRefAddr(PROP_DRIVER, driver));
+            cpdsRef.add(new StringRefAddr(PROP_URL, url));
+            cpdsRef.add(new StringRefAddr(PROP_USER, user));
+            cpdsRef.add(new StringRefAddr(PROP_PASSWORD, password));
 
             try {
                 initialContext.rebind(name, cpdsRef);
@@ -261,11 +303,14 @@ public class DataSourceRegistrar {
                     new Reference("org.apache.commons.dbcp.datasources.PerUserPoolDataSource",
                             "org.apache.commons.dbcp.datasources.PerUserPoolDataSourceFactory", null);
 
-            ref.add(new BinaryRefAddr(JNDI_ENV, serialize(jndiEnv)));
-            ref.add(new StringRefAddr(DATA_SOURCE_NAME, name));
+            ref.add(new BinaryRefAddr(PROP_JNDI_ENV, serialize(jndiEnv)));
+            ref.add(new StringRefAddr(PROP_DATA_SOURCE_NAME, name));
+            ref.add(new StringRefAddr(PROP_DEFAULTMAXACTIVE, maxActive));
+            ref.add(new StringRefAddr(PROP_DEFAULTMAXIDLE, maxIdle));
+            ref.add(new StringRefAddr(PROP_DEFAULTMAXWAIT, maxWait));
 
             //set default properties for reference
-            setDefaultParameters(ref, dsProperties, prefix);
+            setCommonParameters(ref, dsProperties, prefix);
 
             try {
                 initialContext.rebind(dataSourceName, ref);
@@ -322,15 +367,89 @@ public class DataSourceRegistrar {
      * @param properties The properties which contains required parameter value
      * @param prefix     The key prefix for which is used to get data from given properties
      */
-    private static void setDefaultParameters(Reference reference, Properties properties, String prefix) {
+    private static void setCommonParameters(Reference reference, Properties properties, String prefix) {
+        String defaultAutoCommit = getProperty(properties,
+                prefix + PROP_DEFAULTAUTOCOMMIT, String.valueOf(true));
+        String defaultReadOnly = getProperty(properties,
+                prefix + PROP_DEFAULTREADONLY, String.valueOf(false));
+        String testOnBorrow = getProperty(properties,
+                prefix + PROP_TESTONBORROW, String.valueOf(true));
+        String testOnReturn = getProperty(properties,
+                prefix + PROP_TESTONRETURN, String.valueOf(false));
+        String timeBetweenEvictionRunsMillis = getProperty(properties,
+                prefix + PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+                String.valueOf(GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS));
+        String numTestsPerEvictionRun = getProperty(properties,
+                prefix + PROP_NUMTESTSPEREVICTIONRUN,
+                String.valueOf(GenericObjectPool.DEFAULT_NUM_TESTS_PER_EVICTION_RUN));
+        String minEvictableIdleTimeMillis = getProperty(properties,
+                prefix + PROP_MINEVICTABLEIDLETIMEMILLIS,
+                String.valueOf(GenericObjectPool.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS));
+        String testWhileIdle = getProperty(properties,
+                prefix + PROP_TESTWHILEIDLE, String.valueOf(false));
+        String validationQuery = getProperty(properties,
+                prefix + PROP_VALIDATIONQUERY, null);
 
-        String maxActive = getProperty(properties, prefix + MAX_ACTIVE, "100");
-        String maxIdle = getProperty(properties, prefix + MAX_IDLE, "30");
-        String maxWait = getProperty(properties, prefix + MAX_WAIT, "10000");
+        reference.add(new StringRefAddr(PROP_DEFAULTAUTOCOMMIT, defaultAutoCommit));
+        reference.add(new StringRefAddr(PROP_DEFAULTREADONLY, defaultReadOnly));
+        reference.add(new StringRefAddr(PROP_TESTONBORROW, testOnBorrow));
+        reference.add(new StringRefAddr(PROP_TESTONRETURN, testOnReturn));
+        reference.add(new StringRefAddr(PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+                timeBetweenEvictionRunsMillis));
+        reference.add(new StringRefAddr(PROP_NUMTESTSPEREVICTIONRUN, numTestsPerEvictionRun));
+        reference.add(new StringRefAddr(PROP_MINEVICTABLEIDLETIMEMILLIS,
+                minEvictableIdleTimeMillis));
+        reference.add(new StringRefAddr(PROP_TESTWHILEIDLE, testWhileIdle));
+        if (validationQuery != null && !"".equals(validationQuery)) {
+            reference.add(new StringRefAddr(PROP_VALIDATIONQUERY, validationQuery));
+        }
+    }
 
-        reference.add(new StringRefAddr("defaultMaxActive", maxActive));
-        reference.add(new StringRefAddr("defaultMaxIdle", maxIdle));
-        reference.add(new StringRefAddr("defaultMaxWait", maxWait));
+    /**
+     * Helper method to set all BasicDataSource specific parameter
+     *
+     * @param reference  The naming reference instance
+     * @param properties The properties which contains required parameter value
+     * @param prefix     The key prefix for which is used to get data from given properties
+     */
+    private static void setBasicDataSourceParameters(Reference reference, Properties properties, String prefix) {
+        String minIdle = getProperty(properties,
+                prefix + PROP_MINIDLE, String.valueOf(GenericObjectPool.DEFAULT_MIN_IDLE));
+        String initialSize = getProperty(properties, prefix + PROP_INITIALSIZE, String.valueOf(0));
+        String defaultTransactionIsolation = getProperty(properties,
+                prefix + PROP_DEFAULTTRANSACTIONISOLATION, null);
+        String defaultCatalog = getProperty(properties, prefix + PROP_DEFAULTCATALOG, null);
+        String accessToUnderlyingConnectionAllowed = getProperty(properties,
+                prefix + PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, String.valueOf(false));
+        String removeAbandoned = getProperty(properties,
+                prefix + PROP_REMOVEABANDONED, String.valueOf(false));
+        String removeAbandonedTimeout = getProperty(properties,
+                prefix + PROP_REMOVEABANDONEDTIMEOUT, String.valueOf(300));
+        String logAbandoned = getProperty(properties,
+                prefix + PROP_LOGABANDONED, String.valueOf(false));
+        String poolPreparedStatements = getProperty(properties,
+                prefix + PROP_POOLPREPAREDSTATEMENTS, String.valueOf(false));
+        String maxOpenPreparedStatements = getProperty(properties,
+                prefix + PROP_MAXOPENPREPAREDSTATEMENTS,
+                String.valueOf(GenericKeyedObjectPool.DEFAULT_MAX_TOTAL));
+
+        reference.add(new StringRefAddr(PROP_MINIDLE, minIdle));
+        if (defaultTransactionIsolation != null && !"".equals(defaultTransactionIsolation)) {
+            reference.add(new StringRefAddr(PROP_DEFAULTTRANSACTIONISOLATION,
+                    defaultTransactionIsolation));
+        }
+        reference.add(new StringRefAddr(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+                accessToUnderlyingConnectionAllowed));
+        reference.add(new StringRefAddr(PROP_REMOVEABANDONED, removeAbandoned));
+        reference.add(new StringRefAddr(PROP_REMOVEABANDONEDTIMEOUT, removeAbandonedTimeout));
+        reference.add(new StringRefAddr(PROP_LOGABANDONED, logAbandoned));
+        reference.add(new StringRefAddr(PROP_POOLPREPAREDSTATEMENTS, poolPreparedStatements));
+        reference.add(new StringRefAddr(PROP_MAXOPENPREPAREDSTATEMENTS,
+                maxOpenPreparedStatements));
+        reference.add(new StringRefAddr(PROP_INITIALSIZE, initialSize));
+        if (defaultCatalog != null && !"".equals(defaultCatalog)) {
+            reference.add(new StringRefAddr(PROP_DEFAULTCATALOG, defaultCatalog));
+        }
     }
 
     /**

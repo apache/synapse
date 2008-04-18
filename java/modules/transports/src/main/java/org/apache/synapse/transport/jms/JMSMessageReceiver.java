@@ -20,6 +20,7 @@ import org.apache.axis2.Constants;
 import org.apache.synapse.transport.base.threads.WorkerPool;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisOperation;
@@ -49,6 +50,8 @@ public class JMSMessageReceiver implements MessageListener {
     private ConfigurationContext cfgCtx = null;
     /** A reference to the JMS Connection Factory to which this applies */
     private JMSConnectionFactory jmsConnectionFactory = null;
+    /** Metrics collector */
+    private MetricsCollector metrics = null;
 
     /**
      * Create a new JMSMessage receiver
@@ -64,6 +67,7 @@ public class JMSMessageReceiver implements MessageListener {
         this.jmsConnectionFactory = jmsConFac;
         this.workerPool = workerPool;
         this.cfgCtx = cfgCtx;
+        this.metrics = jmsListener.getMetricsCollector();
     }
 
     /**
@@ -89,6 +93,19 @@ public class JMSMessageReceiver implements MessageListener {
             if (log.isDebugEnabled()) {
                 log.debug("Error reading JMS message headers for debug logging", e);
             }
+        }
+
+        // update transport level metrics
+        try {
+            if (message instanceof BytesMessage) {
+                metrics.incrementBytesReceived(((BytesMessage) message).getBodyLength());
+            } else if (message instanceof TextMessage) {
+                metrics.incrementBytesReceived(((TextMessage) message).getText().getBytes().length);
+            } else {
+                handleException("Unsupported JMS message type : " + message.getClass().getName());
+            }
+        } catch (JMSException e) {
+            log.warn("Error reading JMS message size to update transport metrics", e);
         }
 
         // has this message already expired? expiration time == 0 means never expires
@@ -204,11 +221,14 @@ public class JMSMessageReceiver implements MessageListener {
                     soapAction,
                     contentType
                 );
+                metrics.incrementMessagesReceived();
 
             } catch (JMSException e) {
                 handleException("JMS Exception reading the message Destination or JMS ReplyTo", e);
+                metrics.incrementFaultsReceiving();
             } catch (AxisFault e) {
                 handleException("Axis fault creating a MessageContext", e);
+                metrics.incrementFaultsReceiving();
             }
         }
     }

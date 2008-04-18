@@ -466,6 +466,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         if (state != BaseConstants.STARTED) return;
         try {
             ioReactor.shutdown();
+            state = BaseConstants.STOPPED;
             log.info("Sender shut down");
         } catch (IOException e) {
             log.warn("Error shutting down IOReactor", e);

@@ -40,6 +40,7 @@ import org.apache.axiom.om.OMElement;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.util.*;
+import java.lang.management.ManagementFactory;
 
 public abstract class AbstractTransportListener implements TransportListener {
 
@@ -104,6 +105,22 @@ public abstract class AbstractTransportListener implements TransportListener {
 
         // register to receive updates on services for lifetime management
         cfgCtx.getAxisConfiguration().addObservers(axisObserver);
+
+        // register with JMX
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        String jmxAgentName = System.getProperty("jmx.agent.name");
+        if (jmxAgentName == null || "".equals(jmxAgentName)) {
+            jmxAgentName = "org.apache.synapse";
+        }
+        String name;
+        try {
+            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
+                transportName + "-listener";
+            TransportView tBean = new TransportView(this, null);
+            registerMBean(mbs, tBean, name);
+        } catch (Exception e) {
+            log.warn("Error registering the " + transportName + " transport for JMX management", e);
+        }
     }
 
     public void destroy() {
@@ -242,6 +259,10 @@ public abstract class AbstractTransportListener implements TransportListener {
 
     public void setTransportName(String transportName) {
         this.transportName = transportName;
+    }
+
+    public MetricsCollector getMetricsCollector() {
+        return metrics;
     }
 
     /**

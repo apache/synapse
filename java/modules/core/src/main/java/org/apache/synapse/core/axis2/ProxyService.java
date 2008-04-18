@@ -260,7 +260,7 @@ public class ProxyService {
         }
 
         // if a WSDL was found
-        if (wsdlFound && wsdlElement != null) {
+        if (wsdlElement != null) {
             OMNamespace wsdlNamespace = wsdlElement.getNamespace();
 
             // serialize and create an inputstream to read WSDL
@@ -362,7 +362,7 @@ public class ProxyService {
                     handleException("Error reading WSDL", ioe);
                 }
             }
-        } else {
+        } else if (wsdlFound) {
             handleException("Couldn't build the proxy service : " + name
                     + ". Unable to locate the specified WSDL to build the service");
         }

@@ -34,7 +34,12 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.axiom.om.util.UUIDGenerator;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.util.Map;
+import java.util.Set;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
 public abstract class AbstractTransportSender extends AbstractHandler implements TransportSender {
 
@@ -51,8 +56,10 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     private TransportInDescription transportIn  = null;
     /** transport out description */
     private TransportOutDescription transportOut = null;
-    /** is this transport started? */
-    protected boolean started = false;
+    /** Metrics collector for the sender */
+    protected MetricsCollector metrics = new MetricsCollector();
+    /** state of the listener */
+    private int state = BaseConstants.STOPPED;
 
     /**
      * Initialize the generic transport sender.
@@ -67,12 +74,29 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         this.engine = new AxisEngine(cfgCtx);
         this.transportIn  = cfgCtx.getAxisConfiguration().getTransportIn(transportName);
         this.transportOut = transportOut;
+        this.state = BaseConstants.STARTED;
+
+        // register with JMX
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        String jmxAgentName = System.getProperty("jmx.agent.name");
+        if (jmxAgentName == null || "".equals(jmxAgentName)) {
+            jmxAgentName = "org.apache.synapse";
+        }
+        String name;
+        try {
+            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
+                transportName + "-sender";
+            TransportView tBean = new TransportView(null, this);
+            registerMBean(mbs, tBean, name);
+        } catch (Exception e) {
+            log.warn("Error registering the " + transportName + " transport for JMX management", e);
+        }
     }
 
     public void stop() {
-        if (started) {
-            started = false;
-        }
+        if (state != BaseConstants.STARTED) return;
+        state = BaseConstants.STOPPED;
+        log.info("Sender shut down");
     }
 
     public void cleanup(MessageContext msgContext) throws AxisFault {}
@@ -221,4 +245,93 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     protected void logException(String msg, Exception e) {
         log.error(msg, e);
     }
+
+    //--- jmx/management methods ---
+    public void pause() throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        state = BaseConstants.PAUSED;
+        log.info("Sender paused");
+    }
+
+    public void resume() throws AxisFault {
+        if (state != BaseConstants.PAUSED) return;
+        state = BaseConstants.STARTED;
+        log.info("Sender resumed");
+    }
+
+    public void maintenenceShutdown(long millis) throws AxisFault {
+        if (state != BaseConstants.STARTED) return;
+        long start = System.currentTimeMillis();
+        stop();
+        state = BaseConstants.STOPPED;
+        log.info("Sender shutdown in : " + (System.currentTimeMillis() - start) / 1000 + "s");
+    }
+
+    /**
+     * Returns the number of active threads processing messages
+     * @return number of active threads processing messages
+     */
+    public int getActiveThreadCount() {
+        return 0;
+    }
+
+    // -- jmx/management methods--
+    public long getMessagesReceived() {
+        if (metrics != null) {
+            return metrics.getMessagesReceived();
+        }
+        return -1;
+    }
+
+    public long getFaultsReceiving() {
+        if (metrics != null) {
+            return metrics.getFaultsReceiving();
+        }
+        return -1;
+    }
+
+    public long getBytesReceived() {
+        if (metrics != null) {
+            return metrics.getBytesReceived();
+        }
+        return -1;
+    }
+
+    public long getMessagesSent() {
+        if (metrics != null) {
+            return metrics.getMessagesSent();
+        }
+        return -1;
+    }
+
+    public long getFaultsSending() {
+        if (metrics != null) {
+            return metrics.getFaultsSending();
+        }
+        return -1;
+    }
+
+    public long getBytesSent() {
+        if (metrics != null) {
+            return metrics.getBytesSent();
+        }
+        return -1;
+    }
+
+    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
+        try {
+            ObjectName name = new ObjectName(objectName);
+            Set set = mbs.queryNames(name, null);
+            if (set != null && set.isEmpty()) {
+                mbs.registerMBean(mbeanInstance, name);
+            } else {
+                mbs.unregisterMBean(name);
+                mbs.registerMBean(mbeanInstance, name);
+            }
+        } catch (Exception e) {
+            log.warn("Error registering a MBean with objectname ' " + objectName +
+                " ' for JMX management", e);
+        }
+    }
+
 }

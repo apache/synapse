@@ -28,9 +28,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
-import org.apache.synapse.transport.base.AbstractTransportSender;
-import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.base.*;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,7 +44,7 @@ import java.util.*;
 /**
  * The TransportSender for JMS
  */
-public class JMSSender extends AbstractTransportSender {
+public class JMSSender extends AbstractTransportSender implements ManagementSupport {
 
     public static final String TRANSPORT_NAME = "jms";
 
@@ -233,7 +231,27 @@ public class JMSSender extends AbstractTransportSender {
                 }
 
                 // send the outgoing message over JMS to the destination selected
-                JMSUtils.sendMessageToJMSDestination(session, destination, destinationType, message);
+                try {
+                    JMSUtils.sendMessageToJMSDestination(session, destination, destinationType, message);
+
+                    metrics.incrementMessagesSent();
+                    try {
+                        if (message instanceof BytesMessage) {
+                            metrics.incrementBytesSent(((BytesMessage) message).getBodyLength());
+                        } else if (message instanceof TextMessage) {
+                            metrics.incrementBytesSent((
+                                (TextMessage) message).getText().getBytes().length);
+                        } else {
+                            handleException("Unsupported JMS message type : " +
+                                message.getClass().getName());
+                        }
+                    } catch (JMSException e) {
+                        log.warn("Error reading JMS message size to update transport metrics", e);
+                    }
+                } catch (BaseTransportException e) {
+                    metrics.incrementFaultsSending();
+                    throw e;
+                }
 
                 // if we are expecting a synchronous response back for the message sent out
                 if (waitForResponse) {
@@ -301,16 +319,42 @@ public class JMSSender extends AbstractTransportSender {
             }
 
             Message reply = consumer.receive(timeout);
+
             if (reply != null) {
-                processSyncResponse(msgCtx, reply);
+
+                // update transport level metrics
+                metrics.incrementMessagesReceived();                
+                try {
+                    if (reply instanceof BytesMessage) {
+                        metrics.incrementBytesReceived(((BytesMessage) reply).getBodyLength());
+                    } else if (reply instanceof TextMessage) {
+                        metrics.incrementBytesReceived((
+                            (TextMessage) reply).getText().getBytes().length);
+                    } else {
+                        handleException("Unsupported JMS message type : " +
+                            reply.getClass().getName());
+                    }
+                } catch (JMSException e) {
+                    log.warn("Error reading JMS message size to update transport metrics", e);
+                }
+
+                try {
+                    processSyncResponse(msgCtx, reply);
+                    metrics.incrementMessagesReceived();
+                } catch (AxisFault e) {
+                    metrics.incrementFaultsReceiving();
+                    throw e;
+                }
 
             } else {
                 log.warn("Did not receive a JMS response within " +
                     timeout + " ms to destination : " + replyDestination +
                     " with JMS correlation ID : " + correlationId);
+                metrics.incrementTimeoutsReceiving();
             }
 
         } catch (JMSException e) {
+            metrics.incrementFaultsReceiving();
             handleException("Error creating consumer or receiving reply to : " +
                 replyDestination, e);
         }

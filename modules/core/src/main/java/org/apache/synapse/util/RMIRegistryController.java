@@ -25,8 +25,7 @@ public class RMIRegistryController {
         return ourInstance;
     }
 
-    private RMIRegistryController() {
-    }
+    private RMIRegistryController() {}
 
     /**
      * Creates a RMI local registry with given port
@@ -65,7 +64,6 @@ public class RMIRegistryController {
      * @param e   The exception
      */
     private static void handleException(String msg, Exception e) {
-
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }

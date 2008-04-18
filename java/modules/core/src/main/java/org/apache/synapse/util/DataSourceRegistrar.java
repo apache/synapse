@@ -27,7 +27,7 @@ import javax.naming.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
-import java.io.File;
+import java.util.Hashtable;
 
 /**
  * Utility class to handle data source registration
@@ -43,14 +43,17 @@ public class DataSourceRegistrar {
     private static final String PROVIDER_URL = "providerUrl";
     private static final String PROVIDER_PORT = "providerPort";
     private static final String DOT_STRING = ".";
-    private static final String USER = "username";
+    private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
-    private static final String DRIVER = "driverClassName";
+    private static final String DRIVER_CLS_NAME = "driverClassName";
     private static final String DSNAME = "dsName";
     private static final String URL = "url";
     private static final String MAX_ACTIVE = "maxActive";
     private static final String MAX_IDLE = "maxIdle";
     private static final String MAX_WAIT = "maxWait";
+    private static final String DATA_SOURCE_NAME = "dataSourceName";
+    private static final String DRIVER = "driver";
+    private static final String USER = "user";
 
     /**
      * Register data sources in the JNDI context
@@ -62,8 +65,7 @@ public class DataSourceRegistrar {
 
         if (dsProperties == null) {
             if (log.isDebugEnabled()) {
-                log.debug("DataSource properties cannot be found ." +
-                        " Skipping setting data sources ... ");
+                log.debug("DataSource properties cannot be found..");
             }
             return;
         }
@@ -73,8 +75,7 @@ public class DataSourceRegistrar {
 
         if (dataSources == null || "".equals(dataSources)) {
             if (log.isDebugEnabled()) {
-                log.debug("DataSources aren't in the given properties. " +
-                        "Skipping setting data sources ... ");
+                log.debug("No DataSources defined for initialization..");
             }
             return;
         }
@@ -82,8 +83,7 @@ public class DataSourceRegistrar {
         String[] dataSourcesNames = dataSources.split(",");
         if (dataSourcesNames == null || dataSourcesNames.length == 0) {
             if (log.isDebugEnabled()) {
-                log.debug("DataSources aren't in the given properties." +
-                        " Skipping setting data sources ...");
+                log.debug("No DataSource definitions found for initialization..");
             }
             return;
         }
@@ -92,22 +92,20 @@ public class DataSourceRegistrar {
         buffer.append(SynapseConstants.SYNAPSE_DATASOURCES);
         buffer.append(DOT_STRING);
         // The prefix for root level properties
-        String prefix = buffer.toString();
+        String rootPrefix = buffer.toString();
 
-        // setting  naming provider initial context factory
-        String icFactory = getProperty(dsProperties, prefix + ICFACTORY,
-                "com.sun.jndi.rmi.registry.RegistryContextFactory");
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, icFactory);
+        // setting naming provider URL
+        Hashtable props = new Hashtable();
+        props.put(Context.INITIAL_CONTEXT_FACTORY,
+            getProperty(dsProperties, rootPrefix + ICFACTORY,
+                "com.sun.jndi.rmi.registry.RegistryContextFactory"));
 
         String providerHost = "localhost";
         try {
             InetAddress addr = InetAddress.getLocalHost();
             if (addr != null) {
-
-                // Get hostname
                 String hostname = addr.getHostName();
                 if (hostname == null) {
-                    // Get IP Address
                     String ipAddr = addr.getHostAddress();
                     if (ipAddr != null) {
                         providerHost = ipAddr;
@@ -117,45 +115,38 @@ public class DataSourceRegistrar {
                 }
             }
         } catch (UnknownHostException e) {
-            log.warn("Unable to determine hostname or IP address...Using host as localhost", e);
+            log.warn("Unable to determine hostname or IP address.. Using localhost", e);
         }
 
+        // default port for RMI registry
         int port = 2199;
-
-        String providerPort = getProperty(dsProperties, prefix + PROVIDER_PORT,
-                String.valueOf(port));
-
+        String providerPort =
+            getProperty(dsProperties, rootPrefix + PROVIDER_PORT, String.valueOf(port));
         try {
             port = Integer.parseInt(providerPort);
-        } catch (NumberFormatException ignored) {
-
-        }
+        } catch (NumberFormatException ignored) {}
 
         // Create a RMI local registry
         RMIRegistryController.getInstance().createLocalRegistry(port);
 
-        String providerUrl = getProperty(dsProperties, prefix + PROVIDER_URL,
+        String providerUrl = getProperty(dsProperties, rootPrefix + PROVIDER_URL,
                 "rmi://" + providerHost + ":" + providerPort);
+        props.put(Context.PROVIDER_URL, providerUrl);
 
-        log.info("All Data sources are  registered in the JNDI context with provider Url : " +
+        log.info("DataSources will be registered in the JNDI context with provider URL : " +
                 providerUrl);
 
-        // setting naming provider URL
-        System.setProperty(Context.PROVIDER_URL, providerUrl);
-
         try {
-
-            InitialContext initialContext = new InitialContext();
+            InitialContext initialContext = new InitialContext(props);
             //Registering data sources with the initial context
             for (int i = 0; i < dataSourcesNames.length; i++) {
                 registerDataSource(dataSourcesNames[i], dsProperties, initialContext);
             }
 
         } catch (NamingException e) {
-            String msg = "Error in constructing an initial context for register data sources";
+            String msg = "Error constructing an InitialContext to register DataSources";
             handleException(msg, e);
         }
-
     }
 
     /**
@@ -170,7 +161,7 @@ public class DataSourceRegistrar {
 
         if (dsName == null || "".equals(dsName)) {
             if (log.isDebugEnabled()) {
-                log.debug("Data source is either empty or or null. Skipping registration...");
+                log.debug("DataSource name is either empty or null, ignoring..");
             }
             return;
         }
@@ -184,18 +175,18 @@ public class DataSourceRegistrar {
         // Prefix for getting particular data source's properties
         String prefix = buffer.toString();
 
-        String driver = getProperty(dsProperties, prefix + DRIVER, null);
+        String driver = getProperty(dsProperties, prefix + DRIVER_CLS_NAME, null);
         if (driver == null) {
-            throw new IllegalArgumentException("Driver class name(driver) cannot be found.");
+            handleException(prefix + DRIVER_CLS_NAME + " cannot be found.");
         }
 
         String url = getProperty(dsProperties, prefix + URL, null);
         if (url == null) {
-            throw new IllegalArgumentException("Database URL cannot be found.");
+            handleException(prefix + URL + " cannot be found.");
         }
 
         // get other required properties
-        String user = getProperty(dsProperties, prefix + USER, "synapse");
+        String user = getProperty(dsProperties, prefix + USER_NAME, "synapse");
         String password = getProperty(dsProperties, prefix + PASSWORD, "synapse");
         String dataSourceName = getProperty(dsProperties, prefix + DSNAME, dsName);
 
@@ -209,9 +200,9 @@ public class DataSourceRegistrar {
             Reference ref = new Reference("javax.sql.DataSource",
                     "org.apache.commons.dbcp.BasicDataSourceFactory", null);
 
-            ref.add(new StringRefAddr(DRIVER, driver));
+            ref.add(new StringRefAddr(DRIVER_CLS_NAME, driver));
             ref.add(new StringRefAddr(URL, url));
-            ref.add(new StringRefAddr(USER, user));
+            ref.add(new StringRefAddr(USER_NAME, user));
             ref.add(new StringRefAddr(PASSWORD, password));
 
             //set default properties for reference
@@ -237,15 +228,15 @@ public class DataSourceRegistrar {
             Reference cpdsRef =
                     new Reference(className, factory, null);
 
-            cpdsRef.add(new StringRefAddr("driver", driver));
+            cpdsRef.add(new StringRefAddr(DRIVER, driver));
             cpdsRef.add(new StringRefAddr(URL, url));
-            cpdsRef.add(new StringRefAddr("user", user));
+            cpdsRef.add(new StringRefAddr(USER, user));
             cpdsRef.add(new StringRefAddr(PASSWORD, password));
 
             try {
                 initialContext.rebind(name, cpdsRef);
             } catch (NamingException e) {
-                String msg = " Error when binds a name '" + name + "' to " +
+                String msg = "Error binding name '" + name + "' to " +
                         "the DriverAdapterCPDS reference";
                 handleException(msg, e);
             }
@@ -254,12 +245,11 @@ public class DataSourceRegistrar {
             Reference ref = new Reference("org.apache.commons.dbcp.datasources.PerUserPoolDataSource",
                     "org.apache.commons.dbcp.datasources.PerUserPoolDataSourceFactory", null);
 
-
-            ref.add(new StringRefAddr(DRIVER, driver));
+            ref.add(new StringRefAddr(DRIVER_CLS_NAME, driver));
             ref.add(new StringRefAddr(URL, url));
-            ref.add(new StringRefAddr(USER, user));
+            ref.add(new StringRefAddr(USER_NAME, user));
             ref.add(new StringRefAddr(PASSWORD, password));
-            ref.add(new StringRefAddr("dataSourceName", name));
+            ref.add(new StringRefAddr(DATA_SOURCE_NAME, name));
 
             //set default properties for reference
             setDefaultParameters(ref, dsProperties, prefix);
@@ -267,15 +257,14 @@ public class DataSourceRegistrar {
             try {
                 initialContext.rebind(dataSourceName, ref);
             } catch (NamingException e) {
-                String msg = " Error when binds a name ' " + dataSourceName + " ' to " +
+                String msg = "Error binding name ' " + dataSourceName + " ' to " +
                         "the PerUserPoolDataSource reference";
                 handleException(msg, e);
             }
 
         } else {
-            throw new IllegalArgumentException("Unsupported data source type : " + dsType);
+            handleException("Unsupported data source type : " + dsType);
         }
-
     }
 
     /**
@@ -304,25 +293,20 @@ public class DataSourceRegistrar {
      */
     private static void populateContextTree(InitialContext initialContext, String path) {
 
-        if (path.indexOf(File.separator) != -1) {
-            String[] paths = path.split(File.separator);
+        String[] paths = path.split("/");
+        if (paths != null && paths.length != 0) {
 
-            if (paths != null && paths.length != 0) {
-                Context context = initialContext;
+            Context context = initialContext;
+            for (int i=0; i < paths.length; i++) {
 
-                for (int i = 0; i < paths.length; i++) {
-
-                    try {
-
-                        context = context.createSubcontext(paths[i]);
-                        if (context == null) {
-                            handleException("sub context cannot be null");
-                        }
-
-                    } catch (NamingException e) {
-                        log.warn("Skipping creating sub context due to an error ' " + e.getMessage()+ " '");
-                        return;
+                try {
+                    context = context.createSubcontext(paths[i]);
+                    if (context == null) {
+                        handleException("sub context " + paths[i] + " could not be created");
                     }
+
+                } catch (NamingException e) {
+                    handleException("Unable to create sub context : " + paths[i], e);
                 }
             }
         }
@@ -334,7 +318,6 @@ public class DataSourceRegistrar {
      * @param msg The error message
      */
     private static void handleException(String msg) {
-
         log.error(msg);
         throw new SynapseException(msg);
     }
@@ -346,7 +329,6 @@ public class DataSourceRegistrar {
      * @param e   The exception
      */
     private static void handleException(String msg, Exception e) {
-
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }

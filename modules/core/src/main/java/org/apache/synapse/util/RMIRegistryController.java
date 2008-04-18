@@ -18,8 +18,8 @@ public class RMIRegistryController {
     public static final Log log = LogFactory.getLog(RMIRegistryController.class);
 
     private static RMIRegistryController ourInstance = new RMIRegistryController();
-
     private Registry localRegistry;
+    private boolean weCreatedRMIReg = false;
 
     public static RMIRegistryController getInstance() {
         return ourInstance;

@@ -80,6 +80,9 @@ public class AggregateMediator extends AbstractMediator {
     private Map<String, Aggregate> activeAggregates =
         Collections.synchronizedMap(new HashMap<String, Aggregate>());
 
+    /** Lock object to provide the synchronized access to the activeAggregates on checking */
+    private final Object lock = new Object();
+
     public AggregateMediator() {
         try {
             aggregationExpression = new SynapseXPath("s11:Body/child::*[position()=1] | " +
@@ -122,28 +125,31 @@ public class AggregateMediator extends AbstractMediator {
             if (correlateExpression != null
                 && correlateExpression.evaluate(synCtx) != null) {
 
-                if (activeAggregates.containsKey(correlateExpression.toString())) {
-                    aggregate = activeAggregates.get(correlateExpression.toString());
+                synchronized (lock) {
 
-                } else {
+                    if (activeAggregates.containsKey(correlateExpression.toString())) {
+                        aggregate = activeAggregates.get(correlateExpression.toString());
 
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Creating new Aggregator - " +
-                                (completionTimeoutMillis > 0 ? "expires in : "
-                                        + (completionTimeoutMillis / 1000) + "secs" :
-                                        "without expiry time"));
+                    } else {
+
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                    (completionTimeoutMillis > 0 ? "expires in : "
+                                            + (completionTimeoutMillis / 1000) + "secs" :
+                                            "without expiry time"));
+                        }
+
+                        aggregate = new Aggregate(
+                                correlateExpression.toString(),
+                                completionTimeoutMillis,
+                                minMessagesToComplete,
+                                maxMessagesToComplete, this);
+                        if (completionTimeoutMillis > 0) {
+                            synCtx.getConfiguration().getSynapseTimer().
+                                    schedule(aggregate, completionTimeoutMillis);
+                        }
+                        activeAggregates.put(correlateExpression.toString(), aggregate);
                     }
-
-                    aggregate = new Aggregate(
-                        correlateExpression.toString(),
-                        completionTimeoutMillis,
-                        minMessagesToComplete,
-                        maxMessagesToComplete, this);
-                    if (completionTimeoutMillis > 0) {
-                        synCtx.getConfiguration().getSynapseTimer().
-                                schedule(aggregate, completionTimeoutMillis);
-                    }
-                    activeAggregates.put(correlateExpression.toString(), aggregate);
                 }
 
             } else if (synCtx.getProperty(EIPConstants.AGGREGATE_CORRELATION) != null) {
@@ -158,28 +164,31 @@ public class AggregateMediator extends AbstractMediator {
                 if (o != null && o instanceof String) {
                     correlation = (String) o;
 
-                    if (activeAggregates.containsKey(correlation)) {
-                        aggregate = activeAggregates.get(correlation);
+                    synchronized (lock) {
 
-                    } else {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Creating new Aggregator - " +
-                                    (completionTimeoutMillis > 0 ? "expires in : "
-                                            + (completionTimeoutMillis / 1000) + "secs" :
-                                            "without expiry time"));
-                        }
+                        if (activeAggregates.containsKey(correlation)) {
+                            aggregate = activeAggregates.get(correlation);
+
+                        } else {
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                        (completionTimeoutMillis > 0 ? "expires in : "
+                                                + (completionTimeoutMillis / 1000) + "secs" :
+                                                "without expiry time"));
+                            }
                         
-                        aggregate = new Aggregate(
-                                correlation,
-                                completionTimeoutMillis,
-                                minMessagesToComplete,
-                            maxMessagesToComplete, this);
+                            aggregate = new Aggregate(
+                                    correlation,
+                                    completionTimeoutMillis,
+                                    minMessagesToComplete,
+                                    maxMessagesToComplete, this);
 
-                        if (completionTimeoutMillis > 0) {
-                            synCtx.getConfiguration().getSynapseTimer().
-                                    schedule(aggregate, completionTimeoutMillis);
+                            if (completionTimeoutMillis > 0) {
+                                synCtx.getConfiguration().getSynapseTimer().
+                                        schedule(aggregate, completionTimeoutMillis);
+                            }
+                            activeAggregates.put(correlation, aggregate);
                         }
-                        activeAggregates.put(correlation, aggregate);
                     }
 
                 } else {

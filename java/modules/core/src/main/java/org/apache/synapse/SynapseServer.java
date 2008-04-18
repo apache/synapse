@@ -25,7 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 
 /**
- * Starts all transports as specified on the axis2.xml
+ * This is the class invoked by the command line scripts synapse.sh and synapse-daemon.sh to
+ * start an instance of Synapse. This class calls on the ServerManager to start up the instance
  */
 public class SynapseServer {
 
@@ -48,7 +49,6 @@ public class SynapseServer {
         serverManager.setAxis2Repolocation(args[0]);
         serverManager.start();
         addShutdownHook();
-
     }
 
     private static void addShutdownHook() {

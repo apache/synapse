@@ -143,20 +143,19 @@ public class StockQuoteClient {
             payload = StockQuoteHandler.createMarketActivityRequest();
             options.setAction("urn:getMarketActivity");
         } else if ("quote".equals(mode) || "dualquote".equals(mode)) {
-            serviceClient.engageModule("addressing");
-            options.setUseSeparateListener(true);
             payload = StockQuoteHandler.createStandardQuoteRequest(
                     symbol, Integer.parseInt(itr));
             options.setAction("urn:getQuote");
+            if ("dualquote".equals(mode)) {
+                serviceClient.engageModule("addressing");
+                options.setUseSeparateListener(true);
+            }
         }
 
         // set addressing, transport and proxy url
         if (addUrl != null && !"null".equals(addUrl)) {
             serviceClient.engageModule("addressing");
             options.setTo(new EndpointReference(addUrl));
-            if ("dualquote".equals(mode)) {
-                options.setUseSeparateListener(true);
-            }
         }
         if (trpUrl != null && !"null".equals(trpUrl)) {
             options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);

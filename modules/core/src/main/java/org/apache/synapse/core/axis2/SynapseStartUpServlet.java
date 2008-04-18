@@ -33,7 +33,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * This servlet will start and stop all the listeners.
+ * When Synapse is deployed on a WAR container, this is the init servlet that kicks off the
+ * Synapse instance, calling on the ServerManager
  */
 
 public class SynapseStartUpServlet extends HttpServlet {

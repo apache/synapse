@@ -35,8 +35,13 @@ import java.io.File;
 import java.net.*;
 
 /**
- * To manage the Synapse Server  instances. This class is responsible for
- * the staring and stopping listeners
+ * This is the core class that starts up a Synapse instance.
+ *
+ * From the command line scripts synapse.sh and synapse-daemon.sh (though the wrapper.conf)
+ * the SynapseServer is invoked which inturn calls on this to start the instance
+ *
+ * When the WAR deployment is used, the SynapseStartUpServlet servlet calls on this class to
+ * initialize Synapse
  */
 
 public class ServerManager {
@@ -115,7 +120,7 @@ public class ServerManager {
                 = configctx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
             Parameter synCfg
                 = configctx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
-            String message = "Unable to initialize the Synapse Configuration : Can not find the ";
+            String message = "Unable to initialize the Synapse Configuration : Cannot find the ";
             if (synCfg == null || synCfg.getValue() == null
                 || !(synCfg.getValue() instanceof SynapseConfiguration)) {
                 log.fatal(message + "Synapse Configuration");
@@ -136,14 +141,11 @@ public class ServerManager {
                         stp.init((SynapseEnvironment) synEnv.getValue());
                     }
                 }
-            }
-            
+            }            
             log.info("Ready for processing");
 
         } catch (Throwable t) {
-            t.printStackTrace();
-            log.fatal("Startup failed...");
-            System.exit(1); // must stop application
+            log.fatal("Startup failed...", t);
         }
     }
 
@@ -152,14 +154,13 @@ public class ServerManager {
      */
     public void stop() {
         try {
-
             RMIRegistryController.getInstance().removeLocalRegistry();
             
             if (listenerManager != null) {
                 listenerManager.stop();
                 listenerManager.destroy();
             }
-            //we need to call this method to clean the team fils we created.
+            //we need to call this method to clean the temp files we created.
             if (configctx != null) {
                 configctx.terminate();
             }

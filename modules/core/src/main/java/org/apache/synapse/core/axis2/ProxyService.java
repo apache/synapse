@@ -225,6 +225,7 @@ public class ProxyService {
 
         InputStream wsdlInputStream = null;
         OMElement wsdlElement = null;
+        boolean wsdlFound = false;
 
         if (wsdlKey != null) {
             synCfg.getEntryDefinition(wsdlKey);
@@ -232,8 +233,10 @@ public class ProxyService {
             if (keyObject instanceof OMElement) {
                 wsdlElement = (OMElement) keyObject;
             }
+            wsdlFound = true;
         } else if (inLineWSDL != null) {
             wsdlElement = (OMElement) inLineWSDL;
+            wsdlFound = true;
         } else if (wsdlURI != null) {
             try {
                 URL url = wsdlURI.toURL();
@@ -241,15 +244,23 @@ public class ProxyService {
                 if (node instanceof OMElement) {
                     wsdlElement = (OMElement) node;
                 }
+                wsdlFound = true;
             } catch (MalformedURLException e) {
                 handleException("Malformed URI for wsdl", e);
             } catch (IOException e) {
                 handleException("Error reading from wsdl URI", e);
             }
+        } else {
+            // this is for POX... create a dummy service and an operation for which
+            // our SynapseDispatcher will properly dispatch to
+            if (trace()) trace.info("Did not find a WSDL. Assuming a POX or Legacy service");
+            proxyService = new AxisService();
+            AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
+            proxyService.addOperation(mediateOperation);
         }
 
         // if a WSDL was found
-        if (wsdlElement != null) {
+        if (wsdlFound && wsdlElement != null) {
             OMNamespace wsdlNamespace = wsdlElement.getNamespace();
 
             // serialize and create an inputstream to read WSDL
@@ -352,12 +363,8 @@ public class ProxyService {
                 }
             }
         } else {
-            // this is for POX... create a dummy service and an operation for which
-            // our SynapseDispatcher will properly dispatch to
-            if (trace()) trace.info("Did not find a WSDL. Assuming a POX or Legacy service");
-            proxyService = new AxisService();
-            AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
-            proxyService.addOperation(mediateOperation);
+            handleException("Couldn't build the proxy service : " + name
+                    + ". Unable to locate the specified WSDL to build the service");
         }
 
         // Set the name and description. Currently Axis2 uses the name as the

@@ -18,10 +18,7 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import org.apache.synapse.transport.base.AbstractTransportSender;
-import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.base.BaseTransportException;
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.base.*;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
@@ -50,7 +47,7 @@ import java.io.ByteArrayOutputStream;
  * axis2.xml - transport definition
  *  <transportSender name="file" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
  */
-public class VFSTransportSender extends AbstractTransportSender {
+public class VFSTransportSender extends AbstractTransportSender implements ManagementSupport {
 
     public static final String TRANSPORT_NAME = "vfs";
 
@@ -195,6 +192,7 @@ public class VFSTransportSender extends AbstractTransportSender {
                                 try {
                                     ((DataHandler) dh).writeTo(baos);
                                 } catch (IOException e) {
+                                    metrics.incrementFaultsSending();
                                     handleException("Error serializing binary content of element : " +
                                         BaseConstants.DEFAULT_BINARY_WRAPPER, e);
                                 }
@@ -205,9 +203,11 @@ public class VFSTransportSender extends AbstractTransportSender {
                     	os.close();
                     }
                 } catch (FileSystemException e) {
+                    metrics.incrementFaultsSending();
                     handleException("Error getting an output stream to file : " +
                         responseFile.getName().getBaseName(), e);
                 } catch (IOException e) {
+                    metrics.incrementFaultsSending();
                     handleException("Error getting binary content of message", e);
                 }
 
@@ -225,15 +225,22 @@ public class VFSTransportSender extends AbstractTransportSender {
                         } else {
                             os.write(firstChild.getText().getBytes());
                         }
+                    } catch (IOException e) {
+                        metrics.incrementFaultsSending();
+                        handleException("Error serializing text content of element : " +
+                                        BaseConstants.DEFAULT_TEXT_WRAPPER, e);
                     } finally {
                     	os.close();
                     }
                 } catch (FileSystemException e) {
+                    metrics.incrementFaultsSending();
                     handleException("Error getting an output stream to file : " +
                         responseFile.getName().getBaseName(), e);
                 } catch (IOException e) {
+                    metrics.incrementFaultsSending();
                     handleException("Error getting text content of message as bytes", e);
                 } catch (XMLStreamException e) {
+                    metrics.incrementFaultsSending();
                     handleException("Error serializing OMSourcedElement content", e);
                 }
             } else {
@@ -241,6 +248,16 @@ public class VFSTransportSender extends AbstractTransportSender {
             }
         } else {
             populateSOAPFile(responseFile, msgContext);
+        }
+
+        // update metrics
+        metrics.incrementMessagesSent();
+        try {
+            if (responseFile != null && responseFile.getContent() != null) {
+                metrics.incrementBytesSent(responseFile.getContent().getSize());
+            }
+        } catch (FileSystemException e) {
+            log.warn("Unable to update transport metrics for file written", e);
         }
     }
 

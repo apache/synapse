@@ -778,34 +778,33 @@ Derby Database server) section and setup database for
 <p><strong>synapse.properties configuration <br />
 </strong></p>
 <pre>#datasources
-synapse.datasources =lookupds,reportds
-#JNDI naming initial context factory , provider URL and port
+synapse.datasources=lookupds,reportds
 synapse.datasources.icFactory=com.sun.jndi.rmi.registry.RegistryContextFactory
 synapse.datasources.providerUrl=rmi://localhost:2199
 synapse.datasources.providerPort=2199
 
-synapse.datasources.lookupds.type =BasicDataSource
-# name which uses when registering datasource in the context tree. If this isn't available then uses #datasource identifier (Ex lookupds)
-synapse.datasources.lookupds.dsName=lookupdb
-
+synapse.datasources.lookupds.type=BasicDataSource
 synapse.datasources.lookupds.driverClassName=org.apache.derby.jdbc.ClientDriver
 synapse.datasources.lookupds.url=jdbc:derby://localhost:1527/lookupdb;create=false
 synapse.datasources.lookupds.username=synapse
 synapse.datasources.lookupds.password=synapse
+synapse.datasources.lookupds.dsName=lookupdb
 synapse.datasources.lookupds.maxActive=100
 synapse.datasources.lookupds.maxIdle=20
 synapse.datasources.lookupds.maxWait=10000
 
-synapse.datasources.reportds.type =PerUserPoolDataSource
-synapse.datasources.lookupds.cpdsadapter.factory=org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS
-synapse.datasources.lookupds.cpdsadapter.className=org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS
-synapse.datasources.lookupds.cpdsadapter.name=cpds
+synapse.datasources.reportds.type=PerUserPoolDataSource
+synapse.datasources.reportds.cpdsadapter.factory=org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS
+synapse.datasources.reportds.cpdsadapter.className=org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS
+synapse.datasources.reportds.cpdsadapter.name=cpds
 synapse.datasources.reportds.dsName=reportdb
-
 synapse.datasources.reportds.driverClassName=org.apache.derby.jdbc.ClientDriver
 synapse.datasources.reportds.url=jdbc:derby://localhost:1527/reportdb;create=false
 synapse.datasources.reportds.username=synapse
-synapse.datasources.reportds.password=synapse</pre>
+synapse.datasources.reportds.password=synapse
+synapse.datasources.reportds.maxActive=100
+synapse.datasources.reportds.maxIdle=20
+synapse.datasources.reportds.maxWait=10000</pre>
 </div>
 </div>
 </body>

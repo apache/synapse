@@ -42,10 +42,10 @@ import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
-import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.threads.WorkerPool;
 import org.apache.synapse.transport.base.threads.WorkerPoolFactory;
+import org.apache.synapse.transport.nhttp.util.PipeImpl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -468,6 +468,17 @@ public class ClientHandler implements NHttpClientHandler {
                 
                 log.error("Received an internal server error : " +
                         response.getStatusLine().getReasonPhrase());
+                return;
+            }
+            case HttpStatus.SC_CONTINUE : {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Received a 100 Continue response");
+                }
+
+                // according to the HTTP 1.1 specification HTTP status 100 continue implies that
+                // the response will be followed, and the client should just ignore the 100 Continue
+                // and wait for the response
                 return;
             }
             case HttpStatus.SC_OK : {

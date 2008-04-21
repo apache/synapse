@@ -237,7 +237,7 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                     metrics.incrementMessagesSent();
                     try {
                         if (message instanceof BytesMessage) {
-                            metrics.incrementBytesSent(((BytesMessage) message).getBodyLength());
+                            metrics.incrementBytesSent(JMSUtils.getBodyLength((BytesMessage) message));
                         } else if (message instanceof TextMessage) {
                             metrics.incrementBytesSent((
                                 (TextMessage) message).getText().getBytes().length);
@@ -326,7 +326,7 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                 metrics.incrementMessagesReceived();                
                 try {
                     if (reply instanceof BytesMessage) {
-                        metrics.incrementBytesReceived(((BytesMessage) reply).getBodyLength());
+                        metrics.incrementBytesReceived(JMSUtils.getBodyLength((BytesMessage) reply));
                     } else if (reply instanceof TextMessage) {
                         metrics.incrementBytesReceived((
                             (TextMessage) reply).getText().getBytes().length);

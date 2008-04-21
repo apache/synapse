@@ -51,6 +51,8 @@ import javax.naming.Context;
 import java.io.*;
 import java.util.*;
 import java.nio.ByteBuffer;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Miscallaneous methods used for the JMS transport
@@ -58,6 +60,8 @@ import java.nio.ByteBuffer;
 public class JMSUtils extends BaseUtils {
 
     private static final Log log = LogFactory.getLog(JMSUtils.class);
+    private static final Class[]  NOARGS  = new Class[] {};
+    private static final Object[] NOPARMS = new Object[] {};
 
     private static BaseUtils _instance = new JMSUtils();
 
@@ -792,5 +796,33 @@ public class JMSUtils extends BaseUtils {
         } else {
             return ((TopicSession) session).createTemporaryTopic();
         }
+    }
+
+    public static long getBodyLength(BytesMessage bMsg) {
+        try {
+            Method mtd = bMsg.getClass().getMethod("getBodyLength", NOARGS);
+            if (mtd != null) {
+                return (Long) mtd.invoke(bMsg, NOPARMS);
+            }
+        } catch (Exception e) {
+            // JMS 1.0
+            if (log.isDebugEnabled()) {
+                log.debug("Error trying to determine JMS BytesMessage body length", e);
+            }
+        }
+
+        // if JMS 1.0
+        long length = 0;
+        try {
+            byte[] buffer = new byte[2048];
+            bMsg.reset();
+            for (int bytesRead = bMsg.readBytes(buffer); bytesRead != -1;
+                 bytesRead = bMsg.readBytes(buffer)) {
+                 if (bytesRead != -1) {
+                    length += bytesRead;
+                 }
+            }
+        } catch (JMSException e) {}
+        return length;
     }
 }

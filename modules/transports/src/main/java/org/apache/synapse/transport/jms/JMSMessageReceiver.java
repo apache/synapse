@@ -98,7 +98,7 @@ public class JMSMessageReceiver implements MessageListener {
         // update transport level metrics
         try {
             if (message instanceof BytesMessage) {
-                metrics.incrementBytesReceived(((BytesMessage) message).getBodyLength());
+                metrics.incrementBytesReceived((JMSUtils.getBodyLength((BytesMessage) message)));
             } else if (message instanceof TextMessage) {
                 metrics.incrementBytesReceived(((TextMessage) message).getText().getBytes().length);
             } else {

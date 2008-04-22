@@ -29,13 +29,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This interface is a point of control for Axis2 (and Sandesha2 in particular) to control
- * the behaviour of a Request-Response transport such as HTTP/s
+ * This interface is a point of control for Axis2 to control the behaviour of a Request-Response
+ * transport such as HTTP/s
  *
  * For nhttp, this does not make much of a difference, as we are capable of keeping a socket open
- * and writing to it from a different thread, while letting the initial thread that read the request
- * go free. However, it seems like Sandesha2 is looking for this interface, and it is not going to
- * create much of an issue anyway
+ * and writing to it from a different thread, while letting the initial thread that read the
+ * request go free.
  */
 public class HttpCoreRequestResponseTransport implements RequestResponseTransport {
 

@@ -47,8 +47,8 @@ public class AnonymousServiceFactory {
     private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
     private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
 
-    public static final String OUT_IN_OPERATION   = "__OUT_IN_OPERATION__";
-    public static final String OUT_ONLY_OPERATION = "__OUT_ONLY_OPERATION__";
+    public static final String OUT_IN_OPERATION   = "anonOutInOp";
+    public static final String OUT_ONLY_OPERATION = "anonOutonlyOp";
 
     private static SynapseCallbackReceiver synapseCallbackReceiver = null;
 
@@ -99,7 +99,7 @@ public class AnonymousServiceFactory {
 
                         if (wsRMOn) {
                             service.engageModule(axisCfg.getModule(
-                                SynapseConstants.SANDESHA2_MODULE_NAME), axisCfg);
+                                SynapseConstants.MERCURY_MODULE_NAME), axisCfg);
                         }
                         if (wsSecOn) {
                             service.engageModule(axisCfg.getModule(

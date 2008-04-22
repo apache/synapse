@@ -202,6 +202,7 @@ public class ServerWorker implements Runnable {
         // invocation within the actual service and synapse for a dual channel request from the
         // client. This condition is a bit complex but cannot simplify any further.
         if (msgContext != null && msgContext.getOperationContext() != null &&
+                !msgContext.getOperationContext().getAxisOperation().isControlOperation() &&
                 ((!Constants.VALUE_TRUE.equals(msgContext.getOperationContext().getProperty(
                         Constants.RESPONSE_WRITTEN)) && !"SKIP".equals(
                         msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN)))

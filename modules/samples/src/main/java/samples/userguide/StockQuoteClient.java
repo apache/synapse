@@ -32,8 +32,8 @@ import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.util.UUIDGenerator;
+import org.wso2.mercury.util.MercuryClientConstants;
 import samples.common.StockQuoteHandler;
 
 import java.io.File;
@@ -190,7 +190,7 @@ public class StockQuoteClient {
             serviceClient.engageModule("Mercury");
             options.setProperty("MercuryLastMessage", Constants.VALUE_TRUE);
             options.setProperty(
-                    SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
+                    MercuryClientConstants.SEQUENCE_OFFER, UUIDGenerator.getUUID());
         }
 
         serviceClient.setOptions(options);

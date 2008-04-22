@@ -20,16 +20,16 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.UUIDGenerator;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
+import org.wso2.mercury.util.MercuryClientConstants;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public class RMSequenceMediator extends AbstractMediator {
                 orgMessageCtx.getOptions().setProperty(
                     SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
                 orgMessageCtx.getOptions().setProperty(
-                    SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
+                    MercuryClientConstants.SEQUENCE_OFFER, offeredSeqID);
                 orgMessageCtx.getOptions().setProperty(
                     SynapseConstants.MERCURY_LAST_MESSAGE, "true");
 
@@ -104,7 +104,7 @@ public class RMSequenceMediator extends AbstractMediator {
                 if (!sequenceMap.containsKey(correlationValue)) {
                     offeredSeqID = UUIDGenerator.getUUID();
                     orgMessageCtx.getOptions().setProperty(
-                        SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
+                        MercuryClientConstants.SEQUENCE_OFFER, offeredSeqID);
                 }
 
                 String sequenceID = retrieveSequenceID(correlationValue);

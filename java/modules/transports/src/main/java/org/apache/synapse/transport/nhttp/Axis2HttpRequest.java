@@ -18,31 +18,35 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.MessageContext;
+import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.synapse.transport.nhttp.util.PipeImpl;
-import org.apache.synapse.transport.nhttp.util.RESTUtil;
-import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
-import org.apache.http.*;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpVersion;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HTTP;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.axiom.om.OMOutputFormat;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+import org.apache.synapse.transport.nhttp.util.PipeImpl;
+import org.apache.synapse.transport.nhttp.util.RESTUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Map;
+import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Represents an outgoing Axis2 HTTP/s request. It holds the EPR of the destination, the
@@ -188,6 +192,17 @@ public class Axis2HttpRequest {
             log.debug("get source channel of the pipe on which the outgoing response is written");
         }
         return pipe.source();
+    }
+
+    /**
+     * Return the sink channel of the pipe that bridges the serialized output to the socket
+     * @return sink channel to read serialized message contents
+     */
+    public WritableByteChannel getSinkChannel() {
+        if (log.isDebugEnabled()) {
+            log.debug("get sink channel of the pipe on which the outgoing response is written");
+        }
+        return pipe.sink();
     }
 
     /**

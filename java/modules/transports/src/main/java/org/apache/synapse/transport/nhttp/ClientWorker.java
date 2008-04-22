@@ -81,6 +81,10 @@ public class ClientWorker implements Runnable {
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().
                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+            // fix for RM to work because of a soapAction and wsaAction conflict
+            if (responseMsgCtx != null) {
+                responseMsgCtx.setSoapAction("");
+            }
         } catch (AxisFault af) {
             log.error("Error getting IN message context from the operation context", af);
             return;
@@ -91,11 +95,11 @@ public class ClientWorker implements Runnable {
         // context, as it may get a 202 accepted or 200. So if the operation is complete ignore
         // this message, else, create a new message context and handle this
         if (responseMsgCtx == null && outMsgCtx.getOperationContext().isComplete()) {
+
             if (log.isDebugEnabled()) {
                 log.debug("Error getting IN message context from the operation context. " +
                         "Possibly an RM terminate sequence message");
             }
-            return;
 
         } else {
             if (responseMsgCtx == null) {

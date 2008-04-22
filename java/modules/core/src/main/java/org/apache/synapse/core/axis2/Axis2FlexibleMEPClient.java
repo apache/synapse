@@ -298,22 +298,23 @@ public class Axis2FlexibleMEPClient {
 
     private static void copyRMOptions(MessageContext oriContext, Options targetOptions) {
         Options oriOptions = oriContext.getOptions();
-        if (oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE) != null) {
-            targetOptions.setProperty(SynapseConstants.SANDESHA_LAST_MESSAGE,
-                    oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE));
+        if (oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE) != null) {
+            targetOptions.setProperty(SynapseConstants.MERCURY_LAST_MESSAGE,
+                    oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE));
         }
-        if (oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION) != null) {
-            targetOptions.setProperty(SynapseConstants.SANDESHA_SPEC_VERSION,
-                    oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION));
+        if (oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION) != null) {
+            targetOptions.setProperty(SynapseConstants.MERCURY_SPEC_VERSION,
+                    oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION));
         }
-        if (oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY) != null) {
-            targetOptions.setProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY,
-                    oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY));
+        if (oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY) != null) {
+            targetOptions.setProperty(SynapseConstants.MERCURY_SEQUENCE_KEY,
+                    oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY));
         }
-        if (oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
-            targetOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,
-                    oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID));
-        }
+        // todo:[ruwan] migrate to Mercury
+//        if (oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
+//            targetOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,
+//                    oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID));
+//        }
     }
 
     /**

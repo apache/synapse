@@ -44,7 +44,6 @@
     <!--is set, then Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
     <parameter name="DrillDownToRootCauseForFaultReason">false</parameter>
 
-    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
     <parameter name="userName">admin</parameter>
     <parameter name="password">axis2</parameter>
 

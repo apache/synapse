@@ -499,7 +499,7 @@ public class ProxyService {
             auditInfo("WS-Reliable messaging is enabled for service : " + name);
             try {
                 proxyService.engageModule(axisCfg.getModule(
-                    SynapseConstants.SANDESHA2_MODULE_NAME), axisCfg);
+                    SynapseConstants.MERCURY_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS RM module on proxy service : " + name, axisFault);
             }

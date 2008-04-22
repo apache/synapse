@@ -96,13 +96,13 @@ public class SynapseInitializationModule implements Module {
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
 
-//        log.info("Initializing Sandesha 2...");
-//        AxisModule sandeshaAxisModule = configurationContext.getAxisConfiguration().
-//            getModule(SynapseConstants.SANDESHA2_MODULE_NAME);
-//        if (sandeshaAxisModule != null) {
-//            Module sandesha2 = sandeshaAxisModule.getModule();
-//            sandesha2.init(configurationContext, sandeshaAxisModule);
-//        }
+        log.info("Initializing Mercury...");
+        AxisModule mercuryAxisModule = configurationContext.getAxisConfiguration().
+            getModule(SynapseConstants.MERCURY_MODULE_NAME);
+        if (mercuryAxisModule != null) {
+            Module mercury = mercuryAxisModule.getModule();
+            mercury.init(configurationContext, mercuryAxisModule);
+        }
 
         // this server name is given by system property SynapseServerName
         // otherwise take host-name

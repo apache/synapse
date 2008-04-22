@@ -264,6 +264,7 @@
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
+                <exclude>org.wso2.mercury:mercury-mar:mar</exclude>
                 <exclude>org.apache.ant:ant:jar</exclude>
                 <exclude>org.apache.ant:ant-nodeps:jar</exclude>
                 <exclude>org.apache.ant:ant-launcher:jar</exclude>
@@ -288,7 +289,7 @@
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
                 <include>org.apache.rampart:rampart:mar</include>
-                <include>org.apache.sandesha2:sandesha2:mar</include>
+                <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
@@ -298,7 +299,7 @@
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
                 <include>org.apache.rampart:rampart:mar</include>
-                <include>org.apache.sandesha2:sandesha2:mar</include>
+                <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
@@ -308,7 +309,7 @@
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
                 <include>org.apache.rampart:rampart:mar</include>
-                <include>org.apache.sandesha2:sandesha2:mar</include>
+                <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>

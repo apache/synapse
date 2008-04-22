@@ -49,6 +49,7 @@ import org.apache.synapse.transport.nhttp.util.PipeImpl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -82,7 +83,9 @@ public class ClientHandler implements NHttpClientHandler {
     private static final String RESPONSE_BUFFER = "response-buffer";
     private static final String OUTGOING_MESSAGE_CONTEXT = "axis2_message_context";
     private static final String REQUEST_SOURCE_CHANNEL = "request-source-channel";
-    private static final String RESPONSE_SINK_CHANNEL = "request-sink-channel";
+    private static final String RESPONSE_SINK_CHANNEL = "response-sink-channel";
+    private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
+    private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
 
     private static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
     private static final String CONTENT_TYPE = "Content-Type";
@@ -132,6 +135,7 @@ public class ClientHandler implements NHttpClientHandler {
 
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
+            context.setAttribute(REQUEST_SINK_CHANNEL, axis2Req.getSinkChannel());
 
             HttpRequest request = axis2Req.getRequest();
             request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
@@ -172,6 +176,7 @@ public class ClientHandler implements NHttpClientHandler {
 
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
+            context.setAttribute(REQUEST_SINK_CHANNEL, axis2Req.getSinkChannel());
 
             HttpRequest request = axis2Req.getRequest();
             request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
@@ -189,9 +194,28 @@ public class ClientHandler implements NHttpClientHandler {
 
     public void closed(final NHttpClientConnection conn) {
     	checkAxisRequestComplete(conn, "Abnormal connection close", null);
+
+        // Check sink and source channels and close them if they aren't closed already.
+        // Normally these should be closed by inputReady() and outputReady(). A null request
+        // or response will not hit inputReady and outputReady however.
+
+        HttpContext context = conn.getContext();
+        closeChannel((ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL));
+        closeChannel((ReadableByteChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL));
+        closeChannel((WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL));
+        closeChannel((WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL));
+        
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
         }
+    }
+
+    private void closeChannel(Channel chn) {
+        try {
+            if (chn != null && chn.isOpen()) {
+                chn.close();
+            }
+        } catch (IOException ignore) {}
     }
 
     /**
@@ -408,9 +432,8 @@ public class ClientHandler implements NHttpClientHandler {
                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
                         if (responseMsgCtx == null ||
                                 outMsgCtx.getOptions().isUseSeparateListener()) {
-                            // to support Sandesha.. however, this means that we received a
-                            // 202 accepted for an out-only , for which we do not need a
-                            // dummy message anyway
+                            // This means that we received a 202 accepted for an out-only ,
+                            // for which we do not need a dummy message anyway
                             return;
                         }
                         responseMsgCtx.setServerSide(true);
@@ -534,6 +557,7 @@ public class ClientHandler implements NHttpClientHandler {
         try {
             PipeImpl responsePipe = new PipeImpl();
             context.setAttribute(RESPONSE_SINK_CHANNEL, responsePipe.sink());
+            context.setAttribute(RESPONSE_SOURCE_CHANNEL, responsePipe.source());
 
             BasicHttpEntity entity = new BasicHttpEntity();
             if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {

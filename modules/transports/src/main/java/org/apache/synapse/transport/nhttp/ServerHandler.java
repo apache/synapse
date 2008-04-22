@@ -43,6 +43,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.Channel;
 
 /**
  * The server connection handler. An instance of this class is used by each IOReactor, to
@@ -76,6 +77,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
     private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
+    private static final String REQUEST_SOURCE_CHANNEL = "request-source-channel";
+    private static final String RESPONSE_SINK_CHANNEL = "response-sink-channel";
     private static final String REQUEST_BUFFER = "request-buffer";
     private static final String RESPONSE_BUFFER = "response-buffer";
 
@@ -117,7 +120,9 @@ public class ServerHandler implements NHttpServiceHandler {
             PipeImpl requestPipe  = new PipeImpl(); // the pipe used to process the request
             PipeImpl responsePipe = new PipeImpl(); // the pipe used to process the response
             context.setAttribute(REQUEST_SINK_CHANNEL, requestPipe.sink());
+            context.setAttribute(REQUEST_SOURCE_CHANNEL, requestPipe.source());
             context.setAttribute(RESPONSE_SOURCE_CHANNEL, responsePipe.source());
+            context.setAttribute(RESPONSE_SINK_CHANNEL, responsePipe.sink());
 
             // create the default response to this request
             ProtocolVersion httpVersion = request.getRequestLine().getProtocolVersion();
@@ -273,9 +278,28 @@ public class ServerHandler implements NHttpServiceHandler {
     }
 
     public void closed(final NHttpServerConnection conn) {
+
+        // Check sink and source channels and close them if they aren't closed already.
+        // Normally these should be closed by inputReady() and outputReady(). A null request
+        // or response will not hit inputReady and outputReady however.
+
+        HttpContext context = conn.getContext();
+        closeChannel((ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL));
+        closeChannel((ReadableByteChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL));
+        closeChannel((WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL));
+        closeChannel((WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL));
+
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
         }
+    }
+
+    private void closeChannel(Channel chn) {
+        try {
+            if (chn != null && chn.isOpen()) {
+                chn.close();
+            }
+        } catch (IOException ignore) {}
     }
 
     /**

@@ -224,18 +224,18 @@ public class EndpointDefinition {
     }
 
     /**
-     * Get the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     * Get the WS-RM configuration policys' 'key' to be used
      *
-     * @return the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     * @return the WS-RM configuration policys' 'key' to be used
      */
     public String getWsRMPolicyKey() {
         return wsRMPolicyKey;
     }
 
     /**
-     * Set the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     * Set the WS-RM configuration policys' 'key' to be used
      *
-     * @param wsRMPolicyKey the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     * @param wsRMPolicyKey the WS-RM configuration policys' 'key' to be used
      */
     public void setWsRMPolicyKey(String wsRMPolicyKey) {
         this.wsRMPolicyKey = wsRMPolicyKey;

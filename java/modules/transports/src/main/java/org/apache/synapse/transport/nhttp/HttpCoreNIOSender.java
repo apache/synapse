@@ -18,37 +18,21 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.lang.management.ManagementFactory;
-
-import javax.net.ssl.SSLContext;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.util.MessageContextBuilder;
-import org.apache.axis2.util.Utils;
 import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.AddressingHelper;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.TransportSender;
-import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
@@ -58,18 +42,35 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.reactor.*;
+import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.nio.reactor.IOReactorExceptionHandler;
+import org.apache.http.nio.reactor.SessionRequest;
+import org.apache.http.nio.reactor.SessionRequestCallback;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
-import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.TransportView;
-import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+import org.wso2.mercury.util.MercuryConstants;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -379,9 +380,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // if this is a dummy message to handle http 202 case with non-blocking IO
         // set the status code to 202 and the message body to an empty byte array (see below)
-        if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED) &&
-                msgContext.getProperty(
-                    Sandesha2Constants.MessageContextProperties.SEQUENCE_ID) == null) {
+        if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
         } else {
             Object statusCode = msgContext.getProperty(NhttpConstants.HTTP_SC);
@@ -412,9 +411,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         OutputStream out = worker.getOutputStream();
         try {
-            if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED) &&
-                msgContext.getProperty(
-                    Sandesha2Constants.MessageContextProperties.SEQUENCE_ID) == null) {
+            if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
                 // see comment above on the reasoning
                 out.write(new byte[0]);
             } else {

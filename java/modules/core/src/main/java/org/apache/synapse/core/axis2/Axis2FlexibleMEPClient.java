@@ -46,7 +46,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;

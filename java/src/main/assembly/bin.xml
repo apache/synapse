@@ -263,7 +263,6 @@
                 <exclude>mx4j:mx4j-jmx:jar</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
-                <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
                 <exclude>org.wso2.mercury:mercury-mar:mar</exclude>
                 <exclude>org.apache.ant:ant:jar</exclude>
                 <exclude>org.apache.ant:ant-nodeps:jar</exclude>

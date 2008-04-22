@@ -187,8 +187,8 @@ public class StockQuoteClient {
         }
         if (Boolean.parseBoolean(wsrm)) {
             System.out.println("Using WS-RM");
-            serviceClient.engageModule("sandesha2");
-            options.setProperty("Sandesha2LastMessage", "true");
+            serviceClient.engageModule("Mercury");
+            options.setProperty("MercuryLastMessage", Constants.VALUE_TRUE);
             options.setProperty(
                     SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
         }

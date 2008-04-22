@@ -48,8 +48,8 @@ public final class SynapseConstants {
     public static final QName SYNAPSE_OPERATION_NAME = new QName("mediate");
 
     //- names of modules to be engaged at runtime -
-    /** The Name of the WS-RM Sandesha module */
-    public static final String SANDESHA2_MODULE_NAME = "sandesha2";
+    /** The Name of the WS-RM Mercury module */
+    public static final String MERCURY_MODULE_NAME = "Mercury";
     /** The Name of the WS-A Addressing module */
     public static final String ADDRESSING_MODULE_NAME = "addressing";
     /** The Name of the WS-Security Rampart module */
@@ -121,12 +121,12 @@ public final class SynapseConstants {
         /** The message context property name which holds the exception (if any) for the last encountered exception */
         public static final String ERROR_EXCEPTION = "ERROR_EXCEPTION";
 
-        /** Sandesha last message property name */
-        public static final String SANDESHA_LAST_MESSAGE = "Sandesha2LastMessage";
-        /** Sandesha last sequence key property name */
-        public static final String SANDESHA_SEQUENCE_KEY = "Sandesha2SequenceKey";
-        /** Sandesha WS-RM specification version property name */
-        public static final String SANDESHA_SPEC_VERSION = "Sandesha2RMSpecVersion";
+        /** Mercury last message property name */
+        public static final String MERCURY_LAST_MESSAGE = "MercuryLastMessage";
+        /** Mercury last sequence key property name */
+        public static final String MERCURY_SEQUENCE_KEY = "MercurySequenceKey";
+        /** Mercury WS-RM specification version property name */
+        public static final String MERCURY_SPEC_VERSION = "MercuryRMSpecVersion";
 
     //- Axis2 Message Context Properties used by Synapse -
     /** an axis2 message context property set to hold the relates to for POX responses */

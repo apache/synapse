@@ -76,18 +76,18 @@ public class RMSequenceMediator extends AbstractMediator {
 
             String version = getVersionValue();
             orgMessageCtx.getOptions().setProperty(
-                SynapseConstants.SANDESHA_SPEC_VERSION, version);
+                SynapseConstants.MERCURY_SPEC_VERSION, version);
 
             if (isSingle()) {
                 String sequenceID = UUIDGenerator.getUUID();
                 String offeredSeqID = UUIDGenerator.getUUID();
 
                 orgMessageCtx.getOptions().setProperty(
-                    SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
+                    SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
                 orgMessageCtx.getOptions().setProperty(
                     SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
                 orgMessageCtx.getOptions().setProperty(
-                    SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
+                    SynapseConstants.MERCURY_LAST_MESSAGE, "true");
 
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Using WS-RM version " + version +
@@ -109,11 +109,11 @@ public class RMSequenceMediator extends AbstractMediator {
 
                 String sequenceID = retrieveSequenceID(correlationValue);
                 orgMessageCtx.getOptions().setProperty(
-                    SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
+                    SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
 
                 if (lastMessage) {
                     orgMessageCtx.getOptions().setProperty(
-                        SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
+                        SynapseConstants.MERCURY_LAST_MESSAGE, "true");
                     sequenceMap.remove(correlationValue);
                 }
 

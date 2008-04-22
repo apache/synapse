@@ -44,9 +44,7 @@ import org.apache.commons.logging.LogFactory;
  *      ...
  *    </parameter>+
  *
- *    <!-- Apache Sandesha configurations : may be obsolete soon -->
- *    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..
- *      xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+ *    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..>
  *      ...
  *    </Policy>+
  *

@@ -214,12 +214,13 @@ public class FaultMediator extends AbstractMediator {
         boolean traceOrDebugOn, boolean traceOn) {
 
         if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Creating a SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2") + " fault");
+            traceOrDebug(traceOn, "Creating a SOAP "
+                    + (soapVersion == SOAP11 ? "1.1" : "1.2") + " fault");
         }
 
         // get the correct SOAP factory to be used
-        SOAPFactory factory = (
-            soapVersion == SOAP11 ? OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory());
+        SOAPFactory factory = (soapVersion == SOAP11 ?
+                OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory());
 
         // create the SOAP fault document and envelope
         OMDocument soapFaultDocument = factory.createOMDocument();
@@ -271,7 +272,8 @@ public class FaultMediator extends AbstractMediator {
         try {
             synCtx.setEnvelope(faultEnvelope);
         } catch (AxisFault af) {
-            handleException("Error replacing current SOAP envelope with the fault envelope", af, synCtx);
+            handleException("Error replacing current SOAP envelope " +
+                    "with the fault envelope", af, synCtx);
         }
 
         if (synCtx.getFaultTo() != null) {
@@ -394,21 +396,23 @@ public class FaultMediator extends AbstractMediator {
         if (soapVersion == SOAP11) {
             this.faultCodeValue = faultCodeValue;
 
+        } else if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
+                faultCodeValue.getNamespaceURI()) &&
+                (SOAP12Constants.FAULT_CODE_DATA_ENCODING_UNKNOWN.equals(
+                        faultCodeValue.getLocalPart()) ||
+                        SOAP12Constants.FAULT_CODE_MUST_UNDERSTAND.equals(
+                                faultCodeValue.getLocalPart()) ||
+                        SOAP12Constants.FAULT_CODE_RECEIVER.equals(
+                                faultCodeValue.getLocalPart()) ||
+                        SOAP12Constants.FAULT_CODE_SENDER.equals(
+                                faultCodeValue.getLocalPart()) ||
+                        SOAP12Constants.FAULT_CODE_VERSION_MISMATCH.equals(
+                                faultCodeValue.getLocalPart())) ) {
+
+            this.faultCodeValue = faultCodeValue;
+
         } else {
-            if (
-                SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(faultCodeValue.getNamespaceURI()) &&
-
-                (SOAP12Constants.FAULT_CODE_DATA_ENCODING_UNKNOWN.equals(faultCodeValue.getLocalPart()) ||
-                SOAP12Constants.FAULT_CODE_MUST_UNDERSTAND.equals(faultCodeValue.getLocalPart()) ||
-                SOAP12Constants.FAULT_CODE_RECEIVER.equals(faultCodeValue.getLocalPart()) ||
-                SOAP12Constants.FAULT_CODE_SENDER.equals(faultCodeValue.getLocalPart()) ||
-                SOAP12Constants.FAULT_CODE_VERSION_MISMATCH.equals(faultCodeValue.getLocalPart())) ){
-
-                this.faultCodeValue = faultCodeValue;
-
-            } else {
-                handleException("Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue);
-            }
+            handleException("Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue);
         }
     }
 

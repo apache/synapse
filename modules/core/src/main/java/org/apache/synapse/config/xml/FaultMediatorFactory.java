@@ -34,9 +34,9 @@ import java.net.URISyntaxException;
  * Creates a fault mediator instance
  *
  * <pre>
- * &lt;makefault [version="soap11|soap12"]&gt;
- *   &lt;code (value="literal" | expression="xpath")/&gt;
- *   &lt;reason (value="literal" | expression="xpath")&gt;
+ * &lt;makefault [version="soap11|soap12|pox"]&gt;
+ *   &lt;code (value="literal" | expression="xpath")/&gt;?
+ *   &lt;reason (value="literal" | expression="xpath")&gt;?
  *   &lt;node&gt;?
  *   &lt;role&gt;?
  *   &lt;detail&gt;?
@@ -45,14 +45,21 @@ import java.net.URISyntaxException;
  */
 public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
-    private static final QName FAULT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "makefault");
+    private static final QName FAULT_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "makefault");
 
-    private static final QName ATT_VERSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "version");
-    private static final QName CODE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "code");
-    private static final QName REASON_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "reason");
-    private static final QName NODE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "node");
-    private static final QName ROLE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "role");
-    private static final QName DETAIL_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "detail");
+    private static final QName ATT_VERSION_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "version");
+    private static final QName CODE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "code");
+    private static final QName REASON_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "reason");
+    private static final QName NODE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "node");
+    private static final QName ROLE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "role");
+    private static final QName DETAIL_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "detail");
 
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";
@@ -106,8 +113,9 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                 handleException("A 'value' or 'expression' attribute must specify the fault code");
             }
 
-        } else {
-            handleException("The fault code is a required attribute for the makefault mediator");
+        } else if (faultMediator.getSoapVersion() != FaultMediator.POX) {
+            handleException("The fault code is a required attribute for the " +
+                    "makefault mediator unless it is a pox fault");
         }
 
         OMElement reason = elem.getFirstChildWithName(REASON_Q);
@@ -128,8 +136,9 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                 handleException("A 'value' or 'expression' attribute must specify the fault code");
             }
 
-        } else {
-            handleException("The fault reason is a required attribute for the makefault mediator");
+        } else if (faultMediator.getSoapVersion() != FaultMediator.POX) {
+            handleException("The fault reason is a required attribute for the " +
+                    "makefault mediator unless it is a pox fault");
         }
 
         // after successfully creating the mediator

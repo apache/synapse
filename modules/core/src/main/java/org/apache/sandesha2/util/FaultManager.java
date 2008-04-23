@@ -761,7 +761,7 @@ public class FaultManager {
 	    	transaction = storageManager.getTransaction();
 
 	    	// constructing the fault
-	    	AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
+	    	AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart, rmMsgCtx);
 	    	response = manageIncomingFault (axisFault, rmMsgCtx, faultPart);
 	    	
 	    	if(transaction != null && transaction.isActive()) transaction.commit();
@@ -775,10 +775,28 @@ public class FaultManager {
 	}
 
 	
-	private static AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart) {
-		AxisFault axisFault = new AxisFault(faultPart.getCode(), faultPart.getReason(), faultPart.getNode(), faultPart
-				.getRole(), faultPart.getDetail());
+	private static AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart, RMMsgContext rmMsgCtx) {
+		
+		String soapFaultSubcode = null;
+		SequenceFault sequenceFault = rmMsgCtx.getSequenceFault();
+		AxisFault axisFault = null;
 
+		// If the sequence fault part is not null, then we have an RM specific fault.
+		if (sequenceFault != null) {
+			soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode().getLocalPart();
+			
+			//Need to concatenate all info about the error into string
+			StringBuffer faultSB = new StringBuffer();
+			faultSB.append(soapFaultSubcode + " ");
+			faultSB.append(sequenceFault.getFaultCode().getDetail() + " ");
+			faultSB.append(faultPart.getDetail().getText());
+
+			axisFault = new AxisFault(faultSB.toString(), sequenceFault.getFaultCode().getFaultCode());
+		} else {
+			axisFault = new AxisFault(faultPart.getCode(), faultPart.getReason(), faultPart.getNode(), faultPart
+					.getRole(), faultPart.getDetail());
+		}
+			
 		return axisFault;
 	}
 

@@ -50,6 +50,7 @@ public class Aggregate extends TimerTask {
     /** The AggregateMediator that should be invoked on completion of the aggregation */
     private AggregateMediator aggregateMediator = null;
     private List<MessageContext> messages = new ArrayList<MessageContext>();
+    private boolean locked = false;
 
     /**
      * Save aggregation properties and timeout
@@ -230,5 +231,13 @@ public class Aggregate extends TimerTask {
                 expiryTimeMillis);
         }
         aggregateMediator.completeAggregate(this);
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public synchronized void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

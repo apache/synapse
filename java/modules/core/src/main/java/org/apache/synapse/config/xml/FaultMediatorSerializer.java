@@ -27,9 +27,9 @@ import org.apache.synapse.mediators.transform.FaultMediator;
 
 /**
  * <pre>
- * &lt;makefault [version="soap11|soap12"]&gt;
- *   &lt;code (value="literal" | expression="xpath")/&gt;
- *   &lt;reason (value="literal" | expression="xpath")&gt;
+ * &lt;makefault [version="soap11|soap12|pox"]&gt;
+ *   &lt;code (value="literal" | expression="xpath")/&gt;?
+ *   &lt;reason (value="literal" | expression="xpath")&gt;?
  *   &lt;node&gt;?
  *   &lt;role&gt;?
  *   &lt;detail&gt;?
@@ -76,8 +76,9 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
         } else if (mediator.getFaultCodeExpr() != null) {
             SynapseXPathSerializer.serializeXPath(mediator.getFaultCodeExpr(), code, "expression");
 
-        } else {
-            handleException("Fault code is required for a fault mediator");
+        } else if (mediator.getSoapVersion() != FaultMediator.POX) {
+            handleException("Fault code is required for a fault " +
+                    "mediator unless it is a pox fault");
         }
 
         OMElement reason = fac.createOMElement("reason", synNS, fault);
@@ -90,8 +91,9 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
             SynapseXPathSerializer.serializeXPath(
                 mediator.getFaultReasonExpr(), reason, "expression");
 
-        } else {
-            handleException("Fault reason is required for a fault mediator");
+        } else if (mediator.getSoapVersion() != FaultMediator.POX) {
+            handleException("Fault reason is required for a fault " +
+                    "mediator unless it is a pox fault");
         }
 
 
@@ -107,7 +109,8 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 
         if (mediator.getFaultDetailExpr() != null) {
             OMElement detail = fac.createOMElement("detail", synNS, fault);
-            SynapseXPathSerializer.serializeXPath(mediator.getFaultDetailExpr(), detail, "expression");            
+            SynapseXPathSerializer.serializeXPath(
+                    mediator.getFaultDetailExpr(), detail, "expression");            
         } else if (mediator.getFaultDetail() != null) {
             OMElement detail = fac.createOMElement("detail", synNS, fault);
             detail.setText(mediator.getFaultDetail());

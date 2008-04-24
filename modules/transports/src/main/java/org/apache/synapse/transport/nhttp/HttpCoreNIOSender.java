@@ -56,7 +56,6 @@ import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.TransportView;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
-import org.wso2.mercury.util.MercuryConstants;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -175,7 +174,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         } catch (IOException e) {
             log.fatal("Encountered an I/O error: " + e.getMessage(), e);
         }
-        log.info("Sender Shutdown");
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender Shutdown");
     }
 
     /**
@@ -464,7 +463,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         try {
             ioReactor.shutdown();
             state = BaseConstants.STOPPED;
-            log.info("Sender shut down");
         } catch (IOException e) {
             log.warn("Error shutting down IOReactor", e);
         }

@@ -38,6 +38,7 @@ import java.net.URL;
 import java.net.SocketAddress;
 import java.net.InetSocketAddress;
 import java.io.IOException;
+import java.io.FileInputStream;
 
 public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
 
@@ -69,25 +70,30 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             String storePassword = ksEle.getFirstChildWithName(new QName("Password")).getText();
             String keyPassword   = ksEle.getFirstChildWithName(new QName("KeyPassword")).getText();
 
+            FileInputStream fis = null;
             try {
                 KeyStore keyStore = KeyStore.getInstance(type);
-                URL url = getClass().getClassLoader().getResource(location);
-                if (log.isDebugEnabled()) {
-                    log.debug("Loading Key Store from URL : " + url);
-                }
+                fis = new FileInputStream(location);
+                log.info("Loading Identity Keystore from : " + location);
 
-                keyStore.load(url.openStream(), storePassword.toCharArray());
+                keyStore.load(fis, storePassword.toCharArray());
                 KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
                     KeyManagerFactory.getDefaultAlgorithm());
                 kmfactory.init(keyStore, keyPassword.toCharArray());
                 keymanagers = kmfactory.getKeyManagers();
 
             } catch (GeneralSecurityException gse) {
-                log.error("Error loading Key store : " + location, gse);
-                throw new AxisFault("Error loading Key store : " + location, gse);
+                log.error("Error loading Keystore : " + location, gse);
+                throw new AxisFault("Error loading Keystore : " + location, gse);
             } catch (IOException ioe) {
-                log.error("Error opening Key store : " + location, ioe);
-                throw new AxisFault("Error opening Key store : " + location, ioe);
+                log.error("Error opening Keystore : " + location, ioe);
+                throw new AxisFault("Error opening Keystore : " + location, ioe);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ignore) {}
+                }
             }
         }
 
@@ -97,14 +103,13 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             String type          = tsEle.getFirstChildWithName(new QName("Type")).getText();
             String storePassword = tsEle.getFirstChildWithName(new QName("Password")).getText();
 
+            FileInputStream fis = null;
             try {
                 KeyStore trustStore = KeyStore.getInstance(type);
-                URL url = getClass().getClassLoader().getResource(location);
-                if (log.isDebugEnabled()) {
-                    log.debug("Loading Trust Key Store from URL : " + url);
-                }
+                fis = new FileInputStream(location);
+                log.info("Loading Trust Keystore from : " + location);
 
-                trustStore.load(url.openStream(), storePassword.toCharArray());
+                trustStore.load(fis, storePassword.toCharArray());
                 TrustManagerFactory trustManagerfactory = TrustManagerFactory.getInstance(
                     TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerfactory.init(trustStore);
@@ -116,6 +121,12 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             } catch (IOException ioe) {
                 log.error("Error opening Key store : " + location, ioe);
                 throw new AxisFault("Error opening Key store : " + location, ioe);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ignore) {}
+                }
             }
         }
 

@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
+import java.io.FileInputStream;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -89,14 +90,13 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
             String storePassword = ksEle.getFirstChildWithName(new QName("Password")).getText();
             String keyPassword   = ksEle.getFirstChildWithName(new QName("KeyPassword")).getText();
 
+            FileInputStream fis = null;
             try {
                 KeyStore keyStore = KeyStore.getInstance(type);
-                URL url = getClass().getClassLoader().getResource(location);
-                if (log.isDebugEnabled()) {
-                    log.debug("Loading Key Store from URL : " + url);
-                }
+                fis = new FileInputStream(location);
+                log.info("Loading Identity Keystore from : " + location);
 
-                keyStore.load(url.openStream(), storePassword.toCharArray());
+                keyStore.load(fis, storePassword.toCharArray());
                 KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
                     KeyManagerFactory.getDefaultAlgorithm());
                 kmfactory.init(keyStore, keyPassword.toCharArray());
@@ -108,6 +108,12 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
             } catch (IOException ioe) {
                 log.error("Error opening Key store : " + location, ioe);
                 throw new AxisFault("Error opening Key store : " + location, ioe);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ignore) {}
+                }
             }
         }
 
@@ -117,14 +123,13 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
             String type          = tsEle.getFirstChildWithName(new QName("Type")).getText();
             String storePassword = tsEle.getFirstChildWithName(new QName("Password")).getText();
 
+            FileInputStream fis = null;
             try {
                 KeyStore trustStore = KeyStore.getInstance(type);
-                URL url = getClass().getClassLoader().getResource(location);
-                if (log.isDebugEnabled()) {
-                    log.debug("Loading Trust Key Store from URL : " + url);
-                }
+                fis = new FileInputStream(location);
+                log.info("Loading Trust Keystore from : " + location);
 
-                trustStore.load(url.openStream(), storePassword.toCharArray());
+                trustStore.load(fis, storePassword.toCharArray());
                 TrustManagerFactory trustManagerfactory = TrustManagerFactory.getInstance(
                     TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerfactory.init(trustStore);
@@ -136,6 +141,12 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
             } catch (IOException ioe) {
                 log.error("Error opening Key store : " + location, ioe);
                 throw new AxisFault("Error opening Key store : " + location, ioe);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ignore) {}
+                }
             }
         }
 

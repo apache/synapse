@@ -98,7 +98,7 @@ public class SynapseConfigurationBuilder {
             properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(props));
             return properties;
         } catch (Exception e) {
-            log.warn("Unable to load synapse properties : Using the default tunning parameters for Synapse");
+            log.info("Using the default tuning parameters for Synapse");
         }
         return new Properties();
     }

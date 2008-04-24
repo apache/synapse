@@ -91,12 +91,13 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         } catch (Exception e) {
             log.warn("Error registering the " + transportName + " transport for JMX management", e);
         }
+        log.info(transportName.toUpperCase() + " Sender started");
     }
 
     public void stop() {
         if (state != BaseConstants.STARTED) return;
         state = BaseConstants.STOPPED;
-        log.info("Sender shut down");
+        log.info(transportName.toUpperCase() + " Sender Shutdown");
     }
 
     public void cleanup(MessageContext msgContext) throws AxisFault {}

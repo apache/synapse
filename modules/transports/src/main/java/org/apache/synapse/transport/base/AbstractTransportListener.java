@@ -142,6 +142,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             state = BaseConstants.STOPPED;
             // cancel receipt of service lifecycle events
             cfgCtx.getAxisConfiguration().getObserversList().remove(axisObserver);
+            log.info(transportName.toUpperCase() + " Listener Shutdown");
         }
     }
 
@@ -151,6 +152,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             // register to receive updates on services for lifetime management
             cfgCtx.getAxisConfiguration().addObservers(axisObserver);
         }
+        log.info(transportName.toUpperCase() + " Listener started");
 
         // iterate through deployed services and start
         Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();

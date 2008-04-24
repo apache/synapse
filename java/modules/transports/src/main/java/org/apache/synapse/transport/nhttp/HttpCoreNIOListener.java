@@ -128,7 +128,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         } catch (IOException e) {
             log.fatal("Encountered an I/O error: " + e.getMessage(), e);
         }
-        log.info("Listener Shutdown");
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Shutdown");
     }
 
     protected IOEventDispatch getEventDispatch(
@@ -291,7 +291,6 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         try {
             ioReactor.shutdown();
             state = BaseConstants.STOPPED;
-            log.info("Listener shut down");
         } catch (IOException e) {
             handleException("Error shutting down IOReactor", e);
         }

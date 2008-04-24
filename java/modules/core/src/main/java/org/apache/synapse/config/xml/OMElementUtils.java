@@ -23,12 +23,11 @@ import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
+import org.jaxen.XPath;
 
 import java.util.Iterator;
 
@@ -70,12 +69,26 @@ public class OMElementUtils {
     }
 
     /**
-     * Add all applicable xmlns NS declarations of element 'elem' into XPath expression
-     * @param xpath                                       xmlns:m0="http://services.samples/xsd"
+     * Add the namespace declarations of a given {@link OMElement} to the namespace
+     * context of an XPath expression. Typically this method is used with an XPath
+     * expression appearing in an attribute of the given element.
+     * <p>
+     * Note that the default namespace is explicitly excluded and not added to the
+     * namespace context. This implies that XPath expressions
+     * appearing in Synapse configuration files follow the same rule as in XSL
+     * stylesheets. Indeed, the XSLT specification defines the namespace context of
+     * an XPath expression as follows:
+     * <blockquote>
+     * the set of namespace declarations are those in scope on the element which has the
+     * attribute in which the expression occurs; [...] the default namespace
+     * (as declared by xmlns) is not part of this set
+     * </blockquote>
+     * 
+     * @param xpath
      * @param elem
      * @param log
      */
-    public static void addNameSpaces(AXIOMXPath xpath, OMElement elem, Log log) {
+    public static void addNameSpaces(XPath xpath, OMElement elem, Log log) {
 
         OMElement currentElem = elem;
 
@@ -84,46 +97,11 @@ public class OMElementUtils {
             while (it.hasNext()) {
 
                 OMNamespace n = (OMNamespace) it.next();
-                // assume the behavior of attributes as unqualified from default
+                // Exclude the default namespace as explained in the Javadoc above
                 if (n != null && !"".equals(n.getPrefix())) {
 
                     try {
                         xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
-                    } catch (JaxenException je) {
-                        String msg = "Error adding declared name space with prefix : "
-                            + n.getPrefix() + "and uri : " + n.getNamespaceURI()
-                            + " to the XPath : " + xpath;
-                        log.error(msg);
-                        throw new SynapseException(msg, je);
-                    }
-                }
-            }
-
-            OMContainer parent = currentElem.getParent();
-            //if the parent is a document element or parent is null ,then return
-            if (parent == null || parent instanceof OMDocument) {
-                return;
-            }
-            if (parent instanceof OMElement) {
-                currentElem = (OMElement) parent;
-            }
-        }
-    }
-
-    public static void addNameSpaces(SynapseXPath xpath, OMElement elem, Log log) {
-
-        OMElement currentElem = elem;
-
-        while (currentElem != null) {
-            Iterator it = currentElem.getAllDeclaredNamespaces();
-            while (it.hasNext()) {
-
-                OMNamespace n = (OMNamespace) it.next();
-                // assume the behavior of attributes as unqualified from default
-                if (n != null && !"".equals(n.getPrefix())) {
-
-                    try {
-                        xpath.addNamespace(n);
                     } catch (JaxenException je) {
                         String msg = "Error adding declared name space with prefix : "
                             + n.getPrefix() + "and uri : " + n.getNamespaceURI()

@@ -22,6 +22,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +35,7 @@ import org.apache.synapse.util.RMIRegistryController;
 
 import java.io.File;
 import java.net.*;
+import java.util.Map;
 
 /**
  * This is the core class that starts up a Synapse instance.
@@ -49,6 +52,7 @@ public class ServerManager {
     private static ServerManager instance;
     private static final Log log = LogFactory.getLog(ServerManager.class);
     private String axis2Repolocation;
+    private String axis2Xml;
     private ListenerManager listenerManager;
     private ConfigurationContext configctx;
     private static final int DEFAULT_HTTP_PORT = 8080;
@@ -69,6 +73,10 @@ public class ServerManager {
         this.axis2Repolocation = axis2Repolocation;
     }
 
+    public void setAxis2Xml(String axis2Xml) {
+        this.axis2Xml = axis2Xml;
+    }
+
     /**
      * starting all the listeners
      */
@@ -78,7 +86,7 @@ public class ServerManager {
 		try {
 			URL.setURLStreamHandlerFactory(new URLStreamHandlerFactoryImpl());
 		} catch (Throwable t) {
-			log.warn("Unable to register a URLStreamHandlerFactory - " +
+			log.debug("Unable to register a URLStreamHandlerFactory - " +
 					"Custom URL protocols may not work properly (e.g. classpath://)");
 		}
 
@@ -86,11 +94,16 @@ public class ServerManager {
             log.fatal("The Axis2 Repository must be provided");
             return;
         }
-        log.info("Using the Axis2 Repository "
+        log.info("Using the Axis2 Repository : "
                            + new File(axis2Repolocation).getAbsolutePath());
+        
+        if (axis2Xml != null) {
+            log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
+        }
+
         try {
             configctx = ConfigurationContextFactory.
-                    createConfigurationContextFromFileSystem(axis2Repolocation, null);
+                    createConfigurationContextFromFileSystem(axis2Repolocation, axis2Xml);
             
             listenerManager = configctx.getListenerManager();
             if (listenerManager == null) {
@@ -105,14 +118,14 @@ public class ServerManager {
                 String trp = (String) o;
                 TransportInDescription trsIn = (TransportInDescription)
                     configctx.getAxisConfiguration().getTransportsIn().get(trp);
-                listenerManager.addListener(trsIn, false);
-                
+
                 String msg = "Starting transport " + trsIn.getName();
                 if (trsIn.getParameter("port") != null) {
                     msg += " on port " + trsIn.getParameter("port").getValue();
                 }
-                
                 log.info(msg);
+
+                listenerManager.addListener(trsIn, false);
             }
 
             // now initialize SynapseConfig
@@ -155,16 +168,33 @@ public class ServerManager {
     public void stop() {
         try {
             RMIRegistryController.getInstance().removeLocalRegistry();
-            
+
+            // stop all services
+            Map<String, AxisService> serviceMap = configctx.getAxisConfiguration().getServices();
+            for (AxisService svc : serviceMap.values()) {
+                svc.setActive(false);
+            }
+
+            // stop all modules
+            Map<String, AxisModule> moduleMap = configctx.getAxisConfiguration().getModules();
+            for (AxisModule mod : moduleMap.values()) {
+                if (mod.getModule() != null && !"synapse".equals(mod.getName())) {
+                    mod.getModule().shutdown(configctx);
+                }
+            }
+
+            // stop all transports
             if (listenerManager != null) {
                 listenerManager.stop();
                 listenerManager.destroy();
             }
+            
             //we need to call this method to clean the temp files we created.
             if (configctx != null) {
                 configctx.terminate();
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.error("Error stopping the ServerManager", e);
         }
     }
 

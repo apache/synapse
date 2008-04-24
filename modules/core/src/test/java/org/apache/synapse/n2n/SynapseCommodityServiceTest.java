@@ -32,6 +32,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.transport.TransportListener;
@@ -41,12 +42,10 @@ import org.apache.synapse.utils.Services;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.io.*;
 
 
 public class SynapseCommodityServiceTest extends TestCase {
-
-    private TransportListener synapseServer = null;
-    private TransportListener businessServer = null;
 
     protected void setUp() throws java.lang.Exception {
         // Initializing Synapse repository
@@ -55,16 +54,21 @@ public class SynapseCommodityServiceTest extends TestCase {
         System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
                            "./../../repository/conf/axis2.xml");
 
+        findAndReplace(
+            new File("./../../repository/conf/axis2.xml"),
+            new File("./target/test_repos/axis2.xml"),
+            "lib/", "src/main/resources/");
+
         ConfigurationContext synapseConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "./target/test_repos/synapse",
-                        "./../../repository/conf/axis2.xml");
+                        "./target/test_repos/axis2.xml");
 
         // Initializing Bussiness Endpoint
         ConfigurationContext businessConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "./target/test_repos/synapse",
-                        "./../../repository/conf/axis2.xml");
+                        "./target/test_repos/axis2.xml");
 
         HashMap messageReciverMap = new HashMap();
         Class inOnlyMessageReceiver = org.apache.axis2.util.Loader.loadClass(
@@ -110,8 +114,6 @@ public class SynapseCommodityServiceTest extends TestCase {
     }
 
     protected void tearDown() throws java.lang.Exception {
-        //businessServer.stop();
-        //synapseServer.stop();
     }
 
     private void startServer(ConfigurationContext configctx) throws AxisFault {
@@ -173,5 +175,35 @@ public class SynapseCommodityServiceTest extends TestCase {
         commodityEle.addChild(realCommodity);
 
         return commodityEle;
+    }
+
+    private void findAndReplace(File srcFile, File tgtFile, String search, String replace) throws Exception {
+
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        try {
+            StringBuffer buffer = new StringBuffer(1024);
+            reader = new BufferedReader(new FileReader(srcFile));
+            String line = null;
+            while( (line = reader.readLine()) != null){
+                line = line.trim();
+                buffer.append(line + "\n");
+            }
+
+            String result = buffer.toString().replace(search, replace);
+
+            writer = new BufferedWriter(new FileWriter((tgtFile != null ? tgtFile : srcFile)));
+            writer.write(result);
+
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException ignore) {}
+        }
     }
 }

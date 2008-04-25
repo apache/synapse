@@ -336,6 +336,14 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     /**
+     * Returns the number of requestes queued in the thread pool
+     * @return queue size
+     */
+    public int getQueueSize() {
+        return handler.getQueueSize();
+    }
+
+    /**
      * Stop accepting new connections, and wait the maximum specified time for in-flight
      * requests to complete before a controlled shutdown for maintenence
      *

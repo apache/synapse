@@ -382,4 +382,8 @@ public class ServerHandler implements NHttpServiceHandler {
     public int getActiveCount() {
         return workerPool.getActiveCount();
     }
+
+    public int getQueueSize() {
+        return workerPool.getQueueSize();
+    }
 }

@@ -276,6 +276,14 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         return 0;
     }
 
+    /**
+     * Return the number of requests queued in the thread pool
+     * @return queue size
+     */
+    public int getQueueSize() {
+        return 0;
+    }
+
     // -- jmx/management methods--
     public long getMessagesReceived() {
         if (metrics != null) {

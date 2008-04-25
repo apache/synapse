@@ -611,4 +611,8 @@ public class ClientHandler implements NHttpClientHandler {
     public int getActiveCount() {
         return workerPool.getActiveCount();
     }
+
+    public int getQueueSize() {
+        return workerPool.getQueueSize();
+    }
 }

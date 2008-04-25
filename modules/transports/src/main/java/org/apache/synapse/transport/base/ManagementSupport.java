@@ -25,6 +25,7 @@ public interface ManagementSupport {
     public void resume() throws AxisFault;
     void maintenenceShutdown(long millis) throws AxisFault;
     public int getActiveThreadCount();
+    public int getQueueSize();
 
     public long getMessagesReceived();
     public long getFaultsReceiving();

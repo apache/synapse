@@ -105,6 +105,15 @@ public class TransportView implements TransportViewMBean {
         return -1;
     }
 
+    public int getQueueSize() {
+        if (listener != null && listener instanceof ManagementSupport) {
+            return ((ManagementSupport) listener).getQueueSize();
+        } else if (sender != null && sender instanceof ManagementSupport) {
+            return ((ManagementSupport) sender).getQueueSize();
+        }
+        return -1;
+    }
+
     // JMX Operations
     public void start() throws Exception{
         if (listener != null) {

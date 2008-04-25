@@ -33,8 +33,9 @@ public class NativeWorkerPool implements WorkerPool {
 
     private static final Log log = LogFactory.getLog(NativeWorkerPool.class);
 
-    java.util.concurrent.Executor nativeExecutor = null;
-    Executor executor = null;
+    private java.util.concurrent.Executor nativeExecutor = null;
+    private Executor executor = null;
+    private LinkedBlockingQueue blockingQueue = null;
 
     public NativeWorkerPool(int core, int max, int keepAlive,
         int queueLength, String threadGroupName, String threadGroupId) {
@@ -42,12 +43,12 @@ public class NativeWorkerPool implements WorkerPool {
         if (log.isDebugEnabled()) {
             log.debug("Using native util.concurrent package..");
         }
+        blockingQueue =
+            (queueLength == -1 ? new LinkedBlockingQueue() : new LinkedBlockingQueue(queueLength));
         executor = new ThreadPoolExecutor(
             core, max, keepAlive,
             TimeUnit.SECONDS,
-            queueLength == -1 ?
-                new LinkedBlockingQueue() :
-                new LinkedBlockingQueue(queueLength),
+            blockingQueue,
             new NativeThreadFactory(new ThreadGroup(threadGroupName), threadGroupId));
     }
 
@@ -57,6 +58,10 @@ public class NativeWorkerPool implements WorkerPool {
 
     public int getActiveCount() {
         return ((ThreadPoolExecutor) executor).getActiveCount();
+    }
+
+    public int getQueueSize() {
+        return blockingQueue.size();
     }
 
     /**

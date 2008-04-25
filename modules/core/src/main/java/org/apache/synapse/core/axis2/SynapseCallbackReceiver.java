@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -67,6 +68,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
 
         callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
+        ServerManager.getInstance().setCallbackStore(callbackStore);
 
         // create the Timer object and a TimeoutHandler task
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
@@ -85,6 +87,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
     public void addCallback(String MsgID, AxisCallback callback) {
         callbackStore.put(MsgID, callback);
+        if (log.isDebugEnabled()) {
+            log.debug("Callback added. Total callbacks waiting for : " + callbackStore.size());
+        }
     }
 
     /**
@@ -114,6 +119,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
         if (messageID != null) {
             AxisCallback callback = callbackStore.remove(messageID);
+            if (log.isDebugEnabled()) {
+                log.debug("Callback removed. Pending callbacks count : " + callbackStore.size());
+            }
 
             RelatesTo[] relates = messageCtx.getRelationships();
             if (relates != null && relates.length > 1) {

@@ -24,9 +24,7 @@ import org.apache.axiom.soap.SOAPFault;
 import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.Options;
@@ -59,7 +57,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private static final Log log = LogFactory.getLog(SynapseCallbackReceiver.class);
 
     /** This is the synchronized callbackStore that maps outgoing messageID's to callback objects */
-    private Map callbackStore;  // this will be made thread safe within the constructor
+    private Map<String, AxisCallback> callbackStore;  // will made thread safe in the constructor
 
     /**
      * Create the *single* instance of this class that would be used by all anonymous services
@@ -68,7 +66,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      */
     public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
 
-        callbackStore = Collections.synchronizedMap(new HashMap());
+        callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
 
         // create the Timer object and a TimeoutHandler task
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
@@ -115,7 +113,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         }
 
         if (messageID != null) {
-            AxisCallback callback = (AxisCallback) callbackStore.remove(messageID);
+            AxisCallback callback = callbackStore.remove(messageID);
 
             RelatesTo[] relates = messageCtx.getRelationships();
             if (relates != null && relates.length > 1) {
@@ -147,7 +145,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      * @param synapseOutMsgCtx the corresponding (outgoing) Synapse MessageContext for the above
      *                         Axis2 MC, that holds Synapse specific information such as the error
      *                         handler stack and local properties etc.
-     * @throws AxisFault 
+     * @throws AxisFault       if the message cannot be processed
      */
     private void handleMessage(MessageContext response,
         org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
@@ -204,8 +202,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         (response.getWSAAction() != null ? response.getWSAAction() : "null"));
                 String[] cids = response.getAttachmentMap().getAllContentIDs();
                 if (cids != null && cids.length > 0) {
-                    for (int i = 0; i < cids.length; i++) {
-                        log.debug("Attachment : " + cids[i]);
+                    for (String cid : cids) {
+                        log.debug("Attachment : " + cid);
                     }
                 }
                 log.debug("Body : \n" + response.getEnvelope());
@@ -285,10 +283,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             synapseInMessageContext.setTracingState(synapseOutMsgCtx.getTracingState());
 
             // set the properties of the original MC to the new MC
-            Iterator iter = synapseOutMsgCtx.getPropertyKeySet().iterator();
 
-            while (iter.hasNext()) {
-                Object key = iter.next();
+            for (Object key : synapseOutMsgCtx.getPropertyKeySet()) {
                 synapseInMessageContext.setProperty(
                         (String) key, synapseOutMsgCtx.getProperty((String) key));
             }
@@ -322,8 +318,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         int insertPos = 0;
         RelatesTo[] newRelates = new RelatesTo[relates.length];
 
-        for (int i = 0; i < relates.length; i++) {
-            RelatesTo current = relates[i];
+        for (RelatesTo current : relates) {
             boolean found = false;
             for (int j = 0; j < newRelates.length && j < insertPos; j++) {
                 if (newRelates[j].equals(current) ||

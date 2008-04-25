@@ -481,6 +481,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener
 
     protected void startListeningForService(AxisService service) {
 
+        if (service.getName().startsWith("__")) {
+            return;
+        }
+
         Parameter param = service.getParameter(BaseConstants.TRANSPORT_POLL_INTERVAL);
         long pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
         if (param != null && param.getValue() instanceof String) {
@@ -488,7 +492,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener
                 pollInterval = Integer.parseInt(param.getValue().toString());
             } catch (NumberFormatException e) {
                 log.error("Invalid poll interval : " + param.getValue() + " for service : " +
-                    service.getName() + " default to : " + (BaseConstants.DEFAULT_POLL_INTERVAL/1000) + "sec", e);
+                    service.getName() + " default to : "
+                        + (BaseConstants.DEFAULT_POLL_INTERVAL/1000) + "sec", e);
+                disableTransportForService(service);
             }
         }
 
@@ -496,10 +502,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener
         try {
             entry.setFileURI(
                 BaseUtils.getRequiredServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_URI));
-            entry.setFileNamePattern(
-                BaseUtils.getOptionalServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
-            entry.setContentType(
-                BaseUtils.getRequiredServiceParam(service, VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
+            entry.setFileNamePattern(BaseUtils.getOptionalServiceParam(service,
+                    VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
+            entry.setContentType(BaseUtils.getRequiredServiceParam(service,
+                    VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
             String option = BaseUtils.getOptionalServiceParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
             entry.setActionAfterProcess(
@@ -548,7 +554,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
             String msg = "Error configuring the File/VFS transport for Service : " +
                 service.getName() + " :: " + axisFault.getMessage();
             log.warn(msg);
-            //cfgCtx.getAxisConfiguration().getFaultyServices().put(service.getName(), msg);
+            disableTransportForService(service);
         }
     }
 

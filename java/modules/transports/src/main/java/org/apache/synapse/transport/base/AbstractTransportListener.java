@@ -360,6 +360,14 @@ public abstract class AbstractTransportListener implements TransportListener {
         return workerPool.getActiveCount();
     }
 
+    /**
+     * Return the number of requests queued in the thread pool
+     * @return queue size
+     */
+    public int getQueueSize() {
+        return workerPool.getQueueSize();
+    }
+
     public long getMessagesReceived() {
         if (metrics != null) {
             return metrics.getMessagesReceived();

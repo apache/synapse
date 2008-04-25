@@ -22,7 +22,14 @@ package org.apache.synapse.transport.base.threads;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.*;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
+import java.util.concurrent.*;
 
 /**
  * Utility class to support the backport util.concurrent in JDK 1.4 and the
@@ -32,8 +39,9 @@ public class BackportWorkerPool implements WorkerPool {
 
     private static final Log log = LogFactory.getLog(BackportWorkerPool.class);
 
-    java.util.concurrent.Executor nativeExecutor = null;
-    Executor executor = null;
+    private java.util.concurrent.Executor nativeExecutor = null;
+    private Executor executor = null;
+    private java.util.concurrent.LinkedBlockingQueue blockingQueue = null;
 
     public BackportWorkerPool(int core, int max, int keepAlive,
         int queueLength, String threadGroupName, String threadGroupId) {
@@ -41,6 +49,8 @@ public class BackportWorkerPool implements WorkerPool {
         if (log.isDebugEnabled()) {
             log.debug("Using backport of the util.concurrent package..");
         }
+        blockingQueue =
+            (queueLength == -1 ? new java.util.concurrent.LinkedBlockingQueue() : new java.util.concurrent.LinkedBlockingQueue(queueLength));
         executor = new ThreadPoolExecutor(
             core, max, keepAlive,
             TimeUnit.SECONDS,
@@ -56,6 +66,10 @@ public class BackportWorkerPool implements WorkerPool {
 
     public int getActiveCount() {
         return ((ThreadPoolExecutor) executor).getActiveCount();
+    }
+
+    public int getQueueSize() {
+        return blockingQueue.size();
     }
 
     /**

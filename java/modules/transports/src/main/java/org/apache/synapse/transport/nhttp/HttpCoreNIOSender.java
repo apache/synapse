@@ -578,6 +578,14 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return handler.getActiveCount();
     }
 
+    /**
+     * Returns the number of requestes queued in the thread pool
+     * @return queue size
+     */
+    public int getQueueSize() {
+        return handler.getQueueSize();
+    }
+
     // -- jmx/management methods--
     public long getMessagesReceived() {
         if (metrics != null) {

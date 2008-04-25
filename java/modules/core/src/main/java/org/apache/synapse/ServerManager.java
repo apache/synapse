@@ -57,6 +57,7 @@ public class ServerManager {
     private ConfigurationContext configctx;
     private static final int DEFAULT_HTTP_PORT = 8080;
     private static final int ALTERNATIVE_HTTP_PORT = 8008;
+    private Map callbackStore = null;
 
     /**
      * To ensure that there is a only one Manager
@@ -170,16 +171,18 @@ public class ServerManager {
             RMIRegistryController.getInstance().removeLocalRegistry();
 
             // stop all services
-            Map<String, AxisService> serviceMap = configctx.getAxisConfiguration().getServices();
-            for (AxisService svc : serviceMap.values()) {
-                svc.setActive(false);
-            }
+            if (configctx != null && configctx.getAxisConfiguration() != null) {
+                Map<String, AxisService> serviceMap = configctx.getAxisConfiguration().getServices();
+                for (AxisService svc : serviceMap.values()) {
+                    svc.setActive(false);
+                }
 
-            // stop all modules
-            Map<String, AxisModule> moduleMap = configctx.getAxisConfiguration().getModules();
-            for (AxisModule mod : moduleMap.values()) {
-                if (mod.getModule() != null && !"synapse".equals(mod.getName())) {
-                    mod.getModule().shutdown(configctx);
+                // stop all modules
+                Map<String, AxisModule> moduleMap = configctx.getAxisConfiguration().getModules();
+                for (AxisModule mod : moduleMap.values()) {
+                    if (mod.getModule() != null && !"synapse".equals(mod.getName())) {
+                        mod.getModule().shutdown(configctx);
+                    }
                 }
             }
 
@@ -265,6 +268,18 @@ public class ServerManager {
 
     public ConfigurationContext getConfigurationContext() {
         return configctx;
+    }
+
+    public void setCallbackStore(Map callbackStore) {
+        this.callbackStore = callbackStore;
+    }
+
+    /**
+     * Expose the number of callbacks in the callback store
+     * @return the number of callbacks (messages) waiting for responses
+     */
+    public int pendingCallbacks() {
+        return callbackStore.size();
     }
 
     private static final class URLStreamHandlerFactoryImpl implements URLStreamHandlerFactory {

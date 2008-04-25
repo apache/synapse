@@ -135,11 +135,6 @@ public class XSLTMediator extends AbstractMediator {
     private boolean useDOMSourceAndResults = false;
 
     /**
-     * Hold any TransformerException's encountered during transformation by the XSLT processor
-     */
-    private TransformerException transformerException = null;
-
-    /**
      * Default XPath for the selection of the element for the evaluation of the XSLT over
      */
     public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
@@ -307,27 +302,23 @@ public class XSLTMediator extends AbstractMediator {
                 public void warning(TransformerException e) throws TransformerException {
 
                     if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Warning encountered during transformation : "
-                                + e.getMessage());
+                        traceOrDebugWarn(
+                                traceOn, "Warning encountered during transformation : " + e);
                     }
-
-                    log.warn("Transformation warning encountered", e);
                 }
                 
                 public void error(TransformerException e) throws TransformerException {
-                    setTransformerException(e);
+                    log.error("Error occured in XSLT transformation : " + e);
+                    throw e;
                 }
                 
                 public void fatalError(TransformerException e) throws TransformerException {
-                    setTransformerException(e);
+                    log.error("Fatal error occured in the XSLT transformation : " + e);
+                    throw e;
                 }
             });
             
             transformer.transform(transformSrc, transformTgt);
-
-            if (transformerException != null) {
-                throw transformerException;
-            }
 
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Transformation completed - processing result");
@@ -566,10 +557,7 @@ public class XSLTMediator extends AbstractMediator {
     public void setTargetPropertyName(String targetPropertyName) {
         this.targetPropertyName = targetPropertyName;
     }
-
-    public void setTransformerException(TransformerException transformerException) {
-        this.transformerException = transformerException;
-    }
+    
 }
 
 	

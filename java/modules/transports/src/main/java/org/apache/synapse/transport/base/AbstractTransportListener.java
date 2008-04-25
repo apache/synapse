@@ -165,6 +165,25 @@ public abstract class AbstractTransportListener implements TransportListener {
         }
     }
 
+    public void disableTransportForService(AxisService service) {
+
+        log.warn("Disabling the " + getTransportName() + " transport for the service "
+                + service.getName() + ", because it is not configured properly for the service");
+
+        if (service.isEnableAllTransports()) {
+            ArrayList<String> exposedTransports = new ArrayList<String>();
+            for(Object obj: cfgCtx.getAxisConfiguration().getTransportsIn().values()) {
+                String transportName = ((TransportInDescription) obj).getName();
+                if (!transportName.equals(getTransportName())) {
+                    exposedTransports.add(transportName);
+                }
+            }
+            service.setExposedTransports(exposedTransports);
+        } else {
+            service.removeExposedTransport(getTransportName());
+        }
+    }
+
     protected abstract void startListeningForService(AxisService service);
 
     protected abstract void stopListeningForService(AxisService service);

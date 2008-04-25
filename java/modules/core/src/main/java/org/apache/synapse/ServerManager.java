@@ -279,7 +279,11 @@ public class ServerManager {
      * @return the number of callbacks (messages) waiting for responses
      */
     public int pendingCallbacks() {
-        return callbackStore.size();
+        if (callbackStore != null) {
+            return callbackStore.size();
+        } else {
+            return 0;
+        }
     }
 
     private static final class URLStreamHandlerFactoryImpl implements URLStreamHandlerFactory {

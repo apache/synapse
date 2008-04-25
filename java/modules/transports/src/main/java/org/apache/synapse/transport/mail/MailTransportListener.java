@@ -486,6 +486,10 @@ public class MailTransportListener extends AbstractPollingTransportListener
 
     protected void startListeningForService(AxisService service) {
 
+        if (service.getName().startsWith("__")) {
+            return;
+        }
+
         Parameter param = service.getParameter(BaseConstants.TRANSPORT_POLL_INTERVAL);
         long pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
         if (param != null && param.getValue() instanceof String) {
@@ -565,11 +569,13 @@ public class MailTransportListener extends AbstractPollingTransportListener
             String msg = "Error configuring the Mail transport for Service : " +
                 service.getName() + " :: " + axisFault.getMessage();
             log.warn(msg);
+            disableTransportForService(service);
         } catch (AddressException e) {
             String msg = "Error configuring the Mail transport for Service : " +
                 " Invalid email address specified by '" + MailConstants.TRANSPORT_MAIL_ADDRESS +
                 "'parameter for service : " + service.getName() + " :: " + e.getMessage();
             log.warn(msg);
+            disableTransportForService(service);
         }
     }
 

@@ -155,6 +155,7 @@ public class JMSListener extends AbstractTransportListener implements Management
                          "available over the JMS transport";
             log.warn(msg);
             BaseUtils.markServiceAsFaulty(service.getName(), msg, service.getAxisConfiguration());
+            disableTransportForService(service);
             return;
         }
 

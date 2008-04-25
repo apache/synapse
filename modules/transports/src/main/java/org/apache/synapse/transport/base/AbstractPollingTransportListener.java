@@ -110,6 +110,11 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
     public void onPoll() {}
 
     protected void startListeningForService(AxisService service) {
+
+        if (service.getName().startsWith("__")) {
+            return;
+        }
+
         Parameter param = service.getParameter(TRANSPORT_POLL_INTERVAL);
         long pollInterval = DEFAULT_POLL_INTERVAL;
         if (param != null && param.getValue() instanceof String) {
@@ -118,6 +123,7 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
             } catch (NumberFormatException e) {
                 log.error("Invalid poll interval : " + param.getValue() + " for service : " +
                     service.getName() + " Using defaults", e);
+                disableTransportForService(service);
             }
         }
         schedulePoll(service, pollInterval);

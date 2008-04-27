@@ -44,17 +44,16 @@ import java.util.StringTokenizer;
  * <p/>
  * Configuration syntax:
  * <pre>
- * &lt;proxy name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
+ * &lt;proxy name="string" [transports="(http |https |jms )+|all"] [pinnedServers="(serverName )+" [trace="enable|disable"]>
  *    &lt;description>..&lt;/description>?
  *    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
- *       &lt;endpoint>...&lt;/endpoint>
- *       &lt;inSequence>...&lt;/inSequence>
- *       &lt;outSequence>...&lt;/outSequence>
- *       &lt;faultSequence>...&lt;/faultSequence>
+ *       &lt;endpoint>...&lt;/endpoint>?
+ *       &lt;inSequence>...&lt;/inSequence>?
+ *       &lt;outSequence>...&lt;/outSequence>?
+ *       &lt;faultSequence>...&lt;/faultSequence>?
  *    &lt;/target>?
  *    &lt;publishWSDL uri=".." key="string">
- *       &lt;wsdl:definition>...&lt;/wsdl:definition>?
- *       &lt;wsdl20:description>...&lt;/wsdl20:description>?
+ *       ( &lt;wsdl:definition>...&lt;/wsdl:definition> | &lt;wsdl20:description>...&lt;/wsdl20:description> )?
  *       &lt;resource location="..." key="..."/>*
  *    &lt;/publishWSDL>?
  *    &lt;enableSec/>?

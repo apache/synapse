@@ -29,6 +29,7 @@ import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.TestUtils;
+import org.jaxen.SimpleVariableContext;
 
 import java.util.HashMap;
 
@@ -86,4 +87,16 @@ public class SynapseXPathTest extends TestCase {
         assertTrue(new SynapseXPath("$axis2:test2 = 1234").booleanValueOf(synCtx));
     }
     
+    public void testStandardXPathFunctions() throws Exception {
+        MessageContext ctx = TestUtils.getTestContext("<test>123456</test>");
+        assertEquals(6, new SynapseXPath("string-length(//test)").numberValueOf(ctx).intValue());
+    }
+    
+    public void testCustomVariables() throws Exception {
+        SynapseXPath xpath = new SynapseXPath("$myvar");
+        SimpleVariableContext variableContext = new SimpleVariableContext();
+        variableContext.setVariableValue("myvar", "myvalue");
+        xpath.setVariableContext(variableContext);
+        assertEquals("myvalue", xpath.evaluate(TestUtils.getTestContext("<test/>")));
+    }
 }

@@ -163,9 +163,6 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                    <excludes>
-                        <exclude>**/amqp/*.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 
@@ -645,16 +642,25 @@
             <version>${slf4j.version}</version>
         </dependency>
 
-        <!--        <dependency>
+        <dependency>
             <groupId>org.apache.qpid</groupId>
             <artifactId>qpid-common</artifactId>
             <version>${qpid.version}</version>
+            <exclusions>
+                <!-- Exclude commons-configuration because the transitive
+                     depedency on DOM4J causes problems. Anyway it is not
+                     really used and has disappeared in recent snapshots. -->
+                <exclusion>
+                    <groupId>commons-configuration</groupId>
+                    <artifactId>commons-configuration</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.qpid</groupId>
             <artifactId>qpid-client</artifactId>
             <version>${qpid.version}</version>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>de.schlichtherle.io</groupId>

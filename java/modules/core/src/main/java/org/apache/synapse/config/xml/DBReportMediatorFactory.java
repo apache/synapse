@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.db.DBReportMediator;
 import javax.xml.namespace.QName;
 
 /**
+ * Factory for {@link DBReportMediator} instances.
  * <pre>
  * &lt;dbreport&gt;
  *   &lt;connection&gt;

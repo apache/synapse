@@ -28,10 +28,14 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
- * <callout serviceURL="string" [action="string"]>
- *      <source xpath="expression" | key="string">
- *      <target xpath="expression" | key="string"/>
- * </callout>
+ * Factory for {@link CalloutMediator} instances.
+ * 
+ * <pre>
+ * &lt;callout serviceURL="string" [action="string"]>
+ *      &lt;source xpath="expression" | key="string">
+ *      &lt;target xpath="expression" | key="string"/>
+ * &lt;/callout>
+ * </pre>
  */
 public class CalloutMediatorFactory extends AbstractMediatorFactory {
 

@@ -69,16 +69,15 @@ public class EIPUtils {
      * @return List detached OMElements in the envelope matching the expression
      * @throws JaxenException if the XPath expression evaluation fails
      */
-    public static List getDetachedMatchingElements(SOAPEnvelope envelope, SynapseXPath expression)
+    public static List<OMNode> getDetachedMatchingElements(SOAPEnvelope envelope, SynapseXPath expression)
         throws JaxenException {
 
-        List elementList = new ArrayList();
+        List<OMNode> elementList = new ArrayList<OMNode>();
         Object o = expression.evaluate(envelope);
         if (o instanceof OMNode) {
             elementList.add(((OMNode) o).detach());
         } else if (o instanceof List) {
-            for (Iterator itr = ((List) o).iterator(); itr.hasNext();) {
-                Object elem = itr.next();
+            for (Object elem : (List) o) {
                 if (elem instanceof OMNode) {
                     elementList.add(((OMNode) elem).detach());
                 }

@@ -20,15 +20,13 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.RMSequenceMediator;
 
 /**
- * <pre>
- * &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;
- * </pre>
+ * Serializer for {@link RMSequenceMediator} instances.
+ * 
+ * @see RMSequenceMediatorFactory
  */
 public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
 

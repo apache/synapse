@@ -26,8 +26,9 @@ import org.apache.synapse.mediators.builtin.DropMediator;
 import javax.xml.namespace.QName;
 
 /**
- * This creates a drop mediator instance
- *
+ * Factory for {@link DropMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;drop/&gt;
  * </pre>

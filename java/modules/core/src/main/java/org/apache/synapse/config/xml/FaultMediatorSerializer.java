@@ -20,21 +20,13 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
 
 /**
- * <pre>
- * &lt;makefault [version="soap11|soap12|pox"]&gt;
- *   &lt;code (value="literal" | expression="xpath")/&gt;?
- *   &lt;reason (value="literal" | expression="xpath")&gt;?
- *   &lt;node&gt;?
- *   &lt;role&gt;?
- *   &lt;detail&gt;?
- * &lt;/makefault&gt;
- * </pre>
+ * Serializer for {@link FaultMediator} instances.
+ * 
+ * @see FaultMediatorFactory
  */
 public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 

@@ -31,8 +31,9 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
- * Creates an instance of a Class mediator using XML configuration specified
- *
+ * Factory for {@link POJOCommandMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;pojoCommand name=&quot;class-name&quot;&gt;
  *   &lt;property name=&quot;string&quot; value=&quot;literal&quot; expression=&quot;xpath&quot;?

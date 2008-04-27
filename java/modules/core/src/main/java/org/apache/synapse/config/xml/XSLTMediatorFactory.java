@@ -29,8 +29,9 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
- * Creates a XSLT mediator from the given XML
- *
+ * Factory for {@link XSLTMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;xslt key="property-key" [source="xpath"] [target="string"]&gt;
  *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*

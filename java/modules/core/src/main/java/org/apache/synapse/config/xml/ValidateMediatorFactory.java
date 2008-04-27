@@ -32,15 +32,18 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Creates a validation mediator from the XML configuration
- * <p/>
- * <validate [source="xpath"]>
- *   <schema key="string">+
- *   <property name="<validation-feature-name>" value="true|false"/>
- *   <on-fail>
+ * Factory for {@link ValidateMediator} instances.
+ * <p>
+ * Configuration syntax:
+ * <pre>
+ * &lt;validate [source="xpath"]>
+ *   &lt;schema key="string">+
+ *   &lt;property name="<validation-feature-name>" value="true|false"/>
+ *   &lt;on-fail>
  *     mediator+
- *   </on-fail>
- * </validate>
+ *   &lt;/on-fail>
+ * &lt;/validate>
+ * </pre>
  */
 public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
@@ -53,7 +56,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         ValidateMediator validateMediator = new ValidateMediator();
 
         // process schema element definitions and create DynamicProperties
-        List schemaKeys = new ArrayList();
+        List<String> schemaKeys = new ArrayList<String>();
         Iterator schemas = elem.getChildrenWithName(SCHEMA_Q);
 
         while (schemas.hasNext()) {

@@ -24,32 +24,9 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.db.DBLookupMediator;
 
 /**
- * <pre>
- * &lt;dblookup&gt;
- *   &lt;connection&gt;
- *     &lt;pool&gt;
- *      (
- *       &lt;driver/&gt;
- *       &lt;url/&gt;
- *       &lt;user/&gt;
- *       &lt;password/&gt;
- *     |
- *       &lt;dsName/&gt;
- *       &lt;icClass/&gt;
- *       &lt;url/&gt;
- *       &lt;user/&gt;
- *       &lt;password/&gt;
- *     )
- *       &lt;property name="name" value="value"/&gt;*
- *     &lt;/pool&gt;
- *   &lt;/connection&gt;
- *   &lt;statement&gt;
- *     &lt;sql&gt;select something from table where something_else = ?&lt;/sql&gt;
- *     &lt;parameter [value="" | expression=""] type="int|string"/&gt;*
- *     &lt;result name="string" column="int|string"/&gt;*
- *   &lt;/statement&gt;+
- * &lt;/dblookup&gt;
- * </pre>
+ * Serializer for {@link DBLookupMediator} instances.
+ * 
+ * @see DBLookupMediatorSerializer
  */
 public class DBLookupMediatorSerializer extends AbstractDBMediatorSerializer {
 

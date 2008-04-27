@@ -35,25 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <proxy name="string" [transports="(http |https |jms )+|all"]>
- *    <description>..</description>?
- *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
- *       <endpoint>...</endpoint>
- *       <inSequence>...</inSequence>
- *       <outSequence>...</outSequence>
- *       <faultSequence>...</faultSequence>
- *    </target>?
- *    <publishWSDL uri=".." key="string">
- *       <wsdl:definition>...</wsdl:definition>?
- *       <wsdl20:description>...</wsdl20:description>?
- *       <resource location="..." key="..."/>*
- *    </publishWSDL>?
- *    <policy key="string">
- *       // optional service parameters
- *    <parameter name="string">
- *       text | xml
- *    </parameter>?
- * </proxy>
+ * Serializer for {@link ProxyService} instances.
+ * 
+ * @see ProxyServiceFactory
  */
 public class ProxyServiceSerializer {
 

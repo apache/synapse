@@ -26,8 +26,9 @@ import org.apache.synapse.mediators.filters.InMediator;
 import javax.xml.namespace.QName;
 
 /**
- * Creates an In mediator instance
- *
+ * Factory for {@link InMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;in&gt;
  *    mediator+

@@ -33,6 +33,9 @@ import javax.xml.namespace.QName;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+/**
+ * Factory for {@link Entry} instances.
+ */
 public class EntryFactory implements XMLToObjectMapper {
 
     private static Log log = LogFactory.getLog(EntryFactory.class);

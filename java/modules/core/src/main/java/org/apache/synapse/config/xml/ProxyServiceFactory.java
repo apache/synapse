@@ -40,30 +40,33 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * Creates a ProxyService instance using the XML fragment specification
+ * Factory for {@link ProxyService} instances.
  * <p/>
- * <proxy name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
- *    <description>..</description>?
- *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
- *       <endpoint>...</endpoint>
- *       <inSequence>...</inSequence>
- *       <outSequence>...</outSequence>
- *       <faultSequence>...</faultSequence>
- *    </target>?
- *    <publishWSDL uri=".." key="string">
- *       <wsdl:definition>...</wsdl:definition>?
- *       <wsdl20:description>...</wsdl20:description>?
- *       <resource location="..." key="..."/>*
- *    </publishWSDL>?
- *    <enableSec/>?
- *    <enableRM/>?
- *    <policy key="string"/>?
- *    <policy key="string" type=(in | out)/>?
+ * Configuration syntax:
+ * <pre>
+ * &lt;proxy name="string" [transports="(http |https |jms )+|all"] [trace="enable|disable"]>
+ *    &lt;description>..&lt;/description>?
+ *    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
+ *       &lt;endpoint>...&lt;/endpoint>
+ *       &lt;inSequence>...&lt;/inSequence>
+ *       &lt;outSequence>...&lt;/outSequence>
+ *       &lt;faultSequence>...&lt;/faultSequence>
+ *    &lt;/target>?
+ *    &lt;publishWSDL uri=".." key="string">
+ *       &lt;wsdl:definition>...&lt;/wsdl:definition>?
+ *       &lt;wsdl20:description>...&lt;/wsdl20:description>?
+ *       &lt;resource location="..." key="..."/>*
+ *    &lt;/publishWSDL>?
+ *    &lt;enableSec/>?
+ *    &lt;enableRM/>?
+ *    &lt;policy key="string"/>?
+ *    &lt;policy key="string" type=(in | out)/>?
  *       // optional service parameters
- *    <parameter name="string">
+ *    &lt;parameter name="string">
  *       text | xml
- *    </parameter>?
- * </proxy>
+ *    &lt;/parameter>?
+ * &lt;/proxy>
+ * </pre>
  */
 public class ProxyServiceFactory {
 

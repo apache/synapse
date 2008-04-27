@@ -20,23 +20,17 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * <pre>
- * &lt;xslt key="property-key" [source="xpath"] [target="string"]&gt;
- *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
- *   &lt;feature name="string" value="true| false" /&gt;*
- * &lt;/transform&gt;
- * </pre>
+ * Serializer for {@link XSLTMediator} instances.
+ * 
+ * @see XSLTMediatorFactory
  */
 public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
 
@@ -67,10 +61,9 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
                 "target", nullNS, mediator.getTargetPropertyName()));
         }
         serializeProperties(xslt, mediator.getProperties());
-        List features = mediator.getFeatures();
+        List<MediatorProperty> features = mediator.getFeatures();
         if (!features.isEmpty()) {
-            for (Iterator iter = features.iterator(); iter.hasNext();) {
-                MediatorProperty mp = (MediatorProperty) iter.next();
+            for (MediatorProperty mp : features) {
                 OMElement prop = fac.createOMElement("feature", synNS, xslt);
                 if (mp.getName() != null) {
                     prop.addAttribute(fac.createOMAttribute("name", nullNS, mp.getName()));

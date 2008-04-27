@@ -29,14 +29,14 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
- * This builds a Header Mediator parsing the XML configuration supplied
- *
- * Set header
+ * Factory for {@link HeaderMediator} instances.
+ * <p>
+ * Configuration syntax to set a header:
  *   <pre>
  *      &lt;header name="qname" (value="literal" | expression="xpath")/&gt;
  *   </pre>
  *
- * Remove header
+ * Configuration syntax to remove a header:
  *   <pre>
  *      &lt;header name="qname" action="remove"/&gt;
  *   </pre>

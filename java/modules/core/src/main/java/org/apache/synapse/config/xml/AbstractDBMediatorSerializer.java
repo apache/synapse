@@ -31,6 +31,8 @@ import java.sql.Types;
 import java.util.Iterator;
 
 /**
+ * Base class for serializers for database related mediators.
+ * 
  * <dbreport | dblookup | .. etc>
  *   <connection>
  *     <pool>

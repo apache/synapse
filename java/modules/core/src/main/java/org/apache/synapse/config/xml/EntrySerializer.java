@@ -31,6 +31,9 @@ import org.apache.axiom.om.impl.llom.OMTextImpl;
 import javax.xml.stream.XMLStreamConstants;
 import java.net.URL;
 
+/**
+ * Serializer for {@link Entry} instances.
+ */
 public class EntrySerializer {
 
     private static Log log = LogFactory.getLog(EntrySerializer.class);

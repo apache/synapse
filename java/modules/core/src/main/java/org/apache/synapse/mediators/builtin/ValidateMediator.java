@@ -68,7 +68,7 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * A list of property keys, referring to the schemas to be used for the validation
      */
-    private List schemaKeys = new ArrayList();
+    private List<String> schemaKeys = new ArrayList<String>();
 
     /**
      * An XPath expression to be evaluated against the message to find the element to be validated.
@@ -80,7 +80,7 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * A Map containing features to be passed to the actual validator (Xerces)
      */
-    private List explicityFeatures = new ArrayList();
+    private List<MediatorProperty> explicityFeatures = new ArrayList<MediatorProperty>();
 
     /**
      * This is the actual schema instance used to create a new schema
@@ -136,8 +136,7 @@ public class ValidateMediator extends AbstractListMediator {
         // flag to check if we need to initialize/re-initialize the schema
         boolean reCreate = false;
         // if any of the schemas are not loaded, or have expired, load or re-load them
-        for (Iterator iter = schemaKeys.iterator(); iter.hasNext();) {
-            String propKey = (String) iter.next();
+        for (String propKey : schemaKeys) {
             Entry dp = synCtx.getConfiguration().getEntryDefinition(propKey);
             if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
@@ -156,8 +155,7 @@ public class ValidateMediator extends AbstractListMediator {
                 factory.setErrorHandler(errorHandler);
                 StreamSource[] sources = new StreamSource[schemaKeys.size()];
                 int i = 0;
-                for (Iterator iterator = schemaKeys.iterator(); iterator.hasNext();) {
-                    String propName = (String) iterator.next();
+                for (String propName : schemaKeys) {
                     sources[i++] = SynapseConfigUtils.getStreamSource(synCtx.getEntry(propName));
                 }
 
@@ -342,8 +340,7 @@ public class ValidateMediator extends AbstractListMediator {
      * @return property string value (usually true|false)
      */
     public Object getFeature(String key) {
-        for (Iterator iter = explicityFeatures.iterator(); iter.hasNext();) {
-            MediatorProperty prop = (MediatorProperty) iter.next();
+        for (MediatorProperty prop : explicityFeatures) {
             if (key.equals(prop.getName())) {
                 return prop.getValue();
             }
@@ -377,7 +374,7 @@ public class ValidateMediator extends AbstractListMediator {
      *
      * @param schemaKeys list of local property names
      */
-    public void setSchemaKeys(List schemaKeys) {
+    public void setSchemaKeys(List<String> schemaKeys) {
         this.schemaKeys = schemaKeys;
     }
 
@@ -401,7 +398,7 @@ public class ValidateMediator extends AbstractListMediator {
      * The keys for the schema resources used for validation
      * @return schema registry keys
      */
-    public List getSchemaKeys() {
+    public List<String> getSchemaKeys() {
         return schemaKeys;
     }
 
@@ -409,7 +406,7 @@ public class ValidateMediator extends AbstractListMediator {
      * Features for the actual Xerces validator
      * @return explicityFeatures to be passed to the Xerces validator
      */
-    public List getFeatures() {
+    public List<MediatorProperty> getFeatures() {
         return explicityFeatures;
     }
 }

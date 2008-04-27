@@ -27,6 +27,7 @@
         <groupId>org.apache.synapse</groupId>
         <artifactId>synapse</artifactId>
         <version>1.2-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <groupId>org.apache.synapse</groupId>

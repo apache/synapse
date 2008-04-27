@@ -27,6 +27,7 @@
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
         <version>1.2-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>synapse-transports</artifactId>

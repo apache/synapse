@@ -32,7 +32,6 @@ import org.jaxen.JaxenException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -120,22 +119,18 @@ public class POJOCommandMediator extends AbstractMediator {
         }
 
         // then set the static/constant properties first
-        for (Iterator iter = staticSetterProperties.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String) iter.next();
+        for (String name : staticSetterProperties.keySet()) {
             setInstanceProperty(name, staticSetterProperties.get(name), commandObject, synCtx);
         }
 
         // now set the any dynamic properties from the message context properties
-        for (Iterator iter = contextSetterProperties.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String) iter.next();
+        for (String name : contextSetterProperties.keySet()) {
             setInstanceProperty(name, synCtx.getProperty(contextSetterProperties.get(name)),
                 commandObject, synCtx);
         }
 
         // now set the any dynamic properties evaluating XPath's on the current message
-        for (Iterator iter = messageSetterProperties.keySet().iterator(); iter.hasNext(); ) {
-
-            String name = (String) iter.next();
+        for (String name : messageSetterProperties.keySet()) {
             SynapseXPath xpath = messageSetterProperties.get(name);
             String value = xpath.stringValueOf(synCtx);
 
@@ -171,17 +166,14 @@ public class POJOCommandMediator extends AbstractMediator {
         }
 
         // then set the context properties back to the messageContext from the command
-        for (Iterator iter = contextGetterProperties.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String) iter.next();
+        for (String name : contextGetterProperties.keySet()) {
             synCtx.setProperty(contextGetterProperties.get(name),
                 getInstanceProperty(name, commandObject, synCtx));
         }
 
         // now set the any message properties evaluating XPath's on the current message back
         // to the message from the command
-        for (Iterator iter = messageGetterProperties.keySet().iterator(); iter.hasNext(); ) {
-
-            String name = (String) iter.next();
+        for (String name : messageGetterProperties.keySet()) {
             SynapseXPath xpath = messageGetterProperties.get(name);
 
             Object resultValue = getInstanceProperty(name, commandObject, synCtx);

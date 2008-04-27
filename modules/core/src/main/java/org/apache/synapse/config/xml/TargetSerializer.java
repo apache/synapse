@@ -27,12 +27,9 @@ import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
 import org.apache.synapse.mediators.eip.Target;
 
 /**
- * This will serialize the Target util object for EIP mediators in to the
- * &lt;target&gt; element as specified below
- *
- * &lt;target (sequence="string reference")? (endpoint="string reference")?&gt;
- *  (&lt;sequence&gt; | &lt;endpoinit&gt;)?
- * &lt;/target&gt;
+ * Serializer for {@link Target} instances.
+ * 
+ * @see TargetFactory
  */
 public class TargetSerializer {
 

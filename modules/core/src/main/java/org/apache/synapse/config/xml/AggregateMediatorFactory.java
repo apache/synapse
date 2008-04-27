@@ -32,6 +32,8 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
+ * Factory for {@link AggregateMediator} instances.
+ * 
  * <pre>
  * &lt;aggregate&gt;
  *   &lt;correlateOn expression="xpath"/&gt;?

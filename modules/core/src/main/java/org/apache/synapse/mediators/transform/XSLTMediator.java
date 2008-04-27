@@ -534,7 +534,7 @@ public class XSLTMediator extends AbstractMediator {
      *
      * @return Returns the features explicitly  set to the TransformerFactory through this mediator
      */
-    public List getFeatures(){
+    public List<MediatorProperty> getFeatures(){
         return explicitFeatures;
     }
 
@@ -542,7 +542,7 @@ public class XSLTMediator extends AbstractMediator {
         properties.addAll(list);
     }
 
-    public List getProperties() {
+    public List<MediatorProperty> getProperties() {
         return properties;
     }
 

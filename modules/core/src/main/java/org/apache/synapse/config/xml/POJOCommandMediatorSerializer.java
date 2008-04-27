@@ -23,25 +23,10 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
 
-import java.util.Iterator;
-
 /**
- * Creates an instance of a Class mediator using XML configuration specified
- * <p/>
- * <pre>
- * &lt;pojoCommand name=&quot;class-name&quot;&gt;
- *   &lt;property name=&quot;string&quot; value=&quot;literal&quot; expression=&quot;xpath&quot;?
- *          context-name=&quot;string&quot;? &gt;
- *      either literal or XML child
- *   &lt;/property&gt;
- *   &lt;property name=&quot;string&quot; expression=&quot;XPATH expression&quot;
- *                action=(&quot;ReadMessage&quot; | &quot;UpdateMessage&quot; |
- *                  &quot;ReadAndUpdateMessage&quot;) context-name=&quot;string&quot;? /&gt;
- *   &lt;property name=&quot;string&quot; context-name=&quot;string&quot;
- *                action=(&quot;ReadContext&quot; | &quot;UpdateContext&quot; |
- *                  &quot;ReadAndUpdateContext&quot;) expression=&quot;XPATH expression&quot;? /&gt;
- * &lt;/pojoCommand&gt;
- * </pre>
+ * Serializer for {@link POJOCommandMediator} instances.
+ * 
+ * @see POJOCommandMediatorFactory
  */
 public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
@@ -63,10 +48,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Invalid POJO Command mediator. The command class name is required");
         }
 
-        for (Iterator itr = mediator.
-            getStaticSetterProperties().keySet().iterator(); itr.hasNext(); ) {
-
-            String propName = (String) itr.next();
+        for (String propName : mediator.getStaticSetterProperties().keySet()) {
             Object value = mediator.getStaticSetterProperties().get(propName);
             OMElement prop = fac.createOMElement(PROP_Q);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
@@ -90,10 +72,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             pojoCommand.addChild(prop);
         }
 
-        for (Iterator itr = mediator.
-            getMessageSetterProperties().keySet().iterator(); itr.hasNext(); ) {
-
-            String propName = (String) itr.next();
+        for (String propName : mediator.getMessageSetterProperties().keySet()) {
             OMElement prop = fac.createOMElement(PROP_Q);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
             SynapseXPathSerializer.serializeXPath(
@@ -111,10 +90,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             pojoCommand.addChild(prop);
         }
 
-        for (Iterator itr = mediator.
-            getContextSetterProperties().keySet().iterator(); itr.hasNext(); ) {
-
-            String propName = (String) itr.next();
+        for (String propName : mediator.getContextSetterProperties().keySet()) {
             OMElement prop = fac.createOMElement(PROP_Q);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
             prop.addAttribute(fac.createOMAttribute("context-name", nullNS,
@@ -132,10 +108,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             pojoCommand.addChild(prop);
         }
 
-        for (Iterator itr = mediator.
-            getContextGetterProperties().keySet().iterator(); itr.hasNext(); ) {
-
-            String propName = (String) itr.next();
+        for (String propName : mediator.getContextGetterProperties().keySet()) {
             if (!isSerialized(propName, mediator)) {
                 String value = mediator.getContextGetterProperties().get(propName);
                 OMElement prop = fac.createOMElement(PROP_Q);
@@ -146,10 +119,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
 
-        for (Iterator itr = mediator.
-            getMessageGetterProperties().keySet().iterator(); itr.hasNext(); ) {
-
-            String propName = (String) itr.next();
+        for (String propName : mediator.getMessageGetterProperties().keySet()) {
             if (!isSerialized(propName, mediator)) {
                 OMElement prop = fac.createOMElement(PROP_Q);
                 prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));

@@ -75,7 +75,8 @@ import java.util.List;
  * @see org.apache.synapse.util.xpath.SynapseXPathVariableContext
  */
 public class SynapseXPath extends AXIOMXPath {
-
+    private static final long serialVersionUID = 7639226137534334222L;
+    
     private static final Log log = LogFactory.getLog(SynapseXPath.class);
 
     /**
@@ -183,8 +184,8 @@ public class SynapseXPath extends AXIOMXPath {
             ContextSupport baseContextSupport = getContextSupport();
             ContextSupport contextSupport =
                 new ContextSupport(baseContextSupport.getNamespaceContext(),
-                                   new SynapseXPathFunctionContext(synCtx, true),
-                                   new SynapseXPathVariableContext(synCtx),
+                                   new SynapseXPathFunctionContext(baseContextSupport.getFunctionContext(), synCtx),
+                                   new SynapseXPathVariableContext(baseContextSupport.getVariableContext(), synCtx),
                                    baseContextSupport.getNavigator());
             Context context = new Context(contextSupport);
             context.setNodeSet(new SingletonList(synCtx.getEnvelope()));
@@ -195,7 +196,7 @@ public class SynapseXPath extends AXIOMXPath {
             ContextSupport contextSupport =
                 new ContextSupport(baseContextSupport.getNamespaceContext(),
                                    baseContextSupport.getFunctionContext(),
-                                   new SynapseXPathVariableContext(env),
+                                   new SynapseXPathVariableContext(baseContextSupport.getVariableContext(), env),
                                    baseContextSupport.getNavigator());
             Context context = new Context(contextSupport);
             context.setNodeSet(new SingletonList(env));

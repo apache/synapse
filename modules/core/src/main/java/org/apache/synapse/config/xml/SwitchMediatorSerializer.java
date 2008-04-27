@@ -20,25 +20,15 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 
 import java.util.Iterator;
 
 /**
- * <pre>
- * &lt;switch source="xpath"&gt;
- *   &lt;case regex="string"&gt;
- *     mediator+
- *   &lt;/case&gt;+
- *   &lt;default&gt;
- *     mediator+
- *   &lt;/default&gt;?
- * &lt;/switch&gt;
- * </pre>
+ * Factory for {@link SwitchMediator} instances.
+ * 
+ * @see SwitchMediatorFactory
  */
 public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
 

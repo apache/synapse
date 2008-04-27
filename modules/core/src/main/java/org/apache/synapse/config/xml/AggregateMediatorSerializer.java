@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * Serializer for {@link AggregateMediator} instances.
+ * 
  * <pre>
  * &lt;aggregate&gt;
  *   &lt;correlateOn expression="xpath"/&gt;?

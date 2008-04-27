@@ -46,9 +46,9 @@ public class MediatorPropertyFactory {
 
     private static final Log log = LogFactory.getLog(MediatorPropertyFactory.class);
 
-    public static List getMediatorProperties(OMElement elem) {
+    public static List<MediatorProperty> getMediatorProperties(OMElement elem) {
 
-        List propertyList = new ArrayList();
+        List<MediatorProperty> propertyList = new ArrayList<MediatorProperty>();
 
         Iterator iter = elem.getChildrenWithName(
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property"));

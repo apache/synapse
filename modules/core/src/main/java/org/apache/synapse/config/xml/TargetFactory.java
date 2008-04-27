@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 
 /**
+ * Factory for {@link Target} instances.
+ * <p>
  * This will build the Target util object for EIP mediators using
  * &lt;target&gt; element specified as follows
  *

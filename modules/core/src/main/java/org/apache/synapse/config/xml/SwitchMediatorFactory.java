@@ -32,8 +32,9 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * Constructs a Switch mediator instance from the given XML configuration
- * <p/>
+ * Factory for {@link SwitchMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;switch source="xpath"&gt;
  *   &lt;case regex="string"&gt;

@@ -24,17 +24,12 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * <validate [source="xpath"]>
- *   <schema key="string">+
- *   <property name="<validation-feature-name>" value="true|false"/>
- *   <on-fail>
- *     mediator+
- *   </on-fail>
- * </validate>
+ * Serializer for {@link ValidateMediator} instances.
+ * 
+ * @see ValidateMediatorSerializer
  */
 public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
     implements MediatorSerializer {
@@ -53,17 +48,14 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
             SynapseXPathSerializer.serializeXPath(mediator.getSource(), validate, "source");
         }
 
-        Iterator iterator = mediator.getSchemaKeys().iterator();
-        while (iterator.hasNext()) {
-            String key = (String) iterator.next();
+        for (String key : mediator.getSchemaKeys()) {
             OMElement schema = fac.createOMElement("schema", synNS, validate);
             schema.addAttribute(fac.createOMAttribute("key", nullNS, key));
         }
 
-        List features = mediator.getFeatures();
+        List<MediatorProperty> features = mediator.getFeatures();
         if (!features.isEmpty()) {
-            for (Iterator iter = features.iterator(); iter.hasNext();) {
-                MediatorProperty mp = (MediatorProperty) iter.next();
+            for (MediatorProperty mp : features) {
                 OMElement feature = fac.createOMElement("feature", synNS, validate);
                 if (mp.getName() != null) {
                     feature.addAttribute(fac.createOMAttribute("name", nullNS, mp.getName()));

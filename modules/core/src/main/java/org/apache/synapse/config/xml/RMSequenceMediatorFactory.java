@@ -29,8 +29,9 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
- * Creates a RMSequence mediator through the supplied XML configuration
- * <p/>
+ * Factory for {@link RMSequenceMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;
  * </pre>

@@ -20,23 +20,13 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
- * <pre>
- * &lt;sequence name="string" [onError="string"]&gt;
- *   mediator+
- * &lt;/sequence&gt;
- * </pre>
- * <p/>
- * OR
- * <p/>
- * <pre>
- * &lt;sequence key="name"/&gt;
- * </pre>
+ * Serializer for {@link SequenceMediator} instances.
+ * 
+ * @see SequenceMediatorFactory
  */
 public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 

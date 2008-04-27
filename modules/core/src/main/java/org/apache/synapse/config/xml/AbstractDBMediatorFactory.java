@@ -37,31 +37,35 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 /**
- * <dbreport | dblookup | .. etc>
- *   <connection>
- *     <pool>
+ * Base class for factories for database related mediators.
+ * 
+ * <pre>
+ * &lt;dbreport | dblookup | .. etc>
+ *   &lt;connection>
+ *     &lt;pool>
  *     (
- *       <driver/>
- *       <url/>
- *       <user/>
- *       <password/>
+ *       &lt;driver/>
+ *       &lt;url/>
+ *       &lt;user/>
+ *       &lt;password/>
  *     | 
- *       <dsName/>
- *       <icClass/>
- *       <url/>
- *       <user/>
- *       <password/>
+ *       &lt;dsName/>
+ *       &lt;icClass/>
+ *       &lt;url/>
+ *       &lt;user/>
+ *       &lt;password/>
  *     )
- *       <property name="name" value="value"/>*
- *     </pool>
- *   </connection>
- *   <statement>
- *     <sql>insert into table values (?, ?, ..) OR select target from destinations where src = ?</sql>
- *     <parameter (value="const" | expression="xpath") type="INTEGER|VARCHAR|..."/>*
- *     <result name="propName" column="target | number"/>*
- *   </statement>+
- * </dbreport | dblookup | .. etc>
- *
+ *       &lt;property name="name" value="value"/>*
+ *     &lt;/pool>
+ *   &lt;/connection>
+ *   &lt;statement>
+ *     &lt;sql>insert into table values (?, ?, ..) OR select target from destinations where src = ?&lt;/sql>
+ *     &lt;parameter (value="const" | expression="xpath") type="INTEGER|VARCHAR|..."/>*
+ *     &lt;result name="propName" column="target | number"/>*
+ *   &lt;/statement>+
+ * &lt;/dbreport | dblookup | .. etc>
+ * </pre>
+ * 
  * Supported properties for custom DataSources
  * autocommit = true | false
  * isolation = Connection.TRANSACTION_NONE

@@ -27,6 +27,9 @@ import org.apache.synapse.mediators.db.DBLookupMediator;
 import javax.xml.namespace.QName;
 
 /**
+ * Factory for {@link DBLookupMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;dblookup&gt;
  *   &lt;connection&gt;

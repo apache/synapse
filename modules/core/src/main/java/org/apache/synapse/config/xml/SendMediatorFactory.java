@@ -20,8 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
@@ -32,10 +30,10 @@ import org.apache.synapse.endpoints.Endpoint;
 import javax.xml.namespace.QName;
 
 /**
- * The Send mediator factory parses a Send element and creates an instance of the mediator
- *
- * //TODO document endpoints, failover and load balacing
- *
+ * Factory for {@link SendMediator} instances.
+ * <p>
+ * TODO: document endpoints, failover and load balacing
+ * <p>
  * The &lt;send&gt; element is used to send messages out of Synapse to some endpoint. In the simplest case,
  * the place to send the message to is implicit in the message (via a property of the message itself)-
  * that is indicated by the following:

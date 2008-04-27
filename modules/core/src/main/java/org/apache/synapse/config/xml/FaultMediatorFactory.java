@@ -31,8 +31,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Creates a fault mediator instance
- *
+ * Factory for {@link FaultMediator} instances.
+ * <p>
+ * Configuration syntax:
  * <pre>
  * &lt;makefault [version="soap11|soap12|pox"]&gt;
  *   &lt;code (value="literal" | expression="xpath")/&gt;?

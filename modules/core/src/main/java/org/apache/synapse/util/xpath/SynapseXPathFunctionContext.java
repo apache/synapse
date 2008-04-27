@@ -22,8 +22,8 @@ package org.apache.synapse.util.xpath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.GetPropertyFunction;
 import org.jaxen.Function;
+import org.jaxen.FunctionContext;
 import org.jaxen.UnresolvableException;
-import org.jaxen.XPathFunctionContext;
 
 /**
  * <p>XPath function context to be used when resolving XPath functions when using the
@@ -36,48 +36,37 @@ import org.jaxen.XPathFunctionContext;
  * @see org.jaxen.XPathFunctionContext
  * @see org.apache.synapse.util.xpath.SynapseXPath
  */
-public class SynapseXPathFunctionContext extends XPathFunctionContext {
-
+public class SynapseXPathFunctionContext implements FunctionContext {
+    /** Parent function context */
+    private final FunctionContext parent;
+    
     /** MessageContext to be used by the function resolver */
     private final MessageContext synCtx;
 
     /**
-     * <p>Initialises the function context and the default XPath functions</p>
+     * <p>Initialises the function context</p>
      *
+     * @param parent the parent function context
      * @param synCtx message to be used for the function initialization
      *
      * @see org.jaxen.XPathFunctionContext
      */
-    public SynapseXPathFunctionContext(MessageContext synCtx) {
-        super();
+    public SynapseXPathFunctionContext(FunctionContext parent, MessageContext synCtx) {
+        this.parent = parent;
         this.synCtx = synCtx;
     }
 
     /**
-     * <p>Initialises the function context and the default XPath functions and the extension
-     * functions by Jaxen</p>
-     *
-     * @param synCtx message to be used for the function initialization
-     * @param includeExtensionFunctions whether to include the extensions or not
-     *
-     * @see org.jaxen.XPathFunctionContext
-     */
-    public SynapseXPathFunctionContext(MessageContext synCtx, boolean includeExtensionFunctions) {
-        super(includeExtensionFunctions);
-        this.synCtx = synCtx;
-    }
-
-    /**
-     * <p>Retrieves the functions from the <code>FunctionContext</code> and this contains the
-     * <code>get-property</code> function extension as well</p>
+     * Get the function with a given namespace and name.
+     * <p>
+     * Only the <tt>get-property</tt> function is recognized by this class. Any other
+     * function will be resolved using the parent function context.
      * 
      * @param namespaceURI namespace of the function to be resolved
      * @param prefix string prefix to be resolved
      * @param localName string local name of the function
      * @return resolved function
      * @throws UnresolvableException if the function specified does not found
-     *
-     * @see org.jaxen.XPathFunctionContext#getFunction(String, String, String) 
      */
     public Function getFunction(String namespaceURI, String prefix, String localName)
         throws UnresolvableException {
@@ -92,7 +81,7 @@ public class SynapseXPathFunctionContext extends XPathFunctionContext {
             return getPropertyFunc;
         }
 
-        // if not the get-property function then fetch default xpath functions
-        return super.getFunction(namespaceURI, prefix, localName);
+        // if not the get-property function then try to get it from the parent context
+        return parent.getFunction(namespaceURI, prefix, localName);
     }
 }

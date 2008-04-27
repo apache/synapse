@@ -38,6 +38,8 @@ import java.util.Map;
  * </dl>
  */
 public class SynapseXPathVariableContext implements VariableContext {
+    /** Parent variable context */
+    private final VariableContext parent;
 
     /** MessageContext to be used for the variable resolution */
     private final MessageContext synCtx;
@@ -48,9 +50,11 @@ public class SynapseXPathVariableContext implements VariableContext {
     /**
      * <p>Initializes the <code>SynapseVariableContext</code> with the specified context</p>
      *
+     * @param parent the parent variable context
      * @param synCtx context to be initialized for the variable resolution
      */
-    public SynapseXPathVariableContext(MessageContext synCtx) {
+    public SynapseXPathVariableContext(VariableContext parent, MessageContext synCtx) {
+        this.parent = parent;
         this.synCtx = synCtx;
         this.env = synCtx.getEnvelope();
     }
@@ -58,15 +62,17 @@ public class SynapseXPathVariableContext implements VariableContext {
     /**
      * <p>Initializes the <code>SynapseVariableContext</code> with the specified envelope</p>
      *
+     * @param parent the parent variable context
      * @param env envelope to be initialized for the variable resolution
      */
-    public SynapseXPathVariableContext(SOAPEnvelope env) {
+    public SynapseXPathVariableContext(VariableContext parent, SOAPEnvelope env) {
+        this.parent = parent;
         this.synCtx = null;
         this.env = env;
     }
 
     /**
-     * <p>Gets the variable values resolved from the context. This includes the
+     * Gets the variable values resolved from the context. This includes the
      * <dl>
      *   <dt><tt>body</tt></dt>
      *   <dd>The SOAP 1.1 or 1.2 body element.</dd>
@@ -82,7 +88,8 @@ public class SynapseXPathVariableContext implements VariableContext {
      *   <dt><tt>trp</tt></dt>
      *   <dd>Prefix for the transport headers</dd>
      * </dl>
-     * </p>
+     * If the variable is unknown, this method attempts to resolve it using
+     * the parent variable context.
      * 
      * @param namespaceURI namespaces for the variable resolution
      * @param prefix string prefix for the variable resolution
@@ -130,12 +137,6 @@ public class SynapseXPathVariableContext implements VariableContext {
             }
         }
 
-        StringBuilder message = new StringBuilder("No such variable \"");
-        if (namespaceURI != null) {
-            message.append('{').append(namespaceURI).append('}');
-        }
-        
-        message.append(localName).append('"');
-        throw new UnresolvableException(message.toString());
+        return parent.getVariableValue(namespaceURI, prefix, localName);
     }
 }

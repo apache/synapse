@@ -630,7 +630,8 @@ File     vfs:file:///home/user/directory
       &lt;endpoint&gt;...&lt;/endpoint&gt;?
    &lt;/target&gt;?
    &lt;publishWSDL key="string" uri="string"&gt;
-      &lt;description&gt;...&lt;/description&gt; | &lt;definitions&gt;...&lt;/definitions&gt;
+      ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?
+      &lt;resource location="..." key="..."/&gt;*
    &lt;/publishWSDL&gt;?
    &lt;enableSec/&gt;?
    &lt;enableRM/&gt;?
@@ -654,7 +655,7 @@ File     vfs:file:///home/user/directory
       names separated by comma or space character. If there is no pinned server
       list then proxy service will be started in all server instances. If a
       pinned server names list is given it will only start in the given named
-      Synapse server instances. The Synapse server name picked up from the
+      Synapse server instances. The Synapse server name is picked up from the
       system property 'SynapseServerName', failing which the hostname of the
       machine would be used or default to 'localhost'. You can give a name to a
       Synapse server instance as ./synapse.sh -DSynapseServerName=&lt;ServerName&gt;
@@ -680,7 +681,25 @@ File     vfs:file:///home/user/directory
       proxy service definition itself can not be specified to be dynamic; i.e
       &lt;proxy key="string"/&gt; is wrong)
     </p>
-    <p/>
+    <p>
+      A WSDL for the proxy service can be published using the &lt;publishWSDL&gt;
+      element. The WSDL document can be loaded from the registry by
+      specifying the 'key' attribute or from any other location by specifying the
+      'uri' attribute. Alternatively the WSDL can be provided inline as a child
+      element of &lt;publishWSDL&gt;. Artifacts (schemas or other WSDL documents)
+      imported by the WSDL can be resolved from the registry by specifying
+      appropriate &lt;resource&gt; elements:
+    </p>
+<pre> &lt;publishWSDL key="my.wsdl"&gt;
+   &lt;resource location="http://www.standards.org/standard.wsdl" key="standard.wsdl"/&gt;
+ &lt;/publishWSDL&gt;
+</pre>
+    <p>
+      In this example the WSDL is retrieved from the registry using the key 'my.wsdl'. It
+      imports another WSDL from location 'http://www.standards.org/standard.wsdl'. Instead
+      of loading it from this location, Synapse will retrieve the imported WSDL from the
+      registry entry 'standard.wsdl'.
+    </p>
     <p>
       You can give the following as service parameters:
     </p>

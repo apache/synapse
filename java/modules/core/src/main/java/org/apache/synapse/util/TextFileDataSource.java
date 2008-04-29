@@ -25,21 +25,25 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMSourcedElement;
 import org.apache.axiom.om.ds.OMDataSourceExtBase;
+import org.apache.axiom.om.impl.MTOMXMLStreamWriter;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.impl.serialize.StreamingOMSerializer;
-import org.apache.synapse.SynapseException;
+import org.apache.axiom.om.util.StAXUtils;
 import org.apache.synapse.transport.base.BaseConstants;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 
 public class TextFileDataSource extends OMDataSourceExtBase {
-
-    private static final byte[] empty =
-        "<text xmlns=\"http://ws.apache.org/commons/ns/payload\"/>".getBytes();
     private final TemporaryData temporaryData;
     private final Charset charset;
 
@@ -54,27 +58,23 @@ public class TextFileDataSource extends OMDataSourceExtBase {
         return new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
     }
 
+    @Override
     public void serialize(OutputStream out, OMOutputFormat format) throws XMLStreamException {
-        try {
-            InputStream is = temporaryData.getInputStream();
-            byte[] buf = new byte[4096];
-            int len;
-            while ((len = is.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-        } catch (IOException e) {
-            throw new SynapseException("Error serializing TextFileDataSource to an OutputStream", e);
-        }
+        XMLStreamWriter writer = new MTOMXMLStreamWriter(out, format);
+        serialize(writer);
+        writer.flush();
     }
 
+    @Override
     public void serialize(Writer writer, OMOutputFormat format) throws XMLStreamException {
-        try {
-            writer.write(new String(empty));
-        } catch (IOException e) {
-            throw new XMLStreamException(e);
-        }
+        MTOMXMLStreamWriter xmlWriter =
+            new MTOMXMLStreamWriter(StAXUtils.createXMLStreamWriter(writer));
+        xmlWriter.setOutputFormat(format);
+        serialize(xmlWriter);
+        xmlWriter.flush();
     }
 
+    @Override
     public void serialize(XMLStreamWriter xmlWriter) throws XMLStreamException {
         StreamingOMSerializer serializer = new StreamingOMSerializer();
         serializer.serialize(getReader(), xmlWriter);

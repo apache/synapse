@@ -31,10 +31,11 @@ import javax.xml.namespace.QName;
  * Factory for {@link CalloutMediator} instances.
  * 
  * <pre>
- * &lt;callout serviceURL="string" [action="string"]>
- *      &lt;source xpath="expression" | key="string">
- *      &lt;target xpath="expression" | key="string"/>
- * &lt;/callout>
+ * &lt;callout serviceURL="string" [action="string"]&gt;
+ *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+ *      &lt;source xpath="expression" | key="string"&gt;
+ *      &lt;target xpath="expression" | key="string"/&gt;
+ * &lt;/callout&gt;
  * </pre>
  */
 public class CalloutMediatorFactory extends AbstractMediatorFactory {
@@ -43,8 +44,14 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "callout");
     private static final QName ATT_URL = new QName("serviceURL");
     private static final QName ATT_ACTION = new QName("action");
-    private static final QName Q_SOURCE = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "source");
-    private static final QName Q_TARGET = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
+    private static final QName ATT_AXIS2XML = new QName("axis2xml");
+    private static final QName ATT_REPOSITORY = new QName("repository");
+    private static final QName Q_CONFIG
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "configuration");
+    private static final QName Q_SOURCE
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "source");
+    private static final QName Q_TARGET
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -52,6 +59,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         OMAttribute attServiceURL = elem.getAttribute(ATT_URL);
         OMAttribute attAction     = elem.getAttribute(ATT_ACTION);
+        OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
         OMElement   sourceElt     = elem.getFirstChildWithName(Q_SOURCE);
         OMElement   targetElt     = elem.getFirstChildWithName(Q_TARGET);
 
@@ -63,6 +71,20 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         if (attAction != null) {
             callout.setAction(attAction.getAttributeValue());
+        }
+
+        if (configElt != null) {
+
+            OMAttribute axis2xmlAttr = configElt.getAttribute(ATT_AXIS2XML);
+            OMAttribute repoAttr = configElt.getAttribute(ATT_REPOSITORY);
+
+            if (axis2xmlAttr != null && axis2xmlAttr.getAttributeValue() != null) {
+                callout.setAxis2xml(axis2xmlAttr.getAttributeValue());
+            }
+
+            if (repoAttr != null && repoAttr.getAttributeValue() != null) {
+                callout.setClientRepository(repoAttr.getAttributeValue());
+            }
         }
 
         if (sourceElt != null) {

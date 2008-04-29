@@ -19,23 +19,56 @@
 
 package org.apache.synapse.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMSourcedElement;
 
 public class TextFileDataSourceTest extends TestCase {
-    private final static Charset UTF8 = Charset.forName("UTF-8");
-
-    public void testWithXMLChars() throws Exception {
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+    
+    private OMSourcedElement createSourcedElement(String content, Charset charset) throws IOException {
         TemporaryData tmp = new TemporaryData(4, 1024, "tmp_", ".dat");
         OutputStream out = tmp.getOutputStream();
-        String testString = "Test string with ampersand (&)";
-        out.write(testString.getBytes(UTF8.name()));
+        out.write(content.getBytes(charset.name()));
         out.close();
-        OMSourcedElement element = TextFileDataSource.createOMSourcedElement(tmp, UTF8);
+        return TextFileDataSource.createOMSourcedElement(tmp, charset);
+    }
+    
+    public void testWithXMLChars() throws Exception {
+        String testString = "Test string with ampersand (&)";
+        OMSourcedElement element = createSourcedElement(testString, UTF8);
         assertEquals(testString, element.getText());
+    }
+    
+    public void testSerializeToBytes() throws Exception {
+        OMSourcedElement element = createSourcedElement("test", UTF8);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        element.serialize(baos);
+        byte[] actual = baos.toByteArray();
+        baos.reset();
+        // We validate the result by creating an equivalent OMElement
+        // and calling serialize on it. The two results must be identical.
+        element.cloneOMElement().serialize(baos);
+        byte[] expected = baos.toByteArray();
+        assertTrue(Arrays.equals(expected, actual));
+    }
+    
+    public void testSerializeToChars() throws Exception {
+        OMSourcedElement element = createSourcedElement("test", UTF8);
+        StringWriter sw = new StringWriter();
+        element.serialize(sw);
+        String actual = sw.toString();
+        sw.getBuffer().setLength(0);
+        // Compare with the behavior of an equivalent OMElement
+        element.cloneOMElement().serialize(sw);
+        String expected = sw.toString();
+        assertEquals(expected, actual);
     }
 }

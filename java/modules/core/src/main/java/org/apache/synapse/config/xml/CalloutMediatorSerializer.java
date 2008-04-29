@@ -24,10 +24,13 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 
 /**
- * <callout serviceURL="string" [action="string"]>
- *      <source xpath="expression" | key="string">
- *      <target xpath="expression" | key="string"/>
- * </callout>
+ * <pre>
+ * &lt;callout serviceURL="string" [action="string"]&gt;
+ *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+ *      &lt;source xpath="expression" | key="string"&gt;
+ *      &lt;target xpath="expression" | key="string"/&gt;
+ * &lt;/callout&gt;
+ * </pre>
  */
 public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
@@ -44,6 +47,19 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
         callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
         if (mediator.getAction() != null) {
             callout.addAttribute(fac.createOMAttribute("action", nullNS, mediator.getAction()));
+        }
+
+        if (mediator.getClientRepository() != null || mediator.getAxis2xml() != null) {
+            OMElement config = fac.createOMElement("configuration", synNS);
+            if (mediator.getClientRepository() != null) {
+                config.addAttribute(fac.createOMAttribute(
+                        "repository", nullNS, mediator.getClientRepository()));
+            }
+            if (mediator.getAxis2xml() != null) {
+                config.addAttribute(fac.createOMAttribute(
+                        "axis2xml", nullNS, mediator.getAxis2xml()));
+            }
+            callout.addChild(config);
         }
 
         OMElement source = fac.createOMElement("source", synNS, callout);

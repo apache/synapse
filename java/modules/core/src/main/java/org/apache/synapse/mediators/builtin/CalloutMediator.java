@@ -41,6 +41,7 @@ import java.util.List;
 
 /**
  * <callout serviceURL="string" [action="string"]>
+ *      <configuration [axis2xml="string"] [repository="string"]/>?
  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
  *      <target xpath="expression" | key="string"/>
  * </callout>
@@ -54,6 +55,10 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     private SynapseXPath requestXPath = null;
     private SynapseXPath targetXPath = null;
     private String targetKey = null;
+    private String clientRepository = null;
+    private String axis2xml = null;
+    public static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
+    public static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -76,7 +81,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                 options.setAction(action);
             }
 
-            options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+            options.setProperty(
+                    AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
             sc.setOptions(options);
 
             OMElement request = getRequestPayload(synCtx);
@@ -105,7 +111,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                         tgtNode.insertSiblingAfter(result);
                         tgtNode.detach();
                     } else if (o != null && o instanceof List && !((List) o).isEmpty()) {
-                        OMNode tgtNode = (OMElement) ((List) o).get(0);  // Always fetches *only* the first
+                        // Always fetches *only* the first
+                        OMNode tgtNode = (OMElement) ((List) o).get(0);
                         tgtNode.insertSiblingAfter(result);
                         tgtNode.detach();
                     } else {
@@ -158,7 +165,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                         + requestXPath.toString() + " did not result in an OMElement", synCtx);
                 }
             } catch (JaxenException e) {
-                handleException("Error evaluating XPath expression : " + requestXPath.toString(), e, synCtx);
+                handleException("Error evaluating XPath expression : "
+                        + requestXPath.toString(), e, synCtx);
             }
         }
         return null;
@@ -166,9 +174,10 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void init(SynapseEnvironment synEnv) {
         try {
-            ConfigurationContext cfgCtx =
-                ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                    "./samples/axis2Client/client_repo", "./samples/axis2Client/client_repo/conf/axis2.xml");
+            ConfigurationContext cfgCtx
+                    = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                    clientRepository != null ? clientRepository : DEFAULT_CLIENT_REPO,
+                    axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
             sc = new ServiceClient(cfgCtx, null);
         } catch (AxisFault e) {
             String msg = "Error initializing callout mediator : " + e.getMessage();
@@ -229,5 +238,21 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public SynapseXPath getTargetXPath() {
         return targetXPath;
+    }
+
+    public String getClientRepository() {
+        return clientRepository;
+    }
+
+    public void setClientRepository(String clientRepository) {
+        this.clientRepository = clientRepository;
+    }
+
+    public String getAxis2xml() {
+        return axis2xml;
+    }
+
+    public void setAxis2xml(String axis2xml) {
+        this.axis2xml = axis2xml;
     }
 }

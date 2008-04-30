@@ -37,6 +37,7 @@ import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.async.AxisCallback;
@@ -62,7 +63,6 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
@@ -745,20 +745,27 @@ public class FaultManager {
 	}
 	
 	public static InvocationResponse processMessagesForFaults (RMMsgContext rmMsgCtx, StorageManager storageManager) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::processMessagesForFaults");
 		
 		InvocationResponse response = InvocationResponse.CONTINUE;
 		
-		SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
-		if (envelope==null) 
-			return response;
+		// Rather than look for a SOAPFault, check the action of the message to see if that matches
+		// an RM fault or is the addressing fault (RM 1.0).
 		
-		SOAPFault faultPart = envelope.getBody().getFault();
+		boolean isFault = isRMFaultAction(rmMsgCtx.getMessageContext().getWSAAction());
 
-		if (faultPart != null) {
+		if (isFault) {
 	    Transaction transaction = null;
 
 	    try {
 	    	transaction = storageManager.getTransaction();
+
+			SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
+			if (envelope==null) 
+				return response;
+			
+			SOAPFault faultPart = envelope.getBody().getFault();
 
 	    	// constructing the fault
 	    	AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart, rmMsgCtx);
@@ -771,10 +778,27 @@ public class FaultManager {
 	    		transaction.rollback();
 			}
 		}
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::processMessagesForFaults, " + response);
 		return response;
 	}
 
 	
+	private static boolean isRMFaultAction(String action) {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::processMessagesForFaults , "+action);
+		
+	    boolean isFaultAction = false;
+	    
+	    if (AddressingConstants.Final.WSA_FAULT_ACTION.equals(action) ||
+	    	Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_FAULT.equals(action))
+	    	isFaultAction = true;
+	    
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::processMessagesForFaults , "+isFaultAction);
+	    return isFaultAction;
+    }
+
 	private static AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart, RMMsgContext rmMsgCtx) {
 		
 		String soapFaultSubcode = null;
@@ -989,7 +1013,7 @@ public class FaultManager {
   }
 
 	static void notifyClientsOfFault(String internalSequenceId, 
-			StorageManager storageManager, ConfigurationContext configCtx, AxisFault fault) throws SandeshaStorageException {
+			StorageManager storageManager, ConfigurationContext configCtx, AxisFault fault) throws SandeshaException {
 		// Locate and update all of the messages for this sequence, now that we know
 		// the sequence id.
 		SenderBean target = new SenderBean();
@@ -1004,32 +1028,32 @@ public class FaultManager {
 			// Retrieve the message context.
 			MessageContext context = storageManager.retrieveMessageContext(messageStoreKey, configCtx);
 			
-      AxisOperation axisOperation = context.getAxisOperation();
-      if (axisOperation != null)
-      {
-        MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
-        if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver))
-        {
-            Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
-            if (callback instanceof Callback)
-            {
-                try {
-                    ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
-                } catch (AxisFault axisFault) {
-                    throw new SandeshaStorageException(axisFault);
-                }
-                ((Callback)callback).onError(fault);
-            } else if(callback instanceof AxisCallback) {
-                try {
-                    ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
-                } catch (AxisFault axisFault) {
-                    throw new SandeshaStorageException(axisFault);
-                }
-                ((AxisCallback)callback).onError(fault);
-            }
-        }
-      }
+			AxisOperation axisOperation = context.getAxisOperation();
+			if (axisOperation != null) {
+				
+				MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
+				if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver)) {
+					
+					Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
+					if (callback instanceof Callback) {
+						try {
+							((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
+						} catch (AxisFault axisFault) {
+							throw new SandeshaException(axisFault);
+						}
+						
+					((Callback)callback).onError(fault);
+					} else if(callback instanceof AxisCallback) {
+						try {
+							((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
+						} catch (AxisFault axisFault) {
+							throw new SandeshaException(axisFault);
+						}
+						
+						((AxisCallback)callback).onError(fault);
+					}
+				}
+			}
 		}
-
 	}
 }

@@ -3460,7 +3460,7 @@ Transfer-Encoding: chunked
       <strong>Prerequisites:</strong><br/> 
        You will need the two sample FIX applications that come with Quickfix/J
        (Banzai and Executor). Configure the two applications to establish
-       sessions with Synapse. See <a href="Synapse_Samples_Setup.xml#fixsamplesconfig">
+       sessions with Synapse. See <a href="Synapse_Samples_Setup.html#fixsamplesconfig">
        Configuring Sample FIX Applications</a>
     </p>
     <p>
@@ -3472,7 +3472,7 @@ Transfer-Encoding: chunked
       </a>
     </p>
     <p>
-      Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.xml#fixsamples">
+      Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.html#fixsamples">
       Configuring Synapse for FIX Samples</a>
     </p>
     <p>
@@ -3527,7 +3527,7 @@ Transfer-Encoding: chunked
       <strong>Prerequisites:</strong><br/> 
        You will need the Executor sample application that comes with Quickfix/J.
        Configure Executor to establish a session with Synapse. See <a href=
-       "Synapse_Samples_Setup.xml#fixsamplesconfig">Configuring Sample FIX 
+       "Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX 
        Applications</a>
     </p>
     <p>
@@ -3539,7 +3539,7 @@ Transfer-Encoding: chunked
       </a>
     </p>
     <p>
-      Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.xml#fixsamples">
+      Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.html#fixsamples">
       Configuring Synapse for FIX Samples</a>. There is no need to create the fix-synapse.cfg
       file for this sample. Having only the synapse-sender.cfg file is sufficient.
     </p>
@@ -3633,7 +3633,7 @@ Transfer-Encoding: chunked
       required jar files to the Synapse lib directory, and optionally perform
       other installation tasks as may be required by the individual scripting
       language. This is explained in the <a
-      href="Synapse_Samples_Setup.xml#script">Samples Setup guide</a>.
+      href="Synapse_Samples_Setup.html#script">Samples Setup guide</a>.
     </p>
     <h2>
       <a name="Sample350" id="Sample350">Sample 350: Introduction to the
@@ -3852,7 +3852,7 @@ end
     </p>
     <p>
       This sample uses Ruby so first setup support for this in Synapse as
-      described at <a href="Synapse_Samples_Setup.xml#script">Configuring
+      described at <a href="Synapse_Samples_Setup.html#script">Configuring
       JRuby</a>.
     </p>
     <p>
@@ -3914,7 +3914,7 @@ end
       </p>
       <p>
         This sample uses Ruby so first setup support for this in Synapse as
-        described at <a href="Synapse_Samples_Setup.xml#script">Configuring
+        described at <a href="Synapse_Samples_Setup.html#script">Configuring
         JRuby</a>.
       </p>
       <p>
@@ -3939,7 +3939,7 @@ end
       Following database mediators use Derby in a client/server configuration by
       using the network server. Therefore, to proceed with the following
       samples, you need a working Derby database server and you have to follow
-      the steps in <a href="Synapse_Samples_Setup.xml#derby">Sample Setup
+      the steps in <a href="Synapse_Samples_Setup.html#derby">Sample Setup
       Guide</a> before going through the samples.
     </p>
     <p/>

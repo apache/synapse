@@ -402,7 +402,7 @@ public class SynapseConfigUtils {
         return url;
     }
 
-    public static InputSource resolveRelativeURI(String parentLocation, String relativeLocation) {
+    public static String resolveRelativeURI(String parentLocation, String relativeLocation) {
 
         if (relativeLocation == null) {
             throw new IllegalArgumentException("Import URI cannot be null");
@@ -416,21 +416,21 @@ public class SynapseConfigUtils {
         try {
             importUri = new URI(relativeLocation);
             if (importUri.isAbsolute()) {
-                return getInputSourceFormURI(importUri);
+                return importUri.toString();
             }
         } catch (URISyntaxException e) {
-            handleException("Invalid URI", e);
+            handleException("Invalid URI : " + relativeLocation, e);
         }
 
         if (parentLocation == null) {
-            return getInputSourceFormURI(importUri);
+            return importUri.toString();
         } else {
             // if the importuri is absolute
             if (relativeLocation.startsWith("/") || relativeLocation.startsWith("\\")) {
                 if (importUri != null && !importUri.isAbsolute()) {
                     try {
                         importUri = new URI("file:" + relativeLocation);
-                        return getInputSourceFormURI(importUri);
+                        return importUri.toString();
                     } catch (URISyntaxException e) {
                         handleException("Invalid URI ' " + importUri.getPath() + " '", e);
                     }
@@ -448,12 +448,12 @@ public class SynapseConfigUtils {
                         if (!resolvedUri.isAbsolute()) {
                             resolvedUri = new URI("file:" + resolvedPath);
                         }
-                        return getInputSourceFormURI(resolvedUri);
+                        return resolvedUri.toString();
                     } catch (URISyntaxException e) {
                         handleException("Invalid URI ' " + resolvedPath + " '", e);
                     }
                 } else {
-                    return getInputSourceFormURI(importUri);
+                    return importUri.toString();
                 }
             }
         }

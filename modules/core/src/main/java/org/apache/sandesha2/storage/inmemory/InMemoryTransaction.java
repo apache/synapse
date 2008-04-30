@@ -47,18 +47,20 @@ public class InMemoryTransaction implements Transaction {
 	private boolean sentMessages = false;
 	private boolean active = true;
 	private Thread thread;
+	private boolean useSerialization;
 	
-	InMemoryTransaction(InMemoryStorageManager manager, Thread thread) {
+	InMemoryTransaction(InMemoryStorageManager manager, Thread thread, boolean useSerialization) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
 		this.manager = manager;
 		this.thread = thread;
 		this.threadName = thread.getName();
+		this.useSerialization = useSerialization;
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
 	
 	public void commit() {
 		releaseLocks();
-		if(sentMessages) manager.getSender().wakeThread();
+		if(sentMessages && useSerialization) manager.getSender().wakeThread();
 		active = false;
 	}
 

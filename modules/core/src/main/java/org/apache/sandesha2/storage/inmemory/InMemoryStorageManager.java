@@ -91,7 +91,7 @@ public class InMemoryStorageManager extends StorageManager {
 		// do some work that requires a tran without there being a transaction in scope
 		// then the enlist method will throw an exception.
 		Thread thread = Thread.currentThread();
-		InMemoryTransaction result = new InMemoryTransaction(this, thread);
+		InMemoryTransaction result = new InMemoryTransaction(this, thread, useSerialization);
 		Transaction oldTran = (Transaction) transactions.putIfAbsent(thread, result);
 		if(oldTran!=null){
 			// We don't want to overwrite or return an existing transaction, as someone

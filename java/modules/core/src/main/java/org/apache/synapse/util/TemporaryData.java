@@ -1,8 +1,8 @@
 package org.apache.synapse.util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.SynapseConfiguration;
 
 import java.io.*;
 
@@ -33,25 +33,9 @@ public class TemporaryData {
             } else if (len > (chunks.length-chunkIndex)*chunkSize - chunkOffset) {
 
                 // The buffer will overflow. Switch to a temporary file.
-                temporaryFile = File.createTempFile(tempPrefix, tempSuffix);
-                if (log.isDebugEnabled()) {
-                    log.debug("Using temporary file " + temporaryFile);
-                }
-                temporaryFile.deleteOnExit();
-
-                fileOutputStream = new FileOutputStream(temporaryFile);
-                // Write the buffer to the temporary file.
-                for (int i=0; i<chunkIndex; i++) {
-                    fileOutputStream.write(chunks[i]);
-                }
-
-                if (chunkOffset > 0) {
-                    fileOutputStream.write(chunks[chunkIndex], 0, chunkOffset);
-                }
-
-                // Release references to the buffer so that it can be garbage collected.
-                chunks = null;
-                // Finally, write the new data to the temporary file.
+                fileOutputStream = switchToTempFile();
+                
+                // Write the new data to the temporary file.
                 fileOutputStream.write(b, off, len);
 
             } else {
@@ -59,15 +43,7 @@ public class TemporaryData {
                 // The data will fit into the buffer.
                 while (len > 0) {
 
-                    byte[] chunk;
-                    if (chunkOffset == 0) {
-                        // We will write the first byte to the current chunk. Allocate it.
-                        chunk = new byte[chunkSize];
-                        chunks[chunkIndex] = chunk;
-                    } else {
-                        // The chunk has already been allocated.
-                        chunk = chunks[chunkIndex];
-                    }
+                    byte[] chunk = getCurrentChunk();
 
                     // Determine number of bytes that can be copied to the current chunk.
                     int c = Math.min(len, chunkSize-chunkOffset);
@@ -241,9 +217,91 @@ public class TemporaryData {
         this.tempSuffix = tempSuffix;
         chunks = new byte[numberOfChunks][];
     }
+    
+    /**
+     * Get the current chunk to write to, allocating it if necessary.
+     * 
+     * @return the current chunk to write to (never null)
+     */
+    byte[] getCurrentChunk() {
+        if (chunkOffset == 0) {
+            // We will write the first byte to the current chunk. Allocate it.
+            byte[] chunk = new byte[chunkSize];
+            chunks[chunkIndex] = chunk;
+            return chunk;
+        } else {
+            // The chunk has already been allocated.
+            return chunks[chunkIndex];
+        }
+    }
+    
+    /**
+     * Create a temporary file and write the existing in memory data to it.
+     * 
+     * @return an open FileOutputStream to the temporary file
+     * @throws IOException
+     */
+    FileOutputStream switchToTempFile() throws IOException {
+        temporaryFile = File.createTempFile(tempPrefix, tempSuffix);
+        if (log.isDebugEnabled()) {
+            log.debug("Using temporary file " + temporaryFile);
+        }
+        temporaryFile.deleteOnExit();
 
+        FileOutputStream fileOutputStream = new FileOutputStream(temporaryFile);
+        // Write the buffer to the temporary file.
+        for (int i=0; i<chunkIndex; i++) {
+            fileOutputStream.write(chunks[i]);
+        }
+
+        if (chunkOffset > 0) {
+            fileOutputStream.write(chunks[chunkIndex], 0, chunkOffset);
+        }
+
+        // Release references to the buffer so that it can be garbage collected.
+        chunks = null;
+        
+        return fileOutputStream;
+    }
+    
     public OutputStream getOutputStream() {
         return new OutputStreamImpl();
+    }
+    
+    /**
+     * Fill this object with data read from a given InputStream.
+     * <p>
+     * A call <code>tmp.readFrom(in)</code> has the same effect as the
+     * following code:
+     * <pre>
+     * OutputStream out = tmp.getOutputStream();
+     * IOUtils.copy(in, out);
+     * out.close();
+     * </pre>
+     * However it does so in a more efficient way.
+     * 
+     * @param in An InputStream to read data from. This method will not
+     *           close the stream.
+     * @throws IOException
+     */
+    public void readFrom(InputStream in) throws IOException {
+        while (true) {
+            int c = in.read(getCurrentChunk(), chunkOffset, chunkSize-chunkOffset);
+            if (c == -1) {
+                break;
+            }
+            chunkOffset += c;
+            if (chunkOffset == chunkSize) {
+                chunkIndex++;
+                chunkOffset = 0;
+                if (chunkIndex == chunks.length) {
+                    FileOutputStream fileOutputStream = switchToTempFile();
+                    IOUtils.copy(in, fileOutputStream);
+                    fileOutputStream.close();
+                    break;
+                }
+            }
+        }
     }
     
     public InputStream getInputStream() throws IOException {
@@ -263,7 +321,7 @@ public class TemporaryData {
         }
     }
 
-    protected void finalize() throws Throwable {    
+    protected void finalize() throws Throwable {
         if (temporaryFile != null) {
             log.warn("Cleaning up unreleased temporary file " + temporaryFile);
             temporaryFile.delete();

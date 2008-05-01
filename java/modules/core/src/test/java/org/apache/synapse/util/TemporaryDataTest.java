@@ -19,6 +19,7 @@
 
 package org.apache.synapse.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,5 +102,32 @@ public class TemporaryDataTest extends TestCase {
         in.readFully(data2);
         assertTrue(Arrays.equals(sourceData1, data1));
         assertTrue(Arrays.equals(sourceData2, data2));
+    }
+    
+    private void testReadFrom(int size) throws IOException {
+        byte[] data = new byte[size];
+        random.nextBytes(data);
+        TemporaryData tmp = new TemporaryData(16, 1024, "test", ".dat");
+        try {
+            tmp.readFrom(new ByteArrayInputStream(data));
+            InputStream in = tmp.getInputStream();
+            try {
+                assertTrue(Arrays.equals(data, IOUtils.toByteArray(in)));
+            }
+            finally {
+                in.close();
+            }
+        }
+        finally {
+            tmp.release();
+        }
+    }
+    
+    public void testReadFromInMemory() throws IOException {
+        testReadFrom(10000);
+    }
+    
+    public void testReadFromWithTemporaryFile() throws IOException {
+        testReadFrom(100000);
     }
 }

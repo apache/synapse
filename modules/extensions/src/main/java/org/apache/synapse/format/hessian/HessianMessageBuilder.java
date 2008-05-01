@@ -23,8 +23,11 @@ import org.apache.axiom.om.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import javax.activation.DataHandler;
@@ -69,9 +72,18 @@ public class HessianMessageBuilder implements Builder {
 
         try {
 
-            // add Hessian data inside a data handler
-            DataHandler dataHandler = new DataHandler(
-                    new SynapseBinaryDataSource(inputStream,contentType));
+            Parameter synEnv = messageContext.getConfigurationContext()
+                    .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
+
+            DataHandler dataHandler;
+            if (synEnv != null && synEnv.getValue() != null) {
+                dataHandler = new DataHandler(new SynapseBinaryDataSource(
+                        inputStream, contentType, (SynapseEnvironment) synEnv.getValue()));
+            } else {
+                // add Hessian data inside a data handler
+                dataHandler = new DataHandler(
+                        new SynapseBinaryDataSource(inputStream,contentType));
+            }
             OMText textData = factory.createOMText(dataHandler, true);
             element.addChild(textData);
 

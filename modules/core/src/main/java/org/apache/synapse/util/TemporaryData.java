@@ -2,6 +2,7 @@ package org.apache.synapse.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.SynapseConfiguration;
 
 import java.io.*;
 
@@ -262,7 +263,7 @@ public class TemporaryData {
         }
     }
 
-    protected void finalize() throws Throwable {
+    protected void finalize() throws Throwable {    
         if (temporaryFile != null) {
             log.warn("Cleaning up unreleased temporary file " + temporaryFile);
             temporaryFile.delete();

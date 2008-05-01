@@ -19,10 +19,12 @@
 
 package org.apache.synapse.util;
 
-import org.apache.synapse.util.TemporaryData;
+import org.apache.synapse.core.SynapseEnvironment;
 
 import javax.activation.DataSource;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * DataSource which will be used to pass the Hessian messages in to SOAP body within axis2/synapse
@@ -50,6 +52,23 @@ public class SynapseBinaryDataSource implements DataSource {
 
         this.contentType = contentType;
         this.data = new TemporaryData(4, 1024, "tmp_", ".dat");
+
+        OutputStream out = this.data.getOutputStream();
+        byte[] buffer = new byte[1024];
+        int c;
+        while ((c = inputstream.read(buffer)) != -1) {
+            out.write(buffer, 0, c);
+        }
+        out.flush();
+        out.close();
+        inputstream.close();
+    }
+
+    public SynapseBinaryDataSource(InputStream inputstream, String contentType,
+        SynapseEnvironment synEnv) throws IOException {
+
+        this.contentType = contentType;
+        this.data = synEnv.createTemporaryData();
 
         OutputStream out = this.data.getOutputStream();
         byte[] buffer = new byte[1024];

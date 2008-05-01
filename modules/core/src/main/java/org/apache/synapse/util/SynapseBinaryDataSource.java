@@ -53,14 +53,7 @@ public class SynapseBinaryDataSource implements DataSource {
         this.contentType = contentType;
         this.data = new TemporaryData(4, 1024, "tmp_", ".dat");
 
-        OutputStream out = this.data.getOutputStream();
-        byte[] buffer = new byte[1024];
-        int c;
-        while ((c = inputstream.read(buffer)) != -1) {
-            out.write(buffer, 0, c);
-        }
-        out.flush();
-        out.close();
+        data.readFrom(inputstream);
         inputstream.close();
     }
 
@@ -70,14 +63,7 @@ public class SynapseBinaryDataSource implements DataSource {
         this.contentType = contentType;
         this.data = synEnv.createTemporaryData();
 
-        OutputStream out = this.data.getOutputStream();
-        byte[] buffer = new byte[1024];
-        int c;
-        while ((c = inputstream.read(buffer)) != -1) {
-            out.write(buffer, 0, c);
-        }
-        out.flush();
-        out.close();
+        data.readFrom(inputstream);
         inputstream.close();
     }
 

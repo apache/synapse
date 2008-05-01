@@ -46,7 +46,7 @@ import java.util.Map;
 public class ResourceMap {
     private static final Log log = LogFactory.getLog(ResourceMap.class);
     
-    private final Map/*<String,String>*/ resources = new LinkedHashMap();
+    private final Map<String,String> resources = new LinkedHashMap<String,String>();
     
     /**
      * Add a resource.
@@ -63,7 +63,7 @@ public class ResourceMap {
      * 
      * @return a map containing the (location, registry key) pairs
      */
-    public Map getResources() {
+    public Map<String,String> getResources() {
         return Collections.unmodifiableMap(resources);
     }
     
@@ -94,7 +94,7 @@ public class ResourceMap {
                 }
                 catch (XMLStreamException ex) {
                     String msg = "Unable to serialize registry item '" + key + "' for location '" +
-                        location + "' is not an OMElement";
+                        location + "'";
                     log.error(msg);
                     throw new SynapseException(msg, ex);
                 }

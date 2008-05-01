@@ -19,7 +19,6 @@
 
 package org.apache.synapse.config.xml;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -39,9 +38,7 @@ public class ResourceMapSerializer {
     
     public static void serializeResourceMap(OMElement parent, ResourceMap resourceMap) {
         if (resourceMap != null) {
-            Iterator it = resourceMap.getResources().entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry entry = (Map.Entry)it.next();
+        	for (Map.Entry<String,String> entry : resourceMap.getResources().entrySet()) {
                 OMElement resource = fac.createOMElement("resource",
                     SynapseConstants.SYNAPSE_OMNAMESPACE);
                 resource.addAttribute("location", (String)entry.getKey(), null);

@@ -38,7 +38,7 @@ public class EndpointAbstractFactory {
      * @param configElement Endpoint configuration.
      * @return EndpointFactory implementation.
      */
-    public static EndpointFactory getEndpointFactroy(OMElement configElement) {
+    public static EndpointFactory getEndpointFactory(OMElement configElement) {
 
         if (configElement.getAttribute(new QName("key")) != null) {
             IndirectEndpointFactory endpointFactory = IndirectEndpointFactory.getInstance();

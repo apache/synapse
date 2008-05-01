@@ -91,7 +91,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
             // get the factory for the element
             // create the endpoint and set it in the send medaitor
 
-            EndpointFactory fac = EndpointAbstractFactory.getEndpointFactroy(epElement);
+            EndpointFactory fac = EndpointAbstractFactory.getEndpointFactory(epElement);
             if (fac != null) {
                 Endpoint endpoint = fac.createEndpoint(epElement, true);
                 if (endpoint != null) {

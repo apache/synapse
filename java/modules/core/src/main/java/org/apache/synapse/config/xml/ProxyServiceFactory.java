@@ -216,7 +216,7 @@ public class ProxyServiceFactory {
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
                 if (endpointElement != null) {
                     EndpointFactory fac
-                            = EndpointAbstractFactory.getEndpointFactroy(endpointElement);
+                            = EndpointAbstractFactory.getEndpointFactory(endpointElement);
                     proxy.setTargetInLineEndpoint(fac.createEndpoint(endpointElement, true));
                     isTargetOk = true;
                 }

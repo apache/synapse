@@ -107,7 +107,7 @@ public class Axis2FlexibleMEPClient {
                     "] [ force soap11=" + endpoint.isForceSOAP11() +
                     "] [ force soap12=" + endpoint.isForceSOAP12() +
                     "] [ pox=" + endpoint.isForcePOX() +
-                    "] [ get=" + endpoint.isForcePOX() : "") +
+                    "] [ get=" + endpoint.isForceGET() : "") +
                 "] [ to " + synapseOutMessageContext.getTo() + "]");
         }
 

@@ -95,7 +95,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
 
             OMElement endptElem = (OMElement) iter.next();
 
-            EndpointFactory epFac = EndpointAbstractFactory.getEndpointFactroy(endptElem);
+            EndpointFactory epFac = EndpointAbstractFactory.getEndpointFactory(endptElem);
             Endpoint endpoint = epFac.createEndpoint(endptElem, true);
             endpoint.setParentEndpoint(parent);
             endpoints.add(endpoint);

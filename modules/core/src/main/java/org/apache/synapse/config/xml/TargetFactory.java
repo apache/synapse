@@ -98,7 +98,7 @@ public class TargetFactory {
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
         if (endpoint != null) {
             target.setEndpoint(EndpointAbstractFactory.
-                    getEndpointFactroy(endpoint).createEndpoint(endpoint, true));
+                    getEndpointFactory(endpoint).createEndpoint(endpoint, true));
         }
 
         return target;

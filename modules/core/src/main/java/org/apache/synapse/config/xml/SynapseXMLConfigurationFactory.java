@@ -182,7 +182,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 handleException("Duplicate endpoint definition : " + name);
             }
             Endpoint endpoint =
-                    EndpointAbstractFactory.getEndpointFactroy(ele).createEndpoint(ele, false);
+                    EndpointAbstractFactory.getEndpointFactory(ele).createEndpoint(ele, false);
             config.addEndpoint(name.trim(), endpoint);
         } else {
             handleException("Invalid endpoint definition without a name");

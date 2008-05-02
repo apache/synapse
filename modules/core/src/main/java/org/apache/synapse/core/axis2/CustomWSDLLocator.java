@@ -26,7 +26,7 @@ import org.xml.sax.InputSource;
 import javax.wsdl.xml.WSDLLocator;
 
 /**
- * Class that adapts a ResourceMap object to WSDLLocator.
+ * Class that adapts a {@link ResourceMap} object to {@link WSDLLocator}.
  */
 public class CustomWSDLLocator implements WSDLLocator {
     private final InputSource baseInputSource;
@@ -59,6 +59,14 @@ public class CustomWSDLLocator implements WSDLLocator {
         return baseURI;
     }
 
+    /**
+     * Resolve a schema or WSDL import.
+     * This method will first attempt to resolve the location using the configured
+     * {@link ResourceMap} object. If this fails (because no {@link ResourceMap} is
+     * configured or because {@link ResourceMap#resolve(SynapseConfiguration, String)}
+     * returns null, it will resolve the location using
+     * {@link SynapseConfigUtils#resolveRelativeURI(String, String)}.
+     */
     public InputSource getImportInputSource(String parentLocation, String relativeLocation) {
         InputSource result = null;
         if (resourceMap != null) {

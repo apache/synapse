@@ -301,6 +301,11 @@ public class EndpointDefinition {
         return timeoutDuration;
     }
 
+    /**
+     * Set the timeout duration.
+     * 
+     * @param timeoutDuration a duration in milliseconds
+     */
     public void setTimeoutDuration(long timeoutDuration) {
         this.timeoutDuration = timeoutDuration;
     }

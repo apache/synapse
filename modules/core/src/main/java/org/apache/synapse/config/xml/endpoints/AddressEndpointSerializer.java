@@ -31,34 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Serializes AddressEndpoint to XML.
- *
- * <endpoint [name="name"]>
- *  <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
- *  <address uri="url">
- *
- *    .. extensibility ..
- *
- *    <!-- Axis2 Rampart configurations : may be obsolete soon -->
- *    <parameter name="OutflowSecurity">
- *      ...
- *    </parameter>+
- *
- *    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..>
- *      ...
- *    </Policy>+
- *
- *    <enableRM/>?
- *    <enableSec/>?
- *    <enableAddressing [version=("fianl" | "submission")]/>?
- *
- *    <timeout>
- *      <duration>duration in milliseconds</duration>
- *      <action>discard | fault</action>
- *    </timeout>
- *
- *  </address>
- * </endpoint>
+ * Serializes {@link AddressEndpoint} to XML.
+ * 
+ * @see AddressEndpointFactory
  */
 public class AddressEndpointSerializer implements EndpointSerializer {
 

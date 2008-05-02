@@ -42,10 +42,13 @@ public class CustomURIResolver implements URIResolver {
     }
 
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
+        InputSource result = null;
         if (resourceMap != null) {
-            return resourceMap.resolve(synCfg, schemaLocation);
-        } else {
-            return new InputSource(SynapseConfigUtils.resolveRelativeURI(baseUri, schemaLocation));
+            result = resourceMap.resolve(synCfg, schemaLocation);
         }
+        if (result == null) {
+            result = new InputSource(SynapseConfigUtils.resolveRelativeURI(baseUri, schemaLocation));
+        }
+        return result;
     }
 }

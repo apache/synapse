@@ -248,6 +248,11 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         return suspendOnFailDuration;
     }
 
+    /**
+     * Set the suspend on fail duration.
+     * 
+     * @param suspendOnFailDuration a duration in milliseconds
+     */
     public void setSuspendOnFailDuration(long suspendOnFailDuration) {
         this.suspendOnFailDuration = suspendOnFailDuration;
     }

@@ -33,24 +33,27 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 
 /**
- * Creates AddressEndpoint using a XML configuration.
+ * Creates {@link AddressEndpoint} using a XML configuration.
+ * <p>
+ * Configuration syntax:
+ * <pre>
+ * &lt;endpoint [name="<em>name</em>"] [trace="enable|disable"]>
+ *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"] [statistics="enable|disable"]>
+ *     .. extensibility ..
  *
- * <endpoint [name="name"] [trace="enable|disable"]>
- *   <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
- *   <address uri="url" [format="soap11|soap12|pox"] [optimize="mtom|swa"]>
- *      .. extensibility ..
+ *     &lt;enableRM [policy="<em>key</em>"]/>?
+ *     &lt;enableSec [policy="<em>key</em>"]/>?
+ *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/>?
  *
- *      <timeout>
- *          <duration>duration in milliseconds</duration>
- *          <action>discard | fault</action>
- *      </timeout>?
+ *     &lt;timeout>
+ *       &lt;duration><em>timeout duration in seconds</em>&lt;/duration>
+ *       &lt;action>discard|fault&lt;/action>
+ *     &lt;/timeout>?
  *
- *      <enableRM [policy="key"]/>?
- *      <enableSec [policy="key"]/>?
- *      <enableAddressing [version=("final" | "submission")]/>?
- *      <suspendDurationOnFailure>suspend-duration</suspendDurationOnFailure>?
- *   </address>
- * </endpoint>
+ *     &lt;suspendDurationOnFailure><em>suspend duration in seconds</em>&lt;/suspendDurationOnFailure>?
+ *   &lt;/address>
+ * &lt;/endpoint>
+ * </pre>
  */
 public class AddressEndpointFactory implements EndpointFactory {
 

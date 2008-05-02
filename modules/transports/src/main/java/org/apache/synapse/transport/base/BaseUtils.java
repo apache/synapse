@@ -28,6 +28,7 @@ import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.synapse.transport.vfs.PollTableEntry;
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.*;
@@ -43,6 +44,8 @@ import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -165,7 +168,13 @@ public abstract class BaseUtils {
         SOAPEnvelope envelope = null;
         StAXBuilder builder = null;
 
-        String charSetEnc  = BuilderUtil.getCharSetEncoding(contentType);
+        String charSetEnc;
+        try {
+            charSetEnc = new ContentType(contentType).getParameter("charset");
+        } catch (ParseException ex) {
+            charSetEnc = null;
+        }
+        
         InputStream in = getInputStream(message);
 
         // handle SOAP payloads when a correct content type is available
@@ -222,8 +231,8 @@ public abstract class BaseUtils {
             builder == null ? null :
                 builder.getDocument() == null ? null : builder.getDocument().getCharsetEncoding();
 
-        if (charEncOfMessage != null &&
-            !(charEncOfMessage.trim().length() == 0) &&
+        if (StringUtils.isNotBlank(charEncOfMessage) &&
+            StringUtils.isNotBlank(charSetEnc) &&
             !charEncOfMessage.equalsIgnoreCase(charSetEnc)) {
             handleException("Charset encoding of transport differs from that of the payload");
         }

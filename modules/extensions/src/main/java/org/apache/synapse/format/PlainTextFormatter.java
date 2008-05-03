@@ -27,25 +27,42 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.transport.base.BaseConstants;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public class PlainTextFormatter implements MessageFormatter {
 
     public byte[] getBytes(MessageContext messageContext, OMOutputFormat format) throws AxisFault {
-        OMElement textElt = messageContext.getEnvelope().getBody().getFirstElement();
-        if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(textElt.getQName())) {
-            return textElt.getText().getBytes();
-        }
-        return new byte[0];
+    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    	writeTo(messageContext, format, baos, true);
+    	return baos.toByteArray();
     }
 
     public void writeTo(MessageContext messageContext, OMOutputFormat format, OutputStream outputStream, boolean preserve) throws AxisFault {
-        try {
-            outputStream.write(getBytes(messageContext, format));
-        } catch (IOException e) {
-            throw new AxisFault("Error writing text message to stream", e);
+        OMElement textElt = messageContext.getEnvelope().getBody().getFirstElement();
+        if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(textElt.getQName())) {
+	        try {
+		        Writer out = new OutputStreamWriter(outputStream, format.getCharSetEncoding());
+                XMLStreamReader reader = preserve ? textElt.getXMLStreamReader() : textElt.getXMLStreamReaderWithoutCaching();
+                while (reader.hasNext()) {
+                	int eventType = reader.next();
+                    if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
+                        out.write(reader.getText());
+                    }
+                }
+                out.flush();
+	        } catch (IOException e) {
+	            throw new AxisFault("Error writing text message to stream", e);
+	        } catch (XMLStreamException e) {
+				throw new AxisFault("Error extracting the text payload from the message", e);
+			}
         }
     }
 

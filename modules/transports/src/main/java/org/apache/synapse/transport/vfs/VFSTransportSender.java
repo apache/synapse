@@ -18,12 +18,9 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import org.apache.synapse.format.BinaryFormatter;
-import org.apache.synapse.format.PlainTextFormatter;
 import org.apache.synapse.transport.base.*;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.AxisFault;
@@ -33,7 +30,6 @@ import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.OMElement;
 
 import java.io.IOException;
 
@@ -166,32 +162,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     }
 
     private void populateResponseFile(FileObject responseFile, MessageContext msgContext) throws AxisFault {
-        MessageFormatter messageFormatter = null;
-        
-        // check the first element of the SOAP body, do we have content wrapped using the
-        // default wrapper elements for binary (BaseConstants.DEFAULT_BINARY_WRAPPER) or
-        // text (BaseConstants.DEFAULT_TEXT_WRAPPER) ? If so, select the appropriate
-        // message formatter directly ...
-        OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
-        if (firstChild != null) {
-            if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
-                messageFormatter = new BinaryFormatter();
-            } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
-                messageFormatter = new PlainTextFormatter();
-            }
-        }
-        
-        // ... otherwise, let Axis choose the right message formatter:
-        if (messageFormatter == null) {
-            try {
-                messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-            } catch (AxisFault axisFault) {
-                metrics.incrementFaultsSending();
-                throw new BaseTransportException("Unable to get the message formatter to use");
-            }
-        }
-        
-        // Write the message to the file using the selected message formatter
+        MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         try {
             CountingOutputStream os = new CountingOutputStream(responseFile.getContent().getOutputStream());

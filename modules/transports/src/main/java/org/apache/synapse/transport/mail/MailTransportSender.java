@@ -340,24 +340,26 @@ public class MailTransportSender extends AbstractTransportSender {
                     }
                 }
             } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
-                if (firstChild instanceof OMSourcedElementImpl) {
-                    // Note: this code will be replaced by something more efficient later
-                    baos = new ByteArrayOutputStream();
-                    try {
-                        XMLStreamReader reader = firstChild.getXMLStreamReader();
-                        while (reader.hasNext()) {
-                            if (reader.next() == XMLStreamReader.CHARACTERS) {
-                                baos.write(reader.getText().getBytes());
-                            }
-                        }
-                    } catch (XMLStreamException e) {
-                        handleException("Error serializing 'text' payload from OMSourcedElement", e);
-                    }
-                    dataHandler = new DataHandler(new String(
-                        baos.toByteArray(), format.getCharSetEncoding()), MailConstants.TEXT_PLAIN);
-                } else {
-                    dataHandler = new DataHandler(firstChild.getText(), MailConstants.TEXT_PLAIN);
-                }
+//                if (firstChild instanceof OMSourcedElementImpl) {
+//                    // Note: this code will be replaced by something more efficient later
+//                    baos = new ByteArrayOutputStream();
+//                    try {
+//                        XMLStreamReader reader = firstChild.getXMLStreamReader();
+//                        while (reader.hasNext()) {
+//                            if (reader.next() == XMLStreamReader.CHARACTERS) {
+//                                baos.write(reader.getText().getBytes());
+//                            }
+//                        }
+//                    } catch (XMLStreamException e) {
+//                        handleException("Error serializing 'text' payload from OMSourcedElement", e);
+//                    }
+//                    dataHandler = new DataHandler(new String(
+//                        baos.toByteArray(), format.getCharSetEncoding()), MailConstants.TEXT_PLAIN);
+//                } else {
+//                    dataHandler = new DataHandler(firstChild.getText(), MailConstants.TEXT_PLAIN);
+//                }
+                dataHandler = new DataHandler(firstChild.getText(), MailConstants.TEXT_PLAIN +
+                        "; charset=" + format.getCharSetEncoding());
             } else {
 
                 baos = new ByteArrayOutputStream();

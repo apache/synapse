@@ -90,7 +90,12 @@ public class EndpointDefinition {
      * Endpoint message format. pox/soap11/soap12
      */
     private String format = null;
-
+    
+    /**
+     * The charset encoding for messages sent to the endpoint.
+     */
+    private String charSetEncoding;
+    
     /**
      * timeout duration for waiting for a response. if the user has set some timeout action and
      * the timeout duration is not set, default is set to 0 seconds. note that if the user has
@@ -324,6 +329,24 @@ public class EndpointDefinition {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    /**
+     * Get the charset encoding for messages sent to the endpoint.
+     * 
+     * @param charSetEncoding
+     */
+    public String getCharSetEncoding() {
+        return charSetEncoding;
+    }
+
+    /**
+     * Set the charset encoding for messages sent to the endpoint.
+     * 
+     * @param charSetEncoding the charset encoding or <code>null</code> 
+     */
+    public void setCharSetEncoding(String charSetEncoding) {
+        this.charSetEncoding = charSetEncoding;
     }
 
     /**

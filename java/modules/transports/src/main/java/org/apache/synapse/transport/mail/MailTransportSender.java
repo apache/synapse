@@ -19,10 +19,11 @@
 
 package org.apache.synapse.transport.mail;
 
+import org.apache.synapse.format.MessageFormatterEx;
+import org.apache.synapse.format.MessageFormatterExAdapter;
 import org.apache.synapse.transport.base.AbstractTransportSender;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.base.BaseTransportException;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -32,25 +33,15 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.TransportUtils;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 
 import javax.mail.*;
-import javax.mail.util.ByteArrayDataSource;
 import javax.mail.internet.*;
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.activation.MailcapCommandMap;
 import javax.activation.CommandMap;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import java.util.*;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -210,13 +201,7 @@ public class MailTransportSender extends AbstractTransportSender {
         throws AxisFault, MessagingException, IOException {
 
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
-        MessageFormatter messageFormatter = null;
-
-        try {
-            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-        } catch (AxisFault axisFault) {
-            throw new BaseTransportException("Unable to get the message formatter to use");
-        }
+        MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
 
         WSMimeMessage message = new WSMimeMessage(session);
         Map trpHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
@@ -320,74 +305,34 @@ public class MailTransportSender extends AbstractTransportSender {
         message.setHeader(BaseConstants.SOAPACTION, msgContext.getSoapAction());
 
         // write body
-        ByteArrayOutputStream baos = null;
-        String contentType = messageFormatter.getContentType(
-            msgContext, format, msgContext.getSoapAction());
-        DataHandler dataHandler = null;
+        MessageFormatterEx messageFormatterEx;
+        if (messageFormatter instanceof MessageFormatterEx) {
+            messageFormatterEx = (MessageFormatterEx)messageFormatter;
+        } else {
+            messageFormatterEx = new MessageFormatterExAdapter(messageFormatter);
+        }
+        
+        DataHandler dataHandler = new DataHandler(messageFormatterEx.getDataSource(msgContext, format, msgContext.getSoapAction()));
+        
         MimeMultipart mimeMultiPart = null;
 
-        OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
-        if (firstChild != null) {
+        String mFormat = (String) msgContext.getProperty(MailConstants.TRANSPORT_MAIL_FORMAT);
+        if (mFormat == null) {
+            mFormat = defaultMailFormat;
+        }
 
-            if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
-                baos = new ByteArrayOutputStream();
-                OMNode omNode = firstChild.getFirstOMChild();
+        if (MailConstants.TRANSPORT_FORMAT_MP.equals(mFormat)) {
+            mimeMultiPart = new MimeMultipart();
+            MimeBodyPart mimeBodyPart1 = new MimeBodyPart();
+            mimeBodyPart1.setContent("Web Service Message Attached","text/plain");
+            MimeBodyPart mimeBodyPart2 = new MimeBodyPart();
+            mimeBodyPart2.setDataHandler(dataHandler);
+            mimeBodyPart2.setHeader(BaseConstants.SOAPACTION, msgContext.getSoapAction());
+            mimeMultiPart.addBodyPart(mimeBodyPart1);
+            mimeMultiPart.addBodyPart(mimeBodyPart2);
 
-                if (omNode != null && omNode instanceof OMText) {
-                    Object dh = ((OMText) omNode).getDataHandler();
-                    if (dh != null && dh instanceof DataHandler) {
-                        dataHandler = (DataHandler) dh;
-                    }
-                }
-            } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
-//                if (firstChild instanceof OMSourcedElementImpl) {
-//                    // Note: this code will be replaced by something more efficient later
-//                    baos = new ByteArrayOutputStream();
-//                    try {
-//                        XMLStreamReader reader = firstChild.getXMLStreamReader();
-//                        while (reader.hasNext()) {
-//                            if (reader.next() == XMLStreamReader.CHARACTERS) {
-//                                baos.write(reader.getText().getBytes());
-//                            }
-//                        }
-//                    } catch (XMLStreamException e) {
-//                        handleException("Error serializing 'text' payload from OMSourcedElement", e);
-//                    }
-//                    dataHandler = new DataHandler(new String(
-//                        baos.toByteArray(), format.getCharSetEncoding()), MailConstants.TEXT_PLAIN);
-//                } else {
-//                    dataHandler = new DataHandler(firstChild.getText(), MailConstants.TEXT_PLAIN);
-//                }
-                dataHandler = new DataHandler(firstChild.getText(), MailConstants.TEXT_PLAIN +
-                        "; charset=" + format.getCharSetEncoding());
-            } else {
-
-                baos = new ByteArrayOutputStream();
-                messageFormatter.writeTo(msgContext, format, baos, true);
-
-                // create the data handler
-                dataHandler = new DataHandler(
-                    new String(baos.toByteArray(), format.getCharSetEncoding()), contentType);
-
-                String mFormat = (String) msgContext.getProperty(MailConstants.TRANSPORT_MAIL_FORMAT);
-                if (mFormat == null) {
-                    mFormat = defaultMailFormat;
-                }
-
-                if (MailConstants.TRANSPORT_FORMAT_MP.equals(mFormat)) {
-                    mimeMultiPart = new MimeMultipart();
-                    MimeBodyPart mimeBodyPart1 = new MimeBodyPart();
-                    mimeBodyPart1.setContent("Web Service Message Attached","text/plain");
-                    MimeBodyPart mimeBodyPart2 = new MimeBodyPart();
-                    mimeBodyPart2.setDataHandler(dataHandler);
-                    mimeBodyPart2.setHeader(BaseConstants.SOAPACTION, msgContext.getSoapAction());
-                    mimeMultiPart.addBodyPart(mimeBodyPart1);
-                    mimeMultiPart.addBodyPart(mimeBodyPart2);
-
-                } else {
-                    message.setHeader(BaseConstants.SOAPACTION, msgContext.getSoapAction());
-                }
-            }
+        } else {
+            message.setHeader(BaseConstants.SOAPACTION, msgContext.getSoapAction());
         }
 
         try {
@@ -419,12 +364,6 @@ public class MailTransportSender extends AbstractTransportSender {
             handleException("Error creating mail message or sending it to the configured server", e);
             metrics.incrementFaultsSending();
             
-        } finally {
-            try {
-                if (baos != null) {
-                    baos.close();
-                }
-            } catch (IOException ignore) {}
         }
     }
 }

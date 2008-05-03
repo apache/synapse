@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.URL;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
@@ -31,11 +32,10 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
 import org.apache.synapse.transport.base.BaseConstants;
 
-public class BinaryFormatter implements MessageFormatter {
+public class BinaryFormatter implements MessageFormatterEx {
     public byte[] getBytes(MessageContext messageContext, OMOutputFormat format) throws AxisFault {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeTo(messageContext, format, baos, true);
@@ -87,5 +87,10 @@ public class BinaryFormatter implements MessageFormatter {
     public String formatSOAPAction(MessageContext messageContext,
             OMOutputFormat format, String soapAction) {
         return null;
+    }
+
+    public DataSource getDataSource(MessageContext messageContext,
+            OMOutputFormat format, String soapAction) throws AxisFault {
+        return getDataHandler(messageContext).getDataSource();
     }
 }

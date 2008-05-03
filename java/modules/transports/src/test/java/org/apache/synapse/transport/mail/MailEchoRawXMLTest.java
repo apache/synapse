@@ -76,6 +76,8 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         //Logger.getLogger("org.apache.synapse.transport.mail").setLevel(Level.TRACE);
         server = new UtilsMailServer();
 
+        props.put("mail.smtp.class", TestTransport.class.getName());
+        
         props.put("mail.pop3.host", "pop.gmail.com");
         props.put("mail.pop3.port", "995");
         props.put("mail.pop3.user", "synapse.test.0");
@@ -104,9 +106,9 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         session.setDebug(log.isTraceEnabled());
         
         WSMimeMessage msg = new WSMimeMessage(session);
-	    msg.setFrom(new InternetAddress("synapse.test.0@gmail.com"));
-        msg.setReplyTo(InternetAddress.parse("synapse.test.0@gmail.com"));
-        InternetAddress[] address = {new InternetAddress("synapse.test.6@gmail.com")};
+	    msg.setFrom(new InternetAddress("synapse.test.0"));
+        msg.setReplyTo(InternetAddress.parse("synapse.test.0"));
+        InternetAddress[] address = {new InternetAddress("synapse.test.6")};
 	    msg.setRecipients(Message.RecipientType.TO, address);
 	    msg.setSubject("POX Roundtrip");
         msg.setHeader(BaseConstants.SOAPACTION, Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
@@ -117,11 +119,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         Transport.send(msg);
 
         Thread.yield();
-        Thread.sleep(1000 * 10);
+        Thread.sleep(100);
 
         Object reply = null;
         boolean replyNotFound = true;
-        int retryCount = 3;
+        int retryCount = 50;
         while (replyNotFound) {
             log.debug("Checking for response ... with MessageID : " + msgId);
             reply = getMessage(msgId);
@@ -129,7 +131,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
                 replyNotFound = false;
             } else {
                 if (retryCount-- > 0) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                 } else {
                     break;
                 }
@@ -157,8 +159,8 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         String msgId = UUIDGenerator.getUUID();
         Options options = new Options();
-        options.setTo(new EndpointReference("mailto:synapse.test.6@gmail.com"));
-        options.setReplyTo(new EndpointReference("mailto:synapse.test.0@gmail.com"));
+        options.setTo(new EndpointReference("mailto:synapse.test.6"));
+        options.setReplyTo(new EndpointReference("mailto:synapse.test.0"));
         options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         options.setMessageId(msgId);
 
@@ -169,11 +171,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.fireAndForget(createPayload());
 
         Thread.yield();
-        Thread.sleep(1000 * 10);
+        Thread.sleep(100);
 
         Object reply = null;
         boolean replyNotFound = true;
-        int retryCount = 3;
+        int retryCount = 50;
         while (replyNotFound) {
             log.debug("Checking for response ... with MessageID : " + msgId);
             reply = getMessage(msgId);
@@ -181,7 +183,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
                 replyNotFound = false;
             } else {
                 if (retryCount-- > 0) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                 } else {
                     break;
                 }
@@ -209,8 +211,8 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         String msgId = UUIDGenerator.getUUID();
         Options options = new Options();
-        options.setTo(new EndpointReference("mailto:synapse.test.6@gmail.com"));
-        options.setReplyTo(new EndpointReference("mailto:synapse.test.0@gmail.com"));
+        options.setTo(new EndpointReference("mailto:synapse.test.6"));
+        options.setReplyTo(new EndpointReference("mailto:synapse.test.0"));
         options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         options.setMessageId(msgId);
 
@@ -221,11 +223,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.fireAndForget(createKoreanPayload());
 
         Thread.yield();
-        Thread.sleep(1000 * 10);
+        Thread.sleep(100);
 
         Object reply = null;
         boolean replyNotFound = true;
-        int retryCount = 3;
+        int retryCount = 50;
         while (replyNotFound) {
             log.debug("Checking for response ... with MessageID : " + msgId);
             reply = getMessage(msgId);
@@ -233,7 +235,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
                 replyNotFound = false;
             } else {
                 if (retryCount-- > 0) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                 } else {
                     break;
                 }
@@ -261,8 +263,8 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         String msgId = UUIDGenerator.getUUID();
         Options options = new Options();
-        options.setTo(new EndpointReference("mailto:synapse.test.6@gmail.com"));
-        options.setReplyTo(new EndpointReference("mailto:synapse.test.0@gmail.com"));
+        options.setTo(new EndpointReference("mailto:synapse.test.6"));
+        options.setReplyTo(new EndpointReference("mailto:synapse.test.0"));
         options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         options.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         options.setMessageId(msgId);
@@ -272,11 +274,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.fireAndForget(createPayload());
 
         Thread.yield();
-        Thread.sleep(1000 * 10);
+        Thread.sleep(100);
 
         Object reply = null;
         boolean replyNotFound = true;
-        int retryCount = 3;
+        int retryCount = 50;
         while (replyNotFound) {
             log.debug("Checking for response ... with MessageID : " + msgId);
             reply = getMessage(msgId);
@@ -284,7 +286,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
                 replyNotFound = false;
             } else {
                 if (retryCount-- > 0) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                 } else {
                     break;
                 }
@@ -312,8 +314,8 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         String msgId = UUIDGenerator.getUUID();
         Options options = new Options();
-        options.setTo(new EndpointReference("mailto:synapse.test.7@gmail.com"));
-        options.setReplyTo(new EndpointReference("mailto:synapse.test.0@gmail.com"));
+        options.setTo(new EndpointReference("mailto:synapse.test.7"));
+        options.setReplyTo(new EndpointReference("mailto:synapse.test.0"));
         options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         options.setMessageId(msgId);
 
@@ -322,11 +324,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.fireAndForget(createKoreanPayload());
 
         Thread.yield();
-        Thread.sleep(1000 * 10);
+        Thread.sleep(100);
 
         Object reply = null;
         boolean replyNotFound = true;
-        int retryCount = 3;
+        int retryCount = 50;
         while (replyNotFound) {
             log.debug("Checking for response ... with MessageID : " + msgId);
             reply = getMessage(msgId);
@@ -334,7 +336,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
                 replyNotFound = false;
             } else {
                 if (retryCount-- > 0) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                 } else {
                     break;
                 }
@@ -362,8 +364,8 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         String msgId = UUIDGenerator.getUUID();
         Options options = new Options();
-        options.setTo(new EndpointReference("mailto:synapse.test.7@gmail.com"));
-        options.setReplyTo(new EndpointReference("mailto:synapse.test.0@gmail.com"));
+        options.setTo(new EndpointReference("mailto:synapse.test.7"));
+        options.setReplyTo(new EndpointReference("mailto:synapse.test.0"));
         options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         options.setMessageId(msgId);
         options.setProperty(Constants.Configuration. CHARACTER_SET_ENCODING, KOREAN_CHARSET);
@@ -373,11 +375,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.fireAndForget(createKoreanPayload());
 
         Thread.yield();
-        Thread.sleep(1000 * 10);
+        Thread.sleep(100);
 
         Object reply = null;
         boolean replyNotFound = true;
-        int retryCount = 3;
+        int retryCount = 50;
         while (replyNotFound) {
             log.debug("Checking for response ... with MessageID : " + msgId);
             reply = getMessage(msgId);
@@ -385,7 +387,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
                 replyNotFound = false;
             } else {
                 if (retryCount-- > 0) {
-                    Thread.sleep(10000);
+                    Thread.sleep(100);
                 } else {
                     break;
                 }
@@ -415,7 +417,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         Store store = null;
 
         try {
-            store = session.getStore("pop3");
+            store = session.getStore("test-store");
             store.connect(username, password);
             Folder folder = store.getFolder(MailConstants.DEFAULT_FOLDER);
             folder.open(Folder.READ_WRITE);
@@ -458,6 +460,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         AxisConfiguration axisCfg = new AxisConfiguration();
         TransportOutDescription trpOutDesc = new TransportOutDescription("mailto");
 
+        trpOutDesc.addParameter(new Parameter("mail.smtp.class", TestTransport.class.getName()));
         trpOutDesc.addParameter(new Parameter("mail.smtp.host", "smtp.gmail.com"));
         trpOutDesc.addParameter(new Parameter("mail.smtp.port", "587"));
         trpOutDesc.addParameter(new Parameter("mail.smtp.starttls.enable", "true"));

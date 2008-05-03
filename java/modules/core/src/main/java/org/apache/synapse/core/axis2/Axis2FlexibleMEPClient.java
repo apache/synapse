@@ -107,7 +107,8 @@ public class Axis2FlexibleMEPClient {
                     "] [ force soap11=" + endpoint.isForceSOAP11() +
                     "] [ force soap12=" + endpoint.isForceSOAP12() +
                     "] [ pox=" + endpoint.isForcePOX() +
-                    "] [ get=" + endpoint.isForceGET() : "") +
+                    "] [ get=" + endpoint.isForceGET() +
+                    "] [ encoding=" + endpoint.getCharSetEncoding() : "") +
                 "] [ to " + synapseOutMessageContext.getTo() + "]");
         }
 
@@ -170,6 +171,11 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.setDoingSwA(true);
             }
 
+            if (endpoint.getCharSetEncoding() != null) {
+                axisOutMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
+                        endpoint.getCharSetEncoding());
+            }
+            
             if (endpoint.getAddress() != null) {
                 axisOutMsgCtx.setTo(new EndpointReference(endpoint.getAddress()));
             }

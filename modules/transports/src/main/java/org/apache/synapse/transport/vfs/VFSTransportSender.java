@@ -42,6 +42,8 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 /**
  * axis2.xml - transport definition
@@ -179,6 +181,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
         // within the files but just get the payload in its native format
 
         OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
+        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         if (firstChild != null) {
             if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
                 try {
@@ -213,24 +216,25 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
 
             } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
                 try {
-                    OutputStream os = responseFile.getContent().getOutputStream();
+                    Writer out = new OutputStreamWriter(responseFile.getContent().getOutputStream(),
+                            format.getCharSetEncoding());
                     try {
                         if (firstChild instanceof OMSourcedElementImpl) {
                             XMLStreamReader reader = firstChild.getXMLStreamReader();
                             while (reader.hasNext()) {
                                 if (reader.next() == XMLStreamReader.CHARACTERS) {
-                                    os.write(reader.getText().getBytes());
+                                    out.write(reader.getText());
                                 }
                             }
                         } else {
-                            os.write(firstChild.getText().getBytes());
+                            out.write(firstChild.getText());
                         }
                     } catch (IOException e) {
                         metrics.incrementFaultsSending();
                         handleException("Error serializing text content of element : " +
                                         BaseConstants.DEFAULT_TEXT_WRAPPER, e);
                     } finally {
-                    	os.close();
+                    	out.close();
                     }
                 } catch (FileSystemException e) {
                     metrics.incrementFaultsSending();
@@ -244,10 +248,10 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                     handleException("Error serializing OMSourcedElement content", e);
                 }
             } else {
-                populateSOAPFile(responseFile, msgContext);
+                populateSOAPFile(responseFile, msgContext, format);
             }
         } else {
-            populateSOAPFile(responseFile, msgContext);
+            populateSOAPFile(responseFile, msgContext, format);
         }
 
         // update metrics
@@ -267,8 +271,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
      * @param msgContext the message context that holds the message to be written
      * @throws AxisFault on error
      */
-    private void populateSOAPFile(FileObject responseFile, MessageContext msgContext) throws AxisFault {
-        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
+    private void populateSOAPFile(FileObject responseFile, MessageContext msgContext, OMOutputFormat format) throws AxisFault {
         MessageFormatter messageFormatter = null;
         try {
             messageFormatter = TransportUtils.getMessageFormatter(msgContext);

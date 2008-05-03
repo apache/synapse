@@ -38,7 +38,7 @@ import javax.xml.namespace.QName;
  * Configuration syntax:
  * <pre>
  * &lt;endpoint [name="<em>name</em>"] [trace="enable|disable"]>
- *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"] [statistics="enable|disable"]>
+ *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"] [encoding="<em>charset encoding</em>"] [statistics="enable|disable"]>
  *     .. extensibility ..
  *
  *     &lt;enableRM [policy="<em>key</em>"]/>?
@@ -142,6 +142,7 @@ public class AddressEndpointFactory implements EndpointFactory {
         OMAttribute address = elem.getAttribute(new QName("uri"));
         OMAttribute format = elem.getAttribute(new QName("format"));
         OMAttribute optimize = elem.getAttribute(new QName("optimize"));
+        OMAttribute encoding = elem.getAttribute(new QName("encoding"));
 
         EndpointDefinition endpoint = new EndpointDefinition();
         OMAttribute statistics = elem.getAttribute(
@@ -199,6 +200,10 @@ public class AddressEndpointFactory implements EndpointFactory {
             } else if ("swa".equalsIgnoreCase(method)) {
                 endpoint.setUseSwa(true);
             }
+        }
+        
+        if (encoding != null) {
+            endpoint.setCharSetEncoding(encoding.getAttributeValue());
         }
 
         OMElement wsAddr = elem.getFirstChildWithName(new QName(

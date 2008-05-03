@@ -19,7 +19,6 @@
 
 package org.apache.synapse.format;
 
-import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
@@ -34,10 +33,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
 
+import javax.activation.DataSource;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public class PlainTextFormatter implements MessageFormatter {
+public class PlainTextFormatter implements MessageFormatterEx {
 
     public byte[] getBytes(MessageContext messageContext, OMOutputFormat format) throws AxisFault {
     	ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -93,5 +93,13 @@ public class PlainTextFormatter implements MessageFormatter {
 
     public String formatSOAPAction(MessageContext messageContext, OMOutputFormat format, String soapAction) {
         return null;
+    }
+
+    public DataSource getDataSource(MessageContext messageContext,
+            OMOutputFormat format, String soapAction) throws AxisFault {
+        return new TextFromElementDataSource(
+                messageContext.getEnvelope().getBody().getFirstElement(),
+                format.getCharSetEncoding(),
+                getContentType(messageContext, format, soapAction));
     }
 }

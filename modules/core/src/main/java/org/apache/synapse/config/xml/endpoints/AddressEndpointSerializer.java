@@ -75,53 +75,48 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         return endpointElement;
     }
 
-    public OMElement serializeEndpointDefinition(EndpointDefinition endpt) {
+    public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {
 
-        OMElement address = fac.createOMElement("address", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        OMElement element = fac.createOMElement("address", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
-        if (SynapseConstants.FORMAT_POX.equals(endpt.getFormat())) {
-        	address.addAttribute(fac.createOMAttribute("format", null, "pox"));
-        	
-        } else if (SynapseConstants.FORMAT_GET.equals(endpt.getFormat())) {
-            address.addAttribute(fac.createOMAttribute("format", null, "get"));
-
-        } else if (SynapseConstants.FORMAT_SOAP11.equals(endpt.getFormat())) {
-            address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
-        	
-        } else if (SynapseConstants.FORMAT_SOAP12.equals(endpt.getFormat())) {
-            address.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        } else if (SynapseConstants.FORMAT_GET.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
+        } else if (SynapseConstants.FORMAT_SOAP11.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        } else if (SynapseConstants.FORMAT_SOAP12.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         
-        	// following two kept for backward compatibility
-        } else if (endpt.isForcePOX()) {
-            address.addAttribute(fac.createOMAttribute("format", null, "get"));
-            
-        } else if (endpt.isForceGET()) {
-            address.addAttribute(fac.createOMAttribute("format", null, "pox"));
-
-        } else if (endpt.isForceSOAP11()) {
-            address.addAttribute(fac.createOMAttribute("format", null, "soap11"));
-        } else if (endpt.isForceSOAP12()) {
-            address.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+            // following two kept for backward compatibility
+        } else if (endpointDefinition.isForcePOX()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
+        } else if (endpointDefinition.isForceGET()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        } else if (endpointDefinition.isForceSOAP11()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        } else if (endpointDefinition.isForceSOAP12()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         }
         
-        if (endpt.isUseSwa()) {
-            address.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
-        } else if (endpt.isUseMTOM()) {
-            address.addAttribute(fac.createOMAttribute("optimize", null, "mtom"));
+        if (endpointDefinition.isUseSwa()) {
+            element.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
+        } else if (endpointDefinition.isUseMTOM()) {
+            element.addAttribute(fac.createOMAttribute("optimize", null, "mtom"));
         }
         
-        if (endpt.getCharSetEncoding() != null) {
-            address.addAttribute(fac.createOMAttribute("encoding", null, endpt.getCharSetEncoding()));
+        if (endpointDefinition.getCharSetEncoding() != null) {
+            element.addAttribute(fac.createOMAttribute("encoding", null, endpointDefinition.getCharSetEncoding()));
         }
         
-        if (endpt.getAddress() != null) {
-            address.addAttribute(fac.createOMAttribute(
-                    "uri", null, endpt.getAddress()));
+        if (endpointDefinition.getAddress() != null) {
+            element.addAttribute(fac.createOMAttribute(
+                    "uri", null, endpointDefinition.getAddress()));
 //        } else {
 //            handleException("Invalid Endpoint. Address is required");
         }
 
-        int isEnableStatistics = endpt.getStatisticsState();
+        int isEnableStatistics = endpointDefinition.getStatisticsState();
         String statisticsValue = null;
         if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
             statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE;
@@ -129,58 +124,58 @@ public class AddressEndpointSerializer implements EndpointSerializer {
             statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE;
         }
         if (statisticsValue != null) {
-            address.addAttribute(fac.createOMAttribute(
+            element.addAttribute(fac.createOMAttribute(
                     org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
         }
-        if (endpt.isAddressingOn()) {
+        if (endpointDefinition.isAddressingOn()) {
             OMElement addressing = fac.createOMElement("enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            if (endpt.getAddressingVersion() != null) {
+            if (endpointDefinition.getAddressingVersion() != null) {
                 addressing.addAttribute(fac.createOMAttribute(
-                        "version", null, endpt.getAddressingVersion()));
+                        "version", null, endpointDefinition.getAddressingVersion()));
             }
-            if (endpt.isUseSeparateListener()) {
+            if (endpointDefinition.isUseSeparateListener()) {
                 addressing.addAttribute(fac.createOMAttribute(
                         "separateListener", null, "true"));
             }
-            address.addChild(addressing);
+            element.addChild(addressing);
         }
 
-        if (endpt.isReliableMessagingOn()) {
+        if (endpointDefinition.isReliableMessagingOn()) {
             OMElement rm = fac.createOMElement("enableRM", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            if (endpt.getWsRMPolicyKey() != null) {
+            if (endpointDefinition.getWsRMPolicyKey() != null) {
                 rm.addAttribute(fac.createOMAttribute(
-                        "policy", null, endpt.getWsRMPolicyKey()));
+                        "policy", null, endpointDefinition.getWsRMPolicyKey()));
             }
-            address.addChild(rm);
+            element.addChild(rm);
         }
 
-        if (endpt.isSecurityOn()) {
+        if (endpointDefinition.isSecurityOn()) {
             OMElement sec = fac.createOMElement("enableSec", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            if (endpt.getWsSecPolicyKey() != null) {
+            if (endpointDefinition.getWsSecPolicyKey() != null) {
                 sec.addAttribute(fac.createOMAttribute(
-                        "policy", null, endpt.getWsSecPolicyKey()));
+                        "policy", null, endpointDefinition.getWsSecPolicyKey()));
             }
-            address.addChild(sec);
+            element.addChild(sec);
         }
 
-        if (endpt.getTimeoutAction() != SynapseConstants.NONE) {
+        if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {
             OMElement timeout = fac.createOMElement("timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            address.addChild(timeout);
+            element.addChild(timeout);
 
             OMElement duration = fac.createOMElement("duration", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            duration.setText(Long.toString(endpt.getTimeoutDuration() / 1000));
+            duration.setText(Long.toString(endpointDefinition.getTimeoutDuration() / 1000));
             timeout.addChild(duration);
 
             OMElement action = fac.createOMElement("action", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            if (endpt.getTimeoutAction() == SynapseConstants.DISCARD) {
+            if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
                 action.setText("discard");
-            } else if (endpt.getTimeoutAction() == SynapseConstants.DISCARD_AND_FAULT) {
+            } else if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD_AND_FAULT) {
                 action.setText("fault");
             }
             timeout.addChild(action);
         }
 
-        return address;
+        return element;
     }
 
     private static void handleException(String msg) {

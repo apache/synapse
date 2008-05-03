@@ -90,9 +90,9 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         
             // following two kept for backward compatibility
         } else if (endpointDefinition.isForcePOX()) {
-            element.addAttribute(fac.createOMAttribute("format", null, "get"));
-        } else if (endpointDefinition.isForceGET()) {
             element.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        } else if (endpointDefinition.isForceGET()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
         } else if (endpointDefinition.isForceSOAP11()) {
             element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (endpointDefinition.isForceSOAP12()) {

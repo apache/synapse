@@ -144,7 +144,7 @@ public class AddressEndpointFactory implements EndpointFactory {
         OMAttribute optimize = elem.getAttribute(new QName("optimize"));
         OMAttribute encoding = elem.getAttribute(new QName("encoding"));
 
-        EndpointDefinition endpoint = new EndpointDefinition();
+        EndpointDefinition endpointDefinition = new EndpointDefinition();
         OMAttribute statistics = elem.getAttribute(
                 new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
                         org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
@@ -155,15 +155,15 @@ public class AddressEndpointFactory implements EndpointFactory {
 
                 if (org.apache.synapse.config.xml.XMLConfigConstants.
                         STATISTICS_ENABLE.equals(statisticsValue)) {
-                    endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    endpointDefinition.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (org.apache.synapse.config.xml.XMLConfigConstants.
                         STATISTICS_DISABLE.equals(statisticsValue)) {
-                    endpoint.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    endpointDefinition.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }
         if (address != null) {
-            endpoint.setAddress(address.getAttributeValue());
+            endpointDefinition.setAddress(address.getAttributeValue());
 //        } else {
 //            handleException("One of the 'address' or 'ref' attributes are required in an "
 //                    + "anonymous endpoint");
@@ -172,20 +172,20 @@ public class AddressEndpointFactory implements EndpointFactory {
         {
             String forceValue = format.getAttributeValue().trim().toLowerCase();
             if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
-                endpoint.setForcePOX(true);
-                endpoint.setFormat(SynapseConstants.FORMAT_POX);
-                
+                endpointDefinition.setForcePOX(true);
+                endpointDefinition.setFormat(SynapseConstants.FORMAT_POX);
+
             } else if (SynapseConstants.FORMAT_GET.equals(forceValue)) {
-            	endpoint.setForceGET(true);
-            	endpoint.setFormat(SynapseConstants.FORMAT_GET);
+            	endpointDefinition.setForceGET(true);
+            	endpointDefinition.setFormat(SynapseConstants.FORMAT_GET);
 
             } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
-            	endpoint.setForceSOAP11(true);
-            	endpoint.setFormat(SynapseConstants.FORMAT_SOAP11);
+                endpointDefinition.setForceSOAP11(true);
+                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP11);
                 
             } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
-            	endpoint.setForceSOAP12(true);
-                endpoint.setFormat(SynapseConstants.FORMAT_SOAP12);
+                endpointDefinition.setForceSOAP12(true);
+                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP12);
                 
             } else {
                 handleException("unknown value -\""+forceValue+"\". Attribute 'format' accepts " +
@@ -196,14 +196,14 @@ public class AddressEndpointFactory implements EndpointFactory {
         if (optimize != null && optimize.getAttributeValue().length() > 0) {
             String method = optimize.getAttributeValue().trim();
             if ("mtom".equalsIgnoreCase(method)) {
-                endpoint.setUseMTOM(true);
+                endpointDefinition.setUseMTOM(true);
             } else if ("swa".equalsIgnoreCase(method)) {
-                endpoint.setUseSwa(true);
+                endpointDefinition.setUseSwa(true);
             }
         }
         
         if (encoding != null) {
-            endpoint.setCharSetEncoding(encoding.getAttributeValue());
+            endpointDefinition.setCharSetEncoding(encoding.getAttributeValue());
         }
 
         OMElement wsAddr = elem.getFirstChildWithName(new QName(
@@ -211,14 +211,14 @@ public class AddressEndpointFactory implements EndpointFactory {
                 "enableAddressing"));
 
         if (wsAddr != null) {
-            endpoint.setAddressingOn(true);
+            endpointDefinition.setAddressingOn(true);
 
             OMAttribute version = wsAddr.getAttribute(new QName("version"));
             if (version != null && version.getAttributeValue() != null) {
                 if (SynapseConstants.ADDRESSING_VERSION_FINAL.equals(version.getAttributeValue()) ||
                         SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(
                                 version.getAttributeValue())) {
-                    endpoint.setAddressingVersion(version.getAttributeValue());
+                    endpointDefinition.setAddressingVersion(version.getAttributeValue());
                 } else {
                     handleException("Unknown value for the addressing version. Possible values " +
                             "for the addressing version are 'final' and 'submission' only.");
@@ -229,30 +229,32 @@ public class AddressEndpointFactory implements EndpointFactory {
             if (useSepList != null) {
                 if (useSepList.trim().toLowerCase().startsWith("tr")
                         || useSepList.trim().startsWith("1")) {
-                    endpoint.setUseSeparateListener(true);
+                    endpointDefinition.setUseSeparateListener(true);
                 }
             }
         }
+
         OMElement wsSec = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec"));
         if (wsSec != null) {
-            endpoint.setSecurityOn(true);
+            endpointDefinition.setSecurityOn(true);
             OMAttribute policy = wsSec.getAttribute(new QName(
                     org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
-                endpoint.setWsSecPolicyKey(policy.getAttributeValue());
+                endpointDefinition.setWsSecPolicyKey(policy.getAttributeValue());
             }
         }
         OMElement wsRm = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
         if (wsRm != null) {
-            endpoint.setReliableMessagingOn(true);
+            endpointDefinition.setReliableMessagingOn(true);
             OMAttribute policy = wsRm.getAttribute(new QName(
                     org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
-                endpoint.setWsRMPolicyKey(policy.getAttributeValue());
+                endpointDefinition.setWsRMPolicyKey(policy.getAttributeValue());
             }
         }
+
         // set the timeout configuration
         OMElement timeout = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
@@ -266,7 +268,7 @@ public class AddressEndpointFactory implements EndpointFactory {
                 if (d != null) {
                     try {
                         long timeoutSeconds = new Long(d.trim()).longValue();
-                        endpoint.setTimeoutDuration(timeoutSeconds * 1000);
+                        endpointDefinition.setTimeoutDuration(timeoutSeconds * 1000);
 
                     } catch (NumberFormatException e) {
                         handleException(
@@ -282,25 +284,25 @@ public class AddressEndpointFactory implements EndpointFactory {
                 String a = action.getText();
                 if (a != null) {
                     if ((a.trim()).equalsIgnoreCase("discard")) {
-                        endpoint.setTimeoutAction(SynapseConstants.DISCARD);
+                        endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD);
 
                         // set timeout duration to 30 seconds, if it is not set explicitly
-                        if (endpoint.getTimeoutDuration() == 0) {
-                            endpoint.setTimeoutDuration(30000);
+                        if (endpointDefinition.getTimeoutDuration() == 0) {
+                            endpointDefinition.setTimeoutDuration(30000);
                         }
                     } else if ((a.trim()).equalsIgnoreCase("fault")) {
-                        endpoint.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
+                        endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
 
                         // set timeout duration to 30 seconds, if it is not set explicitly
-                        if (endpoint.getTimeoutDuration() == 0) {
-                            endpoint.setTimeoutDuration(30000);
+                        if (endpointDefinition.getTimeoutDuration() == 0) {
+                            endpointDefinition.setTimeoutDuration(30000);
                         }
                     }
                 }
             }
         }
 
-        return endpoint;
+        return endpointDefinition;
     }
 
     private static void handleException(String msg) {

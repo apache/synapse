@@ -30,11 +30,11 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
+import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
 
-import java.io.OutputStream;
 import java.io.IOException;
 
 /**
@@ -194,28 +194,21 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
         // Write the message to the file using the selected message formatter
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         try {
-            OutputStream os = responseFile.getContent().getOutputStream();
+            CountingOutputStream os = new CountingOutputStream(responseFile.getContent().getOutputStream());
             try {
                 messageFormatter.writeTo(msgContext, format, os, true);
             } finally {
                 os.close();
             }
+            // update metrics
+            metrics.incrementMessagesSent();
+            metrics.incrementBytesSent(os.getByteCount());
         } catch (FileSystemException e) {
             metrics.incrementFaultsSending();
             handleException("IO Error while creating response file : " + responseFile.getName(), e);
         } catch (IOException e) {
             metrics.incrementFaultsSending();
             handleException("IO Error while creating response file : " + responseFile.getName(), e);
-        }
-
-        // update metrics
-        metrics.incrementMessagesSent();
-        try {
-            if (responseFile != null && responseFile.getContent() != null) {
-                metrics.incrementBytesSent(responseFile.getContent().getSize());
-            }
-        } catch (FileSystemException e) {
-            log.warn("Unable to update transport metrics for file written", e);
         }
     }
 }

@@ -18,6 +18,8 @@
 */
 package org.apache.synapse.transport.vfs;
 
+import org.apache.synapse.format.BinaryFormatter;
+import org.apache.synapse.format.PlainTextFormatter;
 import org.apache.synapse.transport.base.*;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
@@ -31,19 +33,9 @@ import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
-
-import javax.activation.DataHandler;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import java.io.OutputStream;
 import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 /**
  * axis2.xml - transport definition
@@ -174,84 +166,46 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     }
 
     private void populateResponseFile(FileObject responseFile, MessageContext msgContext) throws AxisFault {
-
+        MessageFormatter messageFormatter = null;
+        
         // check the first element of the SOAP body, do we have content wrapped using the
         // default wrapper elements for binary (BaseConstants.DEFAULT_BINARY_WRAPPER) or
-        // text (BaseConstants.DEFAULT_TEXT_WRAPPER) ? If so, do not create SOAP messages
-        // within the files but just get the payload in its native format
-
+        // text (BaseConstants.DEFAULT_TEXT_WRAPPER) ? If so, select the appropriate
+        // message formatter directly ...
         OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
-        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         if (firstChild != null) {
             if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
-                try {
-                    OutputStream os = responseFile.getContent().getOutputStream();
-                    try {
-                        OMNode omNode = firstChild.getFirstOMChild();
-                        if (omNode != null && omNode instanceof OMText) {
-                            Object dh = ((OMText) omNode).getDataHandler();
-                            if (dh != null && dh instanceof DataHandler) {
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                try {
-                                    ((DataHandler) dh).writeTo(baos);
-                                } catch (IOException e) {
-                                    metrics.incrementFaultsSending();
-                                    handleException("Error serializing binary content of element : " +
-                                        BaseConstants.DEFAULT_BINARY_WRAPPER, e);
-                                }
-                                os.write(baos.toByteArray());
-                            }
-                        }
-                    } finally {
-                    	os.close();
-                    }
-                } catch (FileSystemException e) {
-                    metrics.incrementFaultsSending();
-                    handleException("Error getting an output stream to file : " +
-                        responseFile.getName().getBaseName(), e);
-                } catch (IOException e) {
-                    metrics.incrementFaultsSending();
-                    handleException("Error getting binary content of message", e);
-                }
-
+                messageFormatter = new BinaryFormatter();
             } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
-                try {
-                    Writer out = new OutputStreamWriter(responseFile.getContent().getOutputStream(),
-                            format.getCharSetEncoding());
-                    try {
-                        if (firstChild instanceof OMSourcedElementImpl) {
-                            XMLStreamReader reader = firstChild.getXMLStreamReader();
-                            while (reader.hasNext()) {
-                                if (reader.next() == XMLStreamReader.CHARACTERS) {
-                                    out.write(reader.getText());
-                                }
-                            }
-                        } else {
-                            out.write(firstChild.getText());
-                        }
-                    } catch (IOException e) {
-                        metrics.incrementFaultsSending();
-                        handleException("Error serializing text content of element : " +
-                                        BaseConstants.DEFAULT_TEXT_WRAPPER, e);
-                    } finally {
-                    	out.close();
-                    }
-                } catch (FileSystemException e) {
-                    metrics.incrementFaultsSending();
-                    handleException("Error getting an output stream to file : " +
-                        responseFile.getName().getBaseName(), e);
-                } catch (IOException e) {
-                    metrics.incrementFaultsSending();
-                    handleException("Error getting text content of message as bytes", e);
-                } catch (XMLStreamException e) {
-                    metrics.incrementFaultsSending();
-                    handleException("Error serializing OMSourcedElement content", e);
-                }
-            } else {
-                populateSOAPFile(responseFile, msgContext, format);
+                messageFormatter = new PlainTextFormatter();
             }
-        } else {
-            populateSOAPFile(responseFile, msgContext, format);
+        }
+        
+        // ... otherwise, let Axis choose the right message formatter:
+        if (messageFormatter == null) {
+            try {
+                messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+            } catch (AxisFault axisFault) {
+                metrics.incrementFaultsSending();
+                throw new BaseTransportException("Unable to get the message formatter to use");
+            }
+        }
+        
+        // Write the message to the file using the selected message formatter
+        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
+        try {
+            OutputStream os = responseFile.getContent().getOutputStream();
+            try {
+                messageFormatter.writeTo(msgContext, format, os, true);
+            } finally {
+                os.close();
+            }
+        } catch (FileSystemException e) {
+            metrics.incrementFaultsSending();
+            handleException("IO Error while creating response file : " + responseFile.getName(), e);
+        } catch (IOException e) {
+            metrics.incrementFaultsSending();
+            handleException("IO Error while creating response file : " + responseFile.getName(), e);
         }
 
         // update metrics
@@ -262,34 +216,6 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
             }
         } catch (FileSystemException e) {
             log.warn("Unable to update transport metrics for file written", e);
-        }
-    }
-
-    /**
-     * Populate file with a SOAP formatted message
-     * @param responseFile the response file created
-     * @param msgContext the message context that holds the message to be written
-     * @throws AxisFault on error
-     */
-    private void populateSOAPFile(FileObject responseFile, MessageContext msgContext, OMOutputFormat format) throws AxisFault {
-        MessageFormatter messageFormatter = null;
-        try {
-            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-        } catch (AxisFault axisFault) {
-            throw new BaseTransportException("Unable to get the message formatter to use");
-        }
-
-        try {
-            OutputStream os = responseFile.getContent().getOutputStream();
-            try {
-            	messageFormatter.writeTo(msgContext, format, os, true);
-            } finally {
-            	os.close();
-            }
-        } catch (FileSystemException e) {
-            handleException("IO Error while creating response file : " + responseFile.getName(), e);
-        } catch (IOException e) {
-            handleException("IO Error while creating response file : " + responseFile.getName(), e);
         }
     }
 }

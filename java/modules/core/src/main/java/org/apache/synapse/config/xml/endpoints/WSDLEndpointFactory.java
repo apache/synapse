@@ -224,11 +224,11 @@ public class WSDLEndpointFactory implements EndpointFactory {
     }
 
     private void extractQOSInformation(EndpointDefinition endpointDefinition,
-        OMElement wsdlElement) {
+        OMElement elem) {
 
-        OMAttribute format = wsdlElement.getAttribute(new QName(
+        OMAttribute format = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "format"));
-        OMAttribute optimize = wsdlElement.getAttribute(new QName(
+        OMAttribute optimize = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "optimize"));
 
         if (format != null)
@@ -264,11 +264,11 @@ public class WSDLEndpointFactory implements EndpointFactory {
             }
         }
 
-        OMElement wsAddr = wsdlElement.getFirstChildWithName(new QName(
+        OMElement wsAddr = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
                 "enableAddressing"));
-        if (wsAddr != null) {
 
+        if (wsAddr != null) {
             endpointDefinition.setAddressingOn(true);
 
             OMAttribute version = wsAddr.getAttribute(new QName("version"));
@@ -283,8 +283,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 }
             }
             
-            String useSepList = wsAddr.getAttributeValue(new QName(
-                    "separateListener"));
+            String useSepList = wsAddr.getAttributeValue(new QName("separateListener"));
             if (useSepList != null) {
                 if (useSepList.trim().toLowerCase().startsWith("tr")
                         || useSepList.trim().startsWith("1")) {
@@ -293,7 +292,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
             }
         }
 
-        OMElement wsSec = wsdlElement.getFirstChildWithName(new QName(
+        OMElement wsSec = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec"));
         if (wsSec != null) {
             endpointDefinition.setSecurityOn(true);
@@ -303,7 +302,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 endpointDefinition.setWsSecPolicyKey(policy.getAttributeValue());
             }
         }
-        OMElement wsRm = wsdlElement.getFirstChildWithName(new QName(
+        OMElement wsRm = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
         if (wsRm != null) {
             endpointDefinition.setReliableMessagingOn(true);
@@ -315,12 +314,13 @@ public class WSDLEndpointFactory implements EndpointFactory {
         }
 
         // set the timeout configuration
-        OMElement timeout = wsdlElement.getFirstChildWithName(new QName(
+        OMElement timeout = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
         if (timeout != null) {
             OMElement duration = timeout.getFirstChildWithName(new QName(
                     org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
                     "duration"));
+
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {

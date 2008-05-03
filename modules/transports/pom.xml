@@ -43,7 +43,6 @@
                 <version>2.3</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/MailEchoRawXMLTest.java</exclude>
                         <exclude>**/AbstractTransportTest.java</exclude>
                     </excludes>
                 </configuration>

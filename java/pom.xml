@@ -1237,12 +1237,15 @@
             <email>OlegK AT apache.org</email>
             <organization>Apache</organization>
         </developer>
+        <developer>
+            <name>Andreas Veithen</name>
+            <id>veithen</id>
+            <email>veithen AT apache.org</email>
+            <url>http://www.linkedin.com/in/aveithen</url>
+        </developer>
     </developers>
 
     <contributors>
-        <contributor>
-            <name>Andreas Veithen</name>
-        </contributor>
         <contributor>
             <name>Hadrian Zbarcea</name>
         </contributor>

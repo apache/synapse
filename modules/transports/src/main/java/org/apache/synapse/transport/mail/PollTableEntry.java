@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.mail;
 
+import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.AddressException;
 import java.util.List;
@@ -238,10 +239,22 @@ public class PollTableEntry {
         }
     }
 
+    /**
+     * Get the mail store protocol.
+     * This protocol identifier is used in calls to {@link Session#getStore()}.
+     * 
+     * @return the mail store protocol
+     */
     public String getProtocol() {
         return protocol;
     }
 
+    /**
+     * Set the mail store protocol.
+     * This protocol identifier is used in calls to {@link Session#getStore()}.
+     * 
+     * @param protocol the mail store protocol
+     */
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }

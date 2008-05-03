@@ -103,29 +103,26 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
     }
 
     public void serializeQOSInformation
-            (EndpointDefinition endpointDefinition, OMElement wsdlElement) {
+            (EndpointDefinition endpointDefinition, OMElement element) {
 
         if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
-            
+            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
         } else if (SynapseConstants.FORMAT_GET.equals(endpointDefinition.getFormat())) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "get"));
-
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
         } else if (SynapseConstants.FORMAT_SOAP11.equals(endpointDefinition.getFormat())) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
-            
+            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (SynapseConstants.FORMAT_SOAP12.equals(endpointDefinition.getFormat())) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         
             // following two kept for backward compatibility
         } else if (endpointDefinition.isForcePOX()) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
+            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
         } else if (endpointDefinition.isForceGET()) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "get"));
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
         } else if (endpointDefinition.isForceSOAP11()) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (endpointDefinition.isForceSOAP12()) {
-            wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         }
         
         int isEnableStatistics = endpointDefinition.getStatisticsState();
@@ -136,13 +133,11 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE;
         }
         if (statisticsValue != null) {
-            wsdlElement.addAttribute(fac.createOMAttribute(
-                    org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME,
-                    null, statisticsValue));
+            element.addAttribute(fac.createOMAttribute(
+                    org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
         }
         if (endpointDefinition.isAddressingOn()) {
-            OMElement addressing = fac.createOMElement("enableAddressing",
-                    SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement addressing = fac.createOMElement("enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getAddressingVersion() != null) {
                 addressing.addAttribute(fac.createOMAttribute(
                         "version", null, endpointDefinition.getAddressingVersion()));
@@ -151,7 +146,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
                 addressing.addAttribute(fac.createOMAttribute(
                         "separateListener", null, "true"));
             }
-            wsdlElement.addChild(addressing);
+            element.addChild(addressing);
         }
 
         if (endpointDefinition.isReliableMessagingOn()) {
@@ -160,7 +155,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
                 rm.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsRMPolicyKey()));
             }
-            wsdlElement.addChild(rm);
+            element.addChild(rm);
         }
 
         if (endpointDefinition.isSecurityOn()) {
@@ -169,24 +164,21 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
                 sec.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsSecPolicyKey()));
             }
-            wsdlElement.addChild(sec);
+            element.addChild(sec);
         }
 
         if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {
-            OMElement timeout = fac.createOMElement(
-                    "timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            wsdlElement.addChild(timeout);
+            OMElement timeout = fac.createOMElement("timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            element.addChild(timeout);
 
-            OMElement duration = fac.createOMElement(
-                    "duration", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement duration = fac.createOMElement("duration", SynapseConstants.SYNAPSE_OMNAMESPACE);
             duration.setText(Long.toString(endpointDefinition.getTimeoutDuration() / 1000));
             timeout.addChild(duration);
 
             OMElement action = fac.createOMElement("action", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
                 action.setText("discard");
-            } else if (endpointDefinition.getTimeoutAction()
-                    == SynapseConstants.DISCARD_AND_FAULT) {
+            } else if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD_AND_FAULT) {
                 action.setText("fault");
             }
             timeout.addChild(action);

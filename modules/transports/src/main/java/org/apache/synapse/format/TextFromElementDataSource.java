@@ -71,7 +71,9 @@ public class TextFromElementDataSource implements DataSource {
                             if (!reader.hasNext()) {
                                 break outer;
                             }
-                            if (reader.next() == XMLStreamReader.CHARACTERS) {
+                            int eventType = reader.next();
+                            if (eventType == XMLStreamReader.CHARACTERS ||
+                                    eventType == XMLStreamReader.CDATA) {
                                 // Note: this is not entirely correct for encodings such as UTF-16.
                                 // Once IO-158 is implemented, we could avoid this by implementing a
                                 // Reader and using ReaderInputStream.

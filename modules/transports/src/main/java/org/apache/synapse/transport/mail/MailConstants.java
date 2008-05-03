@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.mail;
 
+import javax.mail.Session;
+
 public class MailConstants {
 
     public static final String TRANSPORT_NAME = "mailto";
@@ -44,6 +46,11 @@ public class MailConstants {
     public static final long   DEFAULT_RECONNECT_TIMEOUT = 30000;
 
     public static final String TRANSPORT_MAIL_ADDRESS  = "transport.mail.Address";
+    
+    /**
+     * Key for the mail store protocol parameter.
+     * The mail store protocol identifier is used in calls to {@link Session#getStore()}.
+     */
     public static final String TRANSPORT_MAIL_PROTOCOL = "transport.mail.Protocol";
 
     public static final String TRANSPORT_MAIL_FORMAT = "transport.mail.Format";

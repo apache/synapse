@@ -37,6 +37,7 @@ public class UtilsMailServer extends UtilsTransportServer {
         TransportOutDescription trpOutDesc =
             new TransportOutDescription(MailConstants.TRANSPORT_NAME);
         // gmail
+        trpOutDesc.addParameter(new Parameter("mail.smtp.class", TestTransport.class.getName()));
         trpOutDesc.addParameter(new Parameter("mail.smtp.host", "smtp.gmail.com"));
         trpOutDesc.addParameter(new Parameter("mail.smtp.port", "587"));
         trpOutDesc.addParameter(new Parameter("mail.smtp.starttls.enable", "true"));
@@ -60,10 +61,10 @@ public class UtilsMailServer extends UtilsTransportServer {
         // local james
         parameters.add(new Parameter("transport.mail.Address", "synapse.test.6@localhost"));
         //parameters.add(new Parameter("transport.mail.ReplyAddress", "synapse.test.1@gmail.com"));
-        parameters.add(new Parameter("transport.mail.Protocol", "pop3"));
+        parameters.add(new Parameter("transport.mail.Protocol", "test-store"));
         //parameters.add(new Parameter("transport.mail.ContentType", "text/xml"));
         parameters.add(new Parameter("transport.mail.ActionAfterProcess", "DELETE"));
-        parameters.add(new Parameter("transport.PollInterval", "5"));
+        parameters.add(new Parameter("transport.PollInterval", "1"));
 
         // gmail
         parameters.add(new Parameter("mail.pop3.host", "pop.gmail.com"));
@@ -82,10 +83,10 @@ public class UtilsMailServer extends UtilsTransportServer {
         parameters = new ArrayList();
         parameters.add(new Parameter("transport.mail.Address", "synapse.test.7@gmail.com"));
         //parameters.add(new Parameter("transport.mail.ReplyAddress", "synapse.test.1@gmail.com"));
-        parameters.add(new Parameter("transport.mail.Protocol", "imap"));
+        parameters.add(new Parameter("transport.mail.Protocol", "test-store"));
         //parameters.add(new Parameter("transport.mail.ContentType", "text/xml"));
         //parameters.add(new Parameter("transport.mail.ActionAfterProcess", "DELETE"));
-        parameters.add(new Parameter("transport.PollInterval", "5"));
+        parameters.add(new Parameter("transport.PollInterval", "1"));
 
         parameters.add(new Parameter("mail.imap.host", "imap.gmail.com"));
         parameters.add(new Parameter("mail.imap.port", "993"));

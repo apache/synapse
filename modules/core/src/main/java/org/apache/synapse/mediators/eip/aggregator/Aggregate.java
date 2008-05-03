@@ -51,6 +51,7 @@ public class Aggregate extends TimerTask {
     private AggregateMediator aggregateMediator = null;
     private List<MessageContext> messages = new ArrayList<MessageContext>();
     private boolean locked = false;
+    private boolean completed = false;
 
     /**
      * Save aggregation properties and timeout
@@ -226,18 +227,34 @@ public class Aggregate extends TimerTask {
     }
 
     public void run() {
-        if (log.isDebugEnabled()) {
-            log.debug("Time : " + System.currentTimeMillis() + " and this aggregator expired at : " +
-                expiryTimeMillis);
+        while (true) {
+            if (completed) {
+                break;
+            }
+            if (getLock()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Time : " + System.currentTimeMillis() + " and this aggregator " +
+                            "expired at : " + expiryTimeMillis);
+                }
+                aggregateMediator.completeAggregate(this);
+                break;
+            }
         }
-        aggregateMediator.completeAggregate(this);
     }
 
-    public boolean isLocked() {
-        return locked;
+    public synchronized boolean getLock() {
+        return !locked;
     }
 
-    public synchronized void setLocked(boolean locked) {
-        this.locked = locked;
+    public void releaseLock() {
+        locked = false;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

@@ -125,38 +125,42 @@ public class AggregateMediator extends AbstractMediator {
             if (correlateExpression != null
                     && correlateExpression.evaluate(synCtx) != null) {
 
-                if (activeAggregates.containsKey(correlateExpression.toString())) {
-                    while (aggregate == null) {
-                        aggregate = activeAggregates.get(correlateExpression.toString());
-                        if (aggregate != null) {
-                            if (aggregate.isLocked()) {
-                                aggregate = null;
-                            } else {
-                                aggregate.setLocked(true);
+                while (aggregate == null) {
+
+                    synchronized (lock) {
+
+                        if (activeAggregates.containsKey(correlateExpression.toString())) {
+
+                            aggregate = activeAggregates.get(correlateExpression.toString());
+                            if (aggregate != null) {
+                                if (!aggregate.getLock()) {
+                                    aggregate = null;
+                                }
                             }
+
                         } else {
-                            break;
+
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                        (completionTimeoutMillis > 0 ? "expires in : "
+                                                + (completionTimeoutMillis / 1000) + "secs" :
+                                                "without expiry time"));
+                            }
+
+                            aggregate = new Aggregate(
+                                    correlateExpression.toString(),
+                                    completionTimeoutMillis,
+                                    minMessagesToComplete,
+                                    maxMessagesToComplete, this);
+
+                            if (completionTimeoutMillis > 0) {
+                                synCtx.getConfiguration().getSynapseTimer().
+                                        schedule(aggregate, completionTimeoutMillis);
+                            }
+                            aggregate.getLock();
+                            activeAggregates.put(correlateExpression.toString(), aggregate);
                         }
                     }
-                } else {
-
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Creating new Aggregator - " +
-                                (completionTimeoutMillis > 0 ? "expires in : "
-                                        + (completionTimeoutMillis / 1000) + "secs" :
-                                        "without expiry time"));
-                    }
-
-                    aggregate = new Aggregate(
-                            correlateExpression.toString(),
-                            completionTimeoutMillis,
-                            minMessagesToComplete,
-                            maxMessagesToComplete, this);
-                    if (completionTimeoutMillis > 0) {
-                        synCtx.getConfiguration().getSynapseTimer().
-                                schedule(aggregate, completionTimeoutMillis);
-                    }
-                    activeAggregates.put(correlateExpression.toString(), aggregate);
                 }
 
             } else if (synCtx.getProperty(EIPConstants.AGGREGATE_CORRELATION) != null) {
@@ -170,39 +174,39 @@ public class AggregateMediator extends AbstractMediator {
 
                 if (o != null && o instanceof String) {
                     correlation = (String) o;
-                    if (activeAggregates.containsKey(correlation)) {
-                        while (aggregate == null) {
-                            aggregate = activeAggregates.get(correlation);
-                            if (aggregate != null) {
-                                if (aggregate.isLocked()) {
-                                    aggregate = null;
+                    while (aggregate == null) {
+                        synchronized (lock) {
+                            if (activeAggregates.containsKey(correlation)) {
+                                aggregate = activeAggregates.get(correlation);
+                                if (aggregate != null) {
+                                    if (!aggregate.getLock()) {
+                                        aggregate = null;
+                                    }
                                 } else {
-                                    aggregate.setLocked(true);
+                                    break;
                                 }
                             } else {
-                                break;
+                                if (traceOrDebugOn) {
+                                    traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                            (completionTimeoutMillis > 0 ? "expires in : "
+                                                    + (completionTimeoutMillis / 1000) + "secs" :
+                                                    "without expiry time"));
+                                }
+                        
+                                aggregate = new Aggregate(
+                                        correlation,
+                                        completionTimeoutMillis,
+                                        minMessagesToComplete,
+                                        maxMessagesToComplete, this);
+
+                                if (completionTimeoutMillis > 0) {
+                                    synCtx.getConfiguration().getSynapseTimer().
+                                            schedule(aggregate, completionTimeoutMillis);
+                                }
+                                aggregate.getLock();
+                                activeAggregates.put(correlation, aggregate);
                             }
                         }
-
-                    } else {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Creating new Aggregator - " +
-                                    (completionTimeoutMillis > 0 ? "expires in : "
-                                            + (completionTimeoutMillis / 1000) + "secs" :
-                                            "without expiry time"));
-                        }
-                        
-                        aggregate = new Aggregate(
-                                correlation,
-                                completionTimeoutMillis,
-                                minMessagesToComplete,
-                                maxMessagesToComplete, this);
-
-                        if (completionTimeoutMillis > 0) {
-                            synCtx.getConfiguration().getSynapseTimer().
-                                    schedule(aggregate, completionTimeoutMillis);
-                        }
-                        activeAggregates.put(correlation, aggregate);
                     }
                     
                 } else {
@@ -213,7 +217,8 @@ public class AggregateMediator extends AbstractMediator {
                 }
             } else {
                 if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Unable to find aggrgation correlation XPath or property");
+                    traceOrDebug(traceOn,
+                            "Unable to find aggrgation correlation XPath or property");
                 }
                 return true;
             }
@@ -244,7 +249,7 @@ public class AggregateMediator extends AbstractMediator {
                     }
                     return true;
                 } else {
-                    aggregate.setLocked(false);
+                    aggregate.releaseLock();
                 }
 
             } else {
@@ -281,6 +286,7 @@ public class AggregateMediator extends AbstractMediator {
 
         // cancel the timer
         aggregate.cancel();
+        aggregate.setCompleted(true);
 
         MessageContext newSynCtx = getAggregatedMessage(aggregate);
         if (newSynCtx == null) {

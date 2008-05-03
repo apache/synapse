@@ -25,7 +25,11 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.builder.BuilderUtil;
+import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.synapse.format.BinaryFormatter;
+import org.apache.synapse.format.PlainTextFormatter;
 import org.apache.synapse.transport.vfs.PollTableEntry;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.lang.StringUtils;
@@ -139,6 +143,33 @@ public abstract class BaseUtils {
             format.setMimeBoundary((String) mimeBoundaryProperty);
         }
         return format;
+    }
+    
+    /**
+     * Get the MessageFormatter for the given message.
+     * @param msgContext the axis message context
+     * @return the MessageFormatter to be used
+     */
+    public static MessageFormatter getMessageFormatter(MessageContext msgContext) {
+        // check the first element of the SOAP body, do we have content wrapped using the
+        // default wrapper elements for binary (BaseConstants.DEFAULT_BINARY_WRAPPER) or
+        // text (BaseConstants.DEFAULT_TEXT_WRAPPER) ? If so, select the appropriate
+        // message formatter directly ...
+        OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
+        if (firstChild != null) {
+            if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
+                return new BinaryFormatter();
+            } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
+                return new PlainTextFormatter();
+            }
+        }
+        
+        // ... otherwise, let Axis choose the right message formatter:
+        try {
+            return TransportUtils.getMessageFormatter(msgContext);
+        } catch (AxisFault axisFault) {
+            throw new BaseTransportException("Unable to get the message formatter to use");
+        }
     }
 
     public static long getMinPollTime(List pollTable) {

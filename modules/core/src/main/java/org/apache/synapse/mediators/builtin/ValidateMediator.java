@@ -30,29 +30,21 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -244,22 +236,12 @@ public class ValidateMediator extends AbstractListMediator {
         boolean traceOrDebugOn, boolean traceOn) {
 
         try {
-            // create a byte array output stream and serialize the source node into it
-            ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
-            XMLStreamWriter xsWriterForSource =
-                    XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
-
-            // serialize the validation target and get an input stream into it
             OMNode validateSource = getValidateSource(synCtx);
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Validation source : " + validateSource.toString());
             }
-            validateSource.serialize(xsWriterForSource);
 
-            ByteArrayInputStream baisFromSource = new ByteArrayInputStream(
-                baosForSource.toByteArray());
-            XMLReader reader = XMLReaderFactory.createXMLReader();
-            return new SAXSource(reader, new InputSource(baisFromSource));
+            return AXIOMUtils.asSource(validateSource);
 
         } catch (Exception e) {
             handleException("Error accessing source element : " + source, e, synCtx);

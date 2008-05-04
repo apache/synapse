@@ -39,12 +39,10 @@
         <target>
             <inSequence>
                 <log level="full"/>
-                <property name="RESPONSE" value="true"/>
-				<header name="To" value="http://www.w3.org/2005/08/addressing/anonymous"/>
-                <property name="SC_ACCEPTED" value="true" scope="axis2"/>
-                <property action="set" name="OUT_ONLY" value="true"/>
-                <send/>
             </inSequence>
+            <endpoint>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            </endpoint>
             <outSequence>
                 <send/>
             </outSequence>

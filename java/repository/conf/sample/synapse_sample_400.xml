@@ -44,10 +44,6 @@
                                 xmlns:m0="http://services.samples/xsd">
                         <send/>
                     </onComplete>
-                    <invalidate>
-                        <log level="full"/>
-                        <drop/>
-                    </invalidate>
                 </aggregate>
             </outSequence>
         </target>

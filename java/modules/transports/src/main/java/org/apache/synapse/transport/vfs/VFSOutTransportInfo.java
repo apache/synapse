@@ -44,6 +44,7 @@ public class VFSOutTransportInfo implements OutTransportInfo {
     private String contentType = null;
     private int maxRetryCount = 3;
     private long reconnectTimeout = 30000;
+    private boolean append;
 
     VFSOutTransportInfo(String outFileURI) {
         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
@@ -61,6 +62,10 @@ public class VFSOutTransportInfo implements OutTransportInfo {
           String strReconnectTimeout = (String) properties.get(VFSConstants.RECONNECT_TIMEOUT);
             reconnectTimeout = Long.parseLong(strReconnectTimeout) * 1000;
         }        
+        if (properties.containsKey(VFSConstants.APPEND)) {
+            String strAppend = (String)properties.get(VFSConstants.APPEND);
+            append = Boolean.parseBoolean(strAppend);
+        }
     }
 
     public void setContentType(String contentType) {
@@ -91,6 +96,14 @@ public class VFSOutTransportInfo implements OutTransportInfo {
       this.reconnectTimeout = reconnectTimeout;
     }
     
+    public boolean isAppend() {
+        return append;
+    }
+
+    public void setAppend(boolean append) {
+        this.append = append;
+    }
+
     public static Map getProperties(String url) {
         Map h = new HashMap();
         int propPos = url.indexOf("?");

@@ -96,6 +96,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 int retryCount = 0;
                 int maxRetryCount = VFSUtils.getMaxRetryCount(msgCtx, vfsOutInfo);
                 long reconnectionTimeout = VFSUtils.getReconnectTimout(msgCtx, vfsOutInfo);
+                boolean append = vfsOutInfo.isAppend();
                 
                 while(wasError == true) {
                   try {
@@ -133,10 +134,10 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         if (!responseFile.exists()) {
                             responseFile.createFile();
                         }
-                        populateResponseFile(responseFile, msgCtx);
+                        populateResponseFile(responseFile, msgCtx, append);
 
                     } else if (replyFile.getType() == FileType.FILE) {
-                        populateResponseFile(replyFile, msgCtx);
+                        populateResponseFile(replyFile, msgCtx, append);
                         
                     } else {
                         handleException("Unsupported reply file type : " + replyFile.getType() +
@@ -144,7 +145,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                     }
                 } else {
                     replyFile.createFile();
-                    populateResponseFile(replyFile, msgCtx);
+                    populateResponseFile(replyFile, msgCtx, append);
                 }
             } catch (FileSystemException e) {
                 handleException("Error resolving reply file : " +
@@ -161,11 +162,11 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
         }
     }
 
-    private void populateResponseFile(FileObject responseFile, MessageContext msgContext) throws AxisFault {
+    private void populateResponseFile(FileObject responseFile, MessageContext msgContext, boolean append) throws AxisFault {
         MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         try {
-            CountingOutputStream os = new CountingOutputStream(responseFile.getContent().getOutputStream());
+            CountingOutputStream os = new CountingOutputStream(responseFile.getContent().getOutputStream(append));
             try {
                 messageFormatter.writeTo(msgContext, format, os, true);
             } finally {

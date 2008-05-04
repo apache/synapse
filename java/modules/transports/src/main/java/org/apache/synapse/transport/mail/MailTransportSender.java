@@ -24,6 +24,7 @@ import org.apache.synapse.format.MessageFormatterExAdapter;
 import org.apache.synapse.transport.base.AbstractTransportSender;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -48,7 +49,8 @@ import java.io.IOException;
  * The mail transport sender sends mail using an SMTP server configuration defined
  * in the axis2.xml's transport sender definition
  */
-public class MailTransportSender extends AbstractTransportSender {
+public class MailTransportSender extends AbstractTransportSender
+    implements ManagementSupport {
 
     private String smtpUsername = null;
     private String smtpPassword = null;

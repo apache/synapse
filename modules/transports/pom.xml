@@ -44,6 +44,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/AbstractTransportTest.java</exclude>
+                        <exclude>org/apache/synapse/transport/mail/Test*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

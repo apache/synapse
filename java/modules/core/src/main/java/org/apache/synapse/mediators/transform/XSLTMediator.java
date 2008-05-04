@@ -39,10 +39,10 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.TextFileDataSource;
 import org.jaxen.JaxenException;
-import org.springframework.xml.transform.StaxSource;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -239,9 +239,7 @@ public class XSLTMediator extends AbstractMediator {
                 traceOrDebug(traceOn, "Using byte array serialization for transformation");
             }
 
-            // We use Spring's StaxSource for the transformation source. Once we depend
-            // on JDK 1.6, we can replace this by StAXSource from JAXP 1.4.
-            transformSrc = new StaxSource(((OMElement)sourceNode).getXMLStreamReader());
+            transformSrc = AXIOMUtils.asSource(sourceNode);
             
             tempTargetData = synCtx.getEnvironment().createTemporaryData();
             osForTarget = tempTargetData.getOutputStream();

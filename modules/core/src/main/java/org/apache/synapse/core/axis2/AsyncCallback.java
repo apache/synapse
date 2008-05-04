@@ -19,11 +19,9 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axis2.client.async.Callback;
-import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.AxisCallback;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 
 /**
  * This class only "holds" the Synapse out message context for the Synapse callback message

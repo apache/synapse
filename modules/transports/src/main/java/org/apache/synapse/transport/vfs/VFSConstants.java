@@ -44,6 +44,7 @@ public class VFSConstants {
     
     public static final String MAX_RETRY_COUNT = "transport.vfs.MaxRetryCount";
     public static final String RECONNECT_TIMEOUT = "transport.vfs.ReconnectTimeout";
+    public static final String APPEND = "transport.vfs.Append";
     public static final int DEFAULT_MAX_RETRY_COUNT = 3;
     public static final long DEFAULT_RECONNECT_TIMEOUT = 30000;
     

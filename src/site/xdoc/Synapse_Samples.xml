@@ -3157,12 +3157,10 @@ java.naming.provider.url=tcp://localhost:61616</pre>
         &lt;target&gt;
             &lt;inSequence&gt;
                 &lt;log level="full"/&gt;
-                &lt;property name="RESPONSE" value="true"/&gt;
-                &lt;header name="To" value="http://www.w3.org/2005/08/addressing/anonymous"/&gt;
-                &lt;property name="SC_ACCEPTED" value="true" scope="axis2"/&gt;
-                &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
-                &lt;send/&gt;
             &lt;/inSequence&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
             &lt;outSequence&gt;
                 &lt;send/&gt;
             &lt;/outSequence&gt;

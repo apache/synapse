@@ -107,20 +107,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         cfgCtx.getAxisConfiguration().addObservers(axisObserver);
 
         // register with JMX
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        String jmxAgentName = System.getProperty("jmx.agent.name");
-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
-            jmxAgentName = "org.apache.synapse";
-        }
-        String name;
-        try {
-            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
-                transportName + "-listener";
-            TransportView tBean = new TransportView(this, null);
-            registerMBean(mbs, tBean, name);
-        } catch (Exception e) {
-            log.warn("Error registering the " + transportName + " transport for JMX management", e);
-        }
+        registerMBean(new TransportView(this, null), getMBeanName());
     }
 
     public void destroy() {
@@ -160,7 +147,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         while (services.hasNext()) {
             AxisService service = (AxisService) services.next();
             if (BaseUtils.isUsingTransport(service, transportName)) {
-                startListeningForService(service);
+                internalStartListeningForService(service);
             }
         }
     }
@@ -184,6 +171,18 @@ public abstract class AbstractTransportListener implements TransportListener {
         }
     }
 
+    private void internalStartListeningForService(AxisService service) {
+        startListeningForService(service);
+        String serviceName = service.getName();
+        registerMBean(new TransportListenerEndpointView(this, serviceName),
+                      getEndpointMBeanName(serviceName));
+    }
+
+    private void internalStopListeningForService(AxisService service) {
+        unregisterMBean(getEndpointMBeanName(service.getName()));
+        stopListeningForService(service);
+    }
+    
     protected abstract void startListeningForService(AxisService service);
 
     protected abstract void stopListeningForService(AxisService service);
@@ -305,16 +304,16 @@ public abstract class AbstractTransportListener implements TransportListener {
             if (BaseUtils.isUsingTransport(service, transportName)) {
                 switch (event.getEventType()) {
                     case AxisEvent.SERVICE_DEPLOY :
-                        startListeningForService(service);
+                        internalStartListeningForService(service);
                         break;
                     case AxisEvent.SERVICE_REMOVE :
-                        stopListeningForService(service);
+                        internalStopListeningForService(service);
                         break;
                     case AxisEvent.SERVICE_START  :
-                        startListeningForService(service);
+                        internalStartListeningForService(service);
                         break;
                     case AxisEvent.SERVICE_STOP   :
-                        stopListeningForService(service);
+                        internalStopListeningForService(service);
                         break;
                 }
             }
@@ -410,14 +409,27 @@ public abstract class AbstractTransportListener implements TransportListener {
         return -1;
     }
 
+    private String getMBeanName() {
+        String jmxAgentName = System.getProperty("jmx.agent.name");
+        if (jmxAgentName == null || "".equals(jmxAgentName)) {
+            jmxAgentName = "org.apache.synapse";
+        }
+        return jmxAgentName + ":Type=Transport,ConnectorName=" + transportName + "-listener";
+    }
+    
+    private String getEndpointMBeanName(String serviceName) {
+        return getMBeanName() + ",Group=Services,Service=" + serviceName;
+    }
+    
     /**
      * Utility method to allow transports to register MBeans
      * @param mbs the MBeanServer
      * @param mbeanInstance bean instance
      * @param objectName name
      */
-    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
+    private void registerMBean(Object mbeanInstance, String objectName) {
         try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName(objectName);
             Set set = mbs.queryNames(name, null);
             if (set != null && set.isEmpty()) {
@@ -426,6 +438,16 @@ public abstract class AbstractTransportListener implements TransportListener {
                 mbs.unregisterMBean(name);
                 mbs.registerMBean(mbeanInstance, name);
             }
+        } catch (Exception e) {
+            log.warn("Error registering a MBean with objectname ' " + objectName +
+                " ' for JMX management", e);
+        }
+    }
+    
+    private void unregisterMBean(String objectName) {
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.unregisterMBean(new ObjectName(objectName));
         } catch (Exception e) {
             log.warn("Error registering a MBean with objectname ' " + objectName +
                 " ' for JMX management", e);

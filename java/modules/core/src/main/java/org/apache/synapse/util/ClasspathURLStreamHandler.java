@@ -19,11 +19,15 @@
 
 package org.apache.synapse.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+
+import org.apache.commons.lang.StringUtils;
 
 public final class ClasspathURLStreamHandler extends URLStreamHandler {
 
@@ -39,14 +43,13 @@ public final class ClasspathURLStreamHandler extends URLStreamHandler {
 
         public void connect() {}
 
-        public InputStream getInputStream() {
-            String s = url.toExternalForm();
-            s = s.substring((url.getProtocol() + "://").length(), s.length());
-
-            InputStream is = ClasspathURLStreamHandler.class.getClassLoader().getResourceAsStream(s);
+        public InputStream getInputStream() throws IOException {
+            if (StringUtils.isNotEmpty(url.getHost())) {
+                throw new MalformedURLException("No host expected in classpath URLs");
+            }
+            InputStream is = ClasspathURLStreamHandler.class.getClassLoader().getResourceAsStream(url.getFile());
             if (is == null) {
-                String msg = "Unable to read the specified resource from the classpath:  " + s;
-                throw new RuntimeException(msg);
+                throw new IOException("Classpath resource not found: " + url);
             }
             return is;
         }

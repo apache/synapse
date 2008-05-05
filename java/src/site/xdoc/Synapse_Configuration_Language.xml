@@ -1445,6 +1445,22 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       succeeds, the filter mediator will execute the enclosed mediators in
       sequence.
     </p>
+    <p>One could also use this mediator to handle the failure case as well, in which case the
+       configuration would be as follows
+    </p>
+<pre xml:space="preserve"> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+   &lt;then [sequence="string"]&gt;
+     mediator+
+   &lt;/then&gt;
+   &lt;else [sequence="string"]&gt;
+     mediator+
+   &lt;/else&gt;
+ &lt;/filter&gt;</pre>
+    <p>In this case the filter condition remains as earlier and the succeeded messages will be
+       mediated using the the set of mediators enclosed in the then element in sequence, while
+       failed messages will be mediated using the set of mediators enclosed in the else element
+       in sequence
+    </p>
     <p/>
     <h4>
       <a name="switch" id="switch">Switch</a>

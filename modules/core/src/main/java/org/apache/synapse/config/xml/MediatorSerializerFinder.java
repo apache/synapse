@@ -65,7 +65,8 @@ public class MediatorSerializerFinder {
     /**
      * A map of mediator QNames to implementation class
      */
-    private static Map serializerMap = new HashMap();
+    private static Map<String, MediatorSerializer> serializerMap
+            = new HashMap<String, MediatorSerializer>();
 
     public static synchronized MediatorSerializerFinder getInstance() {
         if (instance == null) {
@@ -75,15 +76,14 @@ public class MediatorSerializerFinder {
     }
 
     public MediatorSerializer getSerializer(Mediator mediator) {
-        return (MediatorSerializer) serializerMap.get(mediator.getClass().getName());
+        return serializerMap.get(mediator.getClass().getName());
     }
 
     private MediatorSerializerFinder() {
 
-        serializerMap = new HashMap();
+        serializerMap = new HashMap<String, MediatorSerializer>();
 
-        for (int i = 0; i < mediatorSerializers.length; i++) {
-            Class c = mediatorSerializers[i];
+        for (Class c : mediatorSerializers) {
             try {
                 MediatorSerializer ser = (MediatorSerializer) c.newInstance();
                 serializerMap.put(ser.getMediatorClassName(), ser);
@@ -128,7 +128,7 @@ public class MediatorSerializerFinder {
      * 
      * @return Map of serilaizers already registered with the Finder
      */
-    public Map getSerializerMap() {
+    public Map<String, MediatorSerializer> getSerializerMap() {
         return serializerMap;
     }
 

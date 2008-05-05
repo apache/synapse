@@ -78,7 +78,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
     /**
      * A map of mediator QNames to implementation class
      */
-    private static Map factoryMap = new HashMap();
+    private static Map<QName, Class> factoryMap = new HashMap<QName, Class>();
 
     public static synchronized MediatorFactoryFinder getInstance() {
         if (instance == null) {
@@ -97,29 +97,18 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
 
     private MediatorFactoryFinder() {
 
-        factoryMap = new HashMap();
+        factoryMap = new HashMap<QName, Class>();
 
-        for (int i = 0; i < mediatorFactories.length; i++) {
-			Class c = mediatorFactories[i];
-			try {
+        for (Class c : mediatorFactories) {
+            try {
                 MediatorFactory fac = (MediatorFactory) c.newInstance();
                 factoryMap.put(fac.getTagQName(), c);
             } catch (Exception e) {
-				throw new SynapseException("Error instantiating " + c.getName(), e);
-			}
-		}
+                throw new SynapseException("Error instantiating " + c.getName(), e);
+            }
+        }
         // now iterate through the available pluggable mediator factories
         registerExtensions();
-    }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     /**
@@ -129,8 +118,6 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
     private void registerExtensions() {
-
-        //log.debug("Registering mediator extensions found in the classpath : " + System.getResource("java.class.path"));
 
         // register MediatorFactory extensions
         Iterator it = Service.providers(MediatorFactory.class);
@@ -149,13 +136,13 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
 	 * recursively by the elements which contain processor elements themselves
 	 * (e.g. rules)
 	 * 
-	 * @param element
+	 * @param element XML representation of a mediator
      * @return Processor
 	 */
 	public Mediator getMediator(OMElement element) {
 
         String localName = element.getLocalName();
-        QName qName = null;
+        QName qName;
         if (element.getNamespace() != null) {
             qName = new QName(element.getNamespace().getNamespaceURI(), localName);
         } else {
@@ -164,7 +151,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         if (log.isDebugEnabled()) {
             log.debug("getMediator(" + qName + ")");
         }
-        Class cls = (Class) factoryMap.get(qName);
+        Class cls = factoryMap.get(qName);
 
         if (cls == null && localName.indexOf('.') > -1) {
             String newLocalName = localName.substring(0, localName.indexOf('.'));
@@ -172,7 +159,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
             if (log.isDebugEnabled()) {
                 log.debug("getMediator.2(" + qName + ")");
             }
-            cls = (Class) factoryMap.get(qName);
+            cls = factoryMap.get(qName);
         }
 
         if (cls == null) {
@@ -196,18 +183,20 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
             throw new SynapseException(msg, e);
 		}
 	}
-    /*
-    This method exposes all the MediatorFactories and its Extensions 
-    */
-    public Map getFactoryMap() {
+    
+    /**
+     * This method exposes all the MediatorFactories and its Extensions
+     * @return factoryMap
+     */
+    public Map<QName, Class> getFactoryMap() {
         return factoryMap;
     }
 
     /**
      * Allow the mediator factory finder to act as an XMLToObjectMapper for Mediators
      * (i.e. Sequence Mediator) loaded dynamically from a Registry 
-     * @param om
-     * @return
+     * @param om node from which the object is expected
+     * @return Object buit from the om node
      */
     public Object getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
@@ -217,4 +206,10 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         }
         return null;
     }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
 }

@@ -711,6 +711,11 @@
             <artifactId>oro</artifactId>
             <version>${oro.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons_io.version}</version>
+        </dependency>
 
         <!-- dependencies for extensions -->
 
@@ -1131,6 +1136,7 @@
         <derby.version>10.1.1.0</derby.version>
         <wrapper.version>3.2.3</wrapper.version>
         <saxon.version>8.9</saxon.version>
+        <commons_io.version>1.4</commons_io.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

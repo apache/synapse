@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
 <document>
     <properties>
         <title>Configuration Language</title>
@@ -1064,8 +1063,18 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     <p>
       A mediator token refers to any of the following tokens:
     </p>
-<pre xml:space="preserve"><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a> | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> | <a href="#dblookup">dblookup</a> 
-    | <a href="#dbreport">dbreport</a> | <a href="#RMSequence">RMSequence</a> | <a href="#throttle">throttle</a> | <a href="#xquery">xquery</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#script">script</a> | <a href="#spring">spring</a> </pre>
+<pre xml:space="preserve">
+    <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  
+    | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a>
+    | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#header">header</a>  
+    | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> 
+    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> 
+    | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> 
+    | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> 
+    | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> 
+    | <a href="#script">script</a>
+    | <a href="#RMSequence">RMSequence</a>
+    </pre>
     <p>
       In addition to the above, Synapse will be able to load custom mediators
       via the J2SE Service Provider model. Mediator extensions must implement
@@ -1155,28 +1164,18 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         simple = To, From, WSAction, SOAPAction, ReplyTo, MessageID and any
         properties
       </li>
       <li>
-      </li>
-      <li>
         headers = All SOAP header blocks and any properties
-      </li>
-      <li>
       </li>
       <li>
         full = all attributes included in log level 'simple' and the SOAP
         envelope and any properties
       </li>
       <li>
-      </li>
-      <li>
         custom = Only properties specified to the Log mediator
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -1206,42 +1205,28 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         RESPONSE - 'true' means the message is to be marked as a response
         message
-      </li>
-      <li>
       </li>
       <li>
         OUT_ONLY - 'true' means the message is to be marked as an out-only
         message that does not expect a response
       </li>
       <li>
-      </li>
-      <li>
         ERROR_CODE - this is set to any error message code encountered during a
         fault
-      </li>
-      <li>
       </li>
       <li>
         ERROR_MESSAGE - this is set to any error message text encountered during
         a fault
       </li>
       <li>
-      </li>
-      <li>
         ERROR_DETAIL - this is set to any error message detail text encountered
         during a fault
       </li>
       <li>
-      </li>
-      <li>
         ERROR_EXCEPTION - this is set to any Java Exception encountered during a
         fault
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -1250,23 +1235,12 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-      </li>
-      <li>
-        Sandesha2RMSpecVersion - can be '1.0' or '1.1'
-      </li>
-      <li>
-      </li>
-      <li>
-        Sandesha2SequenceKey - can be an identifier specifying an Sandesha
+        Mercury2SequenceKey - can be an identifier specifying an Mercury
         internal sequence key, and
       </li>
       <li>
-      </li>
-      <li>
-        Sandesha2LastMessage - 'true' will make this the last message and
+        Mercury2LastMessage - 'true' will make this the last message and
         terminate the sequence
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -1275,12 +1249,8 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         FORCE_HTTP_1.0 - forces outgoing http/s messages to use HTTP 1.0
         (instead of the default 1.1)
-      </li>
-      <li>
       </li>
     </ul>
     <h5>
@@ -1304,14 +1274,10 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         SYSTEM_DATE - Returns the current date as a String. Optionally a date
         format as per standard date format may be supplied. e.g.
         synapse:get-property(SYSTEM_DATE, "yyyy.MM.dd G 'at' HH:mm:ss z") or
         get-property(SYSTEM_DATE)
-      </li>
-      <li>
       </li>
       <li>
         SYSTEM_TIME - Returns the current time in milliseconds. (i.e. the
@@ -1319,23 +1285,15 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
         midnight, January 1, 1970 UTC)
       </li>
       <li>
-      </li>
-      <li>
         To, From, Action, FaultTo, ReplyTo, MessageID the message To and Action
         and WS-Addressing properties
-      </li>
-      <li>
       </li>
       <li>
         MESSAGE_FORMAT - returns the message format - i.e. returns pox, get,
         soap11 or soap12
       </li>
       <li>
-      </li>
-      <li>
         OperationName - returns the operation name for the message
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -1372,6 +1330,28 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       href="http://xerces.apache.org/xerces2-j/features.html">http://xerces.apache.org/xerces2-j/features.html</a>)
     </p>
     <p/>
+    <h4>
+      <a name="Callout" id="Callout">Callout</a>
+    </h4>
+<pre xml:space="preserve"> &lt;callout serviceURL="string" [action="string"]&gt;
+   &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+   &lt;source xpath="expression" | key="string"&gt;
+   &lt;target xpath="expression" | key="string"/&gt;
+ &lt;/callout&gt;
+</pre>
+    <p>
+      The &lt;callout&gt; mediator performs a blocking external service invocation during 
+      mediation. The serviceURL and the optional action specifies the parameters for this external
+      call. The source element specifies the payload for the request message using an XPath expression;
+      or a registry key that will be used. The target element specifies a node, at which the resulting
+      payload will be attached into the current message, or the name of a key/property using which
+      the response would be attached to the current message context as a property.
+    </p>
+    <p>As the callout mediator performs a blocking call, it cannot use the default non-blocking http/s
+      transports based on Java NIO, and thus defaults to using the samples/axis2Client/client_repo/conf/axis2.xml
+      as the Axis2 configuration, and samples/axis2Client/client_repo as the client repository unless
+      these are specified separately
+    </p>
     <h3>
       Transformation Mediators
     </h3>
@@ -1414,6 +1394,71 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       temporary files. Though this would be better in performance than using
       byte streams, sometimes it may not work for all transformations.
     </p>
+    <h4>
+      <a name="xquery" id="xquery">XQuery</a>
+    </h4>
+<pre xml:space="preserve">&lt;xquery key="string" [target="xpath"]&gt;
+    &lt;variable name="string" type="string" [key="string"] [expression="xpath"] [value="string"]/&gt;?
+&lt;/xquery&gt; </pre>
+    <p/>
+    <p>
+      The XQuery mediator can be used to perform an XQuery transformation. The
+      'key' attribute specifies the XQuery transformation, and the optional
+      'target' attribute specifies the node of the message that should be
+      transformed. This defaults to the first child of the SOAP body of the
+      payload. The 'variable' elements define a variable that could be bound to
+      the dynamic context of the XQuery engine in order to access those
+      variables through the XQuery script .
+    </p>
+    <p>
+      It is possible to specify just a literal 'value', or an XPath expression
+      over the payload, or even specify a registry key or a registry key
+      combined with an XPath expression that selects the variable. The name of
+      the variable corresponds to the name of variable declaration in the XQuery
+      script. The 'type' of the variable must be a valid type defined by the
+      JSR-000225 (XQJ API).
+    </p>
+    <p>
+      The supported types are:
+    </p>
+    <ul>
+      <li>
+        XQItemType.XQBASETYPE_INT -&gt; INT
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_BYTE - &gt; BYTE
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_SHORT -&gt; SHORT
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_LONG -&gt; LONG
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT
+      </li>
+      <li>
+        XQItemType.XQBASETYPE_STRING -&gt; STRING
+      </li>
+      <li>
+        XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT
+      </li>
+      <li>
+        XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT
+      </li>
+      <li>
+        XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT
+      </li>
+    </ul>
     <p/>
     <h4>
       <a name="header" id="header">Header</a>
@@ -1539,11 +1584,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         autocommit = true | false
-      </li>
-      <li>
       </li>
       <li>
         isolation = Connection.TRANSACTION_NONE |
@@ -1553,61 +1594,37 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
         Connection.TRANSACTION_SERIALIZABLE
       </li>
       <li>
-      </li>
-      <li>
         initialsize = int
-      </li>
-      <li>
       </li>
       <li>
         maxactive = int
       </li>
       <li>
-      </li>
-      <li>
         maxidle = int
-      </li>
-      <li>
       </li>
       <li>
         maxopenstatements = int
       </li>
       <li>
-      </li>
-      <li>
         maxwait = long
-      </li>
-      <li>
       </li>
       <li>
         minidle = int
       </li>
       <li>
-      </li>
-      <li>
         poolstatements = true | false
-      </li>
-      <li>
       </li>
       <li>
         testonborrow = true | false
       </li>
       <li>
-      </li>
-      <li>
         testonreturn = true | false
-      </li>
-      <li>
       </li>
       <li>
         testwhileidle = true | false
       </li>
       <li>
-      </li>
-      <li>
         validationquery = String
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -1656,25 +1673,6 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       Advanced Mediators
     </h3>
     <h4>
-      <a name="RMSequence" id="RMSequence">RMSequence</a>
-    </h4>
-<pre xml:space="preserve"> &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</pre>
-    <p>
-      The &lt;RMSequence&gt; mediator can be used to create a sequence of
-      messages to communicate via WS-Reliable Messaging with an WS-RM enabled
-      endpoint (&lt;enableRM&gt;). The simple use case of this mediator is to
-      specify a single="true" property, because this means that only one message
-      is involved in the same sequence. However if multiple messages should be
-      sent in the same sequence, the correlation property should be used with a
-      XPath expression that selects an unique element value from the incoming
-      message. With the result of the XPath expression, Synapse can group
-      messages together that belong to the same sequence. To close the sequence
-      neatly, for the last message of the sequence also an XPath expression
-      should be specified. With the version attribute the WS-RM specification
-      version to be used can be specified, 1.0 or 1.1.
-    </p>
-    <p/>
-    <h4>
       <a name="throttle" id="throttle">Throttle</a>
     </h4>
 <pre xml:space="preserve">&lt;throttle [onReject="string"] [onAccept="string"] id="string"&gt;
@@ -1697,97 +1695,6 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       inline sequences define how accepted and rejected messages are to be
       handled.
     </p>
-    <h4>
-      <a name="xquery" id="xquery">XQuery</a>
-    </h4>
-<pre xml:space="preserve">&lt;xquery key="string" [target="xpath"]&gt;
-    &lt;variable name="string" type="string" [key="string"] [expression="xpath"] [value="string"]/&gt;?
-&lt;/xquery&gt; </pre>
-    <p/>
-    <p>
-      The XQuery mediator can be used to perform an XQuery transformation. The
-      'key' attribute specifies the XQuery transformation, and the optional
-      'target' attribute specifies the node of the message that should be
-      transformed. This defaults to the first child of the SOAP body of the
-      payload. The 'variable' elements define a variable that could be bound to
-      the dynamic context of the XQuery engine in order to access those
-      variables through the XQuery script .
-    </p>
-    <p>
-      It is possible to specify just a literal 'value', or an XPath expression
-      over the payload, or even specify a registry key or a registry key
-      combined with an XPath expression that selects the variable. The name of
-      the variable corresponds to the name of variable declaration in the XQuery
-      script. The 'type' of the variable must be a valid type defined by the
-      JSR-000225 (XQJ API).
-    </p>
-    <p>
-      The supported types are:
-    </p>
-    <ul>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_INT -&gt; INT
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_BYTE - &gt; BYTE
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_SHORT -&gt; SHORT
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_LONG -&gt; LONG
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQBASETYPE_STRING -&gt; STRING
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT
-      </li>
-      <li>
-      </li>
-      <li>
-        XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT
-      </li>
-      <li>
-      </li>
-    </ul>
     <h4>
       <a name="cache" id="cache">Cache</a>
     </h4>
@@ -1819,6 +1726,9 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       define if the cache is disk or memory based, and the 'maxSize' attribute
       defines the maximum number of elements to be cached.
     </p>
+    <h3>
+      EIP Mediators
+    </h3>
     <h4>
       <a name="clone" id="clone">Clone</a>
     </h4>
@@ -2028,5 +1938,29 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       for it to act as a Mediator. The key will reference the Spring
       ApplicationContext/Configuration used for the bean
     </p>
+
+    <h3>
+      Other Mediators
+    </h3>
+        <h4>
+      <a name="RMSequence" id="RMSequence">RMSequence</a>
+    </h4>
+<pre xml:space="preserve"> &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</pre>
+    <p>
+      The &lt;RMSequence&gt; mediator can be used to create a sequence of
+      messages to communicate via WS-Reliable Messaging with an WS-RM enabled
+      endpoint (&lt;enableRM&gt;). The simple use case of this mediator is to
+      specify a single="true" property, because this means that only one message
+      is involved in the same sequence. However if multiple messages should be
+      sent in the same sequence, the correlation property should be used with a
+      XPath expression that selects an unique element value from the incoming
+      message. With the result of the XPath expression, Synapse can group
+      messages together that belong to the same sequence. To close the sequence
+      neatly, for the last message of the sequence also an XPath expression
+      should be specified. With the version attribute the WS-RM specification
+      version to be used can be specified, 1.0 or 1.1.
+    </p>
+    <p/>
+    <p/>
   </body>
 </document>  

@@ -33,7 +33,7 @@ import java.util.Iterator;
  * Creates an instance of a Cache mediator using XML configuration specified
  *
  * <pre>
- * &lt;cache id="string" [hashGenerator="class"] [timeout="seconds"]
+ * &lt;cache [id="string"] [hashGenerator="class"] [timeout="seconds"]
  *      [scope=(per-host | per-mediator)] collector=(true | false) [maxMessageSize="in-bytes"]&gt;
  *   &lt;onCacheHit [sequence="key"]&gt;
  *     (mediator)+

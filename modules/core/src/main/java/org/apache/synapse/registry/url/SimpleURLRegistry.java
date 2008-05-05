@@ -54,7 +54,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
     public OMNode lookup(String key) {
 
-        log.info("==> Repository fetch of resource with key : " + key);
+        log.debug("==> Repository fetch of resource with key : " + key);
 
         URL url = SynapseConfigUtils.getURLFromPath(root + key);
         if (url == null) {

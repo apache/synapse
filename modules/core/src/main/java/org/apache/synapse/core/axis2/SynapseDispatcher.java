@@ -44,12 +44,10 @@ public class SynapseDispatcher extends AbstractDispatcher {
 
     public AxisService findService(MessageContext mc) throws AxisFault {
         AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
-        AxisService as = ac.getService(SynapseConstants.SYNAPSE_SERVICE_NAME);
-        return as;
+        return ac.getService(SynapseConstants.SYNAPSE_SERVICE_NAME);
     }
 
     public AxisOperation findOperation(AxisService svc, MessageContext mc) throws AxisFault {
-        AxisOperation ao = svc.getOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
-        return ao;
+        return svc.getOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
     }
 }

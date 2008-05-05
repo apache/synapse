@@ -3755,7 +3755,7 @@ Transfer-Encoding: chunked
     <p>
       This example is functionally equivalent to sample # 350 and sample # 8,
       and demonstrates in-line script mediation in Synapse. Use the stock quote
-      client to send a custom quote as in example # 500 to test this example.
+      client to send a custom quote as in example # 350 to test this example.
     </p>
     <p/>
     <h2>
@@ -3860,11 +3860,11 @@ end
     </p>
     <p/>
     <p>
-      This sample is functionally equivalent to sample # 500 (#501 and #8) but
+      This sample is functionally equivalent to sample # 350 (#351 and #8) but
       instead uses a Ruby script using the JRuby interpreter. The script has two
       functions, 'transformRequest' and 'transformResponse', and the Synapse
       configuration specifies which function is to be invoked when used. Execute
-      the stock quote client to send a custom stock quote as per example #500
+      the stock quote client to send a custom stock quote as per example #350
       and check the received stock quote response.
     </p>
     <h2>

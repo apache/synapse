@@ -55,17 +55,18 @@ public class AnonymousServiceFactory {
     /**
      * Creates an AxisService for the requested QoS for sending out messages
      * Callers must guarantee that if wsRMon or wsSecOn is required, that wsAddrOn is also set
+     * @param synCfg Synapse configuration
      * @param axisCfg Axis2 configuration
-     * @param wsAddrOn
-     * @param wsRMOn
-     * @param wsSecOn
+     * @param wsAddrOn whether addressing is on or not
+     * @param wsRMOn whether RM is on ot not
+     * @param wsSecOn whether security is on or not
      * @return An Axis service for the requested QoS
      */
     public static AxisService getAnonymousService(SynapseConfiguration synCfg,
                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
                                                   boolean wsRMOn, boolean wsSecOn) {
 
-        String servicekey = null;
+        String servicekey;
         if (!wsAddrOn) {
             servicekey = NONE;
         } else {
@@ -123,7 +124,9 @@ public class AnonymousServiceFactory {
 
     /**
      * Create a new Anonymous Axis service for OUT-IN as default MEP
+     * @param synCfg the Synapse Configuration
      * @param axisCfg the Axis2 configuration
+     * @param serviceKey key for the service
      * @return an anonymous service named with the given QoS key
      */
     private static AxisService createAnonymousService(SynapseConfiguration synCfg,

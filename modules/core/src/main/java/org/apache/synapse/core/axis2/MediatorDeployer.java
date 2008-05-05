@@ -96,10 +96,10 @@ public class MediatorDeployer implements Deployer {
                     facSB.append((char) c);
                 }
 
-                String[] facClassName = facSB.toString().split("\n");
-                for (int i=0; i<facClassName.length; i++) {
-                    log.info("Registering the Mediator factory: " + facClassName[i]);
-                    Class facClass = urlCl.loadClass(facClassName[i]);
+                String[] facClassNames = facSB.toString().split("\n");
+                for (String facClassName : facClassNames) {
+                    log.info("Registering the Mediator factory: " + facClassName);
+                    Class facClass = urlCl.loadClass(facClassName);
                     MediatorFactory facInst = (MediatorFactory) facClass.newInstance();
                     MediatorFactoryFinder.getInstance()
                             .getFactoryMap().put(facInst.getTagQName(), facClass);
@@ -124,10 +124,10 @@ public class MediatorDeployer implements Deployer {
                     serSB.append((char) c);
                 }
 
-                String[] serClassName = serSB.toString().split("\n");
-                for (int i=0; i<serClassName.length; i++) {
-                    log.info("Registering the Mediator serializer: " + serClassName[i]);
-                    Class serClass = urlCl.loadClass(serClassName[i]);
+                String[] serClassNames = serSB.toString().split("\n");
+                for (String serClassName : serClassNames) {
+                    log.info("Registering the Mediator serializer: " + serClassName);
+                    Class serClass = urlCl.loadClass(serClassName);
                     MediatorSerializer serInst = (MediatorSerializer) serClass.newInstance();
                     MediatorSerializerFinder.getInstance()
                             .getSerializerMap().put(serInst.getMediatorClassName(), serInst);

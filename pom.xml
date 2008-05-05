@@ -300,6 +300,10 @@
                         <groupId>jaxen</groupId>
                         <artifactId>jaxen</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-api</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -311,6 +315,10 @@
                         <groupId>jaxen</groupId>
                         <artifactId>jaxen</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-api</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -321,6 +329,10 @@
                     <exclusion>
                         <groupId>jaxen</groupId>
                         <artifactId>jaxen</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -479,6 +491,10 @@
                 <exclusion>
                     <groupId>jaxen</groupId>
                     <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden-api</artifactId>
                 </exclusion>
             </exclusions>
             <type>mar</type>

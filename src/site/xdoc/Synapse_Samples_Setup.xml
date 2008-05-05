@@ -691,7 +691,8 @@ synapse.sh -sample &lt;n&gt;</pre>
       For Ruby support you need to download the 'jruby-complete.jar' from the
       Maven repository for JRuby, and copy it into the 'lib' folder of Synapse .
       The JRuby JAR can be downloaded from <a
-      href="http://repo1.maven.org/maven2/org/jruby/jruby-complete/">here</a>.
+      href="http://repo1.maven.org/maven2/org/jruby/jruby-complete/1.0.1/jruby-complete-1.0.1.jar">
+      here</a>.
     </p>
     <p/>
     <h2 id="derby">

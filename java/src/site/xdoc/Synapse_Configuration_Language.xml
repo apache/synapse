@@ -1276,8 +1276,8 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       <li>
         SYSTEM_DATE - Returns the current date as a String. Optionally a date
         format as per standard date format may be supplied. e.g.
-        synapse:get-property(SYSTEM_DATE, "yyyy.MM.dd G 'at' HH:mm:ss z") or
-        get-property(SYSTEM_DATE)
+        synapse:get-property("SYSTEM_DATE", "yyyy.MM.dd G 'at' HH:mm:ss z") or
+        get-property('SYSTEM_DATE')
       </li>
       <li>
         SYSTEM_TIME - Returns the current time in milliseconds. (i.e. the
@@ -1698,7 +1698,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     <h4>
       <a name="cache" id="cache">Cache</a>
     </h4>
-<pre xml:space="preserve"> &lt;cache id="string" [hashGenerator="class"] [timeout="seconds"] [scope=(per-host | per-mediator)]
+<pre xml:space="preserve"> &lt;cache [id="string"] [hashGenerator="class"] [timeout="seconds"] [scope=(per-host | per-mediator)]
      collector=(true | false) [maxMessageSize="in-bytes"]&gt;
    &lt;onCacheHit [sequence="key"]&gt;
      (mediator)+

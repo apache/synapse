@@ -23,4 +23,18 @@ public interface WorkerPool {
     public void execute(Runnable task);
     public int getActiveCount();
     public int getQueueSize();
+    
+    /**
+     * Destroy the worker pool. The pool will immediately stop
+     * accepting new tasks. All previously submitted tasks will
+     * be executed. The method blocks until all tasks have
+     * completed execution, or the timeout occurs, or the current
+     * thread is interrupted, whichever happens first.
+     * 
+     * @param timeout the timeout value in milliseconds
+     * @throws InterruptedException if the current thread was
+     *         interrupted while waiting for pending tasks to
+     *         finish execution
+     */
+    public void shutdown(int timeout) throws InterruptedException;
 }

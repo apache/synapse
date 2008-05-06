@@ -19,14 +19,11 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -51,41 +48,33 @@ public class FailoverEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         OMElement failoverElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
         if (failoverElement != null) {
 
             FailoverEndpoint failoverEndpoint = new FailoverEndpoint();
-
             // set endpoint name
             String name = epConfig.getAttributeValue(new QName("name"));
             if (name != null) {
                 failoverEndpoint.setName(name);
             }
-
-            // set endpoints
-            ArrayList endpoints = getEndpoints(failoverElement, failoverEndpoint);
-            failoverEndpoint.setEndpoints(endpoints);
-
+            // set endpoints and return
+            failoverEndpoint.setEndpoints(getEndpoints(failoverElement, failoverEndpoint));
             return failoverEndpoint;
         }
 
         return null;
     }
     
-    private ArrayList getEndpoints(OMElement failoverElement, Endpoint parent) {
+    private ArrayList<Endpoint> getEndpoints(OMElement failoverElement, Endpoint parent) {
 
-        ArrayList endpoints = new ArrayList();
-        Iterator iter = failoverElement.getChildrenWithName
-                (org.apache.synapse.config.xml.XMLConfigConstants.ENDPOINT_ELT);
+        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
+        Iterator iter = failoverElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {
-
             OMElement endptElem = (OMElement) iter.next();
-
-            EndpointFactory epFac = EndpointAbstractFactory.getEndpointFactory(endptElem);
-            Endpoint endpoint = epFac.createEndpoint(endptElem, true);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
             endpoint.setParentEndpoint(parent);
             endpoints.add(endpoint);
         }

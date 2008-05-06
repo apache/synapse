@@ -34,7 +34,7 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
  */
 public class AddressEndpointSerializer extends EndpointSerializer {
 
-    public OMElement serializeEndpoint(Endpoint endpoint) {
+    protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof AddressEndpoint)) {
             throw new SynapseException("Invalid endpoint type.");

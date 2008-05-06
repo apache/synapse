@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.Endpoint;
 
@@ -88,17 +87,10 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
 
         OMElement epElement = elem.getFirstChildWithName(ENDPOINT_Q);
         if (epElement != null) {
-            // get the factory for the element
             // create the endpoint and set it in the send medaitor
-
-            EndpointFactory fac = EndpointAbstractFactory.getEndpointFactory(epElement);
-            if (fac != null) {
-                Endpoint endpoint = fac.createEndpoint(epElement, true);
-                if (endpoint != null) {
-                    sm.setEndpoint(endpoint);
-                }
-            } else {
-                throw new SynapseException("Invalid endpoint fromat.");
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true);
+            if (endpoint != null) {
+                sm.setEndpoint(endpoint);
             }
         }
 

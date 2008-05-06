@@ -33,13 +33,14 @@ import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import java.util.Stack;
 
 /**
- * This class represents an actual endpoint to send the message. It is responsible for sending the
- * message, performing retries if a failure occurred and informing the parent endpoint if a failure
- * couldn't be recovered.
+ * This class represents an endpoint with epr as addressing to header of the message. It is
+ * responsible for sending the message to the epr specified in the message To header, performing
+ * retries if a failure occurred and informing the parent endpoint if a failure couldn't be
+ * recovered.
  */
-public class AddressEndpoint extends FaultHandler implements Endpoint {
+public class DefaultEndpoint extends FaultHandler implements Endpoint {
 
-    private static final Log log = LogFactory.getLog(AddressEndpoint.class);
+    private static final Log log = LogFactory.getLog(DefaultEndpoint.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
@@ -83,52 +84,25 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     }
 
     /**
-     * Checks if the endpoint is active (failed or not). If endpoint is in failed state and
-     * suspendOnFailDuration has elapsed, it will be set to active.
+     * This will always return true, because the endpoint epr is dependent on the message being
+     * processed
      *
-     * @param synMessageContext MessageContext of the current message. This is not used here.
-     * @return true if endpoint is active. false otherwise.
+     * @param synMessageContext not being used
+     * @return true 
      */
     public boolean isActive(MessageContext synMessageContext) {
-
-        boolean active = endpointContext.isActive();
-        if (!active) {
-
-            long recoverOn = endpointContext.getRecoverOn();
-            if (System.currentTimeMillis() > recoverOn) {
-                active = true;
-                endpointContext.setActive(true);
-                endpointContext.setRecoverOn(0);
-
-            }
-        }
-        return active;
+        return true;
     }
 
     /**
-     * Sets if endpoint active or not. if endpoint is set as failed (active = false), the recover on
-     * time is calculated so that it will be activated after the recover on time.
+     * since this is a virtual representation of an endpoint and the epr changes from message
+     * to message setting active state doesn't have a meaning
      *
-     * @param active            true if active. false otherwise.
-     * @param synMessageContext MessageContext of the current message. This is not used here.
+     * @param active not being used
+     * @param synMessageContext not being used
      */
     public synchronized void setActive(boolean active, MessageContext synMessageContext) {
-
-        // this is synchronized as recoverOn can be set to unpredictable values if two threads call
-        // this method simultaneously.
-
-        if (!active) {
-            if (endpoint.getSuspendOnFailDuration() != -1) {
-                // Calculating a new value by adding suspendOnFailDuration to current time.
-                // as the endpoint is set as failed
-                endpointContext.setRecoverOn(
-                        System.currentTimeMillis() + endpoint.getSuspendOnFailDuration());
-            } else {
-                endpointContext.setRecoverOn(Long.MAX_VALUE);
-            }
-        }
-
-        this.endpointContext.setActive(active);
+        // no implementation according to the behavior
     }
 
     /**
@@ -146,45 +120,16 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
 
         if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Address Endpoint");
+            traceOrDebug(traceOn, "Start : Default Endpoint");
 
             if (traceOn && trace.isTraceEnabled()) {
                 trace.trace("Message : " + synCtx.getEnvelope());
             }
         }
 
-        boolean isClusteringEnable = false;
-        // get Axis2 MessageContext and ConfigurationContext
-        org.apache.axis2.context.MessageContext axisMC =
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-        ConfigurationContext cc = axisMC.getConfigurationContext();
-
-        //The check for clustering environment
-
-        ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
-        if (clusterManager != null &&
-                clusterManager.getContextManager() != null) {
-            isClusteringEnable = true;
-        }
-
         String endPointName = this.getName();
         if (endPointName == null) {
-
-            if (traceOrDebugOn && isClusteringEnable) {
-                log.warn("In a clustering environment , the endpoint  name should be specified" +
-                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
-                        "functioned correctly if there are more than one anonymous endpoints. ");
-            }
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
-        }
-
-        if (isClusteringEnable) {
-
-            // if this is a cluster environment , then set configuration context to endpoint context
-            if (endpointContext.getConfigurationContext() == null) {
-                endpointContext.setConfigurationContext(cc);
-                endpointContext.setContextID(endPointName); // The context ID
-            }
         }
 
         // Setting Required property to collect the End Point statistics
@@ -208,10 +153,10 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             }
         }
 
-        if (endpoint.getAddress() != null) {
+        if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Sending message to endpoint : " +
-                        endPointName + " resolves to address = " + endpoint.getAddress());
+                        endPointName + " resolves to address = " + synCtx.getTo().getAddress());
                 traceOrDebug(traceOn, "SOAPAction: " + (synCtx.getSoapAction() != null ?
                         synCtx.getSoapAction() : "null"));
                 traceOrDebug(traceOn, "WSA-Action: " + (synCtx.getWSAAction() != null ?
@@ -243,9 +188,6 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     public void onFault(MessageContext synCtx) {
         // perform retries here
 
-        // if this endpoint has actually failed, inform the parent.
-        setActive(false, synCtx);
-
         if (parentEndpoint != null) {
             parentEndpoint.onChildEndpointFail(this, synCtx);
         } else {
@@ -264,10 +206,9 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
      * @return true if tracing should be performed
      */
     protected boolean isTraceOn(MessageContext msgCtx) {
-        return
-                (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
-                        (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
+        return (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
+                (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                        msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
     }
 
     /**

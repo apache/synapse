@@ -34,12 +34,12 @@ import java.util.List;
 
 /**
  * Load balance endpoint can have multiple endpoints. It will route messages according to the
- * specified load balancing algorithm. This will assume that all immediate child endpoints are identical
- * in state (state is replicated) or state is not maintained at those endpoints. If an endpoint is
- * failing, the failed endpoint is marked as inactive and the message to the next endpoint obtained
- * using the load balancing algorithm. If all the endpoints have failed and the parent endpoint is
- * available, onChildEndpointFail(...) method of parent endpoint is called. If parent is not
- * available, this will call next FaultHandler for the message context.
+ * specified load balancing algorithm. This will assume that all immediate child endpoints are
+ * identical in state (state is replicated) or state is not maintained at those endpoints. If an
+ * endpoint is failing, the failed endpoint is marked as inactive and the message to the next
+ * endpoint obtained using the load balancing algorithm. If all the endpoints have failed and the
+ * parent endpoint is available, onChildEndpointFail(...) method of parent endpoint is called. If
+ * parent is not available, this will call next FaultHandler for the message context.
  */
 public class LoadbalanceEndpoint implements Endpoint {
 
@@ -135,8 +135,8 @@ public class LoadbalanceEndpoint implements Endpoint {
         if (endpoint != null) {
 
             // We have to build the envelop if we are supporting failover.
-            // Failover should sent the original message multiple times if failures occur. So we have to
-            // access the envelop multiple times.
+            // Failover should sent the original message multiple times if failures occur. So we
+            // have to access the envelop multiple times.
             if (failover) {
                 synMessageContext.getEnvelope().build();
             }

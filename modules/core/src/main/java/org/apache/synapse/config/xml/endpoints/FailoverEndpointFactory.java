@@ -41,9 +41,7 @@ import java.util.Iterator;
  *    </failover>
  * </endpoint>
  */
-public class FailoverEndpointFactory implements EndpointFactory {
-
-    private static Log log = LogFactory.getLog(FailoverEndpointFactory.class);
+public class FailoverEndpointFactory extends EndpointFactory {
 
     private static FailoverEndpointFactory instance = new FailoverEndpointFactory();
 
@@ -102,15 +100,5 @@ public class FailoverEndpointFactory implements EndpointFactory {
         }
 
         return endpoints;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

@@ -37,11 +37,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 
-public class SALoadbalanceEndpointSerializer implements EndpointSerializer {
-
-    private static final Log log = LogFactory.getLog(SALoadbalanceEndpointSerializer.class);
-
-    private OMFactory fac = null;
+public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
 
     public OMElement serializeEndpoint(Endpoint endpoint) {
 
@@ -98,10 +94,5 @@ public class SALoadbalanceEndpointSerializer implements EndpointSerializer {
         }
 
         return endpointElement;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

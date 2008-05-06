@@ -19,49 +19,47 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.FailoverEndpoint;
-import org.apache.synapse.SynapseException;
+import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-
-import java.util.List;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.endpoints.DefaultEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
- * Serializes {@link FailoverEndpoint} to XML configuration.
+ * Serializes {@link DefaultEndpoint} to XML.
  *
- * &lt;endpoint [name="name"]&gt;
- *    &lt;failover&gt;
- *       &lt;endpoint&gt;+
- *    &lt;/failover&gt;
- * &lt;/endpoint&gt;
+ * @see DefaultEndpointFactory
  */
-public class FailoverEndpointSerializer extends EndpointSerializer {
+public class DefaultEndpointSerializer extends EndpointSerializer {
 
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
-        if (!(endpoint instanceof FailoverEndpoint)) {
+        if (!(endpoint instanceof DefaultEndpoint)) {
             throw new SynapseException("Invalid endpoint type.");
         }
 
-        FailoverEndpoint failoverEndpoint = (FailoverEndpoint) endpoint;
-
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement
+                = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
-        OMElement failoverElement = fac.createOMElement("failover", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        endpointElement.addChild(failoverElement);
-
-        String name = failoverEndpoint.getName();
+        DefaultEndpoint defaultEndpoint = (DefaultEndpoint) endpoint;
+        String name = defaultEndpoint.getName();
         if (name != null) {
             endpointElement.addAttribute("name", name, null);
         }
 
-        for (Endpoint childEndpoint : failoverEndpoint.getEndpoints()) {
-            failoverElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
-        }
+        EndpointDefinition epAddress = defaultEndpoint.getEndpoint();
+        OMElement defaultElement = serializeEndpointDefinition(epAddress);
+        endpointElement.addChild(defaultElement);
 
         return endpointElement;
+    }
+
+    public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {
+        OMElement element = fac.createOMElement("default", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        serializeQOSInformation(endpointDefinition, element);
+        return element;
     }
 }

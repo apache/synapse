@@ -61,7 +61,7 @@ public class WSDLEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         WSDLEndpoint wsdlEndpoint = new WSDLEndpoint();
         OMAttribute name = epConfig.getAttribute(new QName(
@@ -147,7 +147,7 @@ public class WSDLEndpointFactory extends EndpointFactory {
             
             if (endpoint != null) {
                 // for now, QOS information has to be provided explicitly.
-                extractQOSInformation(endpoint, wsdlElement);
+                extractEndpointProperties(endpoint, wsdlElement);
                 wsdlEndpoint.setEndpoint(endpoint);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");

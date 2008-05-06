@@ -34,7 +34,7 @@ import org.apache.synapse.SynapseConstants;
  */
 public class IndirectEndpointSerializer extends EndpointSerializer {
 
-    public OMElement serializeEndpoint(Endpoint endpoint) {
+    protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof IndirectEndpoint)) {
             throw new SynapseException("Invalid endpoint type.");

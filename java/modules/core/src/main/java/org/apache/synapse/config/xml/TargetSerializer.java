@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.mediators.eip.Target;
 
 /**
@@ -80,8 +80,7 @@ public class TargetSerializer {
         }
 
         if (target.getEndpoint() != null) {
-            targetElem.addChild(EndpointAbstractSerializer.getEndpointSerializer(
-                    target.getEndpoint()).serializeEndpoint(target.getEndpoint()));
+            targetElem.addChild(EndpointSerializer.getElementFromEndpoint(target.getEndpoint()));
         }
 
         return targetElem;

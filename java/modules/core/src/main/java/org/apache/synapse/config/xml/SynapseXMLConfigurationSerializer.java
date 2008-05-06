@@ -1,6 +1,5 @@
 package org.apache.synapse.config.xml;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,7 +18,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.Startup;
@@ -62,7 +61,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         }
 
         Map entries = new HashMap();
-        Map endpoints = new HashMap();
+        Map<String, Endpoint> endpoints = new HashMap<String, Endpoint>();
         Map sequences = new HashMap();
 
         iter = synCfg.getLocalRegistry().keySet().iterator();
@@ -72,7 +71,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
             if (o instanceof Mediator) {
                 sequences.put(key, o);
             } else if (o instanceof Endpoint) {
-                endpoints.put(key, o);
+                endpoints.put(key.toString(), (Endpoint) o);
             } else if (o instanceof Entry) {
                 entries.put(key, o);
             } else {
@@ -113,19 +112,9 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         }
     }
 
-    private static void serializeEndpoints(OMElement definitions, Map endpoints) {
-        Iterator iter = endpoints.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            Object o = endpoints.get(key);
-            if (o instanceof Endpoint) {
-                Endpoint endpoint = (Endpoint) o;
-                OMElement epElement = EndpointAbstractSerializer
-                        .getEndpointSerializer(endpoint).serializeEndpoint(
-                        endpoint);
-                definitions.addChild(epElement);
-            }
-
+    private static void serializeEndpoints(OMElement definitions, Map<String, Endpoint> endpoints) {
+        for (Endpoint endpoint: endpoints.values()) {
+            definitions.addChild(EndpointSerializer.getElementFromEndpoint(endpoint));
         }
     }
 

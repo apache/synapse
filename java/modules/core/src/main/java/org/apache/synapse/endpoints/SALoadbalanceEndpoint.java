@@ -45,16 +45,16 @@ import java.util.List;
  * session -> endpoint map. To update sessions for response messages, all SALoadbalanceEndpoint
  * objects are kept in a global property. When a message passes through SALoadbalanceEndpoints, each
  * endpoint appends its "Synapse unique ID" to the operation context. Once the response for that
- * message arrives, response sender checks first endpoint of the endpoint sequence from the operation
- * context and get that endpoint from the above mentioned global property. Then it will invoke
- * updateSession(...) method of that endpoint. After that, each endpoint will call updateSession(...)
- * method of their appropriate child endpoint, so that all the sending endpoints for the session will
- * be updated.
+ * message arrives, response sender checks first endpoint of the endpoint sequence from the
+ * operation context and get that endpoint from the above mentioned global property. Then it will
+ * invoke updateSession(...) method of that endpoint. After that, each endpoint will call
+ * updateSession(...) method of their appropriate child endpoint, so that all the sending endpoints
+ * for the session will be updated.
  * <p/>
  * This endpoint gets the target endpoint first from the dispatch manager, which will ask all listed
- * dispatchers for a matching session. If a matching session is found it will just invoke the send(...)
- * method of that endpoint. If not it will find an endpoint using the load balancing policy and send to
- * that endpoint.
+ * dispatchers for a matching session. If a matching session is found it will just invoke the
+ * send(...) method of that endpoint. If not it will find an endpoint using the load balancing
+ * policy and send to that endpoint.
  */
 public class SALoadbalanceEndpoint implements Endpoint {
 
@@ -78,7 +78,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
      * List of endpoints among which the load is distributed. Any object implementing the Endpoint
      * interface could be used.
      */
-    private List endpoints = null;
+    private List<Endpoint> endpoints = null;
 
     /**
      * Algorithm used for selecting the next endpoint to direct the first request of sessions.
@@ -117,7 +117,6 @@ public class SALoadbalanceEndpoint implements Endpoint {
 
     public void send(MessageContext synMessageContext) {
 
-        Endpoint endpoint = null;
         if (log.isDebugEnabled()) {
             log.debug("Start : Session Affinity Load-balance Endpoint");
         }
@@ -169,7 +168,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
 
         // first check if this session is associated with a session. if so, get the endpoint
         // associated for that session.
-        endpoint = dispatcher.getEndpoint(synMessageContext, dispatcherContext);
+        Endpoint endpoint = dispatcher.getEndpoint(synMessageContext, dispatcherContext);
         if (endpoint == null) {
 
             // there is no endpoint associated with this session. get a new endpoint using the
@@ -229,7 +228,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
                 Object o = opCtx.getProperty(ENDPOINT_LIST);
 
                 if (o != null) {
-                    List endpointList = (List) o;
+                    List<Endpoint> endpointList = (List<Endpoint>) o;
                     endpointList.add(this);
 
                     // if the next endpoint is not a session affinity one, endpoint sequence ends
@@ -292,8 +291,11 @@ public class SALoadbalanceEndpoint implements Endpoint {
      *
      * @param responseMsgCtx
      * @param endpointList
+     * @param isClusteringEnable
      */
-    public void updateSession(MessageContext responseMsgCtx, List endpointList, boolean isClusteringEnable) {
+    public void updateSession(MessageContext responseMsgCtx, List endpointList,
+        boolean isClusteringEnable) {
+
         Endpoint endpoint = null;
 
         if (isClusteringEnable) {
@@ -362,11 +364,11 @@ public class SALoadbalanceEndpoint implements Endpoint {
         endpointContext.setActive(active);
     }
 
-    public List getEndpoints() {
+    public List<Endpoint> getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints) {
+    public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
     }
 

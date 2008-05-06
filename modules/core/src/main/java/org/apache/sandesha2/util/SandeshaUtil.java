@@ -463,7 +463,7 @@ public class SandeshaUtil {
 	
 	public static void assertProofOfPossession(RMSequenceBean bean, MessageContext context, OMElement elementToCheck)throws SandeshaException{
 		if (log.isDebugEnabled()) 
-			log.debug("Enter: SandeshaUtil::assertProofOfPossession :" + bean + ", " + context + ", " + elementToCheck);
+			log.debug("Enter: SandeshaUtil::assertProofOfPossession :" + bean + ", " + context + ", " + elementToCheck.getQName());
 		
 		String tokenData = null;
 		if(bean!=null){

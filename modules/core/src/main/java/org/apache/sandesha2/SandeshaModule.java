@@ -258,12 +258,15 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			while(ops.hasNext()) {
 				AxisOperation op = (AxisOperation) ops.next();
 				if (log.isDebugEnabled()) log.debug("Examining operation " + op.getName() + ", mep " + op.getMessageExchangePattern());
-
+		
 				String name = null;
 				QName qName = op.getName();
 				if(qName != null) name = qName.getLocalPart();
-				if((name != null && name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)))
-					continue;
+				
+				//Check to see if the operation is a sandesha defined one or an axis2 defined one
+				if((name != null) && (name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX) || 
+						qName.getNamespaceURI().equals(org.apache.axis2.namespace.Constants.AXIS2_NAMESPACE_URI)))
+					continue;	
 
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
@@ -280,7 +283,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			String name = null;
 			QName qName = op.getName();
 			if(qName != null) name = qName.getLocalPart();
-			if((name != null && !name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX))) {
+			//Check to see if the operation is a sandesha defined one or an axis2 defined one
+			if(name != null && (!name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX) || 
+					!qName.getNamespaceURI().equals(org.apache.axis2.namespace.Constants.AXIS2_NAMESPACE_URI))) {
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
 				if(op.getAxisSpecificMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {

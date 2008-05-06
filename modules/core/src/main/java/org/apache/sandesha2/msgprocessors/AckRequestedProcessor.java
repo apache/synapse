@@ -190,7 +190,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			
 			try {
 				AxisEngine.send(ackMsgCtx);
-				TransportUtils.setResponseWritten(ackMsgCtx, true);
+				TransportUtils.setResponseWritten(rmMsgCtx.getMessageContext(), true);
 			} catch (AxisFault e1) {
 				throw new SandeshaException(e1.getMessage());
 			}
@@ -254,13 +254,12 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			// inserting the new Ack.
 			senderBeanMgr.insert(ackBean);
 
-			msgContext.pause();
-
-			if (log.isDebugEnabled())
-				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader " + Boolean.TRUE);
-			
+			msgContext.pause();			
 		}
 		
+		if (log.isDebugEnabled())
+			log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader " + Boolean.FALSE);
+
 		//No need to suspend. Just proceed.
 		return false;
 	}

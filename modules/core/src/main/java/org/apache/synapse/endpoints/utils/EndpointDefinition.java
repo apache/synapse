@@ -110,6 +110,13 @@ public class EndpointDefinition {
     private int timeoutAction = SynapseConstants.NONE;
 
     /**
+     * Leaf level endpoints will be suspended for the specified time by this variable, after a
+     * failure. If this is not explicitly set, it is set to -1, which causes endpoints to
+     * suspended forever.
+     */
+    private long suspendOnFailDuration = -1;
+
+    /**
      * To decide to whether statistics should have collected or not
      */
     private int statisticsState = SynapseConstants.STATISTICS_UNSET;
@@ -333,8 +340,8 @@ public class EndpointDefinition {
 
     /**
      * Get the charset encoding for messages sent to the endpoint.
-     * 
-     * @param charSetEncoding
+     *
+     * @return charSetEncoding
      */
     public String getCharSetEncoding() {
         return charSetEncoding;
@@ -347,6 +354,24 @@ public class EndpointDefinition {
      */
     public void setCharSetEncoding(String charSetEncoding) {
         this.charSetEncoding = charSetEncoding;
+    }
+
+    /**
+     * Get the suspend on fail duration.
+     *
+     * @return suspendOnFailDuration
+     */
+    public long getSuspendOnFailDuration() {
+        return suspendOnFailDuration;
+    }
+
+    /**
+     * Set the suspend on fail duration.
+     *
+     * @param suspendOnFailDuration a duration in milliseconds
+     */
+    public void setSuspendOnFailDuration(long suspendOnFailDuration) {
+        this.suspendOnFailDuration = suspendOnFailDuration;
     }
 
     /**

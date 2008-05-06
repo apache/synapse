@@ -69,9 +69,8 @@ public class AddressEndpointFactory extends EndpointFactory {
     public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         AddressEndpoint addressEndpoint = new AddressEndpoint();
-
-        OMAttribute name
-                = epConfig.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        OMAttribute name = epConfig.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
 
         if (name != null) {
             addressEndpoint.setName(name.getAttributeValue());
@@ -79,30 +78,9 @@ public class AddressEndpointFactory extends EndpointFactory {
 
         OMElement addressElement = epConfig.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
-
         if (addressElement != null) {
             EndpointDefinition endpoint = createEndpointDefinition(addressElement);
             addressEndpoint.setEndpoint(endpoint);
-
-            // set the suspend on fail duration.
-            OMElement suspendElement = addressElement.getFirstChildWithName(new QName(
-                    SynapseConstants.SYNAPSE_NAMESPACE,
-                    org.apache.synapse.config.xml.XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE));
-
-            if (suspendElement != null) {
-                String suspend = suspendElement.getText();
-
-                try {
-                    if (suspend != null) {
-                        long suspendDuration = Long.parseLong(suspend.trim());
-                        addressEndpoint.setSuspendOnFailDuration(suspendDuration * 1000);
-                    }
-
-                } catch (NumberFormatException e) {
-                    handleException("The suspend duration should be specified as a valid number :: "
-                        + e.getMessage(), e);
-                }
-            }
         }
 
         return addressEndpoint;
@@ -119,7 +97,6 @@ public class AddressEndpointFactory extends EndpointFactory {
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
 
         OMAttribute address = elem.getAttribute(new QName("uri"));
-
         EndpointDefinition endpointDefinition = new EndpointDefinition();
 
         if (address != null) {
@@ -127,7 +104,6 @@ public class AddressEndpointFactory extends EndpointFactory {
         }
 
         extractQOSInformation(endpointDefinition, elem);
-
         return endpointDefinition;
     }
 }

@@ -243,6 +243,20 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 }
             }
         }
+
+        // set the suspend on fail duration.
+        OMElement suspendElement = elem.getFirstChildWithName(new QName(
+                SynapseConstants.SYNAPSE_NAMESPACE,
+                XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE));
+        if (suspendElement != null && suspendElement.getText() != null) {
+            try {
+                long suspendDuration = Long.parseLong(suspendElement.getText().trim());
+                endpointDefinition.setSuspendOnFailDuration(suspendDuration * 1000);
+            } catch (NumberFormatException e) {
+                handleException("The suspend duration should be specified as a valid number :: "
+                        + e.getMessage(), e);
+            }
+        }
     }
 
     protected static void handleException(String msg) {

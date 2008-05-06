@@ -30,13 +30,13 @@ import org.apache.synapse.SynapseConstants;
 import java.util.List;
 
 /**
- * Serializes FailoverEndpoint to XML configuration.
+ * Serializes {@link FailoverEndpoint} to XML configuration.
  *
- * <endpoint [name="name"]>
- *    <failover>
- *       <endpoint>+
- *    </failover>
- * </endpoint>
+ * &lt;endpoint [name="name"]&gt;
+ *    &lt;failover&gt;
+ *       &lt;endpoint&gt;+
+ *    &lt;/failover&gt;
+ * &lt;/endpoint&gt;
  */
 public class FailoverEndpointSerializer extends EndpointSerializer {
 

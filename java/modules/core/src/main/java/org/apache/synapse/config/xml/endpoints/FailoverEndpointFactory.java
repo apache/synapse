@@ -33,13 +33,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Creates FailoverEndpoint using a XML configuration.
+ * Creates {@link FailoverEndpoint} using a XML configuration.
  *
- * <endpoint [name="name"]>
- *    <failover>
- *       <endpoint>+
- *    </failover>
- * </endpoint>
+ * &lt;endpoint [name="name"]&gt;
+ *    &lt;failover&gt;
+ *       &lt;endpoint&gt;+
+ *    &lt;/failover&gt;
+ * &lt;/endpoint&gt;
  */
 public class FailoverEndpointFactory extends EndpointFactory {
 

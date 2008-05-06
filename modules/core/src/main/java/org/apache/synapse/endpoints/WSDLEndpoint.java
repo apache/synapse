@@ -53,12 +53,6 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     private String serviceName;
     private String portName;
 
-    /**
-     * Leaf level endpoints will be suspended for the specified time by this variable, after a
-     * failure. If this is not explicitly set, it is set to -1, which causes endpoints to suspended forever.
-     */
-    private long suspendOnFailDuration = -1;
-
     private Endpoint parentEndpoint = null;
     private EndpointDefinition endpoint = null;
 
@@ -200,14 +194,6 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         this.name = name.trim();
     }
 
-    public long getSuspendOnFailDuration() {
-        return suspendOnFailDuration;
-    }
-
-    public void setSuspendOnFailDuration(long suspendOnFailDuration) {
-        this.suspendOnFailDuration = suspendOnFailDuration;
-    }
-
     public String getWsdlURI() {
         return wsdlURI;
     }
@@ -269,10 +255,11 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     public void setActive(boolean active, MessageContext synMessageContext) {
 
         if (!active) {
-            if (suspendOnFailDuration != -1) {
+            if (endpoint.getSuspendOnFailDuration() != -1) {
                 // Calculating a new value by adding suspendOnFailDuration to current time.
                 // as the endpoint is set as failed
-                endpointContext.setRecoverOn(System.currentTimeMillis() + suspendOnFailDuration);
+                endpointContext.setRecoverOn(
+                        System.currentTimeMillis() + endpoint.getSuspendOnFailDuration());
             } else {
                 endpointContext.setRecoverOn(Long.MAX_VALUE);
             }

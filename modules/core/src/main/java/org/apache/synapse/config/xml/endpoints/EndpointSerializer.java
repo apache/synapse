@@ -160,6 +160,17 @@ public abstract class EndpointSerializer {
             }
             timeout.addChild(action);
         }
+
+        long suspendDuration = endpointDefinition.getSuspendOnFailDuration();
+        if (suspendDuration != -1) {
+            // user has set some value for this. let's serialize it.
+            OMElement suspendElement = fac.createOMElement(
+                    org.apache.synapse.config.xml.XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE,
+                    SynapseConstants.SYNAPSE_OMNAMESPACE);
+
+            suspendElement.setText(Long.toString(suspendDuration / 1000));
+            element.addChild(suspendElement);
+        }
     }
 
     protected void handleException(String message) {

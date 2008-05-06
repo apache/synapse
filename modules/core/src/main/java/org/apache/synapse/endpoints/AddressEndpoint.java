@@ -61,12 +61,6 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     private Endpoint parentEndpoint = null;
 
     /**
-     * Leaf level endpoints will be suspended for the specified time by this variable, after a
-     * failure. If this is not explicitly set, it is set to -1, which causes endpoints to suspended forever.
-     */
-    private long suspendOnFailDuration = -1;
-
-    /**
      * The endpoint context , place holder for keep any runtime states related to the endpoint
      */
     private final EndpointContext endpointContext = new EndpointContext();
@@ -124,10 +118,11 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         // this method simultaneously.
 
         if (!active) {
-            if (suspendOnFailDuration != -1) {
+            if (endpoint.getSuspendOnFailDuration() != -1) {
                 // Calculating a new value by adding suspendOnFailDuration to current time.
                 // as the endpoint is set as failed
-                endpointContext.setRecoverOn(System.currentTimeMillis() + suspendOnFailDuration);
+                endpointContext.setRecoverOn(
+                        System.currentTimeMillis() + endpoint.getSuspendOnFailDuration());
             } else {
                 endpointContext.setRecoverOn(Long.MAX_VALUE);
             }
@@ -242,19 +237,6 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
     public void setParentEndpoint(Endpoint parentEndpoint) {
         this.parentEndpoint = parentEndpoint;
-    }
-
-    public long getSuspendOnFailDuration() {
-        return suspendOnFailDuration;
-    }
-
-    /**
-     * Set the suspend on fail duration.
-     * 
-     * @param suspendOnFailDuration a duration in milliseconds
-     */
-    public void setSuspendOnFailDuration(long suspendOnFailDuration) {
-        this.suspendOnFailDuration = suspendOnFailDuration;
     }
 
     public void onFault(MessageContext synCtx) {

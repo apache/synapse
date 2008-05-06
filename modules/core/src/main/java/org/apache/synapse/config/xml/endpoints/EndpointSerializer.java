@@ -49,8 +49,26 @@ public abstract class EndpointSerializer {
      */
     public abstract OMElement serializeEndpoint(Endpoint endpoint);
 
+    /**
+     * Serializes the QoS infomation of the endpoint to the XML element
+     *
+     * @param endpointDefinition specifies the QoS information of the endpoint
+     * @param element to which the QoS information will be serialized
+     */
     protected void serializeQOSInformation(
-        EndpointDefinition endpointDefinition, OMElement element) {
+            EndpointDefinition endpointDefinition, OMElement element) {
+
+        int statisticsState = endpointDefinition.getStatisticsState();
+        String statisticsValue = null;
+        if (statisticsState == SynapseConstants.STATISTICS_ON) {
+            statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
+        } else if (statisticsState == SynapseConstants.STATISTICS_OFF) {
+            statisticsValue = XMLConfigConstants.STATISTICS_DISABLE;
+        }
+        if (statisticsValue != null) {
+            element.addAttribute(fac.createOMAttribute(
+                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
+        }
 
         if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
             element.addAttribute(fac.createOMAttribute("format", null, "pox"));
@@ -72,33 +90,35 @@ public abstract class EndpointSerializer {
             element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         }
 
-        int isEnableStatistics = endpointDefinition.getStatisticsState();
-        String statisticsValue = null;
-        if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
-            statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE;
-        } else if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_OFF) {
-            statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE;
+        if (endpointDefinition.isUseSwa()) {
+            element.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
+        } else if (endpointDefinition.isUseMTOM()) {
+            element.addAttribute(fac.createOMAttribute("optimize", null, "mtom"));
         }
-        if (statisticsValue != null) {
+
+        if (endpointDefinition.getCharSetEncoding() != null) {
             element.addAttribute(fac.createOMAttribute(
-                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
+                    "encoding", null, endpointDefinition.getCharSetEncoding()));
         }
+        
         if (endpointDefinition.isAddressingOn()) {
             OMElement addressing = fac.createOMElement(
                     "enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
+
             if (endpointDefinition.getAddressingVersion() != null) {
                 addressing.addAttribute(fac.createOMAttribute(
                         "version", null, endpointDefinition.getAddressingVersion()));
             }
+            
             if (endpointDefinition.isUseSeparateListener()) {
-                addressing.addAttribute(fac.createOMAttribute(
-                        "separateListener", null, "true"));
+                addressing.addAttribute(fac.createOMAttribute("separateListener", null, "true"));
             }
             element.addChild(addressing);
         }
 
         if (endpointDefinition.isReliableMessagingOn()) {
             OMElement rm = fac.createOMElement("enableRM", SynapseConstants.SYNAPSE_OMNAMESPACE);
+
             if (endpointDefinition.getWsRMPolicyKey() != null) {
                 rm.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsRMPolicyKey()));
@@ -108,6 +128,7 @@ public abstract class EndpointSerializer {
 
         if (endpointDefinition.isSecurityOn()) {
             OMElement sec = fac.createOMElement("enableSec", SynapseConstants.SYNAPSE_OMNAMESPACE);
+
             if (endpointDefinition.getWsSecPolicyKey() != null) {
                 sec.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsSecPolicyKey()));
@@ -116,6 +137,7 @@ public abstract class EndpointSerializer {
         }
 
         if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {
+
             OMElement timeout = fac.createOMElement(
                     "timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
             element.addChild(timeout);

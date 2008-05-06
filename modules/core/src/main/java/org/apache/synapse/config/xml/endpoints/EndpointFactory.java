@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -57,6 +58,15 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return Endpoint implementation for the given configuration.
      */
     public abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint);
+    
+    public Object getObjectFromOMNode(OMNode om) {
+        if (om instanceof OMElement) {
+            return createEndpoint((OMElement) om, false);
+        } else {
+            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
+        }
+        return null;
+    }
 
     /**
      * Extracts the QoS information from the XML which represents a WSDL/Address/Default endpoints
@@ -72,6 +82,32 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "optimize"));
         OMAttribute encoding
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "encoding"));
+
+        OMAttribute statistics = elem.getAttribute(new QName(
+                XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+        if (statistics != null && statistics.getAttributeValue() != null) {
+            String statisticsValue = statistics.getAttributeValue();
+            if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                endpointDefinition.setStatisticsState(SynapseConstants.STATISTICS_ON);
+            } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
+                endpointDefinition.setStatisticsState(SynapseConstants.STATISTICS_OFF);
+            }
+        } else {
+            endpointDefinition.setStatisticsState(SynapseConstants.STATISTICS_UNSET);
+        }
+
+        OMAttribute trace = elem.getAttribute(new QName(
+                XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
+        if (trace != null && trace.getAttributeValue() != null) {
+            String traceValue = trace.getAttributeValue();
+            if (XMLConfigConstants.TRACE_ENABLE.equals(traceValue)) {
+                endpointDefinition.setTraceState(SynapseConstants.TRACING_ON);
+            } else if (XMLConfigConstants.TRACE_DISABLE.equals(traceValue)) {
+                endpointDefinition.setTraceState(SynapseConstants.TRACING_OFF);
+            }
+        } else {
+            endpointDefinition.setTraceState(SynapseConstants.TRACING_UNSET);
+        }
 
         if (format != null) {
             String forceValue = format.getAttributeValue().trim().toLowerCase();

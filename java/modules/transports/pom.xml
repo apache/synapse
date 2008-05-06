@@ -67,6 +67,7 @@
                                 <exclude>**/VFSEchoRawXMLTest.java</exclude>
                                 <exclude>**/MailEchoRawXMLTest.java</exclude>
                                 <exclude>**/AbstractTransportTest.java</exclude>
+                                <exclude>org/apache/synapse/transport/mail/Test*.java</exclude>                                
                             </excludes>
                         </configuration>
                     </plugin>

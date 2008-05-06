@@ -77,18 +77,6 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
             wsdlElement.addChild(wsdlDoc);
         }
 
-        long suspendDuration = wsdlEndpoint.getSuspendOnFailDuration();
-        if (suspendDuration != -1) {
-            // user has set some value for this. let's serialize it.
-
-            OMElement suspendElement = fac.createOMElement(
-                    org.apache.synapse.config.xml.XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE,
-                    SynapseConstants.SYNAPSE_OMNAMESPACE);
-
-            suspendElement.setText(Long.toString(suspendDuration / 1000));
-            wsdlElement.addChild(suspendElement);
-        }
-
         // currently, we have to get QOS information from the endpoint definition and set them as
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.

@@ -64,7 +64,6 @@ public class WSDLEndpointFactory extends EndpointFactory {
     public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         WSDLEndpoint wsdlEndpoint = new WSDLEndpoint();
-
         OMAttribute name = epConfig.getAttribute(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
@@ -74,36 +73,14 @@ public class WSDLEndpointFactory extends EndpointFactory {
 
         OMElement wsdlElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
-
         if (wsdlElement != null) {
-
-            // set the suspend on fail duration.
-            OMElement suspendElement = wsdlElement.getFirstChildWithName(new QName(
-                    SynapseConstants.SYNAPSE_NAMESPACE,
-                    org.apache.synapse.config.xml.XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE));
-
-            if (suspendElement != null) {
-                String suspend = suspendElement.getText();
-
-                try {
-                    if (suspend != null) {
-                        long suspendDuration = Long.parseLong(suspend.trim());
-                        wsdlEndpoint.setSuspendOnFailDuration(suspendDuration * 1000);
-                    }
-
-                } catch (NumberFormatException e) {
-                    handleException("suspendDurationOnFailure should be valid number.");
-                }
-            }
 
             EndpointDefinition endpoint = null;
 
             // get the service name and port name. at this point we should not worry about
             // the presence of those parameters. they are handled by corresponding WSDL builders.
             String serviceName = wsdlElement.getAttributeValue(new QName("service"));
-
             String portName = wsdlElement.getAttributeValue(new QName("port"));
-
             // check if wsdl is supplied as a URI
             String wsdlURI = wsdlElement.getAttributeValue(new QName("uri"));
 
@@ -167,6 +144,7 @@ public class WSDLEndpointFactory extends EndpointFactory {
                 wsdlEndpoint.setWsdlDoc(descriptionElement);
                 handleException("WSDL 2.0 Endpoints are currently not supported.");
             }
+            
             if (endpoint != null) {
                 // for now, QOS information has to be provided explicitly.
                 extractQOSInformation(endpoint, wsdlElement);
@@ -178,5 +156,5 @@ public class WSDLEndpointFactory extends EndpointFactory {
 
         return wsdlEndpoint;
     }
-    
+
 }

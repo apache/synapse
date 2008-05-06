@@ -19,26 +19,26 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
 
 import java.util.List;
 
 /**
- * Serializes LoadbalanceEndpoint to an XML configuration.
+ * Serializes {@link LoadbalanceEndpoint} to an XML configuration.
  *
- * <endpoint [name="name"]>
- *    <loadbalance policy="load balance algorithm">
- *       <endpoint>+
- *    </loadbalance>
- * </endpoint>
+ * &lt;endpoint [name="name"]&gt;
+ *    &lt;loadbalance policy="load balance algorithm"&gt;
+ *       &lt;endpoint&gt;+
+ *    &lt;/loadbalance&gt;
+ * &lt;/endpoint&gt;
  */
 public class LoadbalanceEndpointSerializer extends EndpointSerializer {
 
@@ -49,7 +49,8 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement
+                = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         LoadbalanceEndpoint loadbalanceEndpoint = (LoadbalanceEndpoint) endpoint;
 
@@ -58,7 +59,8 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        OMElement loadbalanceElement = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        OMElement loadbalanceElement
+                = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(loadbalanceElement);
 
         LoadbalanceAlgorithm algorithm = loadbalanceEndpoint.getAlgorithm();
@@ -66,17 +68,15 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
         if (algorithm instanceof RoundRobin) {
              algorithmName = "roundRobin";
         }
-        loadbalanceElement.addAttribute
-                (org.apache.synapse.config.xml.XMLConfigConstants.ALGORITHM_NAME, algorithmName, null);
+        loadbalanceElement.addAttribute(XMLConfigConstants.ALGORITHM_NAME, algorithmName, null);
 
         // set if failover is turned off in the endpoint
         if (!loadbalanceEndpoint.isFailover()) {
             loadbalanceElement.addAttribute("failover", "false", null);
         }
 
-        List endpoints = loadbalanceEndpoint.getEndpoints();
-        for (int i = 0; i < endpoints.size(); i++) {
-            Endpoint childEndpoint = (Endpoint) endpoints.get(i);
+        List<Endpoint> endpoints = loadbalanceEndpoint.getEndpoints();
+        for (Endpoint childEndpoint : endpoints) {
             EndpointSerializer serializer = EndpointAbstractSerializer.
                     getEndpointSerializer(childEndpoint);
             OMElement aeElement = serializer.serializeEndpoint(childEndpoint);

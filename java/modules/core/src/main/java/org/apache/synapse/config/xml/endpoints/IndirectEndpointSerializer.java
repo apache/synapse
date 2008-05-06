@@ -28,9 +28,9 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 
 /**
- * Serializes an IndirectEndpoint to an XML configuration.
+ * Serializes an {@link IndirectEndpoint} to an XML configuration.
  *
- * <endpoint key="key" />
+ * &lt;endpoint key="key"/&gt;
  */
 public class IndirectEndpointSerializer extends EndpointSerializer {
 

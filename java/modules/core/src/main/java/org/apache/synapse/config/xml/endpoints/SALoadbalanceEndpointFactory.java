@@ -40,14 +40,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Creates SALoadbalanceEndpoint from a XML configuration.
+ * Creates {@link SALoadbalanceEndpoint} from a XML configuration.
  *
- * <endpoint [name="name"]>
- *    <session type="soap | ..other session types.." />
- *    <loadbalance policy="policy">
- *       <endpoint>+
- *    </loadbalance>
- * </endpoint>
+ * &lt;endpoint [name="name"]&gt;
+ *    &lt;session type="soap | ..other session types.." /&gt;
+ *    &lt;loadbalance policy="policy"&gt;
+ *       &lt;endpoint&gt;+
+ *    &lt;/loadbalance&gt;
+ * &lt;/endpoint&gt;
  */
 public class SALoadbalanceEndpointFactory extends EndpointFactory {
 

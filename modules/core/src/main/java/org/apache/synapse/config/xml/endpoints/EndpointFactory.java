@@ -34,8 +34,8 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import javax.xml.namespace.QName;
 
 /**
- * All endpoint factories should implement this interface. Use EndpointAbstractFactory to obtain the
- * correct endpoint factory for particular endpoint configuration. As endpoints can be nested inside
+ * All endpoint factories should implement this interface. Use EndpointFactory to obtain the
+ * correct endpoint for particular endpoint configuration. As endpoints can be nested inside
  * each other, EndpointFactory implementations may call other EndpointFactory implementations
  * recursively to obtain the required endpoint hierarchy.
  *
@@ -48,17 +48,23 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     private static Log log = LogFactory.getLog(EndpointFactory.class);
 
     /**
-     * Creates the Endpoint implementation for the given XML endpoint configuration. If the endpoint
-     * configuration is an inline one, it should be an anonymous endpoint. If it is defined as an
-     * immediate child element of the definitions tag it should have a name, which is used as the
-     * key in local registry.
-     *
-     * @param epConfig OMElement conatining the endpoint configuration.
-     * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
-     * @return Endpoint implementation for the given configuration.
+     * Core method which is exposed for the external use, and this will find the proper
+     * {@link EndpointFactory} and create the endpoint which is of the format {@link Endpoint}.
+     * 
+     * @param elem XML from which the endpoint will be built
+     * @param isAnonymous whether this is an anonymous endpoint or not
+     * @return created endpoint
      */
-    public abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint);
-    
+    public static Endpoint getEndpointFromElement(OMElement elem, boolean isAnonymous) {
+        return getEndpointFactory(elem).createEndpoint(elem, isAnonymous);
+    }
+
+    /**
+     * Creates the {@link Endpoint} object from the provided {@link OMNode}
+     *
+     * @param om XML node from which the endpoint will be built
+     * @return created endpoint as an {@link Object}
+     */
     public Object getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
             return createEndpoint((OMElement) om, false);
@@ -69,12 +75,24 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     }
 
     /**
+     * Creates the Endpoint implementation for the given XML endpoint configuration. If the endpoint
+     * configuration is an inline one, it should be an anonymous endpoint. If it is defined as an
+     * immediate child element of the definitions tag it should have a name, which is used as the
+     * key in local registry.
+     *
+     * @param epConfig OMElement conatining the endpoint configuration.
+     * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
+     * @return Endpoint implementation for the given configuration.
+     */
+    protected abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint);
+
+    /**
      * Extracts the QoS information from the XML which represents a WSDL/Address/Default endpoints
      *
-     * @param endpointDefinition to be filled with the extracted information
+     * @param definition to be filled with the extracted information
      * @param elem XML which represents the endpoint with QoS information
      */
-    protected void extractQOSInformation(EndpointDefinition endpointDefinition, OMElement elem) {
+    protected void extractEndpointProperties(EndpointDefinition definition, OMElement elem) {
 
         OMAttribute format
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "format"));
@@ -88,12 +106,12 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         if (statistics != null && statistics.getAttributeValue() != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                endpointDefinition.setStatisticsState(SynapseConstants.STATISTICS_ON);
+                definition.setStatisticsState(SynapseConstants.STATISTICS_ON);
             } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                endpointDefinition.setStatisticsState(SynapseConstants.STATISTICS_OFF);
+                definition.setStatisticsState(SynapseConstants.STATISTICS_OFF);
             }
         } else {
-            endpointDefinition.setStatisticsState(SynapseConstants.STATISTICS_UNSET);
+            definition.setStatisticsState(SynapseConstants.STATISTICS_UNSET);
         }
 
         OMAttribute trace = elem.getAttribute(new QName(
@@ -101,31 +119,31 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         if (trace != null && trace.getAttributeValue() != null) {
             String traceValue = trace.getAttributeValue();
             if (XMLConfigConstants.TRACE_ENABLE.equals(traceValue)) {
-                endpointDefinition.setTraceState(SynapseConstants.TRACING_ON);
+                definition.setTraceState(SynapseConstants.TRACING_ON);
             } else if (XMLConfigConstants.TRACE_DISABLE.equals(traceValue)) {
-                endpointDefinition.setTraceState(SynapseConstants.TRACING_OFF);
+                definition.setTraceState(SynapseConstants.TRACING_OFF);
             }
         } else {
-            endpointDefinition.setTraceState(SynapseConstants.TRACING_UNSET);
+            definition.setTraceState(SynapseConstants.TRACING_UNSET);
         }
 
         if (format != null) {
             String forceValue = format.getAttributeValue().trim().toLowerCase();
             if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
-                endpointDefinition.setForcePOX(true);
-                endpointDefinition.setFormat(SynapseConstants.FORMAT_POX);
+                definition.setForcePOX(true);
+                definition.setFormat(SynapseConstants.FORMAT_POX);
 
             } else if (SynapseConstants.FORMAT_GET.equals(forceValue)) {
-            	endpointDefinition.setForceGET(true);
-            	endpointDefinition.setFormat(SynapseConstants.FORMAT_GET);
+            	definition.setForceGET(true);
+            	definition.setFormat(SynapseConstants.FORMAT_GET);
 
             } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
-                endpointDefinition.setForceSOAP11(true);
-                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP11);
+                definition.setForceSOAP11(true);
+                definition.setFormat(SynapseConstants.FORMAT_SOAP11);
 
             } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
-                endpointDefinition.setForceSOAP12(true);
-                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP12);
+                definition.setForceSOAP12(true);
+                definition.setFormat(SynapseConstants.FORMAT_SOAP12);
 
             } else {
                 handleException("force value -\""+forceValue+"\" not yet implemented");
@@ -135,28 +153,28 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         if (optimize != null && optimize.getAttributeValue().length() > 0) {
             String method = optimize.getAttributeValue().trim();
             if ("mtom".equalsIgnoreCase(method)) {
-                endpointDefinition.setUseMTOM(true);
+                definition.setUseMTOM(true);
             } else if ("swa".equalsIgnoreCase(method)) {
-                endpointDefinition.setUseSwa(true);
+                definition.setUseSwa(true);
             }
         }
 
         if (encoding != null && encoding.getAttributeValue() != null) {
-            endpointDefinition.setCharSetEncoding(encoding.getAttributeValue());
+            definition.setCharSetEncoding(encoding.getAttributeValue());
         }
 
         OMElement wsAddr = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableAddressing"));
         if (wsAddr != null) {
             
-            endpointDefinition.setAddressingOn(true);
+            definition.setAddressingOn(true);
 
             OMAttribute version = wsAddr.getAttribute(new QName("version"));
             if (version != null && version.getAttributeValue() != null) {
                 String versionValue = version.getAttributeValue().trim().toLowerCase();
                 if (SynapseConstants.ADDRESSING_VERSION_FINAL.equals(versionValue) ||
                         SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(versionValue)) {
-                    endpointDefinition.setAddressingVersion(version.getAttributeValue());
+                    definition.setAddressingVersion(version.getAttributeValue());
                 } else {
                     handleException("Unknown value for the addressing version. Possible values " +
                             "for the addressing version are 'final' and 'submission' only.");
@@ -166,7 +184,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             String useSepList = wsAddr.getAttributeValue(new QName("separateListener"));
             if (useSepList != null) {
                 if ("true".equals(useSepList.trim().toLowerCase())) {
-                    endpointDefinition.setUseSeparateListener(true);
+                    definition.setUseSeparateListener(true);
                 }
             }
         }
@@ -175,12 +193,12 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec"));
         if (wsSec != null) {
 
-            endpointDefinition.setSecurityOn(true);
+            definition.setSecurityOn(true);
 
             OMAttribute policy
                     = wsSec.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
-                endpointDefinition.setWsSecPolicyKey(policy.getAttributeValue());
+                definition.setWsSecPolicyKey(policy.getAttributeValue());
             }
         }
         
@@ -188,12 +206,12 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
         if (wsRm != null) {
 
-            endpointDefinition.setReliableMessagingOn(true);
+            definition.setReliableMessagingOn(true);
 
             OMAttribute policy
                     = wsRm.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
-                endpointDefinition.setWsRMPolicyKey(policy.getAttributeValue());
+                definition.setWsRMPolicyKey(policy.getAttributeValue());
             }
         }
 
@@ -209,7 +227,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 if (d != null) {
                     try {
                         long timeoutSeconds = Long.parseLong(d.trim());
-                        endpointDefinition.setTimeoutDuration(timeoutSeconds * 1000);
+                        definition.setTimeoutDuration(timeoutSeconds * 1000);
                     } catch (NumberFormatException e) {
                         handleException("Endpoint timeout duration expected as a " +
                                 "number but was not a number");
@@ -223,19 +241,19 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 String actionString = action.getText();
                 if ("discard".equalsIgnoreCase(actionString.trim())) {
                         
-                    endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD);
+                    definition.setTimeoutAction(SynapseConstants.DISCARD);
 
                     // set timeout duration to 30 seconds, if it is not set explicitly
-                    if (endpointDefinition.getTimeoutDuration() == 0) {
-                        endpointDefinition.setTimeoutDuration(30000);
+                    if (definition.getTimeoutDuration() == 0) {
+                        definition.setTimeoutDuration(30000);
                     }
                 } else if ("fault".equalsIgnoreCase(actionString.trim())) {
                         
-                    endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
+                    definition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
 
                     // set timeout duration to 30 seconds, if it is not set explicitly
-                    if (endpointDefinition.getTimeoutDuration() == 0) {
-                        endpointDefinition.setTimeoutDuration(30000);
+                    if (definition.getTimeoutDuration() == 0) {
+                        definition.setTimeoutDuration(30000);
                     }
                 } else {
                     handleException("Invalid timeout action, action : "
@@ -251,12 +269,66 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         if (suspendElement != null && suspendElement.getText() != null) {
             try {
                 long suspendDuration = Long.parseLong(suspendElement.getText().trim());
-                endpointDefinition.setSuspendOnFailDuration(suspendDuration * 1000);
+                definition.setSuspendOnFailDuration(suspendDuration * 1000);
             } catch (NumberFormatException e) {
                 handleException("The suspend duration should be specified as a valid number :: "
                         + e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * Returns the EndpointFactory implementation for given endpoint configuration. Throws a
+     * SynapseException, if there is no EndpointFactory for given configuration.
+     *
+     * @param configElement Endpoint configuration.
+     * @return EndpointFactory implementation.
+     */
+    private static EndpointFactory getEndpointFactory(OMElement configElement) {
+
+        if (configElement.getAttribute(new QName("key")) != null) {
+            return IndirectEndpointFactory.getInstance();
+        }
+
+        OMElement addressElement = configElement.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
+        if (addressElement != null) {
+            return AddressEndpointFactory.getInstance();
+        }
+
+        OMElement wsdlElement = configElement.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
+        if (wsdlElement != null) {
+            return WSDLEndpointFactory.getInstance();
+        }
+
+        OMElement defaultElement = configElement.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "default"));
+        if (defaultElement != null) {
+            return DefaultEndpointFactory.getInstance();
+        }
+
+        OMElement lbElement = configElement.getFirstChildWithName
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
+        if (lbElement != null) {
+            OMElement sessionElement = configElement.
+                    getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "session"));
+            if (sessionElement != null) {
+                return SALoadbalanceEndpointFactory.getInstance();
+            } else {
+                return LoadbalanceEndpointFactory.getInstance();
+            }
+        }
+
+        OMElement foElement = configElement.getFirstChildWithName
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
+        if (foElement != null) {
+            return FailoverEndpointFactory.getInstance();
+        }
+
+        handleException("Invalid endpoint configuration.");
+        // just to make the compiler happy : never executes
+        return null;
     }
 
     protected static void handleException(String msg) {

@@ -30,7 +30,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
+import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -181,8 +181,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             if (config.getLocalRegistry().get(name.trim()) != null) {
                 handleException("Duplicate endpoint definition : " + name);
             }
-            Endpoint endpoint =
-                    EndpointAbstractFactory.getEndpointFactory(ele).createEndpoint(ele, false);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(ele, false);
             config.addEndpoint(name.trim(), endpoint);
         } else {
             handleException("Invalid endpoint definition without a name");

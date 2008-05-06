@@ -23,7 +23,6 @@ import org.apache.axiom.om.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
@@ -96,9 +95,7 @@ public class ProxyServiceSerializer {
                     "endpoint", nullNS, endpoint));
             proxy.addChild(target);
         } else if (inLineEndpoint != null) {
-            EndpointSerializer serializer
-                    = EndpointAbstractSerializer.getEndpointSerializer(inLineEndpoint);
-            OMElement epElement = serializer.serializeEndpoint(inLineEndpoint);
+            OMElement epElement = EndpointSerializer.getElementFromEndpoint(inLineEndpoint);
             target.addChild(epElement);            
             proxy.addChild(target);
         }

@@ -54,7 +54,8 @@ public class DispatcherContext {
 
     /* Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
      * multiple threads (e.g. multiple clients different sessions).*/
-    private final Map sessionMap = Collections.synchronizedMap(new HashMap());
+    private final Map<String, Endpoint> sessionMap
+            = Collections.synchronizedMap(new HashMap<String, Endpoint>());
 
     /*The axis configuration context-  this will hold the all callers states
      *when doing throttling in a clustered environment. */
@@ -67,7 +68,7 @@ public class DispatcherContext {
     private String keyPrefix;
 
     /*To keep all defined child endpoints  */
-    private final Map endpointsMap = new HashMap();
+    private final Map<String, Endpoint> endpointsMap = new HashMap<String, Endpoint>();
 
     /**
      * return the endpoint  for the given session.
@@ -87,13 +88,13 @@ public class DispatcherContext {
             // gets the value from configuration context (The shared state across all instances )
             Object value = this.configCtx.getPropertyNonReplicable(this.keyPrefix + sessionID);
             if (value != null && value instanceof String) {
-                return (Endpoint) endpointsMap.get(value);
+                return endpointsMap.get(value.toString());
             }
 
         } else {
 
             synchronized (sessionMap) {
-                return (Endpoint) sessionMap.get(sessionID);
+                return sessionMap.get(sessionID);
             }
         }
 
@@ -299,30 +300,23 @@ public class DispatcherContext {
      *
      * @param endpoints The endpoint list
      */
-    public void setEndpoints(List endpoints) {
+    public void setEndpoints(List<Endpoint> endpoints) {
 
         if (endpoints != null) {
 
-            for (int i = 0; i < endpoints.size(); i++) {
-                Object e = endpoints.get(i);
-
-                if (e != null && e instanceof Endpoint) {
-                    Endpoint endpoint = (Endpoint) e;
-
-                    String endPointName = endpoint.getName();
-                    if (endPointName == null) {
-
-                        if (log.isDebugEnabled() && isClusteringEnable()) {
-                            log.warn("In a clustering environment , the endpoint  name should be" +
-                                    " specified even for anonymous endpoints. Otherwise , the " +
-                                    "clustering would not be functioned correctly if there are" +
-                                    " more than one anonymous endpoints. ");
-                        }
-                        endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+            for (Endpoint endpoint : endpoints) {
+                String endPointName = endpoint.getName();
+                if (endPointName == null) {
+                    if (log.isDebugEnabled() && isClusteringEnable()) {
+                        log.warn("In a clustering environment , the endpoint  name should be" +
+                                " specified even for anonymous endpoints. Otherwise , the " +
+                                "clustering would not be functioned correctly if there are" +
+                                " more than one anonymous endpoints. ");
                     }
-
-                    endpointsMap.put(endPointName, endpoint);
+                    endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
                 }
+
+                endpointsMap.put(endPointName, endpoint);
 
             }
         }

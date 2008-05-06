@@ -35,11 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @see AddressEndpointFactory
  */
-public class AddressEndpointSerializer implements EndpointSerializer {
-
-    private static Log log = LogFactory.getLog(AddressEndpointSerializer.class);
-
-    private OMFactory fac = null;
+public class AddressEndpointSerializer extends EndpointSerializer {
 
     public OMElement serializeEndpoint(Endpoint endpoint) {
 
@@ -176,10 +172,5 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         }
 
         return element;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

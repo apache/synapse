@@ -38,9 +38,7 @@ import java.util.List;
  *    </failover>
  * </endpoint>
  */
-public class FailoverEndpointSerializer implements EndpointSerializer {
-
-    private OMFactory fac = null;
+public class FailoverEndpointSerializer extends EndpointSerializer {
 
     public OMElement serializeEndpoint(Endpoint endpoint) {
 

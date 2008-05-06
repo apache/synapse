@@ -36,9 +36,7 @@ import javax.xml.namespace.QName;
  *
  * <endpoint key="key" />
  */
-public class IndirectEndpointFactory implements EndpointFactory {
-
-    private static Log log = LogFactory.getLog(IndirectEndpointFactory.class);
+public class IndirectEndpointFactory extends EndpointFactory {
 
     private static IndirectEndpointFactory instance = new IndirectEndpointFactory();
 
@@ -67,15 +65,5 @@ public class IndirectEndpointFactory implements EndpointFactory {
 			handleException("Invalid XML configuration for an Endpoint. OMElement expected");
 		}
 		return null;
-    }
-
-     private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

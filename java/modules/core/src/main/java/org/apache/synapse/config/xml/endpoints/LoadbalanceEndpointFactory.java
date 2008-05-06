@@ -44,9 +44,7 @@ import java.util.ArrayList;
  *    </loadbalance>
  * </endpoint>
  */
-public class LoadbalanceEndpointFactory implements EndpointFactory {
-
-    private static Log log = LogFactory.getLog(LoadbalanceEndpointFactory.class);
+public class LoadbalanceEndpointFactory extends EndpointFactory {
 
     private static LoadbalanceEndpointFactory instance = new LoadbalanceEndpointFactory();
 
@@ -122,15 +120,5 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
         }
 
         return endpoints;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

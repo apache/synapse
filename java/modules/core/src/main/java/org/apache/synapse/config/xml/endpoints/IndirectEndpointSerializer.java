@@ -32,9 +32,7 @@ import org.apache.synapse.SynapseConstants;
  *
  * <endpoint key="key" />
  */
-public class IndirectEndpointSerializer implements EndpointSerializer {
-
-    private OMFactory fac = null;
+public class IndirectEndpointSerializer extends EndpointSerializer {
 
     public OMElement serializeEndpoint(Endpoint endpoint) {
 

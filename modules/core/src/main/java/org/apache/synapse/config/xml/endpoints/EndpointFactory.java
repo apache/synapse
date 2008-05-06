@@ -43,7 +43,7 @@ import javax.xml.namespace.QName;
  */
 public abstract class EndpointFactory implements XMLToObjectMapper {
 
-    private static Log log = LogFactory.getLog(WSDLEndpointFactory.class);
+    private static Log log = LogFactory.getLog(EndpointFactory.class);
 
     /**
      * Creates the Endpoint implementation for the given XML endpoint configuration. If the endpoint

@@ -74,16 +74,7 @@ public class FailoverEndpointFactory extends EndpointFactory {
 
         return null;
     }
-
-    public Object getObjectFromOMNode(OMNode om) {
-         if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om, false);
-        } else {
-            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
-        }
-        return null;
-    }
-
+    
     private ArrayList getEndpoints(OMElement failoverElement, Endpoint parent) {
 
         ArrayList endpoints = new ArrayList();

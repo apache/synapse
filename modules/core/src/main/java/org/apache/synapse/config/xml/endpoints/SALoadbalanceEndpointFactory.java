@@ -49,9 +49,7 @@ import java.util.Iterator;
  *    </loadbalance>
  * </endpoint>
  */
-public class SALoadbalanceEndpointFactory implements EndpointFactory {
-
-    private static Log log = LogFactory.getLog(LoadbalanceEndpointFactory.class);
+public class SALoadbalanceEndpointFactory extends EndpointFactory {
 
     private static SALoadbalanceEndpointFactory instance = new SALoadbalanceEndpointFactory();
 
@@ -171,15 +169,5 @@ public class SALoadbalanceEndpointFactory implements EndpointFactory {
         }
 
         return endpoints;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

@@ -40,9 +40,7 @@ import java.util.List;
  *    </loadbalance>
  * </endpoint>
  */
-public class LoadbalanceEndpointSerializer implements EndpointSerializer {
-
-    private OMFactory fac = null;
+public class LoadbalanceEndpointSerializer extends EndpointSerializer {
 
     public OMElement serializeEndpoint(Endpoint endpoint) {
 

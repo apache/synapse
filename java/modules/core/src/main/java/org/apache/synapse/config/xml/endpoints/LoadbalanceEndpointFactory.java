@@ -91,15 +91,6 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Object getObjectFromOMNode(OMNode om) {
-        if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om, false);
-        } else {
-            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
-        }
-        return null;
-    }
-
     private ArrayList<Endpoint> getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
 
         ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();

@@ -47,8 +47,8 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement(
-                "endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement
+                = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) endpoint;
         String name = wsdlEndpoint.getName();
@@ -92,8 +92,8 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         // currently, we have to get QOS information from the endpoint definition and set them as
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.
-        EndpointDefinition epAddress = wsdlEndpoint.getEndpoint();
-        serializeQOSInformation(epAddress, wsdlElement);
+        EndpointDefinition epDefinition = wsdlEndpoint.getEndpoint();
+        serializeQOSInformation(epDefinition, wsdlElement);
 
         endpointElement.addChild(wsdlElement);
 

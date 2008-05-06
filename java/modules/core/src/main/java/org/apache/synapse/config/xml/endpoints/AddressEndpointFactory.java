@@ -35,38 +35,30 @@ import javax.xml.namespace.QName;
  * <p>
  * Configuration syntax:
  * <pre>
- * &lt;endpoint [name="<em>name</em>"] [trace="enable|disable"]>
+ * &lt;endpoint [name="<em>name</em>"]&gt;
  *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
- *      [encoding="<em>charset encoding</em>"] [statistics="enable|disable"]>
+ *      [encoding="<em>charset encoding</em>"]
+ *          [statistics="enable|disable"] [trace="enable|disable"]&gt;
  *     .. extensibility ..
  *
- *     &lt;enableRM [policy="<em>key</em>"]/>?
- *     &lt;enableSec [policy="<em>key</em>"]/>?
- *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/>?
+ *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
+ *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+ *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
  *
- *     &lt;timeout>
- *       &lt;duration><em>timeout duration in seconds</em>&lt;/duration>
- *       &lt;action>discard|fault&lt;/action>
- *     &lt;/timeout>?
+ *     &lt;timeout&gt;
+ *       &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
+ *       &lt;action&gt;discard|fault&lt;/action&gt;
+ *     &lt;/timeout&gt;?
  *
  *     &lt;suspendDurationOnFailure&gt;
  *              <em>suspend duration in seconds</em>&lt;/suspendDurationOnFailure&gt;?
- *   &lt;/address>
- * &lt;/endpoint>
+ *   &lt;/address&gt;
+ * &lt;/endpoint&gt;
  * </pre>
  */
 public class AddressEndpointFactory extends EndpointFactory {
 
     private static AddressEndpointFactory instance = new AddressEndpointFactory();
-
-    /**
-     * To decide to whether statistics should have collected or not
-     */
-    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
-    /**
-     * The variable that indicate tracing on or off for the current mediator
-     */
-    protected int traceState = SynapseConstants.TRACING_UNSET;
 
     private AddressEndpointFactory() {}
 
@@ -116,15 +108,6 @@ public class AddressEndpointFactory extends EndpointFactory {
         return addressEndpoint;
     }
 
-    public Object getObjectFromOMNode(OMNode om) {
-        if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om, false);
-        } else {
-            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
-        }
-        return null;
-    }
-
     /**
      * Creates an EndpointDefinition instance using the XML fragment specification. Configuration
      * for EndpointDefinition always resides inside a configuration of an AddressEndpoint. This
@@ -138,23 +121,6 @@ public class AddressEndpointFactory extends EndpointFactory {
         OMAttribute address = elem.getAttribute(new QName("uri"));
 
         EndpointDefinition endpointDefinition = new EndpointDefinition();
-        OMAttribute statistics = elem.getAttribute(
-                new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
-                        org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
-
-        if (statistics != null) {
-            String statisticsValue = statistics.getAttributeValue();
-            if (statisticsValue != null) {
-
-                if (org.apache.synapse.config.xml.XMLConfigConstants.
-                        STATISTICS_ENABLE.equals(statisticsValue)) {
-                    endpointDefinition.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                } else if (org.apache.synapse.config.xml.XMLConfigConstants.
-                        STATISTICS_DISABLE.equals(statisticsValue)) {
-                    endpointDefinition.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
-                }
-            }
-        }
 
         if (address != null) {
             endpointDefinition.setAddress(address.getAttributeValue());

@@ -58,16 +58,20 @@ public abstract class EndpointSerializer {
     protected void serializeQOSInformation(
             EndpointDefinition endpointDefinition, OMElement element) {
 
-        int statisticsState = endpointDefinition.getStatisticsState();
-        String statisticsValue = null;
-        if (statisticsState == SynapseConstants.STATISTICS_ON) {
-            statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
-        } else if (statisticsState == SynapseConstants.STATISTICS_OFF) {
-            statisticsValue = XMLConfigConstants.STATISTICS_DISABLE;
+        if (endpointDefinition.getStatisticsState() == SynapseConstants.STATISTICS_ON) {
+            element.addAttribute(fac.createOMAttribute(XMLConfigConstants.STATISTICS_ATTRIB_NAME,
+                    null, XMLConfigConstants.STATISTICS_ENABLE));
+        } else if (endpointDefinition.getStatisticsState() == SynapseConstants.STATISTICS_OFF) {
+            element.addAttribute(fac.createOMAttribute(XMLConfigConstants.STATISTICS_ATTRIB_NAME,
+                    null, XMLConfigConstants.STATISTICS_DISABLE));
         }
-        if (statisticsValue != null) {
-            element.addAttribute(fac.createOMAttribute(
-                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
+
+        if (endpointDefinition.getTraceState() == SynapseConstants.TRACING_ON) {
+            element.addAttribute(fac.createOMAttribute(XMLConfigConstants.TRACE_ATTRIB_NAME,
+                    null, XMLConfigConstants.TRACE_ENABLE));
+        } else if (endpointDefinition.getStatisticsState() == SynapseConstants.TRACING_OFF) {
+            element.addAttribute(fac.createOMAttribute(XMLConfigConstants.TRACE_ATTRIB_NAME,
+                    null, XMLConfigConstants.TRACE_DISABLE));
         }
 
         if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {

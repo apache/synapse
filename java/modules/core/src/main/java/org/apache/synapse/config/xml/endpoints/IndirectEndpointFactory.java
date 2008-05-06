@@ -57,13 +57,4 @@ public class IndirectEndpointFactory extends EndpointFactory {
         indirectEndpoint.setKey(ref);
         return indirectEndpoint;
     }
-
-    public Object getObjectFromOMNode(OMNode om) {
-        if (om instanceof OMElement) {
-			return createEndpoint((OMElement) om, false);
-		} else {
-			handleException("Invalid XML configuration for an Endpoint. OMElement expected");
-		}
-		return null;
-    }
 }

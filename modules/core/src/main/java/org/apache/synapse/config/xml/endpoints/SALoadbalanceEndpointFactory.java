@@ -19,21 +19,18 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
-import org.apache.synapse.endpoints.dispatch.Dispatcher;
-import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
-import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
-import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMNode;
+import org.apache.synapse.endpoints.dispatch.Dispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -59,7 +56,7 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         // create the endpoint, manager and the algorithms
         SALoadbalanceEndpoint loadbalanceEndpoint = new SALoadbalanceEndpoint();
@@ -95,14 +92,14 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
             loadbalanceEndpoint.setName(name.getAttributeValue());
         }
 
-        OMElement loadbalanceElement =  null;
+        OMElement loadbalanceElement;
         loadbalanceElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
 
         if(loadbalanceElement != null) {
 
             // set endpoints
-            ArrayList endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
+            ArrayList<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
             loadbalanceEndpoint.setEndpoints(endpoints);
 
             // set load balance algorithm
@@ -144,17 +141,13 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private ArrayList getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
+    private ArrayList<Endpoint> getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
 
-        ArrayList endpoints = new ArrayList();
-        Iterator iter = loadbalanceElement.getChildrenWithName
-                (org.apache.synapse.config.xml.XMLConfigConstants.ENDPOINT_ELT);
+        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
+        Iterator iter = loadbalanceElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {
-
             OMElement endptElem = (OMElement) iter.next();
-
-            EndpointFactory epFac = EndpointAbstractFactory.getEndpointFactory(endptElem);
-            Endpoint endpoint = epFac.createEndpoint(endptElem, true);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
             endpoint.setParentEndpoint(parent);
             endpoints.add(endpoint);
         }

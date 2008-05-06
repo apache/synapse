@@ -23,19 +23,19 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 
 /**
- * Creates {@link AddressEndpoint} using a XML configuration.
+ * Creates {@link DefaultEndpoint} using a XML configuration.
  * <p>
  * Configuration syntax:
  * <pre>
  * &lt;endpoint [name="<em>name</em>"]&gt;
- *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+ *   &lt;default [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
  *      [encoding="<em>charset encoding</em>"]
  *          [statistics="enable|disable"] [trace="enable|disable"]&gt;
  *     .. extensibility ..
@@ -55,34 +55,34 @@ import javax.xml.namespace.QName;
  * &lt;/endpoint&gt;
  * </pre>
  */
-public class AddressEndpointFactory extends EndpointFactory {
+public class DefaultEndpointFactory extends EndpointFactory {
 
-    private static AddressEndpointFactory instance = new AddressEndpointFactory();
+    private static DefaultEndpointFactory instance = new DefaultEndpointFactory();
 
-    private AddressEndpointFactory() {}
+    private DefaultEndpointFactory() {}
 
-    public static AddressEndpointFactory getInstance() {
+    public static DefaultEndpointFactory getInstance() {
         return instance;
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
-        AddressEndpoint addressEndpoint = new AddressEndpoint();
+        DefaultEndpoint defaultEndpoint = new DefaultEndpoint();
         OMAttribute name = epConfig.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
 
         if (name != null) {
-            addressEndpoint.setName(name.getAttributeValue());
+            defaultEndpoint.setName(name.getAttributeValue());
         }
 
-        OMElement addressElement = epConfig.getFirstChildWithName(
-                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
-        if (addressElement != null) {
-            EndpointDefinition endpoint = createEndpointDefinition(addressElement);
-            addressEndpoint.setEndpoint(endpoint);
+        OMElement defaultElement = epConfig.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "default"));
+        if (defaultElement != null) {
+            EndpointDefinition endpoint = createEndpointDefinition(defaultElement);
+            defaultEndpoint.setEndpoint(endpoint);
         }
 
-        return addressEndpoint;
+        return defaultEndpoint;
     }
 
     /**
@@ -94,14 +94,7 @@ public class AddressEndpointFactory extends EndpointFactory {
      * @return EndpointDefinition object containing the endpoint details.
      */
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
-
-        OMAttribute address = elem.getAttribute(new QName("uri"));
         EndpointDefinition endpointDefinition = new EndpointDefinition();
-
-        if (address != null) {
-            endpointDefinition.setAddress(address.getAttributeValue());
-        }
-
         extractEndpointProperties(endpointDefinition, elem);
         return endpointDefinition;
     }

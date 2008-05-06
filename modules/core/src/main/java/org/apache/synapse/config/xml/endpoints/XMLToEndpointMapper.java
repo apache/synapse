@@ -48,8 +48,7 @@ public class XMLToEndpointMapper implements XMLToObjectMapper {
     public Object getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
             OMElement epElement = (OMElement) om;
-            return EndpointAbstractFactory.
-                    getEndpointFactory(epElement).createEndpoint(epElement, false);
+            return EndpointFactory.getEndpointFromElement(epElement, false);
         } else {
             throw new SynapseException("Configuration is not in proper format.");
         }

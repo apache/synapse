@@ -26,16 +26,14 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Utility class to support the backport util.concurrent in JDK 1.4 and the
- * native concurrent package in JDK 1.5 or later
+ * Worker pool implementation based on java.util.concurrent in JDK 1.5 or later.
  */
 public class NativeWorkerPool implements WorkerPool {
 
     private static final Log log = LogFactory.getLog(NativeWorkerPool.class);
 
-    private java.util.concurrent.Executor nativeExecutor = null;
-    private Executor executor = null;
-    private LinkedBlockingQueue blockingQueue = null;
+    private final ThreadPoolExecutor executor;
+    private final LinkedBlockingQueue<Runnable> blockingQueue;
 
     public NativeWorkerPool(int core, int max, int keepAlive,
         int queueLength, String threadGroupName, String threadGroupId) {
@@ -44,7 +42,8 @@ public class NativeWorkerPool implements WorkerPool {
             log.debug("Using native util.concurrent package..");
         }
         blockingQueue =
-            (queueLength == -1 ? new LinkedBlockingQueue() : new LinkedBlockingQueue(queueLength));
+            (queueLength == -1 ? new LinkedBlockingQueue<Runnable>()
+                               : new LinkedBlockingQueue<Runnable>(queueLength));
         executor = new ThreadPoolExecutor(
             core, max, keepAlive,
             TimeUnit.SECONDS,
@@ -57,11 +56,16 @@ public class NativeWorkerPool implements WorkerPool {
     }
 
     public int getActiveCount() {
-        return ((ThreadPoolExecutor) executor).getActiveCount();
+        return executor.getActiveCount();
     }
 
     public int getQueueSize() {
         return blockingQueue.size();
+    }
+    
+    public void shutdown(int timeout) throws InterruptedException {
+        executor.shutdown();
+        executor.awaitTermination(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**

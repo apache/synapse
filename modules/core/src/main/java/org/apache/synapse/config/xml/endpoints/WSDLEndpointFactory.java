@@ -24,10 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
 import org.apache.synapse.endpoints.Endpoint;
@@ -35,8 +32,8 @@ import org.apache.synapse.endpoints.WSDLEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 import javax.xml.namespace.QName;
-import java.net.URL;
 import java.io.File;
+import java.net.URL;
 
 /**
  * Creates an WSDL based endpoint from a XML configuration.
@@ -54,9 +51,7 @@ import java.io.File;
  *   </timeout>?
  * </wsdl>
  */
-public class WSDLEndpointFactory implements EndpointFactory {
-
-    private static Log log = LogFactory.getLog(WSDLEndpointFactory.class);
+public class WSDLEndpointFactory extends EndpointFactory {
 
     private static WSDLEndpointFactory instance = new WSDLEndpointFactory();
 
@@ -79,14 +74,12 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
         WSDLEndpoint wsdlEndpoint = new WSDLEndpoint();
 
-//        if (!anonymousEndpoint) {
         OMAttribute name = epConfig.getAttribute(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
         if (name != null) {
             wsdlEndpoint.setName(name.getAttributeValue());
         }
-//        }
 
         OMElement wsdlElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
@@ -212,145 +205,5 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
         return wsdlEndpoint;
     }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    private void extractQOSInformation(EndpointDefinition endpointDefinition,
-        OMElement elem) {
-
-        OMAttribute format = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "format"));
-        OMAttribute optimize = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "optimize"));
-
-        if (format != null)
-        {
-            String forceValue = format.getAttributeValue().trim().toLowerCase();
-            if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
-                endpointDefinition.setForcePOX(true);
-                endpointDefinition.setFormat(SynapseConstants.FORMAT_POX);
-
-            } else if (SynapseConstants.FORMAT_GET.equals(forceValue)) {
-            	endpointDefinition.setForceGET(true);
-            	endpointDefinition.setFormat(SynapseConstants.FORMAT_GET);
-
-            } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
-                endpointDefinition.setForceSOAP11(true);
-                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP11);
-                
-            } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
-                endpointDefinition.setForceSOAP12(true);
-                endpointDefinition.setFormat(SynapseConstants.FORMAT_SOAP12);
-                
-            } else {
-                handleException("force value -\""+forceValue+"\" not yet implemented");
-            }
-        }
-
-        if (optimize != null && optimize.getAttributeValue().length() > 0) {
-            String method = optimize.getAttributeValue().trim();
-            if ("mtom".equalsIgnoreCase(method)) {
-                endpointDefinition.setUseMTOM(true);
-            } else if ("swa".equalsIgnoreCase(method)) {
-                endpointDefinition.setUseSwa(true);
-            }
-        }
-
-        OMElement wsAddr = elem.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
-                "enableAddressing"));
-
-        if (wsAddr != null) {
-            endpointDefinition.setAddressingOn(true);
-
-            OMAttribute version = wsAddr.getAttribute(new QName("version"));
-            if (version != null && version.getAttributeValue() != null) {
-                if (SynapseConstants.ADDRESSING_VERSION_FINAL.equals(version.getAttributeValue()) ||
-                        SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(
-                                version.getAttributeValue())) {
-                    endpointDefinition.setAddressingVersion(version.getAttributeValue());
-                } else {
-                    handleException("Unknown value for the addressing version. Possible values " +
-                            "for the addressing version are 'final' and 'submission' only.");
-                }
-            }
-            
-            String useSepList = wsAddr.getAttributeValue(new QName("separateListener"));
-            if (useSepList != null) {
-                if (useSepList.trim().toLowerCase().startsWith("tr")
-                        || useSepList.trim().startsWith("1")) {
-                    endpointDefinition.setUseSeparateListener(true);
-                }
-            }
-        }
-
-        OMElement wsSec = elem.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec"));
-        if (wsSec != null) {
-            endpointDefinition.setSecurityOn(true);
-            OMAttribute policy = wsSec.getAttribute(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "policy"));
-            if (policy != null) {
-                endpointDefinition.setWsSecPolicyKey(policy.getAttributeValue());
-            }
-        }
-        OMElement wsRm = elem.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
-        if (wsRm != null) {
-            endpointDefinition.setReliableMessagingOn(true);
-            OMAttribute policy = wsRm.getAttribute(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "policy"));
-            if (policy != null) {
-                endpointDefinition.setWsRMPolicyKey(policy.getAttributeValue());
-            }
-        }
-
-        // set the timeout configuration
-        OMElement timeout = elem.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
-        if (timeout != null) {
-            OMElement duration = timeout.getFirstChildWithName(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE,
-                    "duration"));
-
-            if (duration != null) {
-                String d = duration.getText();
-                if (d != null) {
-                    long timeoutSeconds = new Long(d.trim()).longValue();
-                    endpointDefinition.setTimeoutDuration(timeoutSeconds * 1000);
-                }
-            }
-
-            OMElement action = timeout.getFirstChildWithName(new QName(
-                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "action"));
-            if (action != null) {
-                String a = action.getText();
-                if (a != null) {
-                    if ((a.trim()).equalsIgnoreCase("discard")) {
-                        endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD);
-
-                        // set timeout duration to 30 seconds, if it is not set explicitly
-                        if (endpointDefinition.getTimeoutDuration() == 0) {
-                            endpointDefinition.setTimeoutDuration(30000);
-                        }
-                    } else if ((a.trim()).equalsIgnoreCase("fault")) {
-                        endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
-
-                        // set timeout duration to 30 seconds, if it is not set explicitly
-                        if (endpointDefinition.getTimeoutDuration() == 0) {
-                            endpointDefinition.setTimeoutDuration(30000);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    
 }

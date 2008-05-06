@@ -23,7 +23,6 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
@@ -38,7 +37,8 @@ import javax.xml.namespace.QName;
  * Configuration syntax:
  * <pre>
  * &lt;endpoint [name="<em>name</em>"] [trace="enable|disable"]>
- *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"] [encoding="<em>charset encoding</em>"] [statistics="enable|disable"]>
+ *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+ *      [encoding="<em>charset encoding</em>"] [statistics="enable|disable"]>
  *     .. extensibility ..
  *
  *     &lt;enableRM [policy="<em>key</em>"]/>?
@@ -50,12 +50,13 @@ import javax.xml.namespace.QName;
  *       &lt;action>discard|fault&lt;/action>
  *     &lt;/timeout>?
  *
- *     &lt;suspendDurationOnFailure><em>suspend duration in seconds</em>&lt;/suspendDurationOnFailure>?
+ *     &lt;suspendDurationOnFailure&gt;
+ *              <em>suspend duration in seconds</em>&lt;/suspendDurationOnFailure>?
  *   &lt;/address>
  * &lt;/endpoint>
  * </pre>
  */
-public class AddressEndpointFactory implements EndpointFactory {
+public class AddressEndpointFactory extends EndpointFactory {
 
     private static Log log = LogFactory.getLog(AddressEndpointFactory.class);
 
@@ -80,14 +81,12 @@ public class AddressEndpointFactory implements EndpointFactory {
 
         AddressEndpoint addressEndpoint = new AddressEndpoint();
 
-//        if (!anonymousEndpoint) {
         OMAttribute name = epConfig.getAttribute(new QName(
                 org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
         if (name != null) {
             addressEndpoint.setName(name.getAttributeValue());
         }
-//        }
 
         OMElement addressElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
@@ -162,14 +161,13 @@ public class AddressEndpointFactory implements EndpointFactory {
                 }
             }
         }
+
         if (address != null) {
             endpointDefinition.setAddress(address.getAttributeValue());
-//        } else {
-//            handleException("One of the 'address' or 'ref' attributes are required in an "
-//                    + "anonymous endpoint");
         }
-        if (format != null)
-        {
+        
+        if (format != null) {
+            
             String forceValue = format.getAttributeValue().trim().toLowerCase();
             if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
                 endpointDefinition.setForcePOX(true);
@@ -303,15 +301,5 @@ public class AddressEndpointFactory implements EndpointFactory {
         }
 
         return endpointDefinition;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

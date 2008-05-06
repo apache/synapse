@@ -122,6 +122,11 @@ public abstract class AbstractTransportListener implements TransportListener {
         } finally {
             state = BaseConstants.STOPPED;
         }
+        try {
+            workerPool.shutdown(10000);
+        } catch (InterruptedException ex) {
+            log.warn("Thread interrupted while waiting for worker pool to shut down");
+        }
     }
 
     public void stop() throws AxisFault {

@@ -19,30 +19,27 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
- * Creates LoadbalanceEndpoint using an XML configuration.
+ * Creates {@link LoadbalanceEndpoint} using an XML configuration.
  *
- * <endpoint [name="name"]>
- *    <loadbalance policy="load balance algorithm">
- *       <endpoint>+
- *    </loadbalance>
- * </endpoint>
+ * &lt;endpoint [name="name"]&gt;
+ *    &lt;loadbalance policy="load balance algorithm"&gt;
+ *       &lt;endpoint&gt;+
+ *    &lt;/loadbalance&gt;
+ * &lt;/endpoint&gt;
  */
 public class LoadbalanceEndpointFactory extends EndpointFactory {
 
@@ -58,9 +55,8 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
 
         // create the endpoint, manager and the algorithms
 
-        OMElement loadbalanceElement =  null;
-        loadbalanceElement = epConfig.getFirstChildWithName
-                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
+        OMElement loadbalanceElement = epConfig.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
 
         if(loadbalanceElement != null) {
 
@@ -75,7 +71,7 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
             }
 
             // set endpoints
-            ArrayList endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
+            ArrayList<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
             loadbalanceEndpoint.setEndpoints(endpoints);
 
             // set load balance algorithm
@@ -104,9 +100,9 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
         return null;
     }
 
-    private ArrayList getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
+    private ArrayList<Endpoint> getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
 
-        ArrayList endpoints = new ArrayList();
+        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
         Iterator iter = loadbalanceElement.getChildrenWithName
                 (org.apache.synapse.config.xml.XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {

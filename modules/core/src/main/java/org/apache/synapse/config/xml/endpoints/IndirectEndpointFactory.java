@@ -32,9 +32,9 @@ import javax.xml.namespace.QName;
 /**
  * Creates an IndirectEndpoint using a XML configuration. Key can be a name of an endpoint defined
  * in the same Synapse configuration or a registry key pointing to an endpoint configuration in the
- * registry (e.g. <endpoint key="registry/endpoint1.xml" />).
+ * registry (e.g. &lt;endpoint key="registry/endpoint1.xml"/&gt;).
  *
- * <endpoint key="key" />
+ * &lt;endpoint key="key"/&gt;
  */
 public class IndirectEndpointFactory extends EndpointFactory {
 

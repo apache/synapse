@@ -36,20 +36,20 @@ import java.io.File;
 import java.net.URL;
 
 /**
- * Creates an WSDL based endpoint from a XML configuration.
+ * Creates an {@link WSDLEndpoint} based endpoint from a XML configuration.
  *
- * <wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname">
- *   <wsdl:definition>...</wsdl:definition>?
- *   <wsdl20:description>...</wsdl20:description>?
- *   <enableRM [policy="key"]/>?
- *   <enableSec [policy="key"]/>?
- *   <enableAddressing [version=("final" | "submission")]/>?
- *   <suspendDurationOnFailure>suspend-duration</suspendDurationOnFailure>?
- *   <timeout>
- *     <duration>timeout-duration</duration>
- *     <action>discard|fault</action>
- *   </timeout>?
- * </wsdl>
+ * &lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
+ *   &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+ *   &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+ *   &lt;enableRM [policy="key"]/&gt;?
+ *   &lt;enableSec [policy="key"]/&gt;?
+ *   &lt;enableAddressing [version=("final" | "submission")]/&gt;?
+ *   &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
+ *   &lt;timeout&gt;
+ *     &lt;duration&gt;timeout-duration&lt;/duration&gt;
+ *     &lt;action&gt;discard|fault&lt;/action&gt;
+ *   &lt;/timeout&gt;?
+ * &lt;/wsdl&gt;
  */
 public class WSDLEndpointFactory extends EndpointFactory {
 
@@ -59,15 +59,6 @@ public class WSDLEndpointFactory extends EndpointFactory {
 
     public static WSDLEndpointFactory getInstance() {
         return instance;
-    }
-
-    public Object getObjectFromOMNode(OMNode om) {
-        if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om, false);
-        } else {
-            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
-        }
-        return null;
     }
 
     public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
@@ -179,24 +170,6 @@ public class WSDLEndpointFactory extends EndpointFactory {
             if (endpoint != null) {
                 // for now, QOS information has to be provided explicitly.
                 extractQOSInformation(endpoint, wsdlElement);
-                OMAttribute statistics = epConfig.getAttribute(new QName(
-                        org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
-                        org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
-                if (statistics != null) {
-                    String statisticsValue = statistics.getAttributeValue();
-                    if (statisticsValue != null) {
-
-                        if (org.apache.synapse.config.xml.XMLConfigConstants.
-                                STATISTICS_ENABLE.equals(statisticsValue)) {
-                            endpoint.setStatisticsState(
-                                    org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                        } else if (org.apache.synapse.config.xml.XMLConfigConstants.
-                                STATISTICS_DISABLE.equals(statisticsValue)) {
-                            endpoint.setStatisticsState(
-                                    org.apache.synapse.SynapseConstants.STATISTICS_OFF);
-                        }
-                    }
-                }
                 wsdlEndpoint.setEndpoint(endpoint);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");

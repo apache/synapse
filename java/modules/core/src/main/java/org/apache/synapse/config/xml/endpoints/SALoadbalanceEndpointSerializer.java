@@ -19,27 +19,21 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
-import org.apache.synapse.endpoints.dispatch.Dispatcher;
-import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
-import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
-import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.List;
+import org.apache.synapse.endpoints.dispatch.Dispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 
 public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
 
-    public OMElement serializeEndpoint(Endpoint endpoint) {
+    protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof SALoadbalanceEndpoint)) {
             handleException("Invalid endpoint type for serializing. " +
@@ -84,13 +78,8 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
         }
         loadbalanceElement.addAttribute("algorithm", algorithmName, null);
 
-        List endpoints = loadbalanceEndpoint.getEndpoints();
-        for (int i = 0; i < endpoints.size(); i++) {
-            Endpoint childEndpoint = (Endpoint) endpoints.get(i);
-            EndpointSerializer serializer = EndpointAbstractSerializer.
-                    getEndpointSerializer(childEndpoint);
-            OMElement aeElement = serializer.serializeEndpoint(childEndpoint);
-            loadbalanceElement.addChild(aeElement);
+        for (Endpoint childEndpoint : loadbalanceEndpoint.getEndpoints()) {
+            loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
         }
 
         return endpointElement;

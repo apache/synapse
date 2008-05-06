@@ -35,7 +35,8 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
  * endpoint as a private variable as it could expire. Therefore, it only stores the key and gets the
  * actual endpoint from the synapse configuration.
  * <p/>
- * As this is also an instance of endpoint, this can be used any place, where a normal endpoint is used.
+ * As this is also an instance of endpoint, this can be used any place, where a normal endpoint is
+ * used.
  */
 public class IndirectEndpoint implements Endpoint {
 
@@ -44,14 +45,12 @@ public class IndirectEndpoint implements Endpoint {
 
     private String name = null;
     private String key = null;
-    private boolean active = true;
     private Endpoint parentEndpoint = null;
 
     /**
      * This should have a reference to the current message context as it gets the referred endpoint
      * from it.
      */
-    private MessageContext currentMsgCtx = null;
     private final EndpointContext endpointContext = new EndpointContext();
 
     public void send(MessageContext synMessageContext) {
@@ -95,7 +94,7 @@ public class IndirectEndpoint implements Endpoint {
             }
         }
 
-
+        assert endpoint != null;
         if (endpoint.isActive(synMessageContext)) {
             endpoint.send(synMessageContext);
 
@@ -148,6 +147,7 @@ public class IndirectEndpoint implements Endpoint {
             handleException("Reference to non-existent endpoint for key : " + key);
         }
 
+        assert endpoint != null;
         return endpoint.isActive(synMessageContext);
     }
 
@@ -164,6 +164,7 @@ public class IndirectEndpoint implements Endpoint {
             handleException("Reference to non-existent endpoint for key : " + key);
         }
 
+        assert endpoint != null;
         endpoint.setActive(active, synMessageContext);
     }
 
@@ -211,12 +212,9 @@ public class IndirectEndpoint implements Endpoint {
             endptDefn = wsdlEndpt.getEndpoint();
         }
 
-        if (endptDefn != null) {
-            return (endptDefn.getTraceState() == SynapseConstants.TRACING_ON) ||
-                    (endptDefn.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                            synCtx.getTracingState() == SynapseConstants.TRACING_ON);
-        }
-        return false;
+        return endptDefn != null && ((endptDefn.getTraceState() == SynapseConstants.TRACING_ON) ||
+                (endptDefn.getTraceState() == SynapseConstants.TRACING_UNSET &&
+                        synCtx.getTracingState() == SynapseConstants.TRACING_ON));
     }
 
 }

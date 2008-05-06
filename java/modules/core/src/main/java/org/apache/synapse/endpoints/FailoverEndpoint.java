@@ -31,12 +31,13 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import java.util.List;
 
 /**
- * FailoverEndpoint can have multiple child endpoints. It will always try to send messages to current
- * endpoint. If the current endpoint is failing, it gets another active endpoint from the list and
- * make it the current endpoint. Then the message is sent to the current endpoint and if it fails, above
- * procedure repeats until there are no active endpoints. If all endpoints are failing and parent
- * endpoint is available, this will delegate the problem to the parent endpoint. If parent endpoint
- * is not available it will pop the next FaultHandler and delegate the problem to that.
+ * FailoverEndpoint can have multiple child endpoints. It will always try to send messages to
+ * current endpoint. If the current endpoint is failing, it gets another active endpoint from the
+ * list and make it the current endpoint. Then the message is sent to the current endpoint and if
+ * it fails, above procedure repeats until there are no active endpoints. If all endpoints are
+ * failing and parent endpoint is available, this will delegate the problem to the parent endpoint.
+ * If parent endpoint is not available it will pop the next FaultHandler and delegate the problem
+ * to that.
  */
 public class FailoverEndpoint implements Endpoint {
 
@@ -51,7 +52,7 @@ public class FailoverEndpoint implements Endpoint {
      * List of child endpoints. Failover sending is done among these. Any object implementing the
      * Endpoint interface can be a child.
      */
-    private List endpoints = null;
+    private List<Endpoint> endpoints = null;
 
     /**
      * Endpoint for which currently sending the SOAP traffic.
@@ -118,13 +119,11 @@ public class FailoverEndpoint implements Endpoint {
             currentEndpoint.send(synMessageContext);
         } else {
 
-            Endpoint liveEndpoint = null;
             boolean foundEndpoint = false;
-            for (int i = 0; i < endpoints.size(); i++) {
-                liveEndpoint = (Endpoint) endpoints.get(i);
-                if (liveEndpoint.isActive(synMessageContext)) {
+            for (Endpoint endpoint : endpoints) {
+                if (endpoint.isActive(synMessageContext)) {
                     foundEndpoint = true;
-                    currentEndpoint = liveEndpoint;
+                    currentEndpoint = endpoint;
                     currentEndpoint.send(synMessageContext);
                     break;
                 }
@@ -165,8 +164,7 @@ public class FailoverEndpoint implements Endpoint {
     public boolean isActive(MessageContext synMessageContext) {
         boolean active = endpointContext.isActive();
         if (!active) {
-            for (int i = 0; i < endpoints.size(); i++) {
-                Endpoint endpoint = (Endpoint) endpoints.get(i);
+            for (Endpoint endpoint : endpoints) {
                 if (endpoint.isActive(synMessageContext)) {
                     active = true;
                     endpointContext.setActive(true);
@@ -186,14 +184,14 @@ public class FailoverEndpoint implements Endpoint {
         this.endpointContext.setActive(active);
     }
 
-    public List getEndpoints() {
+    public List<Endpoint> getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints) {
+    public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
         if (endpoints.size() > 0) {
-            currentEndpoint = (Endpoint) endpoints.get(0);
+            currentEndpoint = endpoints.get(0);
         }
     }
 

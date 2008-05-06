@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class LoadbalanceEndpointSerializer extends EndpointSerializer {
 
-    public OMElement serializeEndpoint(Endpoint endpoint) {
+    protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof LoadbalanceEndpoint)) {
             throw new SynapseException("Invalid endpoint type.");
@@ -75,12 +75,8 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
             loadbalanceElement.addAttribute("failover", "false", null);
         }
 
-        List<Endpoint> endpoints = loadbalanceEndpoint.getEndpoints();
-        for (Endpoint childEndpoint : endpoints) {
-            EndpointSerializer serializer = EndpointAbstractSerializer.
-                    getEndpointSerializer(childEndpoint);
-            OMElement aeElement = serializer.serializeEndpoint(childEndpoint);
-            loadbalanceElement.addChild(aeElement);
+        for (Endpoint childEndpoint : loadbalanceEndpoint.getEndpoints()) {
+            loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
         }
 
         return endpointElement;

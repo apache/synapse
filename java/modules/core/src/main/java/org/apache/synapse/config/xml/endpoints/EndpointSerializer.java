@@ -26,11 +26,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
- * All endpoint serializers should implement this interface. Use EndpointAbstractSerializer to
+ * All endpoint serializers should implement this interface. Use EndpointSerializer to
  * obtain the correct EndpointSerializer implementation for a particular endpoint.
  * EndpointSerializer implementation may call other EndpointSerializer implementations to serialize
  * nested endpoints.
@@ -42,12 +42,23 @@ public abstract class EndpointSerializer {
     protected OMFactory fac;
 
     /**
+     * Core method which is exposed to the external use, and serializes the {@link Endpoint} to the
+     * XML format
+     *
+     * @param endpoint to be serialized
+     * @return XML format of the serialized endpoint
+     */
+    public static OMElement getElementFromEndpoint(Endpoint endpoint) {
+        return getEndpointSerializer(endpoint).serializeEndpoint(endpoint);
+    }
+
+    /**
      * Serializes the given endpoint implementation to an XML object.
      *
      * @param endpoint Endpoint implementation to be serialized.
      * @return OMElement containing XML configuration.
      */
-    public abstract OMElement serializeEndpoint(Endpoint endpoint);
+    protected abstract OMElement serializeEndpoint(Endpoint endpoint);
 
     /**
      * Serializes the QoS infomation of the endpoint to the XML element
@@ -176,5 +187,32 @@ public abstract class EndpointSerializer {
     protected void handleException(String message) {
         log.error(message);
         throw new SynapseException(message);
+    }
+
+    /**
+     * Returns the EndpointSerializer implementation for the given endpoint. Throws a SynapseException,
+     * if there is no serializer for the given endpoint type.
+     *
+     * @param endpoint Endpoint implementaion.
+     * @return EndpointSerializer implementation.
+     */
+    public static EndpointSerializer getEndpointSerializer(Endpoint endpoint) {
+
+        if (endpoint instanceof AddressEndpoint) {
+            return new AddressEndpointSerializer();
+        } else if (endpoint instanceof WSDLEndpoint) {
+            return new WSDLEndpointSerializer();
+        } else if (endpoint instanceof IndirectEndpoint) {
+            return new IndirectEndpointSerializer();
+        } else if (endpoint instanceof LoadbalanceEndpoint) {
+            return new LoadbalanceEndpointSerializer();
+        } else if (endpoint instanceof SALoadbalanceEndpoint) {
+            return new SALoadbalanceEndpointSerializer();
+        } else if (endpoint instanceof FailoverEndpoint) {
+            return new FailoverEndpointSerializer();
+        }
+
+        throw new SynapseException("Serializer for endpoint " +
+                endpoint.getClass().toString() + " is not defined.");
     }
 }

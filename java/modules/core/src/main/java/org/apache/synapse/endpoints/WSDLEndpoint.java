@@ -35,9 +35,9 @@ import java.util.Stack;
 
 /**
  * WSDLEndpoint represents the endpoints built using a wsdl document. It stores the details about
- * the endpoint in a EndpointDefinition object. Once the WSDLEndpoint object is constructed, it should
- * not access the wsdl document at runtime to obtain endpoint information. If it is necessary to
- * create an endpoint using a dynamic wsdl, store the endpoint configuration in the registry and
+ * the endpoint in a EndpointDefinition object. Once the WSDLEndpoint object is constructed, it
+ * should not access the wsdl document at runtime to obtain endpoint information. If it is necessary
+ * to create an endpoint using a dynamic wsdl, store the endpoint configuration in the registry and
  * create a dynamic wsdl endpoint using that registry key.
  * <p/>
  * TODO: This should allow various policies to be applied on fine grained level (e.g. operations).
@@ -62,11 +62,11 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     private final EndpointContext endpointContext = new EndpointContext();
 
     /**
-     * Sends the message through this endpoint. This method just handles statistics related functions
-     * and gives the message to the Synapse environment to send. It does not add any endpoint
-     * specific details to the message context. These details are added only to the cloned message
-     * context by the Axis2FlexibleMepClient. So that we can reuse the original message context for
-     * resending through different endpoints.
+     * Sends the message through this endpoint. This method just handles statistics related
+     * functions and gives the message to the Synapse environment to send. It does not add any
+     * endpoint specific details to the message context. These details are added only to the cloned
+     * message context by the Axis2FlexibleMepClient. So that we can reuse the original message
+     * context for resending through different endpoints.
      *
      * @param synCtx MessageContext sent by client to Synapse
      */
@@ -83,11 +83,9 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             }
         }
 
-        String eprAddress = null;
         if (endpoint.getAddress() != null) {
 
-            eprAddress = endpoint.getAddress();
-
+            String eprAddress = endpoint.getAddress();
             boolean isClusteringEnable = false;
             // get Axis2 MessageContext and ConfigurationContext
             org.apache.axis2.context.MessageContext axisMC =
@@ -95,7 +93,6 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             ConfigurationContext cc = axisMC.getConfigurationContext();
 
             //The check for clustering environment
-
             ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
             if (clusterManager != null &&
                     clusterManager.getContextManager() != null) {
@@ -106,9 +103,10 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             if (endPointName == null) {
 
                 if (traceOrDebugOn && isClusteringEnable) {
-                    log.warn("In a clustering environment , the endpoint  name should be specified" +
-                            "even for anonymous endpoints. Otherwise , the clustering would not be " +
-                            "functioned correctly if there are more than one anonymous endpoints. ");
+                    log.warn("In a clustering environment , the endpoint  name should be " +
+                            "specified even for anonymous endpoints. Otherwise, the clustering " +
+                            "would not be functioned correctly if there are more than one " +
+                            "anonymous endpoints. ");
                 }
                 endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
             }

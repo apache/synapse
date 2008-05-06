@@ -54,7 +54,7 @@ public class LoadbalanceEndpoint implements Endpoint {
      * List of endpoints among which the load is distributed. Any object implementing the Endpoint
      * interface could be used.
      */
-    private List endpoints = null;
+    private List<Endpoint> endpoints = null;
 
     /**
      * Algorithm used for selecting the next endpoint to direct the load. Default is RoundRobin.
@@ -186,8 +186,7 @@ public class LoadbalanceEndpoint implements Endpoint {
     public boolean isActive(MessageContext synMessageContext) {
         boolean active = endpointContext.isActive();
         if (!active && endpoints != null) {
-            for (int i = 0; i < endpoints.size(); i++) {
-                Endpoint endpoint = (Endpoint) endpoints.get(i);
+            for (Endpoint endpoint : endpoints) {
                 if (endpoint.isActive(synMessageContext)) {
                     active = true;
                     endpointContext.setActive(true);
@@ -215,11 +214,11 @@ public class LoadbalanceEndpoint implements Endpoint {
         this.failover = failover;
     }
 
-    public List getEndpoints() {
+    public List<Endpoint> getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints) {
+    public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
     }
 

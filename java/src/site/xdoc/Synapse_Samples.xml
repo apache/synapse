@@ -4044,7 +4044,7 @@ end
     <p/>
     <p/>
     <p>
-      <strong>Objective:</strong> I<strong>ntroduction to the
+      <strong>Objective:Introduction to the
       dblookup mediator</strong>
     </p>
     <p>
@@ -4149,7 +4149,7 @@ end
 &lt;/definitions&gt;</pre>
     <div>
       <p>
-        <strong>Objective: I<strong>ntroduction to the dbreport mediator</strong></strong>
+        <strong>Objective:Introduction to the dbreport mediator</strong>
       </p>
       <p>
         <strong>Prerequisites:</strong> Setting up Derby database as
@@ -4524,8 +4524,8 @@ end
     &lt;/sequence&gt;
 &lt;/definitions&gt;</pre>
     <p>
-      <b>Objective: Demonstrate the use of throttle mediator for concurrency
-      throttling </b>
+      <strong>Objective: </strong>Demonstrate the use of throttle mediator for concurrency
+      throttling
     </p>
     <p>
       <strong>Prerequisites:</strong>
@@ -5024,10 +5024,10 @@ Discounted price: 138.77458254967408</pre>
 
 &lt;/definitions&gt; </pre>
     <p>
-      <b>Objective: Introduction transformation using XQuery mediator</b>
+      <strong>Objective: </strong>Introduction transformation using XQuery mediator
     </p>
     <p>
-      <b>Prerequisites</b>:Start the Synapse configuration numbered
+      <strong>Prerequisites</strong>:Start the Synapse configuration numbered
       390: i.e. synapse -sample 390
     </p>
     <p>
@@ -5086,8 +5086,8 @@ Discounted price: 138.77458254967408</pre>
       <b/>
     </p>
     <p>
-      <b><strong>Objective: Demonstrate the use of XQuery mediator to
-      import external XML documents to the XQuery engine</strong></b>
+      <strong>Objective: Demonstrate the use of XQuery mediator to
+      import external XML documents to the XQuery engine</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService
@@ -5146,9 +5146,9 @@ Discounted price: 138.77458254967408</pre>
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
     <p>
-      <b><strong>Objective: Demonstrate the use of Iterate mediator to
+      <strong>Objective: Demonstrate the use of Iterate mediator to
       split the messages in to parts and process them asynchronously and then
-      aggregate the responses coming in to synapse</strong></b>
+      aggregate the responses coming in to synapse</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService
@@ -5208,9 +5208,9 @@ Discounted price: 138.77458254967408</pre>
     &lt;/out&gt;
 &lt;/definitions&gt;</pre>
     <p>
-      <b><strong>Objective: Demonstrate the use of Cache mediator in order
+      <strong>Objective: Demonstrate the use of Cache mediator in order
       to cache the response and use that cached response as the response for an
-      identical xml request</strong></b>
+      identical xml request</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService

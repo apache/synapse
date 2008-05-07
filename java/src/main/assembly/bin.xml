@@ -127,21 +127,14 @@
             <directory>src/main/bin/native</directory>
             <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>
             <fileMode>755</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>src/site/resources</directory>
-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
-            <includes>
-                <include>Synapse_Configuration_Language.html</include>
-                <include>Synapse_Samples.html</include>
-                <include>Synapse_Samples_Setup.html</include>
-                <include>Synapse_QuickStart.html</include>
-                <include>Synapse_Extending.html</include>
-            </includes>
-        </fileSet>
+        </fileSet>      
         <fileSet>
             <directory>src/site/resources/images</directory>
             <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/site/resources/logos</directory>
+            <outputDirectory>synapse-${synapse.version}/docs/logos</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>modules/samples/services</directory>
@@ -240,6 +233,33 @@
             </includes>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>src/site/xdoc/Synapse_Configuration_Language.xml</source>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <destName>Synapse_Configuration_Language.html</destName>
+        </file>
+        <file>
+            <source>src/site/xdoc/Synapse_Samples.xml</source>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <destName>Synapse_Samples.html</destName>
+        </file>
+        <file>
+            <source>src/site/xdoc/Synapse_Samples_Setup.xml</source>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <destName>Synapse_Samples_Setup.html</destName>
+        </file>
+        <file>
+            <source>src/site/xdoc/Synapse_QuickStart.xml</source>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <destName>Synapse_QuickStart.html</destName>
+        </file>
+        <file>
+            <source>src/site/xdoc/Synapse_Extending.xml</source>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <destName>Synapse_Extending.html</destName>
+        </file>
+    </files>
     <dependencySets>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>

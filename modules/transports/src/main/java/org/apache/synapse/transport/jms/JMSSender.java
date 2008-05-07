@@ -234,6 +234,14 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                 try {
                     JMSUtils.sendMessageToJMSDestination(session, destination, destinationType, message);
 
+                    // set the actual MessageID to the message context for use by any others
+                    try {
+                        String msgId = message.getJMSMessageID();
+                        if (msgId != null) {
+                            msgCtx.setProperty(JMSConstants.JMS_MESSAGE_ID, msgId);
+                        }
+                    } catch (JMSException ignore) {}
+
                     metrics.incrementMessagesSent();
                     try {
                         if (message instanceof BytesMessage) {

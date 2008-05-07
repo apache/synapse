@@ -107,9 +107,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             StatisticsUtils.processSequenceStatistics(synCtx);
         }
 
-        Mediator mandatorySeq = synCtx.getConfiguration().getSequence(
-                SynapseConstants.MANDATORY_SEQUENCE_KEY);
-
+        Mediator mandatorySeq = synCtx.getConfiguration().getMandatorySequence();
         // the mandatory sequence is optional and hence check for the existance before mediation
         if (mandatorySeq != null) {
 

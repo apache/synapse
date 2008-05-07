@@ -91,11 +91,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         proxyServiceStatisticsStack);
             }
 
-            Mediator mandatorySeq = synCtx.getConfiguration().getSequence(
-                    SynapseConstants.MANDATORY_SEQUENCE_KEY);
-
+            Mediator mandatorySeq = synCtx.getConfiguration().getMandatorySequence();
             if (mandatorySeq != null) {
-
                 if (log.isDebugEnabled()) {
                     log.debug("Start mediating the message in the " +
                         "pre-mediate state using the mandatory sequence");

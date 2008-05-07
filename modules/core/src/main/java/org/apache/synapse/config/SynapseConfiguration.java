@@ -55,7 +55,14 @@ public class SynapseConfiguration implements ManagedLifecycle {
      */
     private QName defaultQName = null;
 
-	/**
+    /**
+     * Mandatory sequence is treated specially since it is required for each and every message.
+     * Keeps the reference to the mandatory sequence while it is available as a sequence in the
+     * localRegistry map
+     */
+    private Mediator mandatorySequence = null;
+
+    /**
      * Holds Proxy services defined through Synapse
      */
 	private Map<String, ProxyService> proxyServices = new HashMap<String, ProxyService>();
@@ -135,7 +142,27 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		return definedSequences;
 	}
 
-	/**
+    /**
+     * Gets the mandatory sequence, from the direct reference. This is also available in the
+     * {@link SynapseConfiguration#getSequence} but this method improves the performance hence this
+     * will be required for all messages
+     *
+     * @return mandatory sequence direct reference in the local configuration
+     */
+    public Mediator getMandatorySequence() {
+        return mandatorySequence;
+    }
+
+    /**
+     * Sets the mandatory sequence direct reference
+     * 
+     * @param mandatorySequence to be set as the direct reference
+     */
+    public void setMandatorySequence(Mediator mandatorySequence) {
+        this.mandatorySequence = mandatorySequence;
+    }
+
+    /**
 	 * Return the sequence specified with the given key
 	 *
 	 * @param key

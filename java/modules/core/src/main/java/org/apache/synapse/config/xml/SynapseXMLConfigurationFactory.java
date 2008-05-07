@@ -168,7 +168,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             if (config.getLocalRegistry().get(name) != null) {
                 handleException("Duplicate sequence definition : " + name);
             }
-            config.addSequence(name, MediatorFactoryFinder.getInstance().getMediator(ele));
+            Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(ele);
+            config.addSequence(name, mediator);
+            // mandatory sequence is treated as a speciall sequence because it will be fetched for
+            // each and every message and keeps a direct reference to that from the configuration
+            // this also limits the ability of the mandatory sequence to be dynamic
+            if (SynapseConstants.MANDATORY_SEQUENCE_KEY.equals(name)) {
+                config.setMandatorySequence(mediator);
+            }
         } else {
             handleException("Invalid sequence definition without a name");
         }

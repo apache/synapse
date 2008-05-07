@@ -171,7 +171,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                     if (fault != null) {
                         Exception e = fault.getException();
                         if (e == null) {
-                            e = new Exception(fault.toString());
+                            SOAPFaultReason reason = fault.getReason();
+                            if (reason != null) {
+                                e = new Exception(reason.getText());
+                            }
                         }
                         // set an error code to the message context, so that error sequences can
                         // filter using that property to determine the cause of error

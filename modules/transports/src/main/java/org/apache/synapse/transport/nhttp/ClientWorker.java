@@ -60,8 +60,6 @@ public class ClientWorker implements Runnable {
     private InputStream in = null;
     /** the HttpResponse received */
     private HttpResponse response = null;
-    /** the metrics collector */
-    private MetricsCollector metrics = null;
 
     /**
      * Create the thread that would process the response message received for the outgoing message
@@ -71,12 +69,11 @@ public class ClientWorker implements Runnable {
      * @param outMsgCtx the original outgoing message context (i.e. corresponding request)
      */
     public ClientWorker(ConfigurationContext cfgCtx, InputStream in,
-        HttpResponse response, MessageContext outMsgCtx, final MetricsCollector metrics) {
+        HttpResponse response, MessageContext outMsgCtx) {
 
         this.cfgCtx = cfgCtx;
         this.in = in;
         this.response = response;
-        this.metrics = metrics;
 
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().
@@ -196,6 +193,14 @@ public class ClientWorker implements Runnable {
             responseMsgCtx.setProperty(NhttpConstants.HTTP_SC,
                     this.response.getStatusLine().getStatusCode());
 
+            // process response received
+            AxisEngine engine = new AxisEngine(cfgCtx);
+            try {
+                engine.receive(responseMsgCtx);
+            } catch (AxisFault af) {
+                log.error("Fault processing response message through Axis2", af);
+            }
+
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);
             return;
@@ -203,20 +208,16 @@ public class ClientWorker implements Runnable {
             log.error("Error creating response SOAP envelope", e);
         } catch (IOException e) {
             log.error("Error closing input stream from which message was read", e);
-        }
 
-        AxisEngine engine = new AxisEngine(cfgCtx);
-        try {
-            engine.receive(responseMsgCtx);
-        } catch (AxisFault af) {
-            log.error("Fault processing response message through Axis2", af);
+        } finally {
+            // this is the guaranteed location to close the RESPONSE_SOURCE_CHANNEL that was used
+            // to read the response back from the server.
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ignore) {}
         }
-
-        try {
-            if (in != null) {
-                in.close();
-            }
-        } catch (IOException ignore) {}
     }
 
     // -------------- utility methods -------------

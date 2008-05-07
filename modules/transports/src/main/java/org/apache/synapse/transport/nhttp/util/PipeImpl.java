@@ -83,7 +83,7 @@ public class PipeImpl {
             try {
                 pipedOut = new PipedOutputStream(pipedIn);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Unable to create an in-memory Pipe");
             }
 
             source = Channels.newChannel(pipedIn);

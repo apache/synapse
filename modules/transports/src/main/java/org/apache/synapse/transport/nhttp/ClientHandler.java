@@ -201,7 +201,9 @@ public class ClientHandler implements NHttpClientHandler {
 
         HttpContext context = conn.getContext();
         closeChannel((ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL));
-        closeChannel((ReadableByteChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL));
+        // Note: We do not close the RESPONSE_SOURCE_CHANNEL at this point in time as its closed
+        // by the ClientWorker:run() in the finally block, after the response was processed
+        // fix for https://issues.apache.org/jira/browse/SYNAPSE-289
         closeChannel((WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL));
         closeChannel((WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL));
         
@@ -568,7 +570,7 @@ public class ClientHandler implements NHttpClientHandler {
 
             workerPool.execute(
                 new ClientWorker(cfgCtx, Channels.newInputStream(responsePipe.source()), response,
-                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT), metrics));
+                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);

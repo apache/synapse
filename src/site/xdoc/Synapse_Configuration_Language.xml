@@ -754,7 +754,7 @@ File     vfs:file:///home/user/directory
     <p>
       Transport specific parameters that may be set as service parameters:
     </p>
-    <table border="0" cellpadding="0" cellspacing="0" style="width: 100%" class="data-table">
+    <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
       <caption/>
       <tbody>
         <tr>
@@ -821,6 +821,18 @@ File     vfs:file:///home/user/directory
           </td>
           <td>
             The destination where a reply will be posted
+          </td>
+        </tr>
+        <tr>
+          <td/>
+          <td>
+            Optional
+          </td>
+          <td>
+            transport.jms.Wrapper
+          </td>
+          <td>
+            The wrapper element for the JMS message
           </td>
         </tr>
         <tr>

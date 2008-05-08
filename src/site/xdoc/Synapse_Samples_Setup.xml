@@ -227,8 +227,6 @@
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         quote - send a quote request for a single stock as follows. The response
         contains the last sales price for the stock which will be displayed
 <pre xml:space="preserve">&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
@@ -236,8 +234,6 @@
     &lt;m:symbol&gt;IBM&lt;/m:symbol&gt;
   &lt;/m:request&gt;
 &lt;/m:getQuote&gt;</pre>
-      </li>
-      <li>
       </li>
       <li>
         customquote - send a quote request in a custom format. Synapse will
@@ -250,8 +246,6 @@
 &lt;/m0:checkPriceRequest&gt;</pre>
       </li>
       <li>
-      </li>
-      <li>
         fullquote - get quote reports for the stock over a number of days (i.e.
         last 100 days of the year).
 <pre xml:space="preserve">&lt;m:getFullQuote xmlns:m="http://services.samples/xsd"&gt;
@@ -259,8 +253,6 @@
     &lt;m:symbol&gt;IBM&lt;/m:symbol&gt;
   &lt;/m:request&gt;
 &lt;/m:getFullQuote&gt;</pre>
-      </li>
-      <li>
       </li>
       <li>
         placeorder - place an order for stocks using a one way request
@@ -273,8 +265,6 @@
 &lt;/m:placeOrder&gt;</pre>
       </li>
       <li>
-      </li>
-      <li>
         marketactivity - get a market activity report for the day (i.e. quotes
         for multiple symbols)
 <pre xml:space="preserve">&lt;m:getMarketActivity xmlns:m="http://services.samples/xsd"&gt;
@@ -284,8 +274,6 @@
     &lt;m:symbol&gt;MSFT&lt;/m:symbol&gt;
   &lt;/m:request&gt;
 &lt;/m:getMarketActivity&gt;</pre>
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -480,21 +468,13 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         activeio-core-3.0.0-incubator.jar
-      </li>
-      <li>
       </li>
       <li>
         activemq-core-4.1.0-incubator.jar
       </li>
       <li>
-      </li>
-      <li>
         geronimo-j2ee-management_1.0_spec-1.0.jar
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -704,11 +684,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <ol>
       <li>
-      </li>
-      <li>
         Set up and start the Derby network server
-      </li>
-      <li>
       </li>
       <li>
         Create and open a connection to the database using the Derby client
@@ -719,14 +695,10 @@ synapse.sh -sample &lt;n&gt;</pre>
         </p>
       </li>
       <li>
-      </li>
-      <li>
         Create a table using the following statement
         <p>
           create table company(name varchar(10), id varchar(10), price double);
         </p>
-      </li>
-      <li>
       </li>
       <li>
         Inserts some data using following statements
@@ -739,8 +711,6 @@ synapse.sh -sample &lt;n&gt;</pre>
         <p>
           insert into company values ('MSFT','c3',0.0);
         </p>
-      </li>
-      <li>
       </li>
     </ol>
     <p>

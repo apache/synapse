@@ -19,6 +19,7 @@
 package org.apache.synapse.transport.udp;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.transport.http.server.HttpUtils;
 import org.apache.synapse.transport.base.AbstractTransportListener;
 import org.apache.synapse.transport.base.ManagementSupport;
 
@@ -51,6 +53,7 @@ import org.apache.synapse.transport.base.ManagementSupport;
 public class UDPListener extends AbstractTransportListener implements ManagementSupport {
     private final Map<String,Endpoint> endpoints = new HashMap<String,Endpoint>();
     
+    private String defaultIp;
     private IODispatcher dispatcher;
     
     @Override
@@ -61,6 +64,11 @@ public class UDPListener extends AbstractTransportListener implements Management
             dispatcher = new IODispatcher(workerPool);
         } catch (IOException ex) {
             throw new AxisFault("Unable to create selector", ex);
+        }
+        try {
+            defaultIp = HttpUtils.getIpAddress(cfgCtx.getAxisConfiguration());
+        } catch (SocketException ex) {
+            throw new AxisFault("Unable to determine the host's IP address", ex);
         }
         // Start a new thread for the I/O dispatcher
         new Thread(dispatcher, getTransportName() + "-dispatcher").start();
@@ -146,7 +154,7 @@ public class UDPListener extends AbstractTransportListener implements Management
         if (endpoint == null) {
             return null;
         } else {
-            return new EndpointReference[] { endpoint.getEndpointReference(ip) };
+            return new EndpointReference[] { endpoint.getEndpointReference(ip == null ? defaultIp : ip) };
         }
     }
 }

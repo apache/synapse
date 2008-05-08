@@ -140,18 +140,4 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
 
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
-    private ArrayList<Endpoint> getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
-
-        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
-        Iterator iter = loadbalanceElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
-        while (iter.hasNext()) {
-            OMElement endptElem = (OMElement) iter.next();
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
-            endpoint.setParentEndpoint(parent);
-            endpoints.add(endpoint);
-        }
-
-        return endpoints;
-    }
 }

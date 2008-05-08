@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -64,21 +65,7 @@ public class FailoverEndpointFactory extends EndpointFactory {
             failoverEndpoint.setEndpoints(getEndpoints(failoverElement, failoverEndpoint));
             return failoverEndpoint;
         }
-
         return null;
     }
-    
-    private ArrayList<Endpoint> getEndpoints(OMElement failoverElement, Endpoint parent) {
 
-        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
-        Iterator iter = failoverElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
-        while (iter.hasNext()) {
-            OMElement endptElem = (OMElement) iter.next();
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
-            endpoint.setParentEndpoint(parent);
-            endpoints.add(endpoint);
-        }
-
-        return endpoints;
-    }
 }

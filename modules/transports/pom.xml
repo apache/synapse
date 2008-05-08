@@ -49,6 +49,34 @@
                     </excludes>
                 </configuration>
             </plugin>
+            
+            <!-- We need a repository with the addressing module for the UDP transport tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.0-alpha-1</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.axis2</groupId>
+                                    <artifactId>addressing</artifactId>
+                                    <version>${addressing.version}</version>
+                                    <type>mar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/test_rep/modules</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

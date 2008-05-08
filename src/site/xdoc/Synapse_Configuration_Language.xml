@@ -702,7 +702,7 @@ File     vfs:file:///home/user/directory
     <p>
       You can give the following as service parameters:
     </p>
-    <table border="0" cellpadding="0" cellspacing="0" style="width: 100%" class="data-table">
+    <table border="1" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
       <caption/>
       <tbody>
         <tr>
@@ -754,7 +754,7 @@ File     vfs:file:///home/user/directory
     <p>
       Transport specific parameters that may be set as service parameters:
     </p>
-    <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
+    <table border="1" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
       <caption/>
       <tbody>
         <tr>
@@ -834,12 +834,6 @@ File     vfs:file:///home/user/directory
           <td>
             The wrapper element for the JMS message
           </td>
-        </tr>
-        <tr>
-          <td/>
-          <td/>
-          <td/>
-          <td/>
         </tr>
         <tr>
           <td>
@@ -1076,16 +1070,8 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       A mediator token refers to any of the following tokens:
     </p>
 <pre xml:space="preserve">
-    <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  
-    | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a>
-    | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#header">header</a>  
-    | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a> 
-    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> 
-    | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> 
-    | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> 
-    | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> 
-    | <a href="#script">script</a>
-    | <a href="#RMSequence">RMSequence</a>
+    <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#header">header</a>  | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a>
+    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a>
     </pre>
     <p>
       In addition to the above, Synapse will be able to load custom mediators

@@ -190,7 +190,7 @@
     <p>
       The above diagram depicts the interactions between the clients, Synapse
       and the services at a higher level. The Clients are able to send SOAP/REST
-      or POX messages over transports such as http/s or JMS with WS-Addressing,
+      or POX messages over transports such as HTTP/S or JMS with WS-Addressing,
       WS-Security or WS-Reliable messaging. They can send binary optimized
       content using MTOM or SwA or binary or plain text JMS messages. After
       mediation through Synapse, the requests are passed over to the sample
@@ -318,7 +318,7 @@
       Proxy Client Mode:
     </h4>
     <p>
-      In this mode, the client uses the 'prxurl' as a http proxy to send the
+      In this mode, the client uses the 'prxurl' as a HTTP proxy to send the
       request. Thus by setting the 'prxurl' to Synapse, the client can ensure
       that the message will reach Synapse for mediation. The client can
       optionally set a WS-Addressing EPR if required.
@@ -389,7 +389,7 @@ ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy
     <p/>
     <p>
       The sample services ship with a pre-configured Axis2 server and
-      demonstrates in-only and in-out SOAP/REST or POX messaging over http/s and
+      demonstrates in-only and in-out SOAP/REST or POX messaging over HTTP/S and
       JMS transports, using WS-Addressing, WS-Security and WS-Reliable Messaging
       and handling of binary content using MTOM and SwA.
     </p>
@@ -410,7 +410,7 @@ Total time: 3 seconds</pre>
     <p>
       To start the Axis2 server, go to the samples/axis2Server directory and
       execute the axis2server.sh or axis2server.bat script. This starts the
-      Axis2 server with the http transport listener on port 9000 and https on
+      Axis2 server with the HTTP transport listener on port 9000 and HTTPS on
       9002 respectively. To enable JMS transport, you will need to setup and
       start a JMS provider. An ActiveMQ 4.0.1 or later JMS server on the local
       machine is supported by default, and can be easily enabled by uncommenting
@@ -547,7 +547,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     &lt;/transportSender&gt;</pre>
     <p/>
     <h2 id="fixtransport">
-      Setting up FIX Transport
+      Setting up the FIX Transport
     </h2>
     <p>
 	To run the FIX samples used in this guide you need a local Quickfix/J

@@ -428,7 +428,6 @@ public abstract class AbstractTransportListener implements TransportListener {
     
     /**
      * Utility method to allow transports to register MBeans
-     * @param mbs the MBeanServer
      * @param mbeanInstance bean instance
      * @param objectName name
      */

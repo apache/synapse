@@ -99,7 +99,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
     public static final String MOVE = "MOVE";
 
     /** Keep the list of directories/files and poll durations */
-    private final List pollTable = new ArrayList();
+    private final List<PollTableEntry> pollTable = new ArrayList<PollTableEntry>();
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
 
@@ -128,11 +128,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener
      * it is time to scan the contents for new files
      */
     public void onPoll() {
-        Iterator iter = pollTable.iterator();
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
+        for (PollTableEntry entry : pollTable) {
             long startTime = System.currentTimeMillis();
-
             if (startTime > entry.getNextPollTime()) {
                 scanFileOrDirectory(entry, entry.getFileURI());
             }
@@ -159,7 +156,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
         int maxRetryCount = entry.getMaxRetryCount();
         long reconnectionTimeout = entry.getReconnectTimeout();
         
-        while(wasError == true) {
+        while(wasError) {
           try {
             retryCount++;
             fileObject = fsManager.resolveFile(fileURI);
@@ -178,7 +175,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
               return;
           }
         
-          if(wasError == true) {
+          if(wasError) {
             try {
               Thread.sleep(reconnectionTimeout);
             } catch (InterruptedException e2) {
@@ -220,31 +217,31 @@ public class VFSTransportListener extends AbstractPollingTransportListener
                     if (log.isDebugEnabled()) {
                         log.debug("File name pattern :" + entry.getFileNamePattern());
                     }
-                    for (int i = 0; i < children.length; i++) {
+                    for (FileObject child : children) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Matching file :" + children[i].getName().getBaseName());
+                            log.debug("Matching file :" + child.getName().getBaseName());
                         }
-                        if ( (entry.getFileNamePattern() != null)
-                                && (children[i].getName().getBaseName().matches(entry.getFileNamePattern()))) {
+                        if ((entry.getFileNamePattern() != null)
+                                && (child.getName().getBaseName().matches(entry.getFileNamePattern()))) {
                             try {
                                 if (log.isDebugEnabled()) {
-                                    log.debug("Processing file :" + children[i]);
+                                    log.debug("Processing file :" + child);
                                 }
-                                processFile(entry, children[i]);
+                                processFile(entry, child);
                                 successCount++;
                                 // tell moveOrDeleteAfterProcessing() file was success
                                 entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
                                 metrics.incrementMessagesReceived();
 
                             } catch (Exception e) {
-                                logException("Error processing File URI : " + children[i].getName(), e);
+                                logException("Error processing File URI : " + child.getName(), e);
                                 failCount++;
                                 // tell moveOrDeleteAfterProcessing() file failed
                                 entry.setLastPollState(PollTableEntry.FAILED);
                                 metrics.incrementFaultsReceiving();
-                             }
+                            }
 
-                            moveOrDeleteAfterProcessing(entry, children[i]);
+                            moveOrDeleteAfterProcessing(entry, child);
                         }
                     }
 
@@ -355,7 +352,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
 
             metrics.incrementBytesReceived(content.getSize());
 
-            Map transportHeaders = new HashMap();
+            Map<String, Object> transportHeaders = new HashMap<String, Object>();
             transportHeaders.put(VFSConstants.FILE_PATH, filePath);
             transportHeaders.put(VFSConstants.FILE_NAME, fileName);
 
@@ -363,7 +360,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener
                 transportHeaders.put(VFSConstants.FILE_LENGTH, Long.valueOf(content.getSize()));
             } catch (FileSystemException ignore) {}
             try {
-                transportHeaders.put(VFSConstants.LAST_MODIFIED, Long.valueOf(content.getLastModifiedTime()));
+                transportHeaders.put(VFSConstants.LAST_MODIFIED,
+                        Long.valueOf(content.getLastModifiedTime()));
             } catch (FileSystemException ignore) {}
 
             // compute the unique message ID
@@ -469,11 +467,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener
      * @throws AxisFault not used
      */
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
-        Iterator iter = pollTable.iterator();
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
-            if (entry.getServiceName().equals(serviceName)) {
-                return new EndpointReference[]{ new EndpointReference("vfs:" + entry.getFileURI())};                
+        for (PollTableEntry entry : pollTable) {
+            if (entry.getServiceName().equals(serviceName)
+                    || serviceName.startsWith(entry.getServiceName() + ".")) {
+                return new EndpointReference[]{new EndpointReference("vfs:" + entry.getFileURI())};
             }
         }
         return null;

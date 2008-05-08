@@ -178,8 +178,9 @@ public class MessageHelper {
             newMC.getOptions().setProperty(key, ori.getOptions().getProperty(key));
         }
 
-        for (Object o1 : ori.getProperties().keySet()) {
-            String key = (String) o1;
+        Iterator itr = ori.getPropertyNames();
+        while (itr.hasNext()) {
+            String key = (String) itr.next();
             if (key != null) {
                 // In a clustered environment, all the properties that need to be relpicated,
                 // are replicated explicitly  by the corresponding Mediators (Ex: throttle,

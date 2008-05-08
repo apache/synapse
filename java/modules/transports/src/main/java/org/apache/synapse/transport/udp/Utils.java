@@ -36,7 +36,7 @@ public class Utils {
                     buffer.append("  ");
                 }
                 buffer.append(' ');
-                if (i == 8) {
+                if (i == 7) {
                     buffer.append(' ');
                 }
             }

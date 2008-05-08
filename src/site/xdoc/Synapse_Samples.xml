@@ -5073,9 +5073,7 @@ Discounted price: 138.77458254967408</pre>
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
-    <p>
-      <b/>
-    </p>
+    
     <p>
       <strong>Objective: Demonstrate the use of XQuery mediator to
       import external XML documents to the XQuery engine</strong>

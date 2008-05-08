@@ -194,16 +194,19 @@ public abstract class BaseUtils {
      * @param contentType
      * @throws AxisFault on errors encountered while setting the envelope to the message context
      */
-    public void setSOAPEnvelope(Object message, MessageContext msgContext, String contentType) throws AxisFault {
+    public void setSOAPEnvelope(Object message, MessageContext msgContext, String contentType)
+            throws AxisFault {
 
         SOAPEnvelope envelope = null;
         StAXBuilder builder = null;
 
-        String charSetEnc;
+        String charSetEnc = null;
         try {
-            charSetEnc = new ContentType(contentType).getParameter("charset");
+            if (contentType != null) {
+                charSetEnc = new ContentType(contentType).getParameter("charset");
+            }
         } catch (ParseException ex) {
-            charSetEnc = null;
+            // ignore
         }
         
         InputStream in = getInputStream(message);
@@ -223,7 +226,9 @@ public abstract class BaseUtils {
         } catch (Exception ignore) {
             try {
                 in.close();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                // ignore
+            }
             in = getInputStream(message);
         }
 
@@ -282,7 +287,7 @@ public abstract class BaseUtils {
     private SOAPEnvelope handleLegacyMessage(MessageContext msgContext, Object message) {
 
         SOAPFactory soapFactory = new SOAP11Factory();
-        SOAPEnvelope envelope = null;
+        SOAPEnvelope envelope;
 
         if (log.isDebugEnabled()) {
             log.debug("Non SOAP/XML message received");
@@ -411,8 +416,8 @@ public abstract class BaseUtils {
 
         } else {
             List transports = service.getExposedTransports();
-            for (int i = 0; i < transports.size(); i++) {
-                if (transportName.equals(transports.get(i))) {
+            for (Object transport : transports) {
+                if (transportName.equals(transport)) {
                     return true;
                 }
             }

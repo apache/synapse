@@ -29,9 +29,12 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * All endpoint factories should implement this interface. Use EndpointFactory to obtain the
@@ -329,6 +332,36 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         handleException("Invalid endpoint configuration.");
         // just to make the compiler happy : never executes
         return null;
+    }
+
+    /**
+     * Helper method to construct children endpoints
+     *
+     * @param listEndpointElement OMElement representing  the children endpoints
+     * @param parent              Parent endpoint
+     * @return List of children endpoints
+     */
+    protected ArrayList<Endpoint> getEndpoints(OMElement listEndpointElement, Endpoint parent) {
+
+        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
+        ArrayList<String> keys = new ArrayList<String>();
+        Iterator iter = listEndpointElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
+        while (iter.hasNext()) {
+            OMElement endptElem = (OMElement) iter.next();
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
+            if (endpoint instanceof IndirectEndpoint) {
+                String key = ((IndirectEndpoint) endpoint).getKey();
+                if (!keys.contains(key)) {
+                    keys.add(key);
+                } else {
+                    handleException("Same endpoint definition cannot be used with in the siblings");
+                }
+            }
+            endpoint.setParentEndpoint(parent);
+            endpoints.add(endpoint);
+        }
+
+        return endpoints;
     }
 
     protected static void handleException(String msg) {

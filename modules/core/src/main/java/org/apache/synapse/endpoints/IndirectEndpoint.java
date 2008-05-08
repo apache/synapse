@@ -19,15 +19,12 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.axis2.clustering.ClusterManager;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
@@ -38,7 +35,7 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
  * As this is also an instance of endpoint, this can be used any place, where a normal endpoint is
  * used.
  */
-public class IndirectEndpoint implements Endpoint {
+public class IndirectEndpoint extends FaultHandler implements Endpoint {
 
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     private static final Log log = LogFactory.getLog(IndirectEndpoint.class);
@@ -46,12 +43,6 @@ public class IndirectEndpoint implements Endpoint {
     private String name = null;
     private String key = null;
     private Endpoint parentEndpoint = null;
-
-    /**
-     * This should have a reference to the current message context as it gets the referred endpoint
-     * from it.
-     */
-    private final EndpointContext endpointContext = new EndpointContext();
 
     public void send(MessageContext synMessageContext) {
 
@@ -61,43 +52,11 @@ public class IndirectEndpoint implements Endpoint {
             handleException("Reference to non-existent endpoint for key : " + key);
         }
 
-        boolean isClusteringEnable = false;
-        // get Axis2 MessageContext and ConfigurationContext
-        org.apache.axis2.context.MessageContext axisMC =
-                ((Axis2MessageContext) synMessageContext).getAxis2MessageContext();
-        ConfigurationContext cc = axisMC.getConfigurationContext();
-
-        //The check for clustering environment
-
-        ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
-        if (clusterManager != null &&
-                clusterManager.getContextManager() != null) {
-            isClusteringEnable = true;
-        }
-
-        String endPointName = this.getName();
-        if (endPointName == null) {
-
-            if (log.isDebugEnabled() && isClusteringEnable) {
-                log.warn("In a clustering environment , the endpoint  name should be specified" +
-                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
-                        "functioned correctly if there are more than one anonymous endpoints. ");
-            }
-            endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
-        }
-
-        if (isClusteringEnable) {
-            // if this is a cluster environment , then set configuration context to endpoint context
-            if (endpointContext.getConfigurationContext() == null) {
-                endpointContext.setConfigurationContext(cc);
-                endpointContext.setContextID(endPointName);
-            }
-        }
-
         assert endpoint != null;
         if (endpoint.isActive(synMessageContext)) {
+             // register this as the immediate fault handler for this message.
+            synMessageContext.pushFaultHandler(this);
             endpoint.send(synMessageContext);
-
         } else {
             // if this is a child of some other endpoint, inform parent about the failure.
             // if not, inform to the next fault handler.
@@ -217,4 +176,17 @@ public class IndirectEndpoint implements Endpoint {
                         synCtx.getTracingState() == SynapseConstants.TRACING_ON));
     }
 
+    public void onFault(MessageContext synMessageContext) {
+        // At this point,child endpoint is in inactive state
+        // if this is a child of some other endpoint, inform parent about the failure.
+        // if not, inform to the next fault handler.
+        if (parentEndpoint != null) {
+            parentEndpoint.onChildEndpointFail(this, synMessageContext);
+        } else {
+            Object o = synMessageContext.getFaultStack().pop();
+            if (o != null) {
+                ((FaultHandler) o).handleFault(synMessageContext);
+            }
+        }
+    }
 }

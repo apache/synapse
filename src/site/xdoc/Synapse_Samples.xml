@@ -3328,7 +3328,8 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable mail transport sender in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#mailsender">Setting up mail transport
+      href="Synapse_Samples_Setup.html
+      #mailsender">Setting up mail transport
       sender</a>
     </p>
     <p>
@@ -3408,7 +3409,7 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable mail transport sender in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#mailsender">Setting up mail transport
+      href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport
       sender</a>
     </p>
     <p>
@@ -3466,7 +3467,7 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable FIX transport in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#fixtransport">Setting up FIX transport
+      href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
       </a>
     </p>
     <p>
@@ -3533,7 +3534,7 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable FIX transport sender in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#fixtransport">Setting up FIX transport
+      href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
       </a>
     </p>
     <p>

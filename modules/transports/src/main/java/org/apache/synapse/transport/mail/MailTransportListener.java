@@ -58,7 +58,7 @@ public class MailTransportListener extends AbstractPollingTransportListener
     public static final String MOVE = "MOVE";
 
     /** Keep the list of directories/files and poll durations */
-    private final List pollTable = new ArrayList();
+    private final List<PollTableEntry> pollTable = new ArrayList<PollTableEntry>();
 
     /**
      * Initializes the Mail transport
@@ -78,11 +78,8 @@ public class MailTransportListener extends AbstractPollingTransportListener
      * it is time to scan the contents for new files
      */
     public void onPoll() {
-        Iterator iter = pollTable.iterator();
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
+        for (PollTableEntry entry : pollTable) {
             long startTime = System.currentTimeMillis();
-
             if (startTime > entry.getNextPollTime()) {
                 checkMail(entry, entry.getEmailAddress());
             }
@@ -472,12 +469,10 @@ public class MailTransportListener extends AbstractPollingTransportListener
      * @throws AxisFault not used
      */
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
-        Iterator iter = pollTable.iterator();
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
-            if (entry.getServiceName().equals(serviceName)) {
-                return new EndpointReference[]{
-                    new EndpointReference(
+        for (PollTableEntry entry : pollTable) {
+            if (entry.getServiceName().equals(serviceName) ||
+                    serviceName.startsWith(entry.getServiceName() + ".")) {
+                return new EndpointReference[]{new EndpointReference(
                         MailConstants.TRANSPORT_PREFIX + entry.getEmailAddress())};
             }
         }
@@ -580,9 +575,7 @@ public class MailTransportListener extends AbstractPollingTransportListener
     }
 
     protected void stopListeningForService(AxisService service) {
-        Iterator iter = pollTable.iterator();
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
+        for (PollTableEntry entry : pollTable) {
             if (service.getName().equals(entry.getServiceName())) {
                 cancelPoll(service);
                 pollTable.remove(entry);

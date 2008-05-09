@@ -62,6 +62,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
 
     private static final String FIRST_MESSAGE_IN_SESSION = "first_message_in_session";
     public static final String ENDPOINT_LIST = "endpointList";
+    public static final String ROOT_ENDPOINT = "rootendpoint";
     public static final String ENDPOINT_NAME_LIST = "endpointNameList";
     private static final String WARN_MESSAGE = "In a clustering environment , the endpoint " +
             " name should be specified" +
@@ -187,72 +188,52 @@ public class SALoadbalanceEndpoint implements Endpoint {
                     //  replicate endpoint itself
 
                     Object o = opCtx.getPropertyNonReplicable(ENDPOINT_NAME_LIST);
-                    if (o != null) {
+                    List epNameList;
+                    if (o instanceof List) {
 
-                        List endpointList = (List) o;
-                        endpointList.add(endPointName);
-
-                        // if the next endpoint is not a session affinity one, endpoint sequence ends
-                        // here. but we have to add the next endpoint to the list.
-                        if (!(endpoint instanceof SALoadbalanceEndpoint)) {
-                            String name = endpoint.getName();
-                            if (name == null) {
-                                log.warn(WARN_MESSAGE);
-                                name = SynapseConstants.ANONYMOUS_ENDPOINT;
-                            }
-                            endpointList.add(name);
-                        }
+                        epNameList = (List) o;
+                        epNameList.add(endPointName);
 
                     } else {
                         // this is the first endpoint in the heirachy. so create the queue and insert
                         // this as the first element.
-                        List endpointList = new ArrayList();
-                        endpointList.add(endPointName);
-
-                        // if the next endpoint is not a session affinity one, endpoint sequence ends
-                        // here. but we have to add the next endpoint to the list.
-                        if (!(endpoint instanceof SALoadbalanceEndpoint)) {
-                            String name = endpoint.getName();
-                            if (name == null) {
-                                log.warn(WARN_MESSAGE);
-                                name = SynapseConstants.ANONYMOUS_ENDPOINT;
-                            }
-                            endpointList.add(name);
-                        }
-
-                        opCtx.setProperty(ENDPOINT_NAME_LIST, endpointList);
+                        epNameList = new ArrayList();
+                        epNameList.add(endPointName);
+                        opCtx.setNonReplicableProperty(ROOT_ENDPOINT,this);
                     }
-
-                }
-
-                Object o = opCtx.getProperty(ENDPOINT_LIST);
-
-                if (o != null) {
-                    List<Endpoint> endpointList = (List<Endpoint>) o;
-                    endpointList.add(this);
-
                     // if the next endpoint is not a session affinity one, endpoint sequence ends
                     // here. but we have to add the next endpoint to the list.
                     if (!(endpoint instanceof SALoadbalanceEndpoint)) {
-                        endpointList.add(endpoint);
+                        String name = endpoint.getName();
+                        if (name == null) {
+                            log.warn(WARN_MESSAGE);
+                            name = SynapseConstants.ANONYMOUS_ENDPOINT;
+                        }
+                        epNameList.add(name);
                     }
+
+                    opCtx.setProperty(ENDPOINT_NAME_LIST, epNameList);
 
                 } else {
+                    Object o = opCtx.getProperty(ENDPOINT_LIST);
+                    List<Endpoint> endpointList;
+                    if (o instanceof List) {
+                        endpointList = (List<Endpoint>) o;
+                        endpointList.add(this);
 
-                    // this is the first endpoint in the heirachy. so create the queue and insert
-                    // this as the first element.
-                    List endpointList = new ArrayList();
-                    endpointList.add(this);
-
+                    } else {
+                        // this is the first endpoint in the heirachy. so create the queue and insert
+                        // this as the first element.
+                        endpointList = new ArrayList();
+                        endpointList.add(this);
+                        opCtx.setProperty(ENDPOINT_LIST, endpointList);
+                    }
                     // if the next endpoint is not a session affinity one, endpoint sequence ends
                     // here. but we have to add the next endpoint to the list.
                     if (!(endpoint instanceof SALoadbalanceEndpoint)) {
                         endpointList.add(endpoint);
                     }
-
-                    opCtx.setProperty(ENDPOINT_LIST, endpointList);
                 }
-
 
             } else {
                 dispatcher.updateSession(synMessageContext, dispatcherContext, endpoint);
@@ -294,7 +275,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
      * @param isClusteringEnable
      */
     public void updateSession(MessageContext responseMsgCtx, List endpointList,
-        boolean isClusteringEnable) {
+                              boolean isClusteringEnable) {
 
         Endpoint endpoint = null;
 
@@ -303,12 +284,12 @@ public class SALoadbalanceEndpoint implements Endpoint {
             // Only keeps endpoint names , because , it is heavy task to
             // replicate endpoint itself
             String epNameObj = (String) endpointList.remove(0);
-            for (Iterator it = endpointList.iterator(); it.hasNext();) {
-                Object epObj = it.next();
-                if (epObj != null && epObj instanceof Endpoint) {
-                    String name = ((Endpoint) epObj).getName();
+            for (Endpoint ep :endpoints) {
+                if (ep != null) {
+                    String name = ep.getName();
                     if (name != null && name.equals(epNameObj)) {
-                        endpoint = ((Endpoint) epObj);
+                        endpoint = ep;
+                        break;
                     }
                 }
             }
@@ -356,8 +337,27 @@ public class SALoadbalanceEndpoint implements Endpoint {
      */
     public boolean isActive(MessageContext synMessageContext) {
         // todo: implement above
-
-        return endpointContext.isActive();
+        boolean active;
+        Endpoint endpoint = dispatcher.getEndpoint(synMessageContext, dispatcherContext);
+        if (endpoint == null) { // If a session is not started
+            active = endpointContext.isActive();
+            if (!active && endpoints != null) {
+                for (Endpoint ep : endpoints) {
+                    if (ep.isActive(synMessageContext)) { //AND at least one child endpoint is active
+                        active = true;
+                        endpointContext.setActive(true);
+                        // don't break the loop though we found one active endpoint. calling isActive()
+                        // on all child endpoints will update their active state. so this is a good
+                        // time to do that.
+                    }
+                }
+            }
+        } else {
+            //If a session is started AND the binding endpoint is active.
+            active = endpoint.isActive(synMessageContext);
+            endpointContext.setActive(active);
+        }
+        return active;
     }
 
     public void setActive(boolean active, MessageContext synMessageContext) {

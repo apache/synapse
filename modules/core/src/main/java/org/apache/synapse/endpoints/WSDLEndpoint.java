@@ -240,6 +240,11 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
                 endpointContext.setActive(true);
             }
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint  '" + name + "' is in state ' " + active + " '");
+        }
+
         return active;
     }
 

@@ -57,9 +57,34 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
         return endpointElement;
     }
 
+    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition, OMElement element) {
+
+        if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        } else if (SynapseConstants.FORMAT_GET.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
+        } else if (SynapseConstants.FORMAT_SOAP11.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        } else if (SynapseConstants.FORMAT_SOAP12.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+
+            // following two kept for backward compatibility
+        } else if (endpointDefinition.isForcePOX()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        } else if (endpointDefinition.isForceGET()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "get"));
+        } else if (endpointDefinition.isForceSOAP11()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
+        } else if (endpointDefinition.isForceSOAP12()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        }
+
+    }
+
     public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {
         OMElement element = fac.createOMElement("default", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        serializeQOSInformation(endpointDefinition, element);
+        serializeCommonEndpointProperties(endpointDefinition, element);
+        serializeSpecificEndpointProperties(endpointDefinition, element);
         return element;
     }
 }

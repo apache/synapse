@@ -37,25 +37,26 @@ import java.net.URL;
 
 /**
  * Creates an {@link WSDLEndpoint} based endpoint from a XML configuration.
- *
+ * <p/>
  * &lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
- *   &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
- *   &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
- *   &lt;enableRM [policy="key"]/&gt;?
- *   &lt;enableSec [policy="key"]/&gt;?
- *   &lt;enableAddressing [version=("final" | "submission")]/&gt;?
- *   &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
- *   &lt;timeout&gt;
- *     &lt;duration&gt;timeout-duration&lt;/duration&gt;
- *     &lt;action&gt;discard|fault&lt;/action&gt;
- *   &lt;/timeout&gt;?
+ * &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+ * &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+ * &lt;enableRM [policy="key"]/&gt;?
+ * &lt;enableSec [policy="key"]/&gt;?
+ * &lt;enableAddressing [version=("final" | "submission")]/&gt;?
+ * &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
+ * &lt;timeout&gt;
+ * &lt;duration&gt;timeout-duration&lt;/duration&gt;
+ * &lt;action&gt;discard|fault&lt;/action&gt;
+ * &lt;/timeout&gt;?
  * &lt;/wsdl&gt;
  */
 public class WSDLEndpointFactory extends EndpointFactory {
 
     private static WSDLEndpointFactory instance = new WSDLEndpointFactory();
 
-    private WSDLEndpointFactory() {}
+    private WSDLEndpointFactory() {
+    }
 
     public static WSDLEndpointFactory getInstance() {
         return instance;
@@ -130,7 +131,7 @@ public class WSDLEndpointFactory extends EndpointFactory {
                 if (resolveRoot != null) {
                     baseUri = resolveRoot.trim();
                 }
-                if(!baseUri.endsWith(File.separator)){
+                if (!baseUri.endsWith(File.separator)) {
                     baseUri = baseUri + File.separator;
                 }
                 endpoint = new WSDL11EndpointBuilder().createEndpointDefinitionFromWSDL(
@@ -144,10 +145,11 @@ public class WSDLEndpointFactory extends EndpointFactory {
                 wsdlEndpoint.setWsdlDoc(descriptionElement);
                 handleException("WSDL 2.0 Endpoints are currently not supported.");
             }
-            
+
             if (endpoint != null) {
                 // for now, QOS information has to be provided explicitly.
-                extractEndpointProperties(endpoint, wsdlElement);
+                extractCommonEndpointProperties(endpoint, wsdlElement);
+                extractSpecificEndpointProperties(endpoint, wsdlElement);
                 wsdlEndpoint.setEndpoint(endpoint);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");
@@ -155,6 +157,10 @@ public class WSDLEndpointFactory extends EndpointFactory {
         }
 
         return wsdlEndpoint;
+    }
+
+    protected void extractSpecificEndpointProperties(EndpointDefinition definition, OMElement elem) {
+
     }
 
 }

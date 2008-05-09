@@ -173,8 +173,15 @@ public class WSDL11EndpointBuilder {
         if (serviceURL != null) {
             EndpointDefinition endpointDefinition = new EndpointDefinition();
             endpointDefinition.setAddress(serviceURL);
+            if (SynapseConstants.FORMAT_SOAP11.equals(format)) {
+                endpointDefinition.setForceSOAP11(true);
+            } else if (SynapseConstants.FORMAT_SOAP12.equals(format)) {
+                endpointDefinition.setForceSOAP12(true);
+            } else {
+                handleException("format value -\"" + format + "\" not yet implemented");
+            }
             endpointDefinition.setFormat(format);
-            
+
             // todo: determine this using wsdl and policy                                    
 
             return endpointDefinition;

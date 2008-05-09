@@ -64,9 +64,9 @@ public abstract class EndpointSerializer {
      * Serializes the QoS infomation of the endpoint to the XML element
      *
      * @param endpointDefinition specifies the QoS information of the endpoint
-     * @param element to which the QoS information will be serialized
+     * @param element            to which the QoS information will be serialized
      */
-    protected void serializeQOSInformation(
+    protected void serializeCommonEndpointProperties(
             EndpointDefinition endpointDefinition, OMElement element) {
 
         if (endpointDefinition.getStatisticsState() == SynapseConstants.STATISTICS_ON) {
@@ -85,26 +85,6 @@ public abstract class EndpointSerializer {
                     null, XMLConfigConstants.TRACE_DISABLE));
         }
 
-        if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
-            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
-        } else if (SynapseConstants.FORMAT_GET.equals(endpointDefinition.getFormat())) {
-            element.addAttribute(fac.createOMAttribute("format", null, "get"));
-        } else if (SynapseConstants.FORMAT_SOAP11.equals(endpointDefinition.getFormat())) {
-            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
-        } else if (SynapseConstants.FORMAT_SOAP12.equals(endpointDefinition.getFormat())) {
-            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
-
-            // following two kept for backward compatibility
-        } else if (endpointDefinition.isForcePOX()) {
-            element.addAttribute(fac.createOMAttribute("format", null, "pox"));
-        } else if (endpointDefinition.isForceGET()) {
-            element.addAttribute(fac.createOMAttribute("format", null, "get"));
-        } else if (endpointDefinition.isForceSOAP11()) {
-            element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
-        } else if (endpointDefinition.isForceSOAP12()) {
-            element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
-        }
-
         if (endpointDefinition.isUseSwa()) {
             element.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
         } else if (endpointDefinition.isUseMTOM()) {
@@ -115,7 +95,7 @@ public abstract class EndpointSerializer {
             element.addAttribute(fac.createOMAttribute(
                     "encoding", null, endpointDefinition.getCharSetEncoding()));
         }
-        
+
         if (endpointDefinition.isAddressingOn()) {
             OMElement addressing = fac.createOMElement(
                     "enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
@@ -124,7 +104,7 @@ public abstract class EndpointSerializer {
                 addressing.addAttribute(fac.createOMAttribute(
                         "version", null, endpointDefinition.getAddressingVersion()));
             }
-            
+
             if (endpointDefinition.isUseSeparateListener()) {
                 addressing.addAttribute(fac.createOMAttribute("separateListener", null, "true"));
             }
@@ -183,6 +163,11 @@ public abstract class EndpointSerializer {
             element.addChild(suspendElement);
         }
     }
+
+    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition, OMElement element){
+
+    }
+
 
     protected void handleException(String message) {
         log.error(message);

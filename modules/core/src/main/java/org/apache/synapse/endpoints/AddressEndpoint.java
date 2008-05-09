@@ -61,10 +61,15 @@ public class AddressEndpoint extends DefaultEndpoint {
             if (System.currentTimeMillis() > recoverOn) {
                 active = true;
                 endpointContext.setActive(true);
-                endpointContext.setRecoverOn(0);
+                endpointContext.setRecoverOn(0);                       
 
             }
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint  '" + getName() + "' is in state ' " + active + " '");
+        }
+
         return active;
     }
 

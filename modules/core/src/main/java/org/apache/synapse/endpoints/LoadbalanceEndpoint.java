@@ -198,6 +198,10 @@ public class LoadbalanceEndpoint implements Endpoint {
             }
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint  '" + name + "' is in state ' " + active + " '");
+        }
+
         return active;
     }
 

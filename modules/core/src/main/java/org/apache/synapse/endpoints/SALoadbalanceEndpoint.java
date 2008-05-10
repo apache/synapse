@@ -343,19 +343,23 @@ public class SALoadbalanceEndpoint implements Endpoint {
             active = endpointContext.isActive();
             if (!active && endpoints != null) {
                 for (Endpoint ep : endpoints) {
-                    if (ep.isActive(synMessageContext)) { //AND at least one child endpoint is active
-                        active = true;
-                        endpointContext.setActive(true);
-                        // don't break the loop though we found one active endpoint. calling isActive()
-                        // on all child endpoints will update their active state. so this is a good
-                        // time to do that.
+                    if (ep != null) {
+                        active = ep.isActive(synMessageContext);
+                        if (active) {    //AND at least one child endpoint is active
+                            endpointContext.setActive(active);
+                            // don't break the loop though we found one active endpoint. calling isActive()
+                            // on all child endpoints will update their active state. so this is a good
+                            // time to do that.
+                        }
                     }
                 }
             }
         } else {
             //If a session is started AND the binding endpoint is active.
             active = endpoint.isActive(synMessageContext);
-            endpointContext.setActive(active);
+            if (active) {
+                endpointContext.setActive(active);
+            }
         }
         return active;
     }

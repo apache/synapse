@@ -47,6 +47,7 @@ public class VFSUtils extends BaseUtils {
      * @param property property name
      * @return property value
      */
+    @Override
     public String getProperty(Object message, String property) {
         try {
             Object o = ((FileContent)message).getAttributes().get(property);
@@ -57,6 +58,7 @@ public class VFSUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public InputStream getInputStream(Object message) {
         try {
             return ((FileContent) message).getInputStream();
@@ -67,6 +69,7 @@ public class VFSUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public String getMessageTextPayload(Object message) {
         try {
             return new String(
@@ -81,6 +84,7 @@ public class VFSUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public byte[] getMessageBinaryPayload(Object message) {
         try {
             return getBytesFromInputStream(getInputStream(message),

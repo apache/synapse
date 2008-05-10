@@ -227,6 +227,7 @@ public class JMSUtils extends BaseUtils {
      * @param property property name
      * @return property value
      */
+    @Override
     public String getProperty(Object message, String property) {
         try {
             return ((Message)message).getStringProperty(property);
@@ -310,6 +311,7 @@ public class JMSUtils extends BaseUtils {
      * @param message the JMS message
      * @return an InputStream to the payload
      */
+    @Override
     public InputStream getInputStream(Object message) {
 
         try {
@@ -682,6 +684,7 @@ public class JMSUtils extends BaseUtils {
     }
 
 
+    @Override
     public String getMessageTextPayload(Object message) {
         if (message instanceof TextMessage) {
             try {
@@ -693,6 +696,7 @@ public class JMSUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public byte[] getMessageBinaryPayload(Object message) {
 
         if (message instanceof BytesMessage) {

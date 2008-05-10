@@ -169,5 +169,5 @@ $JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
         $SYNAPSE_HOME/repository \
         $SYNAPSE_HOME/repository/conf/axis2.xml \
         $SYNAPSE_HOME \
-        $SYNAPSE_HOME/repository/conf/synapse.xml \
+        $SYNAPSE_XML \
         $SYNAPSE_HOME/repository

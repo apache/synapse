@@ -40,105 +40,72 @@ import java.io.IOException;
 public class SynapseStartUpServlet extends HttpServlet {
 
     private static Log log = LogFactory.getLog(SynapseStartUpServlet.class);
+    private ServletContext servletContext = null;
+    private static final String ALREADY_INITED = "synapseAlreadyInited";
 
     public void init() throws ServletException {
         super.init();
     }
 
     public void init(ServletConfig servletConfig) throws ServletException {
-        ServerManager serverManager = ServerManager.getInstance();
-        ServletContext servletContext = servletConfig.getServletContext();
-        if ("true".equals(servletContext.getAttribute("hasAlreadyInit"))) {
-            return;
-        }
-        String synapseHome = resolveSynapseHome(servletConfig);
-        //Setting the all required system properties
-        if (synapseHome != null) {
-            if (synapseHome.endsWith(File.separator)) {
-                synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf(File.separator));
-            }
-            System.setProperty(SynapseConstants.SYNAPSE_HOME, synapseHome);
-            //setting axis2 repository location
-            String axis2Repo = System.getProperty(org.apache.axis2.Constants.AXIS2_REPO);
-            if (axis2Repo == null) {
-                ServerManager.getInstance().setAxis2Repolocation(synapseHome + "/WEB-INF" +
-                    File.separator + "repository");
-                System.setProperty(org.apache.axis2.Constants.AXIS2_REPO,
-                    synapseHome + "/WEB-INF" +
-                        File.separator + "repository");
-            }
-            //setting axis2 configuration location
-            String axis2Xml = System.getProperty(org.apache.axis2.Constants.AXIS2_CONF);
-            if (axis2Xml == null) {
-                System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
-                    synapseHome + File.separator
-                        + "WEB-INF/conf"
-                        + File.separator + org.apache.axis2.Constants.AXIS2_CONF);
-            }
-            //setting synapse configuration location
-            String synapseXml = System.getProperty(org.apache.synapse.SynapseConstants.SYNAPSE_XML);
-            if (synapseXml == null) {
-                System.setProperty(org.apache.synapse.SynapseConstants.SYNAPSE_XML,
-                    synapseHome + File.separator
-                        + "WEB-INF/conf"
-                        + File.separator + org.apache.synapse.SynapseConstants.SYNAPSE_XML);
 
-            }
-        } else {
-            log.fatal("Can not resolve synapse home  : startup failed");
+        servletContext = servletConfig.getServletContext();
+        if (Boolean.TRUE.equals(servletContext.getAttribute(ALREADY_INITED))) {
             return;
         }
+
+        ServerManager serverManager = ServerManager.getInstance();
+        serverManager.setSynapseHome(loadParameter(servletConfig, SynapseConstants.SYNAPSE_HOME));
+        serverManager.setSynapseXMLPath(loadParameter(servletConfig, SynapseConstants.SYNAPSE_XML));
+        serverManager.setResolveRoot(loadParameter(servletConfig, SynapseConstants.RESOLVE_ROOT));
+        serverManager.setAxis2Repolocation(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_REPO));
+        serverManager.setAxis2Xml(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_CONF));
+
         serverManager.start();
-        servletContext.setAttribute("hasAlreadyInit", "true");
+        servletContext.setAttribute(ALREADY_INITED, Boolean.TRUE);
     }
 
 
     protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException,
-        IOException {
+                         HttpServletResponse response) throws ServletException, IOException {
     }
 
     protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException,
-        IOException {
+                          HttpServletResponse response) throws ServletException, IOException {
     }
 
     public void destroy() {
         try {
             ServerManager serverManager = ServerManager.getInstance();
-            serverManager.stop(); // will stop all started  listeners
-        } catch (Exception ignored) {
+            serverManager.stop();
+            servletContext.removeAttribute(ALREADY_INITED);
+        } catch (Exception e) {
+            log.error("Error stopping the Synapse listener manager", e);
         }
     }
 
-    private String resolveSynapseHome(ServletConfig servletConfig) {
-        // If synapse.home has provided as init-param,the it will take as synapse home
-        String synapseHomeAsParam = servletConfig.getInitParameter(SynapseConstants.SYNAPSE_HOME);
-        if (synapseHomeAsParam != null) {
-            if (synapseHomeAsParam.endsWith(File.separator)) {
-                return synapseHomeAsParam.substring(0,
-                        synapseHomeAsParam.lastIndexOf(File.separator));
+    private String loadParameter(ServletConfig servletConfig, String name)
+        throws ServletException {
+
+        if (System.getProperty(name) == null) {
+
+            String value = servletConfig.getInitParameter(name);
+            log.debug("Init parameter '" + name + "' : " + value);
+
+            if (value == null || value.trim().length() == 0) {
+                handleException("A valid system property or init parameter '" + name + "' is required");
             } else {
-                return synapseHomeAsParam;
+                return value;
             }
+        } else {
+            return System.getProperty(name);
         }
-        //if synapse.home has set as a system property , then use it
-        String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
-        //Setting the all required system properties
-        if (synapseHome == null || "".equals(synapseHome)) {
-            ServletContext servletContext = servletConfig.getServletContext();
-            //if synapse.home stil can not find ,then resolve it using real path of the WEB-INF
-            String webinfPath = servletContext.getRealPath("WEB-INF");
-            if (webinfPath != null) {
-                synapseHome = webinfPath.substring(0, webinfPath.lastIndexOf("WEB-INF"));
-                if (synapseHome != null) {
-                    if (synapseHome.endsWith(File.separator)) {
-                        synapseHome = synapseHome.substring(0,
-                                synapseHome.lastIndexOf(File.separator));
-                    }
-                }
-            }
-        }
-        return synapseHome;
+        return null;
+    }
+
+    private void handleException(String message) throws ServletException {
+        log.error(message);
+        log(message);
+        throw new ServletException(message);
     }
 }

@@ -30,6 +30,7 @@ import junit.extensions.TestSetup;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.io.File;
 
 public class DBReportMediatorTest extends AbstractMediatorTestCase {    
 
@@ -57,7 +58,9 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
 
             protected void setUp() throws Exception {
 
-                String tempPath = System.getProperty("java.io.tmpdir");
+                File temp = File.createTempFile("temp", "delete");
+                temp.deleteOnExit();
+                String tempPath = temp.getParent();
 
                 report = (DBReportMediator)
                     new DBReportMediatorFactory().createMediator(createOMElement(

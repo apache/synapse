@@ -31,6 +31,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -305,7 +306,7 @@ public class ProxyService {
 
                         wsdlToAxisServiceBuilder.setBaseUri(
                                 wsdlURI != null ? wsdlURI.toString() :
-                                        System.getProperty(SynapseConstants.SYNAPSE_HOME));
+                                        ServerManager.getInstance().getSynapseHome());
 
                         if (trace()) {
                             trace.info("Setting up custom resolvers");

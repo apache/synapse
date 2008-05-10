@@ -74,11 +74,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
         
         Timer timeOutTimer = synCfg.getSynapseTimer();
-        long timeoutHandlerInterval = SynapseConstants.DEFAULT_TIMEOUT_HANDLER_INTERVAL;
-        try {
-            timeoutHandlerInterval = Long.parseLong(
-                System.getProperty(SynapseConstants.TIMEOUT_HANDLER_INTERVAL));
-        } catch (Exception ignore) {}
+        long timeoutHandlerInterval = ServerManager.getInstance().getTimeoutHandlerInterval();
 
         // schedule timeout handler to run every n seconds (n : specified or defaults to 15s)
         timeOutTimer.schedule(timeoutHandler, 0, timeoutHandlerInterval);

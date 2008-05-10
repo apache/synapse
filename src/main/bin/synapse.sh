@@ -21,10 +21,9 @@
 #
 # Environment Variable Prequisites
 #
-#   SYNAPSE_HOME   Home of Synapse installation. If not set I will  try
-#                   to figure it out.
+#   SYNAPSE_HOME   Home of Synapse installation. If not set will use the parent directory
 #
-#   JAVA_HOME       Must point at your Java Development Kit installation.
+#   JAVA_HOME      Must point at your Java Development Kit installation.
 #
 # NOTE: Borrowed generously from Apache Tomcat startup scripts.
 
@@ -99,7 +98,6 @@ SYNAPSE_CLASSPATH=$SYNAPSE_HOME/repository/conf:$JAVA_HOME/lib/tools.jar:$SYNAPS
 
 # use proper bouncy castle version for the JDK
 jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`
-jdk_14=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.4`
 
 if [ "$jdk_15" ]; then
     echo " Using Bouncy castle JAR for Java 1.5"
@@ -107,12 +105,9 @@ if [ "$jdk_15" ]; then
     do
       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH
     done
-elif [ "$jdk_14" ]; then
-    echo " Using Bouncy castle JAR for Java 1.4"
-    for f in $SYNAPSE_HOME/lib/bcprov-jdk13*.jar
-    do
-      SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH
-    done
+else
+    echo " Synapse requires JDK 1.5.x"
+    exit 1
 fi
 
 # For Cygwin, switch paths to Windows format before running java
@@ -127,9 +122,7 @@ fi
 SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 
 # synapse.xml
-SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/synapse.xml
-
-PORT="-Dport=8080"
+SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse.xml
 
 while [ $# -ge 1 ]; do
 
@@ -138,19 +131,14 @@ if [ "$1" = "-xdebug" ]; then
     shift
 
   elif [ "$1" = "-sample" ]; then
-    SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
+    SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
     shift 2 # -sample and sample number
-
-  elif [ "$1" = "-port" ]; then
-    PORT="-Dport=$2"
-    shift 2 # -port and port number
 
 elif [ "$1" = "-h" ]; then
     echo "Usage: synapse.sh ( commands ... )"
     echo "commands:"
     echo "  -xdebug           Start Synapse under JPDA debugger"
     echo "  -sample (number)  Start with sample Synapse configuration of given number"
-    echo "  -port (number)    Listen in HTTP port with given number (default:8080)"
     shift
     exit 0
 
@@ -171,4 +159,15 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java -server -Xms128M -Xmx128M $XDEBUG $PORT $SYNAPSE_XML -Dresolve.root=$SYNAPSE_HOME/repository -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Dsynapse.home=$SYNAPSE_HOME -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseServer $SYNAPSE_HOME/repository
+$JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
+    $XDEBUG \
+    -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \
+    -Djava.endorsed.dirs=$SYNAPSE_ENDORSED \
+    -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse \
+    -classpath $SYNAPSE_CLASSPATH \
+    org.apache.synapse.SynapseServer \
+        $SYNAPSE_HOME/repository \
+        $SYNAPSE_HOME/repository/conf/axis2.xml \
+        $SYNAPSE_HOME \
+        $SYNAPSE_HOME/repository/conf/synapse.xml \
+        $SYNAPSE_HOME/repository

@@ -103,7 +103,7 @@ public class MediatorSerializerFinder {
      */
     private void registerExtensions() {
         if (log.isDebugEnabled()) {
-            log.debug("Registering mediator extensions found in the classpath : " + System.getProperty("java.class.path"));
+            log.debug("Registering mediator extensions found in the classpath.. ");
         }
         // register MediatorSerializer extensions
         Iterator it = Service.providers(MediatorSerializer.class);

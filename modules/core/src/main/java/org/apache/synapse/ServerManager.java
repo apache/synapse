@@ -49,39 +49,47 @@ import java.util.Map;
 
 public class ServerManager {
 
-    private static ServerManager instance;
     private static final Log log = LogFactory.getLog(ServerManager.class);
+
+    /** The singleton server manager instance */
+    private static ServerManager instance = new ServerManager();
+
+    /** The Axis2 repository location */
     private String axis2Repolocation;
+    /** The path to the axis2.xml file */
     private String axis2Xml;
+    /** The synapse home is the home directory of the Synapse installation */
+    private String synapseHome;
+    /** The path to the synapse.xml file */
+    private String synapseXMLPath;
+    /** The root directory to resolve paths for registry, default to synapse.home/repository */
+    private String resolveRoot;
+    /** An optional server name to activate pinned services, tasks etc.. and to differentiate instances on a cluster */
+    private String serverName = "localhost";
+
+    /** The Axis2 listener Manager */
     private ListenerManager listenerManager;
+    /** The Axis2 configuration context used by Synapse */
     private ConfigurationContext configctx;
-    private static final int DEFAULT_HTTP_PORT = 8080;
-    private static final int ALTERNATIVE_HTTP_PORT = 8008;
+    /** Reference to the Synapse configuration */
+    private SynapseConfiguration synConfig = null;
     private Map callbackStore = null;
 
     /**
-     * To ensure that there is a only one Manager
-     * @return  Server Manager Instance
+     * return the singleton server manager
+     * @return  ServerManager Instance
      */
     public static ServerManager getInstance() {
-        if (instance == null) {
-            instance = new ServerManager();
-        }
         return instance;
-    }
-
-    public void setAxis2Repolocation(String axis2Repolocation) {
-        this.axis2Repolocation = axis2Repolocation;
-    }
-
-    public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
     }
 
     /**
      * starting all the listeners
      */
     public void start() {
+
+        // validate if we can start
+        validate();
 
         // Register custom protocol handler classpath://
 		try {
@@ -90,17 +98,6 @@ public class ServerManager {
 			log.debug("Unable to register a URLStreamHandlerFactory - " +
 					"Custom URL protocols may not work properly (e.g. classpath://)");
 		}
-
-        if (axis2Repolocation == null) {
-            log.fatal("The Axis2 Repository must be provided");
-            return;
-        }
-        log.info("Using the Axis2 Repository : "
-                           + new File(axis2Repolocation).getAbsolutePath());
-        
-        if (axis2Xml != null) {
-            log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
-        }
 
         try {
             configctx = ConfigurationContextFactory.
@@ -111,8 +108,6 @@ public class ServerManager {
                 listenerManager = new ListenerManager();
                 listenerManager.init(configctx);
             }
-            // decide on HTTP port to execute
-            selectPort(configctx);
 
             for (Object o : configctx.getAxisConfiguration().getTransportsIn().keySet()) {
                 
@@ -134,11 +129,14 @@ public class ServerManager {
                 = configctx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
             Parameter synCfg
                 = configctx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
+
             String message = "Unable to initialize the Synapse Configuration : Cannot find the ";
             if (synCfg == null || synCfg.getValue() == null
                 || !(synCfg.getValue() instanceof SynapseConfiguration)) {
                 log.fatal(message + "Synapse Configuration");
                 throw new SynapseException(message + "Synapse Configuration");
+            } else {
+                synConfig = (SynapseConfiguration) synCfg.getValue();
             }
 
             if (synEnv == null || synEnv.getValue() == null
@@ -155,11 +153,13 @@ public class ServerManager {
                         stp.init((SynapseEnvironment) synEnv.getValue());
                     }
                 }
-            }            
+            }
+
             log.info("Ready for processing");
 
         } catch (Throwable t) {
-            log.fatal("Startup failed...", t);
+            log.fatal("Synaps startup failed...", t);
+            throw new SynapseException("Synapse startup failed", t);
         }
     }
 
@@ -192,86 +192,13 @@ public class ServerManager {
                 listenerManager.destroy();
             }
             
-            //we need to call this method to clean the temp files we created.
+            // we need to call this method to clean the temp files we created.
             if (configctx != null) {
                 configctx.terminate();
             }
         } catch (Exception e) {
             log.error("Error stopping the ServerManager", e);
         }
-    }
-
-    /**
-     * Helper method to select a alternate port if the currently selected port is in use
-     * @param configCtx configuration context 
-     */
-    private static void selectPort(ConfigurationContext configCtx) {
-        // check if configured port is available
-        TransportInDescription trsIn = (TransportInDescription)
-                configCtx.getAxisConfiguration().getTransportsIn().get("http");
-
-        if (trsIn != null) {
-
-            int port = DEFAULT_HTTP_PORT;
-            String bindAddress = null;
-
-            String strPort = System.getProperty("port");
-            if (strPort != null) {
-                // port is specified as a VM parameter
-                try {
-                    port = Integer.parseInt(strPort);
-                } catch (NumberFormatException e) {
-                    // user supplied parameter is not a valid integer. so use the port in configuration.
-                    log.error("System property 'port' does not provide a valid integer");
-                }
-            }
-
-            Parameter param = trsIn.getParameter("port");
-            if (param != null && param.getValue() != null) {
-                port = Integer.parseInt(param.getValue().toString());
-            }
-
-            param = trsIn.getParameter(NhttpConstants.BIND_ADDRESS);
-            if (param != null && param.getValue() != null) {
-                bindAddress = ((String) param.getValue()).trim();
-            }
-
-            while (true) {
-                ServerSocket sock = null;
-                try {
-                    if (bindAddress == null) {
-                        sock = new ServerSocket(port);
-                    } else {
-                        sock = new ServerSocket(port, 50, InetAddress.getByName(bindAddress));
-                    }
-                    trsIn.getParameter("port").setValue(Integer.toString(port));
-                    break;
-                } catch (Exception e) {
-                    log.warn("Port " + port + " already in use. Trying alternate");
-                    if (port == DEFAULT_HTTP_PORT) {
-                        port = ALTERNATIVE_HTTP_PORT;
-                    } else {
-                        port++;
-                    }
-                } finally {
-                    if (sock != null) {
-                        try {
-                            sock.close();
-                        } catch (Exception e) {
-                            // do nothing
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public ConfigurationContext getConfigurationContext() {
-        return configctx;
-    }
-
-    public void setCallbackStore(Map callbackStore) {
-        this.callbackStore = callbackStore;
     }
 
     /**
@@ -298,6 +225,139 @@ public class ServerManager {
                 urlSH = new ClasspathURLStreamHandler();
             }
             return urlSH;
+        }
+    }
+
+    /**
+     * Validate core settings for startup
+     */
+    private void validate() {
+        if (axis2Repolocation == null) {
+            handleFatal("Axis2 repository");
+        } else {
+            log.info("Using the Axis2 Repository : " + new File(axis2Repolocation).getAbsolutePath());
+        }
+
+        if (axis2Xml == null) {
+            handleFatal("axis2.xml location");
+        } else {
+            log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
+        }
+
+        if (synapseHome == null) {
+            handleFatal("Synapse home");
+        } else {
+            log.info("Using Synapse home as : " + synapseHome);
+        }
+
+        if (synapseXMLPath == null) {
+            handleFatal("synapse.xml path");
+        }
+
+        if (resolveRoot == null) {
+            handleFatal("resolve root");
+        } else {
+            log.info("Using resolve.root as : " + resolveRoot);
+        }
+
+        if (serverName == null) {
+            try {
+                serverName = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException ignore) {}
+            log.info("The server name was not specified, defaulting to : " + serverName);
+        }
+
+        log.info("The timeout handler will run every : " + (getTimeoutHandlerInterval()/1000) + "s");
+    }
+
+    public void handleFatal(String msgPre) {
+        String msg = "The " + msgPre + " must be set as a system property or init-parameter";
+        log.fatal(msg);
+        throw new SynapseException(msg);
+    }
+
+    // getters and setters
+    public ConfigurationContext getConfigurationContext() {
+        return configctx;
+    }
+
+    public void setCallbackStore(Map callbackStore) {
+        this.callbackStore = callbackStore;
+    }
+
+    public void setAxis2Repolocation(String axis2Repolocation) {
+        this.axis2Repolocation = axis2Repolocation;
+    }
+
+    public void setAxis2Xml(String axis2Xml) {
+        this.axis2Xml = axis2Xml;
+    }
+
+    public String getSynapseHome() {
+        return synapseHome;
+    }
+
+    public void setSynapseHome(String synapseHome) {
+        this.synapseHome = synapseHome;
+    }
+
+    public String getResolveRoot() {
+        return resolveRoot;
+    }
+
+    public void setResolveRoot(String resolveRoot) {
+        this.resolveRoot = resolveRoot;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getSynapseXMLPath() {
+        return synapseXMLPath;
+    }
+
+    public void setSynapseXMLPath(String synapseXMLPath) {
+        this.synapseXMLPath = synapseXMLPath;
+    }
+
+    public int getConnectTimeout() {
+        if (synConfig == null) {
+            return (int) SynapseConstants.DEFAULT_GLOBAL_TIMEOUT;
+        } else {
+            return (int) synConfig.getProperty(
+                SynapseConstants.CONNECTTIMEOUT, SynapseConstants.DEFAULT_CONNECTTIMEOUT);
+        }
+    }
+
+    public int getReadTimeout() {
+        if (synConfig == null) {
+            return SynapseConstants.DEFAULT_READTIMEOUT;
+        } else {
+            return (int) synConfig.getProperty(
+                SynapseConstants.READTIMEOUT, SynapseConstants.DEFAULT_READTIMEOUT);
+        }
+    }
+
+    public long getTimeoutHandlerInterval() {
+        if (synConfig == null) {
+            return SynapseConstants.DEFAULT_TIMEOUT_HANDLER_INTERVAL;
+        } else {
+            return synConfig.getProperty(
+                SynapseConstants.TIMEOUT_HANDLER_INTERVAL, SynapseConstants.DEFAULT_TIMEOUT_HANDLER_INTERVAL);
+        }
+    }
+
+    public long getGlobalTimeoutInterval() {
+        if (synConfig == null) {
+            return SynapseConstants.DEFAULT_GLOBAL_TIMEOUT;
+        } else {
+            return synConfig.getProperty(
+                SynapseConstants.GLOBAL_TIMEOUT_INTERVAL, SynapseConstants.DEFAULT_GLOBAL_TIMEOUT);
         }
     }
 }

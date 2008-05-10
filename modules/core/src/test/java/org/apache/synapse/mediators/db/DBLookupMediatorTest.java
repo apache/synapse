@@ -28,6 +28,7 @@ import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
 
 import java.sql.SQLException;
+import java.io.File;
 
 public class DBLookupMediatorTest extends AbstractMediatorTestCase {
 
@@ -52,7 +53,9 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
 
             protected void setUp() throws Exception {
 
-                String tempPath = System.getProperty("java.io.tmpdir");
+                File temp = File.createTempFile("temp", "delete");
+                temp.deleteOnExit();
+                String tempPath = temp.getParent();
 
                 lookup = (DBLookupMediator)
                     new DBLookupMediatorFactory().createMediator(createOMElement(

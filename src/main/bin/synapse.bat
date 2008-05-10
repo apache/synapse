@@ -20,7 +20,7 @@ if "%OS%"=="WINNT" @setlocal
 rem %~dp0 is expanded pathname of the current script under NT
 set SYNAPSE_HOME=%~dps0..
 
-set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\synapse.xml"
+set _SYNAPSE_XML="%SYNAPSE_HOME%\repository\conf\synapse.xml"
 set _XDEBUG=
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
@@ -36,14 +36,13 @@ goto setupArgs
 rem is there is a -xdebug in the options
 :xdebug
 
-
 set _XDEBUG="wrapper.java.additional.10=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
 shift
 goto setupArgs
 
 :SYNAPSESample
 shift
-set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\sample\synapse_sample_%1.xml"
+set _SYNAPSE_XML="%SYNAPSE_HOME%\repository\conf\sample\synapse_sample_%1.xml"
 shift
 goto setupArgs
 
@@ -74,7 +73,6 @@ cd %SYNAPSE_HOME%
 echo "Starting WSO2 Enterprise Service Bus ..."
 echo Using SYNAPSE_HOME:        %SYNAPSE_HOME%
 echo Using JAVA_HOME:       %JAVA_HOME%
-echo Using SYNAPSE_XML:     %_SYNAPSE_XML%
 
 rem Decide on the wrapper binary.
 set _WRAPPER_BASE=wrapper
@@ -102,7 +100,7 @@ rem
 rem Start the Wrapper
 rem
 :startup
-"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.java.additional.1=%_SYNAPSE_XML% %_XDEBUG%
+"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% %_XDEBUG%
 
 if not errorlevel 1 goto :eof
 pause

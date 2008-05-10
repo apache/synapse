@@ -89,13 +89,10 @@ public class SynapseConfigurationBuilder {
     }
 
     private static Properties loadSynapseProperties() {
-        String props = System.getProperty(SynapseConstants.SYNAPSE_PROPERTIES);
-        if (props == null) {
-            props = SynapseConstants.DEFAULT_PROP_PATH;
-        }
         try {
             Properties properties = new Properties();
-            properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(props));
+            properties.load(Thread.currentThread().getContextClassLoader().
+                getResourceAsStream(SynapseConstants.SYNAPSE_PROPERTIES));
             return properties;
         } catch (Exception e) {
             log.info("Using the default tuning parameters for Synapse");

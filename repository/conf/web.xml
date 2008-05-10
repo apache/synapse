@@ -30,12 +30,30 @@ Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <servlet>
         <servlet-name>StartUpServlet</servlet-name>
         <servlet-class>org.apache.synapse.core.axis2.SynapseStartUpServlet</servlet-class>
-        <!-- synapse.home parameter is optinal. if set this,then it take as the synapse.home
-         This value must contains the absolute path to the syapase home  -->
-        <!--<init-param>-->
-            <!--<param-name>synapse.home</param-name>-->
-            <!--<param-value>@synapse.home@</param-value>-->
-        <!--</init-param>-->
+
+        <!-- The following init parameters are *required* to start the ESB -->
+        <!-- They must be configured correctly here, or made available as Java System Properties -->
+        <init-param>
+            <param-name>synapse.home</param-name>
+            <param-value>.</param-value>
+        </init-param>
+        <init-param>
+            <param-name>synapse.xml</param-name>
+            <param-value>webapp/WEB-INF/classes/conf/synapse.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>axis2.repo</param-name>
+            <param-value>repository</param-value>
+        </init-param>
+        <init-param>
+            <param-name>axis2.xml</param-name>
+            <param-value>webapp/WEB-INF/classes/conf/axis2.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resolve.root</param-name>
+            <param-value>repository</param-value>
+        </init-param>
+
         <load-on-startup>1</load-on-startup>
     </servlet>
 

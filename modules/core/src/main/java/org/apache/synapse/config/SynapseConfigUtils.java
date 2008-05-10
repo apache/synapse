@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 import org.xml.sax.InputSource;
 
@@ -134,7 +135,7 @@ public class SynapseConfigUtils {
                         log.debug("Can not open a connection to the URL with a path :" +
                                 path);
                     }
-                    String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
+                    String synapseHome = ServerManager.getInstance().getSynapseHome();
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
@@ -297,29 +298,11 @@ public class SynapseConfigUtils {
     }
 
     private static int getReadTimeout() {
-        //getting  read timeout
-        String readTO = System.getProperty(SynapseConstants.READTIMEOUT);
-        int readTimeout = SynapseConstants.DEFAULT_READTIMEOUT;
-        if (readTO != null && !"".equals(readTO)) {
-            try {
-                readTimeout = Integer.parseInt(readTO);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        return readTimeout;
+        return ServerManager.getInstance().getReadTimeout();
     }
 
     private static int getConnectionTimeout() {
-        //getting  connection timeout
-        String connectionTO = System.getProperty(SynapseConstants.CONNECTTIMEOUT);
-        int connectionTimeout = SynapseConstants.DEFAULT_CONNECTTIMEOUT;
-        if (connectionTO != null && !"".equals(connectionTO)) {
-            try {
-                connectionTimeout = Integer.parseInt(connectionTO);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        return connectionTimeout;
+        return ServerManager.getInstance().getConnectTimeout();
     }
 
     private static void handleException(String msg, Exception e) {
@@ -369,7 +352,7 @@ public class SynapseConfigUtils {
                         log.debug("Can not open a connection to the URL with a path :" +
                                 path);
                     }
-                    String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
+                    String synapseHome = ServerManager.getInstance().getSynapseHome();
                     if (synapseHome != null) {
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));

@@ -218,7 +218,7 @@
         </parameter>
         <parameter name="truststore" locked="false">
             <TrustStore>
-                <Location>../../lib/strust.jks</Location>
+                <Location>../../lib/trust.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>

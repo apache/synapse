@@ -32,21 +32,29 @@ public class SynapseServer {
 
     private static final Log log = LogFactory.getLog(SynapseServer.class);
 
+    private static final String USAGE_TXT =
+        "Usage: SynapseServer <axis2_repository> <axis2_xml> <synapse_home> <synapse_xml> <resolve_root>" +
+        "\n Opts: -? this message";
+
     public static void printUsage() {
-        System.out.println("Usage: SynapseServer <repository>");
-        System.out.println(" Opts: -? this message");
+        System.out.println(USAGE_TXT);
         System.exit(1);
     }
 
     public static void main(String[] args) throws Exception {
 
         // first check if we should print usage
-        if (args.length != 1 || !new File(args[0]).exists()) {
+        if (args.length != 5) {
             printUsage();
         }
 
         ServerManager serverManager = ServerManager.getInstance();
         serverManager.setAxis2Repolocation(args[0]);
+        serverManager.setAxis2Xml(args[1]);
+        serverManager.setSynapseHome(args[2]);
+        serverManager.setSynapseXMLPath(args[3]);
+        serverManager.setResolveRoot(args[4]);
+        
         serverManager.start();
         addShutdownHook();
     }

@@ -96,8 +96,6 @@ public final class SynapseConstants {
 
     /** The name of the system property that will hold the Synapse home directory */
     public static final String SYNAPSE_HOME = "synapse.home";
-    /** The default synapse.properties file path */
-    public static final String DEFAULT_PROP_PATH = "synapse.properties";
     /** The name of the system property used to specify/override the Synapse config XML location */
     public static final String SYNAPSE_XML = "synapse.xml";
     /** The name of the system property used to specify/override the Synapse properties location */
@@ -250,9 +248,9 @@ public final class SynapseConstants {
 
     public static final int DEFAULT_CONNECTTIMEOUT = 20000;
 
-    public static final String READTIMEOUT = "Connection.ReadTimeout";
+    public static final String READTIMEOUT = "synapse.connection.read_timeout";
 
-    public static final String CONNECTTIMEOUT = "Connection.ConnectTimeout";
+    public static final String CONNECTTIMEOUT = "synapse.connection.connect_timeout";
 
     /** chunk size and chunk length configuration parameters */
     public static final int DEFAULT_THRESHOLD_CHUNKS = 8;

@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.startup.AbstractStartup;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -92,7 +93,7 @@ public class SimpleQuartz extends AbstractStartup {
         // this server name given by system property SynapseServerName
         // otherwise take host-name
         // else assume localhost
-        String thisServerName = System.getProperty(SynapseConstants.SYNAPSE_SERVER_NAME);
+        String thisServerName = ServerManager.getInstance().getServerName();
         if(thisServerName == null || thisServerName.equals("")) {
           try {
             InetAddress addr = InetAddress.getLocalHost();

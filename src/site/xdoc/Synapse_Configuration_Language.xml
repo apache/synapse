@@ -484,7 +484,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </h4>
     <p>
       Address endpoint is an endpoint defined by specifying the EPR and other
-      attributes of the endpoint directly in the configuration.The 'uri'
+      attributes of the endpoint directly in the configuration. The 'uri'
       attribute of the address element contains the EPR of the target endpoint.
       Message format for the endpoint and the method to optimize attachments can
       be specified in the format and optimize attributes respectively. Reliable
@@ -519,28 +519,40 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       enableAddressing elements. Optionally, the WS-RM and WS-Security policies
       could be specified using the 'policy' attributes.
     </p>
-<pre xml:space="preserve">&lt;address uri="endpoint-address" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]&gt;
-  &lt;enableRM [policy="key"]/&gt;?
-  &lt;enableSec [policy="key"]/&gt;?
-  &lt;enableAddressing/&gt;?
-  &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
+<pre xml:space="preserve">&lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+         [encoding="<em>charset encoding</em>"]
+         [statistics="enable|disable"] [trace="enable|disable"]&gt;
+  &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+  
   &lt;timeout&gt;
-    &lt;duration&gt;timeout-duration&lt;/duration&gt;
+    &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
     &lt;action&gt;discard|fault&lt;/action&gt;
   &lt;/timeout&gt;?
+  
+  &lt;suspendDurationOnFailure&gt;
+    <em>suspend duration in seconds</em>
+  &lt;/suspendDurationOnFailure&gt;?
 &lt;/address&gt;</pre>
     <p>
       Following are some sample address URI definitions.
     </p>
-<pre xml:space="preserve">e.g.
-HTTP   http://localhost:9000/soap/SimpleStockQuoteService
-JMS     jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;
-              java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
-              java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=topic
-Mail    mailto:guest@host
-File     vfs:file:///home/user/directory
-           vfs:file:///home/user/file
-           vfs:ftp://guest:guest@localhost/directory?vfs.passive=true</pre>
+    <table border="1" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
+      <tbody>
+        <tr><th>Transport</th><th>Sample address</th></tr>
+        <tr><td>HTTP</td><td><tt>http://localhost:9000/soap/SimpleStockQuoteService</tt></td></tr>
+        <tr><td>JMS</td><td><tt>jms:/SimpleStockQuoteService?<br/>
+              &#160;&#160;&#160;transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;<br/>
+              &#160;&#160;&#160;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;<br/>
+              &#160;&#160;&#160;java.naming.provider.url=tcp://localhost:61616&amp;<br/>
+              &#160;&#160;&#160;transport.jms.DestinationType=topic</tt></td></tr>
+        <tr><td>Mail</td><td><tt>mailto:guest@host</tt></td></tr>
+        <tr><td>VFS</td><td><tt>vfs:file:///home/user/directory</tt></td></tr>
+        <tr><td/><td><tt>vfs:file:///home/user/file</tt></td></tr>
+        <tr><td/><td><tt>vfs:ftp://guest:guest@localhost/directory?vfs.passive=true</tt></td></tr>
+      </tbody>
+    </table>
     <h4>
       <a name="wsdl-endpoint" id="wsdl-endpoint">WSDL Endpoint</a>
     </h4>
@@ -859,7 +871,16 @@ File     vfs:file:///home/user/directory
             transport.vfs.ContentType
           </td>
           <td>
-            The content type for messages for this service
+            The expected content type for files retrieved for this service. The
+            VFS transport uses this information to select the appropriate
+            message builder.
+            <br/>
+            Examples:
+            <ul>
+              <li><tt>text/xml</tt> for plain XML or SOAP</li>
+              <li><tt>text/plain; charset=ISO-8859-1</tt> for text files</li>
+              <li><tt>application/octet-stream</tt> for binary data</li>
+            </ul>
           </td>
         </tr>
         <tr>
@@ -963,12 +984,6 @@ File     vfs:file:///home/user/directory
         </tr>
         <tr>
           <td/>
-          <td/>
-          <td/>
-          <td/>
-        </tr>
-        <tr>
-          <td/>
           <td>
             Optional
           </td>
@@ -1002,12 +1017,6 @@ File     vfs:file:///home/user/directory
           <td>
             Timestamp prefix format for processed file name. java.text.SimpleDateFormat compatible string. e.g. yyMMddHHmmss&apos;-&apos;
           </td>
-        </tr>
-        <tr>
-          <td/>
-          <td/>
-          <td/>
-          <td/>
         </tr>
       </tbody>
     </table>

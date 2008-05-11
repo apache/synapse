@@ -19,6 +19,7 @@
 
 package org.apache.synapse;
 
+import org.apache.axis2.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,16 +45,24 @@ public class SynapseServer {
     public static void main(String[] args) throws Exception {
 
         // first check if we should print usage
-        if (args.length != 5) {
+        if (args.length != 1 && args.length != 5) {
             printUsage();
         }
 
         ServerManager serverManager = ServerManager.getInstance();
         serverManager.setAxis2Repolocation(args[0]);
-        serverManager.setAxis2Xml(args[1]);
-        serverManager.setSynapseHome(args[2]);
-        serverManager.setSynapseXMLPath(args[3]);
-        serverManager.setResolveRoot(args[4]);
+        if (args.length == 1) {
+            log.warn("Configuring server manager using deprecated system properties; please update your configuration");
+            serverManager.setAxis2Xml(System.getProperty(Constants.AXIS2_CONF));
+            serverManager.setSynapseHome(System.getProperty(SynapseConstants.SYNAPSE_HOME));
+            serverManager.setSynapseXMLPath(System.getProperty(SynapseConstants.SYNAPSE_XML));
+            serverManager.setResolveRoot(System.getProperty(SynapseConstants.RESOLVE_ROOT));
+        } else {
+            serverManager.setAxis2Xml(args[1]);
+            serverManager.setSynapseHome(args[2]);
+            serverManager.setSynapseXMLPath(args[3]);
+            serverManager.setResolveRoot(args[4]);
+        }
         
         serverManager.start();
         addShutdownHook();

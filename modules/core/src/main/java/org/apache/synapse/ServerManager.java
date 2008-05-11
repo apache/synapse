@@ -24,11 +24,14 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisModule;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.format.BinaryBuilder;
+import org.apache.synapse.format.PlainTextBuilder;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.ClasspathURLStreamHandler;
 import org.apache.synapse.util.RMIRegistryController;
@@ -103,6 +106,8 @@ public class ServerManager {
             configctx = ConfigurationContextFactory.
                     createConfigurationContextFromFileSystem(axis2Repolocation, axis2Xml);
             
+            addDefaultBuildersAndFormatters(configctx.getAxisConfiguration());
+            
             listenerManager = configctx.getListenerManager();
             if (listenerManager == null) {
                 listenerManager = new ListenerManager();
@@ -160,6 +165,15 @@ public class ServerManager {
         } catch (Throwable t) {
             log.fatal("Synaps startup failed...", t);
             throw new SynapseException("Synapse startup failed", t);
+        }
+    }
+
+    private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
+        if (axisConf.getMessageBuilder("text/plain") == null) {
+            axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
+        }
+        if (axisConf.getMessageBuilder("application/octet-stream") == null) {
+            axisConf.addMessageBuilder("application/octet-stream", new BinaryBuilder());
         }
     }
 
@@ -254,11 +268,11 @@ public class ServerManager {
             handleFatal("synapse.xml path");
         }
 
-        if (resolveRoot == null) {
-            handleFatal("resolve root");
-        } else {
-            log.info("Using resolve.root as : " + resolveRoot);
-        }
+//        if (resolveRoot == null) {
+//            handleFatal("resolve root");
+//        } else {
+//            log.info("Using resolve.root as : " + resolveRoot);
+//        }
 
         if (serverName == null) {
             try {

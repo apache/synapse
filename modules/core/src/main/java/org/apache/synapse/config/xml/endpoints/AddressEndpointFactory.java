@@ -35,22 +35,23 @@ import javax.xml.namespace.QName;
  * Configuration syntax:
  * <pre>
  * &lt;endpoint [name="<em>name</em>"]&gt;
- *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
- *      [encoding="<em>charset encoding</em>"]
- *          [statistics="enable|disable"] [trace="enable|disable"]&gt;
+ *   &lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+ *            [encoding="<em>charset encoding</em>"]
+ *            [statistics="enable|disable"] [trace="enable|disable"]&gt;
  *     .. extensibility ..
- * <p/>
+ *
  *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
  *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
  *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
- * <p/>
+ *
  *     &lt;timeout&gt;
  *       &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
  *       &lt;action&gt;discard|fault&lt;/action&gt;
  *     &lt;/timeout&gt;?
- * <p/>
+ *
  *     &lt;suspendDurationOnFailure&gt;
- *              <em>suspend duration in seconds</em>&lt;/suspendDurationOnFailure&gt;?
+ *       <em>suspend duration in seconds</em>
+ *     &lt;/suspendDurationOnFailure&gt;?
  *   &lt;/address&gt;
  * &lt;/endpoint&gt;
  * </pre>

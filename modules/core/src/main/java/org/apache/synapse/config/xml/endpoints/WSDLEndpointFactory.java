@@ -38,19 +38,33 @@ import java.net.URL;
 
 /**
  * Creates an {@link WSDLEndpoint} based endpoint from a XML configuration.
- * <p/>
- * &lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
- * &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
- * &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
- * &lt;enableRM [policy="key"]/&gt;?
- * &lt;enableSec [policy="key"]/&gt;?
- * &lt;enableAddressing [version=("final" | "submission")]/&gt;?
- * &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
- * &lt;timeout&gt;
- * &lt;duration&gt;timeout-duration&lt;/duration&gt;
- * &lt;action&gt;discard|fault&lt;/action&gt;
- * &lt;/timeout&gt;?
- * &lt;/wsdl&gt;
+ * <p>
+ * Configuration syntax:
+ * <pre>
+ * &lt;endpoint [name="<em>name</em>"]&gt;
+ *   &lt;wsdl [uri="<em>WSDL location</em>"]
+ *         service="<em>qualified name</em>" port="<em>qualified name</em>"
+ *         [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+ *         [encoding="<em>charset encoding</em>"]
+ *         [statistics="enable|disable"] [trace="enable|disable"]&gt;
+ *     &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+ *     &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+ *     
+ *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
+ *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+ *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+ *     
+ *     &lt;timeout&gt;
+ *       &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
+ *       &lt;action&gt;discard|fault&lt;/action&gt;
+ *     &lt;/timeout&gt;?
+ *     
+ *     &lt;suspendDurationOnFailure&gt;
+ *       <em>suspend duration in seconds</em>
+ *     &lt;/suspendDurationOnFailure&gt;?
+ *   &lt;/wsdl&gt;
+ * &lt;/endpoint&gt;
+ * </pre>
  */
 public class WSDLEndpointFactory extends EndpointFactory {
 

@@ -29,13 +29,8 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
  * Serializes an WSDL based endpoint to an XML configuration.
- * <p/>
- * <endpoint [name="name"]>
- * <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
- * <wsdl uri="wsdl uri" service="service name" port="port name">
- * .. extensibility ..
- * </wsdl>
- * </endpoint>
+ * 
+ * @see WSDLEndpointFactory
  */
 public class WSDLEndpointSerializer extends EndpointSerializer {
 

@@ -106,6 +106,8 @@ public class ServerManager {
             configctx = ConfigurationContextFactory.
                     createConfigurationContextFromFileSystem(axis2Repolocation, axis2Xml);
             
+            addDefaultBuildersAndFormatters(configctx.getAxisConfiguration());
+            
             listenerManager = configctx.getListenerManager();
             if (listenerManager == null) {
                 listenerManager = new ListenerManager();
@@ -163,6 +165,15 @@ public class ServerManager {
         } catch (Throwable t) {
             log.fatal("Synaps startup failed...", t);
             throw new SynapseException("Synapse startup failed", t);
+        }
+    }
+
+    private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
+        if (axisConf.getMessageBuilder("text/plain") == null) {
+            axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
+        }
+        if (axisConf.getMessageBuilder("application/octet-stream") == null) {
+            axisConf.addMessageBuilder("application/octet-stream", new BinaryBuilder());
         }
     }
 

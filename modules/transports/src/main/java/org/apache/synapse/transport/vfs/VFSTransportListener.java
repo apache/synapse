@@ -22,19 +22,24 @@ import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.AbstractPollingTransportListener;
 import org.apache.synapse.transport.base.ManagementSupport;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.description.*;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
-import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import java.util.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -415,7 +420,24 @@ public class VFSTransportListener extends AbstractPollingTransportListener
 
 
             // set the message payload to the message context
-            VFSUtils.getInstace().setSOAPEnvelope(content, msgContext, contentType);
+            InputStream in = content.getInputStream();
+            try {
+                SOAPEnvelope envelope;
+                try {
+                    envelope = TransportUtils.createSOAPMessage(msgContext, in, contentType);
+                } catch (XMLStreamException ex) {
+                    handleException("Error parsing XML", ex);
+                    return;
+                }
+                msgContext.setEnvelope(envelope);
+            }
+            finally {
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    handleException("Error closing stream", ex);
+                }
+            }
 
             handleIncomingMessage(
                 msgContext,

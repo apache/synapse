@@ -27,10 +27,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.http.server.HttpUtils;
 import org.apache.synapse.transport.base.AbstractTransportListener;
+import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.ManagementSupport;
 
 /**
@@ -86,44 +86,18 @@ public class UDPListener extends AbstractTransportListener implements Management
 
     @Override
     protected void startListeningForService(AxisService service) {
-        Parameter param;
-        
         int port;
-        param = service.getParameter(UDPConstants.PORT_KEY);
-        if (param == null) {
-            log.info("No UDP port number specified for service " + service.getName() + "; disabling transport for this service");
-            disableTransportForService(service);
-            return;
-        } else {
-            try {
-                port = Integer.parseInt(param.getValue().toString());
-            }
-            catch (NumberFormatException ex) {
-                log.error("Invalid port number " + param.getValue() + " for service " + service.getName());
-                disableTransportForService(service);
-                return;
-            }
-        }
-        
         int maxPacketSize = UDPConstants.DEFAULT_MAX_PACKET_SIZE;
-        param = service.getParameter(UDPConstants.MAX_PACKET_SIZE_KEY);
-        if (param != null) {
-            try {
-                maxPacketSize = Integer.parseInt(param.getValue().toString());
-            }
-            catch (NumberFormatException ex) {
-                log.warn("Invalid maximum packet size; falling back to default value " + maxPacketSize);
-            }
-        }
-        
         String contentType;
-        param = service.getParameter(UDPConstants.CONTENT_TYPE_KEY);
-        if (param == null) {
-            log.info("No content type specified for service " + service.getName() + "; disabling transport for this service");
+        
+        try {
+            port = BaseUtils.getRequiredServiceParamInt(service, UDPConstants.PORT_KEY);
+            maxPacketSize = BaseUtils.getOptionalServiceParamInt(service, UDPConstants.MAX_PACKET_SIZE_KEY, UDPConstants.DEFAULT_MAX_PACKET_SIZE);
+            contentType = BaseUtils.getRequiredServiceParam(service, UDPConstants.CONTENT_TYPE_KEY);
+        } catch (AxisFault ex) {
+            log.warn("Error configuring the UDP transport for service '" + service.getName() + "': " + ex.getMessage());
             disableTransportForService(service);
             return;
-        } else {
-            contentType = (String)param.getValue();
         }
         
         Endpoint endpoint = new Endpoint(this, port, contentType, maxPacketSize, service, metrics);

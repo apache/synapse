@@ -543,6 +543,16 @@
             <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
             <type>mar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- direct dependencies for 3rd party JARs / Util JARs -->
@@ -1292,6 +1302,9 @@
     </developers>
 
     <contributors>
+        <contributor>
+            <name>Eric Hubert</name>
+        </contributor>
         <contributor>
             <name>Hadrian Zbarcea</name>
         </contributor>

@@ -260,15 +260,17 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// sending the message
 			boolean successfullySent = false;
 			
-			//try to redecorate the EPR if necessary
-			if (log.isDebugEnabled())
-				log.debug("Redecorate EPR : " + msgCtx.getEnvelope().getHeader());
-			EndpointReference replyToEPR = msgCtx.getReplyTo();
-			if(replyToEPR!=null){
-				replyToEPR = SandeshaUtil.getEPRDecorator(msgCtx.getConfigurationContext()).decorateEndpointReference(replyToEPR);
-				msgCtx.setReplyTo(replyToEPR); 
+			// No need to redecorate application messages ... only for rm protocol messages
+			if(Sandesha2Constants.MessageTypes.APPLICATION!=senderBean.getMessageType()){
+				//try to redecorate the EPR if necessary
+				if (log.isDebugEnabled())
+					log.debug("Redecorate EPR : " + msgCtx.getEnvelope().getHeader());
+				EndpointReference replyToEPR = msgCtx.getReplyTo();
+				if(replyToEPR!=null){
+					replyToEPR = SandeshaUtil.getEPRDecorator(msgCtx.getConfigurationContext()).decorateEndpointReference(replyToEPR);
+					msgCtx.setReplyTo(replyToEPR); 
+				}
 			}
-			
 			// have to commit the transaction before sending. This may
 			// get changed when WS-AT is available.
 			if(transaction != null) {

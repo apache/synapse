@@ -4285,7 +4285,7 @@ end
 
       <div>
       <p>Prior to run this sample please follow the 'Setting up Synapse
-      DataSources' section in the sample setup guide.</p>
+      DataSources' section in the <a href="Synapse_Samples_Setup.html">sample setup guide</a>.</p>
       <pre>&lt;!-- Reusable database connection pool --&gt;
       &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -4439,9 +4439,9 @@ end
       pools</strong></p>
 
       <p><strong>Prerequisites:</strong> Setting up DataBase and DataSources
-      according to the sample setup guide.</p>
+      according to the <a href="Synapse_Samples_Setup.html">sample setup guide</a>.</p>
 
-      <p>Start the Synapse configuration numbered 363: i.e. synapse -sample 3623</p>
+      <p>Start the Synapse configuration numbered 363: i.e. synapse -sample 363</p>
 
       <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
       already done </p>
@@ -4450,14 +4450,15 @@ end
       <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
 
       <p>Then the console output </p>
-      <pre>INFO LogMediator text = ** Looking up from the Database **
-      ...
-      ID - c1
-      ...
-      INFO LogMediator text = ** Reporting to the Database **
-      INFO LogMediator text = ** Looking up from the Database **
-      INFO LogMediator text = Stock price - 183.3635460215262
-       </pre>
+      <pre> INFO LogMediator text = ** Looking up from the Database **
+    ...
+ ID - c1
+    ...
+ INFO LogMediator text = ** Reporting to the Database **
+    ...
+ INFO LogMediator text = ** Looking up from the Database **
+    ...
+ INFO LogMediator text = Stock price - 183.3635460215262</pre>
 
       </div>
       

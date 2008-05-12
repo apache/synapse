@@ -45,7 +45,7 @@ public class SynapseServer {
     public static void main(String[] args) throws Exception {
 
         // first check if we should print usage
-        if (args.length != 1 && args.length != 5) {
+        if (args.length != 1 && args.length != 4 && args.length != 5) {
             printUsage();
         }
 
@@ -57,7 +57,12 @@ public class SynapseServer {
             serverManager.setSynapseHome(System.getProperty(SynapseConstants.SYNAPSE_HOME));
             serverManager.setSynapseXMLPath(System.getProperty(SynapseConstants.SYNAPSE_XML));
             serverManager.setResolveRoot(System.getProperty(SynapseConstants.RESOLVE_ROOT));
-        } else {
+        } else if(args.length == 4) {
+            serverManager.setAxis2Xml(args[1]);
+            serverManager.setSynapseHome(args[2]);
+            serverManager.setSynapseXMLPath(args[3]);
+            serverManager.setResolveRoot(args[2] + File.separator + "repository");
+        } else if(args.length == 5) {
             serverManager.setAxis2Xml(args[1]);
             serverManager.setSynapseHome(args[2]);
             serverManager.setSynapseXMLPath(args[3]);

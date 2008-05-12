@@ -30,10 +30,15 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 
+import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
+
 public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBeanMgr {
 	
 	private static final Log log = LogFactory.getLog(InMemoryInvokerBeanMgr.class);
 
+	private Lock lock = new ReentrantLock();
+	
 	public InMemoryInvokerBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.STORAGE_MAP);
 	}
@@ -43,20 +48,24 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		InvokerBean finder = new InvokerBean();
 		finder.setMsgNo(bean.getMsgNo());
 		finder.setSequenceID(bean.getSequenceID());
-		synchronized(this){
-			if(super.findUnique(finder)!=null){
-				if(log.isDebugEnabled()) log.debug("InMemoryInvokerBeanMgr insert failed due to existing invoker bean");
-				return false;
-			}
-			else{
-				return super.insert(bean.getMessageContextRefKey(), bean);
-			}
+		lock.lock();
+		boolean result = false;
+		if(super.findUnique(finder)!=null){
+			if(log.isDebugEnabled()) log.debug("InMemoryInvokerBeanMgr insert failed due to existing invoker bean");
+			result = false;
 		}
-
+		else{
+			result = super.insert(bean.getMessageContextRefKey(), bean);
+		}
+		lock.unlock();
+		return result;
 	}
 
 	public boolean delete(String key) throws SandeshaStorageException {
-		return super.delete(key);
+		lock.lock();
+		boolean result = super.delete(key);
+		lock.unlock();
+		return result;
 	}
 
 	public InvokerBean retrieve(String key) throws SandeshaStorageException {

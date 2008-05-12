@@ -404,6 +404,43 @@ public abstract class BaseUtils {
         }
     }
 
+    public static Integer getOptionalServiceParamInt(AxisService service, String paramName) throws AxisFault {
+        Parameter param = service.getParameter(paramName);
+        if (param == null || param.getValue() == null) {
+            return null;
+        } else {
+            Object paramValue = param.getValue();
+            if (paramValue instanceof Integer) {
+                return (Integer)paramValue;
+            } else if (paramValue instanceof String) {
+                try {
+                    return Integer.valueOf((String)paramValue);
+                } catch (NumberFormatException ex) {
+                    throw new AxisFault("Invalid value '" + paramValue + "' for parameter '" + paramName +
+                            "' for service : " + service.getName());
+                }
+            } else {
+                throw new AxisFault("Invalid type for parameter '" + paramName + "' for service : " +
+                        service.getName());
+            }
+        }
+    }
+    
+    public static int getOptionalServiceParamInt(AxisService service, String paramName, int defaultValue) throws AxisFault {
+        Integer value = getOptionalServiceParamInt(service, paramName);
+        return value == null ? defaultValue : value.intValue();
+    }
+
+    public static int getRequiredServiceParamInt(AxisService service, String paramName) throws AxisFault {
+        Integer value = getOptionalServiceParamInt(service, paramName);
+        if (value == null) {
+            throw new AxisFault("Cannot find parameter : " + paramName +
+                    " for service : " + service.getName());
+        } else {
+            return value.intValue();
+        }
+    }
+    
     public static boolean isUsingTransport(AxisService service, String transportName) {
         boolean process = service.isEnableAllTransports();
         if (process) {

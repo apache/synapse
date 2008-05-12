@@ -977,32 +977,18 @@ public class SandeshaUtil {
 			return; //This message is aimed to be stored only if, Sandesha2TransportOutDescription is set.
 		
 		ArrayList executionChain = message.getExecutionChain();
-		ArrayList retransmittablePhaseNames = getRetransmittablePhaseNameList();
 		ArrayList retransmittablePhases = new ArrayList ();
 		
-		for (Iterator it=executionChain.iterator();it.hasNext();) {
-			Handler handler = (Handler) it.next();
-			
-			if (retransmittablePhaseNames.contains(handler.getName())) {
+		int executionChainLength = executionChain.size();
+		for(int i=0;i<executionChainLength;i++){
+			Handler handler = (Handler)executionChain.get(i);
+			if("Security".equals(handler.getName())||"MessageOut".equals(handler.getName())){
 				retransmittablePhases.add(handler);
-				
-				it.remove();
+				executionChain.remove(i);
+				executionChainLength=executionChain.size();
 			}
 		}
-		
 		message.setProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES, retransmittablePhases);
-	}
-	
-	private static ArrayList getRetransmittablePhaseNameList () {
-		
-		//TODO get this phase list from a property
-		
-		String security = "Security";
-		
-		ArrayList phases = new ArrayList ();
-		phases.add(security);
-		
-		return phases;
 	}
 	
         /**

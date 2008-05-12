@@ -688,29 +688,18 @@ synapse.sh -sample &lt;n&gt;</pre>
       </li>
       <li>
         Create and open a connection to the database using the Derby client
-        driver
-        <p>
-          CONNECT
-          'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';
-        </p>
+        driver<br/>
+        <pre> CONNECT 'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</pre>
       </li>
       <li>
         Create a table using the following statement
-        <p>
-          create table company(name varchar(10), id varchar(10), price double);
-        </p>
+        <pre> CREATE table company(name varchar(10), id varchar(10), price double);</pre>
       </li>
       <li>
         Inserts some data using following statements
-        <p>
-          insert into company values ('IBM','c1',0.0);
-        </p>
-        <p>
-          insert into company values ('SUN','c2',0.0);
-        </p>
-        <p>
-          insert into company values ('MSFT','c3',0.0);
-        </p>
+        <pre> INSERT into company values ('IBM','c1',0.0);
+ INSERT into company values ('SUN','c2',0.0);
+ INSERT into company values ('MSFT','c3',0.0);</pre>
       </li>
     </ol>
     <p>
@@ -739,11 +728,11 @@ both two definition. This configuration is related with sample 363.</p>
 <p>Configuration is somewhat similar to the log4j appender configuration.</p>
 
 
-<p>It is need set up two databases , Please follows the above (Setting up
-Derby Database server) section and setup database for
-'jdbc:derby://localhost:1527/lookupdb' and
-'jdbc:derby://localhost:1527/reportdb' using user name and password as
-'synapse'.</p>
+<p>It requires two databases, follow the above specified (Setting up
+Derby Database server) steps to create the two databases
+<strong>'jdbc:derby://localhost:1527/lookupdb'</strong>,
+<strong>'jdbc:derby://localhost:1527/reportdb'</strong> using the user name and password as
+'synapse'. Fill in the data for those two databases as per described in the above section</p>
 
 <div>
 <p><strong>synapse.properties configuration <br />

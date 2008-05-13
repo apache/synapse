@@ -2762,7 +2762,7 @@ Connection: Keep-Alive
       In this case, client sends a WS-RM enabled request to Synapse where Synapse
       sends normal request to the server. This can be observed by examining the
       wire level messages between the client and Synapse. These messages would
-      be similar to the wire level messages shown in sample 53. Each message
+      be similar to the wire level messages shown in sample 101. Each message
       would perform a similar function to the messages discussed in sample 53.
     </p>
     <p/>

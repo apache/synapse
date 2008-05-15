@@ -302,11 +302,19 @@ public class ServerManager {
     }
 
     public void setAxis2Repolocation(String axis2Repolocation) {
-        this.axis2Repolocation = axis2Repolocation;
+        if (!new File(axis2Repolocation).isAbsolute()) {
+            this.axis2Repolocation = synapseHome + File.separator + axis2Repolocation;
+        } else {
+            this.axis2Repolocation = axis2Repolocation;
+        }
     }
 
     public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
+        if (!new File(axis2Xml).isAbsolute()) {
+            this.axis2Xml = synapseHome + File.separator + axis2Xml;
+        } else {
+            this.axis2Xml = axis2Xml;
+        }
     }
 
     public String getSynapseHome() {
@@ -322,7 +330,11 @@ public class ServerManager {
     }
 
     public void setResolveRoot(String resolveRoot) {
-        this.resolveRoot = resolveRoot;
+        if (!new File(resolveRoot).isAbsolute()) {
+            this.resolveRoot = synapseHome + File.separator + resolveRoot;
+        } else {
+            this.resolveRoot = resolveRoot;
+        }
     }
 
     public String getServerName() {
@@ -338,7 +350,11 @@ public class ServerManager {
     }
 
     public void setSynapseXMLPath(String synapseXMLPath) {
-        this.synapseXMLPath = synapseXMLPath;
+        if (!new File(synapseXMLPath).isAbsolute()) {
+            this.synapseXMLPath = synapseHome + File.separator + synapseXMLPath;
+        } else {
+            this.synapseXMLPath = synapseXMLPath;
+        }
     }
 
     public int getConnectTimeout() {

@@ -235,7 +235,7 @@ public final class SynapseConstants {
     public static final String FORMAT_SOAP12 = "soap12";    
     
     /** Synapse server instance name */
-    public static final String SYNAPSE_SERVER_NAME = "SynapseServerName";
+    public static final String SERVER_NAME = "serverName";
 
     public static final String SYNAPSE_DATASOURCES = "synapse.datasources";
     

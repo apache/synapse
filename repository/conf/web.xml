@@ -34,7 +34,7 @@ Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
         <!-- The following init parameters are *required* to start the ESB -->
         <!-- They must be configured correctly here, or made available as Java System Properties -->
 
-        <!-- Synapse currently only supported the extracted WAR deployment model. Thus you need
+        <!-- Synapse currently only supports the extracted WAR deployment model. Thus you need
         to extract the synapse.war to a directory, and then configure your servlet engine to
         deploy it off the file system.
 

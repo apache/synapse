@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.channels.ClosedChannelException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -219,12 +220,20 @@ public class Axis2HttpRequest {
         try {
             messageFormatter.writeTo(msgContext, format, out, true);
         } catch (Exception e) {
-            /* close PipeImpl will manually raise exception
-               while streaming, so blocking status will be released */
-            if (e instanceof AxisFault) {
-                throw (AxisFault) e;
+            Throwable t = e.getCause();
+            if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Ignore closed channel exception, as the " +
+                        "SessionRequestCallback handles this exception");
+                }                
             } else {
-                handleException("Error streaming message context", e);
+                /* close PipeImpl will manually raise exception
+                   while streaming, so blocking status will be released */
+                if (e instanceof AxisFault) {
+                    throw (AxisFault) e;
+                } else {
+                    handleException("Error streaming message context", e);
+                }
             }
         }
         finally {

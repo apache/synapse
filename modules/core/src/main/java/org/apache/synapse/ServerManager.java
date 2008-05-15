@@ -279,6 +279,8 @@ public class ServerManager {
                 serverName = InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException ignore) {}
             log.info("The server name was not specified, defaulting to : " + serverName);
+        } else {
+            log.info("Using server name : " + serverName);
         }
 
         log.info("The timeout handler will run every : " + (getTimeoutHandlerInterval()/1000) + "s");

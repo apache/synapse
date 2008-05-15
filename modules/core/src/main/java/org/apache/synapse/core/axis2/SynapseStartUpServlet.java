@@ -60,6 +60,7 @@ public class SynapseStartUpServlet extends HttpServlet {
         serverManager.setResolveRoot(loadParameter(servletConfig, SynapseConstants.RESOLVE_ROOT));
         serverManager.setAxis2Repolocation(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_REPO));
         serverManager.setAxis2Xml(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_CONF));
+        serverManager.setServerName(loadParameter(servletConfig, SynapseConstants.SERVER_NAME));
 
         serverManager.start();
         servletContext.setAttribute(ALREADY_INITED, Boolean.TRUE);

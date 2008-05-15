@@ -62,7 +62,7 @@ public class ConnectionPool {
                         return conn;
                     } else {
                         if (log.isDebugEnabled()) {
-                            log.debug("closing stale connection");
+                            log.debug("closing stale connection to : " + host + ":" + port);
                         }
                         try {
                             conn.close();

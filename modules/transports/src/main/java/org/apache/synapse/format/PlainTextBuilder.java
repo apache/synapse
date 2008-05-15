@@ -51,13 +51,15 @@ public class PlainTextBuilder implements Builder {
     public OMElement processDocument(InputStream inputStream,
                                      String contentType,
                                      MessageContext msgContext) throws AxisFault {
-        Parameter wrapperParam = msgContext.getAxisService().getParameter(BaseConstants.WRAPPER_PARAM);
-        QName wrapperQName;
-        if (wrapperParam != null) {
-            wrapperQName = BaseUtils.getQNameFromString(wrapperParam.getValue());
-        } else {
-            wrapperQName = BaseConstants.DEFAULT_TEXT_WRAPPER;
-        }
+
+        QName wrapperQName = BaseConstants.DEFAULT_TEXT_WRAPPER;
+        if (msgContext.getAxisService() != null) {
+            Parameter wrapperParam = msgContext.getAxisService().getParameter(BaseConstants.WRAPPER_PARAM);
+            if (wrapperParam != null) {
+                wrapperQName = BaseUtils.getQNameFromString(wrapperParam.getValue());
+            }
+        }        
+
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement wrapper = factory.createOMElement(wrapperQName, null);
         String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);

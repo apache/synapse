@@ -22,6 +22,7 @@ set SYNAPSE_HOME=%~dps0..
 
 set _SYNAPSE_XML="%SYNAPSE_HOME%\repository\conf\synapse.xml"
 set _XDEBUG=
+set _SERVER_NAME=
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
 rem of arguments (up to the command line limit, anyway).
@@ -29,6 +30,7 @@ rem of arguments (up to the command line limit, anyway).
 :setupArgs
 if ""%1""=="""" goto doneStart
 if ""%1""==""-sample"" goto SYNAPSESample
+if ""%1""==""-serverName"" goto serverName
 if ""%1""==""-xdebug"" goto xdebug
 shift
 goto setupArgs
@@ -43,6 +45,12 @@ goto setupArgs
 :SYNAPSESample
 shift
 set _SYNAPSE_XML="%SYNAPSE_HOME%\repository\conf\sample\synapse_sample_%1.xml"
+shift
+goto setupArgs
+
+:serverName
+shift
+set _SERVER_NAME=%1
 shift
 goto setupArgs
 
@@ -100,7 +108,7 @@ rem
 rem Start the Wrapper
 rem
 :startup
-"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% %_XDEBUG%
+"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% wrapper.app.parameter.7=%_SERVER_NAME% %_XDEBUG%
 
 if not errorlevel 1 goto :eof
 pause

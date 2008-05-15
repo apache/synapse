@@ -124,6 +124,9 @@ SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 # synapse.xml
 SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse.xml
 
+# server name
+SERVER_NAME=
+
 while [ $# -ge 1 ]; do
 
 if [ "$1" = "-xdebug" ]; then
@@ -134,11 +137,16 @@ if [ "$1" = "-xdebug" ]; then
     SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
     shift 2 # -sample and sample number
 
+  elif [ "$1" = "-serverName" ]; then
+    SERVER_NAME=$2
+    shift 2 # -serverName and actual name
+
 elif [ "$1" = "-h" ]; then
     echo "Usage: synapse.sh ( commands ... )"
     echo "commands:"
-    echo "  -xdebug           Start Synapse under JPDA debugger"
-    echo "  -sample (number)  Start with sample Synapse configuration of given number"
+    echo "  -xdebug            Start Synapse under JPDA debugger"
+    echo "  -sample (number)   Start with sample Synapse configuration of given number"
+    echo "  -serverName <name> Name of the Synapse server instance"
     shift
     exit 0
 
@@ -170,4 +178,5 @@ $JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
         $SYNAPSE_HOME/repository/conf/axis2.xml \
         $SYNAPSE_HOME \
         $SYNAPSE_XML \
-        $SYNAPSE_HOME/repository
+        $SYNAPSE_HOME/repository \
+        $SERVER_NAME

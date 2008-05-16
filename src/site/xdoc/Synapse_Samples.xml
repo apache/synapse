@@ -3245,7 +3245,7 @@ Transfer-Encoding: chunked
     <p>
       Create three new directories in a test directory. e.g. in, out, original
       in /home/user/test. Open
-      SYNAPSE_HOME/repository/conf/sample/synapse_sample_115.xml and edit the
+      SYNAPSE_HOME/repository/conf/sample/synapse_sample_254.xml and edit the
       following values. Change transport.vfs.FileURI,
       transport.vfs.MoveAfterProcess, transport.vfs.MoveAfterFailure parameter
       values to the above in, original, original directories respectively.

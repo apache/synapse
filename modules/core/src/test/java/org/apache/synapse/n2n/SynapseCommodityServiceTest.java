@@ -49,6 +49,7 @@ import java.io.*;
 public class SynapseCommodityServiceTest extends TestCase {
 
     protected void setUp() throws java.lang.Exception {
+        ServerManager.getInstance().setSynapseHome(".");
         // Initializing Synapse repository
         ServerManager.getInstance().setSynapseXMLPath(
                            "./../../repository/conf/sample/resources/misc/synapse.xml");

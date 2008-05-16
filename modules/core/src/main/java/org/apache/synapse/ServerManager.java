@@ -246,33 +246,27 @@ public class ServerManager {
      * Validate core settings for startup
      */
     private void validate() {
-        if (axis2Repolocation == null) {
-            handleFatal("Axis2 repository");
-        } else {
-            log.info("Using the Axis2 Repository : " + new File(axis2Repolocation).getAbsolutePath());
-        }
-
-        if (axis2Xml == null) {
-            handleFatal("axis2.xml location");
-        } else {
-            log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
-        }
-
-        if (synapseHome == null) {
+        if (synapseHome == null || !new File(synapseHome).exists()) {
             handleFatal("Synapse home");
         } else {
             log.info("Using Synapse home as : " + synapseHome);
         }
 
-        if (synapseXMLPath == null) {
-            handleFatal("synapse.xml path");
+        if (axis2Repolocation == null || !new File(axis2Repolocation).exists()) {
+            handleFatal("Axis2 repository");
+        } else {
+            log.info("Using the Axis2 Repository : " + new File(axis2Repolocation).getAbsolutePath());
         }
 
-//        if (resolveRoot == null) {
-//            handleFatal("resolve root");
-//        } else {
-//            log.info("Using resolve.root as : " + resolveRoot);
-//        }
+        if (axis2Xml == null || !new File(axis2Xml).exists()) {
+            handleFatal("axis2.xml location");
+        } else {
+            log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
+        }
+
+        if (synapseXMLPath == null || !new File(synapseXMLPath).exists()) {
+            handleFatal("synapse.xml path");
+        }
 
         if (serverName == null) {
             try {
@@ -302,7 +296,7 @@ public class ServerManager {
     }
 
     public void setAxis2Repolocation(String axis2Repolocation) {
-        if (!new File(axis2Repolocation).isAbsolute()) {
+        if (!new File(axis2Repolocation).isAbsolute() && synapseHome != null) {
             this.axis2Repolocation = synapseHome + File.separator + axis2Repolocation;
         } else {
             this.axis2Repolocation = axis2Repolocation;
@@ -310,7 +304,7 @@ public class ServerManager {
     }
 
     public void setAxis2Xml(String axis2Xml) {
-        if (!new File(axis2Xml).isAbsolute()) {
+        if (!new File(axis2Xml).isAbsolute() && synapseHome != null) {
             this.axis2Xml = synapseHome + File.separator + axis2Xml;
         } else {
             this.axis2Xml = axis2Xml;
@@ -330,7 +324,7 @@ public class ServerManager {
     }
 
     public void setResolveRoot(String resolveRoot) {
-        if (!new File(resolveRoot).isAbsolute()) {
+        if (!new File(resolveRoot).isAbsolute() && synapseHome != null) {
             this.resolveRoot = synapseHome + File.separator + resolveRoot;
         } else {
             this.resolveRoot = resolveRoot;
@@ -350,7 +344,7 @@ public class ServerManager {
     }
 
     public void setSynapseXMLPath(String synapseXMLPath) {
-        if (!new File(synapseXMLPath).isAbsolute()) {
+        if (!new File(synapseXMLPath).isAbsolute() && synapseHome != null) {
             this.synapseXMLPath = synapseHome + File.separator + synapseXMLPath;
         } else {
             this.synapseXMLPath = synapseXMLPath;

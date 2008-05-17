@@ -30,8 +30,8 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.http.server.HttpUtils;
 import org.apache.synapse.transport.base.AbstractTransportListener;
-import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.ManagementSupport;
+import org.apache.synapse.transport.base.ParamUtils;
 
 /**
  * Transport listener for the UDP protocol.
@@ -91,9 +91,9 @@ public class UDPListener extends AbstractTransportListener implements Management
         String contentType;
         
         try {
-            port = BaseUtils.getRequiredServiceParamInt(service, UDPConstants.PORT_KEY);
-            maxPacketSize = BaseUtils.getOptionalServiceParamInt(service, UDPConstants.MAX_PACKET_SIZE_KEY, UDPConstants.DEFAULT_MAX_PACKET_SIZE);
-            contentType = BaseUtils.getRequiredServiceParam(service, UDPConstants.CONTENT_TYPE_KEY);
+            port = ParamUtils.getRequiredParamInt(service, UDPConstants.PORT_KEY);
+            maxPacketSize = ParamUtils.getOptionalParamInt(service, UDPConstants.MAX_PACKET_SIZE_KEY, UDPConstants.DEFAULT_MAX_PACKET_SIZE);
+            contentType = ParamUtils.getRequiredParam(service, UDPConstants.CONTENT_TYPE_KEY);
         } catch (AxisFault ex) {
             log.warn("Error configuring the UDP transport for service '" + service.getName() + "': " + ex.getMessage());
             disableTransportForService(service);

@@ -22,6 +22,7 @@ import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.AbstractPollingTransportListener;
 import org.apache.synapse.transport.base.ManagementSupport;
+import org.apache.synapse.transport.base.ParamUtils;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -501,47 +502,47 @@ public class VFSTransportListener extends AbstractPollingTransportListener
         PollTableEntry entry = new PollTableEntry();
         try {
             entry.setFileURI(
-                BaseUtils.getRequiredServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_URI));
-            entry.setFileNamePattern(BaseUtils.getOptionalServiceParam(service,
+                ParamUtils.getRequiredParam(service, VFSConstants.TRANSPORT_FILE_FILE_URI));
+            entry.setFileNamePattern(ParamUtils.getOptionalParam(service,
                     VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
-            entry.setContentType(BaseUtils.getRequiredServiceParam(service,
+            entry.setContentType(ParamUtils.getRequiredParam(service,
                     VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
-            String option = BaseUtils.getOptionalServiceParam(
+            String option = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
             entry.setActionAfterProcess(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = BaseUtils.getOptionalServiceParam(
+            option = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
             entry.setActionAfterErrors(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = BaseUtils.getOptionalServiceParam(
+            option = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
             entry.setActionAfterFailure(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
 
-            String moveDirectoryAfterProcess = BaseUtils.getOptionalServiceParam(
+            String moveDirectoryAfterProcess = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
             entry.setMoveAfterProcess(moveDirectoryAfterProcess);
-            String moveDirectoryAfterErrors = BaseUtils.getOptionalServiceParam(
+            String moveDirectoryAfterErrors = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
             entry.setMoveAfterErrors(moveDirectoryAfterErrors);
-            String moveDirectoryAfterFailure = BaseUtils.getOptionalServiceParam(
+            String moveDirectoryAfterFailure = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
             entry.setMoveAfterFailure(moveDirectoryAfterFailure);
 
-            String moveFileTimestampFormat = BaseUtils.getOptionalServiceParam(
+            String moveFileTimestampFormat = ParamUtils.getOptionalParam(
                 service, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
             if(moveFileTimestampFormat != null) {
                 DateFormat moveTimestampFormat = new SimpleDateFormat(moveFileTimestampFormat);
                 entry.setMoveTimestampFormat(moveTimestampFormat);
             }
 
-            String strMaxRetryCount = BaseUtils.getOptionalServiceParam(
+            String strMaxRetryCount = ParamUtils.getOptionalParam(
                 service, VFSConstants.MAX_RETRY_COUNT);
             if(strMaxRetryCount != null)
               entry.setMaxRetryCount(Integer.parseInt(strMaxRetryCount));
 
-            String strReconnectTimeout = BaseUtils.getOptionalServiceParam(
+            String strReconnectTimeout = ParamUtils.getOptionalParam(
                 service, VFSConstants.RECONNECT_TIMEOUT);            
             if(strReconnectTimeout != null)
               entry.setReconnectTimeout(Integer.parseInt(strReconnectTimeout) * 1000);

@@ -31,6 +31,7 @@ import org.apache.synapse.transport.base.AbstractPollingTransportListener;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.ManagementSupport;
+import org.apache.synapse.transport.base.ParamUtils;
 
 import javax.mail.*;
 import javax.mail.internet.AddressException;
@@ -504,7 +505,7 @@ public class MailTransportListener extends AbstractPollingTransportListener
         PollTableEntry entry = new PollTableEntry();
         try {
             entry.setEmailAddress(
-                BaseUtils.getRequiredServiceParam(service, MailConstants.TRANSPORT_MAIL_ADDRESS));
+                ParamUtils.getRequiredParam(service, MailConstants.TRANSPORT_MAIL_ADDRESS));
 
             List<Parameter> params = service.getParameters();
             for (Parameter p : params) {
@@ -526,37 +527,37 @@ public class MailTransportListener extends AbstractPollingTransportListener
             }
 
             entry.setContentType(
-                BaseUtils.getOptionalServiceParam(service, MailConstants.TRANSPORT_MAIL_CONTENT_TYPE));
+                ParamUtils.getOptionalParam(service, MailConstants.TRANSPORT_MAIL_CONTENT_TYPE));
             entry.setReplyAddress(
-                BaseUtils.getOptionalServiceParam(service, MailConstants.TRANSPORT_MAIL_REPLY_ADDRESS));
+                ParamUtils.getOptionalParam(service, MailConstants.TRANSPORT_MAIL_REPLY_ADDRESS));
 
             entry.addPreserveHeaders(
-                BaseUtils.getOptionalServiceParam(service, MailConstants.TRANSPORT_MAIL_PRESERVE_HEADERS));
+                ParamUtils.getOptionalParam(service, MailConstants.TRANSPORT_MAIL_PRESERVE_HEADERS));
             entry.addRemoveHeaders(
-                BaseUtils.getOptionalServiceParam(service, MailConstants.TRANSPORT_MAIL_REMOVE_HEADERS));
+                ParamUtils.getOptionalParam(service, MailConstants.TRANSPORT_MAIL_REMOVE_HEADERS));
 
-            String option = BaseUtils.getOptionalServiceParam(
+            String option = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_ACTION_AFTER_PROCESS);
             entry.setActionAfterProcess(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = BaseUtils.getOptionalServiceParam(
+            option = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_ACTION_AFTER_FAILURE);
             entry.setActionAfterFailure(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
 
-            String moveFolderAfterProcess = BaseUtils.getOptionalServiceParam(
+            String moveFolderAfterProcess = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_MOVE_AFTER_PROCESS);
             entry.setMoveAfterProcess(moveFolderAfterProcess);
-            String modeFolderAfterFailure = BaseUtils.getOptionalServiceParam(
+            String modeFolderAfterFailure = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_MOVE_AFTER_FAILURE);
             entry.setMoveAfterFailure(modeFolderAfterFailure);
 
-            String strMaxRetryCount = BaseUtils.getOptionalServiceParam(
+            String strMaxRetryCount = ParamUtils.getOptionalParam(
                 service, MailConstants.MAX_RETRY_COUNT);
             if (strMaxRetryCount != null)
                 entry.setMaxRetryCount(Integer.parseInt(strMaxRetryCount));
 
-            String strReconnectTimeout = BaseUtils.getOptionalServiceParam(
+            String strReconnectTimeout = ParamUtils.getOptionalParam(
                 service, MailConstants.RECONNECT_TIMEOUT);
             if (strReconnectTimeout != null)
                 entry.setReconnectTimeout(Integer.parseInt(strReconnectTimeout) * 1000);

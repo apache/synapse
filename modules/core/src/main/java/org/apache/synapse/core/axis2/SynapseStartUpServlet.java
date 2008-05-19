@@ -44,11 +44,7 @@ public class SynapseStartUpServlet extends HttpServlet {
     private static final String ALREADY_INITED = "synapseAlreadyInited";
 
     public void init() throws ServletException {
-        super.init();
-    }
-
-    public void init(ServletConfig servletConfig) throws ServletException {
-
+    	ServletConfig servletConfig = getServletConfig();
         servletContext = servletConfig.getServletContext();
         if (Boolean.TRUE.equals(servletContext.getAttribute(ALREADY_INITED))) {
             return;

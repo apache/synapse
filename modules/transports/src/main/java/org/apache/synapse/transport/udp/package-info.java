@@ -81,6 +81,16 @@
  *       When SOAP with WS-Addressing is used, the packets could be
  *       received on a single port and dispatched based on the <tt>To</tt>
  *       header. This is not supported.</li>
+ *   <li>It might be useful to allow configuration of the content type at the
+ *       transport level rather than the service level. In this case, the
+ *       <tt>contentType</tt> parameter would not be included in the endpoint
+ *       reference. This is necessary for interoperability with the SOAP over UDP
+ *       standard.</li>
+ *   <li>Technically, it would be quite easy to support binding several UDP ports
+ *       to the same service. However, the way endpoints are configured
+ *       at the service level doesn't allow this for the moment. Indeed,
+ *       using simple text properties only allows to specify the configuration
+ *       of a single endpoint.</li>
  *   <li>The transport sender uses a randomly chosen UDP source port. Some
  *       UDP based services may check the source port and discard the packet.
  *       Also, in two-way communication scenarios, stateful firewalls will

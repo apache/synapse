@@ -24,8 +24,6 @@ package org.apache.synapse.transport.udp;
 public class UDPConstants {
     private UDPConstants() {}
     
-    public static final String TRANSPORT_NAME = "udp";
-    
     public static final int DEFAULT_MAX_PACKET_SIZE = 1024;
     
     public static final String PORT_KEY = "transport.udp.port";

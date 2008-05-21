@@ -19,19 +19,13 @@
 package org.apache.synapse.transport.udp;
 
 import java.io.IOException;
-import java.net.SocketException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.transport.http.server.HttpUtils;
-import org.apache.synapse.transport.base.AbstractTransportListener;
 import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.ParamUtils;
+import org.apache.synapse.transport.base.datagram.AbstractDatagramTransportListener;
+import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
 
 /**
  * Transport listener for the UDP protocol.
@@ -50,85 +44,20 @@ import org.apache.synapse.transport.base.ParamUtils;
  * 
  * @see org.apache.synapse.transport.udp
  */
-public class UDPListener extends AbstractTransportListener implements ManagementSupport {
-    private final Map<String,Endpoint> endpoints = new HashMap<String,Endpoint>();
-    
-    private String defaultIp;
-    private IODispatcher dispatcher;
-    
+public class UDPListener extends AbstractDatagramTransportListener<Endpoint> implements ManagementSupport {
     @Override
-    public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn) throws AxisFault {
-        setTransportName(UDPConstants.TRANSPORT_NAME);
-        super.init(cfgCtx, transportIn);
-        try {
-            dispatcher = new IODispatcher(workerPool);
-        } catch (IOException ex) {
-            throw new AxisFault("Unable to create selector", ex);
-        }
-        try {
-            defaultIp = HttpUtils.getIpAddress(cfgCtx.getAxisConfiguration());
-        } catch (SocketException ex) {
-            throw new AxisFault("Unable to determine the host's IP address", ex);
-        }
+    protected IODispatcher createDispatcher(DatagramDispatcherCallback callback) throws IOException {
+    	IODispatcher dispatcher = new IODispatcher(callback);
+    	new Thread(dispatcher, getTransportName() + "-dispatcher").start();
         // Start a new thread for the I/O dispatcher
-        new Thread(dispatcher, getTransportName() + "-dispatcher").start();
+    	return dispatcher;
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
-        try {
-            dispatcher.stop();
-        } catch (IOException ex) {
-            log.error("Failed to stop dispatcher", ex);
-        }
-    }
-
-    @Override
-    protected void startListeningForService(AxisService service) {
-        int port;
-        int maxPacketSize = UDPConstants.DEFAULT_MAX_PACKET_SIZE;
-        String contentType;
-        
-        try {
-            port = ParamUtils.getRequiredParamInt(service, UDPConstants.PORT_KEY);
-            maxPacketSize = ParamUtils.getOptionalParamInt(service, UDPConstants.MAX_PACKET_SIZE_KEY, UDPConstants.DEFAULT_MAX_PACKET_SIZE);
-            contentType = ParamUtils.getRequiredParam(service, UDPConstants.CONTENT_TYPE_KEY);
-        } catch (AxisFault ex) {
-            log.warn("Error configuring the UDP transport for service '" + service.getName() + "': " + ex.getMessage());
-            disableTransportForService(service);
-            return;
-        }
-        
-        Endpoint endpoint = new Endpoint(this, port, contentType, maxPacketSize, service, metrics);
-        try {
-            dispatcher.addEndpoint(endpoint);
-        } catch (IOException ex) {
-            log.error("Unable to listen on port " + port, ex);
-            disableTransportForService(service);
-            return;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Started listening on port " + port + " [contentType=" + contentType + "; maxPacketSize=" + maxPacketSize + "; service=" + service.getName() + "]");
-        }
-        endpoints.put(service.getName(), endpoint);
-    }
-
-    @Override
-    protected void stopListeningForService(AxisService service) {
-        try {
-            dispatcher.removeEndpoint(service.getName());
-        } catch (IOException ex) {
-            log.error("I/O exception while stopping listener for service " + service.getName(), ex);
-        }
-    }
-
-    public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
-        Endpoint endpoint = endpoints.get(serviceName);
-        if (endpoint == null) {
-            return null;
-        } else {
-            return new EndpointReference[] { endpoint.getEndpointReference(ip == null ? defaultIp : ip) };
-        }
+    protected Endpoint createEndpoint(AxisService service) throws AxisFault {
+    	Endpoint endpoint = new Endpoint();
+    	endpoint.setPort(ParamUtils.getRequiredParamInt(service, UDPConstants.PORT_KEY));
+    	endpoint.setMaxPacketSize(ParamUtils.getOptionalParamInt(service, UDPConstants.MAX_PACKET_SIZE_KEY, UDPConstants.DEFAULT_MAX_PACKET_SIZE));
+    	return endpoint;
     }
 }

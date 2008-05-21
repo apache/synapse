@@ -16,12 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.transport.udp;
+package org.apache.synapse.transport.base.datagram;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Utility class with methods used by the UDP transport.
+ * Utility class with methods used by datagram transports.
  */
 public class Utils {
     private Utils() {}

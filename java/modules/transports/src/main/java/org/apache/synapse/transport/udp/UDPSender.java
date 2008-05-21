@@ -47,7 +47,7 @@ public class UDPSender extends AbstractTransportSender {
     
     @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
-        setTransportName(UDPConstants.TRANSPORT_NAME);
+        setTransportName(transportOut.getName());
         super.init(cfgCtx, transportOut);
     }
     

@@ -16,35 +16,38 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.transport.udp;
+package org.apache.synapse.transport.pipe;
+
+import java.io.File;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.transport.base.datagram.DatagramEndpoint;
 
 /**
- * UDP endpoint description.
+ * Pipe endpoint description.
  */
-public class Endpoint extends DatagramEndpoint {
-    private int port;
-    private int maxPacketSize;
-    
-    public int getPort() {
-        return port;
-    }
-    
-    public void setPort(int port) {
-		this.port = port;
+public class PipeEndpoint extends DatagramEndpoint {
+	private File pipe;
+	private Protocol protocol;
+
+	public File getPipe() {
+		return pipe;
 	}
 
-	public int getMaxPacketSize() {
-        return maxPacketSize;
-    }
-
-    public void setMaxPacketSize(int maxPacketSize) {
-		this.maxPacketSize = maxPacketSize;
+	public void setPipe(File pipe) {
+		this.pipe = pipe;
 	}
 
+	public Protocol getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
+    }
+
+    @Override
 	public EndpointReference getEndpointReference(String ip) {
-        return new EndpointReference("udp://" + ip + ":" + getPort() + "?contentType=" + getContentType());
-    }
+		return new EndpointReference("pipe://" + pipe.getAbsolutePath() + "?contentType=" + getContentType());
+	}
 }

@@ -16,35 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.transport.udp;
-
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.base.datagram.DatagramEndpoint;
 
 /**
- * UDP endpoint description.
+ * Base classes for datagram transports.
+ * <p>
+ * A datagram type transport is a transport that entirely reads a message
+ * into memory before starting to process it: in contrast to transports like HTTP,
+ * it doesn't support streaming. This approach can be chosen either because
+ * of the characteristics of the underlying protocol (such as in the case of UDP)
+ * or because streaming a message would unnecessarily delay the processing of the
+ * next available message (as in the case of a UNIX pipe).
  */
-public class Endpoint extends DatagramEndpoint {
-    private int port;
-    private int maxPacketSize;
-    
-    public int getPort() {
-        return port;
-    }
-    
-    public void setPort(int port) {
-		this.port = port;
-	}
-
-	public int getMaxPacketSize() {
-        return maxPacketSize;
-    }
-
-    public void setMaxPacketSize(int maxPacketSize) {
-		this.maxPacketSize = maxPacketSize;
-	}
-
-	public EndpointReference getEndpointReference(String ip) {
-        return new EndpointReference("udp://" + ip + ":" + getPort() + "?contentType=" + getContentType());
-    }
-}
+package org.apache.synapse.transport.base.datagram;

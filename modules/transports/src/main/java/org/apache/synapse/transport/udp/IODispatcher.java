@@ -32,6 +32,9 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.base.datagram.DatagramDispatcher;
+import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
+import org.apache.synapse.transport.base.datagram.ProcessPacketTask;
 import org.apache.synapse.transport.base.threads.WorkerPool;
 
 /**
@@ -54,7 +57,7 @@ import org.apache.synapse.transport.base.threads.WorkerPool;
  * {@link #run()} method. The three methods mentioned above will block until
  * the operation has completed.
  */
-public class IODispatcher implements Runnable {
+public class IODispatcher implements DatagramDispatcher<Endpoint>, Runnable {
     private static abstract class SelectorOperation {
         private final CountDownLatch done = new CountDownLatch(1);
         private IOException exception;
@@ -83,18 +86,18 @@ public class IODispatcher implements Runnable {
     
     private static final Log log = LogFactory.getLog(IODispatcher.class);
     
-    private final WorkerPool workerPool;
+    private final DatagramDispatcherCallback callback;
     private final Selector selector;
     private final Queue<SelectorOperation> selectorOperationQueue = new ConcurrentLinkedQueue<SelectorOperation>();
     
     /**
      * Constructor.
      * 
-     * @param workerPool the worker pool to dispatch processing task to
+     * @param callback
      * @throws IOException if the {@link Selector} instance could not be created
      */
-    public IODispatcher(WorkerPool workerPool) throws IOException {
-        this.workerPool = workerPool;
+    public IODispatcher(DatagramDispatcherCallback callback) throws IOException {
+        this.callback = callback;
         selector = Selector.open();
     }
     
@@ -123,19 +126,18 @@ public class IODispatcher implements Runnable {
      * Remove an endpoint. This causes the corresponding UDP socket to be
      * closed.
      * 
-     * @param serviceName the name of the service corresponding to
-     *                    the endpoint
+     * @param endpoint the endpoint description
      * @throws IOException if an error occurred when closing the socket
      */
-    public void removeEndpoint(final String serviceName) throws IOException {
+    public void removeEndpoint(final Endpoint endpoint) throws IOException {
         execute(new SelectorOperation() {
             @Override
             public void doExecute(Selector selector) throws IOException {
                 Iterator<SelectionKey> it = selector.keys().iterator();
                 while (it.hasNext()) {
                     SelectionKey key = it.next();
-                    Endpoint endpoint = (Endpoint)key.attachment();
-                    if (serviceName.equals(endpoint.getService().getName())) {
+                    Endpoint endpointForKey = (Endpoint)key.attachment();
+                    if (endpoint == endpointForKey) {
                         key.cancel();
                         key.channel().close();
                         break;
@@ -250,7 +252,7 @@ public class IODispatcher implements Runnable {
             if (log.isDebugEnabled()) {
                 log.debug("Received packet from " + address + " with length " + length);
             }
-            workerPool.execute(new ProcessPacketTask(endpoint, data, length));
+            callback.receive(endpoint, data, length);
         } catch (IOException ex) {
             endpoint.getMetrics().incrementFaultsReceiving();
             log.error("Error receiving UDP packet", ex);

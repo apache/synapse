@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.transport.udp;
+package org.apache.synapse.transport.base.datagram;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -30,18 +30,18 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.base.MetricsCollector;
 
 /**
- * Task encapsulating the processing of a packet.
+ * Task encapsulating the processing of a datagram.
  * Instances of this class will be dispatched to worker threads for
  * execution.
  */
 public class ProcessPacketTask implements Runnable {
     private static final Log log = LogFactory.getLog(ProcessPacketTask.class);
     
-    private final Endpoint endpoint;
+    private final DatagramEndpoint endpoint;
     private final byte[] data;
     private final int length;
     
-    public ProcessPacketTask(Endpoint endpoint, byte[] data, int length) {
+    public ProcessPacketTask(DatagramEndpoint endpoint, byte[] data, int length) {
         this.endpoint = endpoint;
         this.data = data;
         this.length = length;
@@ -60,7 +60,7 @@ public class ProcessPacketTask implements Runnable {
             metrics.incrementBytesReceived(length);
         } catch (Exception ex) {
             metrics.incrementFaultsReceiving();
-            StringBuilder buffer = new StringBuilder("Error during processing of UDP packet:\n");
+            StringBuilder buffer = new StringBuilder("Error during processing of datagram:\n");
             Utils.hexDump(buffer, data, length);
             log.error(buffer.toString(), ex);
         }

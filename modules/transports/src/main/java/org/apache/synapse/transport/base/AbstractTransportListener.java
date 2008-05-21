@@ -142,7 +142,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         if (state != BaseConstants.STARTED) {
             state = BaseConstants.STARTED;
             // register to receive updates on services for lifetime management
-            cfgCtx.getAxisConfiguration().addObservers(axisObserver);
+            // cfgCtx.getAxisConfiguration().addObservers(axisObserver);
         }
         log.info(transportName.toUpperCase() + " Listener started");
 
@@ -451,7 +451,10 @@ public abstract class AbstractTransportListener implements TransportListener {
     private void unregisterMBean(String objectName) {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            mbs.unregisterMBean(new ObjectName(objectName));
+            ObjectName objName = new ObjectName(objectName);
+            if (mbs.isRegistered(objName)) {
+                mbs.unregisterMBean(objName);
+            }
         } catch (Exception e) {
             log.warn("Error un-registering a MBean with objectname ' " + objectName +
                 " ' for JMX management", e);

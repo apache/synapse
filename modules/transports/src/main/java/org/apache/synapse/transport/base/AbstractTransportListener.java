@@ -453,7 +453,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             mbs.unregisterMBean(new ObjectName(objectName));
         } catch (Exception e) {
-            log.warn("Error registering a MBean with objectname ' " + objectName +
+            log.warn("Error un-registering a MBean with objectname ' " + objectName +
                 " ' for JMX management", e);
         }
     }

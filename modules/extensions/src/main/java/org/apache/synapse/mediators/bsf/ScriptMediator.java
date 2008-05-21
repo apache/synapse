@@ -336,10 +336,11 @@ public class ScriptMediator extends AbstractMediator {
             String includeKey = (String) iter.next();
             String includeSourceCode = (String) includes.get(includeKey);
             Entry includeEntry = synCtx.getConfiguration().getEntryDefinition(includeKey);
-            boolean includeEntryNeedsReload = (entry != null) && entry.isDynamic()
-                    && (!entry.isCached() || entry.isExpired());
+            boolean includeEntryNeedsReload = (includeEntry != null) && includeEntry.isDynamic()
+                    && (!includeEntry.isCached() || includeEntry.isExpired());
             synchronized (resourceLock) {
-                if (includeSourceCode == null || needsReload) {
+                if (includeSourceCode == null || includeEntryNeedsReload) {
+                    log.debug("Re-/Loading the include script with key " + includeKey);
                     Object o = synCtx.getEntry(includeKey);
                     if (o instanceof OMElement) {
                         includeSourceCode = ((OMElement) (o)).getText();

@@ -43,6 +43,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -297,7 +298,25 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 													     SandeshaUtil.getStackTraceFromException(e)), 
 													     e,
 													     rmdBean.getAcksToEndpointReference());
-				// Return false if an Exception hasn't been thrown.
+
+                                //Tidy up the RMDBean
+				Transaction tran = null;
+				try {
+					tran = storageManager.getTransaction();
+					storageManager.getRMDBeanMgr().delete(rmdBean.getSequenceID());
+	
+					if(tran != null && tran.isActive()) tran.commit();
+					tran = null;
+					
+				} catch (SandeshaStorageException ex){
+					if (log.isDebugEnabled())
+						log.debug("Caught an exception deleting the RMD bean", ex);	
+				} finally {
+					if(tran!=null && tran.isActive())
+						tran.rollback();
+				}
+
+                                // Return false if an Exception hasn't been thrown.
 				if (log.isDebugEnabled())
 					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
 				return false;

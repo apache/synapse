@@ -638,6 +638,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 				}
 				else{
+                                        //Setting the AxisService object
+					responseMessageContext.setAxisService(msgCtx.getAxisService());
+
 					//we cannot set service ctx for application response msgs since the srvc ctx will not match the op ctx, causing
 					//problems with addressing
 					if(log.isDebugEnabled()) log.debug("NOT setting service ctx for response type " + messageType + ", current srvc ctx =" + responseMessageContext.getServiceContext());

@@ -25,6 +25,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.ParamUtils;
 import org.apache.synapse.transport.base.datagram.AbstractDatagramTransportListener;
 import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
@@ -53,7 +54,7 @@ import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
  *       is used to select the appropriate message builder.</dd>
  * </dl>
  */
-public class PipeListener extends AbstractDatagramTransportListener<PipeEndpoint> {
+public class PipeListener extends AbstractDatagramTransportListener<PipeEndpoint> implements ManagementSupport {
     private Protocol protocol;
     
     @Override

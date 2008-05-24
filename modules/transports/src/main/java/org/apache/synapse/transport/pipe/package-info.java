@@ -51,6 +51,9 @@
  * <h4>Known issues and limitations</h4>
  * 
  * <ul>
+ *   <li>The listener doesn't implement all management operations
+ *       specified by
+ *       {@link org.apache.synapse.transport.base.ManagementSupport}.</li>
  *   <li>Configuring the protocol at the transport level while allowing
  *       to specify the content type on a per service basis (see
  *       {@link org.apache.synapse.transport.pipe.PipeListener}) is somewhat

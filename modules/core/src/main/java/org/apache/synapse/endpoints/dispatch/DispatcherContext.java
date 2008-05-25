@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
+import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -110,20 +112,25 @@ public class DispatcherContext {
     public void setEndpoint(String sessionID, Endpoint endpoint) {
 
         if (isClusteringEnable) {  // if this is a clustering env.
-            String endPointName = endpoint.getName();
-            if (endPointName == null) {
+
+            String endpointName;
+            if (endpoint instanceof IndirectEndpoint) {
+                endpointName = ((IndirectEndpoint) endpoint).getKey();
+            } else {
+                endpointName = endpoint.getName();
+            }
+
+            if (endpointName == null && !(endpoint instanceof IndirectEndpoint)) {
 
                 if (log.isDebugEnabled() && isClusteringEnable()) {
-                    log.warn("In a clustering environment , the endpoint  name should be" +
-                            " specified even for anonymous endpoints. Otherwise , the " +
-                            "clustering would not be functioned correctly if there are" +
-                            " more than one anonymous endpoints. ");
+                    log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);
                 }
-                endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+                endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
             }
+            
             if (keyPrefix != null) {
                 // replicates the state so that all instances across cluster can see this state
-                setAndReplicateState(keyPrefix + sessionID, endPointName);
+                setAndReplicateState(keyPrefix + sessionID, endpointName);
             }
 
         } else {
@@ -305,19 +312,22 @@ public class DispatcherContext {
         if (endpoints != null) {
 
             for (Endpoint endpoint : endpoints) {
-                String endPointName = endpoint.getName();
-                if (endPointName == null) {
+
+                String endpointName;
+                if (endpoint instanceof IndirectEndpoint) {
+                    endpointName = ((IndirectEndpoint) endpoint).getKey();
+                } else {
+                    endpointName = endpoint.getName();
+                }
+                
+                if (endpointName == null) {
                     if (log.isDebugEnabled() && isClusteringEnable()) {
-                        log.warn("In a clustering environment , the endpoint  name should be" +
-                                " specified even for anonymous endpoints. Otherwise , the " +
-                                "clustering would not be functioned correctly if there are" +
-                                " more than one anonymous endpoints. ");
+                        log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);
                     }
-                    endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+                    endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
                 }
 
-                endpointsMap.put(endPointName, endpoint);
-
+                endpointsMap.put(endpointName, endpoint);
             }
         }
     }

@@ -34,7 +34,6 @@ import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.DispatcherContext;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -64,10 +63,9 @@ public class SALoadbalanceEndpoint implements Endpoint {
     public static final String ENDPOINT_LIST = "endpointList";
     public static final String ROOT_ENDPOINT = "rootendpoint";
     public static final String ENDPOINT_NAME_LIST = "endpointNameList";
-    private static final String WARN_MESSAGE = "In a clustering environment , the endpoint " +
-            " name should be specified" +
-            "even for anonymous endpoints. Otherwise , the clustering would not be " +
-            "functional correctly if there are more than one anonymous endpoints. ";
+    public static final String WARN_MESSAGE = "In a clustering environment, the endpoint " +
+            "name should be specified even for anonymous endpoints. Otherwise the clustering " +
+            "would not function properly, if there are more than one anonymous endpoints.";
 
     /**
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
@@ -100,18 +98,19 @@ public class SALoadbalanceEndpoint implements Endpoint {
     private Dispatcher dispatcher = null;
 
     /**
-     * The dispatcher context , place holder for keep any runtime states that are used when
+     * The dispatcher context, place holder for keeping any runtime states that are used when
      * finding endpoint for the session
      */
     private final DispatcherContext dispatcherContext = new DispatcherContext();
+
     /**
-     * The endpoint context , place holder for keep any runtime states related to the endpoint
+     * The endpoint context, place holder for keeping any runtime states related to the endpoint
      */
     private final EndpointContext endpointContext = new EndpointContext();
 
     /**
-     * The algorithm context , place holder for keep any runtime states related to the load balance
-     * algorithm
+     * The algorithm context, place holder for keeping any runtime states related to the load
+     * balance algorithm
      */
     private final AlgorithmContext algorithmContext = new AlgorithmContext();
 
@@ -119,7 +118,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
     public void send(MessageContext synMessageContext) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Start : Session Affinity Load-balance Endpoint");
+            log.debug("Start : Session Affinity Load-balance Endpoint " + name);
         }
 
         boolean isClusteringEnable = false;
@@ -129,40 +128,66 @@ public class SALoadbalanceEndpoint implements Endpoint {
         ConfigurationContext cc = axisMC.getConfigurationContext();
 
         //The check for clustering environment
-
         ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
         if (clusterManager != null &&
                 clusterManager.getContextManager() != null) {
             isClusteringEnable = true;
         }
 
-        String endPointName = this.getName();
-        if (endPointName == null) {
-
-            if (log.isDebugEnabled() && isClusteringEnable) {
+        String endpointName = this.getName();
+        if (endpointName == null) {
+            if (isClusteringEnable) {
                 log.warn(WARN_MESSAGE);
             }
-            endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+            if (log.isDebugEnabled()) {
+                log.debug("Using the name for the anonymous endpoint as : '"
+                        + SynapseConstants.ANONYMOUS_ENDPOINT + "'");
+            }
+            endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
         }
 
         if (isClusteringEnable) {
-            // if this is a cluster environment , then set configuration context to endpoint context
-            if (endpointContext.getConfigurationContext() == null) {
-                endpointContext.setConfigurationContext(cc);
-                endpointContext.setContextID(endPointName);
 
+            // if this is a cluster environment, then set configuration context to endpoint context
+            if (endpointContext.getConfigurationContext() == null) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Setting the ConfigurationContext to " +
+                            "the EndpointContext with the name " + endpointName +
+                            " for replicating data on the cluster");
+                }
+                endpointContext.setConfigurationContext(cc);
+                endpointContext.setContextID(endpointName);
             }
-            // if this is a cluster environment , then set configuration context to load balance
+
+            // if this is a cluster environment, then set configuration context to load balance
             //  algorithm context
             if (algorithmContext.getConfigurationContext() == null) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Setting the ConfigurationContext to " +
+                            "the AlgorithmContext with the name " + endpointName +
+                            " for replicating data on the cluster");
+                }
                 algorithmContext.setConfigurationContext(cc);
-                algorithmContext.setContextID(endPointName);
+                algorithmContext.setContextID(endpointName);
             }
-            // if this is a cluster environment , then set configuration context to session based
+
+            // if this is a cluster environment, then set configuration context to session based
             // endpoint dispatcher
             if (dispatcherContext.getConfigurationContext() == null) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Setting the ConfigurationContext to " +
+                            "the DispatcherContext with the name " + endpointName +
+                            " for replicating data on the cluster");
+                }
                 dispatcherContext.setConfigurationContext(cc);
-                dispatcherContext.setContextID(endPointName);
+                dispatcherContext.setContextID(endpointName);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Setting the endpoints to the DispatcherContext : " + endpoints);
+                }
                 dispatcherContext.setEndpoints(endpoints);
             }
         }
@@ -179,28 +204,34 @@ public class SALoadbalanceEndpoint implements Endpoint {
             // this is a start of a new session. so update session map.
             if (dispatcher.isServerInitiatedSession()) {
 
+                if (log.isDebugEnabled()) {
+                    log.debug("Creating a new server initiated session for the current message");
+                }
+
                 // add this endpoint to the endpoint sequence of operation context.
                 Axis2MessageContext axis2MsgCtx = (Axis2MessageContext) synMessageContext;
                 OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
 
-                if (isClusteringEnable) {  // if this is a clustering env.
-                    //Only keeps endpoint names , because , it is heavy task to
-                    //  replicate endpoint itself
+                if (isClusteringEnable) {
+                    // If running on a cluster keeps endpoint names, because it is heavy task to
+                    // replicate endpoint itself
 
                     Object o = opCtx.getPropertyNonReplicable(ENDPOINT_NAME_LIST);
-                    List epNameList;
+                    List<String> epNameList;
                     if (o instanceof List) {
 
-                        epNameList = (List) o;
-                        epNameList.add(endPointName);
+                        epNameList = (List<String>) o;
+                        // todo : check the following statement : ruwan
+                        epNameList.add(endpointName);
 
                     } else {
-                        // this is the first endpoint in the heirachy. so create the queue and insert
-                        // this as the first element.
-                        epNameList = new ArrayList();
-                        epNameList.add(endPointName);
-                        opCtx.setNonReplicableProperty(ROOT_ENDPOINT,this);
+                        // this is the first endpoint in the heirachy. so create the queue and
+                        // insert this as the first element.
+                        epNameList = new ArrayList<String>();
+                        epNameList.add(endpointName);
+                        opCtx.setNonReplicableProperty(ROOT_ENDPOINT, this);
                     }
+                    
                     // if the next endpoint is not a session affinity one, endpoint sequence ends
                     // here. but we have to add the next endpoint to the list.
                     if (!(endpoint instanceof SALoadbalanceEndpoint)) {
@@ -212,22 +243,27 @@ public class SALoadbalanceEndpoint implements Endpoint {
                         epNameList.add(name);
                     }
 
+                    if (log.isDebugEnabled()) {
+                        log.debug("Operating on a cluster. Setting the endpoint name list to " +
+                                "the OperationContext : " + epNameList);
+                    }
                     opCtx.setProperty(ENDPOINT_NAME_LIST, epNameList);
 
                 } else {
+                    
                     Object o = opCtx.getProperty(ENDPOINT_LIST);
                     List<Endpoint> endpointList;
                     if (o instanceof List) {
                         endpointList = (List<Endpoint>) o;
                         endpointList.add(this);
-
                     } else {
-                        // this is the first endpoint in the heirachy. so create the queue and insert
-                        // this as the first element.
-                        endpointList = new ArrayList();
+                        // this is the first endpoint in the heirachy. so create the queue and
+                        // insert this as the first element.
+                        endpointList = new ArrayList<Endpoint>();
                         endpointList.add(this);
                         opCtx.setProperty(ENDPOINT_LIST, endpointList);
                     }
+                    
                     // if the next endpoint is not a session affinity one, endpoint sequence ends
                     // here. but we have to add the next endpoint to the list.
                     if (!(endpoint instanceof SALoadbalanceEndpoint)) {
@@ -254,6 +290,12 @@ public class SALoadbalanceEndpoint implements Endpoint {
             // endpoints given by session dispatchers may not be active. therefore, we have check
             // it here.
             if (endpoint.isActive(synMessageContext)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Using the endpoint on the session with "
+                            + ((endpoint instanceof IndirectEndpoint) ? "key : "
+                            + ((IndirectEndpoint) endpoint).getKey() : "name : "
+                            + endpoint.getName()) + " for sending the message");
+                }
                 endpoint.send(synMessageContext);
             } else {
                 informFailure(synMessageContext);
@@ -262,6 +304,10 @@ public class SALoadbalanceEndpoint implements Endpoint {
         } else {
 
             // all child endpoints have failed. so mark this also as failed.
+            if (log.isDebugEnabled()) {
+                log.debug("Marking the Endpoint as failed, " +
+                        "because all child endpoints has been failed");
+            }
             setActive(false, synMessageContext);
             informFailure(synMessageContext);
         }
@@ -284,9 +330,16 @@ public class SALoadbalanceEndpoint implements Endpoint {
             // Only keeps endpoint names , because , it is heavy task to
             // replicate endpoint itself
             String epNameObj = (String) endpointList.remove(0);
-            for (Endpoint ep :endpoints) {
+            for (Endpoint ep : endpoints) {
                 if (ep != null) {
-                    String name = ep.getName();
+
+                    String name;
+                    if (ep instanceof IndirectEndpoint) {
+                        name = ((IndirectEndpoint) ep).getKey();
+                    } else {
+                        name = ep.getName();
+                    }
+
                     if (name != null && name.equals(epNameObj)) {
                         endpoint = ep;
                         break;
@@ -361,6 +414,12 @@ public class SALoadbalanceEndpoint implements Endpoint {
                 endpointContext.setActive(active);
             }
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("SALoadbalanceEndpoint with name '" + getName() + "' is in "
+                    + (active ? "active" : "inactive") + " state");
+        }
+
         return active;
     }
 
@@ -420,11 +479,11 @@ public class SALoadbalanceEndpoint implements Endpoint {
 
     private void informFailure(MessageContext synMessageContext) {
 
+        log.warn("Failed to send using the selected endpoint, becasue it is inactive");
+        
         if (parentEndpoint != null) {
             parentEndpoint.onChildEndpointFail(this, synMessageContext);
-
         } else {
-
             Object o = synMessageContext.getFaultStack().pop();
             if (o != null) {
                 ((FaultHandler) o).handleFault(synMessageContext);

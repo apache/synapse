@@ -67,7 +67,8 @@ public class AddressEndpoint extends DefaultEndpoint {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Endpoint  '" + getName() + "' is in state ' " + active + " '");
+            log.debug("AddressEndpoint with name '" + getName() + "' is in "
+                    + (active ? "active" : "inactive") + " state");
         }
 
         return active;
@@ -140,9 +141,7 @@ public class AddressEndpoint extends DefaultEndpoint {
         if (endPointName == null) {
 
             if (traceOrDebugOn && isClusteringEnable) {
-                log.warn("In a clustering environment , the endpoint  name should be specified" +
-                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
-                        "functioned correctly if there are more than one anonymous endpoints. ");
+                log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);
             }
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
         }

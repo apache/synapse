@@ -37,24 +37,28 @@ public interface Dispatcher {
      * synapseMessageContext is not found it should return null.
      *
      * @param synCtx client -> esb message context.
+     * @param dispatcherContext context for dispatching
      * @return Endpoint Endpoint associated with this session.
      */
     public Endpoint getEndpoint(MessageContext synCtx, DispatcherContext dispatcherContext);
 
     /**
      * Updates the session maps. This will be called in the first client -> synapse -> server flow
-     * for client initiated sessions. For server initiated sessions, this will be called in the first
-     * server -> synapse -> client flow.
+     * for client initiated sessions. For server initiated sessions, this will be called in the
+     * first server -> synapse -> client flow.
      *
      * @param synCtx   SynapseMessageContext
+     * @param dispatcherContext context for dispatching
      * @param endpoint Selected endpoint for this session.
      */
-    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext, Endpoint endpoint);
+    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext,
+        Endpoint endpoint);
 
     /**
      * Removes the session belonging to the given message context.
      *
      * @param synCtx MessageContext containing an session ID.
+     * @param dispatcherContext context for dispatching
      */
     public void unbind(MessageContext synCtx, DispatcherContext dispatcherContext);
 

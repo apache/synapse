@@ -81,7 +81,8 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
                 loadbalanceEndpoint.setDispatcher(csDispatcher);
             }
         } else {
-            handleException("Session affinity endpoints should have a session element in the configuration.");
+            handleException("Session affinity endpoints should " +
+                    "have a session element in the configuration.");
         }
 
         // set endpoint name
@@ -109,8 +110,8 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
 
             // set abandon time
             //long abandonTime = 0;
-            //OMAttribute atAttribute = loadbalanceElement.getAttribute
-            //        (new QName(null, org.apache.synapse.config.xml.Constants.RETRY_AFTER_FAILURE_TIME));
+            //OMAttribute atAttribute = loadbalanceElement.getAttribute(new QName(
+            //      null, org.apache.synapse.config.xml.Constants.RETRY_AFTER_FAILURE_TIME));
             //if(atAttribute != null) {
             //    String at = atAttribute.getAttributeValue();
             //    abandonTime = Long.parseLong(at);
@@ -138,6 +139,6 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
             return loadbalanceEndpoint;
         }
 
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 }

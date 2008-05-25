@@ -21,8 +21,6 @@ package org.apache.synapse.endpoints;
 
 import org.apache.axis2.clustering.ClusterManager;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -36,14 +34,10 @@ import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
  */
 public class AddressEndpoint extends DefaultEndpoint {
 
-    private static final Log log = LogFactory.getLog(AddressEndpoint.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * The endpoint context , place holder for keep any runtime states related to the endpoint
      */
     private final EndpointContext endpointContext = new EndpointContext();
-
 
     /**
      * Checks if the endpoint is active (failed or not). If endpoint is in failed state and

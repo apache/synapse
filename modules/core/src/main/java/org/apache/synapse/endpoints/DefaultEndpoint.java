@@ -37,8 +37,9 @@ import java.util.Stack;
  */
 public class DefaultEndpoint extends FaultHandler implements Endpoint {
 
-    private static final Log log = LogFactory.getLog(DefaultEndpoint.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
+    protected Log log;
+    
+    protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
@@ -57,6 +58,10 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
      * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects.
      */
     private Endpoint parentEndpoint = null;
+
+    public DefaultEndpoint() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     public EndpointDefinition getEndpoint() {
         return endpoint;

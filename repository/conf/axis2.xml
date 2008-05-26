@@ -148,7 +148,7 @@
     <!-- ================================================= -->
     <!-- the non blocking http transport based on HttpCore + NIO extensions -->
     <transportReceiver name="http" class="org.apache.synapse.transport.nhttp.HttpCoreNIOListener">
-    	<parameter name="port">8080</parameter>
+    	<parameter name="port">8280</parameter>
     	<parameter name="non-blocking">true</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
         <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->

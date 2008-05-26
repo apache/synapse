@@ -42,7 +42,7 @@ Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
         absolute path to the extracted synapse.war file. You must also edit the axis2.xml
         inside the WEB-INF/conf directory, and specify full absolute paths to all https
         keystores (e.g. replace "lib/identity.jks" etc..) You may also have to change the
-        default http port (8080) to something else, if it conflict with the servlet engine port-->
+        default http port (8280) to something else, if it conflict with the servlet engine port-->
         <init-param>
             <param-name>synapse.home</param-name>
             <param-value>_extract_synapse.war_and_edit_its_web.xml_</param-value>

@@ -466,13 +466,13 @@
         Smart Client mode
       </li>
       <li>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ </pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ </pre>
       </li>
       <li>
         Using Synapse as a HTTP Proxy
       </li>
       <li>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8280/</pre>
       </li>
       <li>
         Gateway Mode / Dumb Client
@@ -552,11 +552,11 @@
     <p>
       Execute the Dumb Client as:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuote<br/></pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote<br/></pre>
     <p>
       This time you will see Synapse receiving a message for which Synapse was
       set as the ultimate receiver of the message. Based on the 'To' EPR of
-      http://localhost:8080/soap/StockQuote, Synapse performs a match to the
+      http://localhost:8280/soap/StockQuote, Synapse performs a match to the
       path '/StockQuote' and as the request matches the XPath expression of the
       filter mediator, the filter mediator's child mediators execute. This sends
       the message to a different endpoint as specified by the endpoint
@@ -617,12 +617,12 @@
     </p>
     <p>
       ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService
-      -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM
+      -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM
     </p>
 <pre xml:space="preserve">INFO LogMediator - symbol = Great stock - IBM, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService </pre>
     <p>
       ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService
-      -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT
+      -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT
     </p>
 <pre xml:space="preserve">INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
     <h2>
@@ -680,7 +680,7 @@
       named "main" is executed. Then for the incoming message flow the &lt;in&gt;
       mediator executes, and it calls the sequence named "stockquote".
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 <pre xml:space="preserve">DEBUG SequenceMediator - Sequence mediator &lt;main&gt; :: mediate()<br/>DEBUG InMediator - In mediator mediate()<br/>DEBUG SequenceMediator - Sequence mediator &lt;stockquote&gt; :: mediate()</pre>
     <p>
       As the "stockquote" sequence executes, the log mediator dumps a simple
@@ -776,7 +776,7 @@
       sequence named 'fault'. Thus the 'fault' sequence can be seen executing,
       and writing the generic error message to the logs.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
 [HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : bogus
 [HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault
@@ -789,7 +789,7 @@
       when the send fails, you could see the proper error handler invocation and
       the custom error message printed as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate()
 [HttpServerWorker-1] DEBUG SequenceMediator - Setting the onError handler for the sequence
 [HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
@@ -856,7 +856,7 @@
       stock request. This error message is captured and returned to the original
       client as a SOAP fault in this example.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
     <p>
       returns,
     </p>
@@ -865,7 +865,7 @@
     <p>
       And
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</pre>
     <p>
       returns,
     </p>
@@ -896,7 +896,7 @@
       to the stock quote service on the sample Axis2 server. Thus it is now
       possible to request for a stock quote as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <h2>
       <a name="Sample7" id="Sample7">Sample 7: Introduction to local Registry
       entries and using Schema validation</a>
@@ -972,7 +972,7 @@
       client. (i.e. expects a 'stocksymbol' element instead of 'symbol' to
       specify the stock symbol)
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
     <h2>
       <a name="Sample8" id="Sample8">Sample 8: Introduction to static and
       dynamic registry resources, and using XSLT transformations</a>
@@ -1043,7 +1043,7 @@
       Execute the custom quote client as 'ant stockquote -Dmode=customquote ...'
       and analyze the the Synapse debug log output
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
     <p>
       The incoming message is now transformed into a standard stock quote
       request as expected by the SimpleStockQuoteService deployed on the local
@@ -1128,7 +1128,7 @@
       stockquote..'. You will notice that that Synapse fetches the definition of
       the sequence from the registry and executes its rules as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
@@ -1195,7 +1195,7 @@
       that the endpoint is cached and reused by Synapse - similarly to example #
       8.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <p>
       Now edit the repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml
       definition and update the address to
@@ -1233,7 +1233,7 @@
       (Note: Full registry based configuration is not dynamic atleast for the
       moment. i.e. it is not reloading itself)
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] INFO LogMediator - message = This is a dynamic Synapse configuration</pre>
     <p>
       The actual synapse.xml loaded is:
@@ -1266,7 +1266,7 @@
       through Synapse into the sample Axis2 server instance, which reports the
       acceptance of the order as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=placeorder</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder</pre>
 <pre xml:space="preserve">SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
     <p>
       If you send your client request through TCPmon, you will notice that the
@@ -1306,7 +1306,7 @@
       Execute the 'ant stockquote' specifying that the request should be a REST
       request as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuote -Drest=true</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote -Drest=true</pre>
     <p>
       This example shows a HTTP REST request (as shown below) being transformed
       into a SOAP request and forwarded to the stock quote service.
@@ -1993,7 +1993,7 @@ Content-ID:
       "http://localhost:9000/soap/SimpleStockQuoteService" according to the
       above WSDL. Now run the client using the following command.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
     <p>
       Client will print the quote price for IBM received from the server running
       on port 9000. Observe the Axis2 console and the Synapse console to verify
@@ -2054,7 +2054,7 @@ Content-ID:
       removed from the decrypted message and the response is delivered back to
       the client, as expected. You may execute the client as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <p>
       The message sent by Synapse to the secure service can be seen as follows,
       when TCPMon is used.
@@ -2162,7 +2162,7 @@ User-Agent: Synapse-HttpComponents-NIO
       the Synapse and the server. Now run the sample client using the following
       command.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
     <p>
       You can observe the client output displaying the quote price for IBM as
       follows:
@@ -2336,7 +2336,7 @@ User-Agent: Synapse-HttpComponents-NIO
     <p/>
     <p>
       Once Synapse starts, you could go to
-      http://localhost:8080/soap/StockQuoteProxy?wsdl and view the WSDL
+      http://localhost:8280/soap/StockQuoteProxy?wsdl and view the WSDL
       generated for the proxy service defined in the configuration. This WSDL is
       based on the source WSDL supplied in the proxy service definition, and is
       updated to reflect the proxy service EPR.
@@ -2345,7 +2345,7 @@ User-Agent: Synapse-HttpComponents-NIO
       Execute the stock quote client by requesting for a stock quote on the
       proxy service as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy</pre>
     <p>
       An 'inSequence' or 'endpoint' or both of these would decide how the
       message would be handled after the proxy service receives the message. In
@@ -2407,7 +2407,7 @@ User-Agent: Synapse-HttpComponents-NIO
       receive the reply generated by the actual service hosted on the Axis2
       server instance.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy1<br/>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy2</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy1<br/>ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy2</pre>
     <h2>
       <a name="Sample152" id="Sample152">Sample 152: Switching transports and
       message format from SOAP to REST/POX</a>
@@ -2444,7 +2444,7 @@ User-Agent: Synapse-HttpComponents-NIO
       and thus if the user tries to access it over HTTP, would result in a
       fault.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuoteProxy
 ...
      [java] org.apache.axis2.AxisFault: The service cannot be found for the endpoint reference (EPR) /soap/StockQuoteProxy</pre>
     <p/>
@@ -2547,12 +2547,12 @@ Connection: Keep-Alive
       sign and encrypt the request by specifying the client side security policy
       as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
     <p>
       By following through the debug logs or TCPMon output, you could see that
       the request received by the proxy service was signed and encrypted. Also,
       looking up the WSDL of the proxy service by requesting the URL
-      http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
+      http://localhost:8280/soap/StockQuoteProxy?wsdl reveals the security
       policy attachments are not there and security is not engaged. When sending
       the message to the backend service, you could verify that the security
       headers were there as in the original message to synapse from client, and
@@ -2632,7 +2632,7 @@ Connection: Keep-Alive
       <p>
         Run the client with
       </p>
-<pre xml:space="preserve">  ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8080/soap/LBProxy </pre>
+<pre xml:space="preserve">  ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8280/soap/LBProxy </pre>
       <p>
         Functionality is similar to the sample #54.
       </p>
@@ -2697,12 +2697,12 @@ Connection: Keep-Alive
       service, and sign and encrypt the request by specifying the client side
       security policy as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
     <p>
       By following through the debug logs or TCPMon output, you could see that
       the request received by the proxy service was signed and encrypted. Also,
       looking up the WSDL of the proxy service by requesting the
-      URLhttp://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
+      URLhttp://localhost:8280/soap/StockQuoteProxy?wsdl reveals the security
       policy attachment to the supplied base WSDL. When sending the message to
       the backend service, you could verify that the security headers were
       removed, and that the response received does not use WS-Security, but that
@@ -2757,7 +2757,7 @@ Connection: Keep-Alive
       required as the reliable messaging is applicable only between the client
       and Synapse. Now start the client with WS-RM as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dwsrm=true</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dwsrm=true</pre>
     <p>
       In this case, client sends a WS-RM enabled request to Synapse where Synapse
       sends normal request to the server. This can be observed by examining the
@@ -2822,7 +2822,7 @@ Connection: Keep-Alive
 <pre xml:space="preserve">&lt;transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"&gt; ...</pre>
     <p>
       Once you start the Synapse configuration and request for the WSDL of the
-      proxy service (http://localhost:8080/soap/StockQuoteProxy?wsdl) you will
+      proxy service (http://localhost:8280/soap/StockQuoteProxy?wsdl) you will
       notice that its exposed only on the JMS transport. This is because the
       configuration specified this requirement in the proxy service definition.
     </p>
@@ -2909,7 +2909,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       You may also notice that the simple stock quote proxy service exposed in
       Synapse is now available only in HTTP as we have specified transport for
       that service as HTTP. To observe this, access the WSDL of stock quote
-      proxy service at http://localhost:8080/soap/StockQuoteProxy?wsdl.
+      proxy service at http://localhost:8280/soap/StockQuoteProxy?wsdl.
     </p>
     <p>
       This Synapse configuration creates a proxy service over HTTP and forwards
@@ -2918,7 +2918,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       the stock quote reply over JMS to the Synapse server. To test this, send a
       place order request to Synapse using HTTP as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dmode=placeorder -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dmode=placeorder -Dsymbol=MSFT</pre>
     <p>
       The sample Axis2 server console will print a message indicating that it
       has accepted the order as follows:
@@ -3192,7 +3192,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       see the logged message, and if TCPMon was used at the client, you would
       see the 202 Accepted response sent back to the client from Synapse
     </p>
-<pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8080/soap/OneWayProxy</pre>
+<pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8280/soap/OneWayProxy</pre>
 <pre xml:space="preserve">HTTP/1.1 202 Accepted
 Content-Type: text/xml; charset=UTF-8
 Host: 127.0.0.1
@@ -3545,7 +3545,7 @@ Transfer-Encoding: chunked
     <p>
       Invoke the FIX Client as follows. This command sends a FIX message
       embedded in a SOAP message over HTTP.
-      <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8080/soap/FIXProxy</pre>
+      <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8280/soap/FIXProxy</pre>
     </p>
     <p>
       Synapse will create a session with Executor and forward the order request. The
@@ -3692,7 +3692,7 @@ Transfer-Encoding: chunked
       uses the function attribute to specify which function should be invoked.
       Use the stock quote client to issue a custom quote client as follows.:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
     <p>
       Synapse uses the script mediator and the specified JavaScript function to
       convert the custom request to a standard quote request. Subsequently the
@@ -3789,7 +3789,7 @@ Transfer-Encoding: chunked
       will receive the response "99.9" as the last sale price as per the above
       script.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/
 ...
 stockquote:
      [java] Standard :: Stock price = $99.9</pre>
@@ -3921,7 +3921,7 @@ end
       <p>
         Run the client with
       </p>
-<pre xml:space="preserve"> ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+<pre xml:space="preserve"> ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
     </div>
     <h2>
       <a name="DBMediators" id="DBMediators">Database interactions in
@@ -4068,7 +4068,7 @@ end
     <p>
       When the IBM stock quote is requested,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
     <p>
       Synapse console shows
     </p>
@@ -4077,7 +4077,7 @@ end
     <p>
       For the SUN stock quote,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</pre>
     <p/>
     <p>
       Synapse console shows
@@ -4086,7 +4086,7 @@ end
     <p>
       and for the MSFT stock quote,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
 <pre xml:space="preserve">INFO LogMediator text = ** Looking up from the Database **<br/>INFO LogMediator text = Company ID &#x2013; c2</pre>
     <p>
       For any other symbols, Synapse console shows
@@ -4171,7 +4171,7 @@ end
     <p>
       Run the client using,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
     <p>
       and then execute the following query using database client tool against
       synapsedb.
@@ -4275,7 +4275,7 @@ end
     <p>
       When running client,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
     <p>
       Synapse console shows,
     </p>
@@ -4447,7 +4447,7 @@ end
       already done </p>
 
       <p>Runs the client as follows</p>
-      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 
       <p>Then the console output </p>
       <pre> INFO LogMediator text = ** Looking up from the Database **
@@ -4544,7 +4544,7 @@ end
       client sends 20 requests concurrently, then approximately half of those will
       succeed. The client command is as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</pre>
     <p/>
     <h2>
       <a name="Sample371" id="Sample371">Sample 371: Restricting requests
@@ -4665,7 +4665,7 @@ end
       exceeds the specified time. Now run the client 5 times repetitively using
       the following command to see how throttling works.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</pre>
     <p>
       For the first four requests you will get the quote prices for IBM as
       follows.
@@ -4764,7 +4764,7 @@ end
     <p>
       Run the client as follows
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy</pre>
     <div>
       <p>
         You will get same results as in sample 371. If you run the load test,
@@ -4949,7 +4949,7 @@ public class DiscountQuoteMediator implements Mediator {
     <p>
       Now run the client using the following command.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
     <p>
       You will see the below output in the client console with the discounted
       quote value.
@@ -5036,7 +5036,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       Execute the custom quote client as 'ant stockquote -Dmode=customquote ...'
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dmode=customquote </pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dmode=customquote </pre>
     <p/>
     <h2>
       <a name="Sample391" id="Sample391">Sample 391: How to use data from an
@@ -5095,7 +5095,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       Invoke the client as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy</pre>
     <h2>
       <a name="Splitter" id="Splitter">Splitting messages in to parts and
       process in parallel (Iterate / Clone)</a>
@@ -5159,7 +5159,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       Invoke the client as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/SplitAggregateProxy -Ditr=4</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/SplitAggregateProxy -Ditr=4</pre>
 
     <h2>
       <a name="Cache" id="Cache">Caching the responses over the requests
@@ -5219,7 +5219,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       To observe this behaviour, invoke the client as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <p>
       You could notice that if you send more than one requests within 20 seconds
       only the first request is forwarded to the actual service, and the rest of
@@ -5288,7 +5288,7 @@ Discounted price: 138.77458254967408</pre>
       <p>
         Invoke the client as follows.
       </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
     </div>
   </body>
 </document>

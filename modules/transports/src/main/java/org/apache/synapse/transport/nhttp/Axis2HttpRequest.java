@@ -95,6 +95,7 @@ public class Axis2HttpRequest {
         this.msgContext = null;
         this.format = null;
         this.messageFormatter = null;
+        this.outputBuffer = null;
     }
 
     public EndpointReference getEpr() {

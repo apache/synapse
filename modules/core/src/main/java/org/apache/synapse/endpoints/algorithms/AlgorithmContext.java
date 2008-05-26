@@ -45,17 +45,18 @@ public class AlgorithmContext {
     private static final String UNDERSCORE_STRING = "_";
     private static final String CURRENT_EPR = "currentEPR";
 
-    /*The axis configuration context-  this will hold the all callers states
-     *when doing throttling in a clustered environment. */
+    /* The axis configuration context-  this will hold the all callers states
+     * when doing throttling in a clustered environment. */
     private ConfigurationContext configCtx;
 
     /* Is this env. support clustering*/
     private boolean isClusteringEnable = false;
 
-    /*The key for 'currentEPR' attribute and this is used when this attribute value being replicated */
+    /* The key for 'currentEPR' attribute and this is used when this attribute value being
+     * replicated */
     private String currentEPRPropertyKey;
 
-    /*The pointer to current epr - The position of the current EPR */
+    /* The pointer to current epr - The position of the current EPR */
     private int currentEPR = 0;
 
     /**
@@ -102,10 +103,17 @@ public class AlgorithmContext {
         if (isClusteringEnable) {  // if this is a clustering env.
 
             if (currentEPRPropertyKey != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Setting the current EPR " + currentEPR
+                            + " with the key " + currentEPRPropertyKey);
+                }
                 // Sets the property and  replicates the current state  so that all instances
                 setAndReplicateState(currentEPRPropertyKey, currentEPR);
             }
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Setting the current EPR " + currentEPR);
+            }
             this.currentEPR = currentEPR;
         }
     }
@@ -155,7 +163,6 @@ public class AlgorithmContext {
         buffer.append(UNDERSCORE_STRING);
         buffer.append(CURRENT_EPR);
         currentEPRPropertyKey = buffer.toString();
-
     }
 
 
@@ -165,7 +172,6 @@ public class AlgorithmContext {
      * @param msg The error message
      */
     protected void handleException(String msg) {
-
         log.error(msg);
         throw new SynapseException(msg);
     }
@@ -177,7 +183,6 @@ public class AlgorithmContext {
      * @param e   The exception
      */
     protected void handleException(String msg, Exception e) {
-
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
@@ -196,12 +201,16 @@ public class AlgorithmContext {
 
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("Going to replicate the property with key : " + key
+                    log.debug("Start replicating the property with key : " + key
                             + " value : " + value);
                 }
 
                 configCtx.setProperty(key, value);
                 Replicator.replicate(configCtx, new String[]{key});
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Completed replication of the property with key : " + key);
+                }
 
             } catch (ClusteringFault clusteringFault) {
                 handleException("Error during the replicating states ", clusteringFault);

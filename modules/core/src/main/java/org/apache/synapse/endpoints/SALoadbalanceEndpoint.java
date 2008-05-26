@@ -205,7 +205,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
             if (dispatcher.isServerInitiatedSession()) {
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Creating a new server initiated session for the current message");
+                    log.debug("Adding a new server initiated session for the current message");
                 }
 
                 // add this endpoint to the endpoint sequence of operation context.
@@ -213,17 +213,14 @@ public class SALoadbalanceEndpoint implements Endpoint {
                 OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
 
                 if (isClusteringEnable) {
-                    // If running on a cluster keeps endpoint names, because it is heavy task to
+                    // If running on a cluster keep endpoint names, because it is heavy to
                     // replicate endpoint itself
 
                     Object o = opCtx.getPropertyNonReplicable(ENDPOINT_NAME_LIST);
                     List<String> epNameList;
                     if (o instanceof List) {
-
                         epNameList = (List<String>) o;
-                        // todo : check the following statement : ruwan
                         epNameList.add(endpointName);
-
                     } else {
                         // this is the first endpoint in the heirachy. so create the queue and
                         // insert this as the first element.
@@ -235,7 +232,14 @@ public class SALoadbalanceEndpoint implements Endpoint {
                     // if the next endpoint is not a session affinity one, endpoint sequence ends
                     // here. but we have to add the next endpoint to the list.
                     if (!(endpoint instanceof SALoadbalanceEndpoint)) {
-                        String name = endpoint.getName();
+
+                        String name;
+                        if (endpoint instanceof IndirectEndpoint) {
+                            name = ((IndirectEndpoint) endpoint).getKey();
+                        } else {
+                            name = endpoint.getName();
+                        }
+
                         if (name == null) {
                             log.warn(WARN_MESSAGE);
                             name = SynapseConstants.ANONYMOUS_ENDPOINT;
@@ -326,8 +330,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
         Endpoint endpoint = null;
 
         if (isClusteringEnable) {
-            // if this is a clustering env.
-            // Only keeps endpoint names , because , it is heavy task to
+            // if this is a clustering env. only keep endpoint names, because, it is heavy to
             // replicate endpoint itself
             String epNameObj = (String) endpointList.remove(0);
             for (Endpoint ep : endpoints) {

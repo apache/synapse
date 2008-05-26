@@ -266,10 +266,7 @@ public class ClientHandler implements NHttpClientHandler {
         Axis2HttpRequest axis2Request = (Axis2HttpRequest)
                 conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
 
-        if (axis2Request == null) {
-            log.error("httpContext's AXIS2_HTTP_REQUEST attribute was null");
-
-        } else if (!axis2Request.isCompleted()) {
+        if (axis2Request != null && !axis2Request.isCompleted()) {
 
             axis2Request.setCompleted(true);
             if (errorMessage == null && exceptionToRaise == null) {

@@ -38,7 +38,7 @@ public class NHttpConfiguration {
     private static final int WORKER_KEEP_ALIVE     = 5;
     private static final int BLOCKING_QUEUE_LENGTH = -1;
     private static final int IO_WORKER_COUNT = 2;
-    private static final int BUFFER_SIZE           = 2048;
+    private static final int BUFFER_SIZE           = 8192;
 
     // server listener
     private static final String S_T_CORE     = "snd_t_core";

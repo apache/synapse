@@ -19,10 +19,10 @@
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.threads.WorkerPoolFactory;
 import org.apache.synapse.transport.base.threads.WorkerPool;
+import org.apache.synapse.transport.nhttp.util.SharedInputBuffer;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -32,6 +32,10 @@ import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.entity.ContentInputStream;
+import org.apache.http.nio.entity.ContentOutputStream;
+import org.apache.http.nio.util.*;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.http.util.EncodingUtils;
@@ -39,11 +43,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.Channel;
 
 /**
  * The server connection handler. An instance of this class is used by each IOReactor, to
@@ -62,6 +61,8 @@ public class ServerHandler implements NHttpServiceHandler {
     private final HttpProcessor httpProcessor;
     /** the strategy to re-use connections */
     private final ConnectionReuseStrategy connStrategy;
+    /** the buffer allocator */
+    private final ByteBufferAllocator allocator;
 
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
@@ -75,12 +76,8 @@ public class ServerHandler implements NHttpServiceHandler {
     /** the metrics collector */
     private MetricsCollector metrics = null;
 
-    private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
-    private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
-    private static final String REQUEST_SOURCE_CHANNEL = "request-source-channel";
-    private static final String RESPONSE_SINK_CHANNEL = "response-sink-channel";
-    private static final String REQUEST_BUFFER = "request-buffer";
-    private static final String RESPONSE_BUFFER = "response-buffer";
+    public static final String REQUEST_SINK_BUFFER = "synapse.request-sink-buffer";
+    public static final String RESPONSE_SOURCE_BUFFER = "synapse.response-source-buffer";
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
         final boolean isHttps, final MetricsCollector metrics) {
@@ -92,6 +89,7 @@ public class ServerHandler implements NHttpServiceHandler {
         this.responseFactory = new DefaultHttpResponseFactory();
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
+        this.allocator = new HeapByteBufferAllocator();
 
         this.cfg = NHttpConfiguration.getInstance();
         this.workerPool = WorkerPoolFactory.getWorkerPool(
@@ -112,17 +110,11 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpRequest request = conn.getHttpRequest();
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
-        // allocate temporary buffers to process this request
-        context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
-        context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
-
         try {
-            PipeImpl requestPipe  = new PipeImpl(); // the pipe used to process the request
-            PipeImpl responsePipe = new PipeImpl(); // the pipe used to process the response
-            context.setAttribute(REQUEST_SINK_CHANNEL, requestPipe.sink());
-            context.setAttribute(REQUEST_SOURCE_CHANNEL, requestPipe.source());
-            context.setAttribute(RESPONSE_SOURCE_CHANNEL, responsePipe.source());
-            context.setAttribute(RESPONSE_SINK_CHANNEL, responsePipe.sink());
+            ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+            ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+            context.setAttribute(REQUEST_SINK_BUFFER, inputBuffer);
+            context.setAttribute(RESPONSE_SOURCE_BUFFER, outputBuffer);
 
             // create the default response to this request
             ProtocolVersion httpVersion = request.getRequestLine().getProtocolVersion();
@@ -132,7 +124,6 @@ public class ServerHandler implements NHttpServiceHandler {
 
             // create a basic HttpEntity using the source channel of the response pipe
             BasicHttpEntity entity = new BasicHttpEntity();
-            entity.setContent(Channels.newInputStream(responsePipe.source()));
             if (httpVersion.greaterEquals(HttpVersion.HTTP_1_1)) {
                 entity.setChunked(true);
             }
@@ -141,12 +132,9 @@ public class ServerHandler implements NHttpServiceHandler {
             // hand off processing of the request to a thread off the pool
             workerPool.execute(
                 new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
-                    request, Channels.newInputStream(requestPipe.source()),
-                    response, Channels.newOutputStream(responsePipe.sink())));
+                    request, new ContentInputStream(inputBuffer),
+                    response, new ContentOutputStream(outputBuffer)));
 
-        } catch (IOException e) {
-            handleException("Error processing request received for : " +
-                request.getRequestLine().getUri(), e, conn);
         } catch (Exception e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
@@ -161,24 +149,18 @@ public class ServerHandler implements NHttpServiceHandler {
     public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) {
 
         HttpContext context = conn.getContext();
-        WritableByteChannel sink = (WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL);
-        ByteBuffer inbuf = (ByteBuffer) context.getAttribute(REQUEST_BUFFER);
+        ContentInputBuffer inBuf = (ContentInputBuffer) context.getAttribute(REQUEST_SINK_BUFFER);
 
         try {
-            while (decoder.read(inbuf) > 0) {
-                inbuf.flip();
-                sink.write(inbuf);
-                if (metrics != null) {
-                    metrics.incrementBytesReceived(inbuf.position());
-                }
-                inbuf.compact();
+            int bytesRead = inBuf.consumeContent(decoder);
+            if (metrics != null && bytesRead > 0) {
+                metrics.incrementBytesReceived(bytesRead);
             }
 
             if (decoder.isCompleted()) {
                 if (metrics != null) {
                     metrics.incrementMessagesReceived();
                 }
-                sink.close();
             }
 
         } catch (IOException e) {
@@ -195,29 +177,22 @@ public class ServerHandler implements NHttpServiceHandler {
 
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        ReadableByteChannel source = (ReadableByteChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL);
-        ByteBuffer outbuf = (ByteBuffer) context.getAttribute(RESPONSE_BUFFER);
+        ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(RESPONSE_SOURCE_BUFFER);
 
         try {
-            int bytesRead = source.read(outbuf);
-            if (bytesRead == -1 && outbuf.position() == 0) {
-                encoder.complete();
-            } else {
-                outbuf.flip();
-                encoder.write(outbuf);
-                if (metrics != null) {
-                    metrics.incrementBytesSent(outbuf.position());
-                }
-                outbuf.compact();
+            int bytesWritten = outBuf.produceContent(encoder);
+            if (metrics != null && bytesWritten > 0) {
+                metrics.incrementBytesSent(bytesWritten);
             }
 
             if (encoder.isCompleted()) {
                 if (metrics != null) {
                     metrics.incrementMessagesSent();
                 }
-                source.close();
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
+                } else {
+                    conn.requestInput();
                 }
             }
 
@@ -279,27 +254,13 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public void closed(final NHttpServerConnection conn) {
 
-        // Check sink and source channels and close them if they aren't closed already.
-        // Normally these should be closed by inputReady() and outputReady(). A null request
-        // or response will not hit inputReady and outputReady however.
-
         HttpContext context = conn.getContext();
-        closeChannel((ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL));
-        closeChannel((ReadableByteChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL));
-        closeChannel((WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL));
-        closeChannel((WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL));
+        context.removeAttribute(REQUEST_SINK_BUFFER);
+        context.removeAttribute(RESPONSE_SOURCE_BUFFER);
 
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
         }
-    }
-
-    private void closeChannel(Channel chn) {
-        try {
-            if (chn != null && chn.isOpen()) {
-                chn.close();
-            }
-        } catch (IOException ignore) {}
     }
 
     /**

@@ -2450,7 +2450,7 @@ User-Agent: Synapse-HttpComponents-NIO
     <p/>
     <p>
       Accessing this over HTTPS (ant stockquote
-      -Dtrpurl=https://localhost:8443/soap/StockQuoteProxy) causes the proxy
+      -Dtrpurl=https://localhost:8243/soap/StockQuoteProxy) causes the proxy
       service to access the SimpleStockQuoteService on the sample Axis2 server
       using REST/POX. This could be seen if the message exchange was captured
       using TCPMon as follows. The REST/POX response is now transformed back

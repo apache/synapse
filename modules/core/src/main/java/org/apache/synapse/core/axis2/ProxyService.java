@@ -524,8 +524,9 @@ public class ProxyService {
 
     private Policy getPolicyFromKey(String key, SynapseConfiguration synCfg) {
 
-        return PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
-                synCfg.getEntry(key)).getInputStream());
+        synCfg.getEntryDefinition(key);
+        return PolicyEngine.getPolicy(
+                SynapseConfigUtils.getStreamSource(synCfg.getEntry(key)).getInputStream());
     }
 
     /**

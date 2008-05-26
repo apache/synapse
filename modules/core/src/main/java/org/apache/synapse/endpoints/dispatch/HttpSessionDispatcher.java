@@ -95,7 +95,16 @@ public class HttpSessionDispatcher implements Dispatcher {
             Object cookie = headerMap.get(SET_COOKIE);
 
             if (cookie != null && cookie instanceof String) {
-                dispatcherContext.setEndpoint((String) cookie, endpoint);
+                
+                // extract the first name value pair of the Set-Cookie header, which is considered
+                // as the session id which will be sent back from the client with the Cookie header
+                // for example;
+                //      Set-Cookie: JSESSIONID=760764CB72E96A7221506823748CF2AE; Path=/
+                // will result in the session id "JSESSIONID=760764CB72E96A7221506823748CF2AE"
+                // and the client is expected to send the Cookie header as;
+                //      Cookie: JSESSIONID=760764CB72E96A7221506823748CF2AE
+                String sessionId = ((String) cookie).split(";")[0];
+                dispatcherContext.setEndpoint(sessionId, endpoint);
             }
         }
     }

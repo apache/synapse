@@ -44,7 +44,7 @@ public class ThreadedClient {
 
         String epr1 = System.getProperty("epr");
         if (epr1 == null) {
-            epr1 = "http://localhost:8080";
+            epr1 = "http://localhost:8280";
         }
         System.out.println("EPR: " + epr1);
 

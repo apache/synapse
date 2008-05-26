@@ -15,7 +15,7 @@ public class SynapseSample_102_Integration extends AbstractAutomationTestCase {
     }
 
     public void testSample() throws Exception {
-        System.setProperty("trpurl", "http://localhost:8080/soap/StockQuoteProxy");
+        System.setProperty("trpurl", "http://localhost:8280/soap/StockQuoteProxy");
         try {
             getStringResultOfTest(StockQuoteClient.executeTestClient());
         } catch (AxisFault f) {

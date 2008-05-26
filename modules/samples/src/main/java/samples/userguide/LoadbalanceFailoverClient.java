@@ -74,7 +74,7 @@ public class LoadbalanceFailoverClient {
 
     public String sessionlessClient() throws AxisFault {
 
-        String synapsePort = "8080";
+        String synapsePort = "8280";
         int iterations = 100;
         boolean infinite = true;
 
@@ -176,7 +176,7 @@ public class LoadbalanceFailoverClient {
      */
     private void sessionfullClient() {
 
-        String synapsePort = "8080";
+        String synapsePort = "8280";
         int iterations = 100;
         boolean infinite = true;
 

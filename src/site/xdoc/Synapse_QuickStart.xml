@@ -266,7 +266,7 @@ user@host:/opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService$</p
     <p/>
     <p>
       Go to &lt;synapse-home&gt;/bin directory and type the command given below.
-      Synapse will be started on port 8280 (http) and 8443 (https - under JDK
+      Synapse will be started on port 8280 (http) and 8243 (https - under JDK
       1.5)
     </p>
     <div class="command">
@@ -300,8 +300,8 @@ Using SYNAPSE_XML:     -Dsynapse.xml=/opt/synapse-1.1.1/repository/conf/sample/s
 2007-11-05 14:58:56,801 [127.0.1.1-asankha] [main]  INFO SynapseInitializationModule Synapse initialized successfully...!
 2007-11-05 14:58:56,886 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOSender HTTPS Sender starting
 2007-11-05 14:58:56,887 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOSender HTTP Sender starting
-2007-11-05 14:58:57,039 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOListener HTTPS Listener starting on port : 8443
-2007-11-05 14:58:57,040 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport https on port 8443
+2007-11-05 14:58:57,039 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOListener HTTPS Listener starting on port : 8243
+2007-11-05 14:58:57,040 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport https on port 8243
 2007-11-05 14:58:57,041 [127.0.1.1-asankha] [main]  INFO HttpCoreNIOListener HTTP Listener starting on port : 8280
 2007-11-05 14:58:57,041 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport http on port 8280
 2007-11-05 14:58:57,085 [127.0.1.1-asankha] [main]  INFO ServerManager Starting transport vfs

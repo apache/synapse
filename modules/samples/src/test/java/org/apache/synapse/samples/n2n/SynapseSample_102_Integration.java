@@ -23,7 +23,7 @@ public class SynapseSample_102_Integration extends AbstractAutomationTestCase {
                     "/soap/StockQuoteProxy", f.getReason());
         }
 
-        System.setProperty("trpurl", "https://localhost:8443/soap/StockQuoteProxy");
+        System.setProperty("trpurl", "https://localhost:8243/soap/StockQuoteProxy");
         String resultString = getStringResultOfTest(StockQuoteClient.executeTestClient());
         assertXpathExists("ns:getQuoteResponse", resultString);
         assertXpathExists("ns:getQuoteResponse/ns:return", resultString);

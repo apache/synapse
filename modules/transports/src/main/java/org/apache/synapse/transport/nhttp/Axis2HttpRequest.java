@@ -31,20 +31,18 @@ import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpVersion;
+import org.apache.http.nio.util.ContentOutputBuffer;
+import org.apache.http.nio.entity.ContentOutputStream;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
-import org.apache.synapse.transport.nhttp.util.PipeImpl;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.channels.ClosedChannelException;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,13 +62,15 @@ public class Axis2HttpRequest {
     private HttpHost httpHost = null;
     /** the message context being sent */
     private MessageContext msgContext = null;
-    /** the Pipe which facilitates the serialization output to be written to the channel */
-    private PipeImpl pipe = null;
     /** The Axis2 MessageFormatter that will ensure proper serialization as per Axis2 semantics */
     MessageFormatter messageFormatter = null;
     /** The OM Output format holder */
     OMOutputFormat format = null;
-    protected boolean completed = false; //added for request complete checking
+    private ContentOutputBuffer outputBuffer = null;
+    /** ready to begin streaming? */
+    private boolean readyToStream = false;
+    /** for request complete checking */
+    private boolean completed = false;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
         this.epr = epr;
@@ -79,11 +79,22 @@ public class Axis2HttpRequest {
         this.format = NhttpUtils.getOMOutputFormat(msgContext);
         this.messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
-        try {
-            this.pipe = new PipeImpl();
-        } catch (IOException e) {
-            log.error("Error creating pipe to write message body", e);
-        }
+    }
+
+    public void setReadyToStream(boolean readyToStream) {
+        this.readyToStream = readyToStream;
+    }
+    
+    public void setOutputBuffer(ContentOutputBuffer outputBuffer) {
+        this.outputBuffer = outputBuffer;
+    }
+
+    public void clear() {
+        this.epr = null;
+        this.httpHost = null;
+        this.msgContext = null;
+        this.format = null;
+        this.messageFormatter = null;
     }
 
     public EndpointReference getEpr() {
@@ -185,28 +196,6 @@ public class Axis2HttpRequest {
     }
 
     /**
-     * Return the source channel of the pipe that bridges the serialized output to the socket
-     * @return source channel to read serialized message contents
-     */
-    public ReadableByteChannel getSourceChannel() {
-        if (log.isDebugEnabled()) {
-            log.debug("get source channel of the pipe on which the outgoing response is written");
-        }
-        return pipe.source();
-    }
-
-    /**
-     * Return the sink channel of the pipe that bridges the serialized output to the socket
-     * @return sink channel to read serialized message contents
-     */
-    public WritableByteChannel getSinkChannel() {
-        if (log.isDebugEnabled()) {
-            log.debug("get sink channel of the pipe on which the outgoing response is written");
-        }
-        return pipe.sink();
-    }
-
-    /**
      * Start streaming the message into the Pipe, so that the contents could be read off the source
      * channel returned by getSourceChannel()
      * @throws AxisFault on error
@@ -216,7 +205,16 @@ public class Axis2HttpRequest {
         if (log.isDebugEnabled()) {
             log.debug("start streaming outgoing http request");
         }
-        OutputStream out = Channels.newOutputStream(pipe.sink());
+
+        synchronized(this) {
+            while (!readyToStream) {
+                try {
+                    this.wait();
+                } catch (InterruptedException ignore) {}
+            }
+        }
+
+        OutputStream out = new ContentOutputStream(outputBuffer);
         try {
             messageFormatter.writeTo(msgContext, format, out, true);
         } catch (Exception e) {
@@ -257,9 +255,6 @@ public class Axis2HttpRequest {
     }
 
     public void setCompleted(boolean completed) {
-        if (completed && !isCompleted()) {
-            this.pipe.close();
-        }
         this.completed = completed;
     }
 }

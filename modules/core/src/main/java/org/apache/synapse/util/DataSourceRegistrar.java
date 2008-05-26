@@ -514,7 +514,7 @@ public class DataSourceRegistrar {
         if ((result == null || result.length() == 0 || "".equals(result)) && def != null) {
             if (log.isDebugEnabled()) {
                 log.debug("The name with ' " + name + " ' cannot be found. " +
-                        "Using default vale " + def);
+                        "Using default value " + def);
             }
             result = def;
         }

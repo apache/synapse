@@ -105,6 +105,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener
 
     /** Keep the list of directories/files and poll durations */
     private final List<PollTableEntry> pollTable = new ArrayList<PollTableEntry>();
+    /** Keep the list of removed pollTable entries */
+    private final List<PollTableEntry> removeTable = new ArrayList<PollTableEntry>();
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
 
@@ -133,6 +135,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener
      * it is time to scan the contents for new files
      */
     public void onPoll() {
+        if (!removeTable.isEmpty()) {
+            pollTable.removeAll(removeTable);
+        }
+        
         for (PollTableEntry entry : pollTable) {
             long startTime = System.currentTimeMillis();
             if (startTime > entry.getNextPollTime()) {
@@ -583,7 +589,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
             PollTableEntry entry = (PollTableEntry) iter.next();
             if (service.getName().equals(entry.getServiceName())) {
                 cancelPoll(service);
-                pollTable.remove(entry);
+                removeTable.add(entry);
             }
         }
     }

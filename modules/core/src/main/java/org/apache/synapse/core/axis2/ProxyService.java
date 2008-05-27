@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -553,8 +554,10 @@ public class ProxyService {
                 auditWarn("Unable to find the SynapseEnvironment. " +
                     "Components of the proxy service may not be initialized");
             }
-            
-            axisConfig.getServiceForActivation(this.getName()).setActive(true);
+
+            AxisService as = axisConfig.getServiceForActivation(this.getName());
+            as.setActive(true);
+            axisConfig.notifyObservers(AxisEvent.SERVICE_START, as);
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
         } else {
@@ -585,9 +588,10 @@ public class ProxyService {
                 AxisService as = axisConfig.getService(this.getName());
                 if (as != null) {
                     as.setActive(false);
+                    axisConfig.notifyObservers(AxisEvent.SERVICE_STOP, as);
                 }
                 this.setRunning(false);
-                auditInfo("Started the proxy service : " + name);
+                auditInfo("Stopped the proxy service : " + name);
             } catch (AxisFault axisFault) {
                 handleException("Error stopping the proxy service : " + name, axisFault);
             }

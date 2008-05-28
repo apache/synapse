@@ -465,23 +465,17 @@
       <li>
         Smart Client mode
       </li>
-      <li>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ </pre>
-      </li>
+        <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ </pre>
       <li>
         Using Synapse as a HTTP Proxy
       </li>
-      <li>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8280/</pre>
-      </li>
+        <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8280/</pre>
       <li>
         Gateway Mode / Dumb Client
       </li>
-      <li>
         <p>
           See sample # 1
         </p>
-      </li>
     </ol>
     <p>
       <strong>Prerequisites:<br/> </strong>Start the Synapse

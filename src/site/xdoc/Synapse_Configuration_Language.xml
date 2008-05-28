@@ -463,8 +463,8 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       An endpoint may be specified as an address endpoint, WSDL based endpoint,
       a load balancing endpoint or a fail-over endpoint as follows:
     </p>
-<pre xml:space="preserve">&lt;endpoint [name="string"] [key="string"] [trace="enable"]&gt;
-  <a href="#address-endpoint">address-endpoint</a> | <a href="#wsdl-endpoint">wsdl-endpoint</a> | <a href="#load-balanced-endpoint">load-balanced-endpoint</a> | <a href="#fail-over-endpoint">fail-over-endpoint</a>
+<pre xml:space="preserve">&lt;endpoint [name="string"] [key="string"]&gt;
+  <a href="#address-endpoint">address-endpoint</a> | <a href="#default-endpoint">default-endpoint</a> | <a href="#wsdl-endpoint">wsdl-endpoint</a> | <a href="#load-balanced-endpoint">load-balanced-endpoint</a> | <a href="#fail-over-endpoint">fail-over-endpoint</a>
 &lt;/endpoint&gt; </pre>
     <p>
       All above endpoint types can have a name attribute, and such named
@@ -554,6 +554,34 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       </tbody>
     </table>
     <h4>
+      <a name="default-endpoint" id="default-endpoint">Default Endpoint</a>
+    </h4>
+    <p>
+      Default endpoint is an endpoint defined for adding QoS and other configurations
+      to the endpoint which is resolved from the 'To' address of the message context.
+      All the configurations such as message format for the endpoint, the method
+      to optimize attachments, reliable messaging, security policies for the endpoint
+      can be specified as in the Address Endpoint. This endpoint differs from the address
+      endpoint only in the uri attribute which will not be present in this endpoint.
+      Following section describes the configuration of a default endpoint
+    </p>
+    <pre xml:space="preserve">&lt;default [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+         [encoding="<em>charset encoding</em>"]
+         [statistics="enable|disable"] [trace="enable|disable"]&gt;
+  &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+
+  &lt;timeout&gt;
+    &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
+    &lt;action&gt;discard|fault&lt;/action&gt;
+  &lt;/timeout&gt;?
+
+  &lt;suspendDurationOnFailure&gt;
+    <em>suspend duration in seconds</em>
+  &lt;/suspendDurationOnFailure&gt;?
+&lt;/default&gt;</pre>
+    <h4>
       <a name="wsdl-endpoint" id="wsdl-endpoint">WSDL Endpoint</a>
     </h4>
     <p>
@@ -599,14 +627,16 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       The optional 'session' element makes the endpoint a session affinity based
       load balancing endpoint. If it is specified, sessions are bound to
       endpoints in the first message and all successive messages for those
-      sessions are directed to their associated endpoints. Only http sessions
-      are currently supported, and identifies sessions based on http cookies.
-      The 'failover' attribute mentioned above is not applicable for session
-      affinity based endpoints and it is always considered as set to false. If
-      it is required to have failover behavior in session affinity based load
-      balance endpoints, list failover endpoints as the target endpoints.
+      sessions are directed to their associated endpoints. Currently there are two types
+      of sessions supported in SAL endpoints. Namely HTTP transport based session
+      which identifies the sessions based on http cookies and the Client session which
+      identifies the session by looking at a SOAP header sent by the client with the QName
+      '{http://ws.apache.org/ns/synapse}ClientID'. The 'failover' attribute mentioned above
+      is not applicable for session affinity based endpoints and it is always
+      considered as set to false. If it is required to have failover behavior in session
+      affinity based load balance endpoints, list failover endpoints as the target endpoints.
     </p>
-<pre xml:space="preserve">&lt;session type="http"/&gt;?
+<pre xml:space="preserve">&lt;session type="http|simpleClientSession"/&gt;?
 &lt;loadBalance [policy="roundRobin"] [failover="true|false"]&gt;
   &lt;endpoint .../&gt;+
 &lt;/loadBalance&gt;</pre>
@@ -1308,6 +1338,58 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       retrieve Axis2 message context properties or transport headers. e.g.
       synapse:get-property('transport', 'USER_AGENT')
     </p>
+    <h5>
+      SynapseXpath variables
+    </h5>
+    <p>
+      There are a set of predefined XPath variables when writing XPaths in
+      the Synapse Configuration. Those are as follows;
+    </p>
+    <ul>
+        <li>
+            body - The SOAP 1.1 or 1.2 body element
+        </li>
+        <p>
+            For example; expression="$body/getQuote" refers to the first
+            getQuote element in the SOAP body regardless of whether the message
+            is SOAP-11 or SOAP-12
+        </p>
+        <li>
+            header - The SOAP 1.1 or 1.2 header element
+        </li>
+        <p>
+            For example; expression="$header/wsa:To" refers to the addressing
+            To header regardless of whether this message is SOAP-11 or SOAP-12
+        </p>
+    </ul>
+    <p>
+      Further there are some variable prefixes defined in synapse XPaths
+      which can be usefull in writing the configurations;
+    </p>
+    <ul>
+        <li>
+            ctx - Prefix for Synapse MessageContext properties
+        </li>
+        <p>
+            For example; expression="$ctx:RESPONSE" gives the value of the
+            synapse message context property with name 'RESPONSE'
+        </p>
+        <li>
+            axis2 - Prefix for Axis2 MessageContext properties
+        </li>
+        <p>
+            For example; expression="$axis2:messageType" gives the value of the
+            axis2 message context property with name 'messageType'
+        </p>
+        <li>
+            trp - Prefix for the transport headers
+        </li>
+        <p>
+            For example; expression="$trp:Content-Type" gives the value of the
+            'Content-Type' transport header, which is going to be the
+            Content-Type of the current message
+        </p>
+    </ul>
     <h4>
       <a name="sequence_ref" id="sequence_ref">Sequence</a>
     </h4>

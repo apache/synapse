@@ -221,8 +221,6 @@
 
     <transportSender name="http"  class="org.apache.synapse.transport.nhttp.HttpCoreNIOSender">
         <parameter name="non-blocking" locked="false">true</parameter>
-        <!-- If following is set to 'true', optional action part of the Content-Type will not be added to the SOAP 1.2 messages -->
-        <!--  <parameter name="OmitSOAP12Action">true</parameter>  -->
     </transportSender>
     <transportSender name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender">
         <parameter name="non-blocking" locked="false">true</parameter>

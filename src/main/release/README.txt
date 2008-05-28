@@ -1,4 +1,4 @@
-Apache Synapse 1.2-SNAPSHOT build  (January 2008) - http://ws.apache.org/synapse/
+Apache Synapse 1.2 build  (June 2008) - http://ws.apache.org/synapse/
 ------------------------------------------------------------------------------------------
 
 -------------------
@@ -89,8 +89,8 @@ Please refer to the release_notes.txt file for information on common issues and 
 Any issues with this release can be reported to Apache Synapse mailing list or in the JIRA issue tracker.
 
 Mailing list subscription:
-    synapse-dev-subscribe@ws.apache.org
-    synapse-user-subscribe@ws.apache.org
+    dev-subscribe@synapse.apache.org
+    user-subscribe@synapse.apache.org
 
 Jira:
     http://issues.apache.org/jira/browse/Synapse

@@ -4441,7 +4441,7 @@ end
       already done </p>
 
       <p>Runs the client as follows</p>
-      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
+      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
 
       <p>Then the console output </p>
       <pre> INFO LogMediator text = ** Looking up from the Database **

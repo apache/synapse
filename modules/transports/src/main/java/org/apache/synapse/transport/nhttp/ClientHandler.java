@@ -382,6 +382,11 @@ public class ClientHandler implements NHttpClientHandler {
                     log.debug("Received a 202 Accepted response");
                 }
 
+                // sometimes, some http clients sends an "\r\n" as the content body with a
+                // HTTP 202 OK.. we will just get it into this temp buffer and ignore it..
+                ContentInputBuffer inputBuffer = new SharedInputBuffer(8, conn, allocator);
+                context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
+
                 // create a dummy message with an empty SOAP envelope and a property
                 // NhttpConstants.SC_ACCEPTED set to Boolean.TRUE to indicate this is a
                 // placeholder message for the transport to send a HTTP 202 to the

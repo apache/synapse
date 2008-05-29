@@ -38,6 +38,7 @@ import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.util.LoggingControl;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -52,7 +53,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 	private static final Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
 
 	public InvocationResponse invoke(MessageContext msgCtx) throws AxisFault {
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaOutHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 
 		InvocationResponse returnValue = InvocationResponse.CONTINUE;
@@ -73,7 +74,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//see if this message is unreliable i.e. WSRM not requried
 		if(SandeshaUtil.isMessageUnreliable(msgCtx)) {
-			if (log.isDebugEnabled())
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message " + returnValue);
 			return returnValue;
 		}
@@ -81,7 +82,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		// Also do not apply RM to fault messages
 		{
 			if(msgCtx.isProcessingFault()) {
-				if(log.isDebugEnabled())
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for fault message " + returnValue);
 				return returnValue ;
 			}
@@ -94,7 +95,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE)) {
-			if (log.isDebugEnabled())
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("Exit: SandeshaOutHandler::invoke, Application processing done " + returnValue);
 			return returnValue;
 		}
@@ -111,7 +112,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			MsgProcessor msgProcessor = null;
 			int messageType = rmMsgCtx.getMessageType();
-			if(log.isDebugEnabled()) log.debug("Message Type: " + messageType);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Message Type: " + messageType);
 			if (messageType == Sandesha2Constants.MessageTypes.UNKNOWN) {
                 if (msgCtx.isServerSide()) {
                 	String inboundSequence = (String) msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
@@ -145,7 +146,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			//Should be done only to the server side
 			OperationContext opCtx = msgCtx.getOperationContext();
 			if(msgCtx.isServerSide() && opCtx != null && returnValue == InvocationResponse.SUSPEND) {
-				if(log.isDebugEnabled()) log.debug("Setting HOLD_RESPONSE property");
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Setting HOLD_RESPONSE property");
 				opCtx.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
 			}
 
@@ -176,7 +177,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 		}
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaOutHandler::invoke " + returnValue);
 		return returnValue;
 	}

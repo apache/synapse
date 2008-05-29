@@ -29,8 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * When Synapse is deployed on a WAR container, this is the init servlet that kicks off the
@@ -40,23 +39,38 @@ import java.io.IOException;
 public class SynapseStartUpServlet extends HttpServlet {
 
     private static Log log = LogFactory.getLog(SynapseStartUpServlet.class);
-    private ServletContext servletContext = null;
     private static final String ALREADY_INITED = "synapseAlreadyInited";
 
     public void init() throws ServletException {
     	ServletConfig servletConfig = getServletConfig();
-        servletContext = servletConfig.getServletContext();
+    	ServletContext servletContext = servletConfig.getServletContext();
         if (Boolean.TRUE.equals(servletContext.getAttribute(ALREADY_INITED))) {
             return;
         }
 
         ServerManager serverManager = ServerManager.getInstance();
-        serverManager.setSynapseHome(loadParameter(servletConfig, SynapseConstants.SYNAPSE_HOME));
-        serverManager.setSynapseXMLPath(loadParameter(servletConfig, SynapseConstants.SYNAPSE_XML));
-        serverManager.setResolveRoot(loadParameter(servletConfig, SynapseConstants.RESOLVE_ROOT));
-        serverManager.setAxis2Repolocation(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_REPO));
-        serverManager.setAxis2Xml(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_CONF));
-        serverManager.setServerName(loadParameter(servletConfig, SynapseConstants.SERVER_NAME));
+        String synHome = loadParameter(servletConfig, SynapseConstants.SYNAPSE_HOME, false);
+
+        if (synHome == null) {
+            log.info("synapse.home not set; using web application root as default value");
+            String webinfPath = servletContext.getRealPath("WEB-INF");
+            if (webinfPath == null || !webinfPath.endsWith("WEB-INF")) {
+                handleException("Unable to determine web application root directory");
+            } else {
+                synHome = webinfPath.substring(0, webinfPath.length()-7);
+                log.info("Setting synapse.home to : " + synHome);
+            }
+        }
+        serverManager.setSynapseHome(synHome);
+        
+        serverManager.setSynapseXMLPath(loadParameter(servletConfig, SynapseConstants.SYNAPSE_XML, true));
+        String resolveRoot = loadParameter(servletConfig, SynapseConstants.RESOLVE_ROOT, false);
+        if (resolveRoot != null) {
+            serverManager.setResolveRoot(resolveRoot);
+        }
+        serverManager.setAxis2Repolocation(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_REPO, true));
+        serverManager.setAxis2Xml(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_CONF, true));
+        serverManager.setServerName(loadParameter(servletConfig, SynapseConstants.SERVER_NAME, false));
 
         serverManager.start();
         servletContext.setAttribute(ALREADY_INITED, Boolean.TRUE);
@@ -75,13 +89,13 @@ public class SynapseStartUpServlet extends HttpServlet {
         try {
             ServerManager serverManager = ServerManager.getInstance();
             serverManager.stop();
-            servletContext.removeAttribute(ALREADY_INITED);
+            getServletContext().removeAttribute(ALREADY_INITED);
         } catch (Exception e) {
             log.error("Error stopping the Synapse listener manager", e);
         }
     }
 
-    private String loadParameter(ServletConfig servletConfig, String name)
+    private String loadParameter(ServletConfig servletConfig, String name, boolean required)
         throws ServletException {
 
         if (System.getProperty(name) == null) {
@@ -89,7 +103,7 @@ public class SynapseStartUpServlet extends HttpServlet {
             String value = servletConfig.getInitParameter(name);
             log.debug("Init parameter '" + name + "' : " + value);
 
-            if (value == null || value.trim().length() == 0) {
+            if ((value == null || value.trim().length() == 0) && required) {
                 handleException("A valid system property or init parameter '" + name + "' is required");
             } else {
                 return value;

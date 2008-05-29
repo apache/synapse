@@ -5173,7 +5173,7 @@ Discounted price: 138.77458254967408</pre>
     </h2>
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
-        &lt;cache timeout="20000" scope="per-host" collector="false"
+        &lt;cache timeout="20" scope="per-host" collector="false"
                hashGenerator="org.wso2.caching.digest.DOMHASHGenerator"&gt;
             &lt;implementation type="memory" maxSize="100"/&gt;
         &lt;/cache&gt;

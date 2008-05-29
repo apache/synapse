@@ -7,9 +7,9 @@
 <p>
     You can obtain the code by downloading the <a class="externalLink" href="http://ws.apache.org/synapse/download/1.1/download.cgi">source distribution</a> or, more commonly, checking out the source from Subversion (SVN).
     To checkout the code from <a class="externalLink" href="http://subversion.tigris.org/">Subversion</a>, firstly get subversion installed, then use the following commands:
-    <pre>svn co http://svn.apache.org/repos/asf/webservices/synapse/trunk/java [path-where-you-want-the-code]</pre>
+    <pre>svn co http://svn.apache.org/repos/asf/synapse/trunk/java [path-where-you-want-the-code]</pre>
     If you are a committer then you need to use the secure version:
-    <pre>svn co https://svn.apache.org/repos/asf/webservices/synapse/trunk/java [path-where-you-want-the-code]</pre></p>
+    <pre>svn co https://svn.apache.org/repos/asf/synapse/trunk/java [path-where-you-want-the-code]</pre></p>
 </section>
 <section name="Building">
 <p>

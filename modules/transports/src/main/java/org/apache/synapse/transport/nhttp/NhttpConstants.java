@@ -30,4 +30,5 @@ public class NhttpConstants {
     public static final String WSDL_EPR_PREFIX = "WSDLEPRPrefix";
     public static final String REMOTE_HOST ="REMOTE_HOST";
     public static final String BIND_ADDRESS = "bind-address";
+    public static final String NON_BLOCKING_TRANSPORT = "NonBlockingTransport";
 }

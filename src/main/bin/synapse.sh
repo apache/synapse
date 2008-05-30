@@ -127,6 +127,9 @@ SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse.xml
 # server name
 SERVER_NAME=
 
+# ----- Uncomment the following line to enalbe the SSL debug options ----------
+# TEMP_PORPS="-Djavax.net.debug=all"
+
 while [ $# -ge 1 ]; do
 
 if [ "$1" = "-xdebug" ]; then
@@ -169,6 +172,7 @@ echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
 $JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
     $XDEBUG \
+    $TEMP_PORPS \
     -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \
     -Djava.endorsed.dirs=$SYNAPSE_ENDORSED \
     -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse \

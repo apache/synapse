@@ -1160,7 +1160,7 @@
         <!-- addressing, rampart, neethi -->
         <addressing.version>1.4</addressing.version>
         <rampart.version>1.4</rampart.version>
-        <mercury.version>0.9</mercury.version>
+        <mercury.version>0.91</mercury.version>
         <neethi.version>2.0.4</neethi.version>
         <wss4j.version>1.5.4</wss4j.version>
         <opensaml.version>1.1</opensaml.version>

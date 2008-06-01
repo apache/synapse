@@ -100,6 +100,8 @@ public final class SynapseConstants {
     public static final String SYNAPSE_XML = "synapse.xml";
     /** The name of the system property used to specify/override the Synapse properties location */
     public static final String SYNAPSE_PROPERTIES = "synapse.properties";
+    /** conf directory name **/
+    public static final String CONF_DIRECTORY = "conf";
 
     //- Synapse Message Context Properties -
         /** The Synapse MC property name that holds the name of the Proxy service thats handling it */

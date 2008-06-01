@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -89,11 +90,43 @@ public class SynapseConfigurationBuilder {
     }
 
     private static Properties loadSynapseProperties() {
+
         try {
             Properties properties = new Properties();
-            properties.load(Thread.currentThread().getContextClassLoader().
-                getResourceAsStream(SynapseConstants.SYNAPSE_PROPERTIES));
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+            if (log.isDebugEnabled()) {
+                log.debug("synapse.properties file is loading from classpath");
+            }
+
+            InputStream in = cl.getResourceAsStream(SynapseConstants.SYNAPSE_PROPERTIES);
+            if (in == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to load synapse.propeties file");
+                }
+
+                String path = SynapseConstants.CONF_DIRECTORY +
+                        File.separatorChar + SynapseConstants.SYNAPSE_PROPERTIES;
+                if (log.isDebugEnabled()) {
+                    log.debug("synapse.properties file is loading from classpath" +
+                            " with resource path '" + path + " '");
+                }
+
+                in = cl.getResourceAsStream(path);
+                if (in == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Unable to load the synapse.properties file from classpath" +
+                                " with resource name '" + path + " '");
+                    }
+                }
+            }
+
+            if (in != null) {
+                properties.load(in);
+            }
+            
             return properties;
+
         } catch (Exception e) {
             log.info("Using the default tuning parameters for Synapse");
         }

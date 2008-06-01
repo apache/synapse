@@ -615,16 +615,10 @@
       value is looked up by the log mediator and logged using the
       'get-property()' XPath extension function.
     </p>
-    <p>
-      ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService
-      -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM
-    </p>
-<pre xml:space="preserve">INFO LogMediator - symbol = Great stock - IBM, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService </pre>
-    <p>
-      ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService
-      -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT
-    </p>
-<pre xml:space="preserve">INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
+    <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
+    <pre xml:space="preserve">      INFO LogMediator - symbol = Great stock - IBM, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService </pre>
+    <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
+    <pre xml:space="preserve">      INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
     <h2>
       <a name="Sample3" id="Sample3">Sample 3: Local Registry entry
       definitions, reusable endpoints and sequences</a>
@@ -1057,7 +1051,7 @@
       During the response processing you could see the SimpleURLRegistry
       fetching the resource as shown by the log message below
     </p>
-<pre xml:space="preserve">[HttpClientWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
+<pre xml:space="preserve">[HttpClientWorker-1] DEBUG SimpleURLRegistry ==> Repository fetch of resource with key : transform/transform_back.xslt</pre>
     <p>
       If you run the client again immediately (i.e within 15 seconds of the
       first request) you will not see the resource being reloaded by the
@@ -1129,7 +1123,7 @@
       the sequence from the registry and executes its rules as follows:
     </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
-<pre xml:space="preserve">[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
+<pre xml:space="preserve">[HttpServerWorker-1] DEBUG  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
 ...
@@ -1146,7 +1140,7 @@
       sequence, you will notice that the new sequence is loaded and executed by
       Synapse from the following log messages.
     </p>
-<pre xml:space="preserve">[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
+<pre xml:space="preserve">[HttpServerWorker-1] DEBUG  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
 ...
@@ -1425,14 +1419,14 @@ Transfer-Encoding: chunked
       the ASF logo and receive its response back again and saves it into a
       temporary file.
     </p>
-<pre xml:space="preserve">[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as MTOM</pre>
-<pre xml:space="preserve">[java] Saved response to file : /tmp/mtom-36877.gif</pre>
+<pre xml:space="preserve">[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as MTOM
+[java] Saved response to file : ./../../work/temp/sampleClient/mtom-4417.gif</pre>
     <p>
       Next try SwA as:
     </p>
 <pre xml:space="preserve">ant optimizeclient -Dopt_mode=swa</pre>
 <pre xml:space="preserve">[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as SwA
-[java] Saved response to file : /tmp/swa-47549.gif</pre>
+[java] Saved response to file : ./../../work/temp/sampleClient/swa-30391.gif</pre>
     <p>
       By using TCPMon and sending the message through it, one can inspect that
       the requests and responses sent are indeed MTOM optimized or sent as HTTP

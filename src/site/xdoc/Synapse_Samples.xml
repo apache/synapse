@@ -4366,7 +4366,11 @@ end
     <p>
       Synapse console shows,
     </p>
-<pre xml:space="preserve">INFO LogMediator text = ** Reporting to the Database **<br/><br/>...<br/><br/>INFO LogMediator text = ** Looking up from the Database **<br/><br/>...<br/><br/>INFO LogMediator text = Stock price - 153.47886496064808</pre>
+<pre xml:space="preserve">INFO LogMediator text = ** Reporting to the Database **
+...
+INFO LogMediator text = ** Looking up from the Database **
+...
+INFO LogMediator text = Stock price - 153.47886496064808</pre>
     <p/>
       <h2><a name="Sample363" id="Sample363">Sample 363: Reusable database connection pools</a></h2>
 

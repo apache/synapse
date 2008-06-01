@@ -2,7 +2,7 @@
 
 <document>
     <properties>
-        <title>Samples Guide</title>
+        <title>Apache Synapse - Samples Guide</title>
     </properties>
     <head>
         <style type="text/css" xml:space="preserve">
@@ -102,23 +102,22 @@
     }</style>
     </head>
   <body>
-      <table border="0" style="width: 100%">
-      <caption/>
-      <tbody>
-        <tr>
-          <td>
-            <h1>
-                Running the Synapse Samples              
-            </h1>
-          </td>
-          <td>
-            <img alt="Synapse logo"
-            src="images/synapse-logo-web2.png" width="197"
-            height="82"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="margin-top:-40px; float:right;">
+      <img alt="Synapse logo"
+           src="images/synapse-logo-web2.png" width="197"
+           height="82"/>
+    </div>
+    <div>
+      <h1>
+        Apache Synapse ESB - Running the Samples
+      </h1>
+    </div>
+    <p>
+      This guide will walk you through the built-in samples shipped with the product,
+      which will cover most of the basic functional sceanrios and capabilities of Apache Synapse
+      as an ESB. If you are aunable to solve your problem by reading through and
+      running these samples, feel free to raise your problem on the
+      <a href="http://synapse.apache.org/mail-lists.html">mailing lists</a>.</p>
     <h2>
       <a name="TOC" id="TOC">Contents</a>
     </h2>
@@ -180,6 +179,9 @@
             <li>
               <a href="#Sample12">Sample 12: One way messaging /
               fireAndForget through synapse</a>
+            </li>
+            <li>
+              <a href="#Sample13">Sample 13: Dual channel invocation through synapse</a>
             </li>
           </ul>
         </li>
@@ -249,6 +251,10 @@
             <li>
               <a href="#Sample154">Sample 154: Load Balancing with Proxy
               Service </a>
+            </li>
+            <li>
+              <a href="#Sample155">Sample 155: Dual channel invocation
+              on both client side and server side of synapse with Proxy Services</a>
             </li>
           </ul>
         </li>
@@ -1266,6 +1272,46 @@
       If you send your client request through TCPmon, you will notice that the
       SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
       Synapse in turns replies to the client with a HTTP 202 acknowledgment
+    </p>
+    <h2>
+      <a name="Sample13" id="Sample13">Sample 13: Dual channel invocation through synapse</a>
+    </h2>
+    <p>
+      <strong>Objective: Demonstrate dual channel messaging
+      through synapse</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong><br/> Start the Axis2 server
+      and deploy the SimpleStockQuoteService (Refer steps above)<br/> Start
+      the Synapse configuration numbered 0: i.e. synapse -sample 0
+    </p>
+    <p>
+      This example invokes the same 'getQuote' operation on the
+      SimpleStockQuoteService using the custom client which uses the Axis2
+      ServiceClient API with useSeparateListener set to true so that the response is
+      coming through a different channel than the one which is used to send the request
+      to a callback defined in the client.
+      To test this, use 'ant
+      -Dmode=dualquote...' and you will notice the dual channel invocation
+      through Synapse into the sample Axis2 server instance, which reports the response
+      back to the client over a different channel:
+    </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=dualquote</pre>
+<pre xml:space="preserve">Response received to the callback
+Standard dual channel :: Stock price = $57.16686934968289</pre>
+    <p>
+      If you send your client request through TCPmon, you will notice that
+      Synapse replies to the client with a HTTP 202 acknowledgment when you send the request and
+      the communication between synapse and the server happens on a single channel and then you
+      get the response back from synapse to the clients callback in a different channel (which
+      cannot be observed through TCPmon)
+    </p>
+    <p>
+      Also you could see the wsa:Reply-To header being something like
+      http://localhost:8200/axis2/soap/anonService2 which implies that the reply
+      is being on a different channel listening on the port 8200. Please note that it is
+      required to engage addressing when using the dual channel invocation because it
+      requires the wsa:Reply-To header.
     </p>
     <h1>
       <a name="Endpoints" id="Endpoints">Advanced mediations with endpoints</a>
@@ -2631,6 +2677,59 @@ Connection: Keep-Alive
         Functionality is similar to the sample #54.
       </p>
     </div>
+    <h2>
+      <a name="Sample155" id="Sample155">Sample 155: Dual channel invocation
+      on both client side and serverside of synapse with Proxy Services</a>
+    </h2>
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"&gt;
+                    &lt;enableAddressing separateListener="true"/&gt;
+                &lt;/address&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+    <p>
+      <strong>Objective: Demonstrate the dual channel invocation with Synapse proxy services</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong><br/> Start the Synapse
+      configuration numbered 150: i.e. synapse -sample 155<br/> Start the
+      Axis2 server and deploy the SimpleStockQuoteService if not already done
+    </p>
+    <p/>
+    <p>
+      This sample will show the action of the dual channel invocation within client and Synapse
+      as well as within synapse and the actual server. Note that if you want to enable dual
+      channel invocation you need to set the separateListener attribute to true of the
+      enableAddressing element of the endpoint.
+    </p>
+    <p>
+      Execute the stock quote client by requesting for a stock quote on a dual channel from the
+      proxy service as follows:
+    </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dmode=dualquote</pre>
+    <p>
+      In the above example, the request received is forwarded to the sample service
+      hosted on Axis2 and the endpoint specifies to enable addressing and do the invocation
+      over a dual channel. If you observe this message flow by using a TCPmon, you could see that
+      on the channel you send the request to synapse the response has been written as an
+      HTTP 202 Accepted, where as the real response from synapse will come over a different channel
+      which cannot be obsesrved unless you use tcpdump to dump all the TCP level messages.
+    </p>
+    <p>
+      At the same time you can observe the behaviour of the invocation between synapse and
+      the actual Axis2 service, where you can see a 202 Accepted message being delivered to synapse
+      as the response to the request. The actual response will be delivered to synapse over a
+      different channel.
+    </p>
     <h1>
       <a name="ProxyServiceQoS" id="ProxyServiceQoS">QoS addition and
       deduction for service mediation (proxy) samples</a>

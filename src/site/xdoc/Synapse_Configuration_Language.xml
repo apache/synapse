@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document>
     <properties>
-        <title>Configuration Language</title>
+        <title>Apache Synapse - Configuration Language</title>
     </properties>
     <head>
         <style type="text/css" xml:space="preserve">
@@ -101,23 +101,16 @@
     }</style>
     </head>
     <body>
-    <table border="0" style="width: 100%">
-      <caption/>
-      <tbody>
-        <tr>
-          <td>
-            <h1>
-              Apache Synapse ESB - Configuration
-            </h1>
-          </td>
-          <td>
-            <img alt="Synapse logo"
-            src="images/synapse-logo-web2.png" width="197"
-            height="82"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="margin-top:-40px; float:right;">
+      <img alt="Synapse logo"
+           src="images/synapse-logo-web2.png" width="197"
+           height="82"/>
+    </div>
+    <div>
+      <h1>
+        Apache Synapse ESB - Configuration
+      </h1>
+    </div>
     <h3>
       Overview
     </h3>

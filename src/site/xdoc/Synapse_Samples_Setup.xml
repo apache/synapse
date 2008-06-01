@@ -2,7 +2,7 @@
 
 <document>
     <properties>
-        <title>Samples Setup</title>
+        <title>Apache Synapse - Samples Setup</title>
     </properties>
     <head>
         <style type="text/css" xml:space="preserve">
@@ -43,7 +43,7 @@
         color: #000000;
         font-weight: normal;
     }
-    p {
+    p, td {
         font-family: Verdana, arial, sans-serif;
         font-size: 11px;
         line-height: 16px;
@@ -102,23 +102,16 @@
     }</style>
     </head>
     <body>
-    <table border="0" style="width: 100%">
-      <caption/>
-      <tbody>
-        <tr>
-          <td>
-            <h1>
-              Apache Synapse ESB - Samples Setup
-            </h1>
-          </td>
-          <td>
-            <img alt="Synapse logo"
-            src="images/synapse-logo-web2.png" width="197"
-            height="82"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="margin-top:-40px; float:right;">
+      <img alt="Synapse logo"
+           src="images/synapse-logo-web2.png" width="197"
+           height="82"/>
+    </div>
+    <div>
+      <h1>
+        Apache Synapse ESB - Samples Setup
+      </h1>
+    </div>
     <p/>
     <p>
       Synapse ships with a set of working examples that demonstrate some of the
@@ -148,7 +141,7 @@
     <h2>
       Understanding the Samples
     </h2>
-    <table border="1" style="width: 100%">
+    <table border="0" style="width: 100%">
       <caption/>
       <tbody>
         <tr>
@@ -527,8 +520,11 @@ synapse.sh -sample &lt;n&gt;</pre>
     &lt;/transportSender&gt;</pre>
     <p/>
     <h2 id="fixtransport">
-      Setting up the FIX Transport
+      Configuring Synapse for the FIX Transport
     </h2>
+    <h3 id="fixtransport">
+      Setting up the FIX Transport
+    </h3>
     <p>
 	To run the FIX samples used in this guide you need a local Quickfix/J
 	installation.
@@ -540,9 +536,9 @@ synapse.sh -sample &lt;n&gt;</pre>
       and FIXTransportListener sample configurations.
     </p>
     <p/>
-    <h2 id="fixsamples">
+    <h3 id="fixsamples">
       Configuring Synapse for FIX Samples
-    </h2>
+    </h3>
     <p>
       Put the following entries in a file called fix-synapse.cfg
       <pre>
@@ -582,9 +578,9 @@ synapse.sh -sample &lt;n&gt;</pre>
         directories.
     </p>
     <p/>
-    <h2 id="fixsamplesconfig">
+    <h3 id="fixsamplesconfig">
       Configuring Sample FIX Applications
-    </h2>
+    </h3>
     <p>
       Locate and edit the FIX configuration file of Executor to be as follows.
       This file is usually named executor.cfg

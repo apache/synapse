@@ -101,15 +101,15 @@ public class Axis2FlexibleMEPClient {
                 "] [sec = " + wsSecurityEnabled +
                 "] [rm = " + wsRMEnabled +
                 (endpoint != null ?
-                    "] [ mtom = " + endpoint.isUseMTOM() +
-                    "] [ swa = " + endpoint.isUseSwa() +
-                    "] [ format = " + endpoint.getFormat() +                    
-                    "] [ force soap11=" + endpoint.isForceSOAP11() +
-                    "] [ force soap12=" + endpoint.isForceSOAP12() +
-                    "] [ pox=" + endpoint.isForcePOX() +
-                    "] [ get=" + endpoint.isForceGET() +
-                    "] [ encoding=" + endpoint.getCharSetEncoding() : "") +
-                "] [ to " + synapseOutMessageContext.getTo() + "]");
+                    "] [mtom = " + endpoint.isUseMTOM() +
+                    "] [swa = " + endpoint.isUseSwa() +
+                    "] [format = " + endpoint.getFormat() +
+                    "] [force soap11=" + endpoint.isForceSOAP11() +
+                    "] [force soap12=" + endpoint.isForceSOAP12() +
+                    "] [pox=" + endpoint.isForcePOX() +
+                    "] [get=" + endpoint.isForceGET() +
+                    "] [encoding=" + endpoint.getCharSetEncoding() : "") +
+                "] [to " + synapseOutMessageContext.getTo() + "]");
         }
 
         // save the original message context wihout altering it, so we can tie the response

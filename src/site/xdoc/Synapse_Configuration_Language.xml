@@ -101,7 +101,7 @@
     }</style>
     </head>
     <body>
-    <div style="margin-top:-40px; float:right;">
+    <div style="margin-top:-40px; float:right; _margin-top:0px;">
       <img alt="Synapse logo"
            src="images/synapse-logo-web2.png" width="197"
            height="82"/>

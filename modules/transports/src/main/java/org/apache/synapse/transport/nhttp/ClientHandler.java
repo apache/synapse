@@ -261,7 +261,7 @@ public class ClientHandler implements NHttpClientHandler {
      * @param exceptionToRaise an Exception to be returned to the MR on failure
      */
     private void checkAxisRequestComplete(NHttpClientConnection conn,
-        String errorMessage, Exception exceptionToRaise) {
+        final String errorMessage, final Exception exceptionToRaise) {
 
         Axis2HttpRequest axis2Request = (Axis2HttpRequest)
                 conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
@@ -273,32 +273,36 @@ public class ClientHandler implements NHttpClientHandler {
                 return; // no need to continue
             }
 
-            MessageContext mc = axis2Request.getMsgContext();
+            final MessageContext mc = axis2Request.getMsgContext();
 
             if (mc.getAxisOperation() != null &&
                     mc.getAxisOperation().getMessageReceiver() != null) {
 
-                MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
-                try {
-                    MessageContext nioFaultMessageContext = null;
-                    if (errorMessage != null) {
-                        nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
-                            mc, new AxisFault(errorMessage));
-                    } else if (exceptionToRaise != null) {
-                        nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
-                            /** this is not a mistake I do NOT want getMessage()*/
-                            mc, new AxisFault(exceptionToRaise.toString(), exceptionToRaise));
-                    }
+                workerPool.execute( new Runnable() {
+                    public void run() {
+                        MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+                        try {
+                            MessageContext nioFaultMessageContext = null;
+                            if (errorMessage != null) {
+                                nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
+                                    mc, new AxisFault(errorMessage));
+                            } else if (exceptionToRaise != null) {
+                                nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
+                                    /** this is not a mistake I do NOT want getMessage()*/
+                                    mc, new AxisFault(exceptionToRaise.toString(), exceptionToRaise));
+                            }
 
-                    if (nioFaultMessageContext != null) {
-                        nioFaultMessageContext.setProperty(
-                                NhttpConstants.SENDING_FAULT, Boolean.TRUE);
-                        mr.receive(nioFaultMessageContext);
-                    }
+                            if (nioFaultMessageContext != null) {
+                                nioFaultMessageContext.setProperty(
+                                        NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                                mr.receive(nioFaultMessageContext);
+                            }
 
-                } catch (AxisFault af) {
-                    log.error("Unable to report back failure to the message receiver", af);
-                }
+                        } catch (AxisFault af) {
+                            log.error("Unable to report back failure to the message receiver", af);
+                        }
+                    }
+                });
             }
         }
     }
@@ -544,6 +548,10 @@ public class ClientHandler implements NHttpClientHandler {
             new ClientWorker(cfgCtx, new ContentInputStream(inputBuffer), response,
                 (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
 
+    }
+
+    public void execute(Runnable task) {
+        workerPool.execute(task);        
     }
 
     // ----------- utility methods -----------

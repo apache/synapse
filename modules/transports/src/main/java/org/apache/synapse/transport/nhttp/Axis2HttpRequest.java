@@ -208,39 +208,39 @@ public class Axis2HttpRequest {
         }
 
         synchronized(this) {
-            while (!readyToStream) {
+            while (!readyToStream && !completed) {
                 try {
                     this.wait();
                 } catch (InterruptedException ignore) {}
             }
         }
 
-        OutputStream out = new ContentOutputStream(outputBuffer);
-        try {
-            messageFormatter.writeTo(msgContext, format, out, true);
-        } catch (Exception e) {
-            Throwable t = e.getCause();
-            if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Ignore closed channel exception, as the " +
-                        "SessionRequestCallback handles this exception");
-                }                
-            } else {
-                /* close PipeImpl will manually raise exception
-                   while streaming, so blocking status will be released */
-                if (e instanceof AxisFault) {
-                    throw (AxisFault) e;
+        if (!completed) {
+            OutputStream out = new ContentOutputStream(outputBuffer);
+            try {
+                messageFormatter.writeTo(msgContext, format, out, true);
+            } catch (Exception e) {
+                Throwable t = e.getCause();
+                if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Ignore closed channel exception, as the " +
+                            "SessionRequestCallback handles this exception");
+                    }
                 } else {
-                    handleException("Error streaming message context", e);
+                    if (e instanceof AxisFault) {
+                        throw (AxisFault) e;
+                    } else {
+                        handleException("Error streaming message context", e);
+                    }
                 }
             }
-        }
-        finally {
-            try {
-                out.flush();
-                out.close();
-            } catch (IOException e) {
-                handleException("Error closing outgoing message stream", e);
+            finally {
+                try {
+                    out.flush();
+                    out.close();
+                } catch (IOException e) {
+                    handleException("Error closing outgoing message stream", e);
+                }
             }
         }
     }
@@ -257,5 +257,8 @@ public class Axis2HttpRequest {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+        synchronized(this) {
+            this.notifyAll();
+        }
     }
 }

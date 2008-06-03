@@ -96,15 +96,7 @@ public class SynapseInitializationModule implements Module {
         transports.add(Constants.TRANSPORT_HTTPS);
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
-
-        log.info("Initializing Mercury...");
-        AxisModule mercuryAxisModule = configurationContext.getAxisConfiguration().
-            getModule(SynapseConstants.MERCURY_MODULE_NAME);
-        if (mercuryAxisModule != null) {
-            Module mercury = mercuryAxisModule.getModule();
-            mercury.init(configurationContext, mercuryAxisModule);
-        }
-
+        
         // this server name is given by system property SynapseServerName
         // otherwise take host-name
         // if nothing found assume localhost

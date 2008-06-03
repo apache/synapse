@@ -107,7 +107,7 @@ public class LoadbalanceEndpoint implements Endpoint {
         String endPointName = this.getName();
         if (endPointName == null) {
 
-            if (log.isDebugEnabled() && isClusteringEnable) {
+            if (isClusteringEnable) {
                 log.warn("In a clustering environment , the endpoint  name should be specified" +
                         "even for anonymous endpoints. Otherwise , the clustering would not be " +
                         "functioned correctly if there are more than one anonymous endpoints. ");

@@ -232,7 +232,7 @@
       A Synapse configuration holds two special sequences named as "main" and
       "fault". These may be defined within the synapse.xml, or externally via
       the Registry. If either is not found, a suitable default is generated at
-      runtime by the ESB. The default "main" sequence will simple send a message
+      runtime by the ESB. The default "main" sequence will simply send a message
       without mediation, while the default "fault" sequence would log the
       message including the payload and any error/exception encountered and stop
       further processing. The 'fault' sequence executes whenever Synapse itself

@@ -181,7 +181,7 @@
       </tbody>
     </table>
     <p>
-      The above diagram depicts the interactions between the clients, Synapse
+      The above table depicts the interactions between the clients, Synapse
       and the services at a higher level. The Clients are able to send SOAP/REST
       or POX messages over transports such as HTTP/S or JMS with WS-Addressing,
       WS-Security or WS-Reliable messaging. They can send binary optimized
@@ -522,6 +522,20 @@ synapse.sh -sample &lt;n&gt;</pre>
     <h2 id="fixtransport">
       Configuring Synapse for the FIX Transport
     </h2>
+    <p>
+      First of all you need to put the following jar files into the lib folder of the
+      synapse distribution
+    </p>
+    <ul>
+      <li>quickfixj-core-1.3.1.jar</li>
+      <li>quickfixj-msg-fix40-1.3.1.jar</li>
+      <li>quickfixj-msg-fix41-1.3.1.jar</li>
+      <li>quickfixj-msg-fix42-1.3.1.jar</li>
+      <li>quickfixj-msg-fix43-1.3.1.jar</li>
+      <li>quickfixj-msg-fix44-1.3.1.jar</li>
+      <li>slf4j-api-1.3.0.jar</li>
+      <li>slf4j-jdk14-1.3.0.jar</li>
+    </ul>
     <h3 id="fixtransport">
       Setting up the FIX Transport
     </h3>

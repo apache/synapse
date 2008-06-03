@@ -115,7 +115,7 @@
     <p>
       This guide will walk you through the built-in samples shipped with the product,
       which will cover most of the basic functional sceanrios and capabilities of Apache Synapse
-      as an ESB. If you are aunable to solve your problem by reading through and
+      as an ESB. If you are unable to solve your problem by reading through and
       running these samples, feel free to raise your problem on the
       <a href="http://synapse.apache.org/mail-lists.html">mailing lists</a>.</p>
     <h2>
@@ -3166,7 +3166,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       Once received by the sample service, it is saved into a temporary file and
       could be verified for correctness.
     </p>
-<pre xml:space="preserve">Wrote to file : /tmp/mtom-60319.gif</pre>
+<pre xml:space="preserve">Wrote to file : ./../../work/temp/sampleServer/mtom-4417.gif</pre>
     <p/>
     <p>
       The final section of this example shows how a POX JMS message received by

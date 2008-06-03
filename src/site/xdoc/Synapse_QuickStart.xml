@@ -130,7 +130,7 @@
         A Java 2 SE - JDK or JRE of version 1.5.x or higher
       </li>
       <li>
-        Apache Ant http://ant.apache.org
+        Apache Ant <a href="http://ant.apache.org">http://ant.apache.org</a>
       </li>
     </ul>
     <h2>
@@ -150,8 +150,9 @@
     </h3>
     <p>
       Our first task is to download Synapse. Open a web browser and access the
-      following URL: http://synapse.apache.org/download.html. You will then
-      see the list of available releases. Click on the latest version, and you
+      following URL:
+      <a href="http://synapse.apache.org/download.html">http://synapse.apache.org/download.html</a>.
+      You will then see the list of available releases. Click on the latest version, and you
       will be directed to the Synapse release download page. Now download the
       'Standard binary distribution' ZIP or tar.gz archive compatible with your
       operating system.
@@ -549,7 +550,7 @@ SOAPAction: null
       deeper and reveal the advanced features of Synapse. You can browse through
       the samples for your interested areas. If you have any issue regarding
       Synapse as a user, feel free ask it in the Synapse user mailing list
-      (http://synapse.apache.org/mail-lists.html).
+      (<a href="http://synapse.apache.org/mail-lists.html">http://synapse.apache.org/mail-lists.html</a>).
     </p>
     <p/>
     <p/>

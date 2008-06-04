@@ -98,15 +98,19 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		SecurityToken token = secManager.getSecurityToken(rmMsgCtx.getMessageContext());
 		
 		//we want to find valid sender beans
+		List possibleBeans = null;
+		int possibleBeanIndex = -10;
 		SenderBean findSenderBean = new SenderBean();
+		boolean secured = false;
 		if(token!=null && identifier==null){
+			secured = true;
 			if(log.isDebugEnabled()) log.debug("token found " + token);
 			//this means we have to scope our search for sender beans that belong to sequences that own the same token
 			String data = secManager.getTokenRecoveryData(token);
 			//first look for RMS beans
 			RMSBean finderRMS = new RMSBean();
 			finderRMS.setSecurityTokenData(data);
-			List possibleBeans = storageManager.getRMSBeanMgr().find(finderRMS);
+			possibleBeans = storageManager.getRMSBeanMgr().find(finderRMS);
 			
 			//try looking for RMD beans too
 			RMDBean finderRMD = new RMDBean();
@@ -121,8 +125,8 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			if(size>0){
 				//select one at random: TODO better method?
 				Random random = new Random ();
-				int itemToPick = random.nextInt(size);
-				RMSequenceBean selectedSequence = (RMSequenceBean)possibleBeans.get(itemToPick);
+				possibleBeanIndex = random.nextInt(size);
+				RMSequenceBean selectedSequence = (RMSequenceBean)possibleBeans.get(possibleBeanIndex);
 				findSenderBean.setSequenceID(selectedSequence.getSequenceID());
 				if(log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
 			}
@@ -132,7 +136,8 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				//return false; //TODO put this in once tested live
 			}
 		}
-			
+		
+		
 		//lookup a sender bean
 		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 		
@@ -148,47 +153,74 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			findSenderBean.setSequenceID(identifier.getIdentifier());
 		}
 		
-		// Set the time to send field to be now
-		findSenderBean.setTimeToSend(System.currentTimeMillis());
-		
-		//finding the beans that go with the criteria of the passed SenderBean
-		//The reSend flag is ignored for this selection, so there is no need to
-		//set it.
-		Collection collection = senderBeanMgr.find(findSenderBean);
-		
-		//removing beans that does not pass the resend test
-		for (Iterator it=collection.iterator();it.hasNext();) {
-			SenderBean bean = (SenderBean) it.next();
-			if (!bean.isReSend() && bean.getSentCount()>0)
-				it.remove();
-		}
-		
-		//selecting a bean to send RANDOMLY. TODO- Should use a better mechanism.
-		int size = collection.size();
-		int itemToPick=-1;
-		
-		boolean pending = false;
-		if (size>0) {
-			Random random = new Random ();
-			itemToPick = random.nextInt(size);
-		}
-
-		if (size>1)
-			pending = true;  //there are more than one message to be delivered using the makeConnection.
-							 //So the MessagePending header should have value true;
-		
-		Iterator it = collection.iterator();
-		
 		SenderBean senderBean = null;
-		for (int item=0;item<size;item++) {
-		    senderBean = (SenderBean) it.next();
-			if (item==itemToPick)
-				break;
-		}
+		boolean pending = false;
+		while (true){
+			// Set the time to send field to be now
+			findSenderBean.setTimeToSend(System.currentTimeMillis());
+			
+			//finding the beans that go with the criteria of the passed SenderBean
+			//The reSend flag is ignored for this selection, so there is no need to
+			//set it.
+			Collection collection = senderBeanMgr.find(findSenderBean);
+			
+			//removing beans that does not pass the resend test
+			for (Iterator it=collection.iterator();it.hasNext();) {
+				SenderBean bean = (SenderBean) it.next();
+				if (!bean.isReSend() && bean.getSentCount()>0)
+					it.remove();
+			}
+			
+			//selecting a bean to send RANDOMLY. TODO- Should use a better mechanism.
+			int size = collection.size();
+			int itemToPick=-1;
+			
+			pending = false;
+			if (size>0) {
+				Random random = new Random ();
+				itemToPick = random.nextInt(size);
+			}
 
-		if (senderBean==null) {
-			if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
-			return false;
+			if (size>1)
+				pending = true;  //there are more than one message to be delivered using the makeConnection.
+								 //So the MessagePending header should have value true;
+			
+			Iterator it = collection.iterator();
+			
+			senderBean = null;
+			for (int item=0;item<size;item++) {
+			    senderBean = (SenderBean) it.next();
+				if (item==itemToPick)
+					break;
+			}
+			
+			if (senderBean==null) {
+				//If secured try another sequence
+				//Remove old one from the list and pick another random one
+				if(secured){
+					possibleBeans.remove(possibleBeanIndex);
+					int possBeansSize = possibleBeans.size();
+					
+					if(possBeansSize > 0){
+						//select one at random: TODO better method?
+						Random random = new Random ();
+						possibleBeanIndex = random.nextInt(possBeansSize);
+						RMSequenceBean selectedSequence = (RMSequenceBean)possibleBeans.get(possibleBeanIndex);
+						findSenderBean.setSequenceID(selectedSequence.getSequenceID());
+						if(log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
+					}
+					else{
+						if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
+						return false;
+					}
+					
+				} else {
+					if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
+					return false;
+				}
+			} else {
+				break;
+			}
 		}
 	
 		if (transaction != null && transaction.isActive()) {

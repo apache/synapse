@@ -1107,18 +1107,6 @@
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
-        <!-- TODO remove this repository before actual release -->
-        <repository>
-            <id>temp-repo</id>
-            <name>Rampart and WSS4J release candidate Repository</name>
-            <url>http://people.apache.org/~ruwan/synapse/1_2/tmp_m2/</url>
-            <releases>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-        </repository>
     </repositories>
 
     <modules>

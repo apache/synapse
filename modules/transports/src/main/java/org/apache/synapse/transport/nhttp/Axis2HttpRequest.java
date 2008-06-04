@@ -133,7 +133,7 @@ public class Axis2HttpRequest {
                     "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
                 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                messageFormatter.writeTo(msgContext, format, baos, true);
+                messageFormatter.writeTo(msgContext, format, baos, false);
                 BasicHttpEntity entity = new BasicHttpEntity();
                 entity.setContentLength(baos.toByteArray().length);
                 ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
@@ -218,7 +218,7 @@ public class Axis2HttpRequest {
         if (!completed) {
             OutputStream out = new ContentOutputStream(outputBuffer);
             try {
-                messageFormatter.writeTo(msgContext, format, out, true);
+                messageFormatter.writeTo(msgContext, format, out, false);
             } catch (Exception e) {
                 Throwable t = e.getCause();
                 if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {

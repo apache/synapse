@@ -55,7 +55,7 @@ public class ConnectionPool {
                 while (!connections.isEmpty()) {
                     conn = (NHttpClientConnection) connections.remove(0);
 
-                    if (conn.isOpen()) {
+                    if (conn.isOpen() && !conn.isStale()) {
                         if (log.isDebugEnabled()) {
                             log.debug("A connection to host : " + host + " on port : " +
                                 port + " is available in the pool, and will be reused");

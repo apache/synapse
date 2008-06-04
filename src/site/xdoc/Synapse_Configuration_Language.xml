@@ -622,7 +622,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       endpoints in the first message and all successive messages for those
       sessions are directed to their associated endpoints. Currently there are two types
       of sessions supported in SAL endpoints. Namely HTTP transport based session
-      which identifies the sessions based on http cookies and the Client session which
+      which identifies the sessions based on http cookies and the client session which
       identifies the session by looking at a SOAP header sent by the client with the QName
       '{http://ws.apache.org/ns/synapse}ClientID'. The 'failover' attribute mentioned above
       is not applicable for session affinity based endpoints and it is always
@@ -684,7 +684,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       these as specified with the optional 'transports' attribute.
     </p>
     <p>
-      You can give a list of synapse server names where this proxy service
+      You can give a list of Synapse server names where this proxy service
       should be deployed using 'pinnedServers' attribute. It takes the server
       names separated by comma or space character. If there is no pinned server
       list then proxy service will be started in all server instances. If a
@@ -1091,7 +1091,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       executed only once just after the initialization of Synapse
     </p>
     <p>
-      You can give a list of synapse server names where this task should be
+      You can give a list of Synapse server names where this task should be
       started using pinnedServers attribute. Refer to the explanation of this
       attribute under proxy services for more information.
     </p>
@@ -1265,7 +1265,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     </p>
     <ul>
       <li>
-        Mercury2SequenceKey - can be an identifier specifying an Mercury
+        Mercury2SequenceKey - can be an identifier specifying a Mercury
         internal sequence key, and
       </li>
       <li>
@@ -1356,7 +1356,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
         </p>
     </ul>
     <p>
-      Further there are some variable prefixes defined in synapse XPaths
+      Further there are some variable prefixes defined in Synapse XPaths
       which can be usefull in writing the configurations;
     </p>
     <ul>
@@ -1365,7 +1365,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
         </li>
         <p>
             For example; expression="$ctx:RESPONSE" gives the value of the
-            synapse message context property with name 'RESPONSE'
+            Synapse message context property with name 'RESPONSE'
         </p>
         <li>
             axis2 - Prefix for Axis2 MessageContext properties
@@ -1450,9 +1450,9 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     <p>
       The &lt;makefault&gt; mediator transforms the current message into a fault
       message, but does NOT send it. The &lt;send&gt; mediator needs to be
-      invoked to send a fault message created this way. The fault message "to"
-      header is set to the "faultTo" of the original message if such a header
-      existed on the original message. If a 'version' attribute is specified,
+      invoked to send a fault message created this way. The fault message "To"
+      header is set to the "Fault-To" of the original message if such a header
+      exists on the original message. If a 'version' attribute is specified,
       the created fault message will be created as a selected SOAP 1.1, SOAP
       1.2 or POX fault.
     </p>
@@ -1469,8 +1469,8 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       selected element of the current message payload. If the source element is
       not specified, it defaults to the first child of the soap body. Optionally
       parameters (XSLT) could be passed into the transformations through the
-      'property' elements.The 'feature' elements defines any features which
-      should be set to the TransformerFactory by explicitly. The feature
+      'property' elements. The 'feature' element defines any features which
+      should be explicitly set to the TransformerFactory. The feature
       'http://ws.apache.org/ns/synapse/transform/feature/dom' turns on DOM based
       transformations instead of serializing elements into Byte streams and/or
       temporary files. Though this would be better in performance than using
@@ -1584,7 +1584,7 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
    &lt;/else&gt;
  &lt;/filter&gt;</pre>
     <p>In this case the filter condition remains as earlier and the succeeded messages will be
-       mediated using the the set of mediators enclosed in the then element in sequence, while
+       mediated using the the set of mediators enclosed in the 'then' element in sequence, while
        failed messages will be mediated using the set of mediators enclosed in the else element
        in sequence
     </p>

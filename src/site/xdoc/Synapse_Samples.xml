@@ -178,10 +178,10 @@
             </li>
             <li>
               <a href="#Sample12">Sample 12: One way messaging /
-              fireAndForget through synapse</a>
+              fireAndForget through Synapse</a>
             </li>
             <li>
-              <a href="#Sample13">Sample 13: Dual channel invocation through synapse</a>
+              <a href="#Sample13">Sample 13: Dual channel invocation through Synapse</a>
             </li>
           </ul>
         </li>
@@ -254,7 +254,7 @@
             </li>
             <li>
               <a href="#Sample155">Sample 155: Dual channel invocation
-              on both client side and server side of synapse with Proxy Services</a>
+              on both client side and server side of Synapse with Proxy Services</a>
             </li>
           </ul>
         </li>
@@ -313,7 +313,7 @@
           </ul>
         </li>
         <li>
-          <a href="#Task">Introduction to synapse tasks</a>
+          <a href="#Task">Introduction to Synapse tasks</a>
           <ul>
             <li>
               <a href="#Sample300">Sample 300: Introduction to tasks with
@@ -426,7 +426,7 @@
               <ul>
                 <li>
                   <a href="#Sample420">Sample 420: Simple cache implemented
-                  on synapse for the actual service</a>
+                  on Synapse for the actual service</a>
                 </li>
               </ul>
             </li>
@@ -1241,11 +1241,11 @@
 &lt;/definitions&gt;</pre>
     <h2>
       <a name="Sample12" id="Sample12">Sample 12: One way messaging /
-      fireAndForget through synapse</a>
+      fireAndForget through Synapse</a>
     </h2>
     <p>
       <strong>Objective: Demonstrate one-way messaging / fireAndForget
-      through synapse</strong>
+      through Synapse</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> Start the Axis2 server
@@ -1268,11 +1268,11 @@
       Synapse in turns replies to the client with a HTTP 202 acknowledgment
     </p>
     <h2>
-      <a name="Sample13" id="Sample13">Sample 13: Dual channel invocation through synapse</a>
+      <a name="Sample13" id="Sample13">Sample 13: Dual channel invocation through Synapse</a>
     </h2>
     <p>
       <strong>Objective: Demonstrate dual channel messaging
-      through synapse</strong>
+      through Synapse</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> Start the Axis2 server
@@ -1296,8 +1296,8 @@ Standard dual channel :: Stock price = $57.16686934968289</pre>
     <p>
       If you send your client request through TCPmon, you will notice that
       Synapse replies to the client with a HTTP 202 acknowledgment when you send the request and
-      the communication between synapse and the server happens on a single channel and then you
-      get the response back from synapse to the clients callback in a different channel (which
+      the communication between Synapse and the server happens on a single channel and then you
+      get the response back from Synapse to the clients callback in a different channel (which
       cannot be observed through TCPmon)
     </p>
     <p>
@@ -1558,7 +1558,7 @@ Content-ID:
       Start Synapse with sample configuration 52. (i.e. synapse -sample 52)
     </p>
     <p>
-      Deploy the LoadbalanceFailoverService by switching to &lt;synapse
+      Deploy the LoadbalanceFailoverService by switching to &lt;Synapse
       installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService
       directory and running ant.
     </p>
@@ -1567,7 +1567,7 @@ Content-ID:
       9003 and give some unique names to each server.
     </p>
     <p>
-      Example commands to run sample Axis2 servers from the &lt;synapse
+      Example commands to run sample Axis2 servers from the &lt;Synapse
       installation directory&gt;/samples/axis2Server directory in Linux are
       listed below:
     </p>
@@ -2570,12 +2570,12 @@ Connection: Keep-Alive
     <p>
       The proxy service will receive secure messages with security headers which
       are MustUnderstand. But hence element 'engageSec' is not present in the
-      proxy configuration synapse will not engage that Apache Rampart on this
+      proxy configuration Synapse will not engage that Apache Rampart on this
       proxy service. It is expected that an MustUnderstand failure exception on
       the AxisEngine would occur before the message arrives Synapse. But Synapse
       handles this message and gets it in by setting all the headers which are
       MustUnderstand and not processed to processed state. This will enable
-      synapse to route the messages without reading the Security headers (just
+      Synapse to route the messages without reading the Security headers (just
       routing the messages from client to service, both of which are secure). To
       execute the client, send a stock quote request to the proxy service, and
       sign and encrypt the request by specifying the client side security policy
@@ -2589,10 +2589,10 @@ Connection: Keep-Alive
       http://localhost:8280/soap/StockQuoteProxy?wsdl reveals the security
       policy attachments are not there and security is not engaged. When sending
       the message to the backend service, you could verify that the security
-      headers were there as in the original message to synapse from client, and
+      headers were there as in the original message to Synapse from client, and
       that the response received does use WS-Security, and forwarded back to the
       client without any modification. You should note that this wont be a
-      security hole because the message inside synapse is signed and encrypted
+      security hole because the message inside Synapse is signed and encrypted
       and can only be forwarded to a secure service to be useful.
     </p>
     <h2>
@@ -2673,7 +2673,7 @@ Connection: Keep-Alive
     </div>
     <h2>
       <a name="Sample155" id="Sample155">Sample 155: Dual channel invocation
-      on both client side and serverside of synapse with Proxy Services</a>
+      on both client side and serverside of Synapse with Proxy Services</a>
     </h2>
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="StockQuoteProxy"&gt;
@@ -2701,7 +2701,7 @@ Connection: Keep-Alive
     <p/>
     <p>
       This sample will show the action of the dual channel invocation within client and Synapse
-      as well as within synapse and the actual server. Note that if you want to enable dual
+      as well as within Synapse and the actual server. Note that if you want to enable dual
       channel invocation you need to set the separateListener attribute to true of the
       enableAddressing element of the endpoint.
     </p>
@@ -2714,14 +2714,14 @@ Connection: Keep-Alive
       In the above example, the request received is forwarded to the sample service
       hosted on Axis2 and the endpoint specifies to enable addressing and do the invocation
       over a dual channel. If you observe this message flow by using a TCPmon, you could see that
-      on the channel you send the request to synapse the response has been written as an
-      HTTP 202 Accepted, where as the real response from synapse will come over a different channel
+      on the channel you send the request to Synapse the response has been written as an
+      HTTP 202 Accepted, where as the real response from Synapse will come over a different channel
       which cannot be obsesrved unless you use tcpdump to dump all the TCP level messages.
     </p>
     <p>
-      At the same time you can observe the behaviour of the invocation between synapse and
-      the actual Axis2 service, where you can see a 202 Accepted message being delivered to synapse
-      as the response to the request. The actual response will be delivered to synapse over a
+      At the same time you can observe the behaviour of the invocation between Synapse and
+      the actual Axis2 service, where you can see a 202 Accepted message being delivered to Synapse
+      as the response to the request. The actual response will be delivered to Synapse over a
       different channel.
     </p>
     <h1>
@@ -3682,20 +3682,20 @@ Transfer-Encoding: chunked
     <p>
       <strong>Prerequisites:</strong><br/>
       Build the SimpleStockQuoteService as mentioned above and start the
-      sample axis2 server before staring synapse.
+      sample axis2 server before staring Synapse.
     </p>
     <p>
-      When ever synapse gets started and initialized, this task will run
-      periodically in 5 second intervals. You could limit the number of times
-      that you want to run this task by adding a count attribute with an integer
-      as the value, if the count is not present as in this sample this task will
+      When ever Synapse gets started with this configuration (i.e. ./synapse.sh -sample 300)
+      and initialized, this task will run periodically in 5 second intervals. You could
+      limit the number of times that you want to run this task by adding a count attribute
+      with an integer as the value, if the count is not present as in this sample this task will
       run forever.
     </p>
     <p>
       One can write his own task class implementing the
       org.apache.synapse.startup.Task interface and implementing the execute
       method to do the task. For this particular sample we have used the
-      MessageInjector which just injects a message specified into synapse environment.
+      MessageInjector which just injects a message specified into Synapse environment.
     </p>
     <h1>
       <a name="AdvancedMediation" id="AdvancedMediation">Advanced mediations
@@ -4625,15 +4625,15 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
     <p>
       Above configuration specifies a throttle mediator inside the in mediator.
       Therefore, all request messages directed to the main sequence will be
-      subjected to throttling. Throttle mediator has policy, onAccept and
-      onReject tags at top level. Policy tag specifies the throttling policy to
-      be applied for messages. In this sample policy contains only component
+      subjected to throttling. Throttle mediator has 'policy', 'onAccept' and
+      'onReject' tags at top level. The 'policy' tag specifies the throttling policy for
+      throttling messages. This sample policy only contains a component
       called "MaximumConcurrentAccess". This indicates the maximum number of
-      concurrent request that may have passed through the synapse on a single
-      unit of time. To test concurrency throttling ,it is required to send
-      concurrent request to synapse. For synapse with above configuration, if
-      client sends 20 requests concurrently, then approximately half of those will
-      succeed. The client command is as follows.
+      concurrent requests that can pass through Synapse on a single
+      unit of time. To test concurrency throttling, it is required to send
+      concurrent requests to Synapse. If Synapse with above configuration, receives
+      20 requests concurrently from clients, then approximately half of those will
+      succeed while the others being throttled. The client command to try this is as follows.
     </p>
 <pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</pre>
     <p/>
@@ -5229,7 +5229,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       <strong>Objective: Demonstrate the use of Iterate mediator to
       split the messages in to parts and process them asynchronously and then
-      aggregate the responses coming in to synapse</strong>
+      aggregate the responses coming in to Synapse</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService
@@ -5240,10 +5240,10 @@ Discounted price: 138.77458254967408</pre>
       400).
     </p>
     <p>
-      In this sample, the message sent to synapse is comprised of a number of
-      elements of the same type. When synapse receives this
+      In this sample, the message sent to Synapse is comprised of a number of
+      elements of the same type. When Synapse receives this
       message it will iterate through those elements and then will send to the
-      specified endpoint. When all the responses appear to synapse then those
+      specified endpoint. When all the responses appear to Synapse then those
       messages will be aggregated to form the resultant response and will send back
       to the client.
     </p>
@@ -5266,7 +5266,7 @@ Discounted price: 138.77458254967408</pre>
     </p>
     <h2>
       <a name="Sample420" id="Sample420">Sample 420: Simple cache implemented
-      on synapse for the actual service</a>
+      on Synapse for the actual service</a>
     </h2>
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
@@ -5299,10 +5299,10 @@ Discounted price: 138.77458254967408</pre>
       420).
     </p>
     <p>
-      In this sample, the message sent to synapse is checked for an existing
+      In this sample, the message sent to Synapse is checked for an existing
       cached response by calculating the hash value of the request. If there is
-      a cache hit in synapse then this request will not be forwarded to the
-      actual service, rather synapse responds to the client with the cached
+      a cache hit in Synapse then this request will not be forwarded to the
+      actual service, rather Synapse responds to the client with the cached
       response. In case of a cache miss that particular message will be
       forwarded to the actual service and caches that response in the out path
       for the use of consecutive requests of the same type.

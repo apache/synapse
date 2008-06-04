@@ -414,7 +414,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 // see comment above on the reasoning
                 out.write(new byte[0]);
             } else {
-                messageFormatter.writeTo(msgContext, format, out, true);
+                messageFormatter.writeTo(msgContext, format, out, false);
             }
             out.close();
         } catch (IOException e) {
@@ -446,7 +446,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         try {
-            messageFormatter.writeTo(msgContext, format, out, true);
+            messageFormatter.writeTo(msgContext, format, out, false);
             out.close();
         } catch (IOException e) {
             handleException("IO Error sending response message", e);

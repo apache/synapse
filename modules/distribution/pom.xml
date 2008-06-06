@@ -35,6 +35,47 @@
 
     <build>
     <plugins>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>process-resources</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>org.apache.sandesha2</groupId>
+                   <artifactId>sandesha2-core</artifactId>
+                   <version>${pom.version}</version>
+                   <classifier>sources</classifier>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/sources/</outputDirectory>
+                 </artifactItem>
+                 <artifactItem>
+                   <groupId>org.apache.sandesha2</groupId>
+                   <artifactId>sandesha2-interop</artifactId>
+                   <version>${pom.version}</version>
+                   <classifier>sources</classifier>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/sources/</outputDirectory>
+                 </artifactItem>
+                 <artifactItem>
+                   <groupId>org.apache.sandesha2</groupId>
+                   <artifactId>sandesha2-rampart-integration</artifactId>
+                   <version>${pom.version}</version>
+                   <classifier>sources</classifier>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/sources/</outputDirectory>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
 	<plugin>
 	    <groupId>org.apache.maven.plugins</groupId>
 	    <artifactId>maven-antrun-plugin</artifactId>
@@ -57,15 +98,9 @@
 							     doctitle="Sandesha2"
 							     bottom="Copyright &#169; 2007 Apache Web Services Project. All Rights Reserved."
 							     >
-							    <packageset dir="../../modules/core/src/main/java" defaultexcludes="yes">
+							    <packageset dir="target/sources/" defaultexcludes="yes">
 								    <include name="org/apache/sandesha2/**"/>
 							    </packageset>
-							    <packageset dir="../../modules/interop/src/main/java" defaultexcludes="yes">
-								    <include name="org/apache/sandesha2/**"/>
-							    </packageset>    
-							    <packageset dir="../../modules/rampart-integration/src/main/java" defaultexcludes="yes">
-								    <include name="org/apache/sandesha2/**"/>
-							    </packageset>							
 					      </javadoc>
 				        </tasks>
 				    </configuration>

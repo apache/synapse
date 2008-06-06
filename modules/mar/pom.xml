@@ -43,27 +43,33 @@
 		
         <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <id>create-test-resources</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <!--copy jboss client jars into service archive-->
-                                <copydir src="../core/target/classes"
-                                      dest="target/classes"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>		
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>process-resources</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>org.apache.sandesha2</groupId>
+                   <artifactId>sandesha2-core</artifactId>
+                   <version>${pom.version}</version>
+                   <type>jar</type>
+                   <overWrite>false</overWrite>
+                   <outputDirectory>${project.build.directory}/classes/</outputDirectory>
+                   <includes>**/*.class,**/*.xml</includes>
+                   <excludes>**/*test.class</excludes>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>	
 
 
             <plugin>

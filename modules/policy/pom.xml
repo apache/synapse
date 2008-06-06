@@ -42,33 +42,33 @@
         </resources>
         <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <id>create-test-resources</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <tasks>
-                				<!--copy class files required for policy jar from core module-->
-								<copy todir="target/classes">
-				   					<fileset dir="../core/target/classes" includes="**/policy/**/*.class"/>
-				   					<fileset dir="../core/target/classes" includes="**/*.properties"/>
-				   					<fileset dir="../core/target/classes" includes="org/apache/sandesha2/i18n/**" />
-				   					<fileset dir="../core/target/classes" includes="**/*Sandesha2Constants*.class"/>
-				   					<fileset dir="../core/target/classes" includes="**/*SandeshaException*.class"/>
-								</copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>		
-
+<plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>process-resources</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>org.apache.sandesha2</groupId>
+                   <artifactId>sandesha2-core</artifactId>
+                   <version>${pom.version}</version>
+                   <type>jar</type>
+                   <overWrite>false</overWrite>
+                   <outputDirectory>${project.build.directory}/classes/</outputDirectory>
+                   <includes>**/policy/**/*.class,**/*.properties,org/apache/sandesha2/i18n/**,**/*Sandesha2Constants*.class,**/*SandeshaException*.class</includes>
+                   <excludes>META-INF/maven/org.apache.sandesha2/sandesha2-core/**</excludes>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

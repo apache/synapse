@@ -27,14 +27,14 @@
 		
 		<property name="build.repo.dir" value="${build.dir}/repos" />
 		<property name="server.dist.path" value="${build.repo.dir}/server" />
-		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
+		<property name="repo.addressing.mar" value="${build.dir}/copiedmars/addressing-${addressing.version}.mar" />
 			
 		<mkdir dir="${server.dist.path}" />
 		<mkdir dir="${server.dist.path}/modules" />
 		<mkdir dir="${server.dist.path}/services" />
 		
 		<copy file="${basedir}/test-resources/server_axis2.xml" todir="${server.dist.path}" />
-		<copy file="${basedir}/../mar/target/sandesha2-${sandesha2.version}.mar" todir="${server.dist.path}/modules" /> 
+		<copy file="${build.dir}/copiedmars/sandesha2-${sandesha2.version}.mar" todir="${server.dist.path}/modules" /> 
 		
 		<copy todir="${server.dist.path}/services" >
             <fileset dir="../samples/target/aars">
@@ -51,13 +51,13 @@
 
 		<property name="build.repo.dir" value="${build.dir}/repos" />
 		<property name="client.dist.path" value="${build.repo.dir}/client" />
-		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
+		<property name="repo.addressing.mar" value="${build.dir}/copiedmars/addressing-${addressing.version}.mar" />
 			
 		<mkdir dir="${client.dist.path}" />
 		<mkdir dir="${client.dist.path}/modules" />
 		
 		<copy file="${basedir}/test-resources/client_axis2.xml" todir="${client.dist.path}" />
-		<copy file="${basedir}/../mar/target/sandesha2-${sandesha2.version}.mar" todir="${client.dist.path}/modules" />
+		<copy file="${build.dir}/copiedmars/sandesha2-${sandesha2.version}.mar" todir="${client.dist.path}/modules" />
 		
 		<!-- Copying dependent mar files --> 
 		<copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
@@ -85,7 +85,7 @@
 		</copy>
 
 		<!-- Switch on serialization in the module.xml file -->
-		<unjar src="../mar/target/sandesha2-${sandesha2.version}.mar" dest="${serialize.temp.path}"/>
+		<unjar src="${build.dir}/copiedmars/sandesha2-${sandesha2.version}.mar" dest="${serialize.temp.path}"/>
 		<replace file="${serialize.temp.path}/META-INF/module.xml" 
 		  token="&lt;!-- &lt;sandesha2:UseMessageSerialization>true&lt;/sandesha2:UseMessageSerialization> -->"
 		  value="&lt;sandesha2:UseMessageSerialization>true&lt;/sandesha2:UseMessageSerialization>"/>
@@ -101,10 +101,10 @@
 		<property name="secure.client.path" value="${build.dir}/repos/secure-client"/>
 		<property name="secure.server.path" value="${build.dir}/repos/secure-server"/>
          
-		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
-		<property name="repo.rampart.mar" value="${local.repo}/org/apache/rampart/rampart/${rampart.version}/rampart-${rampart.version}.mar" />
-		<property name="repo.rampart.core.jar" value="${local.repo}/org/apache/rampart/rampart-core/${rampart.version}/rampart-core-${rampart.version}.jar" />
-		<property name="repo.rampart.policy.jar" value="${local.repo}/org/apache/rampart/rampart-policy/${rampart.version}/rampart-policy-${rampart.version}.jar" />
+		<property name="repo.addressing.mar" value="${build.dir}/copiedmars/addressing-${addressing.version}.mar" />
+		<property name="repo.rampart.mar" value="${build.dir}/copiedmars/rampart-${rampart.version}.mar" />
+		<property name="repo.rampart.core.jar" value="${build.dir}/copiedjars/rampart-core-${rampart.version}.jar" />
+		<property name="repo.rampart.policy.jar" value="${build.dir}/copiedjars/rampart-policy-${rampart.version}.jar" />
 			
 		<property name="secure.temp.path" value="${build.dir}/temp/secure" />
 		<mkdir dir="${secure.temp.path}" />
@@ -122,7 +122,7 @@
 		</copy>
 
 		<!-- Replace the security manager in the module.xml file -->
-		<unjar src="../mar/target/sandesha2-${sandesha2.version}.mar" dest="${secure.temp.path}"/>
+		<unjar src="${build.dir}/copiedmars/sandesha2-${sandesha2.version}.mar" dest="${secure.temp.path}"/>
 		<replace file="${secure.temp.path}/META-INF/module.xml" 
 			token="dummy.DummySecurityManager"  value="UnitTestSecurityManager"/>
 		<jar jarfile="${secure.client.path}/modules/sandesha2-UnitTest.mar" basedir="${secure.temp.path}"/>

@@ -41,41 +41,33 @@
             </resource>
         </resources>
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <id>create-test-resources</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <tasks>
-
-                                <!--copy sandesha client classes from core module-->
-                                <copy overwrite="yes"
-                                      file="../core/target/classes/org/apache/sandesha2/client/SandeshaClientConstants.class"
-                                      tofile="target/classes/org/apache/sandesha2/client/SandeshaClientConstants.class"/>
-                                <copy overwrite="yes"
-                                      file="../core/target/classes/org/apache/sandesha2/client/SandeshaListener.class"
-                                      tofile="target/classes/org/apache/sandesha2/client/SandeshaListener.class"/>
-                                <copy overwrite="yes"
-                                      file="../core/target/classes/org/apache/sandesha2/client/SequenceReport.class"
-                                      tofile="target/classes/org/apache/sandesha2/client/SequenceReport.class"/>
-
-
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>		
-
-
-            <plugin>
+<plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>process-resources</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>org.apache.sandesha2</groupId>
+                   <artifactId>sandesha2-core</artifactId>
+                   <version>${pom.version}</version>
+                   <type>jar</type>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/classes/</outputDirectory>
+                   <includes>org/apache/sandesha2/client/SandeshaClientConstants.class,org/apache/sandesha2/client/SandeshaListener.class,org/apache/sandesha2/client/SequenceReport.class</includes>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>	
+             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>

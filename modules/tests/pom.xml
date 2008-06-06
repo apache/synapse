@@ -53,7 +53,68 @@
                     <target>1.4</target>
                 </configuration>
             </plugin>
-			
+
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.sandesha2</groupId>
+                  <artifactId>sandesha2</artifactId>
+                  <version>${pom.version}</version>
+                  <type>mar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.axis2</groupId>
+                  <artifactId>addressing</artifactId>
+                  <version>${addressing.version}</version>
+                  <type>mar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.rampart</groupId>
+                  <artifactId>rampart</artifactId>
+                  <version>${rampart.version}</version>
+                  <type>mar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.rampart</groupId>
+                  <artifactId>rampart-core</artifactId>
+                  <version>${rampart.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/copiedjars</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.rampart</groupId>
+                  <artifactId>rampart-policy</artifactId>
+                  <version>${ramprt.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/copiedjars</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/wars</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>			
+
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>

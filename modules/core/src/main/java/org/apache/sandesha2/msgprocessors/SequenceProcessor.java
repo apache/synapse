@@ -170,7 +170,7 @@ public class SequenceProcessor {
 		}
 		
 		EndpointReference replyTo = rmMsgCtx.getReplyTo();
-		String key = SandeshaUtil.getUUID(); // key to store the message.
+		
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
 		long highestInMsgNo = bean.getHighestInMessageNumber();
@@ -371,7 +371,7 @@ public class SequenceProcessor {
 		// it directly ourselves.
 		InvokerWorker worker = null;
 		if (SandeshaUtil.isInOrder(msgCtx)) {
-		    
+			String key = SandeshaUtil.getUUID(); // key to store the message.
 			InvokerBean invokerBean = new InvokerBean(key, msgNo, sequenceId);
 			ContextManager contextMgr = SandeshaUtil.getContextManager(configCtx);
 

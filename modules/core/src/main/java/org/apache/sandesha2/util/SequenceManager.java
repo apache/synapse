@@ -65,8 +65,7 @@ public class SequenceManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceManager::setupNewSequence");
 		
-		String sequenceId = SandeshaUtil.getUUID();
-
+		
 		// Generate the new RMD Bean
 		RMDBean rmdBean = new RMDBean();
 
@@ -119,7 +118,7 @@ public class SequenceManager {
 			rmdBean.setSecurityTokenData(tokenData);
 		}		
 		
-		rmdBean.setSequenceID(sequenceId);
+		rmdBean.setSequenceID(SandeshaUtil.getUUID());
 		rmdBean.setNextMsgNoToProcess(1);
 		
 		rmdBean.setToAddress(to.getAddress());

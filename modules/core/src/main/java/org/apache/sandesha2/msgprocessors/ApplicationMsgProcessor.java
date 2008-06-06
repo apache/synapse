@@ -159,9 +159,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (msgContext.getMessageID() == null)
 			msgContext.setMessageID(SandeshaUtil.getUUID());
 
-		String storageKey = SandeshaUtil.getUUID(); // the key which will be
-													// used to store this
-													// message.
+		
 
 		/*
 		 * Internal sequence id is the one used to refer to the sequence (since
@@ -440,8 +438,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(message);
 			}
 	
-			String messageId1 = SandeshaUtil.getUUID();
+			
 			if (rmMsgCtx.getMessageId() == null) {
+				String messageId1 = SandeshaUtil.getUUID();
 				rmMsgCtx.setMessageId(messageId1);
 			}
 	
@@ -461,9 +460,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 			
 			// processing the response if not an dummy.
-			if (!dummyMessage)
+			if (!dummyMessage){
+				String storageKey = SandeshaUtil.getUUID(); 
 				processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager, tran, hasUserTransaction);
-			
+			}
 			//Users wont be able to get reliable response msgs in the back channel in the back channel of a 
 			//reliable message. If he doesn't have a endpoint he should use polling mechanisms.
 			msgContext.pause();

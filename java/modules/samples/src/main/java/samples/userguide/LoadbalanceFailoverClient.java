@@ -74,7 +74,7 @@ public class LoadbalanceFailoverClient {
 
     public String sessionlessClient() throws AxisFault {
 
-        String synapsePort = "8080";
+        String synapsePort = "8280";
         int iterations = 100;
         boolean infinite = true;
 
@@ -176,7 +176,7 @@ public class LoadbalanceFailoverClient {
      */
     private void sessionfullClient() {
 
-        String synapsePort = "8080";
+        String synapsePort = "8280";
         int iterations = 100;
         boolean infinite = true;
 
@@ -302,7 +302,7 @@ public class LoadbalanceFailoverClient {
         envelope.addChild(header);
 
         OMNamespace synNamespace = soapFactory.
-            createOMNamespace("http://ws.apache.org/namespaces/synapse", "syn");
+            createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
         OMElement clientIDElement = soapFactory.createOMElement("ClientID", synNamespace);
         clientIDElement.setText(clientID);
         header.addChild(clientIDElement);

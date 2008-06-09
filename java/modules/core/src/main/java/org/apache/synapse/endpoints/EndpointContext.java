@@ -26,10 +26,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 
 /**
- * Keeps the states of the endpoint.This hides where those states are kept .For a cluster environment
- * ,all states are kept in the axis2 configuration context in order to replicate those states so that
- * other synapse instance in the same cluster can see those changes . This class can be evolved to
- * keep any run time states related to the endpoint .For a non-clustered environment ,
+ * Keeps the states of the endpoint.This hides where those states are kept .For a cluster
+ * environment,all states are kept in the axis2 configuration context in order to replicate those
+ * states so that other synapse instance in the same cluster can see those changes . This class can
+ * be evolved to keep any run time states related to the endpoint .For a non-clustered environment,
  * all data are kept locally.
  * <p/>
  * This class provide the abstraction need to separate the dynamic data from the static data and
@@ -41,7 +41,7 @@ public class EndpointContext {
     private static final Log log = LogFactory.getLog(EndpointContext.class);
 
     /* The  static constant only for construct key prefix for each property in endpoint context
-     *as it is need when those property state going to replicate in a cluster env. */
+     * as it is need when those property state going to replicate in a cluster env. */
     private static final String ACTIVE = "active";
     private static final String RECOVER_ON = "recover_on";
     private static final String UNDERSCORE_STRING = "_";
@@ -53,13 +53,14 @@ public class EndpointContext {
     /* Time to recover a failed endpoint.*/
     private long recoverOn = Long.MAX_VALUE;
 
-    /*The axis configuration context-  this will hold the all callers states
+    /* The axis configuration context-  this will hold the all callers states
      * when doing throttling in a clustered environment. */
     private ConfigurationContext configCtx;
 
-    /*The key for 'active' attribute and this is used when this attribute value being replicated */
+    /* The key for 'active' attribute and this is used when this attribute value being replicated */
     private String activePropertyKey;
-    /*The key for 'recoverOn' attribute and this is used when this attribute value being replicated */
+    /* The key for 'recoverOn' attribute and this is used when this attribute value being
+     * replicated */
     private String recoverOnPropertyKey;
 
     /* Is this env. support clustering*/
@@ -232,12 +233,16 @@ public class EndpointContext {
 
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("Going to replicate the property with key : " + key +
+                    log.debug("Start replicating the property with key : " + key +
                             " value : " + value);
                 }
 
                 configCtx.setProperty(key, value);
                 Replicator.replicate(configCtx, new String[]{key});
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Completed replication of the property with key : " + key);
+                }
 
             } catch (ClusteringFault clusteringFault) {
                 handleException("Error during the replicating states ", clusteringFault);
@@ -251,7 +256,6 @@ public class EndpointContext {
      * @param msg The error message
      */
     protected void handleException(String msg) {
-
         log.error(msg);
         throw new SynapseException(msg);
     }
@@ -263,7 +267,6 @@ public class EndpointContext {
      * @param e   The exception
      */
     protected void handleException(String msg, Exception e) {
-
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }

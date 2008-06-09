@@ -253,8 +253,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 			mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
 			mc.getEnvelope().addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            handleException("Unable to attach the SOAP envelope to " +
+                    "the created new message context", e);
+        }
 
         return mc;
     }
@@ -332,6 +333,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      */
     public void setInitialized(boolean state) {
         this.initialized = state;
+    }
+
+    private void handleException(String message, Throwable e) {
+        log.error(message, e);
+        throw new SynapseException(message, e);
     }
 
 }

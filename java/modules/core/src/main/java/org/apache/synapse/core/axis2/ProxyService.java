@@ -25,12 +25,14 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -305,7 +307,7 @@ public class ProxyService {
 
                         wsdlToAxisServiceBuilder.setBaseUri(
                                 wsdlURI != null ? wsdlURI.toString() :
-                                        System.getProperty(SynapseConstants.SYNAPSE_HOME));
+                                        ServerManager.getInstance().getSynapseHome());
 
                         if (trace()) {
                             trace.info("Setting up custom resolvers");
@@ -523,8 +525,9 @@ public class ProxyService {
 
     private Policy getPolicyFromKey(String key, SynapseConfiguration synCfg) {
 
-        return PolicyEngine.getPolicy(SynapseConfigUtils.getStreamSource(
-                synCfg.getEntry(key)).getInputStream());
+        synCfg.getEntryDefinition(key);
+        return PolicyEngine.getPolicy(
+                SynapseConfigUtils.getStreamSource(synCfg.getEntry(key)).getInputStream());
     }
 
     /**
@@ -551,8 +554,10 @@ public class ProxyService {
                 auditWarn("Unable to find the SynapseEnvironment. " +
                     "Components of the proxy service may not be initialized");
             }
-            
-            axisConfig.getServiceForActivation(this.getName()).setActive(true);
+
+            AxisService as = axisConfig.getServiceForActivation(this.getName());
+            as.setActive(true);
+            axisConfig.notifyObservers(AxisEvent.SERVICE_START, as);
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
         } else {
@@ -583,9 +588,10 @@ public class ProxyService {
                 AxisService as = axisConfig.getService(this.getName());
                 if (as != null) {
                     as.setActive(false);
+                    axisConfig.notifyObservers(AxisEvent.SERVICE_STOP, as);
                 }
                 this.setRunning(false);
-                auditInfo("Started the proxy service : " + name);
+                auditInfo("Stopped the proxy service : " + name);
             } catch (AxisFault axisFault) {
                 handleException("Error stopping the proxy service : " + name, axisFault);
             }

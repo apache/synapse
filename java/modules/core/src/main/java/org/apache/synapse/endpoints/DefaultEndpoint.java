@@ -19,14 +19,11 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.axis2.clustering.ClusterManager;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 
@@ -40,8 +37,9 @@ import java.util.Stack;
  */
 public class DefaultEndpoint extends FaultHandler implements Endpoint {
 
-    private static final Log log = LogFactory.getLog(DefaultEndpoint.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
+    protected Log log;
+    
+    protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
@@ -61,11 +59,9 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
      */
     private Endpoint parentEndpoint = null;
 
-    /**
-     * The endpoint context , place holder for keep any runtime states related to the endpoint
-     */
-    private final EndpointContext endpointContext = new EndpointContext();
-
+    public DefaultEndpoint() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     public EndpointDefinition getEndpoint() {
         return endpoint;
@@ -88,7 +84,7 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
      * processed
      *
      * @param synMessageContext not being used
-     * @return true 
+     * @return true
      */
     public boolean isActive(MessageContext synMessageContext) {
         return true;
@@ -98,7 +94,7 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
      * since this is a virtual representation of an endpoint and the epr changes from message
      * to message setting active state doesn't have a meaning
      *
-     * @param active not being used
+     * @param active            not being used
      * @param synMessageContext not being used
      */
     public synchronized void setActive(boolean active, MessageContext synMessageContext) {

@@ -21,66 +21,23 @@ package org.apache.synapse.endpoints;
 
 import org.apache.axis2.clustering.ClusterManager;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 
-import java.util.Stack;
-
 /**
  * This class represents an actual endpoint to send the message. It is responsible for sending the
  * message, performing retries if a failure occurred and informing the parent endpoint if a failure
  * couldn't be recovered.
  */
-public class AddressEndpoint extends FaultHandler implements Endpoint {
-
-    private static final Log log = LogFactory.getLog(AddressEndpoint.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
-    /**
-     * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
-     * of indirect endpoints.
-     */
-    private String name = null;
-
-    /**
-     * Stores the endpoint details for this endpoint. Details include EPR, WS-Addressing
-     * information, WS-Security information, etc.
-     */
-    private EndpointDefinition endpoint = null;
-
-    /**
-     * Parent endpoint of this endpoint if this used inside another endpoint. Possible parents are
-     * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects.
-     */
-    private Endpoint parentEndpoint = null;
+public class AddressEndpoint extends DefaultEndpoint {
 
     /**
      * The endpoint context , place holder for keep any runtime states related to the endpoint
      */
     private final EndpointContext endpointContext = new EndpointContext();
-
-
-    public EndpointDefinition getEndpoint() {
-        return endpoint;
-    }
-
-    public void setEndpoint(EndpointDefinition endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name.trim();
-    }
 
     /**
      * Checks if the endpoint is active (failed or not). If endpoint is in failed state and
@@ -98,10 +55,16 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             if (System.currentTimeMillis() > recoverOn) {
                 active = true;
                 endpointContext.setActive(true);
-                endpointContext.setRecoverOn(0);
+                endpointContext.setRecoverOn(0);                       
 
             }
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("AddressEndpoint with name '" + getName() + "' is in "
+                    + (active ? "active" : "inactive") + " state");
+        }
+
         return active;
     }
 
@@ -118,6 +81,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         // this method simultaneously.
 
         if (!active) {
+            EndpointDefinition endpoint = getEndpoint();
             if (endpoint.getSuspendOnFailDuration() != -1) {
                 // Calculating a new value by adding suspendOnFailDuration to current time.
                 // as the endpoint is set as failed
@@ -171,9 +135,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         if (endPointName == null) {
 
             if (traceOrDebugOn && isClusteringEnable) {
-                log.warn("In a clustering environment , the endpoint  name should be specified" +
-                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
-                        "functioned correctly if there are more than one anonymous endpoints. ");
+                log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);
             }
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
         }
@@ -187,6 +149,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             }
         }
 
+        EndpointDefinition endpoint = getEndpoint();
         // Setting Required property to collect the End Point statistics
         boolean statisticsEnable
                 = (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
@@ -232,66 +195,11 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         synCtx.getEnvironment().send(endpoint, synCtx);
     }
 
-    public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-        // nothing to do as this is a leaf level endpoint
-    }
-
-    public void setParentEndpoint(Endpoint parentEndpoint) {
-        this.parentEndpoint = parentEndpoint;
-    }
-
     public void onFault(MessageContext synCtx) {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
         setActive(false, synCtx);
-
-        if (parentEndpoint != null) {
-            parentEndpoint.onChildEndpointFail(this, synCtx);
-        } else {
-            Stack faultStack = synCtx.getFaultStack();
-            if (!faultStack.isEmpty()) {
-                ((FaultHandler) faultStack.pop()).handleFault(synCtx);
-            }
-        }
-    }
-
-    /**
-     * Should this mediator perform tracing? True if its explicitly asked to
-     * trace, or its parent has been asked to trace and it does not reject it
-     *
-     * @param msgCtx the current message
-     * @return true if tracing should be performed
-     */
-    protected boolean isTraceOn(MessageContext msgCtx) {
-        return
-                (endpoint.getTraceState() == SynapseConstants.TRACING_ON) ||
-                        (endpoint.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                                msgCtx.getTracingState() == SynapseConstants.TRACING_ON);
-    }
-
-    /**
-     * Is tracing or debug logging on?
-     *
-     * @param isTraceOn is tracing known to be on?
-     * @return true, if either tracing or debug logging is on
-     */
-    protected boolean isTraceOrDebugOn(boolean isTraceOn) {
-        return isTraceOn || log.isDebugEnabled();
-    }
-
-    /**
-     * Perform Trace and Debug logging of a message @INFO (trace) and DEBUG (log)
-     *
-     * @param traceOn is runtime trace on for this message?
-     * @param msg     the message to log/trace
-     */
-    protected void traceOrDebug(boolean traceOn, String msg) {
-        if (traceOn) {
-            trace.info(msg);
-        }
-        if (log.isDebugEnabled()) {
-            log.debug(msg);
-        }
+        super.onFault(synCtx);
     }
 }

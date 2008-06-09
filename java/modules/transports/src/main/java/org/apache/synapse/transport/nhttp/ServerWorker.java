@@ -201,28 +201,43 @@ public class ServerWorker implements Runnable {
         // is received to synapse. Otherwise we will not be able to support the single channel
         // invocation within the actual service and synapse for a dual channel request from the
         // client. This condition is a bit complex but cannot simplify any further.
-        if (msgContext != null && msgContext.getOperationContext() != null &&
-                !msgContext.getOperationContext().getAxisOperation().isControlOperation() &&
-                ((!Constants.VALUE_TRUE.equals(msgContext.getOperationContext().getProperty(
-                        Constants.RESPONSE_WRITTEN)) && !"SKIP".equals(
-                        msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN)))
-                        || (((RequestResponseTransport) msgContext.getProperty(
-                        RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
-                        == RequestResponseTransport.RequestResponseTransportStatus.ACKED)
-                        || msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED))) {
+        if (msgContext != null &&
+            msgContext.getOperationContext() != null &&
+            !msgContext.getOperationContext().getAxisOperation().isControlOperation()) {
 
-            response.setStatusCode(HttpStatus.SC_ACCEPTED);
-            serverHandler.commitResponse(conn, response);
+            String respWritten = (String)
+                msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
+            boolean respWillFollow =
+                !Constants.VALUE_TRUE.equals(respWritten) && !"SKIP".equals(respWritten);
+            boolean acked = ((
+                (RequestResponseTransport)
+                    msgContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
+                == RequestResponseTransport.RequestResponseTransportStatus.ACKED);
+            boolean forced = msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED);
 
-            try {
-                is.close();
-            } catch (IOException ignore) {}
+            if (respWillFollow || acked || forced) {
 
-            // make sure that the output stream is flushed and closed properly
-            try {
-                os.flush();
-                os.close();
-            } catch (IOException ignore) {}
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending 202 Accepted response for MessageID : " +
+                        msgContext.getMessageID() +
+                        " response written : " + respWritten +
+                        " response will follow : " + respWillFollow +
+                        " acked : " + acked + " forced ack : " + forced);
+                }
+
+                response.setStatusCode(HttpStatus.SC_ACCEPTED);
+                serverHandler.commitResponse(conn, response);
+
+                try {
+                    is.close();
+                } catch (IOException ignore) {}
+
+                // make sure that the output stream is flushed and closed properly
+                try {
+                    os.flush();
+                    os.close();
+                } catch (IOException ignore) {}
+            }
         }
     }
 

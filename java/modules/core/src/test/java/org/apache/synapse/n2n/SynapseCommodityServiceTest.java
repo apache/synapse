@@ -37,6 +37,7 @@ import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.utils.Services;
 
@@ -48,10 +49,11 @@ import java.io.*;
 public class SynapseCommodityServiceTest extends TestCase {
 
     protected void setUp() throws java.lang.Exception {
+        ServerManager.getInstance().setSynapseHome(".");
         // Initializing Synapse repository
-        System.setProperty(SynapseConstants.SYNAPSE_XML,
+        ServerManager.getInstance().setSynapseXMLPath(
                            "./../../repository/conf/sample/resources/misc/synapse.xml");
-        System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
+        ServerManager.getInstance().setAxis2Xml(
                            "./../../repository/conf/axis2.xml");
 
         findAndReplace(

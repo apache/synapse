@@ -46,10 +46,14 @@ public class TestMessageContext implements MessageContext {
 
     private SynapseConfiguration synCfg = null;
 
+    private SynapseEnvironment synEnv;
+
     SOAPEnvelope envelope = null;
 
     private EndpointReference to = null;
 
+    private String soapAction = null;
+    
     public SynapseConfiguration getConfiguration() {
         return synCfg;
     }
@@ -59,10 +63,11 @@ public class TestMessageContext implements MessageContext {
     }
 
     public SynapseEnvironment getEnvironment() {
-        return null;
+        return synEnv;
     }
 
     public void setEnvironment(SynapseEnvironment se) {
+        synEnv = se;
     }
 
     public Map getContextEntries() {
@@ -203,25 +208,19 @@ public class TestMessageContext implements MessageContext {
     }
 
     public String getSoapAction() {
-        return null;
+        return soapAction;
     }
 
     public void setSoapAction(String string) {
+        soapAction = string;
     }
 
     public void setWSAMessageID(String messageID) {
-        //Todo
+        // TODO
     }
 
     public String getWSAMessageID() {
-        return null;  //Todo
-    }
-
-    public void setMessageId(String messageID) {
-    }
-
-    public String getMessageId() {
-        return null;
+        return null;  // TODO
     }
 
     public boolean isDoingMTOM() {
@@ -272,10 +271,11 @@ public class TestMessageContext implements MessageContext {
     }
 
     public int getTracingState() {
-        return 0;
+        return 0;  // TODO
     }
 
     public void setTracingState(int tracingState) {
+        // TODO
     }
 
     public MessageContext getSynapseContext() {

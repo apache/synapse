@@ -19,44 +19,46 @@
 
 package org.apache.synapse.transport.mail;
 
-import org.apache.synapse.transport.AbstractTransportTest;
-import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.mail.UtilsMailServer;
-import org.apache.synapse.transport.mail.MailTransportSender;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.Constants;
-import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.axiom.om.util.UUIDGenerator;
-import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.mail.*;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.InternetAddress;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.namespace.QName;
-import javax.activation.DataHandler;
-import javax.activation.CommandMap;
-import javax.activation.MailcapCommandMap;
-import java.util.Properties;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Date;
-import java.io.StringReader;
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.AbstractTransportTest;
+import org.apache.synapse.transport.base.BaseConstants;
 
 public class MailEchoRawXMLTest extends AbstractTransportTest {
 
@@ -106,11 +108,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         session.setDebug(log.isTraceEnabled());
         
         WSMimeMessage msg = new WSMimeMessage(session);
-	    msg.setFrom(new InternetAddress("synapse.test.0"));
+        msg.setFrom(new InternetAddress("synapse.test.0"));
         msg.setReplyTo(InternetAddress.parse("synapse.test.0"));
         InternetAddress[] address = {new InternetAddress("synapse.test.6")};
-	    msg.setRecipients(Message.RecipientType.TO, address);
-	    msg.setSubject("POX Roundtrip");
+        msg.setRecipients(Message.RecipientType.TO, address);
+        msg.setSubject("POX Roundtrip");
         msg.setHeader(BaseConstants.SOAPACTION, Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         msg.setSentDate(new Date());
         msg.setHeader(MailConstants.MAIL_HEADER_MESSAGE_ID, msgId);

@@ -38,8 +38,8 @@
               <pre class="download-pre"><a
               href="[preferred]/synapse/1.2/synapse-1.2-bin.tar.gz"
               class="downloadLink"
-              title="[preferred]/synapse/1.2/Apache-Synapse-1.2-bin.tar.gz"><strong>tar.gz </strong></a><a
-              href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.md5"
+              title="[preferred]/synapse/1.2/Apache-Synapse-1.2-bin.tar.gz"><strong>synapse-1.2-bin.tar.gz</strong></a>
+ (<a href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.md5"
               class="externalLink"
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.md5">MD5</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.sha"
@@ -47,12 +47,12 @@
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.sha">SHA1</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.asc">PGP</a></pre>
+              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.tar.gz.asc">PGP</a>)</pre>
               <pre class="download-pre"><a
               href="[preferred]/synapse/1.2/synapse-1.2-bin.zip"
               class="downloadLink"
-              title="[preferred]/synapse/1.2/synapse-1.2-bin.zip"><strong>zip </strong></a><a
-              href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.md5"
+              title="[preferred]/synapse/1.2/synapse-1.2-bin.zip"><strong>synapse-1.2-bin.zip</strong></a>
+ (<a href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.md5"
               class="externalLink"
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.md5">MD5</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.sha"
@@ -60,7 +60,7 @@
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.sha">SHA1</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.asc">PGP</a></pre>
+              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-bin.zip.asc">PGP</a>)</pre>
             </td>
           </tr>
           <tr class="b">
@@ -75,8 +75,8 @@
             <td>
               <pre class="download-pre"><a
               href="[preferred]/synapse/1.2/synapse-1.2-src.tar.gz"
-              title="[preferred]/synapse/1.2/synapse-1.2-src.tar.gz"><strong>tar.gz </strong></a><a
-              href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.tar.gz.md5"
+              title="[preferred]/synapse/1.2/synapse-1.2-src.tar.gz"><strong>synapse-1.2-src.tar.gz</strong></a>
+ (<a href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.tar.gz.md5"
               class="externalLink"
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.tar.gz.md5"
               name="MD5" id="MD5">MD5</a> <a
@@ -86,11 +86,11 @@
               name="SHA1" id="SHA1">SHA1</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.tar.gz.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.tar.gz.asc">PGP</a></pre>
+              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.tar.gz.asc">PGP</a>)</pre>
               <pre class="download-pre"><a
               href="[preferred]/synapse/1.2/synapse-1.2-src.zip"
-              title="[preferred]/synapse/1.2/synapse-1.2-src.zip"><strong>zip </strong></a><a
-              href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.md5"
+              title="[preferred]/synapse/1.2/synapse-1.2-src.zip"><strong>synapse-1.2-src.zip</strong></a>
+ (<a href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.md5"
               class="externalLink"
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.md5">MD5</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.sha"
@@ -98,7 +98,7 @@
               title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.sha">SHA1</a> <a
               href="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.asc">PGP</a></pre>
+              title="http://www.apache.org/dist/synapse/1.2/synapse-1.2-src.zip.asc">PGP</a>)</pre>
             </td>
           </tr>
         </tbody>

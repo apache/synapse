@@ -77,7 +77,7 @@ public class XSLTMediatorTest extends TestCase {
         mp.setValue("value1");
         list.add(mp);
         transformMediator.addAllProperties(list);
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt"));
@@ -117,7 +117,7 @@ public class XSLTMediatorTest extends TestCase {
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt"));
@@ -153,7 +153,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         for (int i=0; i<2; i++) {
-            Map props = new HashMap();
+            Map<String,Entry> props = new HashMap<String,Entry>();
             Entry prop = new Entry();
             prop.setType(Entry.URL_SRC);
             prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load.xml"));
@@ -177,7 +177,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         for (int i=0; i<2; i++) {
-            Map props = new HashMap();
+            Map<String,Entry> props = new HashMap<String,Entry>();
             Entry prop = new Entry();
             prop.setType(Entry.URL_SRC);
             prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load_3.xml"));
@@ -199,7 +199,7 @@ public class XSLTMediatorTest extends TestCase {
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load_2.xml"));
@@ -224,7 +224,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         for (int i=0; i<5; i++) {
-            Map props = new HashMap();
+            Map<String,Entry> props = new HashMap<String,Entry>();
             Entry prop = new Entry();
             prop.setType(Entry.URL_SRC);
             prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_load_2.xml"));
@@ -251,7 +251,7 @@ public class XSLTMediatorTest extends TestCase {
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt"));

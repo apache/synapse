@@ -20,7 +20,6 @@
 package org.apache.synapse.mediators;
 
 import java.io.StringReader;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
@@ -46,7 +45,7 @@ import org.apache.synapse.registry.url.SimpleURLRegistry;
 
 public class TestUtils {
 
-    public static TestMessageContext getTestContext(String bodyText, Map props) throws Exception {
+    public static TestMessageContext getTestContext(String bodyText, Map<String,Entry> props) throws Exception {
 
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
@@ -55,10 +54,8 @@ public class TestUtils {
         synCtx.setEnvironment(new Axis2SynapseEnvironment(testConfig));        
 
         if (props != null) {
-            Iterator iter = props.keySet().iterator();
-            while (iter.hasNext()) {
-                String key = (String) iter.next();
-                testConfig.addEntry(key, (Entry) props.get(key));
+            for (Map.Entry<String,Entry> mapEntry : props.entrySet()) {
+                testConfig.addEntry(mapEntry.getKey(), mapEntry.getValue());
             }
         }
         synCtx.setConfiguration(testConfig);
@@ -81,7 +78,7 @@ public class TestUtils {
     }
 
     public static Axis2MessageContext getAxis2MessageContext(String bodyText,
-                                                             Map props) throws Exception {
+                                                             Map<String,Entry> props) throws Exception {
         // create a test synapse context
         SynapseConfiguration testConfig = new SynapseConfiguration();
         org.apache.axis2.context.MessageContext inContext =
@@ -91,10 +88,8 @@ public class TestUtils {
         testConfig.setRegistry(new SimpleURLRegistry());
 
         if (props != null) {
-            Iterator iter = props.keySet().iterator();
-            while (iter.hasNext()) {
-                String key = (String) iter.next();
-                testConfig.addEntry(key, (Entry) props.get(key));
+            for (Map.Entry<String,Entry> mapEntry : props.entrySet()) {
+                testConfig.addEntry(mapEntry.getKey(), mapEntry.getValue());
             }
         }
         synCtx.setConfiguration(testConfig);
@@ -114,7 +109,7 @@ public class TestUtils {
         return synCtx;
     }
 
-    public static TestMessageContext getTestContextForXSLTMediator(String bodyText, Map props) throws Exception {
+    public static TestMessageContext getTestContextForXSLTMediator(String bodyText, Map<String,Entry> props) throws Exception {
 
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
@@ -123,10 +118,8 @@ public class TestUtils {
         synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         if (props != null) {
-            Iterator iter = props.keySet().iterator();
-            while (iter.hasNext()) {
-                String key = (String) iter.next();
-                testConfig.addEntry(key, (Entry) props.get(key));
+            for (Map.Entry<String,Entry> mapEntry : props.entrySet()) {
+                testConfig.addEntry(mapEntry.getKey(), mapEntry.getValue());
             }
         }
         synCtx.setConfiguration(testConfig);
@@ -149,7 +142,7 @@ public class TestUtils {
         return synCtx;
     }
 
-    public static TestMessageContext getTestContextForXSLTMediatorUsingFile(String path, Map props) throws Exception {
+    public static TestMessageContext getTestContextForXSLTMediatorUsingFile(String path, Map<String,Entry> props) throws Exception {
 
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
@@ -158,10 +151,8 @@ public class TestUtils {
         synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         if (props != null) {
-            Iterator iter = props.keySet().iterator();
-            while (iter.hasNext()) {
-                String key = (String) iter.next();
-                testConfig.addEntry(key, (Entry) props.get(key));
+            for (Map.Entry<String,Entry> mapEntry : props.entrySet()) {
+                testConfig.addEntry(mapEntry.getKey(), mapEntry.getValue());
             }
         }
         synCtx.setConfiguration(testConfig);

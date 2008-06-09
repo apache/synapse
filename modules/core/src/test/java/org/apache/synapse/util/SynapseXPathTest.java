@@ -78,8 +78,7 @@ public class SynapseXPathTest extends TestCase {
     }
 
     public void testAxis2ContextProperties() throws Exception {
-        HashMap props = new HashMap();
-        Axis2MessageContext synCtx = TestUtils.getAxis2MessageContext("<test/>", props);
+        Axis2MessageContext synCtx = TestUtils.getAxis2MessageContext("<test/>", null);
         synCtx.getAxis2MessageContext().setProperty("test", message);
         synCtx.getAxis2MessageContext().setProperty("test2", "1234");
         assertEquals(message, new SynapseXPath("$axis2:test").evaluate(synCtx));

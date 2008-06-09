@@ -148,7 +148,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key");
         validate.setSchemaKeys(keys);
         SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
@@ -158,7 +158,7 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
@@ -177,7 +177,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key-1");
         keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
@@ -188,7 +188,7 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
@@ -211,7 +211,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key-1");
         keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
@@ -222,7 +222,7 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
@@ -245,7 +245,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
@@ -255,7 +255,7 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
@@ -274,7 +274,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
@@ -284,7 +284,7 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
@@ -303,7 +303,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
@@ -313,7 +313,7 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
@@ -356,7 +356,7 @@ public class ValidateMediatorTest extends TestCase {
         setOnFailInvoked(false);
 
         // set the schema url, source xpath and any name spaces
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
@@ -367,7 +367,7 @@ public class ValidateMediatorTest extends TestCase {
         validate.removeChild(0);
         validate.addChild(testMediator);
 
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);
         prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));

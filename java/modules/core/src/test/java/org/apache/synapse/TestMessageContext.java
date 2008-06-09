@@ -53,7 +53,7 @@ public class TestMessageContext implements MessageContext {
     private EndpointReference to = null;
 
     private String soapAction = null;
-   
+    
     public SynapseConfiguration getConfiguration() {
         return synCfg;
     }
@@ -216,10 +216,11 @@ public class TestMessageContext implements MessageContext {
     }
 
     public void setWSAMessageID(String messageID) {
+        // TODO
     }
 
     public String getWSAMessageID() {
-        return null;
+        return null;  // TODO
     }
 
     public boolean isDoingMTOM() {
@@ -270,11 +271,18 @@ public class TestMessageContext implements MessageContext {
     }
 
     public int getTracingState() {
-        return 0;  //Todo
+        return 0;  // TODO
     }
 
     public void setTracingState(int tracingState) {
-        //Todo
+        // TODO
+    }
+
+    public MessageContext getSynapseContext() {
+        return null;
+    }
+
+    public void setSynapseContext(MessageContext env) {
     }
 
     public Stack getFaultStack() {
@@ -287,12 +295,5 @@ public class TestMessageContext implements MessageContext {
 
     public Log getServiceLog() {
         return LogFactory.getLog(TestMessageContext.class);
-    }
-
-    public MessageContext getSynapseContext() {
-        return null;
-    }
-
-    public void setSynapseContext(MessageContext env) {
     }
 }

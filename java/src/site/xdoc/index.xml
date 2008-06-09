@@ -37,7 +37,7 @@
       <b>Latest News</b>
   </p><p>
       Synapse 1.2 release adds the support for the <a href="http://www.fixprotocol.org/">Financial Information eXchange (FIX)</a> an industry
-    driven messaging standard through <a href="http://www.quickfixj.org/">QuickFixJ</a> as well as <a href="http://hessian.caucho.com/">Hessian binary web service protocol</a>.
+    driven messaging standard through <a href="http://www.quickfixj.org/">QuickFixJ</a> as well as <a href="http://hessian.caucho.com/">Hessian binary web service protocol</a>, as well as other functional, stability and performance improvements. For more details please see the <a href="http://svn.apache.org/repos/asf/synapse/tags/1.2/src/main/release/docs/release_notes.txt">1.2 release notes</a>.
   </p>
   <p>For more information, see:
   <ul>

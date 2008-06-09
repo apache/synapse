@@ -54,6 +54,14 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
 
         <!--For Axiom/E4X -->
         <!--<dependency>

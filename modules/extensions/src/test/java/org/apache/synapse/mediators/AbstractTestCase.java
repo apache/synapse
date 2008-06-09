@@ -18,23 +18,23 @@
  */
 package org.apache.synapse.mediators;
 
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.OMElement;
-import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.MediatorFactoryFinder;
-import org.apache.synapse.Mediator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
-import org.custommonkey.xmlunit.XMLTestCase;
+import java.io.IOException;
+import java.io.StringReader;
 
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.StringReader;
-import java.io.IOException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.config.xml.MediatorSerializer;
+import org.custommonkey.xmlunit.XMLTestCase;
+import org.xml.sax.SAXException;
 
 /**
  *

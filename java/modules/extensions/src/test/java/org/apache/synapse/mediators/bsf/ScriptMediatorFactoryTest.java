@@ -65,7 +65,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
         Entry prop = new Entry();
         prop.setKey("MyMediator");
         prop.setValue(MY_MEDIATOR);
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         props.put("MyMediator", prop);
         MessageContext mc = TestUtils.getTestContext("<foo/>", props);
 
@@ -77,7 +77,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
     public void testRegPropWithFunctionMediatorFactory() throws Exception {
         Entry prop = new Entry();
         prop.setValue(MY_MEDIATOR_FOO_FUNC);
-        Map props = new HashMap();
+        Map<String,Entry> props = new HashMap<String,Entry>();
         props.put("MyFooMediator", prop);
         MessageContext mc = TestUtils.getTestContext("<foo/>", props);
 

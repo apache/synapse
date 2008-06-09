@@ -106,10 +106,10 @@ public class SyslogMessageBuilder implements Builder {
                 if (next == '\n') {
                     in.consume();
                     in.consume(-1);
+                    // Fall through
+                } else if (next == -1) {
                     content = buffer.toString();
                     break;
-                } else if (next == -1) {
-                    throw new ProtocolException("Unexpected end of content");
                 } else {
                     in.consume();
                     buffer.append((char)next);

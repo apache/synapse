@@ -16,25 +16,25 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-
 package org.apache.synapse.mediators;
 
-import org.custommonkey.xmlunit.XMLTestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.MediatorFactoryFinder;
-import org.apache.synapse.Mediator;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.StringReader;
 
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.StringReader;
-import java.io.IOException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.config.xml.MediatorSerializer;
+import org.custommonkey.xmlunit.XMLTestCase;
+import org.xml.sax.SAXException;
 
 /**
  *

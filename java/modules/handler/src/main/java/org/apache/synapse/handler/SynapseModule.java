@@ -29,6 +29,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.SynapseInitializationModule;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -67,10 +68,10 @@ public class SynapseModule implements Module {
     public void init(ConfigurationContext configurationContext,
                      AxisModule axisModule) throws AxisFault {
         if (System.getProperty(SynapseConstants.SYNAPSE_XML) == null) {
-            System.setProperty(SynapseConstants.SYNAPSE_XML, configurationContext.
+            ServerManager.getInstance().setSynapseXMLPath(configurationContext.
                     getAxisConfiguration().getRepository().getPath() + "/conf/synapse.xml");
         }
-        if (new File(System.getProperty(SynapseConstants.SYNAPSE_XML)).exists()) {
+        if (new File(ServerManager.getInstance().getSynapseXMLPath()).exists()) {
             initializationModule = new org.apache.synapse.core.axis2.SynapseInitializationModule();
             initializationModule.init(configurationContext, axisModule);
 
@@ -96,7 +97,7 @@ public class SynapseModule implements Module {
         } else {
             handleException("Unable to initialize the Synapse initializationModule. Couldn't " +
                     "find the configuration file in the location "
-                    + System.getProperty(SynapseConstants.SYNAPSE_XML));
+                    + ServerManager.getInstance().getSynapseXMLPath());
         }
     }
 

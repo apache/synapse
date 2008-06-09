@@ -29,16 +29,19 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * All endpoint factories should implement this interface. Use EndpointFactory to obtain the
  * correct endpoint for particular endpoint configuration. As endpoints can be nested inside
  * each other, EndpointFactory implementations may call other EndpointFactory implementations
  * recursively to obtain the required endpoint hierarchy.
- *
+ * <p/>
  * This also serves as the XMLToObjactMapper implementation for specific endpoint implementations.
  * If the endpoint type is not known use XMLToEndpointMapper as the generic XMLToObjectMapper for
  * all endpoints.
@@ -50,8 +53,8 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     /**
      * Core method which is exposed for the external use, and this will find the proper
      * {@link EndpointFactory} and create the endpoint which is of the format {@link Endpoint}.
-     * 
-     * @param elem XML from which the endpoint will be built
+     *
+     * @param elem        XML from which the endpoint will be built
      * @param isAnonymous whether this is an anonymous endpoint or not
      * @return created endpoint
      */
@@ -80,7 +83,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * immediate child element of the definitions tag it should have a name, which is used as the
      * key in local registry.
      *
-     * @param epConfig OMElement conatining the endpoint configuration.
+     * @param epConfig          OMElement conatining the endpoint configuration.
      * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
      * @return Endpoint implementation for the given configuration.
      */
@@ -90,12 +93,10 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * Extracts the QoS information from the XML which represents a WSDL/Address/Default endpoints
      *
      * @param definition to be filled with the extracted information
-     * @param elem XML which represents the endpoint with QoS information
+     * @param elem       XML which represents the endpoint with QoS information
      */
-    protected void extractEndpointProperties(EndpointDefinition definition, OMElement elem) {
+    protected void extractCommonEndpointProperties(EndpointDefinition definition, OMElement elem) {
 
-        OMAttribute format
-                = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "format"));
         OMAttribute optimize
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "optimize"));
         OMAttribute encoding
@@ -127,28 +128,6 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             definition.setTraceState(SynapseConstants.TRACING_UNSET);
         }
 
-        if (format != null) {
-            String forceValue = format.getAttributeValue().trim().toLowerCase();
-            if (SynapseConstants.FORMAT_POX.equals(forceValue)) {
-                definition.setForcePOX(true);
-                definition.setFormat(SynapseConstants.FORMAT_POX);
-
-            } else if (SynapseConstants.FORMAT_GET.equals(forceValue)) {
-            	definition.setForceGET(true);
-            	definition.setFormat(SynapseConstants.FORMAT_GET);
-
-            } else if (SynapseConstants.FORMAT_SOAP11.equals(forceValue)) {
-                definition.setForceSOAP11(true);
-                definition.setFormat(SynapseConstants.FORMAT_SOAP11);
-
-            } else if (SynapseConstants.FORMAT_SOAP12.equals(forceValue)) {
-                definition.setForceSOAP12(true);
-                definition.setFormat(SynapseConstants.FORMAT_SOAP12);
-
-            } else {
-                handleException("force value -\""+forceValue+"\" not yet implemented");
-            }
-        }
 
         if (optimize != null && optimize.getAttributeValue().length() > 0) {
             String method = optimize.getAttributeValue().trim();
@@ -166,7 +145,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         OMElement wsAddr = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableAddressing"));
         if (wsAddr != null) {
-            
+
             definition.setAddressingOn(true);
 
             OMAttribute version = wsAddr.getAttribute(new QName("version"));
@@ -201,7 +180,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 definition.setWsSecPolicyKey(policy.getAttributeValue());
             }
         }
-        
+
         OMElement wsRm = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
         if (wsRm != null) {
@@ -240,7 +219,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             if (action != null && action.getText() != null) {
                 String actionString = action.getText();
                 if ("discard".equalsIgnoreCase(actionString.trim())) {
-                        
+
                     definition.setTimeoutAction(SynapseConstants.DISCARD);
 
                     // set timeout duration to 30 seconds, if it is not set explicitly
@@ -248,7 +227,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                         definition.setTimeoutDuration(30000);
                     }
                 } else if ("fault".equalsIgnoreCase(actionString.trim())) {
-                        
+
                     definition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
 
                     // set timeout duration to 30 seconds, if it is not set explicitly
@@ -275,6 +254,10 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                         + e.getMessage(), e);
             }
         }
+    }
+
+    protected void extractSpecificEndpointProperties(EndpointDefinition definition, OMElement elem){
+
     }
 
     /**
@@ -329,6 +312,36 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         handleException("Invalid endpoint configuration.");
         // just to make the compiler happy : never executes
         return null;
+    }
+
+    /**
+     * Helper method to construct children endpoints
+     *
+     * @param listEndpointElement OMElement representing  the children endpoints
+     * @param parent              Parent endpoint
+     * @return List of children endpoints
+     */
+    protected ArrayList<Endpoint> getEndpoints(OMElement listEndpointElement, Endpoint parent) {
+
+        ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
+        ArrayList<String> keys = new ArrayList<String>();
+        Iterator iter = listEndpointElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
+        while (iter.hasNext()) {
+            OMElement endptElem = (OMElement) iter.next();
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
+            if (endpoint instanceof IndirectEndpoint) {
+                String key = ((IndirectEndpoint) endpoint).getKey();
+                if (!keys.contains(key)) {
+                    keys.add(key);
+                } else {
+                    handleException("Same endpoint definition cannot be used with in the siblings");
+                }
+            }
+            endpoint.setParentEndpoint(parent);
+            endpoints.add(endpoint);
+        }
+
+        return endpoints;
     }
 
     protected static void handleException(String msg) {

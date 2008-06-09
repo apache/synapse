@@ -114,7 +114,7 @@
 	</wsdl:binding>
 	<wsdl:service name="FastStockQuoteService">
 		<wsdl:port name="FastStockQuoteServiceSOAP11port" binding="axis2:FastStockQuoteServiceSOAP11Binding">
-			<soap:address location="http://localhost:8080/soap/FastStockQuoteService"/>
+			<soap:address location="http://localhost:8280/soap/FastStockQuoteService"/>
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

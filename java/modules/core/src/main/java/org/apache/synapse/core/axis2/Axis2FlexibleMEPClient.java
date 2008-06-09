@@ -101,15 +101,15 @@ public class Axis2FlexibleMEPClient {
                 "] [sec = " + wsSecurityEnabled +
                 "] [rm = " + wsRMEnabled +
                 (endpoint != null ?
-                    "] [ mtom = " + endpoint.isUseMTOM() +
-                    "] [ swa = " + endpoint.isUseSwa() +
-                    "] [ format = " + endpoint.getFormat() +                    
-                    "] [ force soap11=" + endpoint.isForceSOAP11() +
-                    "] [ force soap12=" + endpoint.isForceSOAP12() +
-                    "] [ pox=" + endpoint.isForcePOX() +
-                    "] [ get=" + endpoint.isForceGET() +
-                    "] [ encoding=" + endpoint.getCharSetEncoding() : "") +
-                "] [ to " + synapseOutMessageContext.getTo() + "]");
+                    "] [mtom = " + endpoint.isUseMTOM() +
+                    "] [swa = " + endpoint.isUseSwa() +
+                    "] [format = " + endpoint.getFormat() +
+                    "] [force soap11=" + endpoint.isForceSOAP11() +
+                    "] [force soap12=" + endpoint.isForceSOAP12() +
+                    "] [pox=" + endpoint.isForcePOX() +
+                    "] [get=" + endpoint.isForceGET() +
+                    "] [encoding=" + endpoint.getCharSetEncoding() : "") +
+                "] [to " + synapseOutMessageContext.getTo() + "]");
         }
 
         // save the original message context wihout altering it, so we can tie the response
@@ -279,13 +279,13 @@ public class Axis2FlexibleMEPClient {
             mepClient.setCallback(callback);
         }
 
-        mepClient.execute(true);
-
         // with the nio transport, this causes the listener not to write a 202
         // Accepted response, as this implies that Synapse does not yet know if
         // a 202 or 200 response would be written back.
         originalInMsgCtx.getOperationContext().setProperty(
             org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
+
+        mepClient.execute(true);        
    }
 
     private static MessageContext cloneForSend(MessageContext ori) throws AxisFault {

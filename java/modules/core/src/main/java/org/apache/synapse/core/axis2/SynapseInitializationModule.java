@@ -32,6 +32,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 
@@ -95,19 +96,11 @@ public class SynapseInitializationModule implements Module {
         transports.add(Constants.TRANSPORT_HTTPS);
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
-
-        log.info("Initializing Mercury...");
-        AxisModule mercuryAxisModule = configurationContext.getAxisConfiguration().
-            getModule(SynapseConstants.MERCURY_MODULE_NAME);
-        if (mercuryAxisModule != null) {
-            Module mercury = mercuryAxisModule.getModule();
-            mercury.init(configurationContext, mercuryAxisModule);
-        }
-
+        
         // this server name is given by system property SynapseServerName
         // otherwise take host-name
         // if nothing found assume localhost
-        String thisServerName = System.getProperty(SynapseConstants.SYNAPSE_SERVER_NAME);
+        String thisServerName = ServerManager.getInstance().getServerName();
         if(thisServerName == null || thisServerName.equals("")) {
           try {
             InetAddress addr = InetAddress.getLocalHost();
@@ -154,16 +147,12 @@ public class SynapseInitializationModule implements Module {
         AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
         SynapseConfiguration synapseConfiguration;
 
-        String config = System.getProperty(SynapseConstants.SYNAPSE_XML);
+        String config = ServerManager.getInstance().getSynapseXMLPath();
 
         if (config != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("System property '" + SynapseConstants.SYNAPSE_XML +
-                        "' specifies Synapse configuration as " + config);
-            }
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
-            log.warn("System property '" + SynapseConstants.SYNAPSE_XML +
+            log.warn("System property or init-parameter '" + SynapseConstants.SYNAPSE_XML +
                 "' is not specified. Using default configuration..");
             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }

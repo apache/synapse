@@ -334,12 +334,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 ioReactor.connect(new InetSocketAddress(url.getHost(), port),
                     null, axis2Req, sessionRequestCallback);
                 if (log.isDebugEnabled()) {
-                    log.debug("A new connection established");
+                    log.debug("A new connection established to : " + url.getHost() + ":" + port);
                 }
             } else {
                 ((ClientHandler) handler).submitRequest(conn, axis2Req);
                 if (log.isDebugEnabled()) {
-                    log.debug("An existing connection reused");
+                    log.debug("An existing connection reused to : " + url.getHost() + ":" + port);
                 }
             }
 
@@ -414,7 +414,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 // see comment above on the reasoning
                 out.write(new byte[0]);
             } else {
-                messageFormatter.writeTo(msgContext, format, out, true);
+                messageFormatter.writeTo(msgContext, format, out, false);
             }
             out.close();
         } catch (IOException e) {
@@ -446,7 +446,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         try {
-            messageFormatter.writeTo(msgContext, format, out, true);
+            messageFormatter.writeTo(msgContext, format, out, false);
             out.close();
         } catch (IOException e) {
             handleException("IO Error sending response message", e);
@@ -476,7 +476,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * related to the outgoing request
      * @return a Session request callback
      */
-    private static SessionRequestCallback getSessionRequestCallback() {
+    private SessionRequestCallback getSessionRequestCallback() {
         return new SessionRequestCallback() {
             public void completed(SessionRequest request) {
             }
@@ -503,7 +503,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
                         axis2Request.setCompleted(true);
                         MessageContext mc = axis2Request.getMsgContext();
-                        MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+                        final MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
 
                         if (mr != null) {
                             try {
@@ -520,10 +520,19 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                                     /** this is not a mistake I do NOT want getMessage()*/
                                     axisFault = new AxisFault(exception.toString(), exception);
                                 }
-                                MessageContext nioFaultMessageContext =
+                                final MessageContext nioFaultMessageContext =
                                     MessageContextBuilder.createFaultMessageContext(mc, axisFault);
                                 nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
-                                mr.receive(nioFaultMessageContext);
+
+                                handler.execute(new Runnable() {
+                                    public void run() {
+                                        try {
+                                            mr.receive(nioFaultMessageContext);
+                                        } catch (AxisFault af) {
+                                            log.error("Error processing fault message context", af);
+                                        }
+                                    }
+                                });
 
                             } catch (AxisFault af) {
                                 log.error("Unable to report back failure to the message receiver", af);

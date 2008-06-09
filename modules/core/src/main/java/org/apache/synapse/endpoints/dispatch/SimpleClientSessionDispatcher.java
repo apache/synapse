@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
 
 /**
  * This dispatcher is implemented to demonstrate a sample client session. It will detect sessions
- * based on the <syn:ClientID xmlns:syn="http://ws.apache.org/namespaces/synapse"> soap header of the
+ * based on the <syn:ClientID xmlns:syn="http://ws.apache.org/ns/synapse"> soap header of the
  * request message. Therefore, above header has to be included in the request soap messages by the
  * client who wants to initiate and maintain a session.
  */
@@ -38,31 +38,42 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
 
     private static final Log log = LogFactory.getLog(SimpleClientSessionDispatcher.class);
 
+    private static final QName CSID_QNAME
+            = new QName("http://ws.apache.org/ns/synapse", "ClientID", "syn");
+
     public Endpoint getEndpoint(MessageContext synCtx, DispatcherContext dispatcherContext) {
 
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
         if (header != null) {
-            OMElement sgcIDElm = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+            OMElement sgcIDElm = header.getFirstChildWithName(CSID_QNAME);
 
             if (sgcIDElm != null) {
                 String sgcID = sgcIDElm.getText();
 
                 if (sgcID != null) {
+                    log.debug("Using the client session id : '"
+                            + sgcID + "' extracted from current message to retrieve endpoint");
                     Object o = dispatcherContext.getEndpoint(sgcID);
 
                     if (o != null && o instanceof Endpoint) {
                         return (Endpoint) o;
                     }
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Couldn't find the client session id for the current message " +
+                            "to retrieve endpoint");
                 }
+            } else if (log.isDebugEnabled()) {
+                log.debug("Couldn't find a SOAP header with the QName " + CSID_QNAME +
+                        " for the current message to retrieve the endpoint");
             }
         }
 
         return null;
     }
 
-    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext, Endpoint endpoint) {
+    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext,
+        Endpoint endpoint) {
 
         if (endpoint == null || dispatcherContext == null) {
             return;
@@ -71,15 +82,24 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
         if (header != null) {
-            OMElement csIDElm = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+            OMElement csIDElm = header.getFirstChildWithName(CSID_QNAME);
 
             if (csIDElm != null) {
                 String csID = csIDElm.getText();
 
                 if (csID != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Using the client session id : '"
+                                + csID + "' extracted from current message to update the session");
+                    }
                     dispatcherContext.setEndpoint(csID, endpoint);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Couldn't find the client session id for the current message " +
+                            "to update the session");
                 }
+            } else if (log.isDebugEnabled()) {
+                log.debug("Couldn't find a SOAP header with the QName " + CSID_QNAME +
+                        " for the current message to update the session");
             }
         }
     }
@@ -94,15 +114,20 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
         SOAPHeader header = synCtx.getEnvelope().getHeader();
 
         if (header != null) {
-            OMElement csIDElm = header.getFirstChildWithName(
-                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+            OMElement csIDElm = header.getFirstChildWithName(CSID_QNAME);
 
             if (csIDElm != null) {
                 String csID = csIDElm.getText();
 
                 if (csID != null) {
                     dispatcherContext.removeSession(csID);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Couldn't find the client session id for the current message " +
+                            "to unbind the session");
                 }
+            } else if (log.isDebugEnabled()) {
+                log.debug("Couldn't find a SOAP header with the QName " + CSID_QNAME +
+                        " for the current message to unbind the session");
             }
         }
     }

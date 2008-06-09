@@ -710,6 +710,29 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
+     * Gets the String representation of the property value if there is a property for the
+     * given propKey or returns the default value passed
+     *
+     * @param propKey - key for the property lookup
+     * @param def     - default value
+     * @return String representation of the property value with the given key or the def value
+     */
+    public long getProperty(String propKey, long def) {
+        String val = System.getProperty(propKey);
+        if (val == null) {
+            val = properties.getProperty(propKey);
+        }
+
+        if (val != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using synapse tuning parameter : " + propKey + " = " + val);
+            }
+            return Long.valueOf(val);
+        }
+        return def;
+    }
+
+    /**
      * Gets the propety value if the property specified by the propKey is there or null else
      *
      * @param propKey - key for the property lookup

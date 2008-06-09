@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
+import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,8 +42,8 @@ import java.util.Map;
  * For a non-clustered environment , all data are kept locally.
  * <p/>
  * This class provide the abstraction need to separate the dynamic data from the static data and
- * improve the  high cohesion and provides capability to replicate only required state at a given time
- * This improves the performance when replicate data.
+ * improve the  high cohesion and provides capability to replicate only required state at a given
+ * time. This improves the performance when replicate data.
  */
 public class DispatcherContext {
 
@@ -85,15 +87,21 @@ public class DispatcherContext {
                 handleException("Cannot find the required key prefix to find the " +
                         "shared state of one of  'session'");
             }
-            // gets the value from configuration context (The shared state across all instances )
+            // gets the value from configuration context (The shared state across all instances)
             Object value = this.configCtx.getPropertyNonReplicable(this.keyPrefix + sessionID);
             if (value != null && value instanceof String) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving the endpoint from the session id " + value);
+                }
                 return endpointsMap.get(value.toString());
             }
 
         } else {
 
             synchronized (sessionMap) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving the endpoint from the session id " + sessionID);
+                }
                 return sessionMap.get(sessionID);
             }
         }
@@ -110,25 +118,37 @@ public class DispatcherContext {
     public void setEndpoint(String sessionID, Endpoint endpoint) {
 
         if (isClusteringEnable) {  // if this is a clustering env.
-            String endPointName = endpoint.getName();
-            if (endPointName == null) {
 
-                if (log.isDebugEnabled() && isClusteringEnable()) {
-                    log.warn("In a clustering environment , the endpoint  name should be" +
-                            " specified even for anonymous endpoints. Otherwise , the " +
-                            "clustering would not be functioned correctly if there are" +
-                            " more than one anonymous endpoints. ");
-                }
-                endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+            String endpointName;
+            if (endpoint instanceof IndirectEndpoint) {
+                endpointName = ((IndirectEndpoint) endpoint).getKey();
+            } else {
+                endpointName = endpoint.getName();
             }
+
+            if (endpointName == null) {
+                if (log.isDebugEnabled() && isClusteringEnable()) {
+                    log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);
+                }
+                endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+            }
+            
             if (keyPrefix != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Adding the enpoint " + endpointName + " with the session id "
+                            + keyPrefix + sessionID + " for replication to the session");
+                }
                 // replicates the state so that all instances across cluster can see this state
-                setAndReplicateState(keyPrefix + sessionID, endPointName);
+                setAndReplicateState(keyPrefix + sessionID, endpointName);
             }
 
         } else {
 
             synchronized (sessionMap) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Adding the endpoint " + endpoint
+                            + " with the session id " + sessionID + " to the session");
+                }
                 sessionMap.put(sessionID, endpoint);
             }
         }
@@ -145,15 +165,21 @@ public class DispatcherContext {
         if (isClusteringEnable) {   // if this is a clustering env.
 
             if (keyPrefix != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing and replicating " +
+                            "the session with the session id " + keyPrefix + id);
+                }
                 //Removes the endpoint name and then replicates the current
                 //state so that all instances
                 removeAndReplicateState(keyPrefix + id);
-
             }
 
         } else {
 
             synchronized (sessionMap) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing the session with the session id " + id);
+                }
                 sessionMap.remove(id);
             }
         }
@@ -214,7 +240,6 @@ public class DispatcherContext {
      * @param msg The error message
      */
     protected void handleException(String msg) {
-
         log.error(msg);
         throw new SynapseException(msg);
     }
@@ -226,7 +251,6 @@ public class DispatcherContext {
      * @param e   The exception
      */
     protected void handleException(String msg, Exception e) {
-
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
@@ -245,7 +269,7 @@ public class DispatcherContext {
 
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("Going to replicate the property with key : " +
+                    log.debug("Start replicating the property with key : " +
                             key + " value : " + value);
                 }
 
@@ -253,6 +277,10 @@ public class DispatcherContext {
                 if (prop == null) {
                     configCtx.setProperty(key, value);
                     Replicator.replicate(configCtx, new String[]{key});
+                }
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Completed replication of the property with key: " + key);
                 }
 
             } catch (ClusteringFault clusteringFault) {
@@ -274,11 +302,15 @@ public class DispatcherContext {
 
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("Going to replicate the property with key : " + key);
+                    log.debug("Start replicating the property removal with key : " + key);
                 }
 
                 configCtx.removeProperty(key);
                 Replicator.replicate(configCtx, new String[]{key});
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Completed replication of the property removal with key : " + key);
+                }
 
             } catch (ClusteringFault clusteringFault) {
                 handleException("Error during the replicating states ", clusteringFault);
@@ -305,19 +337,26 @@ public class DispatcherContext {
         if (endpoints != null) {
 
             for (Endpoint endpoint : endpoints) {
-                String endPointName = endpoint.getName();
-                if (endPointName == null) {
+
+                String endpointName;
+                if (endpoint instanceof IndirectEndpoint) {
+                    endpointName = ((IndirectEndpoint) endpoint).getKey();
+                } else {
+                    endpointName = endpoint.getName();
+                }
+                
+                if (endpointName == null) {
                     if (log.isDebugEnabled() && isClusteringEnable()) {
-                        log.warn("In a clustering environment , the endpoint  name should be" +
-                                " specified even for anonymous endpoints. Otherwise , the " +
-                                "clustering would not be functioned correctly if there are" +
-                                " more than one anonymous endpoints. ");
+                        log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);
                     }
-                    endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+                    endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
                 }
 
-                endpointsMap.put(endPointName, endpoint);
-
+                if (log.isDebugEnabled()) {
+                    log.debug("Adding an endpoint with the name/key "
+                            + endpointName + " to the endpoints map");
+                }
+                endpointsMap.put(endpointName, endpoint);
             }
         }
     }

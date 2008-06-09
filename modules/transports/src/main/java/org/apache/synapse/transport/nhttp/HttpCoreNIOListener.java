@@ -67,8 +67,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /** The EPR prefix for services available over this transport */
     private String serviceEPRPrefix;
-    /** The port to listen on, defaults to 8080 */
-    private int port = 8080;
+    /** The port to listen on, defaults to 8280 */
+    private int port = 8280;
     /** The hostname to use, defaults to localhost */
     private String host = "localhost";
     /** The bind addresses as (address, port) pairs */

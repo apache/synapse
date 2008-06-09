@@ -192,6 +192,7 @@ public class ClientWorker implements Runnable {
             // used at the sender to set the propper status code when passing the message
             responseMsgCtx.setProperty(NhttpConstants.HTTP_SC,
                     this.response.getStatusLine().getStatusCode());
+            responseMsgCtx.setProperty(NhttpConstants.NON_BLOCKING_TRANSPORT, true);
 
             // process response received
             AxisEngine engine = new AxisEngine(cfgCtx);

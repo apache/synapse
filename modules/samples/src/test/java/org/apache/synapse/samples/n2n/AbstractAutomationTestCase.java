@@ -49,7 +49,7 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
     }
 
     protected void setUpSynapseEnv() {
-        System.setProperty("port", "8080");
+        System.setProperty("port", "8280");
         System.setProperty("org.apache.xerces.xni.parser.XMLParserConfiguration",
                 "org.apache.xerces.parsers.XMLGrammarCachingConfiguration");
         System.setProperty("axis2.xml", "modules/samples/target/test_repos/synapse/conf/axis2.xml");
@@ -88,5 +88,5 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
 
     protected final String SYNAPSE_REPO = "modules/samples/target/test_repos/synapse";
     protected final String SAMPLE_CONFIG_ROOT_PATH = "repository/conf/sample/";
-    protected final String SYNAPSE_BASE_URL = "http://localhost:8080/";
+    protected final String SYNAPSE_BASE_URL = "http://localhost:8280/";
 }

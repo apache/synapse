@@ -2,7 +2,7 @@
 
 <document>
     <properties>
-        <title>Samples Setup</title>
+        <title>Apache Synapse - Samples Setup</title>
     </properties>
     <head>
         <style type="text/css" xml:space="preserve">
@@ -43,7 +43,7 @@
         color: #000000;
         font-weight: normal;
     }
-    p {
+    p, td {
         font-family: Verdana, arial, sans-serif;
         font-size: 11px;
         line-height: 16px;
@@ -102,23 +102,16 @@
     }</style>
     </head>
     <body>
-    <table border="0" style="width: 100%">
-      <caption/>
-      <tbody>
-        <tr>
-          <td>
-            <h1>
-              Apache Synapse ESB - Samples Setup
-            </h1>
-          </td>
-          <td>
-            <img alt="Synapse logo"
-            src="images/synapse-logo-web2.png" width="197"
-            height="82"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="margin-top:-40px; float:right; _margin-top:0px;">
+      <img alt="Synapse logo"
+           src="images/synapse-logo-web2.png" width="197"
+           height="82"/>
+    </div>
+    <div>
+      <h1>
+        Apache Synapse ESB - Samples Setup
+      </h1>
+    </div>
     <p/>
     <p>
       Synapse ships with a set of working examples that demonstrate some of the
@@ -148,7 +141,7 @@
     <h2>
       Understanding the Samples
     </h2>
-    <table border="1" style="width: 100%">
+    <table border="0" style="width: 100%">
       <caption/>
       <tbody>
         <tr>
@@ -188,9 +181,9 @@
       </tbody>
     </table>
     <p>
-      The above diagram depicts the interactions between the clients, Synapse
+      The above table depicts the interactions between the clients, Synapse
       and the services at a higher level. The Clients are able to send SOAP/REST
-      or POX messages over transports such as http/s or JMS with WS-Addressing,
+      or POX messages over transports such as HTTP/S or JMS with WS-Addressing,
       WS-Security or WS-Reliable messaging. They can send binary optimized
       content using MTOM or SwA or binary or plain text JMS messages. After
       mediation through Synapse, the requests are passed over to the sample
@@ -218,7 +211,7 @@
 <pre xml:space="preserve">ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
   [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
   [-Daddurl=http://localhost:9000/soap/SimpleStockQuoteService]
-  [-Dtrpurl=http://localhost:8080] [-Dprxurl=http://localhost:8080]
+  [-Dtrpurl=http://localhost:8280] [-Dprxurl=http://localhost:8280]
   [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]</pre>
 
     <p>
@@ -227,8 +220,6 @@
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         quote - send a quote request for a single stock as follows. The response
         contains the last sales price for the stock which will be displayed
 <pre xml:space="preserve">&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
@@ -236,8 +227,6 @@
     &lt;m:symbol&gt;IBM&lt;/m:symbol&gt;
   &lt;/m:request&gt;
 &lt;/m:getQuote&gt;</pre>
-      </li>
-      <li>
       </li>
       <li>
         customquote - send a quote request in a custom format. Synapse will
@@ -250,8 +239,6 @@
 &lt;/m0:checkPriceRequest&gt;</pre>
       </li>
       <li>
-      </li>
-      <li>
         fullquote - get quote reports for the stock over a number of days (i.e.
         last 100 days of the year).
 <pre xml:space="preserve">&lt;m:getFullQuote xmlns:m="http://services.samples/xsd"&gt;
@@ -259,8 +246,6 @@
     &lt;m:symbol&gt;IBM&lt;/m:symbol&gt;
   &lt;/m:request&gt;
 &lt;/m:getFullQuote&gt;</pre>
-      </li>
-      <li>
       </li>
       <li>
         placeorder - place an order for stocks using a one way request
@@ -273,8 +258,6 @@
 &lt;/m:placeOrder&gt;</pre>
       </li>
       <li>
-      </li>
-      <li>
         marketactivity - get a market activity report for the day (i.e. quotes
         for multiple symbols)
 <pre xml:space="preserve">&lt;m:getMarketActivity xmlns:m="http://services.samples/xsd"&gt;
@@ -284,8 +267,6 @@
     &lt;m:symbol&gt;MSFT&lt;/m:symbol&gt;
   &lt;/m:request&gt;
 &lt;/m:getMarketActivity&gt;</pre>
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -318,7 +299,7 @@
       Proxy Client Mode:
     </h4>
     <p>
-      In this mode, the client uses the 'prxurl' as a http proxy to send the
+      In this mode, the client uses the 'prxurl' as a HTTP proxy to send the
       request. Thus by setting the 'prxurl' to Synapse, the client can ensure
       that the message will reach Synapse for mediation. The client can
       optionally set a WS-Addressing EPR if required.
@@ -389,7 +370,7 @@ ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy
     <p/>
     <p>
       The sample services ship with a pre-configured Axis2 server and
-      demonstrates in-only and in-out SOAP/REST or POX messaging over http/s and
+      demonstrates in-only and in-out SOAP/REST or POX messaging over HTTP/S and
       JMS transports, using WS-Addressing, WS-Security and WS-Reliable Messaging
       and handling of binary content using MTOM and SwA.
     </p>
@@ -410,7 +391,7 @@ Total time: 3 seconds</pre>
     <p>
       To start the Axis2 server, go to the samples/axis2Server directory and
       execute the axis2server.sh or axis2server.bat script. This starts the
-      Axis2 server with the http transport listener on port 9000 and https on
+      Axis2 server with the HTTP transport listener on port 9000 and HTTPS on
       9002 respectively. To enable JMS transport, you will need to setup and
       start a JMS provider. An ActiveMQ 4.0.1 or later JMS server on the local
       machine is supported by default, and can be easily enabled by uncommenting
@@ -480,21 +461,13 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <ul>
       <li>
-      </li>
-      <li>
         activeio-core-3.0.0-incubator.jar
-      </li>
-      <li>
       </li>
       <li>
         activemq-core-4.1.0-incubator.jar
       </li>
       <li>
-      </li>
-      <li>
         geronimo-j2ee-management_1.0_spec-1.0.jar
-      </li>
-      <li>
       </li>
     </ul>
     <p>
@@ -547,24 +520,68 @@ synapse.sh -sample &lt;n&gt;</pre>
     &lt;/transportSender&gt;</pre>
     <p/>
     <h2 id="fixtransport">
-      Setting up FIX Transport
+      Configuring Synapse for the FIX Transport
     </h2>
     <p>
-	To run the FIX samples used in this guide you need a local Quickfix/J
-	installation.
+      First of all you need to put the following jar files into the lib folder of the
+      synapse distribution
+    </p>
+    <ul>
+      <li>quickfixj-core-1.3.1.jar</li>
+      <li>quickfixj-msg-fix40-1.3.1.jar</li>
+      <li>quickfixj-msg-fix41-1.3.1.jar</li>
+      <li>quickfixj-msg-fix42-1.3.1.jar</li>
+      <li>quickfixj-msg-fix43-1.3.1.jar</li>
+      <li>quickfixj-msg-fix44-1.3.1.jar</li>
+      <li>slf4j-api-1.3.0.jar</li>
+      <li>slf4j-jdk14-1.3.0.jar</li>
+    </ul>
+    <h3 id="fixtransport">
+      Setting up the FIX Transport
+    </h3>
+    <p>
+	To run the FIX samples used in this guide you need a local 
+    <a href="http://www.quickfixj.org">Quickfix/J</a> installation.
+    Download Quickfix/J from <a href="http://www.quickfixj.org/downloads">here</a>.
     </p>
     <p>
       To enable the FIX transport for samples, you need to uncomment the FIX
       transport sender and FIX transport receiver configurations in the 
       repository/conf/axis2.xml. Simply locate and uncomment the FIXTransportSender
-      and FIXTransportListener sample configurations.
+      and FIXTransportListener sample configurations. Also add the following jars to
+      the Synapse class path (SYNAPSE_HOME/lib directory).
+    </p>
+	<ul>
+		<li>quickfixj-core.jar</li>
+		<li>quickfixj-msg-fix40.jar</li>
+		<li>quickfixj-msg-fix41.jar</li>
+		<li>quickfixj-msg-fix42.jar</li>
+		<li>quickfixj-msg-fix43.jar</li>
+		<li>quickfixj-msg-fix44.jar</li>
+		<li>mina-core-1.1.0.jar</li>
+		<li>slf4j-api-1.3.0.jar</li>
+	</ul>
+    <p>
+      All these jars are shipped with the Quickfix/J binary distribution.
     </p>
     <p/>
-    <h2 id="fixsamples">
+    <h3 id="fixsamples">
       Configuring Synapse for FIX Samples
-    </h2>
+    </h3>
+    <p>
+	In order to configure Synapse to run the FIX samples given in this
+	guide you will need to create some FIX configuration files as
+	specified below.
+    </p>
+    <p>
+	The FileStorePath property in the following two files should point
+        to two directories in your local file system. Once the samples
+        are executed, Synapse will create FIX message stores in these two
+        directories.
+    </p>
     <p>
       Put the following entries in a file called fix-synapse.cfg
+
       <pre>
 	[default]
 	FileStorePath=examples/target/data/synapse-acceptor
@@ -595,16 +612,10 @@ synapse.sh -sample &lt;n&gt;</pre>
 	ReconnectInterval=5
       </pre>
     </p>
-    <p>
-	The FileStorePath property in the above two files should point
-        to two directories in your local file system. Once the samples
-        are executed, Synapse will create FIX message stores in these two
-        directories.
-    </p>
     <p/>
-    <h2 id="fixsamplesconfig">
+    <h3 id="fixsamplesconfig">
       Configuring Sample FIX Applications
-    </h2>
+    </h3>
     <p>
       Locate and edit the FIX configuration file of Executor to be as follows.
       This file is usually named executor.cfg
@@ -704,43 +715,22 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <ol>
       <li>
-      </li>
-      <li>
         Set up and start the Derby network server
       </li>
       <li>
-      </li>
-      <li>
         Create and open a connection to the database using the Derby client
-        driver
-        <p>
-          CONNECT
-          'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';
-        </p>
-      </li>
-      <li>
+        driver<br/>
+        <pre> CONNECT 'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</pre>
       </li>
       <li>
         Create a table using the following statement
-        <p>
-          create table company(name varchar(10), id varchar(10), price double);
-        </p>
-      </li>
-      <li>
+        <pre> CREATE table company(name varchar(10), id varchar(10), price double);</pre>
       </li>
       <li>
         Inserts some data using following statements
-        <p>
-          insert into company values ('IBM','c1',0.0);
-        </p>
-        <p>
-          insert into company values ('SUN','c2',0.0);
-        </p>
-        <p>
-          insert into company values ('MSFT','c3',0.0);
-        </p>
-      </li>
-      <li>
+        <pre> INSERT into company values ('IBM','c1',0.0);
+ INSERT into company values ('SUN','c2',0.0);
+ INSERT into company values ('MSFT','c3',0.0);</pre>
       </li>
     </ol>
     <p>
@@ -769,11 +759,11 @@ both two definition. This configuration is related with sample 363.</p>
 <p>Configuration is somewhat similar to the log4j appender configuration.</p>
 
 
-<p>It is need set up two databases , Please follows the above (Setting up
-Derby Database server) section and setup database for
-'jdbc:derby://localhost:1527/lookupdb' and
-'jdbc:derby://localhost:1527/reportdb' using user name and password as
-'synapse'.</p>
+<p>It requires two databases, follow the above specified (Setting up
+Derby Database server) steps to create the two databases
+<strong>'jdbc:derby://localhost:1527/lookupdb'</strong>,
+<strong>'jdbc:derby://localhost:1527/reportdb'</strong> using the user name and password as
+'synapse'. Fill in the data for those two databases as per described in the above section</p>
 
 <div>
 <p><strong>synapse.properties configuration <br />

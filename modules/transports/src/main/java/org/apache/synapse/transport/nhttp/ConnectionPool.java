@@ -20,6 +20,7 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.HttpHost;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,15 +55,16 @@ public class ConnectionPool {
                 while (!connections.isEmpty()) {
                     conn = (NHttpClientConnection) connections.remove(0);
 
-                    if (conn.isOpen()) {
+                    if (conn.isOpen() && !conn.isStale()) {
                         if (log.isDebugEnabled()) {
                             log.debug("A connection to host : " + host + " on port : " +
                                 port + " is available in the pool, and will be reused");
                         }
+                        conn.requestInput(); // asankha - make sure keep alives work properly when reused with throttling
                         return conn;
                     } else {
                         if (log.isDebugEnabled()) {
-                            log.debug("closing stale connection");
+                            log.debug("closing stale connection to : " + host + ":" + port);
                         }
                         try {
                             conn.close();
@@ -93,11 +95,45 @@ public class ConnectionPool {
             }
         }
 
+        cleanConnectionReferences(conn);
         connections.add(conn);
 
         if (log.isDebugEnabled()) {
             log.debug("Released a connection to host: " + host.getHostName() + " on port : " +
                     host.getPort() + " to the connection pool of current size : " + connections.size());
+        }
+    }
+
+    private static void cleanConnectionReferences(NHttpClientConnection conn) {
+
+        HttpContext ctx = conn.getContext();        
+        Axis2HttpRequest axis2Req =
+            (Axis2HttpRequest) ctx.getAttribute(ClientHandler.AXIS2_HTTP_REQUEST);
+        axis2Req.clear();   // this is linked via the selection key attachment and will free itself
+                            // on timeout of the keep alive connection. Till then minimize the
+                            // memory usage to a few bytes 
+
+        ctx.removeAttribute(ClientHandler.AXIS2_HTTP_REQUEST);
+        ctx.removeAttribute(ClientHandler.OUTGOING_MESSAGE_CONTEXT);
+        ctx.removeAttribute(ClientHandler.REQUEST_SOURCE_BUFFER);
+        ctx.removeAttribute(ClientHandler.RESPONSE_SINK_BUFFER);
+
+        ctx.removeAttribute(ExecutionContext.HTTP_REQUEST);
+        ctx.removeAttribute(ExecutionContext.HTTP_RESPONSE);
+        ctx.removeAttribute(ExecutionContext.HTTP_CONNECTION);
+    }
+
+    public static void forget(NHttpClientConnection conn) {
+
+        HttpHost host = (HttpHost) conn.getContext().getAttribute(
+            ExecutionContext.HTTP_TARGET_HOST);
+        String key = host.getHostName() + ":" + Integer.toString(host.getPort());
+
+        List connections = (List) connMap.get(key);
+        if (connections != null) {
+            synchronized(connections) {
+                connections.remove(conn);
+            }
         }
     }
 }

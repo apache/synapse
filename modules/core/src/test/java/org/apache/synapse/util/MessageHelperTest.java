@@ -30,9 +30,9 @@ public class MessageHelperTest extends TestCase {
     public void testClonePartially() throws Exception {
         String key = "propKey";
         MessageContext origMc = new MessageContext();
-        origMc.setProperty( key, "propValue" );
-        MessageContext newMc = MessageHelper.clonePartially( origMc );
-        Object result = newMc.getProperty( key );
+        origMc.setProperty(key, "propValue");
+        MessageContext newMc = MessageHelper.clonePartially(origMc);
+        Object result = newMc.getProperty(key);
         assertEquals(result, "propValue");
     }
 }

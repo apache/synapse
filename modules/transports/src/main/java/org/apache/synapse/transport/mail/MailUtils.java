@@ -50,6 +50,7 @@ public class MailUtils extends BaseUtils {
      * @param property property name
      * @return property value
      */
+    @Override
     public String getProperty(Object message, String property) {
         try {
             Object o = ((Message) message).getHeader(property);
@@ -62,6 +63,7 @@ public class MailUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public InputStream getInputStream(Object message) {
         try {
             if (message instanceof MimeMessage) {
@@ -100,6 +102,7 @@ public class MailUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public String getMessageTextPayload(Object message) {
         try {
             return new String(
@@ -113,6 +116,7 @@ public class MailUtils extends BaseUtils {
         return null;
     }
 
+    @Override
     public byte[] getMessageBinaryPayload(Object message) {
         try {
             return getBytesFromInputStream(getInputStream(message), ((Message) message).getSize());

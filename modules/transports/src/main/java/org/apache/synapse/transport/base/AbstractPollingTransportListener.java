@@ -78,6 +78,14 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
                     return;
                 }
 
+                if (state == BaseConstants.STOPPED) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Transport " + transportName +
+                                " onPoll() trigger : Transport is currently stopped..");
+                    }
+                    return;
+                }
+
                 workerPool.execute(new Runnable() {
                     public void run() {
                         synchronized (pollLock) {

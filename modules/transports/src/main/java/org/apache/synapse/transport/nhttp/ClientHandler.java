@@ -39,20 +39,17 @@ import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.entity.ContentInputStream;
+import org.apache.http.nio.util.*;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.threads.WorkerPool;
 import org.apache.synapse.transport.base.threads.WorkerPoolFactory;
-import org.apache.synapse.transport.nhttp.util.PipeImpl;
+import org.apache.synapse.transport.nhttp.util.SharedInputBuffer;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 
 /**
  * The client connection handler. An instance of this class is used by each IOReactor, to
@@ -69,6 +66,8 @@ public class ClientHandler implements NHttpClientHandler {
     private final HttpProcessor httpProcessor;
     /** the connection re-use strategy */
     private final ConnectionReuseStrategy connStrategy;
+    /** the buffer allocator */
+    private final ByteBufferAllocator allocator;
 
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
@@ -79,15 +78,12 @@ public class ClientHandler implements NHttpClientHandler {
     /** the metrics collector */
     private MetricsCollector metrics = null;
 
-    private static final String REQUEST_BUFFER = "request-buffer";
-    private static final String RESPONSE_BUFFER = "response-buffer";
-    private static final String OUTGOING_MESSAGE_CONTEXT = "axis2_message_context";
-    private static final String REQUEST_SOURCE_CHANNEL = "request-source-channel";
-    private static final String RESPONSE_SINK_CHANNEL = "response-sink-channel";
-    private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
-    private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
+    public static final String OUTGOING_MESSAGE_CONTEXT = "synapse.axis2_message_context";
+    public static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
 
-    private static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
+    public static final String REQUEST_SOURCE_BUFFER = "synapse.request-source-buffer";
+    public static final String RESPONSE_SINK_BUFFER = "synapse.response-sink-buffer";
+
     private static final String CONTENT_TYPE = "Content-Type";
 
     /**
@@ -105,6 +101,7 @@ public class ClientHandler implements NHttpClientHandler {
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.metrics = metrics;
+        this.allocator = new HeapByteBufferAllocator();
 
         this.cfg = NHttpConfiguration.getInstance();
         workerPool = WorkerPoolFactory.getWorkerPool(
@@ -129,13 +126,14 @@ public class ClientHandler implements NHttpClientHandler {
 
         try {
             HttpContext context = conn.getContext();
+            ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+            axis2Req.setOutputBuffer(outputBuffer);
+            context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);            
 
+            context.setAttribute(AXIS2_HTTP_REQUEST, axis2Req);
             context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
             context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
-
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
-            context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
-            context.setAttribute(REQUEST_SINK_CHANNEL, axis2Req.getSinkChannel());
 
             HttpRequest request = axis2Req.getRequest();
             request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
@@ -143,6 +141,11 @@ public class ClientHandler implements NHttpClientHandler {
 
             conn.submitRequest(request);
             context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+
+            synchronized(axis2Req) {
+                axis2Req.setReadyToStream(true);
+                axis2Req.notifyAll();
+            }
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);
@@ -165,18 +168,14 @@ public class ClientHandler implements NHttpClientHandler {
         try {
             HttpContext context = conn.getContext();
             Axis2HttpRequest axis2Req = (Axis2HttpRequest) attachment;
+            ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+            axis2Req.setOutputBuffer(outputBuffer);
+            context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);
 
             context.setAttribute(AXIS2_HTTP_REQUEST, axis2Req);
             context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
             context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
-
-            // allocate temporary buffers to process this request
-            context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
-            context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferSize()));
-
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
-            context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
-            context.setAttribute(REQUEST_SINK_CHANNEL, axis2Req.getSinkChannel());
 
             HttpRequest request = axis2Req.getRequest();
             request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
@@ -184,6 +183,11 @@ public class ClientHandler implements NHttpClientHandler {
 
             conn.submitRequest(request);
             context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+
+            synchronized(axis2Req) {
+                axis2Req.setReadyToStream(true);
+                axis2Req.notifyAll();
+            }
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);
@@ -193,31 +197,16 @@ public class ClientHandler implements NHttpClientHandler {
     }
 
     public void closed(final NHttpClientConnection conn) {
-    	checkAxisRequestComplete(conn, "Abnormal connection close", null);
-
-        // Check sink and source channels and close them if they aren't closed already.
-        // Normally these should be closed by inputReady() and outputReady(). A null request
-        // or response will not hit inputReady and outputReady however.
+        ConnectionPool.forget(conn);
+        checkAxisRequestComplete(conn, "Abnormal connection close", null);
 
         HttpContext context = conn.getContext();
-        closeChannel((ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL));
-        // Note: We do not close the RESPONSE_SOURCE_CHANNEL at this point in time as its closed
-        // by the ClientWorker:run() in the finally block, after the response was processed
-        // fix for https://issues.apache.org/jira/browse/SYNAPSE-289
-        closeChannel((WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL));
-        closeChannel((WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL));
-        
+        context.removeAttribute(RESPONSE_SINK_BUFFER);
+        context.removeAttribute(REQUEST_SOURCE_BUFFER);        
+
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
         }
-    }
-
-    private void closeChannel(Channel chn) {
-        try {
-            if (chn != null && chn.isOpen()) {
-                chn.close();
-            }
-        } catch (IOException ignore) {}
     }
 
     /**
@@ -272,47 +261,48 @@ public class ClientHandler implements NHttpClientHandler {
      * @param exceptionToRaise an Exception to be returned to the MR on failure
      */
     private void checkAxisRequestComplete(NHttpClientConnection conn,
-        String errorMessage, Exception exceptionToRaise) {
+        final String errorMessage, final Exception exceptionToRaise) {
 
         Axis2HttpRequest axis2Request = (Axis2HttpRequest)
                 conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
 
-        if (axis2Request == null) {
-            log.error("httpContext's AXIS2_HTTP_REQUEST attribute was null");
-
-        } else if (!axis2Request.isCompleted()) {
+        if (axis2Request != null && !axis2Request.isCompleted()) {
 
             axis2Request.setCompleted(true);
             if (errorMessage == null && exceptionToRaise == null) {
                 return; // no need to continue
             }
 
-            MessageContext mc = axis2Request.getMsgContext();
+            final MessageContext mc = axis2Request.getMsgContext();
 
             if (mc.getAxisOperation() != null &&
                     mc.getAxisOperation().getMessageReceiver() != null) {
 
-                MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
-                try {
-                    MessageContext nioFaultMessageContext = null;
-                    if (errorMessage != null) {
-                        nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
-                            mc, new AxisFault(errorMessage));
-                    } else if (exceptionToRaise != null) {
-                        nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
-                            /** this is not a mistake I do NOT want getMessage()*/
-                            mc, new AxisFault(exceptionToRaise.toString(), exceptionToRaise));
-                    }
+                workerPool.execute( new Runnable() {
+                    public void run() {
+                        MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+                        try {
+                            MessageContext nioFaultMessageContext = null;
+                            if (errorMessage != null) {
+                                nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
+                                    mc, new AxisFault(errorMessage));
+                            } else if (exceptionToRaise != null) {
+                                nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
+                                    /** this is not a mistake I do NOT want getMessage()*/
+                                    mc, new AxisFault(exceptionToRaise.toString(), exceptionToRaise));
+                            }
 
-                    if (nioFaultMessageContext != null) {
-                        nioFaultMessageContext.setProperty(
-                                NhttpConstants.SENDING_FAULT, Boolean.TRUE);
-                        mr.receive(nioFaultMessageContext);
-                    }
+                            if (nioFaultMessageContext != null) {
+                                nioFaultMessageContext.setProperty(
+                                        NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                                mr.receive(nioFaultMessageContext);
+                            }
 
-                } catch (AxisFault af) {
-                    log.error("Unable to report back failure to the message receiver", af);
-                }
+                        } catch (AxisFault af) {
+                            log.error("Unable to report back failure to the message receiver", af);
+                        }
+                    }
+                });
             }
         }
     }
@@ -325,25 +315,18 @@ public class ClientHandler implements NHttpClientHandler {
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        WritableByteChannel sink
-                = (WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL);
-        ByteBuffer inbuf = (ByteBuffer) context.getAttribute(REQUEST_BUFFER);
+        ContentInputBuffer inBuf = (ContentInputBuffer) context.getAttribute(RESPONSE_SINK_BUFFER);
 
         try {
-            while (decoder.read(inbuf) > 0) {
-                inbuf.flip();
-                sink.write(inbuf);
-                if (metrics != null) {
-                    metrics.incrementBytesReceived(inbuf.position());
-                }
-                inbuf.compact();
+            int bytesRead = inBuf.consumeContent(decoder);
+            if (metrics != null && bytesRead > 0) {
+                metrics.incrementBytesReceived(bytesRead);
             }
 
             if (decoder.isCompleted()) {
                 if (metrics != null) {
                     metrics.incrementMessagesReceived();
                 }
-                if (sink != null) sink.close();
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
@@ -364,28 +347,18 @@ public class ClientHandler implements NHttpClientHandler {
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         HttpContext context = conn.getContext();
 
-        ReadableByteChannel source
-                = (ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL);
-        ByteBuffer outbuf = (ByteBuffer) context.getAttribute(RESPONSE_BUFFER);
+        ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(REQUEST_SOURCE_BUFFER);
 
         try {
-            int bytesRead = source.read(outbuf);
-            if (bytesRead == -1) {
-                encoder.complete();
-            } else {
-                outbuf.flip();
-                encoder.write(outbuf);
-                if (metrics != null) {
-                    metrics.incrementBytesSent(outbuf.position());
-                }
-                outbuf.compact();
+            int bytesWritten = outBuf.produceContent(encoder);
+            if (metrics != null && bytesWritten > 0) {
+                metrics.incrementBytesSent(bytesWritten);
             }
 
             if (encoder.isCompleted()) {
                 if (metrics != null) {
                     metrics.incrementMessagesSent();
                 }
-                source.close();
             }
 
         } catch (IOException e) {
@@ -412,6 +385,11 @@ public class ClientHandler implements NHttpClientHandler {
                 if (log.isDebugEnabled()) {
                     log.debug("Received a 202 Accepted response");
                 }
+
+                // sometimes, some http clients sends an "\r\n" as the content body with a
+                // HTTP 202 OK.. we will just get it into this temp buffer and ignore it..
+                ContentInputBuffer inputBuffer = new SharedInputBuffer(8, conn, allocator);
+                context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
 
                 // create a dummy message with an empty SOAP envelope and a property
                 // NhttpConstants.SC_ACCEPTED set to Boolean.TRUE to indicate this is a
@@ -556,25 +534,24 @@ public class ClientHandler implements NHttpClientHandler {
     private void processResponse(final NHttpClientConnection conn, HttpContext context,
         HttpResponse response) {
 
-        try {
-            PipeImpl responsePipe = new PipeImpl();
-            context.setAttribute(RESPONSE_SINK_CHANNEL, responsePipe.sink());
-            context.setAttribute(RESPONSE_SOURCE_CHANNEL, responsePipe.source());
+        ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+        context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
 
-            BasicHttpEntity entity = new BasicHttpEntity();
-            if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
-                entity.setChunked(true);
-            }
-            response.setEntity(entity);
-            context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
-
-            workerPool.execute(
-                new ClientWorker(cfgCtx, Channels.newInputStream(responsePipe.source()), response,
-                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
-
-        } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
+        BasicHttpEntity entity = new BasicHttpEntity();
+        if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
+            entity.setChunked(true);
         }
+        response.setEntity(entity);
+        context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
+
+        workerPool.execute(
+            new ClientWorker(cfgCtx, new ContentInputStream(inputBuffer), response,
+                (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
+
+    }
+
+    public void execute(Runnable task) {
+        workerPool.execute(task);        
     }
 
     // ----------- utility methods -----------

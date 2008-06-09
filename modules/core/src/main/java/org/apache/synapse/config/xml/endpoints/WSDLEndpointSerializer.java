@@ -21,7 +21,6 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
@@ -30,13 +29,8 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
  * Serializes an WSDL based endpoint to an XML configuration.
- *
- * <endpoint [name="name"]>
- *    <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
- *    <wsdl uri="wsdl uri" service="service name" port="port name">
- *       .. extensibility ..
- *    </wsdl>
- * </endpoint>
+ * 
+ * @see WSDLEndpointFactory
  */
 public class WSDLEndpointSerializer extends EndpointSerializer {
 
@@ -81,11 +75,14 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.
         EndpointDefinition epDefinition = wsdlEndpoint.getEndpoint();
-        serializeQOSInformation(epDefinition, wsdlElement);
-
+        serializeCommonEndpointProperties(epDefinition, wsdlElement);
+        serializeSpecificEndpointProperties(epDefinition, wsdlElement);
         endpointElement.addChild(wsdlElement);
 
         return endpointElement;
     }
-    
+
+    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition, OMElement element) {
+    }
+
 }

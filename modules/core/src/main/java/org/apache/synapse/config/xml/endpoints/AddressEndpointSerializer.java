@@ -29,10 +29,10 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
  * Serializes {@link AddressEndpoint} to XML.
- * 
+ *
  * @see AddressEndpointFactory
  */
-public class AddressEndpointSerializer extends EndpointSerializer {
+public class AddressEndpointSerializer extends DefaultEndpointSerializer {
 
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
@@ -60,7 +60,7 @@ public class AddressEndpointSerializer extends EndpointSerializer {
     public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {
 
         OMElement element = fac.createOMElement("address", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        
+
         if (endpointDefinition.getAddress() != null) {
             element.addAttribute(
                     fac.createOMAttribute("uri", null, endpointDefinition.getAddress()));
@@ -68,8 +68,9 @@ public class AddressEndpointSerializer extends EndpointSerializer {
             handleException("Invalid Endpoint. Address is required");
         }
 
-        serializeQOSInformation(endpointDefinition, element);
-        
+        serializeCommonEndpointProperties(endpointDefinition, element);
+        serializeSpecificEndpointProperties(endpointDefinition, element);
+
         return element;
     }
 }

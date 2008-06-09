@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.ServerManager;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -59,10 +60,7 @@ public class TimeoutHandler extends TimerTask {
 
     public TimeoutHandler(Map callbacks) {
         this.callbackStore = callbacks;
-        try {
-            globalTimeout = Long.parseLong(
-                System.getProperty(SynapseConstants.GLOBAL_TIMEOUT_INTERVAL));
-        } catch (Exception ignore) {}
+        globalTimeout = ServerManager.getInstance().getGlobalTimeoutInterval();
         log.info("This engine will expire all callbacks after : " + (globalTimeout /1000) +
             " seconds, irrespective of the timeout action, after the specified or optional timeout");
     }

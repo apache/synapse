@@ -19,16 +19,19 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.*;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.base.AbstractTransportListener;
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.ManagementSupport;
-import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.commons.logging.LogFactory;
 
 import javax.jms.JMSException;
 import javax.naming.NamingException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The JMS Transport listener implementation. A JMS Listner will hold one or
@@ -133,6 +136,10 @@ public class JMSListener extends AbstractTransportListener implements Management
         if (serviceName.indexOf('/') != -1) {
             serviceName = serviceName.substring(0, serviceName.indexOf('/'));
         }
+        // strip out the endpoint name if present
+        if (serviceName.indexOf('.') != -1) {
+            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
+        }
         return new EndpointReference[]{
             new EndpointReference((String) serviceNameToEPRMap.get(serviceName))};
     }
@@ -165,8 +172,8 @@ public class JMSListener extends AbstractTransportListener implements Management
 
         String destinationType = JMSUtils.getDestinationTypeForService(service);
         
-        log.info("Starting to listen on destination : " + destinationName + " of type " + destinationType
-            + " for service " + service.getName());
+        log.info("Starting to listen on destination : " + destinationName + " of type "
+                + destinationType + " for service " + service.getName());
         cf.addDestination(destinationName, destinationType, service.getName());
         cf.startListeningOnDestination(destinationName, destinationType);
     }

@@ -112,8 +112,9 @@ public class FIXClient {
 
         options.setAction("urn:mediate");
         serviceClient.setOptions(options);
-        serviceClient.sendReceive(message);
+        OMElement response = serviceClient.sendReceive(message);
         Thread.sleep(5000);
+        System.out.println("Response Received: " + response.toString());
 
         try {
             if (configContext != null) {

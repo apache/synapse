@@ -19,17 +19,24 @@
 
 package org.apache.synapse.endpoints.algorithms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.ArrayList;
 
 /**
- * This is the implementation of the round robin load balancing algorithm. It simply iterates through
- * the endpoint list one by one for until an active endpoint is found.
+ * This is the implementation of the round robin load balancing algorithm. It simply iterates
+ * through the endpoint list one by one for until an active endpoint is found.
  */
 public class RoundRobin implements LoadbalanceAlgorithm {
 
+    private static final Log log = LogFactory.getLog(RoundRobin.class);
+
+    /**
+     * Endpoints list for the round robin algorithm
+     */
     private ArrayList endpoints = null;
 
     public RoundRobin(ArrayList endpoints) {
@@ -44,7 +51,12 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * @param  algorithmContext The context in which holds run time states related to the algorithm
      * @return endpoint to send the next message
      */
-    public Endpoint getNextEndpoint(MessageContext synapseMessageContext, AlgorithmContext algorithmContext) {
+    public Endpoint getNextEndpoint(MessageContext synapseMessageContext,
+        AlgorithmContext algorithmContext) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Using the Round Robin loadbalancing algorithm to select the next endpoint");
+        }
 
         Endpoint nextEndpoint;
         int attempts = 0;
@@ -64,6 +76,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
 
             attempts++;
             if (attempts > endpoints.size()) {
+                log.warn("Couldn't find an endpoint from the Round Robin loadbalancing algorithm");
                 return null;
             }
 
@@ -73,6 +86,9 @@ public class RoundRobin implements LoadbalanceAlgorithm {
     }
 
     public void reset(AlgorithmContext algorithmContext) {
+        if (log.isDebugEnabled()) {
+            log.debug("Resetting the Round Robin loadbalancing algorithm ...");
+        }
         algorithmContext.setCurrentEPR(0);
     }
 }

@@ -31,13 +31,13 @@ import javax.xml.namespace.QName;
 
 /**
  * Creates {@link AddressEndpoint} using a XML configuration.
- * <p>
+ * <p/>
  * Configuration syntax:
  * <pre>
  * &lt;endpoint [name="<em>name</em>"]&gt;
- *   &lt;address uri="<em>url</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
- *      [encoding="<em>charset encoding</em>"]
- *          [statistics="enable|disable"] [trace="enable|disable"]&gt;
+ *   &lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+ *            [encoding="<em>charset encoding</em>"]
+ *            [statistics="enable|disable"] [trace="enable|disable"]&gt;
  *     .. extensibility ..
  *
  *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
@@ -50,16 +50,18 @@ import javax.xml.namespace.QName;
  *     &lt;/timeout&gt;?
  *
  *     &lt;suspendDurationOnFailure&gt;
- *              <em>suspend duration in seconds</em>&lt;/suspendDurationOnFailure&gt;?
+ *       <em>suspend duration in seconds</em>
+ *     &lt;/suspendDurationOnFailure&gt;?
  *   &lt;/address&gt;
  * &lt;/endpoint&gt;
  * </pre>
  */
-public class AddressEndpointFactory extends EndpointFactory {
+public class AddressEndpointFactory extends DefaultEndpointFactory {
 
     private static AddressEndpointFactory instance = new AddressEndpointFactory();
 
-    private AddressEndpointFactory() {}
+    private AddressEndpointFactory() {
+    }
 
     public static AddressEndpointFactory getInstance() {
         return instance;
@@ -102,7 +104,8 @@ public class AddressEndpointFactory extends EndpointFactory {
             endpointDefinition.setAddress(address.getAttributeValue());
         }
 
-        extractEndpointProperties(endpointDefinition, elem);
+        extractCommonEndpointProperties(endpointDefinition, elem);
+        extractSpecificEndpointProperties(endpointDefinition,elem);
         return endpointDefinition;
     }
 }

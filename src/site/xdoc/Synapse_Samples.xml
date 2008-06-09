@@ -2,7 +2,7 @@
 
 <document>
     <properties>
-        <title>Samples Guide</title>
+        <title>Apache Synapse - Samples Guide</title>
     </properties>
     <head>
         <style type="text/css" xml:space="preserve">
@@ -102,23 +102,22 @@
     }</style>
     </head>
   <body>
-      <table border="0" style="width: 100%">
-      <caption/>
-      <tbody>
-        <tr>
-          <td>
-            <h1>
-                Running the Synapse Samples              
-            </h1>
-          </td>
-          <td>
-            <img alt="Synapse logo"
-            src="images/synapse-logo-web2.png" width="197"
-            height="82"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="margin-top:-40px; float:right; _margin-top:0px;">
+      <img alt="Synapse logo"
+           src="images/synapse-logo-web2.png" width="197"
+           height="82"/>
+    </div>
+    <div>
+      <h1>
+        Apache Synapse ESB - Running the Samples
+      </h1>
+    </div>
+    <p>
+      This guide will walk you through the built-in samples shipped with the product,
+      which will cover most of the basic functional sceanrios and capabilities of Apache Synapse
+      as an ESB. If you are unable to solve your problem by reading through and
+      running these samples, feel free to raise your problem on the
+      <a href="http://synapse.apache.org/mail-lists.html">mailing lists</a>.</p>
     <h2>
       <a name="TOC" id="TOC">Contents</a>
     </h2>
@@ -179,7 +178,10 @@
             </li>
             <li>
               <a href="#Sample12">Sample 12: One way messaging /
-              fireAndForget through synapse</a>
+              fireAndForget through Synapse</a>
+            </li>
+            <li>
+              <a href="#Sample13">Sample 13: Dual channel invocation through Synapse</a>
             </li>
           </ul>
         </li>
@@ -250,6 +252,10 @@
               <a href="#Sample154">Sample 154: Load Balancing with Proxy
               Service </a>
             </li>
+            <li>
+              <a href="#Sample155">Sample 155: Dual channel invocation
+              on both client side and server side of Synapse with Proxy Services</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -307,7 +313,7 @@
           </ul>
         </li>
         <li>
-          <a href="#Task">Introduction to synapse tasks</a>
+          <a href="#Task">Introduction to Synapse tasks</a>
           <ul>
             <li>
               <a href="#Sample300">Sample 300: Introduction to tasks with
@@ -415,18 +421,12 @@
                 </li>
               </ul>
             </li>
-
-
-
-
-
-
             <li>
               <a href="#Cache">Caching the responses over the requests</a>
               <ul>
                 <li>
                   <a href="#Sample420">Sample 420: Simple cache implemented
-                  on synapse for the actual service</a>
+                  on Synapse for the actual service</a>
                 </li>
               </ul>
             </li>
@@ -436,7 +436,7 @@
               <ul>
                 <li>
                   <a href="#Sample430">Sample 430: Simple Callout Mediator
-                  for Synchronize web service invocation</a>
+                  for synchronize web service invocation</a>
                 </li>
               </ul>
             </li>
@@ -471,23 +471,17 @@
       <li>
         Smart Client mode
       </li>
-      <li>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ </pre>
-      </li>
+        <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ </pre>
       <li>
         Using Synapse as a HTTP Proxy
       </li>
-      <li>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8080/</pre>
-      </li>
+        <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8280/</pre>
       <li>
         Gateway Mode / Dumb Client
       </li>
-      <li>
         <p>
           See sample # 1
         </p>
-      </li>
     </ol>
     <p>
       <strong>Prerequisites:<br/> </strong>Start the Synapse
@@ -526,7 +520,7 @@
       run this scenario. However this time the difference is at the client, as
       it sends the message to the WS-Addressing 'To' address
       http://localhost:9000/soap/SimpleStockQuoteService, but the transport
-      specifies Synapse as the http proxy.
+      specifies Synapse as the HTTP proxy.
     </p>
     <h2>
       <a name="Sample1" id="Sample1">Sample 1: Simple content based routing
@@ -558,11 +552,11 @@
     <p>
       Execute the Dumb Client as:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuote<br/></pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote<br/></pre>
     <p>
       This time you will see Synapse receiving a message for which Synapse was
       set as the ultimate receiver of the message. Based on the 'To' EPR of
-      http://localhost:8080/soap/StockQuote, Synapse performs a match to the
+      http://localhost:8280/soap/StockQuote, Synapse performs a match to the
       path '/StockQuote' and as the request matches the XPath expression of the
       filter mediator, the filter mediator's child mediators execute. This sends
       the message to a different endpoint as specified by the endpoint
@@ -621,16 +615,10 @@
       value is looked up by the log mediator and logged using the
       'get-property()' XPath extension function.
     </p>
-    <p>
-      ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService
-      -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM
-    </p>
-<pre xml:space="preserve">INFO LogMediator - symbol = Great stock - IBM, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService </pre>
-    <p>
-      ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService
-      -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT
-    </p>
-<pre xml:space="preserve">INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
+    <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
+    <pre xml:space="preserve">      INFO LogMediator - symbol = Great stock - IBM, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService </pre>
+    <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
+    <pre xml:space="preserve">      INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
     <h2>
       <a name="Sample3" id="Sample3">Sample 3: Local Registry entry
       definitions, reusable endpoints and sequences</a>
@@ -684,9 +672,9 @@
       configurations. Execute the 'ant stockquote ..' request again, and
       following through the mediation logs you will now notice that the sequence
       named "main" is executed. Then for the incoming message flow the &lt;in&gt;
-      mediator executes, and it calls into the sequence named "stockquote".
+      mediator executes, and it calls the sequence named "stockquote".
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 <pre xml:space="preserve">DEBUG SequenceMediator - Sequence mediator &lt;main&gt; :: mediate()<br/>DEBUG InMediator - In mediator mediate()<br/>DEBUG SequenceMediator - Sequence mediator &lt;stockquote&gt; :: mediate()</pre>
     <p>
       As the "stockquote" sequence executes, the log mediator dumps a simple
@@ -768,7 +756,7 @@
     </p>
     <p>
       When the IBM stock quote is requested, the configuration routes it to the
-      defined inline endpoint, which routes the message to the
+      defined in-line endpoint, which routes the message to the
       SimpleStockQuoteService on the local Axis2 instance. Hence a valid
       response message is shown at the client.
     </p>
@@ -782,7 +770,7 @@
       sequence named 'fault'. Thus the 'fault' sequence can be seen executing,
       and writing the generic error message to the logs.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
 [HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : bogus
 [HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault
@@ -795,7 +783,7 @@
       when the send fails, you could see the proper error handler invocation and
       the custom error message printed as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate()
 [HttpServerWorker-1] DEBUG SequenceMediator - Setting the onError handler for the sequence
 [HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
@@ -862,7 +850,7 @@
       stock request. This error message is captured and returned to the original
       client as a SOAP fault in this example.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
     <p>
       returns,
     </p>
@@ -871,7 +859,7 @@
     <p>
       And
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</pre>
     <p>
       returns,
     </p>
@@ -902,7 +890,7 @@
       to the stock quote service on the sample Axis2 server. Thus it is now
       possible to request for a stock quote as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <h2>
       <a name="Sample7" id="Sample7">Sample 7: Introduction to local Registry
       entries and using Schema validation</a>
@@ -960,7 +948,7 @@
       This example shows how a static XML fragment could be made available to
       the Synapse local registry. Resources defined in the local registry are
       static (i.e. never changes over the lifetime of the configuration) and may
-      be specified as a source URL, inline text or inline xml. In this example
+      be specified as a source URL, in-line text or in-line xml. In this example
       the schema is made available under the key 'validate_schema'.
     </p>
     <p>
@@ -968,7 +956,7 @@
       the SOAP body. You may specify an XPath expression using the 'source'
       attribute to override this behaviour. The validate mediator now uses the
       'validate_schema' resource to validate the incoming message, and if the
-      message validatation fails it invokes the 'on-fail' sequence of mediators.
+      message validation fails it invokes the 'on-fail' sequence of mediators.
     </p>
     <p>
       If you send a stockquote request using 'ant stockquote ...' you will get a
@@ -976,9 +964,9 @@
       validation failed. This is because the schema used in the example expects
       a slightly different message than what is created by the stock quote
       client. (i.e. expects a 'stocksymbol' element instead of 'symbol' to
-      specify thestock symbol)
+      specify the stock symbol)
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
     <h2>
       <a name="Sample8" id="Sample8">Sample 8: Introduction to static and
       dynamic registry resources, and using XSLT transformations</a>
@@ -1018,11 +1006,11 @@
     </p>
     <p>
       This example uses the XSLT mediator to perform transformations, and the
-      xslt tranformations are specified as registry resources. The first
+      xslt transformations are specified as registry resources. The first
       resource 'xslt-key-req' is specified as a 'local' registry entry. Local
       entries do not place the resource on the registry, but simply make it
       available to the local configuration. If a local entry is defined with a
-      key that already exists in the remote registry, the local entry will have
+      key that already exists in the remote registry, the local entry will get
       higher preference and override the remote resource.
     </p>
     <p>
@@ -1049,7 +1037,7 @@
       Execute the custom quote client as 'ant stockquote -Dmode=customquote ...'
       and analyze the the Synapse debug log output
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
     <p>
       The incoming message is now transformed into a standard stock quote
       request as expected by the SimpleStockQuoteService deployed on the local
@@ -1063,7 +1051,7 @@
       During the response processing you could see the SimpleURLRegistry
       fetching the resource as shown by the log message below
     </p>
-<pre xml:space="preserve">[HttpClientWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
+<pre xml:space="preserve">[HttpClientWorker-1] DEBUG SimpleURLRegistry ==> Repository fetch of resource with key : transform/transform_back.xslt</pre>
     <p>
       If you run the client again immediately (i.e within 15 seconds of the
       first request) you will not see the resource being reloaded by the
@@ -1111,7 +1099,7 @@
     &lt;sequence key="sequence/dynamic_seq_1.xml"/&gt;
 &lt;/definitions&gt; </pre>
     <p>
-      <strong>Objective: Introduction to dynamic sequences with a Registry</strong>
+      <strong>Objective: Introduction to dynamic sequences with a registry</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> Start the Synapse
@@ -1120,13 +1108,13 @@
     </p>
     <p>
       This example introduces the dynamic behaviour of Synapse through the use
-      of a Registry. Synapse supports dynamic definitions for sequences and
+      of a registry. Synapse supports dynamic definitions for sequences and
       endpoints, and as seen before, for resources. In this example we define a
       Synapse configuration which references a sequence definition specified as
       a registry key. The registry key resolves to the actual content of the
       sequence which would be loaded dynamically by Synapse at runtime, and
       cached appropriately as per its definition in the registry. Once the cache
-      expires, Synapse would recheck the meta information for the definition and
+      expires, Synapse would re-check the meta information for the definition and
       re-load the sequence definition if necessary and re-cache it again.
     </p>
     <p>
@@ -1134,8 +1122,8 @@
       stockquote..'. You will notice that that Synapse fetches the definition of
       the sequence from the registry and executes its rules as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
-<pre xml:space="preserve">[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
+<pre xml:space="preserve">[HttpServerWorker-1] DEBUG  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
 ...
@@ -1152,14 +1140,14 @@
       sequence, you will notice that the new sequence is loaded and executed by
       Synapse from the following log messages.
     </p>
-<pre xml:space="preserve">[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
+<pre xml:space="preserve">[HttpServerWorker-1] DEBUG  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
 ...
 [HttpServerWorker-1] INFO  LogMediator - message = *** Test Message 2 ***</pre>
     <p>
       The cache timeout could be tuned appropriately by configuring the URL
-      registry to suite the environment and the needs.
+      registry to suit the environment and the needs.
     </p>
     <h2>
       <a name="Sample10" id="Sample10">Sample 10: Introduction to dynamic
@@ -1188,27 +1176,27 @@
       <strong>Prerequisites:</strong><br/> Start the Synapse
       configuration numbered 10: i.e. synapse -sample 10<br/> Start the Axis2
       server and deploy the SimpleStockQuoteService if not already done<br/>
-      Start a second Axis2 server on http port 9001 and https port 9003 as
+      Start a second Axis2 server on HTTP port 9001 and HTTPS port 9003 as
       follows:
     </p>
 <pre xml:space="preserve">./axis2server.sh -http 9001 -https 9003</pre>
     <p>
       This example introduces dynamic endpoints, where the definition of an
-      endpoint is stored in the Registry. To follow this example execute the
+      endpoint is stored in the registry. To follow this example execute the
       stock quote client as 'ant stockquote..' and see that the message is
       routed to the SimpleStockQuoteService on the default Axis2 instance on
-      http port 9000. Repeat the above example immediately again, and notice
+      HTTP port 9000. Repeat the above example immediately again, and notice
       that the endpoint is cached and reused by Synapse - similarly to example #
       8.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <p>
       Now edit the repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml
       definition and update the address to
-      "http://localhost:9001/soap/SimpleStockQuoteService". After the cached
+      "http://localhost:9001/soap/SimpleStockQuoteService". After the cached value
       expires, the Registry loads the new definition of the endpoint, and then
       the messages can be seen being routed to the second sample Axis2 server on
-      http port 9001.
+      HTTP port 9001.
     </p>
     <h2>
       <a name="Sample11" id="Sample11">Sample 11: A full registry based
@@ -1239,7 +1227,7 @@
       (Note: Full registry based configuration is not dynamic atleast for the
       moment. i.e. it is not reloading itself)
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 <pre xml:space="preserve">[HttpServerWorker-1] INFO LogMediator - message = This is a dynamic Synapse configuration</pre>
     <p>
       The actual synapse.xml loaded is:
@@ -1253,11 +1241,11 @@
 &lt;/definitions&gt;</pre>
     <h2>
       <a name="Sample12" id="Sample12">Sample 12: One way messaging /
-      fireAndForget through synapse</a>
+      fireAndForget through Synapse</a>
     </h2>
     <p>
-      <strong>Objective: Demonstrate one way messaging / fireAndForget
-      through synapse</strong>
+      <strong>Objective: Demonstrate one-way messaging / fireAndForget
+      through Synapse</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> Start the Axis2 server
@@ -1268,16 +1256,56 @@
       This example invokes the one-way 'placeOrder' operation on the
       SimpleStockQuoteService using the custom client which uses the Axis2
       ServiceClient.fireAndForget() API. To test this, use 'ant
-      -Dmode=placeorder...' and you will notice the one way message flowing
+      -Dmode=placeorder...' and you will notice the one-way message flowing
       through Synapse into the sample Axis2 server instance, which reports the
       acceptance of the order as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=placeorder</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder</pre>
 <pre xml:space="preserve">SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
     <p>
       If you send your client request through TCPmon, you will notice that the
       SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
-      Synapse in-turn replies to the client with a HTTP 202 acknowledgement
+      Synapse in turns replies to the client with a HTTP 202 acknowledgment
+    </p>
+    <h2>
+      <a name="Sample13" id="Sample13">Sample 13: Dual channel invocation through Synapse</a>
+    </h2>
+    <p>
+      <strong>Objective: Demonstrate dual channel messaging
+      through Synapse</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong><br/> Start the Axis2 server
+      and deploy the SimpleStockQuoteService (Refer steps above)<br/> Start
+      the Synapse configuration numbered 0: i.e. synapse -sample 0
+    </p>
+    <p>
+      This example invokes the same 'getQuote' operation on the
+      SimpleStockQuoteService using the custom client which uses the Axis2
+      ServiceClient API with useSeparateListener set to true so that the response is
+      coming through a different channel than the one which is used to send the request
+      to a callback defined in the client.
+      To test this, use 'ant
+      -Dmode=dualquote...' and you will notice the dual channel invocation
+      through Synapse into the sample Axis2 server instance, which reports the response
+      back to the client over a different channel:
+    </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=dualquote</pre>
+<pre xml:space="preserve">Response received to the callback
+Standard dual channel :: Stock price = $57.16686934968289</pre>
+    <p>
+      If you send your client request through TCPmon, you will notice that
+      Synapse replies to the client with a HTTP 202 acknowledgment when you send the request and
+      the communication between Synapse and the server happens on a single channel and then you
+      get the response back from Synapse to the clients callback in a different channel (which
+      cannot be observed through TCPmon)
+    </p>
+    <p>
+      Also you could see the wsa:Reply-To header being something like
+      http://localhost:8200/axis2/soap/anonService2 which implies that the reply
+      is being on a different channel listening on the port 8200. Please note that it is
+      required to engage addressing when using the dual channel invocation because it
+      requires the wsa:Reply-To header.
     </p>
     <h1>
       <a name="Endpoints" id="Endpoints">Advanced mediations with endpoints</a>
@@ -1312,9 +1340,9 @@
       Execute the 'ant stockquote' specifying that the request should be a REST
       request as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuote -Drest=true</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote -Drest=true</pre>
     <p>
-      This example shows a http REST request (as shown below) being transformed
+      This example shows a HTTP REST request (as shown below) being transformed
       into a SOAP request and forwarded to the stock quote service.
     </p>
 <pre xml:space="preserve">POST /soap/StockQuote HTTP/1.1
@@ -1380,7 +1408,7 @@ Transfer-Encoding: chunked
       The configuration now sets a local message context property, and forwards
       the message to 'http://localhost:9000/soap/MTOMSwASampleService'
       optimizing binary content as MTOM. By sending this message through TCPMon
-      you would be able to see the actual message sent over the http transport
+      you would be able to see the actual message sent over the HTTP transport
       if required. Thus during response processing, by checking the local
       message property Synapse could identify the past information about the
       current message context, and uses this knowledge to transform the response
@@ -1388,20 +1416,20 @@ Transfer-Encoding: chunked
     </p>
     <p>
       When the client executes successfully, it will upload a file containing
-      the ASF logo and receive its response back again and save it into a
+      the ASF logo and receive its response back again and saves it into a
       temporary file.
     </p>
-<pre xml:space="preserve">[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as MTOM</pre>
-<pre xml:space="preserve">[java] Saved response to file : /tmp/mtom-36877.gif</pre>
+<pre xml:space="preserve">[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as MTOM
+[java] Saved response to file : ./../../work/temp/sampleClient/mtom-4417.gif</pre>
     <p>
       Next try SwA as:
     </p>
 <pre xml:space="preserve">ant optimizeclient -Dopt_mode=swa</pre>
 <pre xml:space="preserve">[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as SwA
-[java] Saved response to file : /tmp/swa-47549.gif</pre>
+[java] Saved response to file : ./../../work/temp/sampleClient/swa-30391.gif</pre>
     <p>
       By using TCPMon and sending the message through it, one can inspect that
-      the requests and responses sent are indeed MTOM optimized or sent as http
+      the requests and responses sent are indeed MTOM optimized or sent as HTTP
       attachments as follows:
     </p>
 <pre xml:space="preserve">POST http://localhost:9000/soap/MTOMSwASampleService HTTP/1.1
@@ -1520,7 +1548,7 @@ Content-ID:
 
 &lt;/definitions&gt;</pre>
     <p>
-      <strong>Objective: Demonstrate the simple load balancing among set of
+      <strong>Objective: Demonstrate the simple load balancing among a set of
       endpoints</strong>
     </p>
     <p>
@@ -1530,7 +1558,7 @@ Content-ID:
       Start Synapse with sample configuration 52. (i.e. synapse -sample 52)
     </p>
     <p>
-      Deploy the LoadbalanceFailoverService by switching to &lt;synapse
+      Deploy the LoadbalanceFailoverService by switching to &lt;Synapse
       installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService
       directory and running ant.
     </p>
@@ -1539,7 +1567,7 @@ Content-ID:
       9003 and give some unique names to each server.
     </p>
     <p>
-      Example commands to run sample Axis2 servers from the &lt;synapse
+      Example commands to run sample Axis2 servers from the &lt;Synapse
       installation directory&gt;/samples/axis2Server directory in Linux are
       listed below:
     </p>
@@ -1586,7 +1614,7 @@ Content-ID:
 [java] Request: 67 ==&gt; Response from server: MyServer3
 ...</pre>
     <p>
-      Now restart MyServer1. You can observe that requets will be again sent to
+      Now restart MyServer1. You can observe that requests will be again sent to
       all three servers roughly after 60 seconds. This is because we have
       specified &lt;suspendDurationOnFailure&gt; as 60 seconds in the
       configuration. Therefore, load balance endpoint will suspend any failed
@@ -1664,7 +1692,7 @@ Content-ID:
     <p>
       Above configuration sends messages with the failover behavior. Initially
       the server at port 9001 is treated as primary and other two are treated as
-      back ups. Messages are always directed only to the primary server. If the
+      backups. Messages are always directed only to the primary server. If the
       primary server has failed, next listed server is selected as the primary.
       Thus, messages are sent successfully as long as there is at least one
       active server. To test this, run the loadbalancefailover client to send
@@ -1759,7 +1787,7 @@ Content-ID:
 
 &lt;/definitions&gt;</pre>
     <p>
-      <strong>Objective: Demonstrate the load balancing with session affinity
+      <strong>Objective: Demonstrate the loadbalancing with session affinity
       using client initiated sessions</strong>
     </p>
     <p>
@@ -1777,16 +1805,16 @@ Content-ID:
       Above configuration is same as the load balancing configuration in sample
       52, except that the session type is specified as "simpleClientSession".
       This is a client initiated session, which means that the client generates
-      the session identifier and send it to with each request. In this sample
+      the session identifier and sends it with each request. In this sample
       session type, client adds a SOAP header named ClientID containing the
       identifier of the client. Synapse binds this ID with a server on the first
-      request and sends all seccessive requests containing that ID to the same
+      request and sends all successive requests containing that ID to the same
       server. Now switch to samples/axis2Client directory and run the client
       using the following command to check this in action.
     </p>
 <pre xml:space="preserve">ant loadbalancefailover -Dmode=session</pre>
     <p>
-      In the session mode, client continuesly sends requests with three diferent
+      In the session mode, client continuously sends requests with three different
       client (session) IDs. One ID is selected among these three IDs for each
       request randomly. Then client prints the session ID with the responded
       server for each request. Client output for the first 10 requests are shown
@@ -1889,8 +1917,8 @@ Content-ID:
     </p>
     <p>
       Deploy the LoadbalanceFailoverService and start four sample Axis2 servers
-      on http ports 9001, 9002, 9003 and 9004 respectively (make sure to specify
-      unconflicting https ports).
+      on HTTP ports 9001, 9002, 9003 and 9004 respectively (make sure to specify
+      non-conflicting HTTPS ports).
     </p>
     <p/>
     <p>
@@ -1902,7 +1930,7 @@ Content-ID:
       mechanism. Therefore, if one endpoint bound to a session failed,
       successive requets for that session will be directed to the next endpoint
       in that failover group. Run the client using the following command to
-      observe this behavoir.
+      observe this behaviour.
     </p>
 <pre xml:space="preserve">ant loadbalancefailover -Dmode=session</pre>
     <p>
@@ -1924,7 +1952,7 @@ Content-ID:
       Note that session 0 is always directed to MyServer1 and session 1 is
       directed to MyServer3. No requests are directed to MyServer2 and MyServer4
       as they are kept as backups by failover endpoints. Now shutdown the server
-      named MyServer1 while running the sample. You will observer that all
+      named MyServer1 while running the sample. You will observe that all
       successive requests for session 0 is now directed to MyServer2, which is
       the backup server for MyServer1's group. This is shown below, where
       MyServer1 was shutdown after the request 534.
@@ -1980,7 +2008,7 @@ Content-ID:
       can extract endpoint's address from the given WSDL. As WSDL documents can
       have many services and many ports inside each service, the service and
       port of the required endpoint has to be specified. As with address
-      endpoints, QoS parameters for the endpoint can be specified inline in the
+      endpoints, QoS parameters for the endpoint can be specified in-line in the
       configuration. An excerpt taken from the sample_proxy_1.wsdl containing
       the specified service and port is listed below.
     </p>
@@ -1999,7 +2027,7 @@ Content-ID:
       "http://localhost:9000/soap/SimpleStockQuoteService" according to the
       above WSDL. Now run the client using the following command.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
     <p>
       Client will print the quote price for IBM received from the server running
       on port 9000. Observe the Axis2 console and the Synapse console to verify
@@ -2060,7 +2088,7 @@ Content-ID:
       removed from the decrypted message and the response is delivered back to
       the client, as expected. You may execute the client as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <p>
       The message sent by Synapse to the secure service can be seen as follows,
       when TCPMon is used.
@@ -2144,7 +2172,7 @@ User-Agent: Synapse-HttpComponents-NIO
     <p>
       Deploy the ReliableStockQuoteService in the sample Axis2 server by
       switching to the samples/axis2Server/src/ReliableStockQuoteService
-      directory and running ant.
+      directory and running the command 'ant'.
     </p>
     <p>
       Start the sample Axis2 server on port 9000.
@@ -2164,13 +2192,13 @@ User-Agent: Synapse-HttpComponents-NIO
       It also specifies the version of the WS-RM to be used. Refer to the
       Synapse configuration language documentation for more information about
       the RMSequence mediator. RM related SOAP headers are removed form the
-      message in the out mediator as WS-RM message exchange happens only between
+      message in the out mediator as WS-RM message exchange takes place only between
       the Synapse and the server. Now run the sample client using the following
       command.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
     <p>
-      You can observer the client output displaying the quote price for IBM as
+      You can observe the client output displaying the quote price for IBM as
       follows:
     </p>
 <pre xml:space="preserve">[java] Standard :: Stock price = $189.2521262517493</pre>
@@ -2342,7 +2370,7 @@ User-Agent: Synapse-HttpComponents-NIO
     <p/>
     <p>
       Once Synapse starts, you could go to
-      http://localhost:8080/soap/StockQuoteProxy?wsdl and view the WSDL
+      http://localhost:8280/soap/StockQuoteProxy?wsdl and view the WSDL
       generated for the proxy service defined in the configuration. This WSDL is
       based on the source WSDL supplied in the proxy service definition, and is
       updated to reflect the proxy service EPR.
@@ -2351,7 +2379,7 @@ User-Agent: Synapse-HttpComponents-NIO
       Execute the stock quote client by requesting for a stock quote on the
       proxy service as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy</pre>
     <p>
       An 'inSequence' or 'endpoint' or both of these would decide how the
       message would be handled after the proxy service receives the message. In
@@ -2401,7 +2429,7 @@ User-Agent: Synapse-HttpComponents-NIO
     </p>
     <p/>
     <p>
-      This configuration creates two proxy services.. The first proxy service
+      This configuration creates two proxy services. The first proxy service
       'StockQuoteProxy1' uses the sequence named 'proxy_1' to process incoming
       messages and the sequence named "out" to process outgoing responses. The
       second proxy service 'StockQuoteProxy2' is set to directly forward
@@ -2411,9 +2439,9 @@ User-Agent: Synapse-HttpComponents-NIO
     <p>
       You could send a stock quote request to each of these proxy services and
       receive the reply generated by the actual service hosted on the Axis2
-      instance.
+      server instance.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy1<br/>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy2</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy1<br/>ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy2</pre>
     <h2>
       <a name="Sample152" id="Sample152">Sample 152: Switching transports and
       message format from SOAP to REST/POX</a>
@@ -2432,7 +2460,7 @@ User-Agent: Synapse-HttpComponents-NIO
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
     <p>
-      <strong>Objective: Switching transports and from SOAP to REST/POX</strong>
+      <strong>Objective: Switching transports and message format from SOAP to REST/POX</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> Start the Synapse
@@ -2446,17 +2474,17 @@ User-Agent: Synapse-HttpComponents-NIO
     <p>
       This configuration demonstrates how a proxy service could be exposed on a
       subset of available transports, and how it could switch from one transport
-      to another. This example exposes the created proxy service only on https,
-      and thus if the user tries to access it over http, would result in a
+      to another. This example exposes the created proxy service only on HTTPS,
+      and thus if the user tries to access it over HTTP, would result in a
       fault.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuoteProxy
 ...
      [java] org.apache.axis2.AxisFault: The service cannot be found for the endpoint reference (EPR) /soap/StockQuoteProxy</pre>
     <p/>
     <p>
-      Accessing this over https (ant stockquote
-      -Dtrpurl=https://localhost:8443/soap/StockQuoteProxy) causes the proxy
+      Accessing this over HTTPS (ant stockquote
+      -Dtrpurl=https://localhost:8243/soap/StockQuoteProxy) causes the proxy
       service to access the SimpleStockQuoteService on the sample Axis2 server
       using REST/POX. This could be seen if the message exchange was captured
       using TCPMon as follows. The REST/POX response is now transformed back
@@ -2540,36 +2568,36 @@ Connection: Keep-Alive
     </p>
     <p/>
     <p>
-      The proxy service will recieve secure messages with security headers which
+      The proxy service will receive secure messages with security headers which
       are MustUnderstand. But hence element 'engageSec' is not present in the
-      proxy configuration synapse will not engage that Apache Rampart on this
+      proxy configuration Synapse will not engage that Apache Rampart on this
       proxy service. It is expected that an MustUnderstand failure exception on
       the AxisEngine would occur before the message arrives Synapse. But Synapse
       handles this message and gets it in by setting all the headers which are
       MustUnderstand and not processed to processed state. This will enable
-      synapse to route the messages without reading the Security headers (just
+      Synapse to route the messages without reading the Security headers (just
       routing the messages from client to service, both of which are secure). To
       execute the client, send a stock quote request to the proxy service, and
       sign and encrypt the request by specifying the client side security policy
       as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
     <p>
       By following through the debug logs or TCPMon output, you could see that
       the request received by the proxy service was signed and encrypted. Also,
       looking up the WSDL of the proxy service by requesting the URL
-      http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
+      http://localhost:8280/soap/StockQuoteProxy?wsdl reveals the security
       policy attachments are not there and security is not engaged. When sending
       the message to the backend service, you could verify that the security
-      headers were there as in the original message to synapse from client, and
+      headers were there as in the original message to Synapse from client, and
       that the response received does use WS-Security, and forwarded back to the
       client without any modification. You should note that this wont be a
-      security hole because the message inside synapse is signed and encrypted
+      security hole because the message inside Synapse is signed and encrypted
       and can only be forwarded to a secure service to be useful.
     </p>
     <h2>
       <a name="Sample154" id="Sample154">Sample 154: Load Balancing with
-      Proxy Service </a>
+      Proxy Services </a>
     </h2>
     <div>
 <pre xml:space="preserve">   &lt;!-- A proxy service with a loadbalace endpoint --&gt;
@@ -2624,7 +2652,7 @@ Connection: Keep-Alive
     &lt;/sequence&gt;
 &lt;/definitions&gt; </pre>
       <p>
-        <strong>Objective: Load Balancing with Proxy Service </strong>
+        <strong>Objective: Load Balancing with Proxy Services </strong>
       </p>
       <p>
         <strong>Prerequisites:</strong> Sample setup is same as
@@ -2636,13 +2664,66 @@ Connection: Keep-Alive
         already done
       </p>
       <p>
-        Runs the client with
+        Run the client with
       </p>
-<pre xml:space="preserve">  ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8080/soap/LBProxy </pre>
+<pre xml:space="preserve">  ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8280/soap/LBProxy </pre>
       <p>
         Functionality is similar to the sample #54.
       </p>
     </div>
+    <h2>
+      <a name="Sample155" id="Sample155">Sample 155: Dual channel invocation
+      on both client side and serverside of Synapse with Proxy Services</a>
+    </h2>
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"&gt;
+                    &lt;enableAddressing separateListener="true"/&gt;
+                &lt;/address&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+    <p>
+      <strong>Objective: Demonstrate the dual channel invocation with Synapse proxy services</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong><br/> Start the Synapse
+      configuration numbered 150: i.e. synapse -sample 155<br/> Start the
+      Axis2 server and deploy the SimpleStockQuoteService if not already done
+    </p>
+    <p/>
+    <p>
+      This sample will show the action of the dual channel invocation within client and Synapse
+      as well as within Synapse and the actual server. Note that if you want to enable dual
+      channel invocation you need to set the separateListener attribute to true of the
+      enableAddressing element of the endpoint.
+    </p>
+    <p>
+      Execute the stock quote client by requesting for a stock quote on a dual channel from the
+      proxy service as follows:
+    </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dmode=dualquote</pre>
+    <p>
+      In the above example, the request received is forwarded to the sample service
+      hosted on Axis2 and the endpoint specifies to enable addressing and do the invocation
+      over a dual channel. If you observe this message flow by using a TCPmon, you could see that
+      on the channel you send the request to Synapse the response has been written as an
+      HTTP 202 Accepted, where as the real response from Synapse will come over a different channel
+      which cannot be obsesrved unless you use tcpdump to dump all the TCP level messages.
+    </p>
+    <p>
+      At the same time you can observe the behaviour of the invocation between Synapse and
+      the actual Axis2 service, where you can see a 202 Accepted message being delivered to Synapse
+      as the response to the request. The actual response will be delivered to Synapse over a
+      different channel.
+    </p>
     <h1>
       <a name="ProxyServiceQoS" id="ProxyServiceQoS">QoS addition and
       deduction for service mediation (proxy) samples</a>
@@ -2703,12 +2784,12 @@ Connection: Keep-Alive
       service, and sign and encrypt the request by specifying the client side
       security policy as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
     <p>
       By following through the debug logs or TCPMon output, you could see that
       the request received by the proxy service was signed and encrypted. Also,
       looking up the WSDL of the proxy service by requesting the
-      URLhttp://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
+      URLhttp://localhost:8280/soap/StockQuoteProxy?wsdl reveals the security
       policy attachment to the supplied base WSDL. When sending the message to
       the backend service, you could verify that the security headers were
       removed, and that the response received does not use WS-Security, but that
@@ -2759,16 +2840,16 @@ Connection: Keep-Alive
       In the above configuration, a proxy service is created with WS-RM enabled
       using the &lt;enableRM/&gt; tag. Therefore, this proxy service is capable
       of communicating with a WS-RM client. It also removes the WS-RM headers in
-      the In Sequence before the message is sent to the back end server. This is
+      the In Sequence before the message is sent to the backend server. This is
       required as the reliable messaging is applicable only between the client
       and Synapse. Now start the client with WS-RM as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dwsrm=true</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dwsrm=true</pre>
     <p>
-      In this case, client sends WS-RM enabled request to Synapse where Synapse
+      In this case, client sends a WS-RM enabled request to Synapse where Synapse
       sends normal request to the server. This can be observed by examining the
       wire level messages between the client and Synapse. These messages would
-      be similar to the wire level messages shown in sample 53. Each message
+      be similar to the wire level messages shown in sample 101. Each message
       would perform a similar function to the messages discussed in sample 53.
     </p>
     <p/>
@@ -2828,7 +2909,7 @@ Connection: Keep-Alive
 <pre xml:space="preserve">&lt;transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"&gt; ...</pre>
     <p>
       Once you start the Synapse configuration and request for the WSDL of the
-      proxy service (http://localhost:8080/soap/StockQuoteProxy?wsdl) you will
+      proxy service (http://localhost:8280/soap/StockQuoteProxy?wsdl) you will
       notice that its exposed only on the JMS transport. This is because the
       configuration specified this requirement in the proxy service definition.
     </p>
@@ -2915,7 +2996,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       You may also notice that the simple stock quote proxy service exposed in
       Synapse is now available only in HTTP as we have specified transport for
       that service as HTTP. To observe this, access the WSDL of stock quote
-      proxy service at http://localhost:8080/soap/StockQuoteProxy?wsdl.
+      proxy service at http://localhost:8280/soap/StockQuoteProxy?wsdl.
     </p>
     <p>
       This Synapse configuration creates a proxy service over HTTP and forwards
@@ -2924,7 +3005,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       the stock quote reply over JMS to the Synapse server. To test this, send a
       place order request to Synapse using HTTP as follows:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dmode=placeorder -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dmode=placeorder -Dsymbol=MSFT</pre>
     <p>
       The sample Axis2 server console will print a message indicating that it
       has accepted the order as follows:
@@ -3048,7 +3129,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
   &lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;&lt;m:order&gt;&lt;m:price&gt;12.33&lt;/m:price&gt;&lt;m:quantity&gt;1000&lt;/m:quantity&gt;&lt;m:symbol&gt;ACP&lt;/m:symbol&gt;&lt;/m:order&gt;
 &lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</pre>
     <p>
-      The sample Axis2 server would now accept the one way message and issue the
+      The sample Axis2 server would now accept the one-way message and issue the
       following message:
     </p>
 <pre xml:space="preserve">Wed Apr 25 19:50:56 LKT 2007 samples.services.SimpleStockQuoteService :: Accepted order for : 1000 stocks of ACP at $ 12.33</pre>
@@ -3060,7 +3141,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       messages and wraps them into a custom element
       '{http://services.samples/xsd}element'. The received message is then
       forwarded to the MTOMSwASampleService using the SOAP action
-      'urn:oneWayUploadUsingMTOM' and optimizing binary conent using MTOM. To
+      'urn:oneWayUploadUsingMTOM' and optimizing binary content using MTOM. To
       execute this sample, use the JMS client to publish a pure binary JMS
       message containing the file
       './../../repository/conf/sample/resources/mtom/asf-logo.gif' to the JMS
@@ -3085,7 +3166,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       Once received by the sample service, it is saved into a temporary file and
       could be verified for correctness.
     </p>
-<pre xml:space="preserve">Wrote to file : /tmp/mtom-60319.gif</pre>
+<pre xml:space="preserve">Wrote to file : ./../../work/temp/sampleServer/mtom-4417.gif</pre>
     <p/>
     <p>
       The final section of this example shows how a POX JMS message received by
@@ -3170,8 +3251,8 @@ java.naming.provider.url=tcp://localhost:61616</pre>
 
 &lt;/definitions&gt;</pre>
     <p>
-      <strong>Objective: Demonstrate one way message bridging from JMS to
-      http and replying with a http 202 Accepted response</strong>
+      <strong>Objective: Demonstrate one-way message bridging from JMS to
+      HTTP and replying with a HTTP 202 Accepted response</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> Start the Axis2 server
@@ -3185,20 +3266,20 @@ java.naming.provider.url=tcp://localhost:61616</pre>
       This example invokes the one-way 'placeOrder' operation on the
       SimpleStockQuoteService using the Axis2 ServiceClient.fireAndForget() API
       at the client. To test this, use 'ant -Dmode=placeorder...' and you will
-      notice the one way JMS message flowing through Synapse into the sample
-      Axis2 server instance over http, and Axis2 acknowledging it with a http
+      notice the one-way JMS message flowing through Synapse into the sample
+      Axis2 server instance over HTTP, and Axis2 acknowledging it with a HTTP
       202 Accepted response.
     </p>
 <pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl="jms:/JMStoHTTPStockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"</pre>
 <pre xml:space="preserve">SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
     <p>
-      The second example shows how Synapse could be made to respond with a http
+      The second example shows how Synapse could be made to respond with a HTTP
       202 Accepted response to a request received. The proxy service simply logs
       the message received and acknowledges it. On the Synapse console you could
       see the logged message, and if TCPMon was used at the client, you would
       see the 202 Accepted response sent back to the client from Synapse
     </p>
-<pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8080/soap/OneWayProxy</pre>
+<pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8280/soap/OneWayProxy</pre>
 <pre xml:space="preserve">HTTP/1.1 202 Accepted
 Content-Type: text/xml; charset=UTF-8
 Host: 127.0.0.1
@@ -3251,11 +3332,11 @@ Transfer-Encoding: chunked
     <p>
       Create three new directories in a test directory. e.g. in, out, original
       in /home/user/test. Open
-      SYNAPSE_HOME/repository/conf/sample/synapse_sample_115.xml and edit the
+      SYNAPSE_HOME/repository/conf/sample/synapse_sample_254.xml and edit the
       following values. Change transport.vfs.FileURI,
       transport.vfs.MoveAfterProcess, transport.vfs.MoveAfterFailure parameter
       values to the above in, original, original directories respectively.
-      Change outSequence endpoint address uri to out directory with the prefeix
+      Change outSequence endpoint address uri to out directory with the prefix
       <em>vfs:</em>. Values you have to change are marked with &lt;!--CHANGE--&gt;.
     </p>
     <p>
@@ -3315,7 +3396,7 @@ Transfer-Encoding: chunked
         &lt;/proxy&gt;
 &lt;/definitions&gt; </pre>
     <p>
-      <strong>Objective: Switching from ftp transport listener to mail
+      <strong>Objective: Switching from FTP transport listener to mail
       transport sender</strong>
     </p>
     <p>
@@ -3328,7 +3409,8 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable mail transport sender in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#mailsender">Setting up mail transport
+      href="Synapse_Samples_Setup.html
+      #mailsender">Setting up mail transport
       sender</a>
     </p>
     <p>
@@ -3347,8 +3429,8 @@ Transfer-Encoding: chunked
       directory given in transport.vfs.FileURI above.
     </p>
     <p>
-      VFS transport listener will pick the file from the directory in the ftp
-      server and send it to the Axis2 service. The file in the ftp directory
+      VFS transport listener will pick the file from the directory in the FTP
+      server and send it to the Axis2 service. The file in the FTP directory
       will be deleted. The response will be sent to the given email address.
     </p>
     <h2>
@@ -3408,7 +3490,7 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable mail transport sender in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#mailsender">Setting up mail transport
+      href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport
       sender</a>
     </p>
     <p>
@@ -3433,13 +3515,13 @@ Transfer-Encoding: chunked
     &lt;proxy name="FIXProxy" transports="fix"&gt;
 
         &lt;parameter name="transport.fix.AcceptorConfigURL"&gt;file:/home/synapse_user/fix-config/fix-synapse.cfg&lt;/parameter&gt;
-        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:/home/synapse_user/fix-config/synapse-sender,cfg&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:/home/synapse_user/fix-config/synapse-sender.cfg&lt;/parameter&gt;
         &lt;parameter name="transport.fix.AcceptorMessageStore"&gt;file&lt;/parameter&gt;
         &lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;
 
         &lt;target&gt;
             &lt;endpoint&gt;
-                &lt;address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/&gt;
+                &lt;address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC"/&gt;
             &lt;/endpoint&gt;
 	    &lt;inSequence&gt;
 		&lt;log level="full"/&gt;
@@ -3452,7 +3534,7 @@ Transfer-Encoding: chunked
     &lt;/proxy&gt;
 &lt;/definitions&gt; </pre>
     <p>
-      <strong>Objective: Using the FIX (Financial Information eXchange) transport with Proxy services</strong>
+      <strong>Objective: Demonstrate the usage of the FIX (Financial Information eXchange) transport with proxy services</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong><br/> 
@@ -3466,7 +3548,7 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable FIX transport in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#fixtransport">Setting up FIX transport
+      href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
       </a>
     </p>
     <p>
@@ -3499,13 +3581,13 @@ Transfer-Encoding: chunked
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="FIXProxy"&gt;
 
-        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:/home/synapse_user/fix-config/synapse-sender,cfg&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:/home/synapse_user/fix-config/synapse-sender.cfg&lt;/parameter&gt;
         &lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;
         &lt;parameter name="transport.fix.SendAllToInSequence"&gt;false&lt;/parameter&gt;
 
         &lt;target&gt;
             &lt;endpoint&gt;
-                &lt;address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/&gt;
+                &lt;address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC"/&gt;
             &lt;/endpoint&gt;
 	    &lt;inSequence&gt;
 	    	&lt;property name="transport.fix.ServiceName" value="FIXProxy" scope="axis2-client"/&gt;
@@ -3533,7 +3615,7 @@ Transfer-Encoding: chunked
     </p>
     <p>
       Enable FIX transport sender in the Synapse axis2.xml. See <a
-      href="Synapse_Samples_Setup.xml#fixtransport">Setting up FIX transport
+      href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
       </a>
     </p>
     <p>
@@ -3550,7 +3632,7 @@ Transfer-Encoding: chunked
     <p>
       Invoke the FIX Client as follows. This command sends a FIX message
       embedded in a SOAP message over HTTP.
-      <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8080/soap/FIXProxy</pre>
+      <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8280/soap/FIXProxy</pre>
     </p>
     <p>
       Synapse will create a session with Executor and forward the order request. The
@@ -3560,10 +3642,10 @@ Transfer-Encoding: chunked
     </p>
 
     <h1>
-      <a name="Task" id="Task">Introduction to synapse tasks</a>
+      <a name="Task" id="Task">Introduction to Synapse Tasks</a>
     </h1>
     <h2>
-      <a name="Sample300" id="Sample300">Sample 300: Introduction to tasks
+      <a name="Sample300" id="Sample300">Sample 300: Introduction to Tasks
       with simple trigger</a>
     </h2>
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -3598,23 +3680,22 @@ Transfer-Encoding: chunked
       trigger works</strong>
     </p>
     <p>
-      <strong>Prerequisites:</strong><br/> You will need access to
-      build the SimpleStockQuoteService as mentioned in the above and start the
-      sample axis2 server before staring synapse.
+      <strong>Prerequisites:</strong><br/>
+      Build the SimpleStockQuoteService as mentioned above and start the
+      sample axis2 server before staring Synapse.
     </p>
     <p>
-      When ever synapse gets started and initialized, this task will run
-      periodically in 5 second intervals. You could limit the number of times
-      that you want to run this task by adding a count attribute with an integer
-      as the value, if the count is not present as in this sample this task will
+      When ever Synapse gets started with this configuration (i.e. ./synapse.sh -sample 300)
+      and initialized, this task will run periodically in 5 second intervals. You could
+      limit the number of times that you want to run this task by adding a count attribute
+      with an integer as the value, if the count is not present as in this sample this task will
       run forever.
     </p>
     <p>
       One can write his own task class implementing the
       org.apache.synapse.startup.Task interface and implementing the execute
       method to do the task. For this particular sample we have used the
-      MessageInjector which just injects a message specified in to the synapse
-      environment.
+      MessageInjector which just injects a message specified into Synapse environment.
     </p>
     <h1>
       <a name="AdvancedMediation" id="AdvancedMediation">Advanced mediations
@@ -3678,7 +3759,7 @@ Transfer-Encoding: chunked
   }
 ]]&gt;&lt;/x&gt;</pre>
     <p>
-      <strong>Objective: Introduction to script mediators</strong>
+      <strong>Objective: Introduction to the script mediator</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong>
@@ -3690,7 +3771,7 @@ Transfer-Encoding: chunked
     </p>
     <p/>
     <p>
-      This sample is similar to sample 8 but instead of using XSLT the
+      This sample is similar to sample 8 but instead of using XSLT, the
       transformation is done with JavaScript and E4X. Note that the script
       source loaded from a resource must be specified within a CDATA tag within
       an XML element. The script used in this example has two functions,
@@ -3698,7 +3779,7 @@ Transfer-Encoding: chunked
       uses the function attribute to specify which function should be invoked.
       Use the stock quote client to issue a custom quote client as follows.:
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
     <p>
       Synapse uses the script mediator and the specified JavaScript function to
       convert the custom request to a standard quote request. Subsequently the
@@ -3755,7 +3836,7 @@ Transfer-Encoding: chunked
     <p>
       This example is functionally equivalent to sample # 350 and sample # 8,
       and demonstrates in-line script mediation in Synapse. Use the stock quote
-      client to send a custom quote as in example # 350 to test this example.
+      client to send a custom quote as in example # 350 to try this example.
     </p>
     <p/>
     <h2>
@@ -3789,13 +3870,13 @@ Transfer-Encoding: chunked
     </p>
     <p/>
     <p>
-      This example shows how an inline JavaScript mediator script could access
+      This example shows how an in-line JavaScript mediator script could access
       the Synapse message context API to set its 'To' EPR and to set a custom
       property to mark it as a response. Execute the stock quote client, and you
       will receive the response "99.9" as the last sale price as per the above
       script.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/
 ...
 stockquote:
      [java] Standard :: Stock price = $99.9</pre>
@@ -3863,7 +3944,7 @@ end
       This sample is functionally equivalent to sample # 350 (#351 and #8) but
       instead uses a Ruby script using the JRuby interpreter. The script has two
       functions, 'transformRequest' and 'transformResponse', and the Synapse
-      configuration specifies which function is to be invoked when used. Execute
+      configuration specifies which function to be invoked when used. Execute
       the stock quote client to send a custom stock quote as per example #350
       and check the received stock quote response.
     </p>
@@ -3927,7 +4008,7 @@ end
       <p>
         Run the client with
       </p>
-<pre xml:space="preserve"> ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
+<pre xml:space="preserve"> ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
     </div>
     <h2>
       <a name="DBMediators" id="DBMediators">Database interactions in
@@ -4074,7 +4155,7 @@ end
     <p>
       When the IBM stock quote is requested,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
     <p>
       Synapse console shows
     </p>
@@ -4083,7 +4164,7 @@ end
     <p>
       For the SUN stock quote,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</pre>
     <p/>
     <p>
       Synapse console shows
@@ -4092,7 +4173,7 @@ end
     <p>
       and for the MSFT stock quote,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</pre>
 <pre xml:space="preserve">INFO LogMediator text = ** Looking up from the Database **<br/>INFO LogMediator text = Company ID &#x2013; c2</pre>
     <p>
       For any other symbols, Synapse console shows
@@ -4164,7 +4245,7 @@ end
       </p>
     </div>
     <p>
-      This sample demonstrate simple database write operations. The dbreport
+      This sample demonstrates simple database write operations. The dbreport
       mediator writes (i.e. inserts one row) to a table using the message
       details. It works the same as the dblookup mediator. In this sample ,
       dbreport mediator is used for updating the stock price of the company
@@ -4177,7 +4258,7 @@ end
     <p>
       Run the client using,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
     <p>
       and then execute the following query using database client tool against
       synapsedb.
@@ -4281,17 +4362,21 @@ end
     <p>
       When running client,
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=IBM</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
     <p>
       Synapse console shows,
     </p>
-<pre xml:space="preserve">INFO LogMediator text = ** Reporting to the Database **<br/><br/>...<br/><br/>INFO LogMediator text = ** Looking up from the Database **<br/><br/>...<br/><br/>INFO LogMediator text = Stock price - 153.47886496064808</pre>
+<pre xml:space="preserve">INFO LogMediator text = ** Reporting to the Database **
+...
+INFO LogMediator text = ** Looking up from the Database **
+...
+INFO LogMediator text = Stock price - 153.47886496064808</pre>
     <p/>
       <h2><a name="Sample363" id="Sample363">Sample 363: Reusable database connection pools</a></h2>
 
       <div>
-      <p>Prior to run this sample please follows the 'Setting up Synapse
-      DataSources' section the sample setup guide.</p>
+      <p>Prior to run this sample please follow the 'Setting up Synapse
+      DataSources' section in the <a href="Synapse_Samples_Setup.html">sample setup guide</a>.</p>
       <pre>&lt;!-- Reusable database connection pool --&gt;
       &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -4441,33 +4526,31 @@ end
       </div>
 
       <div>
-      <p><strong>Objective: Demonstrate the use reusable database connection
+      <p><strong>Objective: Demonstrate the use of reusable database connection
       pools</strong></p>
 
       <p><strong>Prerequisites:</strong> Setting up DataBase and DataSources
-      according to the sample setup guide.</p>
+      according to the <a href="Synapse_Samples_Setup.html">sample setup guide</a>.</p>
 
-      <p>Start the Synapse configuration numbered 363: i.e. synapse -sample 3623</p>
+      <p>Start the Synapse configuration numbered 363: i.e. synapse -sample 363</p>
 
       <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
       already done </p>
 
-      <p></p>
-
       <p>Runs the client as follows</p>
-      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+      <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
 
       <p>Then the console output </p>
-      <pre>INFO LogMediator text = ** Looking up from the Database **
-      ...
-      ID - c1
-      ...
-      INFO LogMediator text = ** Reporting to the Database **
-      INFO LogMediator text = ** Looking up from the Database **
-      INFO LogMediator text = Stock price - 183.3635460215262
-       </pre>
+      <pre> INFO LogMediator text = ** Looking up from the Database **
+    ...
+ INFO LogMediator text = Company ID - c1
+    ...
+ INFO LogMediator text = ** Reporting to the Database **
+    ...
+ INFO LogMediator text = ** Looking up from the Database **
+    ...
+ INFO LogMediator text = Stock price - 183.3635460215262</pre>
 
-      <p></p>
       </div>
       
     <h2>
@@ -4542,17 +4625,17 @@ end
     <p>
       Above configuration specifies a throttle mediator inside the in mediator.
       Therefore, all request messages directed to the main sequence will be
-      subjected to throttling. Throttle mediator has policy, onAccept and
-      onReject tags at top level. Policy tag specifies the throttling policy to
-      be applied for messages. In this sample policy contains only component
-      called "MaximumConcurrentAccess" .This indicates the maximum number of
-      concurrent request that may have passed through the synapse on a single
-      unit of time. To test concurrency throttling ,it is required to send
-      concurrent request to synapse. For synapse with above configuration ,if
-      client send 20 request concurrently ,then approximately half of those will
-      success. The client command is as follows.
+      subjected to throttling. Throttle mediator has 'policy', 'onAccept' and
+      'onReject' tags at top level. The 'policy' tag specifies the throttling policy for
+      throttling messages. This sample policy only contains a component
+      called "MaximumConcurrentAccess". This indicates the maximum number of
+      concurrent requests that can pass through Synapse on a single
+      unit of time. To test concurrency throttling, it is required to send
+      concurrent requests to Synapse. If Synapse with above configuration, receives
+      20 requests concurrently from clients, then approximately half of those will
+      succeed while the others being throttled. The client command to try this is as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</pre>
     <p/>
     <h2>
       <a name="Sample371" id="Sample371">Sample 371: Restricting requests
@@ -4673,7 +4756,7 @@ end
       exceeds the specified time. Now run the client 5 times repetitively using
       the following command to see how throttling works.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</pre>
     <p>
       For the first four requests you will get the quote prices for IBM as
       follows.
@@ -4764,19 +4847,19 @@ end
     <p/>
     <p>
       Throttle policy is loaded from the &#x201c;throttle_policy. xml&#x201d;
-      .That policy contains merging policy from sample 370 and 371. To check the
-      functionality , it is need to run load test.The all enabled request from
+      . That policy contains merging policy from sample 370 and 371. To check the
+      functionality, it requires to run a load test. The all enabled request from
       the concurrency throttling will be controlled by the access rate base
       throttling according to the policy.
     </p>
     <p>
       Run the client as follows
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy</pre>
     <div>
       <p>
-        You will get results same as sample 371.if you run the load test,
-        results will be different due to affect of concurrency throttling.
+        You will get same results as in sample 371. If you run the load test,
+        results will be different due to the effect of concurrency throttling.
       </p>
     </div>
     <h2>
@@ -4785,7 +4868,7 @@ end
     </h2>
     <p>
       Class mediator can be used to write your own custom mediation in Java and
-      you have access to the SynapseMessageContext and all the Synapse API in
+      you have access to the SynapseMessageContext and to the full Synapse API in
       there. This is a useful extension mechanism within Synapse to extend its
       functionality. This class can contain fields for which you can assign
       values at runtime through the configuration.
@@ -4946,7 +5029,7 @@ public class DiscountQuoteMediator implements Mediator {
       interface, which contains the mediate(...) method. mediate(...) method of
       the above class is invoked for each response message mediated through the
       main sequence, with the message context of the current message as the
-      parameter. All the details of the message including the SOAP headers, SOAP
+      parameter. All details of the message including the SOAP headers, SOAP
       body and properties of the context hierarchy can be accessed from the
       message context. In this sample, the body of the message is retrieved and
       the discount percentage is subtracted from the quote price. If the quote
@@ -4957,7 +5040,7 @@ public class DiscountQuoteMediator implements Mediator {
     <p>
       Now run the client using the following command.
     </p>
-<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+<pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
     <p>
       You will see the below output in the client console with the discounted
       quote value.
@@ -5044,7 +5127,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       Execute the custom quote client as 'ant stockquote -Dmode=customquote ...'
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dmode=customquote </pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy -Dmode=customquote </pre>
     <p/>
     <h2>
       <a name="Sample391" id="Sample391">Sample 391: How to use data from an
@@ -5082,9 +5165,7 @@ Discounted price: 138.77458254967408</pre>
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
-    <p>
-      <b/>
-    </p>
+    
     <p>
       <strong>Objective: Demonstrate the use of XQuery mediator to
       import external XML documents to the XQuery engine</strong>
@@ -5098,14 +5179,14 @@ Discounted price: 138.77458254967408</pre>
       391).
     </p>
     <p>
-      In this sample, data from commission.xml document is used inside XQUERY
-      document. The stock quote price from the response and commission from the
+      In this sample, data from commission.xml document is used inside XQuery
+      . The stock quote price from the response and commission from the
       commission.xml document will be added and given as a new price .
     </p>
     <p>
       Invoke the client as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/StockQuoteProxy</pre>
     <h2>
       <a name="Splitter" id="Splitter">Splitting messages in to parts and
       process in parallel (Iterate / Clone)</a>
@@ -5148,7 +5229,7 @@ Discounted price: 138.77458254967408</pre>
     <p>
       <strong>Objective: Demonstrate the use of Iterate mediator to
       split the messages in to parts and process them asynchronously and then
-      aggregate the responses coming in to synapse</strong>
+      aggregate the responses coming in to Synapse</strong>
     </p>
     <p>
       <strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService
@@ -5159,40 +5240,37 @@ Discounted price: 138.77458254967408</pre>
       400).
     </p>
     <p>
-      In this sample, the message sent to synapse has embedded with a number of
-      elements of the same type in one message. When synapse received this
-      message it will iterate through those elements and then sent to the
-      specified endpoint. When all the responses appear in to synapse then those
-      messages will be aggregated to form the resultant response and sent back
+      In this sample, the message sent to Synapse is comprised of a number of
+      elements of the same type. When Synapse receives this
+      message it will iterate through those elements and then will send to the
+      specified endpoint. When all the responses appear to Synapse then those
+      messages will be aggregated to form the resultant response and will send back
       to the client.
     </p>
     <p>
       Invoke the client as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8080/soap/SplitAggregateProxy -Ditr=4</pre>
-
-
-
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/soap/SplitAggregateProxy -Ditr=4</pre>
 
     <h2>
       <a name="Cache" id="Cache">Caching the responses over the requests
       (Cache Mediator)</a>
     </h2>
     <p>
-      Cached mediator can be used to utilize the network bandwidth, to protect
+      Cache mediator can be used to utilize the network bandwidth, to protect
       the backend service from being loaded with the same type of requests like
       browser refresh actions and also to speed up the execution of the web
-      service. This mediator should be used with sence, because it is not
+      service. This mediator should be used with sense, because it is not
       applicable for each and every service (for example services with dynamic
       responses for a particular release)
     </p>
     <h2>
       <a name="Sample420" id="Sample420">Sample 420: Simple cache implemented
-      on synapse for the actual service</a>
+      on Synapse for the actual service</a>
     </h2>
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
-        &lt;cache timeout="20000" scope="per-host" collector="false"
+        &lt;cache timeout="20" scope="per-host" collector="false"
                hashGenerator="org.wso2.caching.digest.DOMHASHGenerator"&gt;
             &lt;implementation type="memory" maxSize="100"/&gt;
         &lt;/cache&gt;
@@ -5221,18 +5299,18 @@ Discounted price: 138.77458254967408</pre>
       420).
     </p>
     <p>
-      In this sample, the message sent to synapse is checked for an existing
+      In this sample, the message sent to Synapse is checked for an existing
       cached response by calculating the hash value of the request. If there is
-      a cache hit in synapse then this request will not be forwarded to the
-      actual service, rather synapse respond to the client with the cached
+      a cache hit in Synapse then this request will not be forwarded to the
+      actual service, rather Synapse responds to the client with the cached
       response. In case of a cache miss that particular message will be
-      forwarded to the actual service and cached that response in the out path
+      forwarded to the actual service and caches that response in the out path
       for the use of consecutive requests of the same type.
     </p>
     <p>
       To observe this behaviour, invoke the client as follows.
     </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
     <p>
       You could notice that if you send more than one requests within 20 seconds
       only the first request is forwarded to the actual service, and the rest of
@@ -5280,7 +5358,7 @@ Discounted price: 138.77458254967408</pre>
 &lt;/definitions&gt; </pre>
     <div>
       <p>
-        <strong>Objective:</strong> Demonstrate the use of the Callout
+        <strong>Objective:</strong> Demonstrate the use of the callout
         mediator for the synchronized web service invocation
       </p>
       <p>
@@ -5293,15 +5371,15 @@ Discounted price: 138.77458254967408</pre>
         430).
       </p>
       <p>
-        In this sample, Callout mediator does the direct service invocation to
-        the StockQuoteService using the client request, get the response and set
+        In this sample, the callout mediator does the direct service invocation to
+        the StockQuoteService using the client request, gets the response and sets
         it as the first child of the SOAP message body. Then using the send
         mediator, the message is sent back to the client.
       </p>
       <p>
         Invoke the client as follows.
       </p>
-<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
     </div>
   </body>
 </document>

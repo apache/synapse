@@ -19,12 +19,22 @@
 
 package org.apache.synapse.mediators;
 
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.config.Entry;
@@ -33,15 +43,6 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.registry.url.SimpleURLRegistry;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.engine.AxisConfiguration;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.Map;
 
 public class TestUtils {
 
@@ -51,6 +52,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(testConfig));        
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
@@ -118,6 +120,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
@@ -152,6 +155,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();

@@ -33,6 +33,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.config.Entry;
@@ -41,8 +43,6 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.registry.url.SimpleURLRegistry;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.engine.AxisConfiguration;
 
 public class TestUtils {
 
@@ -120,7 +120,7 @@ public class TestUtils {
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.setRegistry(new SimpleURLRegistry());
-        SynapseEnvironment testEnv = new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig);
+        synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
@@ -130,7 +130,6 @@ public class TestUtils {
             }
         }
         synCtx.setConfiguration(testConfig);
-        synCtx.setEnvironment(testEnv);
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();

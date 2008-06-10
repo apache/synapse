@@ -19,44 +19,46 @@
 
 package org.apache.synapse.transport.base;
 
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.builder.BuilderUtil;
-import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.synapse.format.BinaryFormatter;
-import org.apache.synapse.format.PlainTextFormatter;
-import org.apache.synapse.transport.vfs.PollTableEntry;
-import org.apache.axis2.context.MessageContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.soap.*;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axiom.om.impl.builder.StAXBuilder;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.attachments.ByteArrayDataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
+import javax.activation.DataHandler;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.activation.DataHandler;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Iterator;
+
+import org.apache.axiom.attachments.ByteArrayDataSource;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.impl.builder.StAXBuilder;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.builder.BuilderUtil;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.format.BinaryFormatter;
+import org.apache.synapse.format.PlainTextFormatter;
 
 public abstract class BaseUtils {
 
@@ -169,19 +171,6 @@ public abstract class BaseUtils {
         } catch (AxisFault axisFault) {
             throw new BaseTransportException("Unable to get the message formatter to use");
         }
-    }
-
-    public static long getMinPollTime(List pollTable) {
-        Iterator iter = pollTable.iterator();
-        long min = AbstractPollingTransportListener.DEFAULT_POLL_INTERVAL;
-
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
-            if (entry.getPollInterval() < min) {
-                min = entry.getPollInterval();
-            }
-        }
-        return min;
     }
 
     /**

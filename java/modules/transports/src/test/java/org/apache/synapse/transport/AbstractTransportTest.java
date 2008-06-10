@@ -20,14 +20,13 @@
 package org.apache.synapse.transport;
 
 import junit.framework.TestCase;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.transport.vfs.VFSTransportSender;
 
 public class AbstractTransportTest extends TestCase {
 

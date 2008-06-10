@@ -121,6 +121,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             }
         } finally {
             state = BaseConstants.STOPPED;
+            unregisterMBean(getMBeanName());
         }
         try {
             workerPool.shutdown(10000);
@@ -135,6 +136,9 @@ public abstract class AbstractTransportListener implements TransportListener {
             // cancel receipt of service lifecycle events
             cfgCtx.getAxisConfiguration().getObserversList().remove(axisObserver);
             log.info(transportName.toUpperCase() + " Listener Shutdown");
+            for (AxisService service : getListeningServices()) {
+                internalStopListeningForService(service);
+            }
         }
     }
 
@@ -143,20 +147,37 @@ public abstract class AbstractTransportListener implements TransportListener {
             state = BaseConstants.STARTED;
             // register to receive updates on services for lifetime management
             // cfgCtx.getAxisConfiguration().addObservers(axisObserver);
-        }
-        log.info(transportName.toUpperCase() + " Listener started");
-
-        // iterate through deployed services and start
-        Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();
-
-        while (services.hasNext()) {
-            AxisService service = (AxisService) services.next();
-            if (BaseUtils.isUsingTransport(service, transportName)) {
+            log.info(transportName.toUpperCase() + " Listener started");
+            // iterate through deployed services and start
+            for (AxisService service : getListeningServices()) {
                 internalStartListeningForService(service);
             }
         }
     }
-
+    
+    /**
+     * Get the list of services that are listening on this transport, i.e. that are
+     * configured to use this transport.
+     * 
+     * @return the list of listening services
+     */
+    private List<AxisService> getListeningServices() {
+        List<AxisService> result = new LinkedList<AxisService>();
+        Iterator services = cfgCtx.getAxisConfiguration().getServices().values().iterator();
+        while (services.hasNext()) {
+            AxisService service = (AxisService) services.next();
+            if (!ignoreService(service)
+                    && BaseUtils.isUsingTransport(service, transportName)) {
+                result.add(service);
+            }
+        }
+        return result;
+    }
+    
+    private boolean ignoreService(AxisService service) {
+        return service.getName().startsWith("__"); // these are "private" services
+    }
+    
     public void disableTransportForService(AxisService service) {
 
         log.warn("Disabling the " + getTransportName() + " transport for the service "
@@ -302,11 +323,8 @@ public abstract class AbstractTransportListener implements TransportListener {
 
         public void serviceUpdate(AxisEvent event, AxisService service) {
 
-            if (service.getName().startsWith("__")) {
-                return; // these are "private" services
-            }
-
-            if (BaseUtils.isUsingTransport(service, transportName)) {
+            if (!ignoreService(service)
+                    && BaseUtils.isUsingTransport(service, transportName)) {
                 switch (event.getEventType()) {
                     case AxisEvent.SERVICE_DEPLOY :
                         internalStartListeningForService(service);

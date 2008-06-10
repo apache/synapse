@@ -51,7 +51,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.workers.Sender;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;;
 
 public class InMemoryStorageManager extends StorageManager {
 

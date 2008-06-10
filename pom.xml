@@ -269,11 +269,6 @@
             <version>${axis2.version}</version>
         </dependency>
 
-    	<dependency>
-    		<groupId>backport-util-concurrent</groupId>
-    		<artifactId>backport-util-concurrent</artifactId>
-    		<version>${backport.util.concurrent.version}</version>
-    	</dependency>
     </dependencies>
 
     <modules>
@@ -301,7 +296,6 @@
         <geronimo.spec.activation.version>1.0.1</geronimo.spec.activation.version>
         <geronimo.spec.javamail.version>1.2</geronimo.spec.javamail.version>
         <junit.version>3.8.2</junit.version>        
-        <backport.util.concurrent.version>3.1</backport.util.concurrent.version>
         <log4j.version>1.2.15</log4j.version>
     </properties>
 

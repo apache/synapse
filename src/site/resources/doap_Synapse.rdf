@@ -20,7 +20,7 @@
     <homepage rdf:resource="http://synapse.apache.org/" />
     <asfext:pmc rdf:resource="http://synapse.apache.org" />
     <shortdesc>Apache Synapse is a lightweight ESB engine and XML router.</shortdesc>
-    <description>Apache Synapse is a simple and highly effective Web Services intermediary and SOA framework. It can be
+    <description>Apache Synapse is a simple and highly effective ESB, Web Services intermediary and SOA framework. It can be
 added to your existing network very simply either as a services gateway or as an HTTP proxy. Once Apache
 Synapse is mediating your service requests it can perform many functions including routing, load-balancing,
 transformation and protocol switching. Apache Synapse can be used to build an Enterprise Service Bus (ESB) or
@@ -39,6 +39,13 @@ messages.</description>
     <category rdf:resource="http://www.apache.org/category/network-server"/>
     <category rdf:resource="http://www.apache.org/category/network-client"/>
     
+    <release>
+      <Version>
+        <name>Apache Synapse 1.2</name>
+        <created>2008-06-09</created>
+        <revision>1.2</revision>
+      </Version>
+    </release>
     <release>
       <Version>
         <name>Apache Synapse 1.1.1</name>

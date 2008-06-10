@@ -32,7 +32,6 @@ import org.apache.synapse.format.BinaryFormatter;
 import org.apache.synapse.format.PlainTextFormatter;
 import org.apache.synapse.transport.vfs.PollTableEntry;
 import org.apache.axis2.context.MessageContext;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.*;
@@ -267,8 +266,8 @@ public abstract class BaseUtils {
             builder == null ? null :
                 builder.getDocument() == null ? null : builder.getDocument().getCharsetEncoding();
 
-        if (StringUtils.isNotBlank(charEncOfMessage) &&
-            StringUtils.isNotBlank(charSetEnc) &&
+        if (!isBlank(charEncOfMessage) &&
+            !isBlank(charSetEnc) &&
             !charEncOfMessage.equalsIgnoreCase(charSetEnc)) {
             handleException("Charset encoding of transport differs from that of the payload");
         }
@@ -388,6 +387,18 @@ public abstract class BaseUtils {
      */
     public static boolean isValid(String str) {
         return (str != null && str.trim().length() > 0);
+    }
+
+    public static boolean isBlank(String str) {
+        if (str == null || str.length() == 0) {
+            return true;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;    
     }
 
     public static boolean isUsingTransport(AxisService service, String transportName) {

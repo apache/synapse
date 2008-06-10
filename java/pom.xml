@@ -229,10 +229,6 @@
                 <version>${axis2.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpcore-niossl</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
                         <artifactId>geronimo-javamail_1.4_spec</artifactId>
                     </exclusion>

@@ -18,8 +18,6 @@
  */
 package org.apache.synapse.transport.base.datagram;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * Utility class with methods used by datagram transports.
  */
@@ -31,7 +29,11 @@ public class Utils {
             for (int i=0; i<16; i++) {
                 int index = start+i;
                 if (index < length) {
-                    buffer.append(StringUtils.leftPad(Integer.toHexString(data[start+i]), 2, '0'));
+                    String hex = Integer.toHexString(data[start+i]);
+                    if (hex.length() < 2) {
+                        buffer.append('0');
+                    }
+                    buffer.append(hex);
                 } else {
                     buffer.append("  ");
                 }

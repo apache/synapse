@@ -19,20 +19,25 @@
 
 package org.apache.synapse.transport;
 
-import org.apache.axis2.description.*;
-import org.apache.axis2.Constants;
-import org.apache.axis2.engine.ListenerManager;
-import org.apache.synapse.transport.vfs.VFSTransportListener;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axis2.receivers.RawXMLINOutMessageReceiver;
-import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
-import java.io.File;
-import java.util.List;
-import java.util.Iterator;
+
+import org.apache.axis2.Constants;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
+import org.apache.axis2.receivers.RawXMLINOutMessageReceiver;
+import org.apache.axis2.wsdl.WSDLConstants;
 
 /**
  * Base class for transport util servers used in unit testing

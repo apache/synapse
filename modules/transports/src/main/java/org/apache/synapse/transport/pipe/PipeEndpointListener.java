@@ -25,12 +25,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 /**
  * {@link Runnable} that reads messages from a given UNIX pipe.

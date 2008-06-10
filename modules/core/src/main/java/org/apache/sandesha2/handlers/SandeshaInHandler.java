@@ -119,6 +119,7 @@ public class SandeshaInHandler extends AbstractHandler {
 				if (propertyBean.isEnforceRM()) {
 					String message = SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.rmEnforceFailure, msgCtx.getMessageID());
+					log.warn(message);
 					throw new SandeshaException(message);
 				}
 			}

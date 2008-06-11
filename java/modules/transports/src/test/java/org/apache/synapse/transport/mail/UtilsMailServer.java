@@ -55,7 +55,7 @@ public class UtilsMailServer extends UtilsTransportServer {
 
         // Service1 - polls synapse.test.6@gmail.com using POP3/SSL, and writes the response to
         // synapse.test.1@gmail.com and deletes request on success. Polls every 5 secs
-        List parameters = new ArrayList();
+        List<Parameter> parameters = new ArrayList<Parameter>();
         //gmail
         parameters.add(new Parameter("transport.mail.Address", "synapse.test.6@gmail.com"));
         // local james
@@ -80,7 +80,7 @@ public class UtilsMailServer extends UtilsTransportServer {
 
         // Service2 - polls synapse.test.7@gmail.com using IMAP/SSL, and writes the response to
         // synapse.test.1@gmail.com and deletes request on success. Polls every 5 secs
-        parameters = new ArrayList();
+        parameters = new ArrayList<Parameter>();
         parameters.add(new Parameter("transport.mail.Address", "synapse.test.7@gmail.com"));
         //parameters.add(new Parameter("transport.mail.ReplyAddress", "synapse.test.1@gmail.com"));
         parameters.add(new Parameter("transport.mail.Protocol", "test-store"));

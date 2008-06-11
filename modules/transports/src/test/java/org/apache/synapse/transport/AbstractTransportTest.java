@@ -44,14 +44,18 @@ public class AbstractTransportTest extends TestCase {
      * Create the payload for an echoOMElement request
      * @return
      */
-    protected OMElement createPayload() {
+    protected OMElement createPayload(String textValue) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://localhost/axis2/services/EchoXMLService", "my");
         OMElement method = fac.createOMElement("echoOMElement", omNs);
         OMElement value = fac.createOMElement("myValue", omNs);
-        value.addChild(fac.createOMText(value, "omTextValue"));
+        value.addChild(fac.createOMText(value, textValue));
         method.addChild(value);
         return method;
+    }
+    
+    protected OMElement createPayload() {
+        return createPayload("omTextValue");
     }
 
     /**

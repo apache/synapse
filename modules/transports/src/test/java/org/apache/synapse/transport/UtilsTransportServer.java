@@ -20,7 +20,6 @@
 package org.apache.synapse.transport;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -88,7 +87,7 @@ public abstract class UtilsTransportServer {
      * @param parameters the parameters for the service
      * @throws Exception
      */
-    public void deployEchoService(String name, List parameters) throws Exception {
+    public void deployEchoService(String name, List<Parameter> parameters) throws Exception {
 
         AxisService service = new AxisService(name);
         service.setClassLoader(Thread.currentThread().getContextClassLoader());
@@ -108,9 +107,8 @@ public abstract class UtilsTransportServer {
         service.addOperation(axisOp);
         service.mapActionToOperation(Constants.AXIS2_NAMESPACE_URI + "/echoOMElementNoResponse", axisOp);
 
-        Iterator iter = parameters.iterator();
-        while (iter.hasNext()) {
-            service.addParameter((Parameter) iter.next());
+        for (Parameter parameter : parameters) {
+            service.addParameter(parameter);
         }
 
         cfgCtx.getAxisConfiguration().addService(service);

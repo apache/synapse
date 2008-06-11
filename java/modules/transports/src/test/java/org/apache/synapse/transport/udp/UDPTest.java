@@ -18,96 +18,62 @@
  */
 package org.apache.synapse.transport.udp;
 
-import javax.xml.namespace.QName;
+import java.io.File;
 
-import junit.framework.TestCase;
-
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
-import org.apache.axis2.receivers.RawXMLINOutMessageReceiver;
-import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.synapse.transport.Echo;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.synapse.transport.AbstractTransportTest;
 
 /**
  * Test case for {@link UDPListener} and {@link UDPSender}.
  */
-public class UDPTest extends TestCase {
+public class UDPTest extends AbstractTransportTest {
+    public UDPTest() {
+        server = new UtilsUDPServer();
+    }
+    
     public void testSoapOverUdpWithEchoService() throws Exception {
-        // Create the configuration context. The test assumes that the repository is set up
-        // to contain the addressing module. The UDP transport is enabled in axis2.xml.
-        ConfigurationContext configurationContext
-            = ConfigurationContextFactory.createConfigurationContextFromFileSystem("target/test_rep",
-                    UDPTest.class.getResource("axis2.xml").getFile());
-        
-        //
-        // Set up the echo service
-        //
-        // TODO: copy&paste from UtilsTransportServer#deployEchoService
-        
-        AxisService service = new AxisService("EchoService");
-        service.setClassLoader(Thread.currentThread().getContextClassLoader());
-        service.addParameter(new Parameter(Constants.SERVICE_CLASS, Echo.class.getName()));
-
-        AxisOperation axisOp = new InOutAxisOperation(new QName("echoOMElement"));
-        axisOp.setMessageReceiver(new RawXMLINOutMessageReceiver());
-        axisOp.setStyle(WSDLConstants.STYLE_RPC);
-        service.addOperation(axisOp);
-        service.mapActionToOperation(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement", axisOp);
-
-        axisOp = new InOutAxisOperation(new QName("echoOMElementNoResponse"));
-        axisOp.setMessageReceiver(new RawXMLINOnlyMessageReceiver());
-        axisOp.setStyle(WSDLConstants.STYLE_RPC);
-        service.addOperation(axisOp);
-        service.mapActionToOperation(Constants.AXIS2_NAMESPACE_URI + "/echoOMElementNoResponse", axisOp);
-        
-        service.addParameter(UDPConstants.PORT_KEY, 3333);
-        service.addParameter(UDPConstants.CONTENT_TYPE_KEY, "text/xml+soap");
-        
-        configurationContext.getAxisConfiguration().addService(service);
-        
-        //
-        // Create echo message to send
-        //
-        // TODO: copy&paste from AbstractTransportTest#createPayload
-        
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace omNs = fac.createOMNamespace("http://localhost/axis2/services/EchoXMLService", "my");
-        OMElement method = fac.createOMElement("echoOMElement", omNs);
-        OMElement value = fac.createOMElement("myValue", omNs);
-        value.addChild(fac.createOMText(value, "omTextValue"));
-        method.addChild(value);
-        
-        //
-        // Call the echo service and check response
-        //
-        
         Options options = new Options();
         options.setTo(new EndpointReference("udp://127.0.0.1:3333?contentType=text/xml+soap"));
         options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElement");
         options.setUseSeparateListener(true);
         options.setTimeOutInMilliSeconds(Long.MAX_VALUE);
 
-        ServiceClient serviceClient = new ServiceClient(configurationContext, null);
+        ServiceClient serviceClient = new ServiceClient(getClientCfgCtx(), null);
         serviceClient.setOptions(options);
         // We need to set up the anonymous service Axis uses to get the response
         AxisService clientService = serviceClient.getServiceContext().getAxisService();
         clientService.addParameter(UDPConstants.PORT_KEY, 4444);
         clientService.addParameter(UDPConstants.CONTENT_TYPE_KEY, "text/xml+soap");
-        OMElement response = serviceClient.sendReceive(method);
+        OMElement response = serviceClient.sendReceive(createPayload());
         
-        assertEquals(new QName(omNs.getNamespaceURI(), "echoOMElementResponse"), response.getQName());
+        assertEquals("echoOMElementResponse", response.getQName().getLocalPart());
+    }
+    
+    public ConfigurationContext getClientCfgCtx() throws Exception {
+        ConfigurationContext cfgCtx =
+            ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                    new File("target/test_rep").getAbsolutePath());
+        AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
+        axisCfg.engageModule("addressing");
+
+        TransportInDescription trpInDesc = new TransportInDescription("udp");
+        trpInDesc.setReceiver(new UDPListener());
+        axisCfg.addTransportIn(trpInDesc);
+        
+        TransportOutDescription trpOutDesc = new TransportOutDescription("udp");
+        trpOutDesc.setSender(new UDPSender());
+        axisCfg.addTransportOut(trpOutDesc);
+        
+        return cfgCtx;
     }
 }

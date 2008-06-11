@@ -45,7 +45,6 @@ public class VFSEchoRawXMLTest extends AbstractTransportTest {
         options.setTo(
             new EndpointReference("vfs:file:" + new File(".").getAbsolutePath() +
                 File.separator + "target/vfs1/req/request.xml"));
-        options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElementNoResponse");
 
         ServiceClient sender = new ServiceClient(getClientCfgCtx(), null);
         sender.setOptions(options);
@@ -71,7 +70,6 @@ public class VFSEchoRawXMLTest extends AbstractTransportTest {
         options.setTo(
             new EndpointReference("vfs:jar:" + new File(".").getAbsolutePath() +
                 File.separator + "target/vfs2/req/requests.jar!request.xml"));
-        options.setAction(Constants.AXIS2_NAMESPACE_URI + "/echoOMElementNoResponse");
 
         ServiceClient sender = new ServiceClient(getClientCfgCtx(), null);
         sender.setOptions(options);

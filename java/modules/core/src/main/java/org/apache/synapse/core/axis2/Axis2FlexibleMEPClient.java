@@ -50,6 +50,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.util.MessageHelper;
+import org.apache.synapse.util.PolicyInfo;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -77,22 +78,26 @@ public class Axis2FlexibleMEPClient {
         EndpointDefinition endpoint,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
 
-        boolean separateListener    = false;
-        boolean wsSecurityEnabled   = false;
-        String wsSecPolicyKey       = null;
-        boolean wsRMEnabled         = false;
-        String wsRMPolicyKey        = null;
-        boolean wsAddressingEnabled = false;
-        String wsAddressingVersion  = null;
+        boolean separateListener      = false;
+        boolean wsSecurityEnabled     = false;
+        String wsSecPolicyKey         = null;
+        String inboundWsSecPolicyKey  = null;
+        String outboundWsSecPolicyKey = null;
+        boolean wsRMEnabled           = false;
+        String wsRMPolicyKey          = null;
+        boolean wsAddressingEnabled   = false;
+        String wsAddressingVersion    = null;
 
         if (endpoint != null) {
-            separateListener    = endpoint.isUseSeparateListener();
-            wsSecurityEnabled   = endpoint.isSecurityOn();
-            wsSecPolicyKey      = endpoint.getWsSecPolicyKey();
-            wsRMEnabled         = endpoint.isReliableMessagingOn();
-            wsRMPolicyKey       = endpoint.getWsRMPolicyKey();
-            wsAddressingEnabled = endpoint.isAddressingOn() || wsSecurityEnabled || wsRMEnabled;
-            wsAddressingVersion = endpoint.getAddressingVersion();
+            separateListener       = endpoint.isUseSeparateListener();
+            wsSecurityEnabled      = endpoint.isSecurityOn();
+            wsSecPolicyKey         = endpoint.getWsSecPolicyKey();
+            inboundWsSecPolicyKey  = endpoint.getInboundWsSecPolicyKey();
+            outboundWsSecPolicyKey = endpoint.getOutboundWsSecPolicyKey();
+            wsRMEnabled            = endpoint.isReliableMessagingOn();
+            wsRMPolicyKey          = endpoint.getWsRMPolicyKey();
+            wsAddressingEnabled    = endpoint.isAddressingOn() || wsSecurityEnabled || wsRMEnabled;
+            wsAddressingVersion    = endpoint.getAddressingVersion();
         }
 
         if (log.isDebugEnabled()) {
@@ -248,11 +253,20 @@ public class Axis2FlexibleMEPClient {
                 clientOptions.setProperty(
                     SynapseConstants.RAMPART_POLICY,
                     getPolicy(synapseOutMessageContext, wsSecPolicyKey));
+            } else {
+                if (inboundWsSecPolicyKey != null) {
+                    // todo: set the in message policy for rampart
+                    // blocked by [https://issues.apache.org/jira/browse/RAMPART-175]
+                }
+                if (outboundWsSecPolicyKey != null) {
+                    // todo: set the out message policy for rampart
+                    // blocked by [https://issues.apache.org/jira/browse/RAMPART-175]
+                }
             }
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
             if (axisOutMsgCtx.getEnvelope().getHeader() == null) {
                 SOAPFactory fac = axisOutMsgCtx.isSOAP11() ?
-                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
+                        OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
                 fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());
             }
         }

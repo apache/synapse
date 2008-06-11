@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.util.PolicyInfo;
 
 /**
  * All endpoint serializers should implement this interface. Use EndpointSerializer to
@@ -127,6 +128,15 @@ public abstract class EndpointSerializer {
             if (endpointDefinition.getWsSecPolicyKey() != null) {
                 sec.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsSecPolicyKey()));
+            } else {
+                if (endpointDefinition.getInboundWsSecPolicyKey() != null) {
+                    sec.addAttribute(fac.createOMAttribute(
+                            "inboundPolicy", null, endpointDefinition.getInboundWsSecPolicyKey()));
+                }
+                if (endpointDefinition.getOutboundWsSecPolicyKey() != null) {
+                    sec.addAttribute(fac.createOMAttribute(
+                            "outboundPolicy", null, endpointDefinition.getOutboundWsSecPolicyKey()));
+                }
             }
             element.addChild(sec);
         }

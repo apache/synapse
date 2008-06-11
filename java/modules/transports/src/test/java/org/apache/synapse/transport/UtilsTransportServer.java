@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
@@ -48,12 +49,11 @@ public abstract class UtilsTransportServer {
     private ConfigurationContext cfgCtx = null;
 
     public void start(TransportInDescription trpInDesc, TransportOutDescription trpDescOut) throws Exception {
-
-        // create a dummy repository
-        File file = makeCleanPath("target/axis2/repository");
-
+        // Create a configuration context using the test repository in target/test_rep. This
+        // repository is set up using maven-dependency-plugin (see pom.xml) to contain the
+        // addressing module which can be engaged using the enableAddressing method.
         cfgCtx = ConfigurationContextFactory.
-            createConfigurationContextFromFileSystem(file.getAbsolutePath());
+            createConfigurationContextFromFileSystem(new File("target/test_rep").getAbsolutePath());
 
         // remove http transport
         cfgCtx.getAxisConfiguration().getTransportsIn().remove("http");        
@@ -76,6 +76,10 @@ public abstract class UtilsTransportServer {
     
     public void stop() throws Exception {
         listnMgr.stop();
+    }
+
+    public void enableAddressing() throws AxisFault {
+        cfgCtx.getAxisConfiguration().engageModule("addressing");
     }
 
     /**

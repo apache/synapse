@@ -53,7 +53,7 @@ public class UtilsVFSServer extends UtilsTransportServer {
 
         // Service1 - polls target/vfs1/req/request.xml, and writes the response to
         // target/vfs1/res folder and deletes request on success. Polls every 2 secs
-        List parameters = new ArrayList();
+        List<Parameter> parameters = new ArrayList<Parameter>();
         parameters.add(new Parameter("transport.vfs.FileURI",
             "vfs:file://" + new File(".").getAbsolutePath() + File.separator + "target/vfs1/req"));
         parameters.add(new Parameter("transport.vfs.FileNamePattern", "request.xml"));
@@ -67,7 +67,7 @@ public class UtilsVFSServer extends UtilsTransportServer {
 
         // Service2 - polls target/vfs2/req/requests.jar, and writes the response to
         // target/vfs/res folder and deletes request on success. Polls every 2 secs
-        parameters = new ArrayList();
+        parameters = new ArrayList<Parameter>();
         parameters.add(new Parameter("transport.vfs.FileURI",
             "vfs:file://" + new File(".").getAbsolutePath() + File.separator + "target/vfs2/req/requests.jar"));
         //parameters.add(new Parameter("transport.vfs.FileNamePattern", "request.xml"));

@@ -40,7 +40,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.om.util.UUIDGenerator;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
@@ -63,9 +62,6 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
     private static final String KOREAN_TEXT = "\uc5ec\ubcf4\uc138\uc694 \uc138\uacc4!";
     private static final String KOREAN_CHARSET = "ISO-2022-KR";
-    private static final String POX_MESSAGE =
-        "<my:echoOMElement xmlns:my=\"http://ws.apache.org/namespaces/axis2\">" +
-        "<my:myValue>omTextValue</my:myValue></my:echoOMElement>";
 
     private Properties props = new Properties();
     private String username = "synapse.test.0";
@@ -93,19 +89,23 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         props.put("mail.smtp.auth", "true");
     }
 
+    private void assertEchoResponse(String textValue, OMElement element) {
+        assertEquals("echoOMElementResponse", element.getLocalName());
+        assertEquals("http://localhost/axis2/services/EchoXMLService",
+                     element.getNamespace().getNamespaceURI());
+        OMElement valueElement = element.getFirstElement();
+        assertEquals("myValue", valueElement.getLocalName());
+        assertEquals("http://localhost/axis2/services/EchoXMLService",
+                     valueElement.getNamespace().getNamespaceURI());
+        assertEquals(textValue, valueElement.getText());
+    }
+    
     private void assertPOXEchoResponse(String textValue, Object reply) throws Exception {
         if (reply != null && reply instanceof String) {
             log.debug("Result Body : " + reply);
             XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
             OMElement res = new StAXOMBuilder(reader).getDocumentElement();
-            if (res != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(res);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals(textValue, ((OMElement) result).getText());
-                }
-            }
+            assertEchoResponse(textValue, res);
         } else {
             fail("Did not receive the reply mail");
         }
@@ -116,14 +116,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
             log.debug("Result Body : " + reply);
             XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
             SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            if (env != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(env);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals(textValue, ((OMElement) result).getText());
-                }
-            }
+            assertEchoResponse(textValue, env.getBody().getFirstElement());
         } else {
             fail("Did not receive the reply mail");
         }
@@ -150,7 +143,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         msg.setSentDate(new Date());
         msg.setHeader(MailConstants.MAIL_HEADER_MESSAGE_ID, msgId);
         msg.setHeader(MailConstants.MAIL_HEADER_X_MESSAGE_ID, msgId);
-        msg.setText(POX_MESSAGE);
+        msg.setText(createPayload().toString());
         Transport.send(msg);
 
         assertPOXEchoResponse("omTextValue", waitForReply(msgId));
@@ -189,7 +182,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.setOptions(options);
         sender.fireAndForget(createPayload(KOREAN_TEXT));
 
-        assertSOAPEchoResponse("omTextValue", waitForReply(msgId));
+        assertSOAPEchoResponse(KOREAN_TEXT, waitForReply(msgId));
     }
 
     public void testRoundTripPOPDefaultCharsetSOAP12() throws Exception {

@@ -36,10 +36,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.om.util.UUIDGenerator;
@@ -96,6 +93,42 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         props.put("mail.smtp.auth", "true");
     }
 
+    private void assertPOXEchoResponse(String textValue, Object reply) throws Exception {
+        if (reply != null && reply instanceof String) {
+            log.debug("Result Body : " + reply);
+            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
+            OMElement res = new StAXOMBuilder(reader).getDocumentElement();
+            if (res != null) {
+                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
+                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
+                Object result = xpath.evaluate(res);
+                if (result != null && result instanceof OMElement) {
+                    assertEquals(textValue, ((OMElement) result).getText());
+                }
+            }
+        } else {
+            fail("Did not receive the reply mail");
+        }
+    }
+    
+    private void assertSOAPEchoResponse(String textValue, Object reply) throws Exception {
+        if (reply != null && reply instanceof String) {
+            log.debug("Result Body : " + reply);
+            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
+            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+            if (env != null) {
+                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
+                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
+                Object result = xpath.evaluate(env);
+                if (result != null && result instanceof OMElement) {
+                    assertEquals(textValue, ((OMElement) result).getText());
+                }
+            }
+        } else {
+            fail("Did not receive the reply mail");
+        }
+    }
+
     public void testRoundTripPOX() throws Exception {
 
         String msgId = UUIDGenerator.getUUID();
@@ -120,41 +153,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         msg.setText(POX_MESSAGE);
         Transport.send(msg);
 
-        Thread.yield();
-        Thread.sleep(100);
-
-        Object reply = null;
-        boolean replyNotFound = true;
-        int retryCount = 50;
-        while (replyNotFound) {
-            log.debug("Checking for response ... with MessageID : " + msgId);
-            reply = getMessage(msgId);
-            if (reply != null) {
-                replyNotFound = false;
-            } else {
-                if (retryCount-- > 0) {
-                    Thread.sleep(100);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (reply != null && reply instanceof String) {
-            log.debug("Result Body : " + reply);
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            OMElement res = new StAXOMBuilder(reader).getDocumentElement();
-            if (res != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(res);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals("omTextValue", ((OMElement) result).getText());
-                }
-            }
-        } else {
-            fail("Did not receive the reply mail");
-        }
+        assertPOXEchoResponse("omTextValue", waitForReply(msgId));
     }
 
     public void testRoundTripMultiPart() throws Exception {
@@ -172,41 +171,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.setOptions(options);
         sender.fireAndForget(createPayload());
 
-        Thread.yield();
-        Thread.sleep(100);
-
-        Object reply = null;
-        boolean replyNotFound = true;
-        int retryCount = 50;
-        while (replyNotFound) {
-            log.debug("Checking for response ... with MessageID : " + msgId);
-            reply = getMessage(msgId);
-            if (reply != null) {
-                replyNotFound = false;
-            } else {
-                if (retryCount-- > 0) {
-                    Thread.sleep(100);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (reply != null && reply instanceof String) {
-            log.debug("Result Body : " + reply);
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            if (env != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(env);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals("omTextValue", ((OMElement) result).getText());
-                }
-            }
-        } else {
-            fail("Did not receive the reply mail");
-        }
+        assertSOAPEchoResponse("omTextValue", waitForReply(msgId));
     }
 
     public void testRoundTripMultiPartKorean() throws Exception {
@@ -222,43 +187,9 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         ServiceClient sender = new ServiceClient(getClientCfgCtx(), null);
         sender.setOptions(options);
-        sender.fireAndForget(createKoreanPayload());
+        sender.fireAndForget(createPayload(KOREAN_TEXT));
 
-        Thread.yield();
-        Thread.sleep(100);
-
-        Object reply = null;
-        boolean replyNotFound = true;
-        int retryCount = 50;
-        while (replyNotFound) {
-            log.debug("Checking for response ... with MessageID : " + msgId);
-            reply = getMessage(msgId);
-            if (reply != null) {
-                replyNotFound = false;
-            } else {
-                if (retryCount-- > 0) {
-                    Thread.sleep(100);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (reply != null && reply instanceof String) {
-            log.debug("Result Body : " + reply);
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            if (env != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(env);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals("omTextValue", ((OMElement) result).getText());
-                }
-            }
-        } else {
-            fail("Did not receive the reply mail");
-        }
+        assertSOAPEchoResponse("omTextValue", waitForReply(msgId));
     }
 
     public void testRoundTripPOPDefaultCharsetSOAP12() throws Exception {
@@ -275,41 +206,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         sender.setOptions(options);
         sender.fireAndForget(createPayload());
 
-        Thread.yield();
-        Thread.sleep(100);
-
-        Object reply = null;
-        boolean replyNotFound = true;
-        int retryCount = 50;
-        while (replyNotFound) {
-            log.debug("Checking for response ... with MessageID : " + msgId);
-            reply = getMessage(msgId);
-            if (reply != null) {
-                replyNotFound = false;
-            } else {
-                if (retryCount-- > 0) {
-                    Thread.sleep(100);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (reply != null && reply instanceof String) {
-            log.debug("Result Body : " + reply);
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            if (env != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(env);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals("omTextValue", ((OMElement) result).getText());
-                }
-            }
-        } else {
-            fail("Did not receive the reply mail");
-        }
+        assertSOAPEchoResponse("omTextValue", waitForReply(msgId));
     }
 
     public void testRoundTripIMAPUTF8Charset() throws Exception {
@@ -323,43 +220,9 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         ServiceClient sender = new ServiceClient(getClientCfgCtx(), null);
         sender.setOptions(options);
-        sender.fireAndForget(createKoreanPayload());
+        sender.fireAndForget(createPayload(KOREAN_TEXT));
 
-        Thread.yield();
-        Thread.sleep(100);
-
-        Object reply = null;
-        boolean replyNotFound = true;
-        int retryCount = 50;
-        while (replyNotFound) {
-            log.debug("Checking for response ... with MessageID : " + msgId);
-            reply = getMessage(msgId);
-            if (reply != null) {
-                replyNotFound = false;
-            } else {
-                if (retryCount-- > 0) {
-                    Thread.sleep(100);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (reply != null && reply instanceof String) {
-            log.debug("Result Body : " + reply);
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            if (env != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(env);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals(KOREAN_TEXT, ((OMElement) result).getText());
-                }
-            }
-        } else {
-            fail("Did not receive the reply mail");
-        }
+        assertSOAPEchoResponse(KOREAN_TEXT, waitForReply(msgId));
     }
 
     public void testRoundTripIMAPKoreanCharset() throws Exception {
@@ -374,43 +237,9 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         ServiceClient sender = new ServiceClient(getClientCfgCtx(), null);
         sender.setOptions(options);
-        sender.fireAndForget(createKoreanPayload());
+        sender.fireAndForget(createPayload(KOREAN_TEXT));
 
-        Thread.yield();
-        Thread.sleep(100);
-
-        Object reply = null;
-        boolean replyNotFound = true;
-        int retryCount = 50;
-        while (replyNotFound) {
-            log.debug("Checking for response ... with MessageID : " + msgId);
-            reply = getMessage(msgId);
-            if (reply != null) {
-                replyNotFound = false;
-            } else {
-                if (retryCount-- > 0) {
-                    Thread.sleep(100);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (reply != null && reply instanceof String) {
-            log.debug("Result Body : " + reply);
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            if (env != null) {
-                AXIOMXPath xpath = new AXIOMXPath("//my:myValue");
-                xpath.addNamespace("my", "http://localhost/axis2/services/EchoXMLService");
-                Object result = xpath.evaluate(env);
-                if (result != null && result instanceof OMElement) {
-                    assertEquals(KOREAN_TEXT, ((OMElement) result).getText());
-                }
-            }
-        } else {
-            fail("Did not receive the reply mail");
-        }
+        assertSOAPEchoResponse(KOREAN_TEXT, waitForReply(msgId));
     }
 
     private Object getMessage(String requestMsgId) {
@@ -451,6 +280,29 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         }
         return null;
     }
+    
+    private Object waitForReply(String msgId) throws Exception {
+        Thread.yield();
+        Thread.sleep(100);
+        
+        Object reply = null;
+        boolean replyNotFound = true;
+        int retryCount = 50;
+        while (replyNotFound) {
+            log.debug("Checking for response ... with MessageID : " + msgId);
+            reply = getMessage(msgId);
+            if (reply != null) {
+                replyNotFound = false;
+            } else {
+                if (retryCount-- > 0) {
+                    Thread.sleep(100);
+                } else {
+                    break;
+                }
+            }
+        }
+        return reply;
+    }
 
     /**
      * Create a axis2 configuration context that 'knows' about the Mail transport
@@ -478,15 +330,5 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
         trpSender.init(cfgCtx, trpOutDesc);
         return cfgCtx;
-    }
-
-    protected OMElement createKoreanPayload() {
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace omNs = fac.createOMNamespace("http://localhost/axis2/services/EchoXMLService", "my");
-        OMElement method = fac.createOMElement("echoOMElement", omNs);
-        OMElement value = fac.createOMElement("myValue", omNs);
-        value.addChild(fac.createOMText(value, KOREAN_TEXT));
-        method.addChild(value);
-        return method;
     }
 }

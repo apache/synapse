@@ -59,6 +59,14 @@ public class EndpointDefinition {
      */
     private String wsSecPolicyKey = null;
     /**
+     * The "key" for any Rampart Security Policy to be used for inbound messages
+     */
+    private String inboundWsSecPolicyKey = null;
+    /**
+     * The "key" for any Rampart Security Policy to be used for outbound messages
+     */
+    private String outboundWsSecPolicyKey = null;
+    /**
      * use a separate listener - implies addressing is on *
      */
     private boolean useSeparateListener = false;
@@ -220,7 +228,7 @@ public class EndpointDefinition {
     /**
      * Return the Rampart Security configuration policys' 'key' to be used (See Rampart)
      *
-     * @return the ORampart Security configuration policys' 'key' to be used (See Rampart)
+     * @return the Rampart Security configuration policys' 'key' to be used (See Rampart)
      */
     public String getWsSecPolicyKey() {
         return wsSecPolicyKey;
@@ -233,6 +241,45 @@ public class EndpointDefinition {
      */
     public void setWsSecPolicyKey(String wsSecPolicyKey) {
         this.wsSecPolicyKey = wsSecPolicyKey;
+    }
+
+    /**
+     * Return the Rampart Security configuration policys' 'key' to be used for inbound messages
+     * (See Rampart)
+     *
+     * @return the Rampart Security configuration policys' 'key' to be used for inbound messages
+     */
+    public String getInboundWsSecPolicyKey() {
+        return inboundWsSecPolicyKey;
+    }
+
+    /**
+     * Set the Rampart Security configuration policys' 'key' to be used for inbound messages
+     * (See Rampart)
+     *
+     * @param inboundWsSecPolicyKey the Rampart Security configuration policys' 'key' to be used
+     */
+    public void setInboundWsSecPolicyKey(String inboundWsSecPolicyKey) {
+        this.inboundWsSecPolicyKey = inboundWsSecPolicyKey;
+    }
+
+    /**
+     * Return the Rampart Security configuration policys' 'key' to be used for outbound messages
+     * (See Rampart)
+     *
+     * @return the ORampart Security configuration policys' 'key' to be used for outbound messages
+     */
+    public String getOutboundWsSecPolicyKey() {
+        return outboundWsSecPolicyKey;
+    }
+
+    /**
+     * Set the Rampart Security configuration policys' 'key' to be used (See Rampart)
+     *
+     * @param outboundWsSecPolicyKey the Rampart Security configuration policys' 'key' to be used
+     */
+    public void setOutboundWsSecPolicyKey(String outboundWsSecPolicyKey) {
+        this.outboundWsSecPolicyKey = outboundWsSecPolicyKey;
     }
 
     /**

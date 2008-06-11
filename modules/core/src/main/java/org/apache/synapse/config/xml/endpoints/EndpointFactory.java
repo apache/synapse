@@ -31,6 +31,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.util.PolicyInfo;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -174,10 +175,22 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
 
             definition.setSecurityOn(true);
 
-            OMAttribute policy
-                    = wsSec.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
-            if (policy != null) {
-                definition.setWsSecPolicyKey(policy.getAttributeValue());
+            OMAttribute policyKey      = wsSec.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
+            OMAttribute inboundPolicyKey  = wsSec.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy"));
+            OMAttribute outboundPolicyKey = wsSec.getAttribute(
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy"));
+            
+            if (policyKey != null && policyKey.getAttributeValue() != null) {
+                definition.setWsSecPolicyKey(policyKey.getAttributeValue());
+            } else {
+                if (inboundPolicyKey != null && inboundPolicyKey.getAttributeValue() != null) {
+                    definition.setInboundWsSecPolicyKey(inboundPolicyKey.getAttributeValue());
+                }
+                if (outboundPolicyKey != null && outboundPolicyKey.getAttributeValue() != null) {
+                    definition.setOutboundWsSecPolicyKey(outboundPolicyKey.getAttributeValue());
+                }
             }
         }
 

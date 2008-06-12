@@ -34,6 +34,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
 
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
@@ -380,6 +382,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener
             String messageId = filePath + "_" + fileName +
                 "_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
 
+            MessageContext msgContext = createMessageContext();
+            
             String contentType = entry.getContentType();
             if (BaseUtils.isBlank(contentType)) {
                 if (file.getName().getExtension().toLowerCase().endsWith(".xml")) {
@@ -387,6 +391,18 @@ public class VFSTransportListener extends AbstractPollingTransportListener
                 } else if (file.getName().getExtension().toLowerCase().endsWith(".txt")) {
                     contentType = "text/plain";
                 }
+            } else {
+                // Extract the charset encoding from the configured content type and
+                // set the CHARACTER_SET_ENCODING property as e.g. SOAPBuilder relies on this.
+                String charSetEnc = null;
+                try {
+                    if (contentType != null) {
+                        charSetEnc = new ContentType(contentType).getParameter("charset");
+                    }
+                } catch (ParseException ex) {
+                    // ignore
+                }
+                msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEnc);
             }
 
             // if the content type was not found, but the service defined it.. use it
@@ -400,7 +416,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener
                 }
             }
 
-            MessageContext msgContext = createMessageContext();
             // set to bypass dispatching if we know the service - we already should!
             AxisService service = cfgCtx.getAxisConfiguration().getService(entry.getServiceName());
             msgContext.setAxisService(service);

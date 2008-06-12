@@ -80,4 +80,39 @@ public class UtilsVFSServer extends UtilsTransportServer {
         deployEchoService("Service2", parameters);
     }
 
+    /**
+     * Delete the path if it exists and, create it
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    private File makeCleanPath(String path) throws Exception {
+        File file = new File(path);
+        if (!file.exists()) {
+            if (!file.mkdirs()) {
+                throw new Exception("Couldn't create directory : " + file.getPath());
+            }
+        } else {
+            // delete any existing
+            recursivelydelete(file);
+            if (file.exists()) {
+                throw new Exception("Couldn't delete directory : " + file.getPath());
+            }
+            if (!file.mkdirs()) {
+                throw new Exception("Couldn't create directory : " + file.getPath());
+            }
+        }
+        return file;
+    }
+
+    private void recursivelydelete(File file) {
+
+        File[] children = file.listFiles();
+        if (children != null && children.length > 0) {
+            for (int i=0; i<children.length; i++) {
+                recursivelydelete(children[i]);
+            }
+        }
+        file.delete();
+    }
 }

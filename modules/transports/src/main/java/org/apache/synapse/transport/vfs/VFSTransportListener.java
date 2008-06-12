@@ -381,7 +381,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
                 "_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
 
             String contentType = entry.getContentType();
-            if (!BaseUtils.isValid(contentType)) {
+            if (BaseUtils.isBlank(contentType)) {
                 if (file.getName().getExtension().toLowerCase().endsWith(".xml")) {
                     contentType = "text/xml";
                 } else if (file.getName().getExtension().toLowerCase().endsWith(".txt")) {

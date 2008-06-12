@@ -32,13 +32,15 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.transport.AbstractTransportTest;
+import org.apache.synapse.transport.UtilsTransportServer;
 
 /**
  * Test case for {@link UDPListener} and {@link UDPSender}.
  */
 public class UDPTest extends AbstractTransportTest {
-    public UDPTest() {
-        server = new UtilsUDPServer();
+    @Override
+    protected UtilsTransportServer createServer() throws Exception {
+        return new UtilsUDPServer();
     }
     
     public void testSoapOverUdpWithEchoService() throws Exception {

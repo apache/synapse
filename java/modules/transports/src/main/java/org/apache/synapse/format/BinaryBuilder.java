@@ -48,12 +48,12 @@ public class BinaryBuilder implements Builder {
     public OMElement processDocument(InputStream inputStream,
                                      String contentType,
                                      MessageContext msgContext) throws AxisFault {
-        Parameter wrapperParam = msgContext.getAxisService().getParameter(BaseConstants.WRAPPER_PARAM);
-        QName wrapperQName;
-        if (wrapperParam != null) {
-            wrapperQName = BaseUtils.getQNameFromString(wrapperParam.getValue());
-        } else {
-            wrapperQName = BaseConstants.DEFAULT_BINARY_WRAPPER;
+        QName wrapperQName = BaseConstants.DEFAULT_BINARY_WRAPPER;
+        if (msgContext.getAxisService() != null) {
+            Parameter wrapperParam = msgContext.getAxisService().getParameter(BaseConstants.WRAPPER_PARAM);
+            if (wrapperParam != null) {
+                wrapperQName = BaseUtils.getQNameFromString(wrapperParam.getValue());
+            }
         }
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement wrapper = factory.createOMElement(wrapperQName, null);

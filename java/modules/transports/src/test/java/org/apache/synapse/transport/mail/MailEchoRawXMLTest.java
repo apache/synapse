@@ -89,17 +89,6 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         props.put("mail.smtp.auth", "true");
     }
 
-    private void assertEchoResponse(String textValue, OMElement element) {
-        assertEquals("echoOMElementResponse", element.getLocalName());
-        assertEquals("http://localhost/axis2/services/EchoXMLService",
-                     element.getNamespace().getNamespaceURI());
-        OMElement valueElement = element.getFirstElement();
-        assertEquals("myValue", valueElement.getLocalName());
-        assertEquals("http://localhost/axis2/services/EchoXMLService",
-                     valueElement.getNamespace().getNamespaceURI());
-        assertEquals(textValue, valueElement.getText());
-    }
-    
     private void assertPOXEchoResponse(String textValue, Object reply) throws Exception {
         if (reply != null && reply instanceof String) {
             log.debug("Result Body : " + reply);
@@ -115,8 +104,7 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         if (reply != null && reply instanceof String) {
             log.debug("Result Body : " + reply);
             XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader((String) reply));
-            SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-            assertEchoResponse(textValue, env.getBody().getFirstElement());
+            assertSOAPEchoResponse(textValue, reader);
         } else {
             fail("Did not receive the reply mail");
         }

@@ -56,7 +56,7 @@ public class UDPTest extends AbstractTransportTest {
         clientService.addParameter(UDPConstants.CONTENT_TYPE_KEY, "text/xml+soap");
         OMElement response = serviceClient.sendReceive(createPayload());
         
-        assertEquals("echoOMElementResponse", response.getQName().getLocalPart());
+        assertEchoResponse(response);
     }
     
     public ConfigurationContext getClientCfgCtx() throws Exception {

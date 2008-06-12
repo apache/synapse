@@ -28,13 +28,12 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.UtilsTransportServer;
 
 public class UtilsUDPServer extends UtilsTransportServer {
-    @Override
-    public void start() throws Exception {
+    public UtilsUDPServer() throws Exception {
         TransportInDescription trpInDesc = new TransportInDescription("udp");
         trpInDesc.setReceiver(new UDPListener());
         TransportOutDescription trpOutDesc = new TransportOutDescription("udp");
         trpOutDesc.setSender(new UDPSender());
-        start(trpInDesc, trpOutDesc);
+        addTransport(trpInDesc, trpOutDesc);
         enableAddressing();
         
         List<Parameter> params = new LinkedList<Parameter>();

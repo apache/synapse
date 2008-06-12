@@ -33,7 +33,7 @@ import java.io.File;
  */
 public class UtilsVFSServer extends UtilsTransportServer {
 
-    public void start() throws Exception {
+    public UtilsVFSServer() throws Exception {
 
         TransportOutDescription trpOutDesc =
             new TransportOutDescription(VFSTransportListener.TRANSPORT_NAME);
@@ -42,7 +42,7 @@ public class UtilsVFSServer extends UtilsTransportServer {
         TransportInDescription trpInDesc =
             new TransportInDescription(VFSTransportListener.TRANSPORT_NAME);
         trpInDesc.setReceiver(new VFSTransportListener());
-        super.start(trpInDesc, trpOutDesc);
+        addTransport(trpInDesc, trpOutDesc);
 
         // create a temp directory for us to poll for the sample service
         makeCleanPath("./target/vfs1/req");

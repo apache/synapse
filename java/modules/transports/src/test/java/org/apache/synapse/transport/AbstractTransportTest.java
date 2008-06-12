@@ -32,17 +32,21 @@ import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 
-public class AbstractTransportTest extends TestCase {
+public abstract class AbstractTransportTest extends TestCase {
 
-    protected UtilsTransportServer server = null;
+    private UtilsTransportServer server;
 
     protected void setUp() throws Exception {
+        server = createServer();
         server.start();
     }
 
     protected void tearDown() throws Exception {
         server.stop();
+        server = null;
     }
+    
+    protected abstract UtilsTransportServer createServer() throws Exception;
 
     /**
      * Create the payload for an echoOMElement request

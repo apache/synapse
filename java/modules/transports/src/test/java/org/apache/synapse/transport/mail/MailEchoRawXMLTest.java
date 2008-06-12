@@ -54,6 +54,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.AbstractTransportTest;
+import org.apache.synapse.transport.UtilsTransportServer;
 import org.apache.synapse.transport.base.BaseConstants;
 
 public class MailEchoRawXMLTest extends AbstractTransportTest {
@@ -69,8 +70,6 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
 
     public MailEchoRawXMLTest() {
         //Logger.getLogger("org.apache.synapse.transport.mail").setLevel(Level.TRACE);
-        server = new UtilsMailServer();
-
         props.put("mail.smtp.class", TestTransport.class.getName());
         
         props.put("mail.pop3.host", "pop.gmail.com");
@@ -87,6 +86,11 @@ public class MailEchoRawXMLTest extends AbstractTransportTest {
         props.put("mail.smtp.user", "synapse.test.1");
         props.put("mail.smtp.password", "mailpassword");
         props.put("mail.smtp.auth", "true");
+    }
+
+    @Override
+    protected UtilsTransportServer createServer() throws Exception {
+        return new UtilsMailServer();
     }
 
     private void assertPOXEchoResponse(String textValue, Object reply) throws Exception {

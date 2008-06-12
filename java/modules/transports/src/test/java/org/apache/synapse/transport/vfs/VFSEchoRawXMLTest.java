@@ -28,6 +28,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.synapse.transport.AbstractTransportTest;
+import org.apache.synapse.transport.UtilsTransportServer;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
@@ -36,9 +37,9 @@ import java.io.File;
 import java.io.FileInputStream;
 
 public class VFSEchoRawXMLTest extends AbstractTransportTest {
-
-    public VFSEchoRawXMLTest() {
-        server = new UtilsVFSServer();
+    @Override
+    protected UtilsTransportServer createServer() throws Exception {
+        return new UtilsVFSServer();
     }
 
     public void testXMLFileInDirectory() throws Exception {

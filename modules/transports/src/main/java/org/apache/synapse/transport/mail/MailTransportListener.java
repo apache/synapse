@@ -279,7 +279,7 @@ public class MailTransportListener extends AbstractPollingTransportListener
 
         // figure out content type of primary request. If the content type is specified, use it
         String contentType = entry.getContentType();
-        if (!BaseUtils.isValid(contentType)) {
+        if (BaseUtils.isBlank(contentType)) {
 
             Object content = message.getContent();
             if (content instanceof Multipart) {

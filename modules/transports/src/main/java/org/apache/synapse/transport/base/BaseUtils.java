@@ -370,14 +370,10 @@ public abstract class BaseUtils {
     }
 
     /**
-     * Utility method to check if a string is not null and not empty
+     * Utility method to check if a string is null or empty
      * @param str the string to check
-     * @return true if not null and not empty
+     * @return true if the string is null or empty
      */
-    public static boolean isValid(String str) {
-        return (str != null && str.trim().length() > 0);
-    }
-
     public static boolean isBlank(String str) {
         if (str == null || str.length() == 0) {
             return true;

@@ -41,7 +41,6 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.PolicyInfo;
 import org.xml.sax.InputSource;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -257,7 +256,7 @@ public class ProxyService {
             // our SynapseDispatcher will properly dispatch to
             if (trace()) trace.info("Did not find a WSDL. Assuming a POX or Legacy service");
             proxyService = new AxisService();
-            AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
+            AxisOperation mediateOperation = new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
             proxyService.addOperation(mediateOperation);
         }
 

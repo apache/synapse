@@ -19,12 +19,16 @@
 
 package org.apache.synapse.transport;
 
+import javax.xml.stream.XMLStreamReader;
+
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 
@@ -58,6 +62,30 @@ public class AbstractTransportTest extends TestCase {
         return createPayload("omTextValue");
     }
 
+    protected void assertEchoResponse(String textValue, OMElement element) {
+        assertEquals("echoOMElementResponse", element.getLocalName());
+        assertEquals("http://localhost/axis2/services/EchoXMLService",
+                     element.getNamespace().getNamespaceURI());
+        OMElement valueElement = element.getFirstElement();
+        assertEquals("myValue", valueElement.getLocalName());
+        assertEquals("http://localhost/axis2/services/EchoXMLService",
+                     valueElement.getNamespace().getNamespaceURI());
+        assertEquals(textValue, valueElement.getText());
+    }
+    
+    protected void assertEchoResponse(OMElement element) {
+        assertEchoResponse("omTextValue", element);
+    }
+    
+    protected void assertSOAPEchoResponse(String textValue, XMLStreamReader reader) {
+        SOAPEnvelope env = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+        assertEchoResponse(textValue, env.getBody().getFirstElement());
+    }
+    
+    protected void assertSOAPEchoResponse(XMLStreamReader reader) {
+        assertSOAPEchoResponse("omTextValue", reader);
+    }
+    
     /**
      * Get the default axis2 configuration context for a client
      * @return

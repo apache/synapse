@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class UtilsMailServer extends UtilsTransportServer {
 
-    public void start() throws Exception {
+    public UtilsMailServer() throws Exception {
 
         TransportOutDescription trpOutDesc =
             new TransportOutDescription(MailConstants.TRANSPORT_NAME);
@@ -51,7 +51,7 @@ public class UtilsMailServer extends UtilsTransportServer {
         TransportInDescription trpInDesc =
             new TransportInDescription(MailConstants.TRANSPORT_NAME);
         trpInDesc.setReceiver(new MailTransportListener());
-        super.start(trpInDesc, trpOutDesc);
+        addTransport(trpInDesc, trpOutDesc);
 
         // Service1 - polls synapse.test.6@gmail.com using POP3/SSL, and writes the response to
         // synapse.test.1@gmail.com and deletes request on success. Polls every 5 secs

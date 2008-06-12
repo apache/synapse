@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.vfs;
 
+import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axis2.Constants;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -32,6 +33,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 public class VFSEchoRawXMLTest extends AbstractTransportTest {
 
@@ -62,6 +64,7 @@ public class VFSEchoRawXMLTest extends AbstractTransportTest {
         if (!res.exists()) {
             fail("Response file not created : " + res.getPath());
         }
+        assertSOAPEchoResponse(StAXUtils.createXMLStreamReader(new FileInputStream(res)));
     }
 
     /*public void testXMLFilesInJAR() throws Exception {

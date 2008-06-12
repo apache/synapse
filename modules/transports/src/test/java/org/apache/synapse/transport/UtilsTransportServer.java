@@ -34,43 +34,58 @@ import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
 import org.apache.axis2.receivers.RawXMLINOutMessageReceiver;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.synapse.format.BinaryBuilder;
+import org.apache.synapse.format.PlainTextBuilder;
 
 /**
  * Base class for transport util servers used in unit testing
  */
-public abstract class UtilsTransportServer {
+public class UtilsTransportServer {
 
-    private ListenerManager listnMgr = null;
-    private ConfigurationContext cfgCtx = null;
+    private final ListenerManager listnMgr;
+    private final ConfigurationContext cfgCtx;
 
-    public void start(TransportInDescription trpInDesc, TransportOutDescription trpDescOut) throws Exception {
+    public UtilsTransportServer() throws AxisFault {
         // Create a configuration context using the test repository in target/test_rep. This
         // repository is set up using maven-dependency-plugin (see pom.xml) to contain the
         // addressing module which can be engaged using the enableAddressing method.
         cfgCtx = ConfigurationContextFactory.
             createConfigurationContextFromFileSystem(new File("target/test_rep").getAbsolutePath());
+        AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
 
         // remove http transport
-        cfgCtx.getAxisConfiguration().getTransportsIn().remove("http");        
-
-        // start given transport
+        axisConfiguration.getTransportsIn().remove("http");
+        
+        // add default builders known by Synapse but not by Axis2
+        axisConfiguration.addMessageBuilder("text/plain", new PlainTextBuilder());
+        axisConfiguration.addMessageBuilder("application/octet-stream", new BinaryBuilder());
+        
+        // create listener manager
         listnMgr = new ListenerManager();
         listnMgr.init(cfgCtx);
         cfgCtx.setTransportManager(listnMgr);
-        //listnMgr.addListener(trpInDesc, false);
-
-        trpDescOut.getSender().init(cfgCtx, trpDescOut);
-        cfgCtx.getAxisConfiguration().addTransportOut(trpDescOut);
-        //trpInDesc.getReceiver().init(cfgCtx, trpInDesc);        
+    }
+    
+    public void addTransport(TransportInDescription trpInDesc,
+                             TransportOutDescription trpDescOut) throws AxisFault {
+        if (trpDescOut != null) {
+            trpDescOut.getSender().init(cfgCtx, trpDescOut);
+            cfgCtx.getAxisConfiguration().addTransportOut(trpDescOut);
+        }
         listnMgr.addListener(trpInDesc, false);
-        listnMgr.start();
+    }
+
+    public void addTransport(TransportInDescription trpInDesc) throws AxisFault {
+        addTransport(trpInDesc, null);
     }
 
     public void start() throws Exception {
+        listnMgr.start();
     }
     
     public void stop() throws Exception {
@@ -81,11 +96,15 @@ public abstract class UtilsTransportServer {
         cfgCtx.getAxisConfiguration().engageModule("addressing");
     }
 
+    public AxisConfiguration getAxisConfiguration() {
+        return cfgCtx.getAxisConfiguration();
+    }
+    
     /**
      * Deploy the standard Echo service with the custom parameters passed in
      * @param name the service name to assign
      * @param parameters the parameters for the service
-     * @throws Exception
+     * @throws Exception 
      */
     public void deployEchoService(String name, List<Parameter> parameters) throws Exception {
 

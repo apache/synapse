@@ -84,8 +84,12 @@ public final class SynapseConstants {
     public static final String ADDRESSING_VERSION_FINAL = "final";
     public static final String ADDRESSING_VERSION_SUBMISSION = "submission";
 
-    /** The Axis2 client options property name for the Rampart policy */
+    /** The Axis2 client options property name for the Rampart service policy */
     public static final String RAMPART_POLICY = "rampartPolicy";
+    /** The Axis2 client options property name for the Rampart in message policy */
+    public static final String RAMPART_IN_POLICY = "rampartInPolicy";
+    /** The Axis2 client options property name for the Rampart out messsage policy */
+    public static final String RAMPART_OUT_POLICY = "rampartOutPolicy";
     /** The Axis2 client options property name for the Sandesha policy */
 	public static final String SANDESHA_POLICY = "sandeshaPolicy";
 

@@ -1,0 +1,47 @@
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+    <!-- introduction to Synapse proxy services. A web service proxy is created and
+     hosted on Synapse based on the given WSDL and exposed over all available
+     transports for Synapse. If a proxy service should be exposed over only a sub set
+     of the available transports, use the transports attribute -->
+    <definitions>
+        <set-property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </definitions>
+
+    <proxies>
+        <proxy name="StockQuoteProxy">
+            <wsdl key="proxy_wsdl"/>
+        </proxy>
+    </proxies>
+
+    <rules>
+        <in>
+            <send>
+                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+            </send>
+        </in>
+        <out>
+            <send/>
+        </out>
+    </rules>
+
+</synapse>

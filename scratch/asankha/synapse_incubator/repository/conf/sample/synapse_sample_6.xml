@@ -1,0 +1,49 @@
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+    <!-- illustration of various mediators : header, in and out mediators -->
+    <rules>
+        <!-- the in mediator applies only to 'incoming' messages (requests) into synapse -->
+        <in>
+            <filter source="//m0:getQuote/m0:request/m0:symbol" regex="IBM"
+                    xmlns:m0="http://services.samples/xsd">
+                <!-- set the message header for the 'To' EPR to the supplied value -->
+                <header name="To"
+                        value="http://localhost:9000/axis2/services/SimpleStockQuoteService1"/>
+                <send/>
+            </filter>
+
+            <!-- drop (i.e. abort processing of) any other messages -->
+            <drop/>
+        </in>
+
+        <!-- the out mediator applies only to 'outgoing' messages (responses) from synapse -->
+        <out>
+            <!-- display a log message at the time a response passes through synapse -->
+            <log level="custom">
+                <property name="message" value="sending back the response"/>
+            </log>
+
+            <send/>
+        </out>
+    </rules>
+
+</synapse> 

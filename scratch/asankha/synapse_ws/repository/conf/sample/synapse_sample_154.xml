@@ -1,0 +1,72 @@
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+    <!-- A proxy service with a loadbalace endpoint -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+
+    <proxy name="LBProxy" transports="http" startOnLoad="true">
+        <target faultSequence="errorHandler">
+            <inSequence>
+                <send>
+                    <endpoint>
+                        <session type="simpleClientSession"/>
+                        <loadbalance algorithm="roundRobin">
+                            <endpoint>
+                                <address uri="http://localhost:9001/soap/LBService1">
+                                    <enableAddressing/>
+                                    <suspendDurationOnFailure>20</suspendDurationOnFailure>
+                                </address>
+                            </endpoint>
+                            <endpoint>
+                                <address uri="http://localhost:9002/soap/LBService1">
+                                    <enableAddressing/>
+                                    <suspendDurationOnFailure>20</suspendDurationOnFailure>
+                                </address>
+                            </endpoint>
+                            <endpoint>
+                                <address uri="http://localhost:9003/soap/LBService1">
+                                    <enableAddressing/>
+                                    <suspendDurationOnFailure>20</suspendDurationOnFailure>
+                                </address>
+                            </endpoint>
+                        </loadbalance>
+                    </endpoint>
+                </send>
+                <drop/>
+            </inSequence>
+            <outSequence>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_2.wsdl"/>
+    </proxy>
+
+    <sequence name="errorHandler">
+
+        <makefault>
+            <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+            <reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/>
+        </makefault>
+
+        <header name="To" action="remove"/>
+        <property name="RESPONSE" value="true"/>
+
+        <send/>
+    </sequence>
+
+</definitions>

@@ -190,8 +190,9 @@ public abstract class TransportListenerTestTemplate extends TestCase {
      * Create a TransportInDescription for the transport under test.
      * 
      * @return the transport description
+     * @throws Exception
      */
-    protected abstract TransportInDescription createTransportInDescription();
+    protected abstract TransportInDescription createTransportInDescription() throws Exception;
     
     /**
      * Carry out initialization before server startup. This method is called

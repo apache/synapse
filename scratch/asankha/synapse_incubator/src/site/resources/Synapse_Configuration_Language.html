@@ -1,0 +1,506 @@
+<!--
+~  Licensed to the Apache Software Foundation (ASF) under one
+~  or more contributor license agreements.  See the NOTICE file
+~  distributed with this work for additional information
+~  regarding copyright ownership.  The ASF licenses this file
+~  to you under the Apache License, Version 2.0 (the
+~  "License"); you may not use this file except in compliance
+~  with the License.  You may obtain a copy of the License at
+~
+~   http://www.apache.org/licenses/LICENSE-2.0
+~
+~  Unless required by applicable law or agreed to in writing,
+~  software distributed under the License is distributed on an
+~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~  KIND, either express or implied.  See the License for the
+~  specific language governing permissions and limitations
+~  under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
+  <title>Synapse Configuration Language</title>
+</head>
+
+<body>
+<h1>Synapse Configuration Language</h1>
+
+<p>The Synapse configuration language is designed to support a processing
+model where messages come into Synapse, are processed via some number of
+mediators and then delivered to an endpoint somewhere. It is currently
+direction agnostic, but directionality can easily be added as a selection
+mechanism for mediators (see below for details).</p>
+
+<h2>Overall Structure</h2>
+
+<p>A Synapse configuration looks like the following at the top level:</p>
+<pre> &lt;synapse&gt;
+   registrydef
+   &lt;definitions&gt;
+     (sequencedef | endpointdef | literalpropertydef)+
+   &lt;definitions&gt;?
+   &lt;proxies&gt;
+     proxyservice+
+   &lt;/proxies&gt;?
+   &lt;rules [key="string"]&gt;
+     mediator*
+   &lt;/rules&gt;
+ &lt;/synapse&gt;</pre>
+
+<h3>Registries</h3>
+
+<p>A registrydef token represents a &lt;registry&gt; element which is used to
+define a Registry which is referenced within the configuration.</p>
+<pre> &lt;registry [name="string"] provider="string"/&gt;
+   &lt;property name="string" value="string"/&gt;*
+ &lt;/registry&gt;</pre>
+
+<p>The registry definition without a name becomes the 'default' registry
+instance for the Synapse instance, and any reference to a registry which does
+not specify a registry name defaults to this instance. Optionally, a number
+of configuration properties may be specified to configure an instance of a
+registry.</p>
+
+<h3>Definitions</h3>
+
+<p>The &lt;definitions&gt; section defines reusable elements that can be used
+from within the rules, and the &lt;rules&gt; section contains the sequence of
+mediators that every message passes through during mediation.</p>
+
+<h4>Properties</h4>
+
+<p>The token literalpropertydef refers to a &lt;set-property&gt; element as
+follows:</p>
+<pre>  &lt;set-property name="string" [value="string"] [src="url"] [key="string"]&gt;
+        &lt;inline-xml/&gt;?
+  &lt;set-property/&gt;</pre>
+
+<p>These properties are top level properties which are set globally for the
+entire system. Values of these properties can be retrieved via the extension
+XPath function called "synapse:get-property(prop-name)".</p>
+
+<p>A property can be static literal text (specified with the value attribute)
+or static XML specified as an inline XML fragment or specified as a URL
+(using the src attribute). A property can alternatively be a DynamicProperty
+which will reference a key on a Registry. If a property is a DynamicProperty,
+it will be fetched from the Registry and cached locally as per meta
+information provided by the Registry for caching. DynamicProperties are
+automatically refreshed when expired, and thus can be used to specify dynamic
+behaviour in Synapse.</p>
+
+<p>Dynamic properties allows the creation of Dynamic Sequences, Endpoints and
+Proxies whose definition would change accordingly with any changes on the
+property.</p>
+
+<h4>Sequences</h4>
+
+<p>A sequencedef token represents a &lt;sequence&gt; element which is used to
+define a named sequence of mediators that can be invoked later by name as a
+sequence of mediators.</p>
+<pre> &lt;sequence name="string" [onError="string"] [key="string"]&gt;
+   mediator*
+ &lt;/sequence&gt;</pre>
+
+<p>If an optional error handler sequence name is specified through the
+attribute 'onError', an exception on this sequence will invoke the sequence
+specified by this name.</p>
+
+<p>A Dynamic Sequence may be defined by specifying a Dynamic Property as its
+definition. As the dynamic property changes, the sequence will dynamically be
+updated accordingly.</p>
+
+<h4>Endpoints</h4>
+
+<p>An endpointdef token represents an &lt;endpoint&gt; element which is used
+to give a logical name to an endpoint address. If the address is not just a
+simple URL, then extensibility elements may be used to indicate the address
+(i.e. to compute the address at runtime).</p>
+<pre> &lt;endpoint name="string" [address="url"] [key="string"]&gt;
+   &lt;enableRM/&gt;?
+   &lt;enableSec [policy="key"]/&gt;?
+   &lt;enableAddressing/&gt;?
+   .. extensibility ..
+ &lt;/endpoint&gt;</pre>
+
+<p>An Axis2 Parameter element within an endpoint definition with the name "
+OutflowSecurity" describes the Apache Rampart security configuration to be
+used for messages flowing to this endpoint. Please see Rampart/Axis2
+documentation for more details.</p>
+
+<p>A Policy element within an endpoint definition with an Id of "RMPolicy"
+describes the Apache Sandesha2 RM configuration (or any overrides against the
+default) to be used for messages flowing to this endpoint. Please see
+Sandesha2/Axis2 documentation for more details.</p>
+
+<p>The enableRM/enableSec options turns on WS-Security or WS-RM on outgoing
+messages to this endpoint.</p>
+
+<p>A Dynamic Endpoint may be defined by specifying a Dynamic Property as its
+definition. As the dynamic property changes, the endpoint will dynamically be
+updated accordingly.</p>
+
+<p>NOTE: The Rampart and/or Sandesha configuration options may change with
+Axis2 changes currently in progress</p>
+
+<p></p>
+
+<h3>Proxy services</h3>
+
+<p>The &lt;proxies&gt; section defines Synapse Proxy services, which are real
+Axis2 services hosted on Synapse, which allows WSDL mediation as well as the
+ability to expose existing services on Synapse, with possibly different
+semantics, such as WS-Security, WS-RM and Transport switching etc.</p>
+
+<p>A proxyservice token represents a &lt;proxy&gt; element which is used to
+define a Synapse Proxy service.</p>
+<pre> &lt;proxy name="string" [description="string"] [transports="(http |https |jms )+|all"]&gt;
+   &lt;target (inSequence="name" outSequence="name") | endpoint="name"/&gt;? // defaults to the synapse main sequence
+   &lt;wsdl key="string"&gt;?
+   &lt;enableRM/&gt;?
+   &lt;enableSec/&gt;?
+   &lt;policy key="string"&gt;*                       // optional service level policies
+                                                // (e.g. WS-Security and/or WS-RM policies)
+   &lt;property name="string" value="string"/&gt;*    // optional service parameters 
+                                                // (e.g. transport.jms.ConnectionFactory)
+ &lt;/proxy&gt;</pre>
+
+<p>A proxy service is created and exposed on the specified transports through
+the underlying Axis2 instance, exposing service EPR's as per the standard
+Axis2 conventions - based on the service name. (Note: that currently Axis2
+does not allow custom URI's to be set for services on some transports.) The
+Proxy service could be exposed over all enabled Axis2 transports such as
+http, https, JMS etc. or on a subset of these. Each service could define the
+target for received messages as a named sequence or a direct endpoint. If a
+target is not supplied, the default Synapse rules will apply for incoming
+message mediation. Any supplied policies would apply as service level
+policies, and any properties could be passed into the proxy services'
+AxisService instance (e.g. the JMS destination etc). If the proxy service
+should enable WS-Reliable Messaging or Security, the appropriate modules
+could be engaged.</p>
+
+<p>A Dynamic Proxy may be defined by specifying a Dynamic Property as its
+definition. As the dynamic property changes, the proxy will dynamically be
+updated accordingly.</p>
+
+<p></p>
+
+<h3>Mediators</h3>
+
+<p>A mediator token refers to any of the following tokens:</p>
+<pre> send | drop | log | makefault | transform | header | filter | 
+ switch | class | validate | setproperty | sequenceref | in | out | rm | try</pre>
+
+<p>In addition to the above, Synapse will be able to load mediators via the
+J2SE Service Provider model. Mediator extensions must implement the
+MediatorFactory interface, similarly to the configuration extensions
+mentioned previously.</p>
+
+<h4>Send</h4>
+
+<p>The send token represents a &lt;send&gt; element. The &lt;send&gt; element
+is used to send messages out of Synapse to some endpoint, and stop further
+mediation of the message. The send mediator also copies any correlation
+message context properties from the current message context to the reply
+message received on the execution of the send operation. This allows the
+reply messages to be correlated to the original messages in a flexible
+manner. Messages may be correlated by WS-A MessageID, or even simple custom
+text labels. Also see the set-property mediator.</p>
+
+<p>In the simplest case, the place to send the message to is implicit in the
+message (via a property of the message itself)- that is indicated by the
+following:</p>
+<pre> &lt;send/&gt;</pre>
+
+<p>If the message is to be sent to one or more endpoints, then the following
+is used:</p>
+<pre> &lt;send&gt;
+   (endpointref | endpoint)+
+ &lt;/send&gt;</pre>
+
+<p>where the endpointref token refers to the following:</p>
+<pre> &lt;endpoint ref="name"/&gt;</pre>
+
+<p>and the endpoint token refers to an anonymous endpoint defined inline:</p>
+<pre> &lt;endpoint address="url"/&gt;</pre>
+
+<p>If the message is to be sent to an endpoint selected by load balancing
+across a set of endpoints, then it is indicated by the following:</p>
+<pre> &lt;send&gt;
+   &lt;load-balance algorithm="uri"&gt;
+     (endpointref | endpoint)+
+   &lt;/load-balance&gt;
+ &lt;/send&gt;</pre>
+
+<p>Similarly, if the message is to be sent to an endpoint with failover
+semantics, then it is indicated by the following:</p>
+<pre> &lt;send&gt;
+   &lt;failover&gt;
+     (endpointref | endpoint)+
+   &lt;/failover&gt;
+ &lt;/send&gt;</pre>
+
+<p>Once the &lt;send&gt; mediator executes, further processing of the current
+message stops.</p>
+
+<p>Note: Synapse does not yet support the load balancing or failover
+semantics, and supports only a single endpoint reference.</p>
+
+<h4>Drop</h4>
+
+<p>The drop token refers to a &lt;drop&gt; element which is used to drop a
+message:</p>
+<pre> &lt;drop/&gt;</pre>
+
+<p>Once the &lt;drop&gt; mediator executes, further processing of the current
+message stops.</p>
+
+<h4>Log</h4>
+
+<p>The log token refers to a &lt;log&gt; element which may be used to log
+messages being mediated:</p>
+<pre> &lt;log [level="string"] [separator="string"]&gt;
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ &lt;/log&gt;</pre>
+
+<p>The optional level attribute selects a pre-defined subset of properties to
+be logged.</p>
+
+<p>e.g.</p>
+<ul>
+  <li>simple = To, From, WSAction, SOAPAction, ReplyTo, MessageID and any
+    properties</li>
+  <li>headers = All SOAP header blocks and any properties</li>
+  <li>full = all attributes included in log level 'simple' and the SOAP
+    envelope and any properties</li>
+  <li>custom = Only properties specified to the Log mediator</li>
+</ul>
+
+<p>A separator if defined will be used to seperate the attributes being
+logged. The default separator is the ',' comma.</p>
+
+<h4>Transforms</h4>
+
+<h5>Faults</h5>
+<pre> &lt;makefault [version="soap11|soap12"]&gt;
+   &lt;code (value="literal" | expression="xpath")/&gt;
+   &lt;reason (value="literal" | expression="xpath")&gt;
+   &lt;node&gt;?
+   &lt;role&gt;?
+   &lt;detail&gt;?
+ &lt;/makefault&gt;</pre>
+
+<p>The &lt;makefault&gt; mediator transforms the current message into a fault
+message, but does NOT send it. The &lt;send&gt; mediator needs to be invoked
+to send a fault message created this way. The fault message "to" header is
+set to the "faultTo" of the original message if such a header existed on the
+original message, else it is set it to the "replyTo" of the original
+message.</p>
+
+<h5>XSLT</h5>
+<pre> &lt;xslt key="string" [source="xpath"]&gt;
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ &lt;/transform&gt;</pre>
+
+<p>The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
+given element. If the source element is not specified, it defaults to the
+first child of the soap body. Optionally parameters (XSLT) could be passed
+into the transformations through the &lt;property&gt; elements.</p>
+
+<h5>Headers</h5>
+<pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
+ &lt;header name="qname" action="remove"/&gt;</pre>
+
+<p>The &lt;header&gt; mediator sets or removes a specified header from the
+current soap message. Currently the set header only supports simple valued
+headers. In the future we may extend this to have XML structured headers by
+embedding the XML content within the element itself. The optional action
+attribute specifies whether the mediator should set or remove the header. If
+omitted, it defaults to a set-header.</p>
+
+<h4>Selection</h4>
+
+<h5>Filters</h5>
+<pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+   mediator+
+ &lt;/filter&gt;</pre>
+
+<p>The &lt;filter&gt; mediator either test the given xpath expression as a
+boolean expression, or match the evaluation result of a source xpath
+expression against the given regular expression. If the test succeeds, the
+filter mediator will execute the enclosed mediators in sequence.</p>
+
+<h5>Switch</h5>
+<pre> &lt;switch source="xpath"&gt;
+   &lt;case regex="string"&gt;
+     mediator+
+   &lt;/case&gt;+
+   &lt;default&gt;
+     mediator+
+   &lt;/default&gt;?
+ &lt;/switch&gt;</pre>
+
+<p>The &lt;switch&gt; mediator will evaluate the given source xpath
+expression into its string value, and match it against the given regular
+expressions. If the specified cases does not match and a default case exists,
+it will be executed.</p>
+
+<h4>Validation</h4>
+<pre> &lt;validate [source="xpath"]&gt;
+   &lt;schema key="string"/&gt;+
+   &lt;on-fail&gt;
+     mediator+
+   &lt;/on-fail&gt;
+ &lt;/validate&gt;</pre>
+
+<p>The &lt;validate&gt; mediator validates the result of the evaluation of
+the source xpath expression, against the schema specified. If the source
+attribute is not specified, the validation is performed against the first
+child of the SOAP body of the current message. If the validation fails, the
+on-fail sequence of mediators is executed.</p>
+
+<p>Note: As the validation mediator is strongly dependent on the Xerces2-J
+2.8.0 parser, it is bundled with the Synapse extensions, so that the Synapse
+core will remain simple and lightweight.</p>
+
+<h4>Properties</h4>
+<pre> &lt;set-property name="string" (value="literal" | expression="xpath") [scope=correlate|axis2]/&gt;</pre>
+
+<p>The setproperty token refers to a &lt;set-property&gt; element which is a
+mediator that has no direct impact on the message but rather on the message
+context flowing through Synapse. The properties thus set on the message
+context applies only to the current message and can be later retrieved
+through the synapse:get-property(prop-name) extension function. If a scope is
+specified for a property, the property could be set as a correlation property
+or an (underlying) Axis2 message context property.</p>
+
+<h4>Try</h4>
+<pre> &lt;try&gt;
+   &lt;sequence&gt;
+     mediator+
+   &lt;/sequence&gt;
+   &lt;onError&gt;
+     mediator+
+   &lt;/onError&gt;
+   &lt;finally&gt;
+     mediator+
+   &lt;/finally&gt;
+  &lt;/try&gt;</pre>
+
+<p>The try token refers to a &lt;try&gt; element which is a mediator that has
+a set of child mediators. If an exception is encountered during the execution
+of these child mediators, the list of mediators specified as the 'onError'
+sequence is executed. The 'finally' list of mediators is then executed
+irrespective of whether an exception was encountered or not.</p>
+
+<h4>Class Mediators</h4>
+<pre> &lt;class name="class-name"&gt;
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ &lt;/class&gt; </pre>
+
+<p>The class mediator creates an instance of the specified class and sets it
+as a mediator. The class must implement the org.apache.synapse.api.Mediator
+interface. If any properties are specified, the corresponding setter methods
+are invoked on the class. However, Synapse will only support String
+properties.</p>
+
+<h4>Reusing Sequences</h4>
+<pre> &lt;sequence ref="name"/&gt;</pre>
+
+<p>A sequenceref token refers to a &lt;sequence&gt; element which is used to
+invoke a named sequence of mediators.</p>
+
+<p></p>
+
+<h3>Extensibility of Synapse</h3>
+
+<p>The Synapse configuration language could be easily extended, with
+configuration extensions as well as mediation extensions. The Spring mediator
+is such an example.</p>
+
+<h4>Spring Configuration</h4>
+
+<p>A Spring configuration could be created as a property or DynamicProperty
+providing a URL or a reference to a Registry. The configuration is then
+created on first use or as necessary (as per DynamicProperty semantics) by
+the mediators which reference this configuration.</p>
+<pre> &lt;set-property name="string" key="string"/&gt;
+ &lt;set-property name="string" src="url"/&gt;</pre>
+
+<p>The name attribute specifies a unique name for the configuration, and the
+src, key or inlined XML references to the Spring configuration</p>
+
+<h4>Spring mediator</h4>
+<pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;</pre>
+
+<p>The &lt;spring&gt; element creates an instance of a mediator, which is
+managed by Spring. This Spring bean must implement the Mediator interface for
+it to act as a Mediator. The key will reference the Spring
+ApplicationContext/Configuration used for the bean</p>
+
+<h4>Script Language Mediators</h4>
+
+<p>Synapse supports Mediators implemented in a variety of scripting languages
+such as JavaScript, Python or Ruby.</p>
+
+<p>There are two ways of defining script mediators, either with the script
+program statements stored in a separate file which is referenced via a
+Synapse property, or with the script program statements embedded in-line
+within the Synapse configuration.</p>
+
+<p>A script mediator using a registry property is defined as follows:</p>
+
+<p></p>
+<pre> &lt;script key="property-key" [function="script-function-name"]/&gt;</pre>
+
+<p>The property-key is a Synapse registry property containing a URL to the
+script source. The function is an optional attribute defining the name of the
+script function to call, if not specified it defaults to a function named
+'mediate'. The function is passed a single parameter which is the Synapse
+MessageContext. The function may return a boolean, if it does not then true
+is assumed. The language the script is written in is determined from the file
+name suffix of the property key value.</p>
+
+<p>An inline script mediator has the script source embedded in the config
+XML:</p>
+<pre> &lt;script.LL&gt;...script source code...&lt;script.LL/&gt;</pre>
+
+<p>where LL is the script language name extension. For example, script.js
+indicates a JavaScript program, script.rb a Ruby program, or script.py a
+Python program. The environment of the script has the Synapse MessageContext
+predefined in a script variable named 'mc'.</p>
+
+<p>An example of an inline mediator using JavaScript/E4X which returns false
+if the SOAP message body contains an element named 'symbol' which has a value
+of 'IBM' would be:</p>
+
+<p></p>
+<pre> &lt;script.js&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script.js/&gt;</pre>
+
+<p>The boolean response from the inlined mediator is either the response from
+the evaluation of the script statements or if that result is not a boolean
+then a response of true is assumed.</p>
+
+<p>Synapse uses the Apache <a href="http://jakarta.apache.org/bsf/">Bean
+Scripting Framework</a> for the script language support, any script language
+supported by BSF may be used to implement a Synapse Mediator.</p>
+
+<p>Implementing a Mediator with a script language can have advantages over
+using the built in Synapse Mediator types or implementing a custom Java class
+Mediator. Script Mediators have all the flexibility of a class Mediator with
+access to the Synapse MessageContext and SynapseEnvironment APIs, and the
+ease of use and dynamic nature of scripting languages allows rapid
+development and prototyping of custom mediators. An additional benefit of
+some scripting languages is that they have very simple and elegant XML
+manipulation capabilities, for example JavaScript E4X or Ruby REXML, so this
+makes them well suited for use in the Synapse mediation environment.</p>
+
+<p>For both types of script mediator definition the MessageContext passed in
+to the script has additional methods over the standard Synapse MessageContext
+to enable working with the XML in a way natural to the scripting language.
+For example when using JavaScript get/setPayloadXML use E4X XML objects, when
+using Ruby they use REXML documents.</p>
+
+<p></p>
+</body>
+</html>

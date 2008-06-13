@@ -1,0 +1,472 @@
+<!--
+~  Licensed to the Apache Software Foundation (ASF) under one
+~  or more contributor license agreements.  See the NOTICE file
+~  distributed with this work for additional information
+~  regarding copyright ownership.  The ASF licenses this file
+~  to you under the Apache License, Version 2.0 (the
+~  "License"); you may not use this file except in compliance
+~  with the License.  You may obtain a copy of the License at
+~
+~   http://www.apache.org/licenses/LICENSE-2.0
+~
+~  Unless required by applicable law or agreed to in writing,
+~  software distributed under the License is distributed on an
+~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~  KIND, either express or implied.  See the License for the
+~  specific language governing permissions and limitations
+~  under the License.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Synapse Userguide</title>
+</head>
+
+<body>
+<h1>User Guide</h1>
+
+<p>*** this document is being updated and the current contents are deprecated
+***</p>
+
+<p>Apache Synapse is a mediation framework for Web Services. Synapse allows
+messages flowing through, into, or out of an organization to be mediated.
+Refer to the project documentation for more details.<br>
+</p>
+
+<h2>Getting started</h2>
+
+<h3>Synapse Installation<br>
+</h3>
+
+<p>Synapse is available in two distributions. A standalone lightweight
+distribution which runs on its own HTTP server, and as a WAR distribution.
+The WAR distribution is not currently supported for the Milestone M2 release.
+Hence you will need to start the lightweight version of Synapse as described
+below.<br>
+</p>
+
+<p>Synapse will always start in the SYNAPSE_HOME directory, which is where
+Synapse is installed. This directory has the following structure.<br>
+</p>
+
+<table style="width: 80%; text-align: left;" border="0" cellpadding="2"
+cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">/synapse<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/bin<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">Contains the binaries. i.e. synapse.sh
+        and synapse.bat</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/lib<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/endorsed<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">If validation mediator is used, Xerces
+        parser JAR files should be placed here</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/samples<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">This directory includes several
+        samples with varying complexity.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/synapse_repository</td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">This is the underlying Axis2
+        repository. Refer to Axis2 documentation for more information and
+        structure of this.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/conf<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">Contains the default synapse.xml
+        configuration file and the axis2.xml configuration file for Axis<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/sample<br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">Contains sample synapse XML
+        configurations to be used with the samples<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/modules<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/services<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">/xdocs<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">-<br>
+      </td>
+      <td style="vertical-align: top;">Contains bundled documentation<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+
+
+<h3>Starting Synapse through the <span
+style="font-family: monospace;"></span>synapse [.sh or .bat] script</h3>
+
+<p>The command line for synapse-lightweight takes the repository directory
+and listening port as optional parameters. However as these arguments are
+optional, if they are not specified the port will default to 8080 for http
+and the repository to the 'synapse_repository' directory.  Execution of the
+script starts up synapse as follows.<br>
+</p>
+
+<table
+style="width: 905px; height: 33px; text-align: left; margin-left: auto; margin-right: auto;"
+border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td
+        style="background-color: rgb(255, 255, 204); vertical-align: top;">C:\Java\SynapseDist\synapse&gt;bin\synapse.bat<br>
+        ......<br>
+        [SimpleHTTPServer] Starting<br>
+        [SimpleHTTPServer] Using the Axis2 Repository
+        C:\Java\SynapseDist\synapse\bin\..\synapse_repository<br>
+        [SimpleHTTPServer] Listening on port 8080<br>
+        [main] INFO  SynapseAxis2Interceptor - Initializing Synapse...<br>
+        [main] INFO  SynapseAxis2Interceptor - System property 'synapse.xml'
+        specifies synapse configuration  as
+        C:\Java\SynapseDist\synapse\bin\..\synapse_repository\conf\synapse.xml<br>
+        [main] INFO  XMLConfigurationBuilder - Generating the Synapse
+        configuration model by parsing the XML configuration<br>
+        [main] INFO  SynapseConfigurationBuilder - Loaded Synapse
+        configuration from :
+        C:\Java\SynapseDist\synapse\bin\..\synapse_repository\conf\synapse.xml<br>
+        [main] INFO  SynapseAxis2Interceptor - Synapse initialized...<br>
+        [SimpleHTTPServer] Started<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+
+<p>If required the port and the Axis2 repository locations could be specified
+as follows<br>
+</p>
+<pre> synapse.sh -p5043 synapse_repository</pre>
+
+<p>A convenience method to start Synapse with sample configurations (found in
+synapse_repository\conf\sample) is available with the M2 release. This could
+be used as follows:</p>
+<pre> synapse.sh -sample &lt;number&gt;</pre>
+
+<p>&lt;number&gt; could be 0, 1 or 2, and will pick up the
+synapse_repository\conf\sample\synapse_sample_&lt;number&gt;.xml file from
+the samples.<br>
+</p>
+
+<p>The default log4j.properties file found in the SYNAPSE_HOME directory sets
+the default Synapse log level as DEBUG. You may change this to INFO or WARN
+as required.<br>
+</p>
+
+<h3>Building the Synapse source</h3>
+
+<p>If you have downloaded the Synapse source, and set up Maven and its
+dependencies, you could build the binary distribution as follows:<br>
+</p>
+<pre> maven dist-bin</pre>
+
+<p>This creates the Synapse-Incubating-M2-SNAPSHOT-bin.zip distribution file
+within target\dist<br>
+</p>
+<pre> maven dist-extensions<br></pre>
+
+<p>The dist-extensions target builds the Synapse extensions
+Extensions-Synapse-M2-SNAPSHOT-bin.zip into target\dist<br>
+</p>
+
+<h3>Installing Extensions</h3>
+Synapse extensions allows the core of Synapse to be kept to the minimum
+level, yet still allow extension. Hence the Spring and Validation support
+which depends on the Spring and Xerces JARs are kept outside of the core
+distribution as extensions. The extensions are written using the Synapse SPI
+and the API which allows the Synapse functionality and configuration to be
+enhanced. (Refer to the Extending Synapse document for more information)
+Hence the Spring extension source provides a good example for someone
+interested in using the SPI /API to extend the functionality and
+configuration of Synapse.<br>
+
+<ul>
+  <li>Spring extension</li>
+</ul>
+
+<p style="margin-left: 40px;">The Spring extension requires spring.jar to be
+placed on the synapse SYNAPSE_HOME/lib folder. In addition, you will need to
+place the synapse_extensions.jar file which could be found within the
+Extensions-Synapse-M2-SNAPSHOT-bin.zip distribution file to be placed into
+the same folder.<br>
+</p>
+<ul>
+  <li>Validate mediator<br>
+  </li>
+</ul>
+
+<p style="margin-left: 40px;">The Validate mediator depends on the Xerces
+2.8.0 parser. To properly setup the Xerces parser, you will need to place the
+xml-apis.jar and xercesImpl.jar JAR files of Xerces into the
+SYNAPSE_HOME/lib/endorsed directory. If you have already installed Xerces
+into your JAVA_HOME/lib/endorsed directory, you may omit the above step.<br>
+<br>
+</p>
+
+<h2>Deployment models</h2>
+
+<p>Synapse can intermediate in a number of different modes as listed below.
+Refer to the README.txt in the samples directory for examples utilizing these
+different models.<br>
+</p>
+<ul>
+  <li>Transparent mode
+    <ol>
+    </ol>
+    <ul>
+      <li>Synapse acts as an HTTP Proxy.</li>
+      <li>Clients are configured with the Synapse endpoint URL as the HTTP
+        Proxy URL.</li>
+      <li>Synapse can work with both WS-A and non-WS-A SOAP messages.</li>
+    </ul>
+    <ol>
+    </ol>
+  </li>
+  <li>Gateway mode
+    <ol>
+    </ol>
+    <ul>
+      <li>The client explicitly sends a message to Synapse (with or without
+        WS-A headers)</li>
+      <li>The synapse configuration must include enough routing information
+        to correctly set the WS-A To and then Synapse forwards the
+      message</li>
+    </ul>
+    <ol>
+    </ol>
+  </li>
+  <li>Smart client mode
+    <ol>
+    </ol>
+    <ul>
+      <li>The client sends the message to Synapse but sets the WS-A headers
+        to the ultimate destination</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Processing model</h2>
+
+<p>Synapse has an overall model under which there are two ways to extend the
+framework. This essentially maps into the &lt;definitions&gt; or global
+Synapse configuration extension through the SPI; and the &lt;rules&gt; or
+mediator extension through the API.<br>
+</p>
+<ol>
+  <li><p>Using the SPI: Developers can build Synapse configuration
+    extensions, which extend the XML configuration of Synapse<br>
+    </p>
+  </li>
+  <li><p>Using the API: Developers can build Mediators, which extend the
+    functionality of Synapse<br>
+    </p>
+  </li>
+</ol>
+
+<p>There are also built-in mediators that do common tasks such as logging,
+editing etc. Typically users of Synapse extend the function using mediators,
+while the Synapse development teams can extend the core by building
+extensions.</p>
+
+<p>A synapse deployment attaches to one or more transport listeners, and
+mediates messages from those listeners. One of the key decisions is how to
+"attach" mediators to messages.<br>
+</p>
+
+<h2>Message Mediation</h2>
+The Synapse configuration language describes the XML syntax used to configure
+Synapse, and describes the built-in mediators. Please refer to <a
+href="http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage">http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage</a>
+for more information.<br>
+<br>
+
+
+<h3>User Mediators</h3>
+Synapse allows users to extend the built in mediators by introducing their
+own. The mediators use the Synapse API. The main API interfaces are described
+below. A user mediator implementation could be as simple as writing your own
+Java class implementing the org.apache.synapse.api.Mediator interface, which
+essentially defines one single method <br>
+
+<pre>public boolean mediate(MessageContext synCtx);<br></pre>
+
+<p>You may additionally define this class as a Spring bean using the Synapse
+Spring extension. The advanced user may want to write his own custom mediator
+as well as extend the XML configuration model with a custom configuration
+extension.<br>
+<br>
+</p>
+
+<h3>Writing a custom Class mediator implementation</h3>
+A custom class mediator must extend the Mediator interface, and implement the
+public boolean mediate(MessageContext synCtx) method and a no argument
+constructor. The MessageContext allows the mediator to use message content or
+to modify the message as required, and hand it over to the next mediator as
+defined in the configuration. Class mediators could be configured as
+follows:<br>
+
+<pre>&lt;class name="class-name"&gt;<br>    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*<br>&lt;/class&gt;<br></pre>
+The class mediator is built into the core of Synapse, and creates an instance
+of your specified class - which must be placed into the SYNAPSE_HOME/lib
+folder as a JAR file. If any properties are defined in the XML configuration
+the setter methods are invoked. However only String properties are allowed
+for Class mediators at this time. Any dependent libraries use by your class
+mediator implementation should be placed into the same lib folder as well.<br>
+<br>
+
+
+<h3>Writing a custom Spring mediator implementation</h3>
+A Spring mediator implementation is a class mediator, which is managed by a
+given Spring configuration. The Spring configuration may be defined globally
+to the Synapse Configuration and reused by multiple Spring managed mediator
+beans or defined inline per bean. Refer to the configuration syntax for more
+information. As the Spring mediator implementation is distributed as an
+"extension" to the core Synapse distribution, you will need to manually place
+the extension_mediators.jar into the SYNAPSE_HOME/lib folder as well as place
+the spring.jar and any other dependencies into the same directory.<br>
+<br>
+A reusable Spring configuration may be defined within the XML configuration
+file as follows within the &lt;definitions&gt; element:<br>
+<br>
+
+<pre>&lt;spring:config name="string" src="file"/&gt;</pre>
+<br>
+And a Spring mediator implementation may be defined within the &lt;rules&gt;
+element as follows:<br>
+<br>
+
+<pre>&lt;spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/&gt;</pre>
+<br>
+The Spring configuration referenced by the "src" attribute will be
+initialized and the bean with the name given by the "bean" attribute will be
+looked up for mediation of the message. This bean must implement the Mediator
+interface. If a reusable Spring configuration was defined, the bean
+definition could refer to this configuration through the name given in the
+"config" attribute.<br>
+<span style="font-family: monospace;"><br>
+</span><br>
+<!-- end page -->
+</body>
+</html>

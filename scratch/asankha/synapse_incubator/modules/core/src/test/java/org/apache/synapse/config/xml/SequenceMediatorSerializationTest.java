@@ -1,0 +1,64 @@
+/*
+* Copyright 2004,2005 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+package org.apache.synapse.config.xml;
+
+/**
+ *
+ *
+ */
+
+public class SequenceMediatorSerializationTest extends AbstractTestCase {
+
+    SequenceMediatorFactory sequenceMediatorFactory;
+    SequenceMediatorSerializer sequenceMediatorSerializer;
+
+    public SequenceMediatorSerializationTest() {
+        super(SequenceMediatorSerializationTest.class.getName());
+        sequenceMediatorFactory = new SequenceMediatorFactory();
+        sequenceMediatorSerializer = new SequenceMediatorSerializer();
+    }
+
+    public void testSequenceMediatorSerializationSenarioOne() throws Exception {
+        String xml = "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"namedsequence\"><header name=\"To\" value=\"http://localhost:9000/axis2/services/TestService\"/><send/></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+
+    public void testSequenceMediatorSerializationSenarioTwo() throws Exception {
+        String xml = "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"namedsequence\"  onError=\"ErrorHandler\"><header name=\"To\" value=\"http://localhost:9000/axis2/services/TestService\"/><send/></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+
+    public void testSequenceMediatorSerializationSenarioThree() throws Exception {
+        String xml = "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" ref=\"sequenceone\"></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+
+    public void testSequenceMediatorSerializationSenarioFour() throws Exception {
+        String xml = "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"sequenceone\" onError=\"ErrorHandler\"></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+
+    public void testSequenceMediatorSerializationSenarioFive() throws Exception {
+        String xml = "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" ref=\"sequenceone\" ></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+}

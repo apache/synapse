@@ -1,0 +1,33 @@
+Apache Synapse 0.90 Release Notes
+
+1. Overview
+Apache Synapse is a highly flexible XML router and mediator that can be the basis of your SOA infrastructure. 
+
+Apache Synapse is an effort undergoing incubation at the Apache Software Foundation (ASF), sponsored by the Apache Incubator PMC. 
+Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, 
+communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. 
+While incubation status is not necessarily a reflection of the completeness or stability of the code, 
+it does indicate that the project has yet to be fully endorsed by the ASF.
+
+Please see http://incubator.apache.org/synapse/
+
+2. Installation Prerequisites 
+Apache Synapse requires either JDK1.4 or JDK1.5 
+
+3. Building the Samples
+Please see the document docs/Synapse_Samples.html
+
+4. Known Problems
+Incoming POX support does not work at this time.
+
+5. Reporting Problems
+Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find. You may also join the synapse-dev mailing list by
+sending email to synapse-dev-subscribe@ws.apache.org 
+
+6. New features
+The 0.90 release adds support for:
+	* WS-Security termination and initiation
+	* WS-ReliableMessaging termination and initiation 
+	* Support for dynamic reloading and remote reigstries
+	* Scripting mediators based on Apache BSF
+	* Refactored and cleaner synapse configuration xml

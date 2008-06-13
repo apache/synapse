@@ -1,0 +1,6 @@
+org.apache.synapse.mediators.validate.ValidateMediatorFactory
+org.apache.synapse.mediators.transform.XSLTMediatorFactory
+org.apache.synapse.mediators.spring.SpringMediatorFactory
+org.apache.synapse.mediators.json.JsonMediatorFactory
+org.apache.synapse.mediators.bsf.ScriptMediatorFactory
+org.apache.synapse.mediators.attachment.AttachmentMediatorFactory

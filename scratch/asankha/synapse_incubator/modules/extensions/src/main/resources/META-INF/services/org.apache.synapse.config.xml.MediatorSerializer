@@ -1,0 +1,4 @@
+org.apache.synapse.mediators.validate.ValidateMediatorSerializer
+org.apache.synapse.mediators.transform.XSLTMediatorSerializer
+org.apache.synapse.mediators.spring.SpringMediatorSerializer
+org.apache.synapse.mediators.json.JsonMediatorSerializer

@@ -82,7 +82,9 @@ public abstract class TransportListenerTestTemplate extends TestCase {
                 break;
             }
         }
-        dispatchPhase.addHandler(new DefaultOperationDispatcher());
+        DefaultOperationDispatcher dispatcher = new DefaultOperationDispatcher();
+        dispatcher.initDispatcher();
+        dispatchPhase.addHandler(dispatcher);
         
         // Set up a test service with a default operation backed by a mock message
         // receiver. The service is configured using the parameters specified by the

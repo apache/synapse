@@ -255,12 +255,12 @@ public class Axis2FlexibleMEPClient {
                     getPolicy(synapseOutMessageContext, wsSecPolicyKey));
             } else {
                 if (inboundWsSecPolicyKey != null) {
-                    // todo: set the in message policy for rampart
-                    // blocked by [https://issues.apache.org/jira/browse/RAMPART-175]
+                    clientOptions.setProperty(SynapseConstants.RAMPART_IN_POLICY,
+                            getPolicy(synapseOutMessageContext, inboundWsSecPolicyKey));
                 }
                 if (outboundWsSecPolicyKey != null) {
-                    // todo: set the out message policy for rampart
-                    // blocked by [https://issues.apache.org/jira/browse/RAMPART-175]
+                    clientOptions.setProperty(SynapseConstants.RAMPART_OUT_POLICY,
+                            getPolicy(synapseOutMessageContext, outboundWsSecPolicyKey));
                 }
             }
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197

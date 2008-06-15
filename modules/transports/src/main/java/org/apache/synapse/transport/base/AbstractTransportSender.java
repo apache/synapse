@@ -54,6 +54,8 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     private TransportInDescription transportIn  = null;
     /** transport out description */
     private TransportOutDescription transportOut = null;
+    /** JMX support */
+    private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for the sender */
     protected MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
@@ -75,26 +77,15 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         this.state = BaseConstants.STARTED;
 
         // register with JMX
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        String jmxAgentName = System.getProperty("jmx.agent.name");
-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
-            jmxAgentName = "org.apache.synapse";
-        }
-        String name;
-        try {
-            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
-                getTransportName() + "-sender";
-            TransportView tBean = new TransportView(null, this);
-            registerMBean(mbs, tBean, name);
-        } catch (Exception e) {
-            log.warn("Error registering the " + getTransportName() + " transport for JMX management", e);
-        }
+        mbeanSupport = new TransportMBeanSupport(this, getTransportName());
+        mbeanSupport.register();
         log.info(getTransportName().toUpperCase() + " Sender started");
     }
 
     public void stop() {
         if (state != BaseConstants.STARTED) return;
         state = BaseConstants.STOPPED;
+        mbeanSupport.unregister();
         log.info(getTransportName().toUpperCase() + " Sender Shutdown");
     }
 

@@ -39,7 +39,6 @@ public class AMQPSender extends AbstractTransportSender {
 
     @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
-        setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, transportOut);
         // init connections
     }

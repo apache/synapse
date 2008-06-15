@@ -60,7 +60,6 @@ public class FIXTransportListener extends AbstractTransportListener {
     public void init(ConfigurationContext cfgCtx,
                      TransportInDescription trpInDesc) throws AxisFault {
 
-        setTransportName(FIXConstants.TRANSPORT_NAME);
         super.init(cfgCtx, trpInDesc);
         //initialize the FIXSessionFactory
         fixSessionFactory = new FIXSessionFactory(new FIXApplicationFactory(this.cfgCtx, this.workerPool));

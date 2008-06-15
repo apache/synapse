@@ -64,7 +64,7 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
             public void run() {
                 if (pollInProgress) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Transport " + transportName +
+                        log.debug("Transport " + getTransportName() +
                                 " onPoll() trigger : already executing poll..");
                     }
                     return;
@@ -72,7 +72,7 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
 
                 if (state == BaseConstants.PAUSED) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Transport " + transportName +
+                        log.debug("Transport " + getTransportName() +
                                 " onPoll() trigger : Transport is currently paused..");
                     }
                     return;

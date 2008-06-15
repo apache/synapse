@@ -72,7 +72,6 @@ public class JMSListener extends AbstractTransportListener implements Management
      */
     public void init(ConfigurationContext cfgCtx,
                      TransportInDescription trpInDesc) throws AxisFault {
-        setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, trpInDesc);
 
         // read the connection factory definitions and create them

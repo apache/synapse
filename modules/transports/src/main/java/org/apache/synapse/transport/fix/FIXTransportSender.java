@@ -67,7 +67,6 @@ public class FIXTransportSender extends AbstractTransportSender {
      * @throws AxisFault on error
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
-        setTransportName(FIXConstants.TRANSPORT_NAME);
         super.init(cfgCtx, transportOut);
         messageSender = new FIXOutgoingMessageHandler();
         log.info("FIX transport sender initialized...");

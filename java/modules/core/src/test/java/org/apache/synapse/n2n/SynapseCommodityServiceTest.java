@@ -104,6 +104,7 @@ public class SynapseCommodityServiceTest extends TestCase {
         synTrsIn = (TransportInDescription)
             synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         synTrsIn.getParameter("port").setValue("12100");
+        System.setProperty("jmx.agent.name", "synapse");
         startServer(synapseConfigCtx);
 
         TransportInDescription busTrsIn = (TransportInDescription)
@@ -112,6 +113,9 @@ public class SynapseCommodityServiceTest extends TestCase {
         busTrsIn = (TransportInDescription)
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         busTrsIn.getParameter("port").setValue("12101");
+        // Set a different agent name to avoid collisions between the MBeans registered
+        // by the two servers.
+        System.setProperty("jmx.agent.name", "business");
         startServer(businessConfigCtx);
     }
 

@@ -37,7 +37,6 @@ public class AMQPListener extends AbstractTransportListener
     @Override
     public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn) throws AxisFault
     {
-        setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, transportIn);
         loadConnectionDefinitions(transportIn);
 

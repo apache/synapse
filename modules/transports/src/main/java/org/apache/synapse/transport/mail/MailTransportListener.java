@@ -72,7 +72,6 @@ public class MailTransportListener extends AbstractPollingTransportListener
      */
     public void init(ConfigurationContext cfgCtx, TransportInDescription trpInDesc)
         throws AxisFault {
-        setTransportName(MailConstants.TRANSPORT_NAME);
         super.init(cfgCtx, trpInDesc);
     }
 

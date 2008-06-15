@@ -46,8 +46,6 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     /** the reference to the actual commons logger to be used for log messages */
     protected Log log = null;
 
-    /** the name of the transport */
-    protected String transportName = null;
     /** the axis2 configuration context */
     protected ConfigurationContext cfgCtx = null;
     /** an axis2 engine over the above configuration context to process messages */
@@ -72,8 +70,8 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         throws AxisFault {
         this.cfgCtx = cfgCtx;
         this.engine = new AxisEngine(cfgCtx);
-        this.transportIn  = cfgCtx.getAxisConfiguration().getTransportIn(transportName);
         this.transportOut = transportOut;
+        this.transportIn  = cfgCtx.getAxisConfiguration().getTransportIn(getTransportName());
         this.state = BaseConstants.STARTED;
 
         // register with JMX
@@ -85,19 +83,19 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         String name;
         try {
             name = jmxAgentName + ":Type=Transport,ConnectorName=" +
-                transportName + "-sender";
+                getTransportName() + "-sender";
             TransportView tBean = new TransportView(null, this);
             registerMBean(mbs, tBean, name);
         } catch (Exception e) {
-            log.warn("Error registering the " + transportName + " transport for JMX management", e);
+            log.warn("Error registering the " + getTransportName() + " transport for JMX management", e);
         }
-        log.info(transportName.toUpperCase() + " Sender started");
+        log.info(getTransportName().toUpperCase() + " Sender started");
     }
 
     public void stop() {
         if (state != BaseConstants.STARTED) return;
         state = BaseConstants.STOPPED;
-        log.info(transportName.toUpperCase() + " Sender Shutdown");
+        log.info(getTransportName().toUpperCase() + " Sender Shutdown");
     }
 
     public void cleanup(MessageContext msgContext) throws AxisFault {}
@@ -189,7 +187,7 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
             responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
         }
 
-        responseMsgCtx.setIncomingTransportName(transportName);
+        responseMsgCtx.setIncomingTransportName(getTransportName());
         responseMsgCtx.setTransportOut(transportOut);
         responseMsgCtx.setTransportIn(transportIn);
 
@@ -226,11 +224,7 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     }
 
     public String getTransportName() {
-        return transportName;
-    }
-
-    public void setTransportName(String transportName) {
-        this.transportName = transportName;
+        return transportOut.getName();
     }
 
     protected void handleException(String msg, Exception e) throws AxisFault {

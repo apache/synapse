@@ -77,7 +77,6 @@ public class MailTransportSender extends AbstractTransportSender
      * @throws org.apache.axis2.AxisFault on error
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
-        setTransportName(MailConstants.TRANSPORT_NAME);
         super.init(cfgCtx, transportOut);
 
         // initialize SMTP session

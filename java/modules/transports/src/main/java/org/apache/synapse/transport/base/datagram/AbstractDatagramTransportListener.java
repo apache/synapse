@@ -39,7 +39,6 @@ public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoi
 	
 	@Override
     public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn) throws AxisFault {
-	    setTransportName(transportIn.getName());
         super.init(cfgCtx, transportIn);
         DatagramDispatcherCallback callback = new DatagramDispatcherCallback() {
             public void receive(DatagramEndpoint endpoint, byte[] data, int length) {

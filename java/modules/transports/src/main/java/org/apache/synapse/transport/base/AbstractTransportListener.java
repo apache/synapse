@@ -47,8 +47,6 @@ public abstract class AbstractTransportListener implements TransportListener {
     /** the reference to the actual commons logger to be used for log messages */
     protected Log log = null;
 
-    /** the name of the transport */
-    protected String transportName = null;
     /** the axis2 configuration context */
     protected ConfigurationContext cfgCtx = null;
     /** an axis2 engine over the above configuration context to process messages */
@@ -93,14 +91,14 @@ public abstract class AbstractTransportListener implements TransportListener {
         this.cfgCtx = cfgCtx;
         this.engine = new AxisEngine(cfgCtx);
         this.transportIn  = transportIn;
-        this.transportOut = cfgCtx.getAxisConfiguration().getTransportOut(transportName);
+        this.transportOut = cfgCtx.getAxisConfiguration().getTransportOut(getTransportName());
 
         if (useAxis2ThreadPool) {
             //this.workerPool = cfgCtx.getThreadPool(); not yet implemented
             throw new AxisFault("Unsupported thread pool for task execution - Axis2 thread pool");
         } else {
             this.workerPool = WorkerPoolFactory.getWorkerPool(
-            10, 20, 5, -1, transportName + "Server Worker thread group", transportName + "-Worker");
+            10, 20, 5, -1, getTransportName() + "Server Worker thread group", getTransportName() + "-Worker");
         }
 
         // register to receive updates on services for lifetime management
@@ -116,7 +114,7 @@ public abstract class AbstractTransportListener implements TransportListener {
                 try {
                     stop();
                 } catch (AxisFault ignore) {
-                    log.warn("Error stopping the transport : " + transportName);
+                    log.warn("Error stopping the transport : " + getTransportName());
                 }
             }
         } finally {
@@ -135,7 +133,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             state = BaseConstants.STOPPED;
             // cancel receipt of service lifecycle events
             cfgCtx.getAxisConfiguration().getObserversList().remove(axisObserver);
-            log.info(transportName.toUpperCase() + " Listener Shutdown");
+            log.info(getTransportName().toUpperCase() + " Listener Shutdown");
             for (AxisService service : getListeningServices()) {
                 internalStopListeningForService(service);
             }
@@ -147,7 +145,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             state = BaseConstants.STARTED;
             // register to receive updates on services for lifetime management
             // cfgCtx.getAxisConfiguration().addObservers(axisObserver);
-            log.info(transportName.toUpperCase() + " Listener started");
+            log.info(getTransportName().toUpperCase() + " Listener started");
             // iterate through deployed services and start
             for (AxisService service : getListeningServices()) {
                 internalStartListeningForService(service);
@@ -167,7 +165,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         while (services.hasNext()) {
             AxisService service = (AxisService) services.next();
             if (!ignoreService(service)
-                    && BaseUtils.isUsingTransport(service, transportName)) {
+                    && BaseUtils.isUsingTransport(service, getTransportName())) {
                 result.add(service);
             }
         }
@@ -233,7 +231,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         MessageContext msgCtx = new MessageContext();
         msgCtx.setConfigurationContext(cfgCtx);
 
-        msgCtx.setIncomingTransportName(transportName);
+        msgCtx.setIncomingTransportName(getTransportName());
         msgCtx.setTransportOut(transportOut);
         msgCtx.setTransportIn(transportIn);
         msgCtx.setServerSide(true);
@@ -300,11 +298,7 @@ public abstract class AbstractTransportListener implements TransportListener {
     }
 
     public String getTransportName() {
-        return transportName;
-    }
-
-    public void setTransportName(String transportName) {
-        this.transportName = transportName;
+        return transportIn.getName();
     }
 
     public MetricsCollector getMetricsCollector() {
@@ -324,7 +318,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         public void serviceUpdate(AxisEvent event, AxisService service) {
 
             if (!ignoreService(service)
-                    && BaseUtils.isUsingTransport(service, transportName)) {
+                    && BaseUtils.isUsingTransport(service, getTransportName())) {
                 switch (event.getEventType()) {
                     case AxisEvent.SERVICE_DEPLOY :
                         internalStartListeningForService(service);
@@ -437,7 +431,7 @@ public abstract class AbstractTransportListener implements TransportListener {
         if (jmxAgentName == null || "".equals(jmxAgentName)) {
             jmxAgentName = "org.apache.synapse";
         }
-        return jmxAgentName + ":Type=Transport,ConnectorName=" + transportName + "-listener";
+        return jmxAgentName + ":Type=Transport,ConnectorName=" + getTransportName() + "-listener";
     }
     
     private String getEndpointMBeanName(String serviceName) {

@@ -90,6 +90,7 @@ public class UtilsTransportServer {
     
     public void stop() throws Exception {
         listnMgr.stop();
+        listnMgr.destroy();
     }
 
     public void enableAddressing() throws AxisFault {

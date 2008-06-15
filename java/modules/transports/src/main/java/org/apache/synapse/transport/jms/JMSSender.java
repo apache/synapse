@@ -64,7 +64,6 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
      * @throws AxisFault on error
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
-        setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, transportOut);
         // read the connection factory definitions and create them
         loadConnectionFactoryDefinitions(transportOut);

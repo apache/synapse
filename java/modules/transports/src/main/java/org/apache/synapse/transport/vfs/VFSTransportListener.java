@@ -121,7 +121,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener
      */
     public void init(ConfigurationContext cfgCtx, TransportInDescription trpInDesc)
         throws AxisFault {
-        setTransportName(TRANSPORT_NAME);
         super.init(cfgCtx, trpInDesc);
         try {
             StandardFileSystemManager fsm = new StandardFileSystemManager();

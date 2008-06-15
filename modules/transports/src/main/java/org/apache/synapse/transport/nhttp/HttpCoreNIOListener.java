@@ -23,11 +23,8 @@ import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
-import java.lang.management.ManagementFactory;
-import java.util.Set;
 
 import javax.net.ssl.SSLContext;
-import javax.management.*;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -51,7 +48,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.MetricsCollector;
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.base.TransportView;
+import org.apache.synapse.transport.base.TransportMBeanSupport;
 
 /**
  * NIO transport listener for Axis2 based on HttpCore and NIO extensions
@@ -77,6 +74,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private SSLContext sslContext = null;
     /** The SSL session handler that manages client authentication etc */
     private SSLIOSessionHandler sslIOSessionHandler = null;
+    /** JMX support */
+    private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for this transport */
     private MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
@@ -199,21 +198,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         }
 
         // register with JMX
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        String jmxAgentName = System.getProperty("jmx.agent.name");
-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
-            jmxAgentName = "org.apache.synapse";
-        }
-        String name;
-        try {
-            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
-                "nio-http" + (sslContext == null ? "" : "s") + "-listener";
-            TransportView tBean = new TransportView(this, null);
-            registerMBean(mbs, tBean, name);
-        } catch (Exception e) {
-            log.warn("Error registering the non-blocking http" +
-                (sslContext == null ? "" : "s") + " transport for JMX management", e);
-        }
+        mbeanSupport
+            = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
+        mbeanSupport.register();
     }
 
     /**
@@ -396,6 +383,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     public void destroy() {
         ioReactor = null;
+        mbeanSupport.unregister();
     }
 
     // -------------- utility methods -------------
@@ -450,21 +438,5 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             return metrics.getBytesSent();
         }
         return -1;
-    }
-
-    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
-        try {
-            ObjectName name = new ObjectName(objectName);
-            Set set = mbs.queryNames(name, null);
-            if (set != null && set.isEmpty()) {
-                mbs.registerMBean(mbeanInstance, name);
-            } else {
-                mbs.unregisterMBean(name);
-                mbs.registerMBean(mbeanInstance, name);
-            }
-        } catch (Exception e) {
-            log.warn("Error registering a MBean with objectname ' " + objectName +
-                " ' for JMX management", e);
-        }
     }
 }

@@ -67,6 +67,8 @@ public abstract class AbstractTransportListener implements TransportListener {
     protected WorkerPool workerPool = null;
     /** use the thread pool available in the axis2 configuration context */
     protected boolean useAxis2ThreadPool = false;
+    /** JMX support */
+    private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for this transport */
     protected MetricsCollector metrics = new MetricsCollector();
 
@@ -105,7 +107,8 @@ public abstract class AbstractTransportListener implements TransportListener {
         cfgCtx.getAxisConfiguration().addObservers(axisObserver);
 
         // register with JMX
-        registerMBean(new TransportView(this, null), getMBeanName());
+        mbeanSupport = new TransportMBeanSupport(this, getTransportName());
+        mbeanSupport.register();
     }
 
     public void destroy() {
@@ -119,7 +122,7 @@ public abstract class AbstractTransportListener implements TransportListener {
             }
         } finally {
             state = BaseConstants.STOPPED;
-            unregisterMBean(getMBeanName());
+            mbeanSupport.unregister();
         }
         try {
             workerPool.shutdown(10000);
@@ -426,16 +429,8 @@ public abstract class AbstractTransportListener implements TransportListener {
         return -1;
     }
 
-    private String getMBeanName() {
-        String jmxAgentName = System.getProperty("jmx.agent.name");
-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
-            jmxAgentName = "org.apache.synapse";
-        }
-        return jmxAgentName + ":Type=Transport,ConnectorName=" + getTransportName() + "-listener";
-    }
-    
     private String getEndpointMBeanName(String serviceName) {
-        return getMBeanName() + ",Group=Services,Service=" + serviceName;
+        return mbeanSupport.getMBeanName() + ",Group=Services,Service=" + serviceName;
     }
     
     /**

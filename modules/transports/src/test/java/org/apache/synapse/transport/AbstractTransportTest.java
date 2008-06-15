@@ -37,8 +37,14 @@ public abstract class AbstractTransportTest extends TestCase {
     private UtilsTransportServer server;
 
     protected void setUp() throws Exception {
+        // Temporarily change jmx.agent.name system property to avoid collisions
+        // between MBeans registered by the server context and those registered
+        // by the client context
+        String agentName = System.getProperty("jmx.agent.name", "org.apache.synapse");
+        System.setProperty("jmx.agent.name", agentName + "-server");
         server = createServer();
         server.start();
+        System.setProperty("jmx.agent.name", agentName);
     }
 
     protected void tearDown() throws Exception {

@@ -54,22 +54,18 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.MetricsCollector;
-import org.apache.synapse.transport.base.TransportView;
+import org.apache.synapse.transport.base.TransportMBeanSupport;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -90,6 +86,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private SSLContext sslContext = null;
     /** The SSL session handler that manages hostname verification etc */
     private SSLIOSessionHandler sslIOSessionHandler = null;
+    /** JMX support */
+    private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for the sender */
     private MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
@@ -118,22 +116,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender starting");
 
         // register with JMX
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        String jmxAgentName = System.getProperty("jmx.agent.name");
-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
-            jmxAgentName = "org.apache.synapse";
-        }
-        String name;
-        try {
-            name = jmxAgentName + ":Type=Transport,ConnectorName=" +
-                "nio-http" + (sslContext == null ? "" : "s") + "-sender";
-            TransportView tBean = new TransportView(null, this);
-            registerMBean(mbs, tBean, name);
-        } catch (Exception e) {
-            log.warn("Error registering the non-blocking http" +
-                (sslContext == null ? "" : "s") + " transport sender for JMX management", e);
-        }
-
+        mbeanSupport
+            = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
+        mbeanSupport.register();
     }
 
     /**
@@ -466,6 +451,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         } catch (IOException e) {
             log.warn("Error shutting down IOReactor", e);
         }
+        mbeanSupport.unregister();
     }
 
     /**
@@ -636,21 +622,5 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             return metrics.getBytesSent();
         }
         return -1;
-    }
-
-    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
-        try {
-            ObjectName name = new ObjectName(objectName);
-            Set set = mbs.queryNames(name, null);
-            if (set != null && set.isEmpty()) {
-                mbs.registerMBean(mbeanInstance, name);
-            } else {
-                mbs.unregisterMBean(name);
-                mbs.registerMBean(mbeanInstance, name);
-            }
-        } catch (Exception e) {
-            log.warn("Error registering a MBean with objectname ' " + objectName +
-                " ' for JMX management", e);
-        }
     }
 }

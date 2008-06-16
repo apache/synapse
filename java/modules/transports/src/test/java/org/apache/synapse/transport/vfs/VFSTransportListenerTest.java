@@ -65,4 +65,7 @@ public class VFSTransportListenerTest extends TransportListenerTestTemplate {
         out.write(content);
         out.close();
     }
+
+    // Since VFS has no Content-Type header, SwA is not supported. Skip this test.
+    @Override public void testSOAPWithAttachments() {}
 }

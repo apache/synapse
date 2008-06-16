@@ -18,8 +18,6 @@
 */
 package org.apache.synapse.endpoints.dispatch;
 
-import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +26,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
+import org.apache.synapse.util.Replicator;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -132,14 +131,14 @@ public class DispatcherContext {
                 }
                 endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
             }
-            
+
             if (keyPrefix != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Adding the enpoint " + endpointName + " with the session id "
                             + keyPrefix + sessionID + " for replication to the session");
                 }
                 // replicates the state so that all instances across cluster can see this state
-                setAndReplicateState(keyPrefix + sessionID, endpointName);
+                Replicator.setAndReplicateState(keyPrefix + sessionID, endpointName, configCtx);
             }
 
         } else {
@@ -171,7 +170,7 @@ public class DispatcherContext {
                 }
                 //Removes the endpoint name and then replicates the current
                 //state so that all instances
-                removeAndReplicateState(keyPrefix + id);
+                Replicator.removeAndReplicateState(keyPrefix + id, configCtx);
             }
 
         } else {
@@ -239,83 +238,9 @@ public class DispatcherContext {
      *
      * @param msg The error message
      */
-    protected void handleException(String msg) {
+    private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    /**
-     * Helper method to replicates states of the property with given key
-     * Sets property and  replicates the current state  so that all instances
-     * across cluster can see this state
-     *
-     * @param key   The key of the property
-     * @param value The value of the property
-     */
-    private void setAndReplicateState(String key, Object value) {
-
-        if (configCtx != null && key != null && value != null) {
-
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Start replicating the property with key : " +
-                            key + " value : " + value);
-                }
-
-                Object prop = configCtx.getPropertyNonReplicable(key);
-                if (prop == null) {
-                    configCtx.setProperty(key, value);
-                    Replicator.replicate(configCtx, new String[]{key});
-                }
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Completed replication of the property with key: " + key);
-                }
-
-            } catch (ClusteringFault clusteringFault) {
-                handleException("Error during the replicating states ", clusteringFault);
-            }
-        }
-    }
-
-    /**
-     * Helper method to replicates states of the property with given key
-     * Removes the property and then replicates the current state so that all instances
-     * across cluster can see this state
-     *
-     * @param key The key of the property
-     */
-    private void removeAndReplicateState(String key) {
-
-        if (configCtx != null && key != null) {
-
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Start replicating the property removal with key : " + key);
-                }
-
-                configCtx.removeProperty(key);
-                Replicator.replicate(configCtx, new String[]{key});
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Completed replication of the property removal with key : " + key);
-                }
-
-            } catch (ClusteringFault clusteringFault) {
-                handleException("Error during the replicating states ", clusteringFault);
-            }
-        }
     }
 
     /**
@@ -344,7 +269,7 @@ public class DispatcherContext {
                 } else {
                     endpointName = endpoint.getName();
                 }
-                
+
                 if (endpointName == null) {
                     if (log.isDebugEnabled() && isClusteringEnable()) {
                         log.warn(SALoadbalanceEndpoint.WARN_MESSAGE);

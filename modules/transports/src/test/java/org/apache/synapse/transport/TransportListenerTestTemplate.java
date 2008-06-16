@@ -20,6 +20,7 @@
 package org.apache.synapse.transport;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -30,11 +31,16 @@ import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
+import org.apache.axiom.attachments.Attachments;
+import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.impl.MIMEOutputUtils;
+import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -65,7 +71,9 @@ import org.apache.synapse.transport.base.BaseConstants;
 public abstract class TransportListenerTestTemplate extends TestCase {
     private static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
     
-    private SOAPEnvelope runTest(String contentType, byte[] content) throws Exception {
+    private final Random random = new Random();
+
+    private MessageData runTest(String contentType, byte[] content) throws Exception {
         UtilsTransportServer server = new UtilsTransportServer();
         
         TransportInDescription trpInDesc = createTransportInDescription();
@@ -112,11 +120,11 @@ public abstract class TransportListenerTestTemplate extends TestCase {
             sendMessage(endpointReferences != null && endpointReferences.length > 0
                                 ? endpointReferences[0].getAddress() : null,
                         contentType, content);
-            SOAPEnvelope envelope = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
-            if (envelope == null) {
+            MessageData messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
+            if (messageData == null) {
                 fail("Failed to get message");
             }
-            return envelope;
+            return messageData;
         }
         finally {
             server.stop();
@@ -137,7 +145,7 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         outputFormat.setCharSetEncoding(charset);
         outputFormat.setIgnoreXMLDeclaration(true);
         orgEnvelope.serializeAndConsume(baos, outputFormat);
-        SOAPEnvelope envelope = runTest("text/xml; charset=\"" + charset + "\"", baos.toByteArray());
+        SOAPEnvelope envelope = runTest("text/xml; charset=\"" + charset + "\"", baos.toByteArray()).getEnvelope();
         OMElement element = envelope.getBody().getFirstElement();
         assertEquals(orgElement.getQName(), element.getQName());
         assertEquals(text, element.getText());
@@ -155,8 +163,37 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         testSOAP11(testString, "ISO-8859-1");
     }
     
+    // TODO: this test actually only makes sense if the transport supports a Content-Type header
+    public void testSOAPWithAttachments() throws Exception {
+        SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
+        SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
+        SOAPBody orgBody = factory.createSOAPBody();
+        OMElement orgElement = factory.createOMElement(new QName("root"));
+        orgBody.addChild(orgElement);
+        orgEnvelope.addChild(orgBody);
+        OMOutputFormat outputFormat = new OMOutputFormat();
+        outputFormat.setCharSetEncoding("UTF-8");
+        outputFormat.setIgnoreXMLDeclaration(true);
+        StringWriter writer = new StringWriter();
+        orgEnvelope.serializeAndConsume(writer);
+        byte[] attachmentContent = new byte[8192];
+        random.nextBytes(attachmentContent);
+        String contentID = UUIDGenerator.getUUID();
+        Attachments orgAttachments = new Attachments();
+        orgAttachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, orgAttachments, outputFormat);
+        MessageData messageData = runTest(outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
+        Attachments attachments = messageData.getAttachments();
+        DataHandler dataHandler = attachments.getDataHandler(contentID);
+        assertNotNull(dataHandler);
+        baos.reset();
+        dataHandler.writeTo(baos);
+        assertTrue(Arrays.equals(attachmentContent, baos.toByteArray()));
+    }
+    
     private void testTextPlain(String text, String charset) throws Exception {
-        SOAPEnvelope envelope = runTest("text/plain; charset=" + charset, text.getBytes(charset));
+        SOAPEnvelope envelope = runTest("text/plain; charset=" + charset, text.getBytes(charset)).getEnvelope();
         OMElement wrapper = envelope.getBody().getFirstElement();
         assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, wrapper.getQName());
         assertEquals(text, wrapper.getText());
@@ -175,10 +212,9 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public void testBinary() throws Exception {
-        Random random = new Random();
         byte[] content = new byte[8192];
         random.nextBytes(content);
-        SOAPEnvelope envelope = runTest("application/octet-stream", content);
+        SOAPEnvelope envelope = runTest("application/octet-stream", content).getEnvelope();
         OMElement wrapper = envelope.getBody().getFirstElement();
         assertEquals(BaseConstants.DEFAULT_BINARY_WRAPPER, wrapper.getQName());
         OMNode child = wrapper.getFirstOMChild();

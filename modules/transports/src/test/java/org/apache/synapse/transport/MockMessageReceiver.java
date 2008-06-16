@@ -23,22 +23,28 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
 
 /**
- * A mock message receiver that puts the SOAP envelope in a queue.
+ * A mock message receiver that puts the message data in a queue.
  */
 public class MockMessageReceiver implements MessageReceiver {
-    private final BlockingQueue<SOAPEnvelope> queue = new LinkedBlockingQueue<SOAPEnvelope>();
+    private final BlockingQueue<MessageData> queue = new LinkedBlockingQueue<MessageData>();
     
     public void receive(MessageContext messageCtx) throws AxisFault {
-        queue.add(messageCtx.getEnvelope());
+        SOAPEnvelope envelope = messageCtx.getEnvelope();
+        envelope.build();
+        Attachments attachments = messageCtx.getAttachmentMap();
+        // Make sure that all attachments are read
+        attachments.getAllContentIDs();
+        queue.add(new MessageData(envelope, attachments));
     }
     
-    public SOAPEnvelope waitForMessage(long timeout, TimeUnit unit) throws InterruptedException {
+    public MessageData waitForMessage(long timeout, TimeUnit unit) throws InterruptedException {
         return queue.poll(timeout, unit);
     }
 }

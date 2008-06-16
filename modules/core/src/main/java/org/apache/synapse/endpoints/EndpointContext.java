@@ -18,12 +18,11 @@
 */
 package org.apache.synapse.endpoints;
 
-import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.Replicator;
 
 /**
  * Keeps the states of the endpoint.This hides where those states are kept .For a cluster
@@ -110,7 +109,7 @@ public class EndpointContext {
 
         if (this.isClusteringEnable) {  // if this is a clustering env.
             // replicates the state so that all instances across cluster can see this state
-            setAndReplicateState(this.activePropertyKey, active);
+            Replicator.setAndReplicateState(this.activePropertyKey, active, configCtx);
         } else {
             this.active = active;
         }
@@ -163,7 +162,7 @@ public class EndpointContext {
 
         if (this.isClusteringEnable) { // if this is a clustering env.
             // replicates the state so that all instances across cluster can see this state
-            setAndReplicateState(this.recoverOnPropertyKey, recoverOn);
+            Replicator.setAndReplicateState(this.recoverOnPropertyKey, recoverOn, configCtx);
         } else {
             this.recoverOn = recoverOn;
         }
@@ -219,55 +218,13 @@ public class EndpointContext {
 
     }
 
-
-    /**
-     * Helper method to replicates states of the property with given key
-     * replicates  the given state so that all instances across cluster can see this state
-     *
-     * @param key   The key of the property
-     * @param value The value of the property
-     */
-    private void setAndReplicateState(String key, Object value) {
-
-        if (configCtx != null && key != null && value != null) {
-
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Start replicating the property with key : " + key +
-                            " value : " + value);
-                }
-
-                configCtx.setProperty(key, value);
-                Replicator.replicate(configCtx, new String[]{key});
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Completed replication of the property with key : " + key);
-                }
-
-            } catch (ClusteringFault clusteringFault) {
-                handleException("Error during the replicating states ", clusteringFault);
-            }
-        }
-    }
-
     /**
      * Helper methods for handle errors.
      *
      * @param msg The error message
      */
-    protected void handleException(String msg) {
+    private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

@@ -18,12 +18,11 @@
 */
 package org.apache.synapse.endpoints.algorithms;
 
-import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.Replicator;
 
 /**
  * Keeps the states of the load balance algorithm.This hides where those states are kept.For a
@@ -108,7 +107,7 @@ public class AlgorithmContext {
                             + " with the key " + currentEPRPropertyKey);
                 }
                 // Sets the property and  replicates the current state  so that all instances
-                setAndReplicateState(currentEPRPropertyKey, currentEPR);
+                Replicator.setAndReplicateState(currentEPRPropertyKey, currentEPR, configCtx);
             }
         } else {
             if (log.isDebugEnabled()) {
@@ -171,51 +170,8 @@ public class AlgorithmContext {
      *
      * @param msg The error message
      */
-    protected void handleException(String msg) {
+    private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    /**
-     * Helper method to replicates states of the property with given key
-     * Sets property and  replicates the current state  so that all instances
-     * across cluster can see this state
-     *
-     * @param key   The key of the property
-     * @param value The value of the property
-     */
-    private void setAndReplicateState(String key, Object value) {
-
-        if (configCtx != null && key != null && value != null) {
-
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Start replicating the property with key : " + key
-                            + " value : " + value);
-                }
-
-                configCtx.setProperty(key, value);
-                Replicator.replicate(configCtx, new String[]{key});
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Completed replication of the property with key : " + key);
-                }
-
-            } catch (ClusteringFault clusteringFault) {
-                handleException("Error during the replicating states ", clusteringFault);
-            }
-        }
-    }
-
 }

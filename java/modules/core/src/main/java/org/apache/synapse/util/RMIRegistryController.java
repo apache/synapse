@@ -34,6 +34,9 @@ public class RMIRegistryController {
      */
     public void createLocalRegistry(int port) {
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a RMI registry with port :" + port);
+            }
             localRegistry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
             String msg = "Couldn't create a local registry(RMI) : port " + port +

@@ -137,38 +137,52 @@ public class DataSourceRegistrar {
         props.put(Context.INITIAL_CONTEXT_FACTORY, namingFactory);
         jndiEvn.put(Context.INITIAL_CONTEXT_FACTORY, namingFactory);
 
-        String providerHost = "localhost";
-        try {
-            InetAddress addr = InetAddress.getLocalHost();
-            if (addr != null) {
-                String hostname = addr.getHostName();
-                if (hostname == null) {
-                    String ipAddr = addr.getHostAddress();
-                    if (ipAddr != null) {
-                        providerHost = ipAddr;
-                    }
-                } else {
-                    providerHost = hostname;
-                }
+        //Provider URL
+        String providerUrl = getProperty(dsProperties, rootPrefix + PROP_PROVIDER_URL, null);
+
+        if (providerUrl != null && !"".equals(providerUrl)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using provided initial context provider url :" + providerUrl);
             }
-        } catch (UnknownHostException e) {
-            log.warn("Unable to determine hostname or IP address.. Using localhost", e);
+
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("No initial context provider url...creaeting a new one");
+            }
+            String providerHost = "localhost";
+            try {
+                InetAddress addr = InetAddress.getLocalHost();
+                if (addr != null) {
+                    String hostname = addr.getHostName();
+                    if (hostname == null) {
+                        String ipAddr = addr.getHostAddress();
+                        if (ipAddr != null) {
+                            providerHost = ipAddr;
+                        }
+                    } else {
+                        providerHost = hostname;
+                    }
+                }
+            } catch (UnknownHostException e) {
+                log.warn("Unable to determine hostname or IP address.. Using localhost", e);
+            }
+
+            // default port for RMI registry
+            int port = 2199;
+            String providerPort =
+                    getProperty(dsProperties, rootPrefix + PROP_PROVIDER_PORT,
+                            String.valueOf(port));
+            try {
+                port = Integer.parseInt(providerPort);
+            } catch (NumberFormatException ignored) {
+            }
+
+            // Create a RMI local registry
+            RMIRegistryController.getInstance().createLocalRegistry(port);
+
+            providerUrl = getProperty(dsProperties, rootPrefix + PROP_PROVIDER_URL,
+                    "rmi://" + providerHost + ":" + providerPort);
         }
-
-        // default port for RMI registry
-        int port = 2199;
-        String providerPort =
-                getProperty(dsProperties, rootPrefix + PROP_PROVIDER_PORT, String.valueOf(port));
-        try {
-            port = Integer.parseInt(providerPort);
-        } catch (NumberFormatException ignored) {
-        }
-
-        // Create a RMI local registry
-        RMIRegistryController.getInstance().createLocalRegistry(port);
-
-        String providerUrl = getProperty(dsProperties, rootPrefix + PROP_PROVIDER_URL,
-                "rmi://" + providerHost + ":" + providerPort);
 
         props.put(Context.PROVIDER_URL, providerUrl);
         jndiEvn.put(Context.PROVIDER_URL, providerUrl);

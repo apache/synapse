@@ -29,7 +29,7 @@
  *
  */
 
-package org.apache.synapse.transport.nhttp.util;
+package org.apache.synapse.util;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;

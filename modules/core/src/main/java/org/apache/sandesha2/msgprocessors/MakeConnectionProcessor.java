@@ -133,7 +133,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			else{
 				//we cannot match a RMD with the correct security credentials so we cannot process this msg under RSP
 				if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage : no RM sequence bean with security credentials" );
-				//return false; //TODO put this in once tested live
+				return false; 
 			}
 		}
 		

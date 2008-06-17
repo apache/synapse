@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -236,5 +237,23 @@ public class XSLTMediatorTest extends TestCase {
         OMElement resultElement = mc.getEnvelope().getBody().getFirstElement();
         assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, resultElement.getQName());
         assertEquals("\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre", resultElement.getText());
+    }
+    
+    // Test for SYNAPSE-307
+    public void testInvalidStylesheet() throws Exception {
+        transformMediator = new XSLTMediator();
+        transformMediator.setXsltKey("xslt-key");
+        
+        MessageContext mc = new TestMessageContextBuilder()
+            .addEntry("xslt-key", getClass().getResource("invalid.xslt"))
+            .setBodyFromString("<root/>")
+            .build();
+        
+        try {
+            transformMediator.mediate(mc);
+            fail("Expected a SynapseException to be thrown");
+        } catch (SynapseException ex) {
+            // this is what is expected
+        }
     }
 }

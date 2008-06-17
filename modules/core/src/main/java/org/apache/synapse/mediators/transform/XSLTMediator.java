@@ -207,6 +207,27 @@ public class XSLTMediator extends AbstractMediator {
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
+        ErrorListener errorListener = new ErrorListener() {
+
+            public void warning(TransformerException e) throws TransformerException {
+
+                if (traceOrDebugOn) {
+                    traceOrDebugWarn(
+                            traceOn, "Warning encountered during transformation : " + e);
+                }
+            }
+            
+            public void error(TransformerException e) throws TransformerException {
+                log.error("Error occured in XSLT transformation : " + e);
+                throw e;
+            }
+            
+            public void fatalError(TransformerException e) throws TransformerException {
+                log.error("Fatal error occured in the XSLT transformation : " + e);
+                throw e;
+            }
+        };
+
         if (traceOrDebugOn) {
             trace.trace("Transformation source : " + sourceNode.toString());
         }
@@ -265,6 +286,8 @@ public class XSLTMediator extends AbstractMediator {
 
         synchronized (transformerLock) {
             if (reCreate || cachedTemplates == null) {
+                // Set an error listener (SYNAPSE-307).
+                transFact.setErrorListener(errorListener);
                 try {
                     cachedTemplates = transFact.newTemplates(
                         SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
@@ -295,26 +318,7 @@ public class XSLTMediator extends AbstractMediator {
                 }
             }
 
-            transformer.setErrorListener(new ErrorListener() {
-
-                public void warning(TransformerException e) throws TransformerException {
-
-                    if (traceOrDebugOn) {
-                        traceOrDebugWarn(
-                                traceOn, "Warning encountered during transformation : " + e);
-                    }
-                }
-                
-                public void error(TransformerException e) throws TransformerException {
-                    log.error("Error occured in XSLT transformation : " + e);
-                    throw e;
-                }
-                
-                public void fatalError(TransformerException e) throws TransformerException {
-                    log.error("Fatal error occured in the XSLT transformation : " + e);
-                    throw e;
-                }
-            });
+            transformer.setErrorListener(errorListener);
             
             transformer.transform(transformSrc, transformTgt);
 

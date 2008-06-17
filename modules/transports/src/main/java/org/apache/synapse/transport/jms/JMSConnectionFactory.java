@@ -28,7 +28,6 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -81,15 +80,15 @@ public class JMSConnectionFactory implements ExceptionListener {
     /** The JNDI name of the actual connection factory */
     private String connFactoryJNDIName = null;
     /** Map of destination JNDI names to service names */
-    private Map serviceJNDINameMapping = null;
+    private Map<String,String> serviceJNDINameMapping = null;
     /** Map of destination JNDI names to destination types*/
-    private Map destinationTypeMapping = null;
+    private Map<String,String> destinationTypeMapping = null;
     /** Map of JMS destination names to service names */
-    private Map serviceDestinationNameMapping = null;
+    private Map<String,String> serviceDestinationNameMapping = null;
     /** JMS Sessions currently active. One session for each Destination / Service */
-    private Map jmsSessions = null;
+    private Map<String,Session> jmsSessions = null;
     /** Properties of the connection factory to acquire the initial context */
-    private Hashtable jndiProperties = null;
+    private Hashtable<String,String> jndiProperties = null;
     /** The JNDI Context used - created using the properties */
     private Context context = null;
     /** The actual ConnectionFactory instance held within */
@@ -116,11 +115,11 @@ public class JMSConnectionFactory implements ExceptionListener {
     public JMSConnectionFactory(String name, ConfigurationContext cfgCtx) {
         this.name = name;
         this.cfgCtx = cfgCtx;
-        serviceJNDINameMapping = new HashMap();
-        destinationTypeMapping = new HashMap();
-        serviceDestinationNameMapping = new HashMap();
-        jndiProperties = new Hashtable();
-        jmsSessions = new HashMap();
+        serviceJNDINameMapping = new HashMap<String,String>();
+        destinationTypeMapping = new HashMap<String,String>();
+        serviceDestinationNameMapping = new HashMap<String,String>();
+        jndiProperties = new Hashtable<String,String>();
+        jmsSessions = new HashMap<String,Session>();
     }
 
 
@@ -197,10 +196,9 @@ public class JMSConnectionFactory implements ExceptionListener {
         if (connection != null) {
             log.info("Re-initializing the JMS connection factory : " + name);
 
-            Iterator sessionIter = jmsSessions.values().iterator();
-            while (sessionIter.hasNext()) {
+            for (Session session : jmsSessions.values()) {
                 try {
-                    ((Session) sessionIter.next()).close();
+                    session.close();
                 } catch (JMSException ignore) {}
             }
             try {
@@ -219,7 +217,6 @@ public class JMSConnectionFactory implements ExceptionListener {
         log.info("Connected to the JMS connection factory : " + connFactoryJNDIName);
 
         try {
-            ConnectionFactory conFac = null;
             QueueConnectionFactory qConFac = null;
             TopicConnectionFactory tConFac = null;
             if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(getConnectionFactoryType())) {
@@ -230,8 +227,8 @@ public class JMSConnectionFactory implements ExceptionListener {
                 handleException("Unable to determine type of Connection Factory - i.e. Queue/Topic", null);
             }
 
-            String user = (String) jndiProperties.get(Context.SECURITY_PRINCIPAL);
-            String pass = (String) jndiProperties.get(Context.SECURITY_CREDENTIALS);
+            String user = jndiProperties.get(Context.SECURITY_PRINCIPAL);
+            String pass = jndiProperties.get(Context.SECURITY_CREDENTIALS);
 
             if (user != null && pass != null) {
                 if (qConFac != null) {
@@ -253,30 +250,28 @@ public class JMSConnectionFactory implements ExceptionListener {
             handleException("Error connecting to Connection Factory : " + connFactoryJNDIName, e);
         }
 
-        Iterator destJNDINameIter = serviceJNDINameMapping.keySet().iterator();
-        while (destJNDINameIter.hasNext()) {
-            String destJNDIName = (String) destJNDINameIter.next();
-            String destinationType = (String) destinationTypeMapping.get(destJNDIName);
+        for (String destJNDIName : serviceJNDINameMapping.keySet()) {
+            String destinationType = destinationTypeMapping.get(destJNDIName);
             startListeningOnDestination(destJNDIName, destinationType);
         }
 
-        connection.start(); // indicate readyness to start receiving messages
+        connection.start(); // indicate readiness to start receiving messages
         log.info("Connection factory : " + name + " initialized...");
     }
 
     /**
      * Create a session for sending to the given destination and save it on the jmsSessions Map
-     * keyed by the destinatin JNDI name
+     * keyed by the destination JNDI name
      * @param destinationJNDIname the destination JNDI name
      * @return a JMS Session to send messages to the destination using this connection factory
      */
     public Session getSessionForDestination(String destinationJNDIname) {
 
-        Session session = (Session) jmsSessions.get(destinationJNDIname);
+        Session session = jmsSessions.get(destinationJNDIname);
 
         if (session == null) {
             try {                
-                Destination dest = (Destination) getPhysicalDestination(destinationJNDIname);
+                Destination dest = getPhysicalDestination(destinationJNDIname);
 
                 if (dest instanceof Topic) {
                     session = ((TopicConnection) connection).
@@ -303,7 +298,7 @@ public class JMSConnectionFactory implements ExceptionListener {
      */
     public void startListeningOnDestination(String destinationJNDIname, String destinationType) {
 
-        Session session = (Session) jmsSessions.get(destinationJNDIname);
+        Session session = jmsSessions.get(destinationJNDIname);
         // if we already had a session open, close it first
         if (session != null) {
             try {
@@ -336,7 +331,7 @@ public class JMSConnectionFactory implements ExceptionListener {
             }
 
             BaseUtils.markServiceAsFaulty(
-                (String) serviceJNDINameMapping.get(destinationJNDIname),
+                serviceJNDINameMapping.get(destinationJNDIname),
                 "Error looking up JMS destination : " + destinationJNDIname,
                 cfgCtx.getAxisConfiguration());
         }
@@ -349,7 +344,7 @@ public class JMSConnectionFactory implements ExceptionListener {
      * @param destinationJNDIname the JNDI name of the JMS destination
      */
     private void stoplisteningOnDestination(String destinationJNDIname) {
-        Session session = (Session) jmsSessions.get(destinationJNDIname);
+        Session session = jmsSessions.get(destinationJNDIname);
         if (session != null) {
             try {
                 session.close();
@@ -363,10 +358,9 @@ public class JMSConnectionFactory implements ExceptionListener {
      */
     public void stop() {
         if (connection != null) {
-            Iterator sessionIter = jmsSessions.values().iterator();
-            while (sessionIter.hasNext()) {
+            for (Session session : jmsSessions.values()) {
                 try {
-                    ((Session) sessionIter.next()).close();
+                    session.close();
                 } catch (JMSException ignore) {}
             }
             try {
@@ -416,7 +410,7 @@ public class JMSConnectionFactory implements ExceptionListener {
         } catch (NamingException e) {
 
             // if we are using ActiveMQ, check for dynamic Queues and Topics
-            String provider = (String) jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY);
+            String provider = jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY);
             if (provider.indexOf("activemq") != -1) {
                 try {
                     destination = (Destination) context.lookup(
@@ -438,7 +432,7 @@ public class JMSConnectionFactory implements ExceptionListener {
     /**
      * Return the EPR for the JMS Destination with the given JNDI name
      * when using this connection factory
-     * @param jndiDestination the JNDI name of the JMS Destionation
+     * @param jndiDestination the JNDI name of the JMS destination
      * @return the EPR for a service using this destination
      */
     public EndpointReference getEPRForDestination(String jndiDestination) {
@@ -448,11 +442,8 @@ public class JMSConnectionFactory implements ExceptionListener {
         sb.append("?").
             append(JMSConstants.CONFAC_JNDI_NAME_PARAM).
             append("=").append(getConnFactoryJNDIName());
-        Iterator props = getJndiProperties().keySet().iterator();
-        while (props.hasNext()) {
-            String key = (String) props.next();
-            String value = (String) getJndiProperties().get(key);
-            sb.append("&").append(key).append("=").append(value);
+        for (Map.Entry<String,String> entry : getJndiProperties().entrySet()) {
+            sb.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }
 
         return new EndpointReference(sb.toString());
@@ -464,11 +455,12 @@ public class JMSConnectionFactory implements ExceptionListener {
      * @param o a JMSOutTransport object which specifies a connection factory
      * @return true if this instance could be substituted for the out-transport
      */
+    // TODO: this implementation violates the contract of Object#equals (however, JMSSender#getJMSConnectionFactory depends on this behavior)
     public boolean equals(Object o) {
         if (o instanceof JMSOutTransportInfo) {
             JMSOutTransportInfo trpInfo = (JMSOutTransportInfo) o;
 
-            Map trpProps = trpInfo.getProperties();
+            Map<String,String> trpProps = trpInfo.getProperties();
             if (equals(trpProps.get(JMSConstants.CONFAC_JNDI_NAME_PARAM), jndiProperties.get(JMSConstants.CONFAC_JNDI_NAME_PARAM))
                 &&
                 equals(trpProps.get(Context.INITIAL_CONTEXT_FACTORY), jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY))
@@ -506,7 +498,7 @@ public class JMSConnectionFactory implements ExceptionListener {
      * @return the name of the service using the destination
      */
     public String getServiceNameForDestinationName(String jmsDestinationName) {
-        return (String) serviceDestinationNameMapping.get(jmsDestinationName);
+        return serviceDestinationNameMapping.get(jmsDestinationName);
     }
 
     /**
@@ -517,11 +509,11 @@ public class JMSConnectionFactory implements ExceptionListener {
      * @return the name of the service using the destination
      */
     public String getServiceNameForDestination(Destination dest, String jmsDestinationName) {
-        String serviceName = (String) serviceDestinationNameMapping.get(jmsDestinationName);
+        String serviceName = serviceDestinationNameMapping.get(jmsDestinationName);
 
         // hack to get around the crazy Active MQ dynamic queue and topic issues
         if (serviceName == null) {
-            String provider = (String) getJndiProperties().get(Context.INITIAL_CONTEXT_FACTORY);
+            String provider = getJndiProperties().get(Context.INITIAL_CONTEXT_FACTORY);
             if (provider.indexOf("activemq") != -1) {
                 serviceName = getServiceNameForJNDIName(
                     (dest instanceof Queue ?
@@ -539,7 +531,7 @@ public class JMSConnectionFactory implements ExceptionListener {
      * @return the name of the service using the destination
      */
     public String getServiceNameForJNDIName(String jndiDestinationName) {
-        return (String) serviceJNDINameMapping.get(jndiDestinationName);
+        return serviceJNDINameMapping.get(jndiDestinationName);
     }
 
     public void setConnFactoryJNDIName(String connFactoryJNDIName) {
@@ -569,7 +561,7 @@ public class JMSConnectionFactory implements ExceptionListener {
         return conFactory;
     }
 
-    public Hashtable getJndiProperties() {
+    public Hashtable<String,String> getJndiProperties() {
         return jndiProperties;
     }
 
@@ -645,7 +637,7 @@ public class JMSConnectionFactory implements ExceptionListener {
     }
 
     /**
-     * Resume frm temporarily pause
+     * Resume from temporarily pause
      */
     public void resume() {
         try {

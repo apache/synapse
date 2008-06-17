@@ -15,10 +15,7 @@
 */
 package org.apache.synapse.transport.jms;
 
-import org.apache.axis2.Constants;
 import org.apache.axis2.client.Options;
-
-import javax.xml.namespace.QName;
 
 public class JMSConstants {
 

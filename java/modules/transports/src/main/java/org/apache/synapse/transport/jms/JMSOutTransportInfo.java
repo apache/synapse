@@ -58,7 +58,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     /** the Reply Destination queue or topic for the outgoing message i.e. JMSConstants.DESTINATION_TYPE_QUEUE, DESTINATION_TYPE_TOPIC */
     private String replyDestinationType = JMSConstants.DESTINATION_TYPE_QUEUE;
     /** the EPR properties when the out-transport info is generated from a target EPR */
-    private Hashtable properties = null;
+    private Hashtable<String,String> properties = null;
     /** the target EPR string where applicable */
     private String targetEPR = null;
     private String contentType = null;
@@ -96,15 +96,15 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             handleException("Invalid prefix for a JMS EPR : " + targetEPR);
         } else {
             properties = JMSUtils.getProperties(targetEPR);
-            String destinationType = (String) properties.get(JMSConstants.DEST_PARAM_TYPE);
+            String destinationType = properties.get(JMSConstants.DEST_PARAM_TYPE);
             if(destinationType != null) {
                 setDestinationType(destinationType);
             }
-            String replyDestinationType = (String) properties.get(JMSConstants.REPLY_PARAM_TYPE);
+            String replyDestinationType = properties.get(JMSConstants.REPLY_PARAM_TYPE);
             if(replyDestinationType != null) {
                 setReplyDestinationType(replyDestinationType);
             }
-            String replyDestinationName = (String) properties.get(JMSConstants.REPLY_PARAM);
+            String replyDestinationName = properties.get(JMSConstants.REPLY_PARAM);
             if(replyDestinationName != null) {
                 setReplyDestinationName(replyDestinationName);
             }
@@ -113,7 +113,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
 
     /**
      * Provides a lazy load when created with a target EPR. This method performs actual
-     * lookup for the connection factory and desination
+     * lookup for the connection factory and destination
      */
     public void loadConnectionFactoryFromProperies() {
         if (properties != null) {
@@ -136,10 +136,10 @@ public class JMSOutTransportInfo implements OutTransportInfo {
      * @param props   the properties which contains the JNDI name of the factory
      * @return the connection factory
      */
-    private ConnectionFactory getConnectionFactory(Context context, Hashtable props) {
+    private ConnectionFactory getConnectionFactory(Context context, Hashtable<String,String> props) {
         try {
 
-            String conFacJndiName = (String) props.get(JMSConstants.CONFAC_JNDI_NAME_PARAM);
+            String conFacJndiName = props.get(JMSConstants.CONFAC_JNDI_NAME_PARAM);
             if (conFacJndiName != null) {
                 return (ConnectionFactory) context.lookup(conFacJndiName);
             } else {
@@ -180,7 +180,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
      * @return the JMS destination, or null if it does not exist
      */
     private Destination getReplyDestination(Context context, String url) {
-        String replyDestinationName = (String) properties.get(JMSConstants.REPLY_PARAM);
+        String replyDestinationName = properties.get(JMSConstants.REPLY_PARAM);
         if(replyDestinationName == null) {
             return null;
         }
@@ -241,7 +241,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
         this.contentType = contentType;
     }
 
-    public Hashtable getProperties() {
+    public Hashtable<String,String> getProperties() {
         return properties;
     }
 

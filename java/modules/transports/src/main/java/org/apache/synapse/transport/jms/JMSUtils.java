@@ -179,8 +179,8 @@ public class JMSUtils extends BaseUtils {
      * @param url a JMS URL of the form jms:/<destination>?[<key>=<value>&]*
      * @return a Hashtable of extracted properties
      */
-    public static Hashtable getProperties(String url) {
-        Hashtable h = new Hashtable();
+    public static Hashtable<String,String> getProperties(String url) {
+        Hashtable<String,String> h = new Hashtable<String,String>();
         int propPos = url.indexOf("?");
         if (propPos != -1) {
             StringTokenizer st = new StringTokenizer(url.substring(propPos + 1), "&");
@@ -206,16 +206,14 @@ public class JMSUtils extends BaseUtils {
      * @param destination the JNDI name of the destination
      * @return the EPR as a String
      */
+    // TODO: duplicate code (see JMSConnectionFactory#getEPRForDestination)
     static String getEPR(JMSConnectionFactory cf, String destination) {
         StringBuffer sb = new StringBuffer();
         sb.append(JMSConstants.JMS_PREFIX).append(destination);
         sb.append("?").append(JMSConstants.CONFAC_JNDI_NAME_PARAM).
                 append("=").append(cf.getConnFactoryJNDIName());
-        Iterator props = cf.getJndiProperties().keySet().iterator();
-        while (props.hasNext()) {
-            String key = (String) props.next();
-            String value = (String) cf.getJndiProperties().get(key);
-            sb.append("&").append(key).append("=").append(value);
+        for (Map.Entry<String,String> entry : cf.getJndiProperties().entrySet()) {
+            sb.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }
         return sb.toString();
     }
@@ -255,7 +253,7 @@ public class JMSUtils extends BaseUtils {
 
     /**
      * Set JNDI properties and any other connection factory parameters to the connection factory
-     * passed in, looing at the parameter in axis2.xml
+     * passed in, looking at the parameter in axis2.xml
      * @param param the axis parameter that holds the connection factory settings
      * @param jmsConFactory the JMS connection factory to which the parameters should be applied
      */

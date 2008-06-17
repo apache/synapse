@@ -60,9 +60,9 @@ public class JMSListener extends AbstractTransportListener implements Management
     public static final String TRANSPORT_NAME = Constants.TRANSPORT_JMS;
 
     /** A Map containing the JMS connection factories managed by this, keyed by name */
-    private Map connectionFactories = new HashMap();
+    private Map<String,JMSConnectionFactory> connectionFactories = new HashMap<String,JMSConnectionFactory>();
     /** A Map of service name to the JMS EPR addresses */
-    private Map serviceNameToEPRMap = new HashMap();
+    private Map<String,String> serviceNameToEPRMap = new HashMap<String,String>();
 
     /**
      * This is the TransportListener initialization method invoked by Axis2
@@ -93,9 +93,7 @@ public class JMSListener extends AbstractTransportListener implements Management
      */
     public void start() throws AxisFault {
 
-        Iterator iter = connectionFactories.values().iterator();
-        while (iter.hasNext()) {
-            JMSConnectionFactory conFac = (JMSConnectionFactory) iter.next();
+        for (JMSConnectionFactory conFac : connectionFactories.values()) {
             conFac.setJmsMessageReceiver(
                 new JMSMessageReceiver(this, conFac, workerPool, cfgCtx));
 
@@ -116,9 +114,8 @@ public class JMSListener extends AbstractTransportListener implements Management
      */
     public void stop() throws AxisFault {
         super.stop();
-        Iterator iter = connectionFactories.values().iterator();
-        while (iter.hasNext()) {
-            ((JMSConnectionFactory) iter.next()).stop();
+        for (JMSConnectionFactory conFac : connectionFactories.values()) {
+            conFac.stop();
         }
     }
 
@@ -140,7 +137,7 @@ public class JMSListener extends AbstractTransportListener implements Management
             serviceName = serviceName.substring(0, serviceName.indexOf('.'));
         }
         return new EndpointReference[]{
-            new EndpointReference((String) serviceNameToEPRMap.get(serviceName))};
+            new EndpointReference(serviceNameToEPRMap.get(serviceName))};
     }
 
     /**
@@ -208,13 +205,13 @@ public class JMSListener extends AbstractTransportListener implements Management
         if (conFacParam != null) {
             String conFac = (String) conFacParam.getValue();
             if (connectionFactories.containsKey(conFac)) {
-                return (JMSConnectionFactory) connectionFactories.get(conFac);
+                return connectionFactories.get(conFac);
             } else {
                 return null;
             }
 
         } else if (connectionFactories.containsKey(JMSConstants.DEFAULT_CONFAC_NAME)) {
-            return (JMSConnectionFactory) connectionFactories.get(JMSConstants.DEFAULT_CONFAC_NAME);
+            return connectionFactories.get(JMSConstants.DEFAULT_CONFAC_NAME);
 
         } else {
             return null;
@@ -252,9 +249,7 @@ public class JMSListener extends AbstractTransportListener implements Management
     public void pause() throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         try {
-            Iterator iter = connectionFactories.values().iterator();
-            while (iter.hasNext()) {
-                JMSConnectionFactory conFac = (JMSConnectionFactory) iter.next();
+            for (JMSConnectionFactory conFac : connectionFactories.values()) {
                 conFac.pause();
             }
             state = BaseConstants.PAUSED;
@@ -271,9 +266,7 @@ public class JMSListener extends AbstractTransportListener implements Management
     public void resume() throws AxisFault {
         if (state != BaseConstants.PAUSED) return;
         try {
-            Iterator iter = connectionFactories.values().iterator();
-            while (iter.hasNext()) {
-                JMSConnectionFactory conFac = (JMSConnectionFactory) iter.next();
+            for (JMSConnectionFactory conFac : connectionFactories.values()) {
                 conFac.resume();
             }
             state = BaseConstants.STARTED;

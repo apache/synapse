@@ -61,12 +61,26 @@ public class SynapseCommodityServiceTest extends TestCase {
             new File("./target/test_repos/axis2.xml"),
             "lib/", "src/main/resources/");
 
+        System.setProperty("jmx.agent.name", "synapse");
         ConfigurationContext synapseConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "./target/test_repos/synapse",
                         "./target/test_repos/axis2.xml");
 
-        // Initializing Bussiness Endpoint
+        TransportInDescription synTrsIn = (TransportInDescription)
+            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
+        synTrsIn.getParameter("port").setValue("10100");
+        synTrsIn = (TransportInDescription)
+            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
+        synTrsIn.getParameter("port").setValue("12100");
+        startServer(synapseConfigCtx);
+
+        // Initializing Business Endpoint
+        
+        // Set a different agent name to avoid collisions between the MBeans registered
+        // by the two servers.
+        System.setProperty("jmx.agent.name", "business");
+        
         ConfigurationContext businessConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "./target/test_repos/synapse",
@@ -98,24 +112,12 @@ public class SynapseCommodityServiceTest extends TestCase {
                                           Services.class.getClassLoader());
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
-        TransportInDescription synTrsIn = (TransportInDescription)
-            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
-        synTrsIn.getParameter("port").setValue("10100");
-        synTrsIn = (TransportInDescription)
-            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
-        synTrsIn.getParameter("port").setValue("12100");
-        System.setProperty("jmx.agent.name", "synapse");
-        startServer(synapseConfigCtx);
-
         TransportInDescription busTrsIn = (TransportInDescription)
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
         busTrsIn.getParameter("port").setValue("10101");
         busTrsIn = (TransportInDescription)
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         busTrsIn.getParameter("port").setValue("12101");
-        // Set a different agent name to avoid collisions between the MBeans registered
-        // by the two servers.
-        System.setProperty("jmx.agent.name", "business");
         startServer(businessConfigCtx);
     }
 

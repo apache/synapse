@@ -146,10 +146,6 @@ public class JMSListener extends AbstractTransportListener implements Management
      * @param service the service for which to listen for messages
      */
     protected void startListeningForService(AxisService service) {
-        if (service.getName().startsWith("__")) {
-            return;
-        }
-        
         JMSConnectionFactory cf = getConnectionFactory(service);
         if (cf == null) {
             String msg = "Service " + service.getName() + " does not specify" +

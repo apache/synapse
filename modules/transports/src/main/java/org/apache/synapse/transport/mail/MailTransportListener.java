@@ -487,10 +487,6 @@ public class MailTransportListener extends AbstractPollingTransportListener
 
     protected void startListeningForService(AxisService service) {
 
-        if (service.getName().startsWith("__")) {
-            return;
-        }
-
         Parameter param = service.getParameter(BaseConstants.TRANSPORT_POLL_INTERVAL);
         long pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
         if (param != null && param.getValue() instanceof String) {

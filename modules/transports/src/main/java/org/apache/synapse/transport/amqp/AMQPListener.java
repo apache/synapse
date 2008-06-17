@@ -80,10 +80,6 @@ public class AMQPListener extends AbstractTransportListener
     @Override
     protected void startListeningForService(AxisService service)
     {
-        if (service.getName().startsWith("__")) {
-            return;
-        }
-
         AMQPConnection con = getConnectionFactory(service);
         if (con == null) {
             String msg = "Service " + service.getName() + " does not specify" +

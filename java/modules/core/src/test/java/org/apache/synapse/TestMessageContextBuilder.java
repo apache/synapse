@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,12 +83,16 @@ public class TestMessageContextBuilder {
         return this;
     }
     
-    public TestMessageContextBuilder addFileEntry(String key, String path) throws MalformedURLException {
+    public TestMessageContextBuilder addEntry(String key, URL url) {
         Entry entry = new Entry();
         entry.setType(Entry.URL_SRC);
-        entry.setSrc(new File(path).toURL());
+        entry.setSrc(url);
         entries.put(key, entry);
         return this;
+    }
+    
+    public TestMessageContextBuilder addFileEntry(String key, String path) throws MalformedURLException {
+        return addEntry(key, new File(path).toURL());
     }
     
     /**

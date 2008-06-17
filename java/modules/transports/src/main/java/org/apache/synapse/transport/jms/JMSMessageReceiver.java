@@ -58,7 +58,7 @@ public class JMSMessageReceiver implements MessageListener {
      *
      * @param jmsListener the JMS transport Listener
      * @param jmsConFac the JMS connection factory we are associated with
-     * @param workerPool the worker thead pool to be used
+     * @param workerPool the worker thread pool to be used
      * @param cfgCtx the axis ConfigurationContext
      */
     JMSMessageReceiver(JMSListener jmsListener, JMSConnectionFactory jmsConFac,
@@ -71,7 +71,7 @@ public class JMSMessageReceiver implements MessageListener {
     }
 
     /**
-     * The entry point on the recepit of each JMS message
+     * The entry point on the reception of each JMS message
      *
      * @param message the JMS message received
      */

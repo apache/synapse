@@ -49,7 +49,7 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
     public static final String TRANSPORT_NAME = "jms";
 
     /** A Map containing the JMS connection factories managed by this, keyed by name */
-    private Map connectionFactories = new HashMap();
+    private Map<String,JMSConnectionFactory> connectionFactories = new HashMap<String,JMSConnectionFactory>();
 
     public JMSSender() {
         log = LogFactory.getLog(JMSSender.class);
@@ -78,16 +78,13 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
      */
     private JMSConnectionFactory getJMSConnectionFactory(JMSOutTransportInfo trpInfo) {
         if(trpInfo.getProperties() != null) {
-          String jmsConnectionFactoryName = (String) trpInfo.getProperties().get(JMSConstants.CONFAC_PARAM);
-          if(jmsConnectionFactoryName != null) {
-            return (JMSConnectionFactory) connectionFactories.get(jmsConnectionFactoryName);
-          }
+            String jmsConnectionFactoryName = trpInfo.getProperties().get(JMSConstants.CONFAC_PARAM);
+            if(jmsConnectionFactoryName != null) {
+                return connectionFactories.get(jmsConnectionFactoryName);
+            }
         }
 
-        Iterator cfNames = connectionFactories.keySet().iterator();
-        while (cfNames.hasNext()) {
-            String cfName = (String) cfNames.next();
-            JMSConnectionFactory cf = (JMSConnectionFactory) connectionFactories.get(cfName);
+        for (JMSConnectionFactory cf : connectionFactories.values()) {
             if (cf.equals(trpInfo)) {
                 return cf;
             }
@@ -125,13 +122,12 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                     jmsOut.loadConnectionFactoryFromProperies();
                     try {
                         // create a one time connection and session to be used
-                        Hashtable jndiProps = jmsOut.getProperties();
-                        String user = (String) jndiProps.get(Context.SECURITY_PRINCIPAL);
-                        String pass = (String) jndiProps.get(Context.SECURITY_CREDENTIALS);
+                        Hashtable<String,String> jndiProps = jmsOut.getProperties();
+                        String user = jndiProps.get(Context.SECURITY_PRINCIPAL);
+                        String pass = jndiProps.get(Context.SECURITY_CREDENTIALS);
 
                         QueueConnectionFactory qConFac = null;
                         TopicConnectionFactory tConFac = null;
-                        ConnectionFactory conFac = null;
 
                         if (JMSConstants.DESTINATION_TYPE_QUEUE.equals(jmsOut.getDestinationType())) {
                             qConFac = (QueueConnectionFactory) jmsOut.getConnectionFactory();

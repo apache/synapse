@@ -19,6 +19,8 @@
 
 package org.apache.synapse.util;
 
+import javax.activation.DataHandler;
+
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
 
@@ -34,5 +36,15 @@ public class MessageHelperTest extends TestCase {
         MessageContext newMc = MessageHelper.clonePartially(origMc);
         Object result = newMc.getProperty(key);
         assertEquals(result, "propValue");
+    }
+    
+    // Regression test for SYNAPSE-309
+    public void testClonePartiallyWithAttachments() throws Exception {
+        MessageContext origMc = new MessageContext();
+        String contentId = origMc.addAttachment(new DataHandler("test", "text/html"));
+        MessageContext newMc = MessageHelper.clonePartially(origMc);
+        DataHandler dh = newMc.getAttachment(contentId);
+        assertNotNull(dh);
+        assertEquals("test", dh.getContent());
     }
 }

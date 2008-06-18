@@ -750,10 +750,10 @@ synapse.sh -sample &lt;n&gt;</pre>
 <div>
 <p>Definition of the reusable database connection pool or datasources can be
 done using synapse.properties file. It is possible to configure any number of
-datasources. Currently only supports two type of datasources and those are
-based on apache dbcp datasources. Those types are BasicDataSource and
-PerUserPoolDataSource (based on apache dhcp).Following configuration includes
-both two definition. This configuration is related with sample 363.</p>
+datasources. Currently only two types of datasources are supported and those are
+based on <a href="http://commons.apache.org/dbcp/">Apache DBCP</a> datasources: BasicDataSource and
+PerUserPoolDataSource. Following configuration includes
+both two definitions. This configuration is related with sample 363.</p>
 
 
 <p>Configuration is somewhat similar to the log4j appender configuration.</p>

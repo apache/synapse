@@ -42,19 +42,26 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.registry.url.SimpleURLRegistry;
 
 /**
  * Utility class to build test message contexts in a flexible way.
  */
 public class TestMessageContextBuilder {
     private final Map<String,Entry> entries = new HashMap<String,Entry>();
+    private boolean requireAxis2MessageContext;
     private String contentString;
     private String contentFile;
     private boolean contentIsEnvelope;
     private boolean addTextAroundBody;
     
+    public TestMessageContextBuilder setRequireAxis2MessageContext(boolean requireAxis2MessageContext) {
+        this.requireAxis2MessageContext = requireAxis2MessageContext;
+        return this;
+    }
+
     public TestMessageContextBuilder setBodyFromString(String string) {
         this.contentString = string;
         contentIsEnvelope = false;
@@ -102,17 +109,25 @@ public class TestMessageContextBuilder {
      * @return
      * @throws Exception
      */
-    public TestMessageContext build() throws Exception {
-        TestMessageContext synCtx = new TestMessageContext();
+    public MessageContext build() throws Exception {
         SynapseConfiguration testConfig = new SynapseConfiguration();
-        testConfig.setRegistry(new SimpleURLRegistry());
-        // TODO: check whether this is required in all cases
-        synCtx.setEnvironment(new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()), testConfig));
+        // TODO: check whether we need a SynapseEnvironment in all cases
+        SynapseEnvironment synEnv
+            = new Axis2SynapseEnvironment(new ConfigurationContext(new AxisConfiguration()),
+                                          testConfig);
+        MessageContext synCtx;
+        if (requireAxis2MessageContext) {
+            synCtx = new Axis2MessageContext(new org.apache.axis2.context.MessageContext(),
+                                             testConfig, synEnv);
+        } else {
+            synCtx = new TestMessageContext();
+            synCtx.setEnvironment(synEnv);
+            synCtx.setConfiguration(testConfig);
+        }
 
         for (Map.Entry<String,Entry> mapEntry : entries.entrySet()) {
             testConfig.addEntry(mapEntry.getKey(), mapEntry.getValue());
         }
-        synCtx.setConfiguration(testConfig);
 
         XMLStreamReader parser = null;
         if (contentString != null) {

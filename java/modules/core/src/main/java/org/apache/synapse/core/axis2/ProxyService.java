@@ -26,6 +26,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEvent;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -257,6 +258,9 @@ public class ProxyService {
             if (trace()) trace.info("Did not find a WSDL. Assuming a POX or Legacy service");
             proxyService = new AxisService();
             AxisOperation mediateOperation = new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
+            // Set the names of the two messages so that Axis2 is able to produce a WSDL (see SYNAPSE-366):
+            mediateOperation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE).setName("in");
+            mediateOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE).setName("out");
             proxyService.addOperation(mediateOperation);
         }
 

@@ -27,8 +27,6 @@ import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
@@ -38,6 +36,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.TemporaryData;
@@ -88,13 +87,10 @@ public class XSLTMediator extends AbstractMediator {
      */
     private String xsltKey = null;
 
-    /** Variable to hold source XPath string to use for debugging */
-    private String sourceXPathString = null;
-
     /**
      * The (optional) XPath expression which yields the source element for a transformation
      */
-    private SynapseXPath source = null;
+    private final SourceXPathSupport source = new SourceXPathSupport();
 
     /**
      * The name of the message context property to store the transformation result  
@@ -135,25 +131,6 @@ public class XSLTMediator extends AbstractMediator {
     private boolean useDOMSourceAndResults = false;
 
     /**
-     * Default XPath for the selection of the element for the evaluation of the XSLT over
-     */
-    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
-            "s12:Body/child::*[position()=1]";
-
-    public XSLTMediator() {
-        // create the default XPath
-        try {
-            this.source = new SynapseXPath(DEFAULT_XPATH);
-            this.source.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-            this.source.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-        } catch (JaxenException e) {
-            String msg = "Error creating default source XPath expression : " + DEFAULT_XPATH;
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
-        }
-    }
-
-    /**
      * Transforms this message (or its element specified as the source) using the
      * given XSLT transformation
      *
@@ -178,9 +155,7 @@ public class XSLTMediator extends AbstractMediator {
 
         } catch (Exception e) {
             handleException("Unable to perform XSLT transformation using : " + xsltKey +
-                " against source XPath : " +
-                (sourceXPathString == null ? DEFAULT_XPATH : " source XPath : " +
-                 sourceXPathString), e, synCtx);
+                " against source XPath : " + source, e, synCtx);
 
         }
 
@@ -447,11 +422,9 @@ public class XSLTMediator extends AbstractMediator {
     private OMNode getTransformSource(MessageContext synCtx) {
                                 
         try {
-            Object o = source.evaluate(synCtx);
+            Object o = source.selectSingleNode(synCtx);  // Always fetches *only* the first
             if (o instanceof OMNode) {
                 return (OMNode) o;
-            } else if (o instanceof List && !((List) o).isEmpty()) {
-                return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
             } else {
                 handleException("The evaluation of the XPath expression "
                         + source + " did not result in an OMNode", synCtx);
@@ -463,11 +436,11 @@ public class XSLTMediator extends AbstractMediator {
     }
 
     public SynapseXPath getSource() {
-        return source;
+        return source.getXPath();
     }
 
     public void setSource(SynapseXPath source) {
-        this.source = source;
+        this.source.setXPath(source);
     }
 
     public String getXsltKey() {
@@ -549,7 +522,7 @@ public class XSLTMediator extends AbstractMediator {
     }
 
     public void setSourceXPathString(String sourceXPathString) {
-        this.sourceXPathString = sourceXPathString;
+        this.source.setXPathString(sourceXPathString);
     }
 
     public String getTargetPropertyName() {

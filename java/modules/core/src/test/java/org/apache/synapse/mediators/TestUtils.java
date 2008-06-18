@@ -32,18 +32,16 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.registry.url.SimpleURLRegistry;
 
 public class TestUtils {
 
-    public static TestMessageContext getTestContext(String bodyText, Map<String,Entry> props) throws Exception {
+    public static MessageContext getTestContext(String bodyText, Map<String,Entry> props) throws Exception {
         TestMessageContextBuilder builder = new TestMessageContextBuilder();
         builder.setBodyFromString(bodyText);
         if (props != null) {
@@ -56,37 +54,18 @@ public class TestUtils {
 
     public static Axis2MessageContext getAxis2MessageContext(String bodyText,
                                                              Map<String,Entry> props) throws Exception {
-        // create a test synapse context
-        SynapseConfiguration testConfig = new SynapseConfiguration();
-        org.apache.axis2.context.MessageContext inContext =
-                new org.apache.axis2.context.MessageContext();
-
-        Axis2MessageContext synCtx = new Axis2MessageContext(inContext, testConfig, null);
-        testConfig.setRegistry(new SimpleURLRegistry());
-
+        TestMessageContextBuilder builder = new TestMessageContextBuilder();
+        builder.setRequireAxis2MessageContext(true);
+        builder.setBodyFromString(bodyText);
         if (props != null) {
             for (Map.Entry<String,Entry> mapEntry : props.entrySet()) {
-                testConfig.addEntry(mapEntry.getKey(), mapEntry.getValue());
+                builder.addEntry(mapEntry.getKey(), mapEntry.getValue());
             }
         }
-        synCtx.setConfiguration(testConfig);
-
-        SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
-        OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();
-        omDoc.addChild(envelope);
-
-        XMLStreamReader parser = XMLInputFactory.newInstance().
-                createXMLStreamReader(new StringReader(bodyText));
-        StAXOMBuilder builder = new StAXOMBuilder(parser);
-
-        // set a dummy static message
-        envelope.getBody().addChild(builder.getDocumentElement());
-
-        synCtx.setEnvelope(envelope);
-        return synCtx;
+        return (Axis2MessageContext)builder.build();
     }
 
-    public static TestMessageContext getTestContext(String bodyText) throws Exception {
+    public static MessageContext getTestContext(String bodyText) throws Exception {
         return getTestContext(bodyText, null);
     }
 

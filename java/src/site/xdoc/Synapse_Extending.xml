@@ -121,10 +121,12 @@
       through the chain of mediators, for each and every message received and
       processed by Synapse. Each message instance is wrapped within a
       MessageContext instance, and the message context is set with the
-      references to the SynapseConfiguration and SynapseEnvironments. The
-      SynapseConfiguration holds the global configuration model that defines
+      references to the SynapseConfiguration and SynapseEnvironment objects. The
+      <a href="apidocs/org/apache/synapse/config/SynapseConfiguration.html">SynapseConfiguration</a>
+      object holds the global configuration model that defines
       mediation rules, local registry entries and other and configuration, while
-      the environment gives access to the underlying SOAP implementation used -
+      the <a href="apidocs/org/apache/synapse/core/SynapseEnvironment.html">SynapseEnvironment</a>
+      object gives access to the underlying SOAP implementation used -
       Axis2. A typical mediator would need to manipulate the MessageContext by
       referring to the SynapseConfiguration. However it is strongly recommended
       that the SynapseConfiguration is not updated by mediator instances as it
@@ -212,8 +214,8 @@ public interface MessageContext {
 
 }</pre>
     <p>
-      The MessageContext interface is based on the Axis2 <a>MessageContext</a>
-      interface, and uses the Axis2 <a>EndpointReference</a> and
+      The MessageContext interface is based on the Axis2 MessageContext
+      interface, and uses the Axis2 EndpointReference and
       SOAPEnvelope classes/interfaces. The purpose of this interface is to
       capture a message as it flows through the system. As you will see the
       message payload is represented using the SOAP infoset. Binary messages can
@@ -257,7 +259,7 @@ public interface <span style="font-weight: bold;">Mediator </span>{
     public String getType();
 }</pre>
     <p>
-      A mediator can read and/or modify the <a>SynapseMessage</a> in
+      A mediator can read and/or modify the message encapsulated in the MessageContext in
       any suitable manner - adjusting the routing headers or changing the
       message body. If the mediate() method returns false, it signals to the
       Synapse processing model to stop further processing of the message. For
@@ -273,7 +275,7 @@ public interface <span style="font-weight: bold;">Mediator </span>{
       Mediators may be Node mediators (i.e. these that can contain child
       mediators) or Leaf mediators (mediators that does not hold any other child
       mediators). A Node mediator  must implement the
-      org.apache.synapse.api.ListMediator interface listed below, or extend from
+      org.apache.synapse.mediators.ListMediator interface listed below, or extend from
       the org.apache.synapse.mediators.AbstractListMediator.
     </p>
     <h4>

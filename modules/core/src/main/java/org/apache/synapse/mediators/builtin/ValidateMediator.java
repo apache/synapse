@@ -20,17 +20,15 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.AXIOMUtils;
+import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.xml.sax.SAXException;
@@ -67,7 +65,7 @@ public class ValidateMediator extends AbstractListMediator {
      * If this is not specified, the validation will occur against the first child element of the
      * SOAP body
      */
-    private SynapseXPath source = null;
+    private final SourceXPathSupport source = new SourceXPathSupport();
 
     /**
      * A Map containing features to be passed to the actual validator (Xerces)
@@ -89,25 +87,6 @@ public class ValidateMediator extends AbstractListMediator {
      * The SchemaFactory used to create new schema instances.
      */
     private  SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-//    private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-//        "//s12:Envelope/s12:Body/child::*[position()=1]";
-
-    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
-        "s12:Body/child::*[position()=1]";
-    
-    public ValidateMediator() {
-        // create the default XPath
-        try {
-            this.source = new SynapseXPath(DEFAULT_XPATH);
-            this.source.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-            this.source.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-        } catch (JaxenException e) {
-            String msg = "Error creating default source XPath expression : " + DEFAULT_XPATH;
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
-        }
-    }
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -297,11 +276,9 @@ public class ValidateMediator extends AbstractListMediator {
     private OMNode getValidateSource(MessageContext synCtx) {
 
         try {
-            Object o = source.evaluate(synCtx);
+            Object o = source.selectSingleNode(synCtx);  // Always fetches *only* the first
             if (o instanceof OMNode) {
                 return (OMNode) o;
-            } else if (o instanceof List && !((List) o).isEmpty()) {
-                return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
             } else {
                 handleException("The evaluation of the XPath expression "
                     + source + " did not result in an OMNode : " + o, synCtx);
@@ -365,7 +342,7 @@ public class ValidateMediator extends AbstractListMediator {
      * @param source an XPath to be set as the source
      */
     public void setSource(SynapseXPath source) {
-       this.source = source;
+       this.source.setXPath(source);
     }
 
     /**
@@ -373,7 +350,7 @@ public class ValidateMediator extends AbstractListMediator {
      * @return the XPath which yields the source element for validation
      */
     public SynapseXPath getSource() {
-        return source;
+        return source.getXPath();
     }
 
     /**

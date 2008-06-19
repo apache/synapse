@@ -79,7 +79,7 @@ public class AlgorithmContext {
             }
             try {
                 if (value instanceof Integer) {
-                    return ((Integer) value).intValue();
+                    return (Integer) value;
                 } else if (value instanceof String) {
                     return Integer.parseInt((String) value);
                 }
@@ -97,7 +97,7 @@ public class AlgorithmContext {
      *
      * @param currentEPR The current position
      */
-    public void setCurrentEPR(int currentEPR) {
+    public void setCurrentEndpointIndex(int currentEPR) {
 
         if (isClusteringEnable) {  // if this is a clustering env.
 

@@ -1325,6 +1325,9 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       <li>
         OperationName - returns the operation name for the message
       </li>
+      <li>
+        OperationNamespace - returns the namespace of the operation for the message
+      </li>
     </ul>
     <p>
       In addition to the above, one may use the get-property() function to
@@ -1715,9 +1718,9 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       expressions. The types of parameters could be any valid SQL types. Only
       the first row of a result set will be considered and any others are
       ignored. The single &lt;result&gt; element contains the 'name' and the
-      column' attributes. The 'name' attribute defines the name under which the
+      'column' attributes. The 'name' attribute defines the name under which the
       result is stored in the Synapse message context, and the column attribute
-      specifies a column number or name .
+      specifies a column number or name.
     </p>
     <h4>
       <a name="dbreport" id="dbreport">DB-report</a>

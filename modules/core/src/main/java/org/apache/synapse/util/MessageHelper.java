@@ -1,30 +1,39 @@
 package org.apache.synapse.util;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.mediators.eip.EIPConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.axiom.attachments.Attachments;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.attachments.Attachments;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMNode;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.client.Options;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyEngine;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.eip.EIPConstants;
 
-import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
  */
 public class MessageHelper {
+
+    private static final Log log = LogFactory.getLog(MessageHelper.class);
 
     /**
      * This method will simulate cloning the message context and creating an exact copy of the
@@ -235,7 +244,7 @@ public class MessageHelper {
      * @return the resulting SOAPEnvelope
      */
     public static SOAPEnvelope removeAddressingHeaders(
-        org.apache.axis2.context.MessageContext axisMsgCtx) {
+            org.apache.axis2.context.MessageContext axisMsgCtx) {
 
         SOAPEnvelope env = axisMsgCtx.getEnvelope();
         SOAPHeader soapHeader = env.getHeader();
@@ -280,6 +289,43 @@ public class MessageHelper {
                 }
             }
         }
+    }
+
+    public static void copyRMOptions(org.apache.axis2.context.MessageContext oriContext, Options targetOptions) {
+        Options oriOptions = oriContext.getOptions();
+        if (oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE) != null) {
+            targetOptions.setProperty(SynapseConstants.MERCURY_LAST_MESSAGE,
+                    oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE));
+        }
+        if (oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION) != null) {
+            targetOptions.setProperty(SynapseConstants.MERCURY_SPEC_VERSION,
+                    oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION));
+        }
+        if (oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY) != null) {
+            targetOptions.setProperty(SynapseConstants.MERCURY_SEQUENCE_KEY,
+                    oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY));
+        }
+    }
+
+    /**
+     * Get the Policy object for the given name from the Synapse configuration at runtime
+     * @param synCtx the current synapse configuration to get to the synapse configuration
+     * @param propertyKey the name of the property which holds the Policy required
+     * @return the Policy object with the given name, from the configuration
+     */
+    public static Policy getPolicy(org.apache.synapse.MessageContext synCtx, String propertyKey) {
+        Object property = synCtx.getEntry(propertyKey);
+        if (property != null && property instanceof OMElement) {
+            return PolicyEngine.getPolicy((OMElement) property);
+        } else {
+            handleException("Cannot locate policy from the property : " + propertyKey);
+        }
+        return null;
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
 }

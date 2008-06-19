@@ -283,11 +283,22 @@ public class XSLTMediator extends AbstractMediator {
                 // set the parameters which will pass to the Transformation
                 for (MediatorProperty prop : properties) {
                     if (prop != null) {
+                        String value;
                         if (prop.getValue() != null) {
-                            transformer.setParameter(prop.getName(), prop.getValue());
+                            value = prop.getValue();
                         } else {
-                            transformer.setParameter(prop.getName(),
-                                    prop.getExpression().stringValueOf(synCtx));
+                            value = prop.getExpression().stringValueOf(synCtx);
+                        }
+                        if (traceOrDebugOn) {
+                            if (value == null) {
+                                traceOrDebug(traceOn, "Not setting parameter '" + prop.getName() + "'");
+                            } else {
+                                traceOrDebug(traceOn, "Setting parameter '" + prop.getName()
+                                                            + "' to '" + value + "'");
+                            }
+                        }
+                        if (value != null) {
+                            transformer.setParameter(prop.getName(), value);
                         }
                     }
                 }

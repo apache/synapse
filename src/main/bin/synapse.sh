@@ -106,8 +106,7 @@ if [ "$jdk_15" ]; then
       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH
     done
 else
-    echo " Synapse requires JDK 1.5.x"
-    exit 1
+    echo " [Warn] Synapse is tested only with Java 5"
 fi
 
 # For Cygwin, switch paths to Windows format before running java

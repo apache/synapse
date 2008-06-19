@@ -19,12 +19,14 @@
 
 package org.apache.synapse.endpoints.algorithms;
 
+import org.apache.axis2.clustering.Member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the implementation of the round robin load balancing algorithm. It simply iterates
@@ -39,8 +41,14 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      */
     private ArrayList endpoints = null;
 
+    private List<Member> members;
+
     public RoundRobin(ArrayList endpoints) {
         this.endpoints = endpoints;
+    }
+
+    public void setApplicationMembers(List<Member> members) {
+        this.members = members;
     }
 
     /**
@@ -48,11 +56,11 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * available, returns null.
      *
      * @param synapseMessageContext MessageContext instance which holds all per-message properties
-     * @param  algorithmContext The context in which holds run time states related to the algorithm
+     * @param algorithmContext      The context in which holds run time states related to the algorithm
      * @return endpoint to send the next message
      */
     public Endpoint getNextEndpoint(MessageContext synapseMessageContext,
-        AlgorithmContext algorithmContext) {
+                                    AlgorithmContext algorithmContext) {
 
         if (log.isDebugEnabled()) {
             log.debug("Using the Round Robin loadbalancing algorithm to select the next endpoint");
@@ -71,7 +79,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
                 } else {
                     currentEPR++;
                 }
-                algorithmContext.setCurrentEPR(currentEPR);
+                algorithmContext.setCurrentEndpointIndex(currentEPR);
             }
 
             attempts++;
@@ -85,10 +93,32 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         return nextEndpoint;
     }
 
+    public Member getNextApplicationMember(AlgorithmContext algorithmContext) {
+        if (members.size() == 0) {
+            return null;
+        }
+        int currentMemberIndex = algorithmContext.getCurrentEndpointIndex();
+        if (currentMemberIndex >= members.size()) {
+            currentMemberIndex = 0;
+        }
+        Member current = members.get(currentMemberIndex);
+        if (currentMemberIndex == members.size() - 1) {
+            currentMemberIndex = 0;
+        } else {
+            currentMemberIndex++;
+        }
+        algorithmContext.setCurrentEndpointIndex(currentMemberIndex);
+        if(log.isDebugEnabled()) {
+            log.debug("Members       : " + members.size());
+            log.debug("Current member: " + current);
+        }
+        return current;
+    }
+
     public void reset(AlgorithmContext algorithmContext) {
         if (log.isDebugEnabled()) {
             log.debug("Resetting the Round Robin loadbalancing algorithm ...");
         }
-        algorithmContext.setCurrentEPR(0);
+        algorithmContext.setCurrentEndpointIndex(0);
     }
 }

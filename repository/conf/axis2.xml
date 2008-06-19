@@ -296,13 +296,121 @@
     <!--</moduleConfig>-->
 
     <!-- ================================================= -->
-    <!-- Clustering  -->
+    <!--                  Clustering                       -->
     <!-- ================================================= -->
-    <!-- Configure and uncomment following for preparing Synapse to a clustered environment -->
-    <!--<cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager">
+    <!-- Configure the following for preparing Synapse to a clustered environment -->
+    <cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
+
+        <!--
+           This parameter indicates whther the cluster has to be automatically initalized
+           when the AxisConfiguration is built. If set to "true" the initialization will not be
+           done at that stage, and some other party will have to explictly initialize the cluster.
+        -->
         <parameter name="AvoidInitiation">false</parameter>
-        <parameter name="domain">apache-synapse.domain</parameter>
-        <contextManager class="org.apache.axis2.clustering.context.DefaultContextManager">
+
+        <!--
+           The membership scheme used in this setup. The only values supported at the moment are
+           "multicast" and "wka"
+
+           1. multicast - membership is automatically discovered using multicasting
+           2. wka - Well-Known Address based multicasting. Membership is discovered with the help
+                    of one or more nodes running at a Well-Known Address. New members joining a
+                    cluster will first connect to a well-known node, register with the well-known node
+                    and get the membership list from it. When new members join, one of the well-known
+                    nodes will notify the others in the group. When a member leaves the cluster or
+                    is deemed to have left the cluster, it will be detected by the Group Membership
+                    Service (GMS) using a TCP ping mechanism.
+        -->
+        <parameter name="membershipScheme">multicast</parameter>
+
+        <!--
+         The clustering domain/group. Nodes in the same group will belong to the same multicast
+         domain. There will not be interference between nodes in different groups.
+        -->
+        <parameter name="domain">apache.synapse.domain</parameter>
+
+        <!--
+           When a Web service request is received, and processed, before the response is sent to the
+           client, should we update the states of all members in the cluster? If the value of
+           this parameter is set to "true", the response to the client will be sent only after
+           all the members have been updated. Obviously, this can be time consuming. In some cases,
+           such this overhead may not be acceptable, in which case the value of this parameter
+           should be set to "false"
+        -->
+        <parameter name="synchronizeAll">true</parameter>
+
+        <!--
+          The maximum number of times we need to retry to send a message to a particular node
+          before giving up and considering that node to be faulty
+        -->
+        <parameter name="maxRetries">10</parameter>
+
+        <!-- The multicast address to be used -->
+        <parameter name="mcastAddress">228.0.0.4</parameter>
+
+        <!-- The multicast port to be used -->
+        <parameter name="mcastPort">45564</parameter>
+
+        <!-- The frequency of sending membership multicast messages (in ms) -->
+        <parameter name="mcastFrequency">500</parameter>
+
+        <!-- The time interval within which if a member does not respond, the member will be
+         deemed to have left the group (in ms)
+         -->
+        <parameter name="memberDropTime">3000</parameter>
+
+        <!--
+           The IP address of the network interface to which the multicasting has to be bound to.
+           Multicasting would be done using this interface.
+        -->
+        <parameter name="mcastBindAddress">127.0.0.1</parameter>
+
+        <!-- The host name or IP address of this member -->
+        <parameter name="localMemberHost">127.0.0.1</parameter>
+
+        <!--
+        The TCP port used by this member. This is the port through which other nodes will
+        contact this member
+         -->
+        <parameter name="localMemberPort">4000</parameter>
+
+        <!--
+           The list of static or well-known members. These entries will only be valid if the
+           "membershipScheme" above is set to "wka"
+        -->
+        <members>
+            <member>
+                <hostName>127.0.0.1</hostName>
+                <port>4000</port>
+            </member>
+            <member>
+                <hostName>127.0.0.1</hostName>
+                <port>4001</port>
+            </member>
+        </members>
+
+        <!--
+        Enable the load balancer entry if you need to run this node as a load balancer.
+        Multiple application domains with different LoadBalanceEventHandler implementations
+        can be defined in this section.
+        -->
+        <loadBalancer enable="false">
+            <applicationDomain name="apache.axis2.app.domain"
+                               handler="org.apache.axis2.clustering.DefaultLoadBalanceEventHandler"/>
+        </loadBalancer>
+            
+        <!--
+           This interface is responsible for handling context replication. The property changes in
+           the Axis2 context hierarchy in this node, are propagated to all other nodes in the cluster.
+
+           The "excludes" patterns can be used to specify the prefixes (e.g. local_*) or
+           suffixes (e.g. *_local) of the properties to be excluded from replication. The pattern
+           "*" indicates that all properties in a particular context should not be replicated.
+
+            The "enable" attribute indicates whether context replication has been enabled
+        -->
+        <contextManager class="org.apache.axis2.clustering.context.DefaultContextManager"
+                         enable="false">
             <listener class="org.apache.axis2.clustering.context.DefaultContextManagerListener"/>
             <replication>
                 <defaults>
@@ -312,13 +420,6 @@
                 <context class="org.apache.axis2.context.ConfigurationContext">
                     <exclude name="UseAsyncOperations"/>
                     <exclude name="SequencePropertyBeanMap"/>
-                    <exclude name="WORK_DIR"/>
-                    <exclude name="NextMsgBeanMap"/>
-                    <exclude name="RetransmitterBeanMap"/>
-                    <exclude name="StorageMapBeanMap"/>
-                    <exclude name="CreateSequenceBeanMap"/>
-                    <exclude name="ConfigContextTimeoutInterval"/>
-                    <exclude name="ContainerManaged"/>
                 </context>
                 <context class="org.apache.axis2.context.ServiceGroupContext">
                     <exclude name="my.sandesha.*"/>
@@ -328,7 +429,7 @@
                 </context>
             </replication>
         </contextManager>
-    </cluster>-->
+    </cluster>
 
     <!-- ================================================= -->
     <!-- Phases  -->

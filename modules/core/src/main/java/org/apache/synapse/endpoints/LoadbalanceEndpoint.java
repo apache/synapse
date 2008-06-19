@@ -65,7 +65,7 @@ public class LoadbalanceEndpoint implements Endpoint {
      * If this supports load balancing with failover. If true, request will be directed to the next
      * endpoint if the current one is failing.
      */
-    private boolean failover = true;
+    protected boolean failover = true;
 
     /**
      * Parent endpoint of this endpoint if this used inside another endpoint. Possible parents are
@@ -100,7 +100,7 @@ public class LoadbalanceEndpoint implements Endpoint {
 
         ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
         if (clusterManager != null &&
-                clusterManager.getContextManager() != null) {
+            clusterManager.getContextManager() != null) {
             isClusteringEnable = true;
         }
 
@@ -109,8 +109,8 @@ public class LoadbalanceEndpoint implements Endpoint {
 
             if (isClusteringEnable) {
                 log.warn("In a clustering environment , the endpoint  name should be specified" +
-                        "even for anonymous endpoints. Otherwise , the clustering would not be " +
-                        "functioned correctly if there are more than one anonymous endpoints. ");
+                         "even for anonymous endpoints. Otherwise , the clustering would not be " +
+                         "functioned correctly if there are more than one anonymous endpoints. ");
             }
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
         }

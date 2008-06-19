@@ -1126,7 +1126,7 @@
         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
 
         <!-- Axis2 1.4 and its dependencies -->
-        <axis2.version>1.4</axis2.version>
+        <axis2.version>SNAPSHOT</axis2.version>
         <axiom.version>SNAPSHOT</axiom.version>
         <xml_schema.version>1.4.2</xml_schema.version>
         <xml_apis.version>1.3.04</xml_apis.version>
@@ -1135,7 +1135,7 @@
         <commons.logging.version>1.1</commons.logging.version>
 
         <!-- addressing, rampart, neethi -->
-        <addressing.version>1.4</addressing.version>
+        <addressing.version>SNAPSHOT</addressing.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <mercury.version>0.91</mercury.version>
         <neethi.version>2.0.4</neethi.version>

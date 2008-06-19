@@ -360,7 +360,7 @@
               (DBLookup / DBReport)</a>
               <ul>
                 <li>
-                  <a href="#Sample360">Sample 360: Introduction to dblookp
+                  <a href="#Sample360">Sample 360: Introduction to dblookup
                   mediator</a>
                 </li>
                 <li>
@@ -4154,7 +4154,7 @@ end
     </p>
     <p/>
     <h2>
-      <a name="Sample360" id="Sample360">Sample 360: Introduction to dblookp
+      <a name="Sample360" id="Sample360">Sample 360: Introduction to dblookup
       mediator</a>
     </h2>
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;

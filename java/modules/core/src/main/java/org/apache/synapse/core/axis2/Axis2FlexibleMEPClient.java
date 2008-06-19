@@ -20,12 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -44,16 +39,11 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.util.MessageHelper;
-import org.apache.synapse.util.PolicyInfo;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -241,9 +231,9 @@ public class Axis2FlexibleMEPClient {
             if (wsRMPolicyKey != null) {
                 clientOptions.setProperty(
                     SynapseConstants.SANDESHA_POLICY,
-                    getPolicy(synapseOutMessageContext, wsRMPolicyKey));
+                        MessageHelper.getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
-            copyRMOptions(originalInMsgCtx, clientOptions);
+            MessageHelper.copyRMOptions(originalInMsgCtx, clientOptions);
         }
 
         // if security is enabled,
@@ -252,15 +242,17 @@ public class Axis2FlexibleMEPClient {
             if (wsSecPolicyKey != null) {
                 clientOptions.setProperty(
                     SynapseConstants.RAMPART_POLICY,
-                    getPolicy(synapseOutMessageContext, wsSecPolicyKey));
+                        MessageHelper.getPolicy(synapseOutMessageContext, wsSecPolicyKey));
             } else {
                 if (inboundWsSecPolicyKey != null) {
                     clientOptions.setProperty(SynapseConstants.RAMPART_IN_POLICY,
-                            getPolicy(synapseOutMessageContext, inboundWsSecPolicyKey));
+                            MessageHelper.getPolicy(
+                                    synapseOutMessageContext, inboundWsSecPolicyKey));
                 }
                 if (outboundWsSecPolicyKey != null) {
                     clientOptions.setProperty(SynapseConstants.RAMPART_OUT_POLICY,
-                            getPolicy(synapseOutMessageContext, outboundWsSecPolicyKey));
+                            MessageHelper.getPolicy(
+                                    synapseOutMessageContext, outboundWsSecPolicyKey));
                 }
             }
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
@@ -307,105 +299,11 @@ public class Axis2FlexibleMEPClient {
         MessageContext newMC = MessageHelper.clonePartially(ori);
 
         newMC.setEnvelope(ori.getEnvelope());        
-        removeAddressingHeaders(newMC);
+        MessageHelper.removeAddressingHeaders(newMC);
 
         newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
             ori.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
 
         return newMC;
-    }
-
-    private static void copyRMOptions(MessageContext oriContext, Options targetOptions) {
-        Options oriOptions = oriContext.getOptions();
-        if (oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE) != null) {
-            targetOptions.setProperty(SynapseConstants.MERCURY_LAST_MESSAGE,
-                    oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE));
-        }
-        if (oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION) != null) {
-            targetOptions.setProperty(SynapseConstants.MERCURY_SPEC_VERSION,
-                    oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION));
-        }
-        if (oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY) != null) {
-            targetOptions.setProperty(SynapseConstants.MERCURY_SEQUENCE_KEY,
-                    oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY));
-        }
-        // todo:[ruwan] migrate to Mercury
-//        if (oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
-//            targetOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,
-//                    oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID));
-//        }
-    }
-
-    /**
-     * Get the Policy object for the given name from the Synapse configuration at runtime
-     * @param synCtx the current synapse configuration to get to the synapse configuration
-     * @param propertyKey the name of the property which holds the Policy required
-     * @return the Policy object with the given name, from the configuration
-     */
-    private static Policy getPolicy(org.apache.synapse.MessageContext synCtx, String propertyKey) {
-        Object property = synCtx.getEntry(propertyKey);
-        if (property != null && property instanceof OMElement) {
-            return PolicyEngine.getPolicy((OMElement) property);
-        } else {
-            handleException("Cannot locate policy from the property : " + propertyKey);
-        }
-        return null;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    /**
-     * Removes Submission and Final WS-Addressing headers and return the SOAPEnvelope
-     * from the given message context
-     * @param axisMsgCtx the Axis2 Message context
-     * @return the resulting SOAPEnvelope
-     */
-    public static SOAPEnvelope removeAddressingHeaders(MessageContext axisMsgCtx) {
-
-        SOAPEnvelope env = axisMsgCtx.getEnvelope();
-        SOAPHeader soapHeader = env.getHeader();
-        ArrayList addressingHeaders;
-
-        if (soapHeader != null) {
-            addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
-                AddressingConstants.Submission.WSA_NAMESPACE);
-
-            if (addressingHeaders != null && addressingHeaders.size() != 0) {
-                detachAddressingInformation(addressingHeaders);
-
-            } else {
-                addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
-                    AddressingConstants.Final.WSA_NAMESPACE);
-                if (addressingHeaders != null && addressingHeaders.size() != 0) {
-                    detachAddressingInformation(addressingHeaders);
-                }
-            }
-        }
-        return env;
-    }
-
-    /**
-     * Remove WS-A headers
-     * @param headerInformation headers to be removed
-     */
-    private static void detachAddressingInformation(ArrayList headerInformation) {
-        for (Object o : headerInformation) {
-            if (o instanceof SOAPHeaderBlock) {
-                SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
-                headerBlock.detach();
-            } else if (o instanceof OMElement) {
-                // work around for a known addressing bug which sends non SOAPHeaderBlock objects
-                OMElement om = (OMElement) o;
-                OMNamespace ns = om.getNamespace();
-                if (ns != null && (
-                    AddressingConstants.Submission.WSA_NAMESPACE.equals(ns.getNamespaceURI()) ||
-                        AddressingConstants.Final.WSA_NAMESPACE.equals(ns.getNamespaceURI()))) {
-                    om.detach();
-                }
-            }
-        }
     }
 }

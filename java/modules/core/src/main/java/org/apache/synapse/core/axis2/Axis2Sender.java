@@ -35,6 +35,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.POXUtils;
 import org.apache.synapse.util.UUIDGenerator;
 
@@ -124,7 +125,7 @@ public class Axis2Sender {
                         AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
             }
             
-            Axis2FlexibleMEPClient.removeAddressingHeaders(messageContext);
+            MessageHelper.removeAddressingHeaders(messageContext);
             messageContext.setMessageID(UUIDGenerator.getUUID());
 
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197

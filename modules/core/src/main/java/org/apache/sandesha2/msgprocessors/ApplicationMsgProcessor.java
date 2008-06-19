@@ -22,6 +22,7 @@ package org.apache.sandesha2.msgprocessors;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -249,7 +250,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						if(!policy.isEnableMakeConnection()) {
 							String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionDisabled);
 							throw new SandeshaException(message);
-						}						
+						}
 					}
 				}
 			}
@@ -388,7 +389,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 							// We have rewritten the replyTo. If this is the first message that we have needed to
 							// rewrite then we should set the sequence up for polling, and once we have saved the
 							// changes to the sequence then we can start the polling thread.
+							
+							//Firstly, we are going to use make connection in this configuration so we should now ensure that
+							//WS-Adressing is enabled
+							if (log.isDebugEnabled()) log.debug("Ensuring that WS-A is enabled for msg " + msgContext);
+							msgContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,Boolean.FALSE);
 							msgContext.setReplyTo(newReplyTo);
+							
+							//start the polling process to pull back response messages
 							if (!rmsBean.isPollingMode()) {
 								rmsBean.setPollingMode(true);
 								startPolling = true;

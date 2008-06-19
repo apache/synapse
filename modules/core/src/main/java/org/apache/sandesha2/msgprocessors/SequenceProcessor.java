@@ -231,12 +231,13 @@ public class SequenceProcessor {
 			EndpointReference acksTo = bean.getAcksToEndpointReference();
 			
 			// Send an Ack if needed.
-			//We are not sending acks for duplicate messages in the RM 1.0 anon InOut case.
+			//We are not sending acks for duplicate messages in the anon InOut case.
 			//If a standalone ack get sent before the actualy message (I.e. before the original msg get
 			//replied), the client may take this as a InOnly message and may avoid looking for the application
-			//response.
-			if (!(Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgCtx.getRMSpecVersion()) && 
-					rmMsgCtx.getReplyTo().hasAnonymousAddress())) {
+			//response if using replay.
+			//Therefore we only send acks back in the anon InOnly case.
+			if (WSDLConstants.MEP_CONSTANT_IN_ONLY == rmMsgCtx.getMessageContext().getAxisOperation().getAxisSpecificMEPConstant() && 
+					(replyTo==null || replyTo.getAddress()==null || replyTo.isWSAddressingAnonymous() )) {
 				sendAckIfNeeded(bean, sequenceId, rmMsgCtx, storageManager, true, acksTo.hasAnonymousAddress());	
 			}
 			

@@ -31,7 +31,6 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.util.PolicyInfo;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -314,6 +313,13 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             } else {
                 return LoadbalanceEndpointFactory.getInstance();
             }
+        }
+
+        OMElement dlbElement = configElement.getFirstChildWithName
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dynamicLoadbalance"));
+        if (dlbElement != null) {
+            //TODO: Handle Session affinitiy & failover
+            return DynamicLoadbalanceEndpointFactory.getInstance();
         }
 
         OMElement foElement = configElement.getFirstChildWithName

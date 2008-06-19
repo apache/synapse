@@ -255,19 +255,40 @@
     <!-- ================================================= -->
     <!-- Clustering  -->
     <!-- ================================================= -->
-    <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->
-    <!-- 
-    <cluster class="org.apache.axis2.cluster.tribes.TribesClusterManager">
-        <parameter name="param1">value1</parameter>
-        <parameter name="domain">apache.axis2.domain</parameter>
-    	<configurationManager class="org.apache.axis2.cluster.configuration.TribesConfigurationManager">
-    	    <listener class="org.apache.axis2.cluster.configuration.DefaultConfigurationManagerListener"/>
-    	</configurationManager>
-    	<contextManager class="org.apache.axis2.cluster.context.TribesContextManager">
-    	    <listener class="org.apache.axis2.cluster.context.DefaultContextManagerListener"/>
-    	</contextManager>
+    <!-- Configure the following for preparing Axis2 to a clustered environment -->
+    <cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
+        <parameter name="AvoidInitiation">true</parameter>
+        <parameter name="membershipScheme">multicast</parameter>
+        <parameter name="domain">apache.axis2.app.domain</parameter>
+        <parameter name="synchronizeAll">true</parameter>
+        <parameter name="maxRetries">10</parameter>
+        <parameter name="mcastAddress">228.0.0.4</parameter>
+        <parameter name="mcastPort">45564</parameter>
+        <parameter name="mcastFrequency">500</parameter>
+        <parameter name="memberDropTime">3000</parameter>
+        <parameter name="mcastBindAddress">127.0.0.1</parameter>
+        <parameter name="localMemberHost">127.0.0.1</parameter>
+        <contextManager class="org.apache.axis2.clustering.context.DefaultContextManager"
+                         enable="false">
+            <listener class="org.apache.axis2.clustering.context.DefaultContextManagerListener"/>
+            <replication>
+                <defaults>
+                    <exclude name="local_*"/>
+                    <exclude name="LOCAL_*"/>
+                </defaults>
+                <context class="org.apache.axis2.context.ConfigurationContext">
+                    <exclude name="UseAsyncOperations"/>
+                    <exclude name="SequencePropertyBeanMap"/>
+                </context>
+                <context class="org.apache.axis2.context.ServiceGroupContext">
+                    <exclude name="my.sandesha.*"/>
+                </context>
+                <context class="org.apache.axis2.context.ServiceContext">
+                    <exclude name="my.sandesha.*"/>
+                </context>
+            </replication>
+        </contextManager>
     </cluster>
-     -->
      
     <!-- ================================================= -->
     <!-- Phases  -->

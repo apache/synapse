@@ -25,6 +25,7 @@ import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.util.CommandLineOption;
 import org.apache.axis2.util.CommandLineOptionParser;
 import org.apache.axis2.util.OptionsValidator;
+import org.apache.axis2.clustering.ClusterManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,6 +99,16 @@ public class SampleAxis2ServerManager {
             listenerManager.init(configctx);
             listenerManager.start();
             log.info("[SimpleAxisServer] Started");
+
+            // Need to initialize the cluster manager at last since we are changing the servers
+            // HTTP/S ports above. In the axis2.xml file, we need to set the "AvoidInitiation" param
+            // to "true"
+            ClusterManager clusterManager =
+                    configctx.getAxisConfiguration().getClusterManager();
+            if(clusterManager != null) {
+                clusterManager.setConfigurationContext(configctx);
+                clusterManager.init();
+            }
         } catch (Throwable t) {
             log.fatal("[SimpleAxisServer] Shutting down. Error starting SimpleAxisServer", t);
             System.exit(1); // must stop application

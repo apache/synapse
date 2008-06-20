@@ -195,9 +195,8 @@ public class ClientWorker implements Runnable {
             responseMsgCtx.setProperty(NhttpConstants.NON_BLOCKING_TRANSPORT, true);
 
             // process response received
-            AxisEngine engine = new AxisEngine(cfgCtx);
             try {
-                engine.receive(responseMsgCtx);
+                AxisEngine.receive(responseMsgCtx);
             } catch (AxisFault af) {
                 log.error("Fault processing response message through Axis2", af);
             }

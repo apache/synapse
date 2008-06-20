@@ -38,8 +38,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.util.Map;
 import java.util.Set;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
 
 public abstract class AbstractTransportSender extends AbstractHandler implements TransportSender {
 
@@ -48,8 +46,6 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
 
     /** the axis2 configuration context */
     protected ConfigurationContext cfgCtx = null;
-    /** an axis2 engine over the above configuration context to process messages */
-    protected AxisEngine engine = null;
     /** transport in description */
     private TransportInDescription transportIn  = null;
     /** transport out description */
@@ -71,7 +67,6 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut)
         throws AxisFault {
         this.cfgCtx = cfgCtx;
-        this.engine = new AxisEngine(cfgCtx);
         this.transportOut = transportOut;
         this.transportIn  = cfgCtx.getAxisConfiguration().getTransportIn(getTransportName());
         this.state = BaseConstants.STARTED;
@@ -142,13 +137,13 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         // send the message context through the axis engine
         try {
                 try {
-                    engine.receive(msgCtx);
+                    AxisEngine.receive(msgCtx);
                 } catch (AxisFault e) {
                     if (log.isDebugEnabled()) {
                         log.debug("Error receiving message", e);
                     }
                     if (msgCtx.isServerSide()) {
-                        engine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
+                        AxisEngine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
                     }
                 }
         } catch (AxisFault axisFault) {

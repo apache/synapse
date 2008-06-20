@@ -60,7 +60,7 @@ public class AcknowledgementManager {
 	 */
 	public static void piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager)
 			throws SandeshaException {
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
 		
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
@@ -78,19 +78,19 @@ public class AcknowledgementManager {
 					EndpointReference acksToEPR = inboundBean.getAcksToEndpointReference();
 
 					if(acksToEPR == null || acksToEPR.hasAnonymousAddress()) {
-						if(log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
+						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
 						RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean, false);
 					}
 				}
 			}
-			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
 			return;
 		}
 		else{
 			//an addressable EPR
 			if(SandeshaUtil.hasReferenceParameters(target)){
 				//we should not proceed since we cannot properly compare ref params
-				if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
 				return;
 			}
 			
@@ -110,7 +110,7 @@ public class AcknowledgementManager {
 		      RMDBean sequence = (RMDBean) sequences.next();
 		      if(SandeshaUtil.hasReferenceParameters(sequence.getAcksToEndpointReference())){
 		    	  //we should not piggy back if there are reference parameters in the acksTo EPR since we cannot compare them
-		    	  if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
+		    	  if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
 		    	  break;
 		      }
 					
@@ -132,15 +132,15 @@ public class AcknowledgementManager {
 					retransmitterBeanMgr.delete(ackBean.getMessageID());
 					storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
 
-				if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
 		        RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
 
 
 			    } else if(rmMessageContext.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			        if(log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
+			        if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
 			          
 			        if(sequence.getHighestInMessageNumber() > 0) {
-						  if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+						  if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
 
 					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
 					}
@@ -148,7 +148,7 @@ public class AcknowledgementManager {
 			}
 		}
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent");
 		return;
 	}
@@ -173,7 +173,7 @@ public class AcknowledgementManager {
 			
 			) throws AxisFault {
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::generateAckMessage " + rmdBean);
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
@@ -213,7 +213,7 @@ public class AcknowledgementManager {
 		// adding the SequenceAcknowledgement part.
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true);
 
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::generateAckMessage");
 		return ackRMMsgCtx;
 	}
@@ -222,7 +222,7 @@ public class AcknowledgementManager {
 	
 
 	public static boolean verifySequenceCompletion(RangeString ackRanges, long lastMessageNo) {
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::verifySequenceCompletion");
 
 		boolean result = false;
@@ -231,7 +231,7 @@ public class AcknowledgementManager {
 			result = true;
 		}
 
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::verifySequenceCompletion " + result);
 		return result;
 	}
@@ -241,7 +241,7 @@ public class AcknowledgementManager {
 			String sequenceId, 
 			long timeToSend,
 			StorageManager storageManager) throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Enter: AcknowledgementManager::addAckBeanEntry");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: AcknowledgementManager::addAckBeanEntry");
 
 		// Write the acks into the envelope
 		ackRMMsgContext.addSOAPEnvelope();
@@ -299,11 +299,11 @@ public class AcknowledgementManager {
 		// inserting the new ack.
 		retransmitterBeanMgr.insert(ackBean);
 
-		if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::addAckBeanEntry");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::addAckBeanEntry");
 	}
 	
 	public static void sendAckNow (RMMsgContext ackRMMsgContext) throws AxisFault {
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::sendAckNow");
 
 		// Write the acks into the envelope
@@ -325,7 +325,7 @@ public class AcknowledgementManager {
 		
 		AxisEngine.send(ackMsgContext);
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::sendAckNow");		
 	}	
 }

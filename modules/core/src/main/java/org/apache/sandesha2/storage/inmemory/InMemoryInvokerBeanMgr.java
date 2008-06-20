@@ -31,6 +31,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
+import org.apache.sandesha2.util.LoggingControl;
 
 
 public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBeanMgr {
@@ -51,7 +52,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		lock.lock();
 		boolean result = false;
 		if(super.findUnique(finder)!=null){
-			if(log.isDebugEnabled()) log.debug("InMemoryInvokerBeanMgr insert failed due to existing invoker bean");
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("InMemoryInvokerBeanMgr insert failed due to existing invoker bean");
 			result = false;
 		}
 		else{

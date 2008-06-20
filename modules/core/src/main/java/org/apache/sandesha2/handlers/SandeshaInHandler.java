@@ -40,6 +40,7 @@ import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.util.LoggingControl;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -60,7 +61,7 @@ public class SandeshaInHandler extends AbstractHandler {
 	
 	public InvocationResponse invoke(MessageContext msgCtx) throws AxisFault {
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaInHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 
 		InvocationResponse returnValue = InvocationResponse.CONTINUE;
@@ -68,13 +69,13 @@ public class SandeshaInHandler extends AbstractHandler {
 		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
-			if (log.isDebugEnabled()) log.debug(message);
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message);
 			throw new AxisFault(message);
 		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && Sandesha2Constants.VALUE_TRUE.equals(DONE)) {
-			if (log.isDebugEnabled())
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("Exit: SandeshaInHandler::invoke, Application processing done " + returnValue);
 			return returnValue;
 		}
@@ -84,11 +85,11 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (msgCtx.getAxisService() != null) {
 			Parameter unreliableParam = msgCtx.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
-				if (log.isDebugEnabled()) log.debug("Exit: SandeshaInHandler::invoke, Service has disabled RM " + returnValue);
+				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: SandeshaInHandler::invoke, Service has disabled RM " + returnValue);
 				return returnValue;
 			}
 		}
-		if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Continuing beyond basic checks");
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Continuing beyond basic checks");
 
 		Transaction transaction = null;
 
@@ -98,7 +99,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);
-				if (log.isDebugEnabled()) log.debug(message);
+				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message);
 				throw new AxisFault(message);
 			}
 
@@ -158,7 +159,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			transaction = null;
 			
 		} catch (Exception e) {
-			if (log.isDebugEnabled()) 
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
 				log.debug("SandeshaInHandler::invoke Exception caught during processInMessage", e);
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
@@ -172,19 +173,20 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault(message, e);
 		} 
 		finally {
-			if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Doing final processing");
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Doing final processing");
 			if (transaction != null && transaction.isActive()) {
 				try {
 					transaction.rollback();
 					transaction = null;
 				} catch (Exception e) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e.toString());
-					log.debug(message, e);
+					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+                      log.debug(message, e);
 				}
 			}
 		}
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaInHandler::invoke " + returnValue);
 		return returnValue;
 	}

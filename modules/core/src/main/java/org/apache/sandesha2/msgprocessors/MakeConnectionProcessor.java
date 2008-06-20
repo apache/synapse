@@ -50,6 +50,7 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.FaultManager;
+import org.apache.sandesha2.util.LoggingControl;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -77,7 +78,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	 * This is processed using a SenderWorker. 
 	 */
 	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
 
 		MakeConnection makeConnection = rmMsgCtx.getMakeConnection();
 		
@@ -104,7 +105,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		boolean secured = false;
 		if(token!=null && identifier==null){
 			secured = true;
-			if(log.isDebugEnabled()) log.debug("token found " + token);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("token found " + token);
 			//this means we have to scope our search for sender beans that belong to sequences that own the same token
 			String data = secManager.getTokenRecoveryData(token);
 			//first look for RMS beans
@@ -128,11 +129,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				possibleBeanIndex = random.nextInt(size);
 				RMSequenceBean selectedSequence = (RMSequenceBean)possibleBeans.get(possibleBeanIndex);
 				findSenderBean.setSequenceID(selectedSequence.getSequenceID());
-				if(log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
 			}
 			else{
 				//we cannot match a RMD with the correct security credentials so we cannot process this msg under RSP
-				if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage : no RM sequence bean with security credentials" );
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage : no RM sequence bean with security credentials" );
 				return false; 
 			}
 		}
@@ -149,7 +150,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			findSenderBean.setToAddress(address);
 		
 		if (identifier!=null){
-			if(log.isDebugEnabled()) log.debug("identifier set, this violates RSP " + identifier);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("identifier set, this violates RSP " + identifier);
 			findSenderBean.setSequenceID(identifier.getIdentifier());
 		}
 		
@@ -207,15 +208,15 @@ public class MakeConnectionProcessor implements MsgProcessor {
 						possibleBeanIndex = random.nextInt(possBeansSize);
 						RMSequenceBean selectedSequence = (RMSequenceBean)possibleBeans.get(possibleBeanIndex);
 						findSenderBean.setSequenceID(selectedSequence.getSequenceID());
-						if(log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
+						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("sequence selected " + findSenderBean.getSequenceID());
 					}
 					else{
-						if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
+						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
 						return false;
 					}
 					
 				} else {
-					if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
+					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
 					return false;
 				}
 			} else {
@@ -229,7 +230,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		}
 		replyToPoll(rmMsgCtx, senderBean, storageManager, pending, makeConnection.getNamespaceValue(), transaction);
 		
-		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage");
 		return false;
 	}
 	
@@ -241,12 +242,12 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			Transaction transaction)
 	throws AxisFault
 	{
-		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::replyToPoll");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::replyToPoll");
 		TransportOutDescription transportOut = pollMessage.getMessageContext().getTransportOut();
 		if (transportOut==null) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cantSendMakeConnectionNoTransportOut);
-			if(log.isDebugEnabled()) log.debug(message);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message);
 			throw new SandeshaException (message);
 		}
 			
@@ -254,7 +255,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,pollMessage.getConfigurationContext());
 		if (returnMessage==null) {
 			String message = "Cannot find the message stored with the key:" + messageStorageKey;
-			if(log.isDebugEnabled()) log.debug(message);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message);
 			// Someone else has either removed the sender & message, or another make connection got here first.
 			return;
 		}
@@ -266,7 +267,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			//this is the case when a stored application response msg was not sucecsfully returned 
 			//on the sending transport's backchannel. Since the msg was stored without a sequence header
 			//we need to lookup the namespace using the RMS bean
-			if(log.isDebugEnabled()) log.debug("Looking up rmNamespace from RMS bean");
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Looking up rmNamespace from RMS bean");
 			String sequenceID = matchingMessage.getSequenceID();
 			if(sequenceID!=null){
 				RMSBean rmsBean = new RMSBean();
@@ -278,7 +279,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				else{
 					//we will never be able to reply to this msg - at the moment the best bet is 
 					//to not process the reply anymore
-					if(log.isDebugEnabled()) log.debug("Could not find RMS bean for polled msg");
+					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Could not find RMS bean for polled msg");
 					continueSending = false;
 					//also remove the sender bean so that we do not select this again
 					storageManager.getSenderBeanMgr().delete(matchingMessage.getMessageID());
@@ -338,7 +339,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			TransportUtils.setResponseWritten(pollMessage.getMessageContext(), true);
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
 	}
 	
 	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) {

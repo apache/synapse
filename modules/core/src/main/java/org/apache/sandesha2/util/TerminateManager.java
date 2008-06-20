@@ -65,7 +65,7 @@ public class TerminateManager {
 
 	public static void checkAndTerminate(ConfigurationContext configurationContext, StorageManager storageManager, RMSBean rmsBean)
 	throws SandeshaStorageException, AxisFault {
-		if(log.isDebugEnabled()) log.debug("Enter: TerminateManager::checkAndTerminate " +rmsBean);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: TerminateManager::checkAndTerminate " +rmsBean);
 
 		long lastOutMessage = rmsBean.getLastOutMessage ();
 
@@ -126,7 +126,7 @@ public class TerminateManager {
 			
 		}
 
-		if(log.isDebugEnabled()) log.debug("Exit: TerminateManager::checkAndTerminate");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: TerminateManager::checkAndTerminate");
 	}
 	
 	
@@ -191,7 +191,7 @@ public class TerminateManager {
 	 */
 	public static void cleanReceivingSideAfterInvocation(String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		if(log.isDebugEnabled()) log.debug("Enter: TerminateManager::cleanReceivingSideAfterInvocation " +sequenceId);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: TerminateManager::cleanReceivingSideAfterInvocation " +sequenceId);
 		
 		InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
 
@@ -217,7 +217,7 @@ public class TerminateManager {
 		else 
 			receivingSideCleanMap.put(sequenceId, CLEANED_AFTER_INVOCATION);		
 		
-		if(log.isDebugEnabled()) log.debug("Exit: TerminateManager::cleanReceivingSideAfterInvocation");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: TerminateManager::cleanReceivingSideAfterInvocation");
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class TerminateManager {
 	private static boolean cleanSendingSideData(String internalSequenceId, StorageManager storageManager, 
 			RMSBean rmsBean, boolean reallocateIfPossible) throws SandeshaException {
 
-		if(log.isDebugEnabled())
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: TerminateManager::cleanSendingSideData " + internalSequenceId + ", " + reallocateIfPossible);
 		
 		boolean reallocatedOK = false;
@@ -278,7 +278,7 @@ public class TerminateManager {
 		else{
 			//cannot reallocate as there are gaps
 			reallocateIfPossible=false;
-			if(log.isDebugEnabled())
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("cannot reallocate sequence as there are gaps");
 		}
 		
@@ -293,7 +293,7 @@ public class TerminateManager {
 					&& retransmitterBean.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION
 					&& retransmitterBean.getMessageNumber()==lastAckedMsg+1){
 					
-					if(log.isDebugEnabled())
+					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 						log.debug("adding message for reallocate: " + retransmitterBean.getMessageNumber());
 					
 					//try to reallocate application msgs that are next in the outgoing list to 
@@ -304,7 +304,7 @@ public class TerminateManager {
 				}
 				else if(reallocateIfPossible){
 					//we are reallocating but this message does not fit the criteria. We should not delete it
-					if(log.isDebugEnabled())
+					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 						log.debug("cannot reallocate: " + retransmitterBean.getMessageNumber());
 					if(msgsToReallocate.size()==0){
 						try{
@@ -316,7 +316,7 @@ public class TerminateManager {
 							msgsToReallocate.add(dummy);							
 						}
 						catch(Exception e){
-							if(log.isDebugEnabled())
+							if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 								log.debug("Exit: TerminateManager::cleanSendingSideData " + e);
 							throw new SandeshaStorageException(e);
 						}
@@ -337,25 +337,25 @@ public class TerminateManager {
 			}
 			catch(Exception e){
 				//want that the reallocation failed
-				if(log.isDebugEnabled())
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 					log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reallocationFailed, rmsBean.getSequenceID(), e.toString()));				
 			}			
 		}
 		
-		if(log.isDebugEnabled())
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: TerminateManager::cleanSendingSideData " + reallocatedOK);
 		return reallocatedOK;
 	}
 
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String internalSequenceID, String outSequenceId, StorageManager storageManager) throws AxisFault {
 	
-		if(log.isDebugEnabled())
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: TerminateManager::addTerminateSequenceMessage " + outSequenceId + ", " + internalSequenceID);
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 
 		if (rmsBean.isTerminateAdded()) {
-			if(log.isDebugEnabled())
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("Exit: TerminateManager::addTerminateSequenceMessage - terminate was added previously.");
 			return;
 		}
@@ -458,7 +458,7 @@ public class TerminateManager {
 		
 		retramsmitterMgr.insert(terminateBean);
 
-		if(log.isDebugEnabled())
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: TerminateManager::addTerminateSequenceMessage");
 	}
 

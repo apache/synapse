@@ -31,6 +31,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.RMBean;
+import org.apache.sandesha2.util.LoggingControl;
 
 import java.util.concurrent.ConcurrentHashMap;;
 
@@ -41,7 +42,7 @@ abstract class InMemoryBeanMgr {
 	protected InMemoryStorageManager mgr;
 
 	protected InMemoryBeanMgr(InMemoryStorageManager mgr, AbstractContext context, String key) {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " <innit> " + mgr + ", " 
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " <innit> " + mgr + ", " 
 				+ context + ", " + key);
 		this.mgr = mgr;
 		Object obj = context.getProperty(key);
@@ -51,53 +52,53 @@ abstract class InMemoryBeanMgr {
 			table = new ConcurrentHashMap();
 			context.setProperty(key, table);
 		}
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " <init> " + this);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " <init> " + this);
 	}
 	
 	protected boolean insert(Object key, RMBean bean) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " insert " + key + ", " + bean);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " insert " + key + ", " + bean);
 		mgr.enlistBean(bean);
 		
 		Object oldValue = table.putIfAbsent(key, bean);
 		boolean wasInserted = (oldValue == null);
 
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " insert " + wasInserted);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " insert " + wasInserted);
 		return wasInserted;
 	}
 
 	protected boolean delete(Object key) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " delete " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " delete " + key);
 		RMBean bean = (RMBean) table.remove(key);
 		if(bean != null) {
 			mgr.enlistBean(bean);
 		}
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " delete " + bean);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " delete " + bean);
 		return bean != null;
 	}
 
 	protected RMBean retrieve(Object key) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " retrieve " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " retrieve " + key);
 		RMBean bean = (RMBean) table.get(key);
 		if(bean != null) {
 			mgr.enlistBean(bean);
 			bean = (RMBean) table.get(key);
 		}
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " retrieve " + bean);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " retrieve " + bean);
 		return bean;
 	}
 
 	protected boolean update(Object key, RMBean bean) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " update " + key + ", " + bean);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " update " + key + ", " + bean);
 		mgr.enlistBean(bean);
 		RMBean oldBean = (RMBean) table.put(key, bean);
 		if(oldBean == null) return false;
 		mgr.enlistBean(oldBean);
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " update " + true);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " update " + true);
 		return true;
 	}
 
 	protected List find(RMBean matchInfo) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
 		ArrayList beans = new ArrayList();
 
 		if(matchInfo == null) {
@@ -117,12 +118,12 @@ abstract class InMemoryBeanMgr {
 				}
 			}
 		}
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " find " + beans);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " find " + beans);
 		return beans;
 	}
 	
 	protected List findNoLock(RMBean matchInfo) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
 		ArrayList beans = new ArrayList();
 
 		if(matchInfo == null) {
@@ -137,12 +138,12 @@ abstract class InMemoryBeanMgr {
 				}
 			}
 		}
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " find " + beans);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " find " + beans);
 		return beans;
 	}
 
 	protected RMBean findUnique (RMBean matchInfo) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " findUnique " + matchInfo);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " findUnique " + matchInfo);
 		RMBean result = findUniqueNoLock(matchInfo);		
 		// Now we have a point-in-time view of the bean, lock it, and double
 		// check that it is still in the table 
@@ -151,7 +152,7 @@ abstract class InMemoryBeanMgr {
 			if(!table.containsValue(result)) result = null;
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " findUnique " + result);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " findUnique " + result);
 		return result;
 	}
   

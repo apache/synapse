@@ -50,6 +50,7 @@ import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.FaultManager;
+import org.apache.sandesha2.util.LoggingControl;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
@@ -71,7 +72,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	
 	public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::invoke, " + msgContext.getEnvelope().getHeader());
 
 		// look at the service to see if RM is totally disabled. This allows the user to disable RM using
@@ -79,12 +80,12 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		if (msgContext.getAxisService() != null) {
 			Parameter unreliableParam = msgContext.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
-				if (log.isDebugEnabled())
+				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 					log.debug("Exit: SandeshaGlobalInHandler::invoke, Service has disabled RM " + InvocationResponse.CONTINUE);
 				return InvocationResponse.CONTINUE;
 			}
 		} else if (msgContext.getConfigurationContext().getAxisConfiguration().getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN) == null) {
-			if (log.isDebugEnabled())
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("Exit: SandeshaGlobalInHandler::invoke, No Property Bean found " + InvocationResponse.CONTINUE);
 			
 			return InvocationResponse.CONTINUE;						
@@ -115,7 +116,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					}
 				} catch(Exception e) {
 					// Do nothing, we failed to find a Sequence header
-					if (log.isDebugEnabled())
+					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 						log.debug("Exception encountered accessing Sequence Header ", e);
 				}
 				if(lastMessageHeader) {
@@ -123,7 +124,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					if(body != null && body.getFirstElement() == null) {
 						// There is an empty body so we know this is the kind of message
 						// that we are looking for.
-						if(log.isDebugEnabled()) log.debug("Setting SOAP Action for a WSRM 1.0 last message");
+						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Setting SOAP Action for a WSRM 1.0 last message");
 						msgContext.setSoapAction(Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_LAST_MESSAGE);
 					}
 				}
@@ -151,13 +152,13 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       processApplicationMessage(rmMsgCtx);
     }
     
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaGlobalInHandler::invoke " + response);
 		return response;
 	}
 	
   private static void processApplicationMessage(RMMsgContext rmMsgCtx) throws AxisFault {
-    if (log.isDebugEnabled())
+    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
       log.debug("Enter: SandeshaGlobalInHandler::processApplicationMessage");
     // Check if this is a duplicate message
     Sequence sequence = rmMsgCtx.getSequence();
@@ -191,7 +192,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         if (msgNo == 0) {
           String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
               .toString(msgNo));
-          log.debug(message);
+          if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+            log.debug(message);
           throw new SandeshaException(message);
         }
     
@@ -213,7 +215,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         }
         else {
            
-          if (log.isDebugEnabled())
+          if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
               log.debug("Detected duplicate message " + msgNo);
             
         	boolean isDuplicate = true;
@@ -227,7 +229,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	          	if((invokerBeanList==null || invokerBeanList.size()==0) 
 	          			&& bean.getNextMsgNoToProcess()<=msgNo){
 	          		isDuplicate = false;
-	              if (log.isDebugEnabled())
+	              if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 	                log.debug("Allowing completed message on sequence " + sequenceId + ", msgNo " + msgNo);
 	          	}
         	}
@@ -246,7 +248,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         }
       } else {
         
-        if (log.isDebugEnabled())
+        if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
             log.debug("Detected message for no sequence " + msgNo);
           messageContext.setRelationships(null);
           // Add the duplicate RM AxisOperation to the message
@@ -266,7 +268,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       if (transaction != null && transaction.isActive())
         transaction.rollback();
     }
-    if (log.isDebugEnabled())
+    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
       log.debug("Exit: SandeshaGlobalInHandler::processApplicationMessage");
   }
   
@@ -276,7 +278,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
    * different dup operation depending on whether the MEP is one way or two way.
    */
   private static void setupDuplicateOperation(RMMsgContext rmMsgCtx) throws SandeshaException {
-    if (log.isDebugEnabled()) log.debug("Enter: SandeshaGlobalInHandler::setupDuplicateOperation");
+    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: SandeshaGlobalInHandler::setupDuplicateOperation");
 
     MessageContext ctx = rmMsgCtx.getMessageContext();
     AxisOperation duplicateMessageOperation = null;
@@ -315,6 +317,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       }
     }
 
-    if (log.isDebugEnabled()) log.debug("Exit: SandeshaGlobalInHandler::setupDuplicateOperation");
+    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: SandeshaGlobalInHandler::setupDuplicateOperation");
   }
 }

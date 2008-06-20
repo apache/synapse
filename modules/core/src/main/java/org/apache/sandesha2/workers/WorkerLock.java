@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.util.LoggingControl;
 
 public class WorkerLock {
 
@@ -33,37 +34,37 @@ public class WorkerLock {
   }
 	
   public synchronized boolean addWork (String work, Object owner) {
-	if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::addWork " + work + ", " + owner);
+	if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: WorkerLock::addWork " + work + ", " + owner);
     if(locks.containsKey(work)){
-    	if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::addWork " + false);
+    	if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: WorkerLock::addWork " + false);
     	return false;
     }
     locks.put(work, owner);
-    if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::addWork " + true);
+    if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: WorkerLock::addWork " + true);
 	return true;
   }
 	
 	public synchronized void removeWork (String work) {
-		if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::removeWork " + work);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: WorkerLock::removeWork " + work);
 		locks.remove(work);
 		
 		//wake up some thread that is waiting on this lock.
 		this.notify();
 		
-		if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::removeWork");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: WorkerLock::removeWork");
 	}
 	
 	public synchronized boolean isWorkPresent (String work) {
-	  if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::isWorkPresent " + work);
+	  if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: WorkerLock::isWorkPresent " + work);
 	  boolean value = locks.containsKey(work);
-	  if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::isWorkPresent " + value);
+	  if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: WorkerLock::isWorkPresent " + value);
 	  return value;
 	}
 	
 	 public synchronized boolean ownsLock(String work, Object owner) {
-		if(log.isDebugEnabled()) log.debug("Enter: WorkerLock::ownsLock " + work + " ," + owner);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: WorkerLock::ownsLock " + work + " ," + owner);
 	    Object realOwner = locks.get(work);
-	    if(log.isDebugEnabled()) log.debug("Exit: WorkerLock::ownsLock " + Boolean.valueOf(realOwner == owner));
+	    if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: WorkerLock::ownsLock " + Boolean.valueOf(realOwner == owner));
 	    return realOwner == owner;
 	  }
 

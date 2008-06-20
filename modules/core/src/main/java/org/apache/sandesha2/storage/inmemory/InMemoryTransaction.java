@@ -30,6 +30,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMBean;
+import org.apache.sandesha2.util.LoggingControl;
 
 /**
  * This class does not really implement transactions, but it is a good
@@ -50,12 +51,12 @@ public class InMemoryTransaction implements Transaction {
 	private boolean useSerialization;
 	
 	InMemoryTransaction(InMemoryStorageManager manager, Thread thread, boolean useSerialization) {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
 		this.manager = manager;
 		this.thread = thread;
 		this.threadName = thread.getName();
 		this.useSerialization = useSerialization;
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
 	
 	public void commit() {
@@ -74,7 +75,7 @@ public class InMemoryTransaction implements Transaction {
 	}
 
 	public void enlist(RMBean bean) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
 		if(bean != null) {
 			synchronized (bean) {
 				InMemoryTransaction other = (InMemoryTransaction) bean.getTransaction();
@@ -95,7 +96,7 @@ public class InMemoryTransaction implements Transaction {
 								waitingForTran = null;
 								releaseLocks();
 								
-								if(log.isDebugEnabled()) log.debug(message, e);
+								if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message, e);
 								throw e;
 							}
 							set.add(other);
@@ -105,7 +106,7 @@ public class InMemoryTransaction implements Transaction {
 					
 					boolean warn = false;
 					try {
-						if(log.isDebugEnabled()) log.debug("This " + this + " waiting for " + waitingForTran);
+						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("This " + this + " waiting for " + waitingForTran);
 						long pre = System.currentTimeMillis();
 						bean.wait(5000); 
 						long post = System.currentTimeMillis();
@@ -117,24 +118,24 @@ public class InMemoryTransaction implements Transaction {
 					other = (InMemoryTransaction) bean.getTransaction();
 					if (other != null && warn) {
 						//we have been waiting for a long time - this might imply a three way deadlock so error condition
-						if(log.isDebugEnabled()) log.debug("possible deadlock :" + this.toString() + " : " + bean.toString());
+						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("possible deadlock :" + this.toString() + " : " + bean.toString());
 					}
 				}
 				
 				waitingForTran = null;
 				if(other == null) {
-					if(log.isDebugEnabled()) log.debug(this + " locking bean");
+					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(this + " locking bean");
 					bean.setTransaction(this);
 					enlistedBeans.add(bean);
 				}
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::enlist");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::enlist");
 	}
 	
 	private void releaseLocks() {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::releaseLocks, " + this);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::releaseLocks, " + this);
 		manager.removeTransaction(this);
 
 		Iterator beans = enlistedBeans.iterator();
@@ -147,7 +148,7 @@ public class InMemoryTransaction implements Transaction {
 		}
 		enlistedBeans.clear();
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::releaseLocks");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::releaseLocks");
 	}
 	
 	public String toString() {

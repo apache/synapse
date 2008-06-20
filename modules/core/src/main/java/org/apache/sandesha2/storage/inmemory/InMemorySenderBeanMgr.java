@@ -32,6 +32,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.LoggingControl;
 
 public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBeanMgr {
 	
@@ -69,7 +70,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 	}
 
 	public SenderBean getNextMsgToSend(String sequenceId) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemorySenderBeanManager::getNextMessageToSend " + sequenceId);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemorySenderBeanManager::getNextMessageToSend " + sequenceId);
 		
 		// Set up match criteria
 		SenderBean matcher = new SenderBean();
@@ -79,7 +80,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		matcher.setTransportAvailable(true);
 		
 		List matches = super.find(matcher);
-		if(log.isDebugEnabled()) log.debug("Found " + matches.size() + " messages");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Found " + matches.size() + " messages");
 		
 		// Look for the message with the lowest send time, and send that one.
 		SenderBean result = null;
@@ -103,7 +104,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanManager::getNextMessageToSend " + result);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanManager::getNextMessageToSend " + result);
 		return result;
 	}
 	

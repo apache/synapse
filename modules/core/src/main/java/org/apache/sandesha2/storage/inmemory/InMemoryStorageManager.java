@@ -47,6 +47,7 @@ import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMBean;
+import org.apache.sandesha2.util.LoggingControl;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.workers.Sender;
@@ -97,7 +98,7 @@ public class InMemoryStorageManager extends StorageManager {
 			// We don't want to overwrite or return an existing transaction, as someone
 			// else should decide if we commit it or not. If we get here then we probably
 			// have a bug.
-			if(log.isDebugEnabled()) log.debug("Possible re-used transaction: " + oldTran);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Possible re-used transaction: " + oldTran);
 			result = null;
 		}
 		return result;
@@ -138,7 +139,7 @@ public class InMemoryStorageManager extends StorageManager {
 			// We attempted to do some work without a transaction in scope
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
 			SandeshaStorageException e = new SandeshaStorageException(message);
-			if(log.isDebugEnabled()) log.debug(message, e);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message, e);
 			throw e;
 		}
 		t.enlist(bean);
@@ -171,7 +172,7 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 	
 	public MessageContext retrieveMessageContext(String key,ConfigurationContext context) throws SandeshaStorageException {
-		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::retrieveMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::retrieveMessageContext, key: " + key);
 		
 		MessageContext messageContext = null;
 		try {
@@ -218,18 +219,18 @@ public class InMemoryStorageManager extends StorageManager {
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.failedToLoadMessage, e.toString());
-			if(log.isDebugEnabled()) log.debug(message);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message);
 			throw new SandeshaStorageException(message, e);
 		}
 
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext, " + messageContext);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext, " + messageContext);
 		return messageContext; 
 	}
 
 	public void storeMessageContext(String key,MessageContext msgContext)
 	throws SandeshaStorageException
 	{
-		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::storeMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::storeMessageContext, key: " + key);
 		
 		if (key==null)
 		    key = SandeshaUtil.getUUID();
@@ -283,15 +284,15 @@ public class InMemoryStorageManager extends StorageManager {
 		} catch(Exception e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.failedToStoreMessage, e.toString());
-			if(log.isDebugEnabled()) log.debug(message);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message);
 			throw new SandeshaStorageException(message, e);
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::storeMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::storeMessageContext, key: " + key);
 	}
 
 	public void updateMessageContext(String key,MessageContext msgContext) throws SandeshaStorageException { 
-		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::updateMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::updateMessageContext, key: " + key);
 
 		Object oldEntry = storageMap.remove(key);
 		if (oldEntry==null)
@@ -300,15 +301,15 @@ public class InMemoryStorageManager extends StorageManager {
 		
 		storeMessageContext(key,msgContext);
 
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::updateMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::updateMessageContext, key: " + key);
 	}
 	
 	public void removeMessageContext(String key) { 
-		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::removeMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::removeMessageContext, key: " + key);
 
 		storageMap.remove(key);
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::removeMessageContext, key: " + key);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::removeMessageContext, key: " + key);
 	}
 	
 	public void  initStorage (AxisModule moduleDesc) {

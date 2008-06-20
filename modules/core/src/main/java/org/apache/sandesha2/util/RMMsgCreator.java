@@ -453,7 +453,7 @@ public class RMMsgCreator {
 	 */
 	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean, boolean addToEnvelope)
 			throws SandeshaException {
-		if(log.isDebugEnabled())
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
 		
 		String rmVersion = rmdBean.getRMVersion();
@@ -489,7 +489,7 @@ public class RMMsgCreator {
 			try {
 				applicationMsg.addSOAPEnvelope();
 			} catch(AxisFault e) {
-				if(log.isDebugEnabled()) log.debug("Caught AxisFault", e);
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Caught AxisFault", e);
 				throw new SandeshaException(e.getMessage(), e);
 			}
 		}else{
@@ -500,7 +500,7 @@ public class RMMsgCreator {
 		// Ensure the message also contains the token that needs to be used
 		secureOutboundMessage(rmdBean, applicationMsg.getMessageContext());
 		
-		if(log.isDebugEnabled()) 
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
 			log.debug("Exit: RMMsgCreator::addAckMessage");
 	}
 	
@@ -565,18 +565,18 @@ public class RMMsgCreator {
 	public static void secureOutboundMessage(RMSequenceBean rmBean, MessageContext message)
 	throws SandeshaException
 	{
-		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::secureOutboundMessage");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::secureOutboundMessage");
 
 		ConfigurationContext configCtx = message.getConfigurationContext();
 
 		if(rmBean.getSecurityTokenData() != null) {
-			if(log.isDebugEnabled()) log.debug("Securing outbound message");
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Securing outbound message");
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			SecurityToken token = secManager.recoverSecurityToken(rmBean.getSecurityTokenData());
 			secManager.applySecurityToken(token, message);
 		}
 
-		if(log.isDebugEnabled()) log.debug("Exit: RMMsgCreator::secureOutboundMessage");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: RMMsgCreator::secureOutboundMessage");
 	}
 
 }

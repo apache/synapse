@@ -45,7 +45,7 @@ public class MessageRetransmissionAdjuster {
 	public static boolean adjustRetransmittion(RMMsgContext rmMsgCtx, SenderBean retransmitterBean, ConfigurationContext configContext,
 			StorageManager storageManager) throws AxisFault {
 
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: MessageRetransmissionAdjuster::adjustRetransmittion");
 
 		String internalSequenceID = retransmitterBean.getInternalSequenceID();
@@ -86,7 +86,7 @@ public class MessageRetransmissionAdjuster {
 			}
 		}
 
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: MessageRetransmissionAdjuster::adjustRetransmittion, " + continueSending);
 		return continueSending;
 	}

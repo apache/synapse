@@ -148,7 +148,7 @@ public class SandeshaUtil {
 
 	public static void startWorkersForSequence(ConfigurationContext context, RMSequenceBean sequence)
 	throws SandeshaException {
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::startWorkersForSequence, sequence " + sequence);
 		
 		StorageManager mgr = getSandeshaStorageManager(context, context.getAxisConfiguration());
@@ -176,7 +176,7 @@ public class SandeshaUtil {
 			if(polling) pollMgr.runThreadForSequence(context, sequenceId, false);
 		}
 		
-		if (log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::startWorkersForSequence");
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::startWorkersForSequence");
 	}
 
 	public static String getMessageTypeString(int messageType) {
@@ -342,7 +342,7 @@ public class SandeshaUtil {
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotGetStorageManager);
-			if (log.isErrorEnabled())
+			if (LoggingControl.isAnyTracingEnabled() && log.isErrorEnabled())
 			  log.error(message, e);
 			throw new SandeshaException(message,e);
 		}
@@ -455,14 +455,15 @@ public class SandeshaUtil {
 			return newMessageContext;
 
 		} catch (AxisFault e) {
-			log.debug(e.getMessage());
+            if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+              log.debug(e.getMessage());
 			throw new SandeshaException(e.getMessage());
 		}
 
 	}
 	
 	public static void assertProofOfPossession(RMSequenceBean bean, MessageContext context, OMElement elementToCheck)throws SandeshaException{
-		if (log.isDebugEnabled()) 
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
 			log.debug("Enter: SandeshaUtil::assertProofOfPossession :" + bean + ", " + context + ", " + elementToCheck.getQName());
 		
 		String tokenData = null;
@@ -470,13 +471,13 @@ public class SandeshaUtil {
 			tokenData = bean.getSecurityTokenData();
 		}
 		if(tokenData != null) {
-			if (log.isDebugEnabled()) log.debug("debug:" + tokenData);
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("debug:" + tokenData);
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(context.getConfigurationContext());
 			SecurityToken token = secManager.recoverSecurityToken(tokenData);
 			secManager.checkProofOfPossession(token, elementToCheck, context); //this will exception if there is no proof
 		}
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::assertProofOfPossession");
 	}
 	
@@ -560,7 +561,8 @@ public class SandeshaUtil {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidStringArray,
 					str);
-			log.debug(message);
+            if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+              log.debug(message);
 			throw new IllegalArgumentException (message);
 		}
 
@@ -569,7 +571,8 @@ public class SandeshaUtil {
 		if (str.charAt(0) != '[' || str.charAt(length - 1) != ']') {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidStringArray, str);
-			log.debug(message);
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+              log.debug(message);
 			throw new IllegalArgumentException(message);
 		}
 
@@ -920,7 +923,7 @@ public class SandeshaUtil {
 		return false;
 	}
 	 public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey, StorageManager manager) throws AxisFault {
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::executeAndStore, " + storageKey);
 		
 		MessageContext msgContext = rmMsgContext.getMessageContext();
@@ -958,7 +961,7 @@ public class SandeshaUtil {
 			//put the original value of isTransportNonBlocking back on
 			msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
 		}
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::executeAndStore");
 	}
 	
@@ -1024,20 +1027,20 @@ public class SandeshaUtil {
 	 * @return targetEnv
 	*/
 	public static SOAPEnvelope copySOAPEnvelope(SOAPEnvelope sourceEnv) {
-        if (log.isDebugEnabled()) 
+        if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
             log.debug("Enter: SandeshaUtil::copySOAPEnvelope");
         
         // Delegate to the CopuUtils provided by Axiom
         SOAPEnvelope targetEnv = CopyUtils.copy(sourceEnv);
         
-        if (log.isDebugEnabled()) 
+        if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
             log.debug("Exit: SandeshaUtil::copySOAPEnvelope");            
 		            
 		return targetEnv;
 	}
 	
 	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, List msgsToSend)throws AxisFault{
-	    if (log.isDebugEnabled())
+	    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 	        log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");
 	    
 		ConfigurationContext ctx = storageManager.getContext();
@@ -1069,7 +1072,7 @@ public class SandeshaUtil {
       		client.fireAndForget(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement());
       	}
       	
-	    if (log.isDebugEnabled())
+	    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 	        log.debug("Exit: SandeshaUtil::reallocateMessagesToNewSequence");
 	}
 
@@ -1078,7 +1081,7 @@ public class SandeshaUtil {
    * @param envelope
    */
   public static SOAPEnvelope removeMustUnderstand(SOAPEnvelope envelope) {
-    if (log.isDebugEnabled())
+    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
       log.debug("Enter: SandeshaUtil::removeMustUnderstand");
     // you have to explicitely set the 'processed' attribute for header
     // blocks, since it get lost in the above read from the stream.
@@ -1101,7 +1104,7 @@ public class SandeshaUtil {
       }
     }
     
-    if (log.isDebugEnabled())
+    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
       log.debug("Exit: SandeshaUtil::removeMustUnderstand");
     return envelope;
   }
@@ -1129,13 +1132,13 @@ public class SandeshaUtil {
 	}	
 	
 	public static boolean isAutoStartNewSequence(MessageContext mc){
-		if(log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isAutoStartNewSequence");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isAutoStartNewSequence");
 		boolean result = false;
 
 		//look at the msg ctx first
 		String auto = (String) mc.getProperty(SandeshaClientConstants.AUTO_START_NEW_SEQUENCE);
 		if ("true".equals(auto)) {
-			if (log.isDebugEnabled()) log.debug("Autostart message context");
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Autostart message context");
 			result = true;
 		}			
 		
@@ -1144,29 +1147,29 @@ public class SandeshaUtil {
 			if (mc.getAxisOperation() != null) {
 				Parameter autoParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.AUTO_START_NEW_SEQUENCE);
 				if (null != autoParam && "true".equals(autoParam.getValue())) {
-					if (log.isDebugEnabled()) log.debug("autostart operation");
+					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("autostart operation");
 					result = true;
 				}
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isAutoStartNewSequence, " + result);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isAutoStartNewSequence, " + result);
 		return result;		
 	}
 	
 	public static boolean isMessageUnreliable(MessageContext mc) {
-		if(log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isMessageUnreliable");
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isMessageUnreliable");
 		boolean result = false;
 
 		//look at the msg ctx first. It is either forced on or off at the msg ctx level
 		String unreliable = (String) mc.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 		if ("true".equals(unreliable)) {
-			if (log.isDebugEnabled()) log.debug("Unreliable message context");
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Unreliable message context");
 			result = true;
 		}		
 		else if("false".equals(unreliable)){
 			//a forced reliable message
-			if (log.isDebugEnabled()) log.debug("Forced reliable message context");
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Forced reliable message context");
 			result = false;
 		}	
 		else if(!result) {
@@ -1174,18 +1177,18 @@ public class SandeshaUtil {
 			if (mc.getAxisOperation() != null) {
 				Parameter unreliableParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 				if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
-					if (log.isDebugEnabled()) log.debug("Unreliable operation");
+					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Unreliable operation");
 					result = true;
 				}
 				else if(null != unreliableParam && "false".equals(unreliable)){
 					//a forced reliable message
-					if (log.isDebugEnabled()) log.debug("Forced reliable message context");
+					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Forced reliable message context");
 					result = false;
 				}	
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isMessageUnreliable, " + result);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isMessageUnreliable, " + result);
 		return result;
 	}
 	
@@ -1224,12 +1227,12 @@ public class SandeshaUtil {
 	public static EndpointReference rewriteEPR(RMSBean sourceBean, EndpointReference epr, ConfigurationContext configContext)
 	throws SandeshaException
 	{
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::rewriteEPR " + epr);
 
 		SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration());
 		if(!policy.isEnableRMAnonURI()) {
-			if (log.isDebugEnabled())
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("Exit: SandeshaUtil::rewriteEPR, anon uri is disabled");
 			return epr;
 		}
@@ -1250,22 +1253,22 @@ public class SandeshaUtil {
 				sourceBean.setAnonymousUUID(uuid);
 			}
 			
-			if(log.isDebugEnabled()) log.debug("Rewriting EPR with anon URI " + uuid);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Rewriting EPR with anon URI " + uuid);
 			epr.setAddress(uuid);
 		}
 		
-		if (log.isDebugEnabled())
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::rewriteEPR " + epr);
 		return epr;
 	}
 
 	public static boolean isInOrder(MessageContext context) throws SandeshaException {
-		if (log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder");
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder");
 		
 		SandeshaPolicyBean policy = getPropertyBean(context.getConfigurationContext().getAxisConfiguration());
 		boolean result = policy.isInOrder();
 		
-		if (log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder, " + result);
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder, " + result);
 		return result;
 	}
 

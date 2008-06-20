@@ -98,7 +98,11 @@ public class ResourceMap {
                     log.error(msg);
                     throw new SynapseException(msg, ex);
                 }
-                return new InputSource(new ByteArrayInputStream(baos.toByteArray()));
+                InputSource inputSource = new InputSource(new ByteArrayInputStream(baos.toByteArray()));
+                // We must set a system ID because Axis2 relies on this (see SYNAPSE-362). Compose a
+                // valid URI with the registry key so that it uniquely identifies the resource.
+                inputSource.setSystemId("synapse-reg:///" + key);
+                return inputSource;
             } else {
                 String msg = "Registry item '" + key + "' for location '" +
                     location + "' is not an OMElement";

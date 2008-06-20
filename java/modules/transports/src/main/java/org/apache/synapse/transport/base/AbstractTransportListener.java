@@ -49,8 +49,6 @@ public abstract class AbstractTransportListener implements TransportListener {
 
     /** the axis2 configuration context */
     protected ConfigurationContext cfgCtx = null;
-    /** an axis2 engine over the above configuration context to process messages */
-    protected AxisEngine engine = null;
 
     /** transport in description */
     private TransportInDescription  transportIn  = null;
@@ -91,7 +89,6 @@ public abstract class AbstractTransportListener implements TransportListener {
         throws AxisFault {
         
         this.cfgCtx = cfgCtx;
-        this.engine = new AxisEngine(cfgCtx);
         this.transportIn  = transportIn;
         this.transportOut = cfgCtx.getAxisConfiguration().getTransportOut(getTransportName());
 
@@ -275,14 +272,14 @@ public abstract class AbstractTransportListener implements TransportListener {
         // send the message context through the axis engine
         try {
                 try {
-                    engine.receive(msgCtx);
+                    AxisEngine.receive(msgCtx);
                 } catch (AxisFault e) {
                     e.printStackTrace();
                     if (log.isDebugEnabled()) {
                         log.debug("Error receiving message", e);
                     }
                     if (msgCtx.isServerSide()) {
-                        engine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
+                        AxisEngine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
                     }
                 }
         } catch (AxisFault axisFault) {

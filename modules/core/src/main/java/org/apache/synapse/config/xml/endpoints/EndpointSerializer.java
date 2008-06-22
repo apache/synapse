@@ -28,19 +28,24 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.util.PolicyInfo;
 
 /**
  * All endpoint serializers should implement this interface. Use EndpointSerializer to
  * obtain the correct EndpointSerializer implementation for a particular endpoint.
  * EndpointSerializer implementation may call other EndpointSerializer implementations to serialize
  * nested endpoints.
+ *
+ * @see EndpointFactory
  */
 public abstract class EndpointSerializer {
 
-    private static Log log = LogFactory.getLog(EndpointSerializer.class);
+    private static Log log;
 
     protected OMFactory fac;
+
+    protected EndpointSerializer() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     /**
      * Core method which is exposed to the external use, and serializes the {@link Endpoint} to the
@@ -134,8 +139,8 @@ public abstract class EndpointSerializer {
                             "inboundPolicy", null, endpointDefinition.getInboundWsSecPolicyKey()));
                 }
                 if (endpointDefinition.getOutboundWsSecPolicyKey() != null) {
-                    sec.addAttribute(fac.createOMAttribute(
-                            "outboundPolicy", null, endpointDefinition.getOutboundWsSecPolicyKey()));
+                    sec.addAttribute(fac.createOMAttribute("outboundPolicy",
+                            null, endpointDefinition.getOutboundWsSecPolicyKey()));
                 }
             }
             element.addChild(sec);
@@ -174,8 +179,10 @@ public abstract class EndpointSerializer {
         }
     }
 
-    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition, OMElement element){
+    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition,
+        OMElement element) {
 
+        // overridden by the Serializers which has specific serialization
     }
 
 

@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
@@ -30,7 +29,6 @@ import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Creates {@link LoadbalanceEndpoint} using an XML configuration.

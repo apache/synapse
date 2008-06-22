@@ -34,12 +34,14 @@ import java.util.ArrayList;
  */
 public class LoadbalanceAlgorithmFactory {
 
-    public static LoadbalanceAlgorithm createLoadbalanceAlgorithm(OMElement loadbalanceElement, ArrayList endpoints) {
+    public static LoadbalanceAlgorithm createLoadbalanceAlgorithm(OMElement loadbalanceElement,
+        ArrayList endpoints) {
 
         LoadbalanceAlgorithm algorithm = null;
 
         String algorithmName = "roundRobin";
-        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(null, XMLConfigConstants.ALGORITHM_NAME));
+        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(
+                null, XMLConfigConstants.ALGORITHM_NAME));
         if(algoAttribute != null) {
             algorithmName = algoAttribute.getAttributeValue();
         }

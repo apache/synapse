@@ -100,10 +100,8 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                     LoadBalanceMembershipHandler lbMembershipHandler =
                             (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
                     Properties properties = new Properties();
-                    for (Iterator props =
-                            eventHandler.getChildrenWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
-                                                                       "property"));
-                         props.hasNext();) {
+                    for (Iterator props = eventHandler.getChildrenWithName(new QName(
+                            SynapseConstants.SYNAPSE_NAMESPACE, "property")); props.hasNext();) {
                         OMElement prop = (OMElement) props.next();
                         String propName =
                                 prop.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
@@ -121,8 +119,8 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                     lbMembershipHandler.init(properties, algorithm);
                     loadbalanceEndpoint.setLoadBalanceMembershipHandler(lbMembershipHandler);
                 } catch (Exception e) {
-                    String msg = "Could not instantiate LoadBalanceMembershipHandler implementation " +
-                                 clazz;
+                    String msg = "Could not instantiate " +
+                            "LoadBalanceMembershipHandler implementation " + clazz;
                     log.error(msg, e);
                     throw new SynapseException(msg, e);
                 }

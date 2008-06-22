@@ -35,7 +35,8 @@ import javax.xml.namespace.QName;
  * Configuration syntax:
  * <pre>
  * &lt;endpoint [name="<em>name</em>"]&gt;
- *   &lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+ *   &lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"]
+ *            [optimize="mtom|swa"]
  *            [encoding="<em>charset encoding</em>"]
  *            [statistics="enable|disable"] [trace="enable|disable"]&gt;
  *     .. extensibility ..
@@ -67,6 +68,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         return instance;
     }
 
+    @Override
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         AddressEndpoint addressEndpoint = new AddressEndpoint();
@@ -95,6 +97,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
      * @param elem XML configuration element
      * @return EndpointDefinition object containing the endpoint details.
      */
+    @Override
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
 
         OMAttribute address = elem.getAttribute(new QName("uri"));

@@ -37,18 +37,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * All endpoint factories should implement this interface. Use EndpointFactory to obtain the
+ * All endpoint factories should extend from this abstract class. Use EndpointFactory to obtain the
  * correct endpoint for particular endpoint configuration. As endpoints can be nested inside
  * each other, EndpointFactory implementations may call other EndpointFactory implementations
  * recursively to obtain the required endpoint hierarchy.
  * <p/>
- * This also serves as the XMLToObjactMapper implementation for specific endpoint implementations.
- * If the endpoint type is not known use XMLToEndpointMapper as the generic XMLToObjectMapper for
- * all endpoints.
+ * This also serves as the {@link XMLToObjectMapper} implementation for specific endpoint
+ * implementations. If the endpoint type is not known use {@link XMLToEndpointMapper} as the
+ * generic {@link XMLToObjectMapper} for all endpoints.
  */
 public abstract class EndpointFactory implements XMLToObjectMapper {
 
-    private static Log log = LogFactory.getLog(EndpointFactory.class);
+    protected static Log log;
+
+    protected EndpointFactory() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     /**
      * Core method which is exposed for the external use, and this will find the proper
@@ -268,8 +272,10 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         }
     }
 
-    protected void extractSpecificEndpointProperties(EndpointDefinition definition, OMElement elem){
+    protected void extractSpecificEndpointProperties(EndpointDefinition definition,
+        OMElement elem) {
 
+        // overridden by the Factories which has specific building
     }
 
     /**

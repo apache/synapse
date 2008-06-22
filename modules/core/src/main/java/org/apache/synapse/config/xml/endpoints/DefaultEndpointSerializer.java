@@ -37,7 +37,7 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof DefaultEndpoint)) {
-            throw new SynapseException("Invalid endpoint type.");
+            handleException("Invalid endpoint type.");
         }
 
         fac = OMAbstractFactory.getOMFactory();
@@ -57,7 +57,9 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
         return endpointElement;
     }
 
-    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition, OMElement element) {
+    @Override
+    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition,
+        OMElement element) {
 
         if (SynapseConstants.FORMAT_POX.equals(endpointDefinition.getFormat())) {
             element.addAttribute(fac.createOMAttribute("format", null, "pox"));

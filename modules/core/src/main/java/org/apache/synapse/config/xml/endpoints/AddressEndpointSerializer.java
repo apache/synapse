@@ -34,10 +34,11 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
  */
 public class AddressEndpointSerializer extends DefaultEndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof AddressEndpoint)) {
-            throw new SynapseException("Invalid endpoint type.");
+            handleException("Invalid endpoint type.");
         }
 
         fac = OMAbstractFactory.getOMFactory();
@@ -57,6 +58,7 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
         return endpointElement;
     }
 
+    @Override
     public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {
 
         OMElement element = fac.createOMElement("address", SynapseConstants.SYNAPSE_OMNAMESPACE);

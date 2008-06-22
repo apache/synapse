@@ -47,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * Builds the EndpointDefinition containing the details for an epr using a WSDL 1.1 document.
@@ -67,8 +66,8 @@ public class WSDL11EndpointBuilder {
      *
      * @return EndpointDefinition containing the information retrieved from the WSDL
      */
-    public EndpointDefinition createEndpointDefinitionFromWSDL
-            (String baseUri, OMElement wsdl, String service, String port) {
+    public EndpointDefinition createEndpointDefinitionFromWSDL(String baseUri, OMElement wsdl,
+        String service, String port) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -101,67 +100,40 @@ public class WSDL11EndpointBuilder {
         return null;
     }
 
-    /**
-     * Creates an EndpointDefinition for WSDL endpoint from a WSDL document residing in the given URI.
-     *
-     * @param wsdlURI URI of the WSDL document
-     * @param service Service of the endpoint
-     * @param port Port of the endpoint
-     *
-     * @return EndpointDefinition containing the information retrieved from the WSDL
-     */
-    private EndpointDefinition createEndpointDefinitionFromWSDL
-            (String wsdlURI, String service, String port) {
-
-        try {
-            WSDLFactory fac = WSDLFactory.newInstance();
-            WSDLReader reader = fac.newWSDLReader();
-            Definition definition = reader.readWSDL(wsdlURI);
-
-            return createEndpointDefinitionFromWSDL(definition, service, port);
-
-        } catch (WSDLException e) {
-            handleException("Error retrieving the WSDL definition from the WSDL URI.");
-        }
-
-        return null;
-    }
-
-    private EndpointDefinition createEndpointDefinitionFromWSDL
-            (Definition definition, String serviceName, String portName) {
+    private EndpointDefinition createEndpointDefinitionFromWSDL(Definition definition,
+        String serviceName, String portName) {
 
         if (definition == null) {
-            handleException("WSDL is not specified.");
+            handleException("WSDL document is not specified.");
         }
 
         if (serviceName == null) {
-            handleException("Service of the WSDL document is not specified.");
+            handleException("Service name of the WSDL document is not specified.");
         }
 
         if (portName == null) {
-            handleException("Port of the WSDL document is not specified.");
+            handleException("Port name of the WSDL document is not specified.");
         }
 
 
         String serviceURL = null;
         // get soap version from wsdl port and update endpoint definition below
         // so that correct soap version is used when endpoint is called
-        String format = null; 
+        String format = null;
+        assert definition != null;
         String tns = definition.getTargetNamespace();
         Service service = definition.getService(new QName(tns, serviceName));
         if (service != null) {
             Port port = service.getPort(portName);
             if (port != null) {
-                List ext = port.getExtensibilityElements();
-                for (int i = 0; i < ext.size(); i++) {
-                    Object o = ext.get(i);
-                    if (o instanceof SOAPAddress) {
-                        SOAPAddress address = (SOAPAddress) o;
+                for (Object obj : port.getExtensibilityElements()) {
+                    if (obj instanceof SOAPAddress) {
+                        SOAPAddress address = (SOAPAddress) obj;
                         serviceURL = address.getLocationURI();
                         format = SynapseConstants.FORMAT_SOAP11;
                         break;
-                    } else if (o instanceof SOAP12Address) {
-                        SOAP12Address address = (SOAP12Address) o;
+                    } else if (obj instanceof SOAP12Address) {
+                        SOAP12Address address = (SOAP12Address) obj;
                         serviceURL = address.getLocationURI();
                         format = SynapseConstants.FORMAT_SOAP12;
                         break;
@@ -178,7 +150,7 @@ public class WSDL11EndpointBuilder {
             } else if (SynapseConstants.FORMAT_SOAP12.equals(format)) {
                 endpointDefinition.setForceSOAP12(true);
             } else {
-                handleException("format value -\"" + format + "\" not yet implemented");
+                handleException("format value '" + format + "' not yet implemented");
             }
             endpointDefinition.setFormat(format);
 

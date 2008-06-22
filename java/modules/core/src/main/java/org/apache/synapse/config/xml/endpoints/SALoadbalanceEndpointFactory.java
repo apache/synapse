@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
@@ -34,10 +33,9 @@ import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
- * Creates {@link SALoadbalanceEndpoint} from a XML configuration.
+ * Creates {@link SALoadbalanceEndpoint} from an XML configuration.
  *
  * &lt;endpoint [name="name"]&gt;
  *    &lt;session type="soap | ..other session types.." /&gt;

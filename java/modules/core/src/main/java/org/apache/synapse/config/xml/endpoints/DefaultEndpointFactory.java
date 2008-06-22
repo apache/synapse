@@ -87,7 +87,9 @@ public class DefaultEndpointFactory extends EndpointFactory {
         return defaultEndpoint;
     }
 
-    protected void extractSpecificEndpointProperties(EndpointDefinition definition, OMElement elem) {
+    @Override
+    protected void extractSpecificEndpointProperties(EndpointDefinition definition,
+        OMElement elem) {
 
         OMAttribute format
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "format"));

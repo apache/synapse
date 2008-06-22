@@ -25,9 +25,11 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMElement;
 
 /**
- * This is a generic XMLToObjectMapper implementation for all endpoint types. Use this if the endpoint
- * type is not known at the time mapper is created. If the endpoint type is known use the EndpointFactory
- * implementation for that specific endpoint.
+ * This is a generic XMLToObjectMapper implementation for all endpoint types. Use this if the
+ * endpoint type is not known at the time mapper is created. If the endpoint type is known use
+ * the EndpointFactory implementation for that specific endpoint.
+ *
+ * @see XMLToObjectMapper
  */
 public class XMLToEndpointMapper implements XMLToObjectMapper {
 

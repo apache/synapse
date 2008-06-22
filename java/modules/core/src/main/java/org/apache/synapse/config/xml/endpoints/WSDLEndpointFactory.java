@@ -174,8 +174,4 @@ public class WSDLEndpointFactory extends EndpointFactory {
         return wsdlEndpoint;
     }
 
-    protected void extractSpecificEndpointProperties(EndpointDefinition definition, OMElement elem) {
-
-    }
-
 }

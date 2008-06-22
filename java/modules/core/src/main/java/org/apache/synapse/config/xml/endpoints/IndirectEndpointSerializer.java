@@ -19,25 +19,24 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseConstants;
 
 /**
  * Serializes an {@link IndirectEndpoint} to an XML configuration.
  *
- * &lt;endpoint key="key"/&gt;
+ * @see IndirectEndpointFactory
  */
 public class IndirectEndpointSerializer extends EndpointSerializer {
 
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof IndirectEndpoint)) {
-            throw new SynapseException("Invalid endpoint type.");
+            handleException("Invalid endpoint type.");
         }
 
         fac = OMAbstractFactory.getOMFactory();

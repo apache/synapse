@@ -29,23 +29,17 @@ import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
 
-import java.util.List;
-
 /**
  * Serializes {@link LoadbalanceEndpoint} to an XML configuration.
  *
- * &lt;endpoint [name="name"]&gt;
- *    &lt;loadbalance policy="load balance algorithm"&gt;
- *       &lt;endpoint&gt;+
- *    &lt;/loadbalance&gt;
- * &lt;/endpoint&gt;
+ * @see LoadbalanceEndpointFactory
  */
 public class LoadbalanceEndpointSerializer extends EndpointSerializer {
 
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof LoadbalanceEndpoint)) {
-            throw new SynapseException("Invalid endpoint type.");
+            handleException("Invalid endpoint type.");
         }
 
         fac = OMAbstractFactory.getOMFactory();

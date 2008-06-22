@@ -28,7 +28,7 @@ import org.apache.synapse.endpoints.WSDLEndpoint;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
- * Serializes an WSDL based endpoint to an XML configuration.
+ * Serializes an {@link WSDLEndpoint} to an XML configuration.
  * 
  * @see WSDLEndpointFactory
  */
@@ -80,9 +80,6 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         endpointElement.addChild(wsdlElement);
 
         return endpointElement;
-    }
-
-    protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition, OMElement element) {
     }
 
 }

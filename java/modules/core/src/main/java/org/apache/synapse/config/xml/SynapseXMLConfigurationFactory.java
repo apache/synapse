@@ -85,7 +85,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineProxy(config, elt);
                 } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
                     defineRegistry(config, elt);
-                } else if (XMLConfigConstants.TASK_ELT.equals(elt.getQName())) {
+                } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt);
                 } else {
                     Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);

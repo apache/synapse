@@ -56,7 +56,6 @@ public class XMLConfigConstants {
     public static final QName ENDPOINT_ELT    = new QName(SYNAPSE_NAMESPACE, "endpoint");
     public static final QName ENTRY_ELT       = new QName(SYNAPSE_NAMESPACE, "localEntry");
     public static final QName REGISTRY_ELT    = new QName(SYNAPSE_NAMESPACE, "registry");
-    public static final QName TASK_ELT        = new QName(SYNAPSE_NAMESPACE, "task");
     public static final QName PROXY_ELT       = new QName(SYNAPSE_NAMESPACE, "proxy");
     public static final String NULL_NAMESPACE = "";
     public static final Object QUARTZ_QNAME   =

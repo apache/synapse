@@ -500,12 +500,14 @@ public class Sender extends SandeshaThread {
 				// messages up
 				if(log.isWarnEnabled()) {
 					String message = null;
+					String internalSequenceID = bean.getInternalSequenceID();
+					String sequenceID = bean.getSequenceID();
 					if (bean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION)					
-						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPolling);					
+						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPolling, sequenceID, internalSequenceID);				
 					else
 					{
 						String messageType = Integer.toString(bean.getMessageType());
-						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPollingProtocol, messageType);
+						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPollingProtocol, messageType, sequenceID, internalSequenceID);
 					}
 					log.warn(message);
 				}

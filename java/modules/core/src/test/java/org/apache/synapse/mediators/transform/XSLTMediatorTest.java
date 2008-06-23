@@ -19,10 +19,14 @@
 
 package org.apache.synapse.mediators.transform;
 
+import javax.xml.namespace.QName;
+
 import junit.framework.TestCase;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -255,5 +259,31 @@ public class XSLTMediatorTest extends TestCase {
         } catch (SynapseException ex) {
             // this is what is expected
         }
+    }
+    
+    /**
+     * Test that the XSLT mediator is able to handle CDATA sections in the
+     * source AXIOM tree.
+     * This tests for regression against WSCOMMONS-338. It should work with
+     * AXIOM versions above 1.2.7.
+     */
+    public void testWithCDATA() throws Exception {
+        transformMediator = new XSLTMediator();
+        transformMediator.setXsltKey("xslt-key");
+        
+        MessageContext mc = new TestMessageContextBuilder()
+            .addEntry("xslt-key", getClass().getResource("cdata.xslt"))
+            .build();
+        
+        OMFactory factory = OMAbstractFactory.getOMFactory();
+        OMElement in = factory.createOMElement(new QName(null, "in"));
+        factory.createOMText(in, "test", OMNode.CDATA_SECTION_NODE);
+        mc.getEnvelope().getBody().addChild(in);
+        
+        transformMediator.mediate(mc);
+        
+        OMElement out = mc.getEnvelope().getBody().getFirstElement();
+        assertEquals("out", out.getLocalName());
+        assertEquals("test", out.getText());
     }
 }

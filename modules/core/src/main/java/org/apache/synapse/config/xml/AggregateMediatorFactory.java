@@ -21,8 +21,6 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
@@ -32,7 +30,7 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 /**
- * Factory for {@link AggregateMediator} instances.
+ * Factory for {@link AggregateMediator} instances from the config;
  * 
  * <pre>
  * &lt;aggregate&gt;
@@ -48,20 +46,29 @@ import javax.xml.namespace.QName;
  */
 public class AggregateMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(AggregateMediatorFactory.class);
-
-    private static final QName AGGREGATE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "aggregate");
-    private static final QName CORELATE_ON_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "correlateOn");
-    private static final QName COMPLETE_CONDITION_Q
+    /** Element QName definitions **/
+    protected static final QName AGGREGATE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "aggregate");
+    protected static final QName CORELATE_ON_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "correlateOn");
+    protected static final QName COMPLETE_CONDITION_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "completeCondition");
-    private static final QName MESSAGE_COUNT_Q
+    protected static final QName MESSAGE_COUNT_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "messageCount");
-    private static final QName ON_COMPLETE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onComplete");
-    private static final QName EXPRESSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
-    private static final QName TIMEOUT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "timeout");
-    private static final QName MIN_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "min");
-    private static final QName MAX_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "max");
-    private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
+    protected static final QName ON_COMPLETE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onComplete");
+
+    /** Attribute QName definitions **/
+    private static final QName EXPRESSION_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
+    private static final QName TIMEOUT_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "timeout");
+    private static final QName MIN_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "min");
+    private static final QName MAX_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "max");
+    private static final QName SEQUENCE_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
 
     public Mediator createMediator(OMElement elem) {
 

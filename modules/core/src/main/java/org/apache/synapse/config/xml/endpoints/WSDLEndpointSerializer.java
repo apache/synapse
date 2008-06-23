@@ -37,7 +37,7 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof WSDLEndpoint)) {
-            throw new SynapseException("Invalid endpoint type.");
+            handleException("Invalid endpoint type.");
         }
 
         fac = OMAbstractFactory.getOMFactory();

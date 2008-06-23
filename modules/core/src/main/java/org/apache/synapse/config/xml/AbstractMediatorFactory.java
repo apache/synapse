@@ -28,6 +28,9 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Parent class for all the {@link MediatorFactory} implementations
+ */
 public abstract class AbstractMediatorFactory implements MediatorFactory {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
@@ -61,8 +64,8 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     /**
      * This is to Initialize the mediator with the default attributes
      *
-     * @param mediator
-     * @param mediatorOmElement
+     * @param mediator of which trace state has to be set
+     * @param mediatorOmElement from which the trace state is extracted
      */
     protected void processTraceState(Mediator mediator, OMElement mediatorOmElement) {
 

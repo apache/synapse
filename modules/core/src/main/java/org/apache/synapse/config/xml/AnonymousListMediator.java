@@ -24,7 +24,6 @@ import org.apache.synapse.MessageContext;
 /**
  * This mediator represents an unnamed list mediator
  */
-
 public class AnonymousListMediator extends AbstractListMediator {
 
      public boolean mediate(MessageContext synCtx) {

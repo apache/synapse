@@ -20,20 +20,19 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 
-import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Parent class for all the {@link org.apache.synapse.mediators.ListMediator} serialization
+ * implementations.
+ */
 public abstract class AbstractListMediatorSerializer extends AbstractMediatorSerializer {
 
-    protected void serializeChildren(OMElement parent, List list) {
-        Iterator iter = list.iterator();
-        while (iter.hasNext()) {
-            Mediator child = (Mediator) iter.next();
+    protected void serializeChildren(OMElement parent, List<Mediator> list) {
+        
+        for (Mediator child : list) {
             MediatorSerializer medSer = MediatorSerializerFinder.getInstance().getSerializer(child);
             if (medSer != null) {
                 medSer.serializeMediator(parent, child);

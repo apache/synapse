@@ -176,7 +176,7 @@ public class SimpleQuartzFactory implements StartupFactory {
         }
     }
 
-    public Class getSerializerClass() {
+    public Class<SimpleQuartzSerializer> getSerializerClass() {
         return SimpleQuartzSerializer.class;
     }
 

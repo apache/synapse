@@ -44,8 +44,11 @@ public class StartupFinder {
     /**
      * A map of mediator QNames to implementation class
      */
-    private static Map factoryMap = new HashMap(),
-            serializerMap = new HashMap();
+    private static Map<QName,Class<? extends StartupFactory>> factoryMap
+                        = new HashMap<QName,Class<? extends StartupFactory>>();
+    
+    private static Map<QName,Class<? extends StartupSerializer>> serializerMap
+                        = new HashMap<QName,Class<? extends StartupSerializer>>();
 
     public static synchronized StartupFinder getInstance() {
         if (instance == null) {
@@ -62,15 +65,15 @@ public class StartupFinder {
         instance = null;
     }
 
-    private static final Class[] builtins = {SimpleQuartzFactory.class};
+    private static final Class<?>[] builtins = {SimpleQuartzFactory.class};
 
     private StartupFinder() {
         // preregister any built in
         for (int i = 0; i < builtins.length; i++) {
-            Class b = builtins[i];
+            Class<? extends StartupFactory> b = builtins[i].asSubclass(StartupFactory.class);
             StartupFactory sf;
             try {
-                sf = (StartupFactory) b.newInstance();
+                sf = b.newInstance();
             } catch (Exception e) {
                 throw new SynapseException("cannot instantiate " + b.getName(), e);
 
@@ -101,7 +104,7 @@ public class StartupFinder {
         // + System.getResource("java.class.path"));
 
         // register MediatorFactory extensions
-        Iterator it = Service.providers(StartupFactory.class);
+        Iterator<?> it = Service.providers(StartupFactory.class);
         while (it.hasNext()) {
             StartupFactory sf = (StartupFactory) it.next();
             QName tag = sf.getTagQName();
@@ -129,7 +132,7 @@ public class StartupFinder {
             log.debug("Creating the Startup for : " + qName);
         }
 
-        Class cls = (Class) factoryMap.get(qName);
+        Class<? extends StartupFactory> cls = factoryMap.get(qName);
         if (cls == null) {
             String msg = "Unknown Startup type referenced by startup element : " + qName;
             log.error(msg);
@@ -137,7 +140,7 @@ public class StartupFinder {
         }
 
         try {
-            StartupFactory sf = (StartupFactory) cls.newInstance();
+            StartupFactory sf = cls.newInstance();
             return sf.createStartup(element);
 
         } catch (InstantiationException e) {
@@ -165,7 +168,7 @@ public class StartupFinder {
      */
     public OMElement serializeStartup(OMElement parent, Startup startup) {
 
-        Class cls = (Class) serializerMap.get(startup.getTagQName());
+        Class<? extends StartupSerializer> cls = serializerMap.get(startup.getTagQName());
         if (cls == null) {
             String msg = "Unknown startup type referenced by startup element : "
                     + startup.getTagQName();
@@ -174,7 +177,7 @@ public class StartupFinder {
         }
 
         try {
-            StartupSerializer ss = (StartupSerializer) cls.newInstance();
+            StartupSerializer ss = cls.newInstance();
             return ss.serializeStartup(parent, startup);
 
         } catch (InstantiationException e) {
@@ -192,14 +195,14 @@ public class StartupFinder {
     /*
       * This method exposes all the StartupFactories and its Extensions
       */
-    public Map getFactoryMap() {
+    public Map<QName,Class<? extends StartupFactory>> getFactoryMap() {
         return factoryMap;
     }
 
     /*
 	 * This method exposes all the StartupSerializers and its Extensions
 	 */
-    public Map getSerializerMap() {
+    public Map<QName,Class<? extends StartupSerializer>> getSerializerMap() {
         return serializerMap;
     }
 

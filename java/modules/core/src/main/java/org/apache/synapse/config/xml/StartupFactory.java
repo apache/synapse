@@ -50,5 +50,5 @@ public interface StartupFactory {
      *
      * @return Class defining the serialization of the startup
      */
-    public Class getSerializerClass();
+    public Class<? extends StartupSerializer> getSerializerClass();
 }

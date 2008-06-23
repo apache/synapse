@@ -609,23 +609,13 @@ public class SandeshaUtil {
 	
 	throws SandeshaException {
 		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
-		RMSBean bean = new RMSBean();
-		bean.setInternalSequenceID(internalSequenceID);
-		
-		bean = rmsBeanMgr.findUnique(bean);
-
+		RMSBean bean = rmsBeanMgr.retrieveByInternalSequenceID(internalSequenceID);
 		return bean;
 	}
 	
-	public static final RMSBean getRMSBeanFromSequenceId(StorageManager storageManager, String sequenceID) 
-	
-	throws SandeshaException {
+	public static final RMSBean getRMSBeanFromSequenceId(StorageManager storageManager, String sequenceID)  throws SandeshaException {
 		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
-		RMSBean bean = new RMSBean();
-		bean.setSequenceID(sequenceID);
-		
-		bean = rmsBeanMgr.findUnique(bean);
-
+		RMSBean bean = rmsBeanMgr.retrieveBySequenceID(sequenceID);
 		return bean;
 	}
 

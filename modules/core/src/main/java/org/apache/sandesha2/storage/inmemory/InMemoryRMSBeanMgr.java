@@ -20,6 +20,9 @@
 package org.apache.sandesha2.storage.inmemory;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -29,23 +32,43 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 
 public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 
+	private Lock lock = new ReentrantLock();
+	
+	private ConcurrentHashMap seqID2csm = new ConcurrentHashMap();
+	private ConcurrentHashMap intSeqID2csm = new ConcurrentHashMap();
+
 	public InMemoryRMSBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
 	}
 
 	public boolean insert(RMSBean bean) throws SandeshaStorageException {
-    boolean res = false;
-    synchronized (table) {
-      RMSBean findBean = new RMSBean();
-      findBean.setInternalSequenceID(bean.getInternalSequenceID());
-      if (findUniqueNoLock(findBean) == null)
-        res = super.insert(bean.getCreateSeqMsgID(), bean);
-    }
+		boolean res = false;
+		lock.lock();
+		if(intSeqID2csm.get(bean.getInternalSequenceID())==null){
+			res = super.insert(bean.getCreateSeqMsgID(), bean);
+			if(res){
+				if(bean.getInternalSequenceID()!=null){
+					intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
+				}
+				if(bean.getSequenceID()!=null){
+					seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
+				}
+			}
+		}			
+		lock.unlock();
+
+
 		return res;
 	}
 
 	public boolean delete(String msgId) throws SandeshaStorageException {
-		return super.delete(msgId);
+		RMSBean removed = (RMSBean) super.delete(msgId);
+		if(removed!=null){
+			seqID2csm.remove(removed.getSequenceID());
+			intSeqID2csm.remove(removed.getInternalSequenceID());
+		}
+		return removed!=null;
+
 	}
 
 	public RMSBean retrieve(String msgId) throws SandeshaStorageException {
@@ -53,7 +76,15 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 	}
 
 	public boolean update(RMSBean bean) throws SandeshaStorageException {
-		return super.update(bean.getCreateSeqMsgID(), bean);
+		boolean result = super.update(bean.getCreateSeqMsgID(), bean);
+		if(bean.getInternalSequenceID()!=null){
+			intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
+		}
+		if(bean.getSequenceID()!=null){
+			seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
+		}
+		return result;
+		
 	}
 
 	public List find(RMSBean bean) throws SandeshaStorageException {
@@ -63,5 +94,33 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 	public RMSBean findUnique (RMSBean bean) throws SandeshaStorageException {
 		return (RMSBean) super.findUnique(bean);
 	}
+	
+	public RMSBean retrieveBySequenceID(String seqId) throws SandeshaStorageException {
+			String csid = (String) seqID2csm.get(seqId);
+			RMSBean bean = null;
+			if(csid!=null){
+				bean = retrieve(csid);
+			}
+			if(bean == null){
+				RMSBean finder = new RMSBean();
+				finder.setSequenceID(seqId);
+				bean = findUnique(finder);
+			}
+			return bean;
+		}
+	
+	public RMSBean retrieveByInternalSequenceID(String internalSeqId) throws SandeshaStorageException {
+			String csid = (String) intSeqID2csm.get(internalSeqId);
+			RMSBean bean = null;
+			if(csid!=null){
+				bean = retrieve(csid);
+			}
+			if(bean == null){
+				RMSBean finder = new RMSBean();
+				finder.setInternalSequenceID(internalSeqId);
+				bean = findUnique(finder);
+			}
+			return bean;
+		}
 
 }

@@ -53,4 +53,7 @@ public interface SenderBeanMgr extends RMBeanManager {
 	 * @return
 	 */
 	public SenderBean retrieveFromMessageRefKey (String messageContextRefKey);
+	
+	public SenderBean retrieve(String sequnceId, long messageNumber) throws SandeshaStorageException;
+
 }

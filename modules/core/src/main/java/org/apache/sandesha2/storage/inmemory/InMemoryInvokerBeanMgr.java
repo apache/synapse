@@ -64,7 +64,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 
 	public boolean delete(String key) throws SandeshaStorageException {
 		lock.lock();
-		boolean result = super.delete(key);
+		boolean result = (super.delete(key)!=null);
 		lock.unlock();
 		return result;
 	}

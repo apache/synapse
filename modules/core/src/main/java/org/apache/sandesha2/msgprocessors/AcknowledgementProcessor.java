@@ -156,13 +156,7 @@ public class AcknowledgementProcessor {
 					for(long messageNo = newRanges[rangeIndex].lowerValue; messageNo<=newRanges[rangeIndex].upperValue; messageNo++){
 						
 						numberOfNewMessagesAcked++;
-						SenderBean matcher = new SenderBean();
-						matcher.setSequenceID(outSequenceId);
-						
-						matcher.setMessageNumber(messageNo);
-						
-						SenderBean retransmitterBean = retransmitterMgr.findUnique(matcher);
-						if (retransmitterBean != null) {
+						SenderBean retransmitterBean = retransmitterMgr.retrieve(outSequenceId, messageNo);						if (retransmitterBean != null) {
 							// Check we haven't got an Ack for a message that hasn't been sent yet !
 							if (retransmitterBean.getSentCount() == 0) {
 								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,

@@ -21,6 +21,7 @@ package org.apache.sandesha2.storage.inmemory;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
@@ -38,23 +39,42 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 	
 	private static final Log log = LogFactory.getLog(InMemorySenderBeanMgr.class);
 
+	ConcurrentHashMap sequenceIdandMessNum2MessageId = new ConcurrentHashMap();
+
 	public InMemorySenderBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.RETRANSMITTER);
 	}
 
 	public boolean delete(String MessageId) throws SandeshaStorageException {
-		return super.delete(MessageId);
+		SenderBean bean =(SenderBean) super.delete(MessageId);
+		if(bean.getSequenceID()!=null && bean.getMessageNumber()>0){
+			sequenceIdandMessNum2MessageId.remove(bean.getSequenceID()+":"+bean.getMessageNumber());
+		}
+		return bean!=null;
+
 	}
 
 	public SenderBean retrieve(String MessageId) throws SandeshaStorageException {
 		return (SenderBean) super.retrieve(MessageId);
 	}
 
+	public SenderBean retrieve(String sequnceId, long messageNumber) throws SandeshaStorageException {
+		String MessageId = (String) sequenceIdandMessNum2MessageId.get(sequnceId+":"+messageNumber);
+		if(MessageId == null){
+			return null;
+		}
+		return (SenderBean) super.retrieve(MessageId);
+	}
+
+
 	public boolean insert(SenderBean bean) throws SandeshaStorageException {
 		if (bean.getMessageID() == null)
 			throw new SandeshaStorageException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.nullMsgId));
 		boolean result = super.insert(bean.getMessageID(), bean);
+		if(bean.getSequenceID()!=null && bean.getMessageNumber()>0){
+			sequenceIdandMessNum2MessageId.put(bean.getSequenceID()+":"+bean.getMessageNumber(), bean.getMessageID());
+		}		
 		mgr.getInMemoryTransaction().setSentMessages(true);
 		return result;
 	}
@@ -79,7 +99,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		matcher.setTimeToSend(System.currentTimeMillis());
 		matcher.setTransportAvailable(true);
 		
-		List matches = super.find(matcher);
+		List matches = super.findNoLock(matcher);
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Found " + matches.size() + " messages");
 		
 		// Look for the message with the lowest send time, and send that one.
@@ -103,6 +123,14 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 				result = bean;
 			}
 		}
+		// Because the beans weren't locked before, need to do a retrieve to get a locked copy.
+		// And then check that it's still valid
+		if(result!=null){
+			result = retrieve(result.getMessageID());
+			if(!result.match(matcher)){
+				result = null;
+			}
+		}
 		
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanManager::getNextMessageToSend " + result);
 		return result;
@@ -110,6 +138,9 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 	
 	public boolean update(SenderBean bean) throws SandeshaStorageException {
 		boolean result = super.update(bean.getMessageID(), bean);
+		if(bean.getSequenceID()!=null && bean.getMessageNumber()>0){
+			sequenceIdandMessNum2MessageId.put(bean.getSequenceID()+":"+bean.getMessageNumber(), bean.getMessageID());
+		}
 		mgr.getInMemoryTransaction().setSentMessages(true);
 		return result;
 	}

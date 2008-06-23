@@ -44,4 +44,7 @@ public interface RMSBeanMgr extends RMBeanManager {
 	
 	public RMSBean findUnique (RMSBean bean) throws SandeshaException;
 
+	public RMSBean retrieveBySequenceID(String seqId) throws SandeshaStorageException;
+		
+	public RMSBean retrieveByInternalSequenceID(String internalSeqId) throws SandeshaStorageException;
 }

@@ -718,11 +718,19 @@ public class FaultManager {
 		SOAPFaultDetail detail = faultPart.getDetail();
 		if (detail != null && !isSOAP11SequenceUnknownFault)
 		{
-			OMElement identifierOM = detail.getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), 
-					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
-			if (identifierOM != null)
+			// At this point we may not know what RM NS is in use.
+			OMElement identifierOM = detail.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI, 
+							Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+			if (identifierOM != null){
 				identifier = identifierOM.getText();
-		}			
+			}else{
+				identifierOM = detail.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2007_02.NS_URI, 
+						Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+				if (identifierOM != null){
+					identifier = identifierOM.getText();
+				}
+			}
+			}			
 
 		if (Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED.equals(soapFaultSubcode)) {
 			processCreateSequenceRefusedFault(rmMsgCtx, fault);

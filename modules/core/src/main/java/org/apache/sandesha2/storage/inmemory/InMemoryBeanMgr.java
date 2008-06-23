@@ -66,14 +66,14 @@ abstract class InMemoryBeanMgr {
 		return wasInserted;
 	}
 
-	protected boolean delete(Object key) throws SandeshaStorageException {
+	protected RMBean delete(Object key) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " delete " + key);
 		RMBean bean = (RMBean) table.remove(key);
 		if(bean != null) {
 			mgr.enlistBean(bean);
 		}
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " delete " + bean);
-		return bean != null;
+		return bean;
 	}
 
 	protected RMBean retrieve(Object key) throws SandeshaStorageException {

@@ -36,7 +36,8 @@ public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 	}
 
 	public boolean delete(String sequenceId) throws SandeshaStorageException {
-		return super.delete(sequenceId);
+		return (super.delete(sequenceId)!=null);
+
 	}
 
 	public RMDBean retrieve(String sequenceId) throws SandeshaStorageException {

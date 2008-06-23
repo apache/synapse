@@ -32,8 +32,10 @@ import org.apache.synapse.mediators.MediatorProperty;
 
 import javax.xml.namespace.QName;
 import java.util.Collection;
-import java.util.Iterator;
 
+/**
+ * Parent class for all the {@link MediatorSerializer} implementations
+ */
 public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
@@ -59,7 +61,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
      * i.e. process any common attributes
      *
      * @param mediatorOmElement the OMElement being created
-     * @param mediator          the Mediator instance being serialized
+     * @param mediator the Mediator instance being serialized
      */
     protected static void saveTracingState(OMElement mediatorOmElement, Mediator mediator) {
         int traceState = mediator.getTraceState();
@@ -76,11 +78,10 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
     }
 
-    protected void serializeMediatorProperties(OMElement parent, Collection props) {
+    protected void serializeMediatorProperties(OMElement parent,
+        Collection<MediatorProperty> props) {
 
-        Iterator iter = props.iterator();
-        while (iter.hasNext()) {
-            MediatorProperty mp = (MediatorProperty) iter.next();
+        for (MediatorProperty mp : props) {
             OMElement prop = fac.createOMElement("property", synNS, parent);
             if (mp.getName() != null) {
                 prop.addAttribute(fac.createOMAttribute("name", nullNS, mp.getName()));
@@ -100,14 +101,13 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
         }
     }
 
-    protected void serializeProperties(OMElement parent, Collection props) {
+    protected void serializeProperties(OMElement parent, Collection<MediatorProperty> props) {
         serializeMediatorProperties(parent, props);
     }
 
     protected void serializeNamespaces(OMElement elem, AXIOMXPath xpath) {
-        Iterator iter = xpath.getNamespaces().keySet().iterator();
-        while (iter.hasNext()) {
-            String prefix = (String) iter.next();
+        for (Object obj : xpath.getNamespaces().keySet()) {
+            String prefix = (String) obj;
             String uri = xpath.getNamespaceContext().translateNamespacePrefixToUri(prefix);
             if (!XMLConfigConstants.SYNAPSE_NAMESPACE.equals(uri)) {
                 elem.declareNamespace(uri, prefix);

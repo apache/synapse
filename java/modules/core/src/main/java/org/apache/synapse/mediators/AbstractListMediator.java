@@ -65,7 +65,7 @@ public abstract class AbstractListMediator extends AbstractMediator
         return true;
     }
 
-    public List getList() {
+    public List<Mediator> getList() {
         return mediators;
     }
 

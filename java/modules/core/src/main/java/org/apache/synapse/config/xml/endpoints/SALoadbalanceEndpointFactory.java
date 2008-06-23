@@ -106,34 +106,6 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
                     createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
             loadbalanceEndpoint.setAlgorithm(algorithm);
 
-            // set abandon time
-            //long abandonTime = 0;
-            //OMAttribute atAttribute = loadbalanceElement.getAttribute(new QName(
-            //      null, org.apache.synapse.config.xml.Constants.RETRY_AFTER_FAILURE_TIME));
-            //if(atAttribute != null) {
-            //    String at = atAttribute.getAttributeValue();
-            //    abandonTime = Long.parseLong(at);
-            //    loadbalanceEndpoint.setAbandonTime(abandonTime);
-            //}
-
-            //long retryInterval = 30000;
-            //OMAttribute riAttribute = loadbalanceElement.getAttribute
-            //        (new QName(null, Constants.RETRY_INTERVAL));
-            //
-            //if(riAttribute != null) {
-            //    String ri = riAttribute.getAttributeValue();
-            //    retryInterval = Long.parseLong(ri);
-            //}
-
-            //int maximumRetries = 0;
-            //OMAttribute mrAttribute = loadbalanceElement.getAttribute
-            //        (new QName(null, Constants.MAXIMUM_RETRIES));
-            //
-            //if(mrAttribute != null) {
-            //    String mr = mrAttribute.getAttributeValue();
-            //    maximumRetries = Integer.parseInt(mr);
-            //}
-
             return loadbalanceEndpoint;
         }
 

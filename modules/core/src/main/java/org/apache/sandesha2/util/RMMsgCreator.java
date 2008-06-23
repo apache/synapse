@@ -86,7 +86,8 @@ public class RMMsgCreator {
 	 * @throws SandeshaException
 	 */
 	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg) throws AxisFault {
-
+		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::createCreateSeqMsg " + applicationRMMsg);
+		
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
 		if (applicationMsgContext == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.appMsgIsNull));
@@ -126,6 +127,7 @@ public class RMMsgCreator {
 			else
 				addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
 		}
+		if(log.isDebugEnabled()) log.debug("RMMsgCreator:: addressing name space is " + addressingNamespace);
 		
 		// If acksTo has not been set, then default to anonymous, using the correct spec level
 		EndpointReference acksToEPR = rmsBean.getAcksToEndpointReference();
@@ -142,6 +144,7 @@ public class RMMsgCreator {
 			Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
 			if(p != null && p.getValue() != null) {
 				twoWayService = ((Boolean) p.getValue()).booleanValue();
+				if(log.isDebugEnabled()) log.debug("RMMsgCreator:: twoWayService " + twoWayService);
 			}
 		}
 		
@@ -201,15 +204,19 @@ public class RMMsgCreator {
 			throw new SandeshaException(message);
 		}
 		createSeqRMMsg.setTo(toEPR);
+		if(log.isDebugEnabled()) log.debug("RMMsgCreator:: toEPR=" + toEPR);
 
 		EndpointReference replyToEPR = rmsBean.getReplyToEndpointReference();
 		if(replyToEPR != null) {
 			replyToEPR = SandeshaUtil.getEPRDecorator(createSeqRMMsg.getConfigurationContext()).decorateEndpointReference(replyToEPR);
 			createSeqRMMsg.setReplyTo(replyToEPR);
+			if(log.isDebugEnabled()) log.debug("RMMsgCreator:: replyToEPR=" + replyToEPR);
 		}
+		
 
 		AcksTo acksTo = new AcksTo(acksToEPR, rmNamespaceValue, addressingNamespace);
 		createSequencePart.setAcksTo(acksTo);
+		if(log.isDebugEnabled()) log.debug("RMMsgCreator:: acksTo=" + acksTo);
 		
 		createSeqRMMsg.setCreateSequence(createSequencePart);
 
@@ -240,6 +247,7 @@ public class RMMsgCreator {
 
 		createSeqRMMsg.addSOAPEnvelope();
 		
+		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::createCreateSeqMsg " + createSeqRMMsg);
 		return createSeqRMMsg;
 	}
 
@@ -318,6 +326,8 @@ public class RMMsgCreator {
 	 */
 	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, RMSequenceBean rmSequenceBean) throws AxisFault {
 
+		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::createCreateSeqResponseMsg " + rmSequenceBean);
+		
 		CreateSequence cs = createSeqMessage.getCreateSequence();
 		String namespace = createSeqMessage.getRMNamespaceValue();
 
@@ -328,6 +338,7 @@ public class RMMsgCreator {
 
 		SequenceOffer offer = cs.getSequenceOffer();
 		if (offer != null) {
+			if(log.isDebugEnabled()) log.debug("RMMsgCreator:: " + offer);
 			String outSequenceId = offer.getIdentifer().getIdentifier();
 
 			if (outSequenceId != null && !"".equals(outSequenceId)) {
@@ -354,12 +365,18 @@ public class RMMsgCreator {
 		String version = SpecSpecificConstants.getSpecVersionString(namespace);
 		String action = SpecSpecificConstants.getCreateSequenceResponseAction(version);
 
-		return createResponseMsg(createSeqMessage, rmSequenceBean, response,
+		RMMsgContext returnRMContext = createResponseMsg(createSeqMessage, rmSequenceBean, response,
 				Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE,action);
+
+		returnRMContext.setTo(createSeqMessage.getReplyTo()); //CSResponse goes to the replyTo, NOT the acksTo
+		
+		if(log.isDebugEnabled()) log.debug("Exit: RMMsgCreator::createCreateSeqResponseMsg " + returnRMContext);
+		return returnRMContext;
 	}
 
 	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
-        
+		if(log.isDebugEnabled())
+			log.debug("Entry: RMMsgCreator::createTerminateSeqResponseMsg " + rmSequenceBean);        
 		TerminateSequence terminateSequence = terminateSeqRMMsg.getTerminateSequence();
 		String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 
@@ -372,13 +389,21 @@ public class RMMsgCreator {
 
 		String version = SpecSpecificConstants.getSpecVersionString(namespace);
 		String action = SpecSpecificConstants.getTerminateSequenceResponseAction(version);
-
-		return createResponseMsg(terminateSeqRMMsg, rmSequenceBean, terminateSequenceResponse,
+		
+		RMMsgContext returnRMContext = createResponseMsg(terminateSeqRMMsg, rmSequenceBean, terminateSequenceResponse,
 				Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE, action);
+		if(rmSequenceBean.getAcksToEndpointReference()!=null){
+			returnRMContext.setTo(rmSequenceBean.getAcksToEndpointReference()); //RSP requirement
+		}
+		if(log.isDebugEnabled())
+			log.debug("Exit: RMMsgCreator::createTerminateSeqResponseMsg " + returnRMContext);
+		return returnRMContext;
+		
 	}
 
 	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
-
+		if(log.isDebugEnabled())
+			log.debug("Entry: RMMsgCreator::createCloseSeqResponseMsg " + rmSequenceBean);
 		CloseSequence closeSequence = closeSeqRMMsg.getCloseSequence();
 		String sequenceID = closeSequence.getIdentifier().getIdentifier();
 
@@ -392,8 +417,14 @@ public class RMMsgCreator {
 		String version = SpecSpecificConstants.getSpecVersionString(namespace);
 		String action = SpecSpecificConstants.getCloseSequenceResponseAction(version);
 
-		return createResponseMsg(closeSeqRMMsg, rmSequenceBean, closeSequenceResponse,
+		RMMsgContext returnRMContext = createResponseMsg(closeSeqRMMsg, rmSequenceBean, closeSequenceResponse,
 				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE, action);
+		if(rmSequenceBean.getAcksToEndpointReference()!=null){
+			returnRMContext.setTo(rmSequenceBean.getAcksToEndpointReference()); //RSP requirement
+		}
+		if(log.isDebugEnabled())
+			log.debug("Exit: RMMsgCreator::createCloseSeqResponseMsg " + returnRMContext);
+		return returnRMContext;
 	}
 
 	/**
@@ -414,9 +445,6 @@ public class RMMsgCreator {
 		MessageContext outMessage = MessageContextBuilder.createOutMessageContext (requestMsg.getMessageContext());
 		RMMsgContext responseRMMsg = new RMMsgContext(outMessage);
 		
-		if(rmSequenceBean.getAcksToEndpointReference()!=null){
-			responseRMMsg.setTo(rmSequenceBean.getAcksToEndpointReference());
-		}
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(requestMsg.getSOAPEnvelope()));
 
 		String namespace = requestMsg.getRMNamespaceValue();

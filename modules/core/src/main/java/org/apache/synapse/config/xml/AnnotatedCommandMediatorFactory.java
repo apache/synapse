@@ -81,7 +81,7 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
                         "A POJO command mediator property must specify the name attribute");
                 } else {
                     if (child.getAttribute(ATT_EXPRN) != null) {
-                        SynapseXPath xpath = null;
+                        SynapseXPath xpath;
                         try {
                             xpath = SynapseXPathFactory.getSynapseXPath(child, ATT_EXPRN);
                             pojoMediator.addMessageSetterProperty(propName, xpath);

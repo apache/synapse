@@ -176,6 +176,8 @@ public class SequenceManager {
 			inboundSequence = (String) firstAplicationMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
 			if(inboundSequence != null) {
 				inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
+				if (log.isDebugEnabled())
+					log.debug("SequenceManager:: server side app msg: inboundBean=" + inboundBean);
 			}
 		}
 		

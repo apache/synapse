@@ -1131,6 +1131,33 @@ public class SandeshaUtil {
 		return newEPR;
 	}	
 	
+	public static boolean isForbidMixedEPRsOnSequence(MessageContext mc)
+	{
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isForbidMixedEPRsOnSequence");
+		boolean result = false;
+
+		//look at the msg ctx first
+		String auto = (String) mc.getProperty(SandeshaClientConstants.FORBID_MIXED_EPRS_ON_SEQUENCE);
+		if ("true".equals(auto)) {
+			if (log.isDebugEnabled()) log.debug("Mixed EPRs forbidden on message context");
+			result = true;
+		}			
+		
+		if(!result) {
+			//look at the operation
+			if (mc.getAxisOperation() != null) {
+				Parameter mixedParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.FORBID_MIXED_EPRS_ON_SEQUENCE);
+				if (null != mixedParam && "true".equals(mixedParam.getValue())) {
+					if (log.isDebugEnabled()) log.debug("mixed EPRs forbidden on operation");
+					result = true;
+				}
+			}
+		}
+		
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isForbidMixedEPRsOnSequence, " + result);
+		return result;			
+	}
+	
 	public static boolean isAutoStartNewSequence(MessageContext mc){
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isAutoStartNewSequence");
 		boolean result = false;

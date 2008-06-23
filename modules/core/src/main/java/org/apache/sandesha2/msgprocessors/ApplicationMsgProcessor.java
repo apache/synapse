@@ -23,6 +23,7 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -169,12 +170,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		 * side - a derivation of wsaTo & SeequenceKey
 		 */
 		String internalSequenceId = getSequenceID(rmMsgCtx, serverSide, false); //get a sequenceID, possibly pre-existing
+		if (log.isDebugEnabled())
+			log.debug("Enter: ApplicationMsgProcessor::internalSequenceId = " + internalSequenceId);
 		
 		boolean lastMessage = false;
 		if(!serverSide){
 			String lastAppMessage = (String) msgContext.getProperty(SandeshaClientConstants.LAST_MESSAGE);
-			if (lastAppMessage != null && "true".equals(lastAppMessage))
+			if (lastAppMessage != null && "true".equals(lastAppMessage)){
 				lastMessage = true;
+				if (log.isDebugEnabled())
+					log.debug("Enter: ApplicationMsgProcessor: last message");
+			}
 		}
 		
 		if (internalSequenceId!=null)
@@ -208,23 +214,44 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 
-		//see if the sequence is closed
-		if(rmsBean != null && 
-			(rmsBean.isSequenceClosedClient() || rmsBean.isTerminateAdded() || rmsBean.isTimedOut())){
-			if(SandeshaUtil.isAutoStartNewSequence(msgContext)){
-				internalSequenceId = getSequenceID(rmMsgCtx, serverSide, true); //require a new sequence
-				rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+		//if this is an existing sequence then we need to do some checks first
+		if(rmsBean != null)
+		{
+			//see if the sequence is closed
+			if(rmsBean.isSequenceClosedClient() || rmsBean.isTerminateAdded() || rmsBean.isTimedOut()){
+				if(SandeshaUtil.isAutoStartNewSequence(msgContext)){
+					internalSequenceId = getSequenceID(rmMsgCtx, serverSide, true); //require a new sequence
+					rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+				}
+				else if(rmsBean.isSequenceClosedClient()){
+					throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
+				}
+				else if(rmsBean.isTerminateAdded()){
+					throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
+				}
+				else if(rmsBean.isTimedOut()){
+					throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
+				}
 			}
-			else if(rmsBean.isSequenceClosedClient()){
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
-			}
-			else if(rmsBean.isTerminateAdded()){
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
-			}
-			else if(rmsBean.isTimedOut()){
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
+			else if(!msgContext.isServerSide())
+			{
+				//we need to check that any outgoing request msg is not using a different MEP than the sequence was established with
+				//The easiest way to check this is to ensure that the request and the replyTo of the RMS bean do not
+				//differ between non-anonymous and anonymous (either MC anonymous or WS-A anonymous)
+				boolean msgIsAnon = !AddressingHelper.isReplyRedirected(msgContext);
+				boolean isSequenceAnon = rmsBean.getReplyToEndpointReference() ==null || 
+											rmsBean.getReplyToEndpointReference().getAddress() ==null || 
+											rmsBean.getReplyToEndpointReference().hasAnonymousAddress();
+				if(msgIsAnon != isSequenceAnon && SandeshaUtil.isForbidMixedEPRsOnSequence(msgContext))
+				{
+					String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsEPRWrong, msgContext.toString(), rmsBean.getSequenceID());
+					log.warn(msg);
+					throw new SandeshaException(msg);
+				}				
 			}
 		}
+		if (log.isDebugEnabled())
+			log.debug("Enter: ApplicationMsgProcessor:: initial sequence checks pass");
 		
 		// If the call application is a 2-way MEP, and uses a anonymous replyTo, and the
 		// RM 1.1 spec level, then we must have MakeConnection enabled. We check that here,
@@ -276,6 +303,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			
 			if (rmsBean == null) { 
 				// SENDING THE CREATE SEQUENCE.
+				if (log.isDebugEnabled())
+					log.debug("Enter: ApplicationMsgProcessor:: sending createSequence");
 				while (rmsBean == null) {
 					// There is a timing window where 2 sending threads can hit this point
 					// at the same time and both will create an RMSBean to the same endpoint
@@ -329,6 +358,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			} else { // This is the first message (systemMessageNumber = -1)
 				messageNumber = 1;
 			}
+			
+			if (log.isDebugEnabled())
+				log.debug("Enter: ApplicationMsgProcessor::message number=" + messageNumber);
 	
 			if (serverSide) {
 				// Deciding whether this is the last message. We assume it is if it relates to
@@ -357,6 +389,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// saving the used message number, and the expected reply count
 			boolean startPolling = false;
 			if (!dummyMessage) {
+				if (log.isDebugEnabled())
+					log.debug("Enter: ApplicationMsgProcessor:: not a dummy msg");
 				rmsBean.setNextMessageNumber(messageNumber);
 	
 				// Identify the MEP associated with the message.
@@ -457,6 +491,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			
 			if (toEPR != null) {
 				// setting default actions.
+				if (log.isDebugEnabled())
+					log.debug("Enter: ApplicationMsgProcessor::setting default actions");
 				String to = toEPR.getAddress();
 				String operationName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
 				if (msgContext.getWSAAction() == null) {

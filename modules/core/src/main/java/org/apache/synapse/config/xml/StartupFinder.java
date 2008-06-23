@@ -118,6 +118,16 @@ public class StartupFinder {
     }
 
     /**
+     * Check whether an element with the given qualified name defines a startup.
+     * 
+     * @param name
+     * @return
+     */
+    public boolean isStartup(QName name) {
+        return factoryMap.containsKey(name);
+    }
+
+    /**
      * This method returns a Processor given an OMElement. This will be used
      * recursively by the elements which contain processor elements themselves
      * (e.g. rules)

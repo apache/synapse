@@ -30,7 +30,6 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.axis2.transport.http.util.RESTUtil;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +37,7 @@ import org.apache.http.*;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.base.MetricsCollector;
+import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.ws.commons.schema.XmlSchema;
 
 import java.io.IOException;
@@ -76,6 +76,7 @@ public class ServerWorker implements Runnable {
     private OutputStream os = null;
     /** the metrics collector */
     private MetricsCollector metrics = null;
+    
     private static final String SOAPACTION   = "SOAPAction";
     private static final String LOCATION     = "Location";
     private static final String CONTENT_TYPE = "Content-Type";
@@ -145,15 +146,14 @@ public class ServerWorker implements Runnable {
             msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
         }
         msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
-        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID()); // TODO check if this is valid
+        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
         msgContext.setServerSide(true);
         msgContext.setProperty(
             Constants.Configuration.TRANSPORT_IN_URL, request.getRequestLine().getUri());
 
-        Map headers = new HashMap();
-        Header[] headerArr = request.getAllHeaders();
-        for (int i = 0; i < headerArr.length; i++) {
-            headers.put(headerArr[i].getName(), headerArr[i].getValue());
+        Map<String, String> headers = new HashMap<String, String>();
+        for (Header header : request.getAllHeaders()) {
+            headers.put(header.getName(), header.getValue());
         }
         msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
 
@@ -259,14 +259,6 @@ public class ServerWorker implements Runnable {
 
         String uri = request.getRequestLine().getUri();
 
-        String contextPath = cfgCtx.getContextRoot();
-        if (!contextPath.startsWith("/")) {
-            contextPath = "/" + contextPath;
-        }
-        if (!contextPath.endsWith("/")) {
-            contextPath = contextPath + "/";
-        }
-
         String servicePath = cfgCtx.getServiceContextPath();
         if (!servicePath.startsWith("/")) {
             servicePath = "/" + servicePath;
@@ -292,9 +284,10 @@ public class ServerWorker implements Runnable {
             }
         }
 
-        Map parameters = new HashMap();
+        Map<String, String> parameters = new HashMap<String, String>();
         int pos = uri.indexOf("?");
         if (pos != -1) {
+            msgContext.setTo(new EndpointReference(uri.substring(0, pos)));
             StringTokenizer st = new StringTokenizer(uri.substring(pos+1), "&");
             while (st.hasMoreTokens()) {
                 String param = st.nextToken();
@@ -305,6 +298,8 @@ public class ServerWorker implements Runnable {
                     parameters.put(param, null);
                 }
             }
+        } else {
+            msgContext.setTo(new EndpointReference(uri));
         }
 
         if ("GET".equalsIgnoreCase(request.getRequestLine().getMethod())) {
@@ -375,7 +370,7 @@ public class ServerWorker implements Runnable {
 
             } else {
                 //cater for named xsds - check for the xsd name
-                String schemaName = (String) parameters.get("xsd");
+                String schemaName = parameters.get("xsd");
                 AxisService service = (AxisService) cfgCtx.getAxisConfiguration()
                     .getServices().get(serviceName);
 
@@ -439,9 +434,11 @@ public class ServerWorker implements Runnable {
 
             } else {
                 try {
-                    Header contentType = request.getFirstHeader(HTTP.CONTENT_TYPE);
-                    RESTUtil.processURLRequest(msgContext, os,
-                            contentType != null ? contentType.getValue() :  null);
+
+                    RESTUtil.processURLRequest(
+                            msgContext, os, (request.getFirstHeader(SOAPACTION) != null ?
+                            request.getFirstHeader(SOAPACTION).getValue() : null),
+                            request.getRequestLine().getUri(), cfgCtx, parameters);
                     // do not let the output stream close (as by default below) since
                     // we are serving this GET request through the Synapse engine
                     return;
@@ -568,26 +565,26 @@ public class ServerWorker implements Runnable {
         if ((services != null) && !services.isEmpty()) {
 
             servicesFound = true;
-            Collection serviceCollection = services.values();
             resultBuf.append("<h2>" + "Deployed services" + "</h2>");
 
-            for (Iterator it = serviceCollection.iterator(); it.hasNext();) {
+            for (Object service : services.values()) {
 
-                AxisService axisService = (AxisService) it.next();
+                AxisService axisService = (AxisService) service;
                 if (axisService.getName().startsWith("__")) {
                     continue;    // skip private services
                 }
 
                 Iterator iterator = axisService.getOperations();
-                resultBuf.append("<h3><a href=\"" + axisService.getName() + "?wsdl\">" +
-                        axisService.getName() + "</a></h3>");
+                resultBuf.append("<h3><a href=\"").append(axisService.getName()).append(
+                        "?wsdl\">").append(axisService.getName()).append("</a></h3>");
 
                 if (iterator.hasNext()) {
                     resultBuf.append("Available operations <ul>");
 
                     for (; iterator.hasNext();) {
                         AxisOperation axisOperation = (AxisOperation) iterator.next();
-                        resultBuf.append("<li>" + axisOperation.getName().getLocalPart() + "</li>");
+                        resultBuf.append("<li>").append(
+                                axisOperation.getName().getLocalPart()).append("</li>");
                     }
                     resultBuf.append("</ul>");
                 } else {
@@ -603,7 +600,8 @@ public class ServerWorker implements Runnable {
 
             while (faultyservices.hasMoreElements()) {
                 String faultyserviceName = (String) faultyservices.nextElement();
-                resultBuf.append("<h3><font color=\"blue\">" + faultyserviceName + "</font></h3>");
+                resultBuf.append("<h3><font color=\"blue\">").append(
+                        faultyserviceName).append("</font></h3>");
             }
         }
 

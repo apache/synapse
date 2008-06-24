@@ -19,10 +19,15 @@
 
 package org.apache.sandesha2.util;
 
+import java.util.Iterator;
+
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.EndpointReferenceHelper;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
@@ -204,10 +209,11 @@ public class SequenceManager {
 			// Server side, we want the replyTo and AcksTo EPRs to point into this server.
 			// We can work that out by looking at the RMD bean that pulled the message in,
 			// and copying its 'ReplyTo' address.
-			if(inboundBean != null && inboundBean.getReplyToEndpointReference() != null) {
-				acksToEPR = inboundBean.getReplyToEndpointReference();
-				replyToEPR = inboundBean.getReplyToEndpointReference();
-			} else {
+			EndpointReference strippedReplyToEpr = stripAddress(inboundBean.getReplyToEndpointReference());
+			if(inboundBean != null && strippedReplyToEpr != null) {
+				acksToEPR = strippedReplyToEpr;
+				replyToEPR = strippedReplyToEpr;
+		} else {
 				String beanInfo = (inboundBean == null) ? "null" : inboundBean.toString();
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.cannotChooseAcksTo, inboundSequence, beanInfo);
@@ -384,4 +390,40 @@ public class SequenceManager {
 
 		return specVersion;
 	}
+	
+	/* becuase RM reuses the incoming EPRs.  Need to use only the address.
+	 */
+	private static EndpointReference stripAddress(EndpointReference eprIn){
+		if(log.isDebugEnabled()) log.debug("stripAddress from EndpointReference : " + eprIn);
+		EndpointReference epr = new EndpointReference(eprIn.getAddress());
+		return epr;
+/**		
+		String schemaNs = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+		String securityNs = "http://schemas.xmlsoap.org/ws/2003/06/utility";
+		
+		Iterator it = eprOut.getAttributes().iterator();
+		while(it.hasNext()){
+			OMAttribute attribute = (OMAttribute)it.next();
+			String ns = attribute.getNamespace().getNamespaceURI();
+			String name = attribute.getLocalName();
+			if((schemaNs.equals(ns) || securityNs.equals(ns)) && "Id".equals(name)){
+				//delete attribute
+				it.remove();
+			} 
+		}
+		Iterator it2 = eprOut.getAddressAttributes().iterator();
+		while(it2.hasNext()){
+			OMAttribute attribute = (OMAttribute)it2.next();
+			String ns = attribute.getNamespace().getNamespaceURI();
+			String name = attribute.getLocalName();
+			if((schemaNs.equals(ns) || securityNs.equals(ns)) && "Id".equals(name)){
+				//delete attribute
+				it2.remove();
+			} 
+		}
+		
+		return eprOut;
+		**/
+}
+
 }

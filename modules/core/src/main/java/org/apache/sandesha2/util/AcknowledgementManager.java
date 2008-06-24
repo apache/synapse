@@ -42,6 +42,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.workers.Sender;
 
 /**
  * Contains logic for managing acknowledgements.
@@ -58,96 +59,102 @@ public class AcknowledgementManager {
 	 * @param applicationRMMsgContext
 	 * @throws SandeshaException
 	 */
-	public static void piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager)
-			throws SandeshaException {
+	public static void piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager) throws SandeshaException {
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
-		
+
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
-		// If this message is going to an anonymous address, and the inbound sequence has
+		// If this message is going to an anonymous address, and the inbound
+		// sequence has
 		// anonymous acksTo, then we add in an ack for the inbound sequence.
 		EndpointReference target = rmMessageContext.getTo();
-		if(target == null || target.hasAnonymousAddress()) {
-			// We have no good indicator of the identity of the destination, so the only sequence
-			// we can ack is the inbound one that caused us to create this response.
+		if (target == null || target.hasAnonymousAddress()) {
+			// We have no good indicator of the identity of the destination, so
+			// the only sequence
+			// we can ack is the inbound one that caused us to create this
+			// response.
 			String inboundSequence = (String) rmMessageContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
-			if(inboundSequence != null) {
+			if (inboundSequence != null) {
 				RMDBean inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
-				if(inboundBean != null && !inboundBean.isTerminated()) {
+				if (inboundBean != null && !inboundBean.isTerminated()) {
 					EndpointReference acksToEPR = inboundBean.getAcksToEndpointReference();
 
-					if(acksToEPR == null || acksToEPR.hasAnonymousAddress()) {
-						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
+					if (acksToEPR == null || acksToEPR.hasAnonymousAddress()) {
+						if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+							log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
 						RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean, false);
 					}
 				}
 			}
-			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
+			if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+				log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
 			return;
-		}
-		else{
-			//an addressable EPR
-			if(SandeshaUtil.hasReferenceParameters(target)){
-				//we should not proceed since we cannot properly compare ref params
-				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
+		} else {
+			// an addressable EPR
+			if (SandeshaUtil.hasReferenceParameters(target)) {
+				// we should not proceed since we cannot properly compare ref
+				// params
+				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+					log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
 				return;
 			}
-			
-		    // From here on, we must be dealing with a real address. Piggyback all sequences that have an
-		    // acksTo that matches the To address, and that have an ackMessage queued up for sending. We
-		    // search for RMDBeans first, to avoid a deadlock.
-		    //
-		    // As a special case, if this is a terminate sequence message then add in ack messages for
-		    // any sequences that have an acksTo that matches the target address. This helps to ensure
-		    // that request-response sequence pairs end cleanly.
-		    RMDBean findRMDBean = new RMDBean();
-		    findRMDBean.setAcksToEndpointReference(target);
-		    findRMDBean.setTerminated(false);
-		    Collection rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
-		    Iterator sequences = rmdBeans.iterator();
-		    while(sequences.hasNext()) {
-		      RMDBean sequence = (RMDBean) sequences.next();
-		      if(SandeshaUtil.hasReferenceParameters(sequence.getAcksToEndpointReference())){
-		    	  //we should not piggy back if there are reference parameters in the acksTo EPR since we cannot compare them
-		    	  if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
-		    	  break;
-		      }
-					
-		      String sequenceId = sequence.getSequenceID();
-		      
-		      // Look for the SenderBean that carries the ack, there should be at most one
-		      SenderBean findBean = new SenderBean();
-		      findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-		      findBean.setSend(true);
-		      findBean.setSequenceID(sequenceId);
-		      findBean.setToAddress(target.getAddress());
-		      
-		      SenderBean ackBean = retransmitterBeanMgr.findUnique(findBean);
-		      
-				// Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
-				long timeNow = System.currentTimeMillis();
-			    if (ackBean != null && ackBean.getTimeToSend() > timeNow) {
-					// Delete the beans that would have sent the ack
-					retransmitterBeanMgr.delete(ackBean.getMessageID());
-					storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
 
-				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
-		        RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
+			String inboundSequence = (String) rmMessageContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
+			// If there's an inbound sequence (i.e. we're provider side) we'll
+			// use that, otherwise
+			// we'll go to the expense of looking the sequence up by the acksTo
+			// address.
+			if (inboundSequence != null) {
+				// We used to look for an ack sender bean before piggybacking an
+				// ack, but in the high-througput
+				// scenarios there always was one, and in the low thoughput
+				// scenarios it's less of an issue if
+				// we piggyback when we don't have to. so for now, lets mimic
+				// the old high-throughout behaviour
+				// in a cheap way by always piggybacking.
+				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+					log.debug("Piggybacking ack for sequence: " + inboundSequence);
+				RMDBean sequence = storageManager.getRMDBeanMgr().retrieve(inboundSequence);
+				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, sequence, false);
+				((Sender) storageManager.getSender()).removeScheduledAcknowledgement(inboundSequence);
+			} else {
+				RMDBean findRMDBean = new RMDBean();
+				findRMDBean.setAcksToEndpointReference(target);
+				findRMDBean.setTerminated(false);
+				Collection rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
+				Iterator sequences = rmdBeans.iterator();
+				while (sequences.hasNext()) {
+					RMDBean sequence = (RMDBean) sequences.next();
+					if (SandeshaUtil.hasReferenceParameters(sequence.getAcksToEndpointReference())) {
+						// we should not piggy back if there are reference
+						// parameters in the acksTo EPR since we cannot compare
+						// them
+						if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+							log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, target has refParams");
+						break;
+					}
 
+					String sequenceId = sequence.getSequenceID();
 
-			    } else if(rmMessageContext.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			        if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
-			          
-			        if(sequence.getHighestInMessageNumber() > 0) {
-						  if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+					// We used to look for an ack sender bean before
+					// piggybacking an ack, but in the high-througput
+					// scenarios there always was one, and in the low thoughput
+					// scenarios it's less of an issue if
+					// we piggyback when we don't have to. so for now, lets
+					// mimic the old high-throughout behaviour
+					// in a cheap way by always piggybacking.
+					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+						log.debug("Piggybacking ack for sequence: " + sequenceId);
 
 					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
-					}
+
+					((Sender) storageManager.getSender()).removeScheduledAcknowledgement(sequenceId);
+
 				}
 			}
 		}
-		
+
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent");
 		return;
@@ -159,20 +166,18 @@ public class AcknowledgementManager {
 	 * @param sequencePropertyKey
 	 * @param sequenceId
 	 * @param storageManager
-	 * @param makeResponse Some work will be done to make the new ack message the response of the reference message.
+	 * @param makeResponse
+	 *            Some work will be done to make the new ack message the
+	 *            response of the reference message.
 	 * @return
 	 * @throws AxisFault
 	 */
 	public static RMMsgContext generateAckMessage(
-			
-			RMMsgContext referenceRMMessage,
-			RMDBean rmdBean,
-			String sequenceId,
-			StorageManager storageManager, 
-			boolean serverSide
-			
-			) throws AxisFault {
-		
+
+	RMMsgContext referenceRMMessage, RMDBean rmdBean, String sequenceId, StorageManager storageManager, boolean serverSide
+
+	) throws AxisFault {
+
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::generateAckMessage " + rmdBean);
 
@@ -180,16 +185,14 @@ public class AcknowledgementManager {
 
 		EndpointReference acksTo = rmdBean.getAcksToEndpointReference();
 
-		if (acksTo==null || acksTo.getAddress() == null)
+		if (acksTo == null || acksTo.getAddress() == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
 
-		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
-				Sandesha2Constants.MessageTypes.ACK,
-				rmdBean.getRMVersion(),
-				referenceMsg.getAxisService());
+		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(Sandesha2Constants.MessageTypes.ACK, rmdBean.getRMVersion(), referenceMsg
+				.getAxisService());
 
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage, ackOperation);
-		
+
 		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
@@ -198,8 +201,7 @@ public class AcknowledgementManager {
 
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
-				.getSOAPVersion(referenceMsg.getEnvelope()));
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(referenceMsg.getEnvelope()));
 
 		// Setting new envelope
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
@@ -207,7 +209,7 @@ public class AcknowledgementManager {
 		ackMsgCtx.setEnvelope(envelope);
 
 		ackMsgCtx.setTo(acksTo);
-		
+
 		ackMsgCtx.setServerSide(serverSide);
 
 		// adding the SequenceAcknowledgement part.
@@ -218,16 +220,13 @@ public class AcknowledgementManager {
 		return ackRMMsgCtx;
 	}
 
-	
-	
-
 	public static boolean verifySequenceCompletion(RangeString ackRanges, long lastMessageNo) {
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::verifySequenceCompletion");
 
 		boolean result = false;
 		Range complete = new Range(1, lastMessageNo);
-		if(ackRanges.isRangeCompleted(complete)) {
+		if (ackRanges.isRangeCompleted(complete)) {
 			result = true;
 		}
 
@@ -235,17 +234,14 @@ public class AcknowledgementManager {
 			log.debug("Exit: AcknowledgementManager::verifySequenceCompletion " + result);
 		return result;
 	}
-	
-	public static void addAckBeanEntry (
-			RMMsgContext ackRMMsgContext,
-			String sequenceId, 
-			long timeToSend,
-			StorageManager storageManager) throws AxisFault {
-		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: AcknowledgementManager::addAckBeanEntry");
+
+	public static void addAckBeanEntry(RMMsgContext ackRMMsgContext, String sequenceId, long timeToSend, StorageManager storageManager) throws AxisFault {
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::addAckBeanEntry");
 
 		// Write the acks into the envelope
 		ackRMMsgContext.addSOAPEnvelope();
-		
+
 		MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
 
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
@@ -258,7 +254,7 @@ public class AcknowledgementManager {
 		ackBean.setReSend(false);
 		ackBean.setSequenceID(sequenceId);
 		EndpointReference to = ackMsgContext.getTo();
-		if (to!=null)
+		if (to != null)
 			ackBean.setToAddress(to.getAddress());
 
 		ackBean.setSend(true);
@@ -275,9 +271,9 @@ public class AcknowledgementManager {
 		Collection coll = retransmitterBeanMgr.find(findBean);
 		Iterator it = coll.iterator();
 
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			SenderBean oldAckBean = (SenderBean) it.next();
-			if(oldAckBean.getTimeToSend() < timeToSend)
+			if (oldAckBean.getTimeToSend() < timeToSend)
 				timeToSend = oldAckBean.getTimeToSend();
 
 			// removing the retransmitted entry for the oldAck
@@ -290,42 +286,44 @@ public class AcknowledgementManager {
 		ackBean.setTimeToSend(timeToSend);
 
 		ackMsgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-		
+
 		// passing the message through sandesha2sender
 		ackMsgContext.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-		
-	    SandeshaUtil.executeAndStore(ackRMMsgContext, key, storageManager);
+
+		SandeshaUtil.executeAndStore(ackRMMsgContext, key, storageManager);
 
 		// inserting the new ack.
 		retransmitterBeanMgr.insert(ackBean);
 
-		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::addAckBeanEntry");
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementManager::addAckBeanEntry");
 	}
-	
-	public static void sendAckNow (RMMsgContext ackRMMsgContext) throws AxisFault {
+
+	public static void sendAckNow(RMMsgContext ackRMMsgContext) throws AxisFault {
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::sendAckNow");
 
 		// Write the acks into the envelope
 		ackRMMsgContext.addSOAPEnvelope();
-		
+
 		MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
-		
+
 		// setting CONTEXT_WRITTEN since acksto is anonymous
 		if (ackRMMsgContext.getMessageContext().getOperationContext() == null) {
 			// operation context will be null when doing in a GLOBAL
 			// handler.
 			AxisOperation op = ackMsgContext.getAxisOperation();
 
-			OperationContext opCtx = OperationContextFactory.createOperationContext(op.getAxisSpecificMEPConstant(), op, ackRMMsgContext.getMessageContext().getServiceContext());
+			OperationContext opCtx = OperationContextFactory.createOperationContext(op.getAxisSpecificMEPConstant(), op, ackRMMsgContext.getMessageContext()
+					.getServiceContext());
 			ackRMMsgContext.getMessageContext().setOperationContext(opCtx);
 		}
 
 		ackRMMsgContext.getMessageContext().setServerSide(true);
-		
+
 		AxisEngine.send(ackMsgContext);
-		
+
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementManager::sendAckNow");		
-	}	
+			log.debug("Exit: AcknowledgementManager::sendAckNow");
+	}
 }

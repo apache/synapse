@@ -113,7 +113,6 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         // Run the test.
         beforeStartup();
         server.start();
-        Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
         try {
             EndpointReference[] endpointReferences
                 = trpInDesc.getReceiver().getEPRsForService(service.getName(), "localhost");

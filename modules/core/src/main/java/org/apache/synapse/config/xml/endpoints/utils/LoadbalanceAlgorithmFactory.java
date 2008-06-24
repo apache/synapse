@@ -19,14 +19,16 @@
 
 package org.apache.synapse.config.xml.endpoints.utils;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.clustering.Member;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Factory of all load balance algorithms. ESBSendMediatorFactroy will use this to create the
@@ -35,19 +37,37 @@ import java.util.ArrayList;
 public class LoadbalanceAlgorithmFactory {
 
     public static LoadbalanceAlgorithm createLoadbalanceAlgorithm(OMElement loadbalanceElement,
-        ArrayList endpoints) {
-
+                                                                  ArrayList endpoints) {
         LoadbalanceAlgorithm algorithm = null;
-
         String algorithmName = "roundRobin";
-        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(
-                null, XMLConfigConstants.ALGORITHM_NAME));
+        OMAttribute algoAttribute =
+                loadbalanceElement.getAttribute(new QName(null, XMLConfigConstants.ALGORITHM_NAME));
         if(algoAttribute != null) {
             algorithmName = algoAttribute.getAttributeValue();
         }
 
-        if(algorithmName.equalsIgnoreCase("roundRobin")) {
-                algorithm = new RoundRobin(endpoints);
+        if (algorithmName.equalsIgnoreCase("roundRobin")) {
+            algorithm = new RoundRobin(endpoints);
+        }
+
+        return algorithm;
+    }
+
+    public static LoadbalanceAlgorithm createLoadbalanceAlgorithm2(OMElement loadbalanceElement,
+                                                                   List<Member> members) {
+
+        LoadbalanceAlgorithm algorithm = null;
+
+        String algorithmName = "roundRobin";
+        OMAttribute algoAttribute =
+                loadbalanceElement.getAttribute(new QName(null, XMLConfigConstants.ALGORITHM_NAME));
+        if (algoAttribute != null) {
+            algorithmName = algoAttribute.getAttributeValue();
+        }
+
+        if (algorithmName.equalsIgnoreCase("roundRobin")) {
+            algorithm = new RoundRobin();
+            algorithm.setApplicationMembers(members);
         }
 
         return algorithm;

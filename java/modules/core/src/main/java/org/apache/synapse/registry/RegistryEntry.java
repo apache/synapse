@@ -19,8 +19,6 @@
 
 package org.apache.synapse.registry;
 
-import java.net.URI;
-
 /**
  * This interface defines the core information to be returned by a Registry implementation
  * about a resource being managed by it. Every Registry implementation *must* provide valid
@@ -38,7 +36,7 @@ public interface RegistryEntry {
     public long getVersion();
 
     /** The type of the resource - optional */
-    public URI getType();
+    public String getType();
 
     /** A description for the resource - optional */
     public String getDescription();

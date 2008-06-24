@@ -20,13 +20,12 @@
 package org.apache.sandesha2.storage.inmemory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMBean;
@@ -44,7 +43,6 @@ public class InMemoryTransaction implements Transaction {
 	private InMemoryStorageManager manager;
 	private String threadName;
 	private ArrayList enlistedBeans = new ArrayList();
-	private InMemoryTransaction waitingForTran = null;
 	private boolean sentMessages = false;
 	private boolean active = true;
 	private Thread thread;
@@ -73,61 +71,54 @@ public class InMemoryTransaction implements Transaction {
 	public boolean isActive () {
 		return active;
 	}
+	
+	private class DummyTransaction extends ReentrantLock implements Transaction {
 
+		public void commit() throws SandeshaStorageException {
+			throw new SandeshaStorageException("Not supported");
+		}
+
+		public boolean isActive() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public void rollback() throws SandeshaStorageException {
+			throw new SandeshaStorageException("Not supported");
+		}
+
+	}
+	
 	public void enlist(RMBean bean) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
-		if(bean != null) {
+		if (bean != null) {
+			DummyTransaction tran = null;
 			synchronized (bean) {
-				InMemoryTransaction other = (InMemoryTransaction) bean.getTransaction();
-				while(other != null && other != this) {
-					// Put ourselves into the list of waiters
-					waitingForTran = other;
+				tran = (DummyTransaction) bean.getTransaction();
+				if (tran == null) {
+					tran = new DummyTransaction();
+					bean.setTransaction(tran);
+				}
+			}
 
-					// Look to see if there is a loop in the chain of waiters
-					if(!enlistedBeans.isEmpty()) {
-						HashSet set = new HashSet();
-						set.add(this);
-						while(other != null) {
-							if(set.contains(other)) {
-								String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.deadlock, this.toString(), bean.toString());
-								SandeshaStorageException e = new SandeshaStorageException(message);
-								
-								// Do our best to get out of the way of the other work in the system
-								waitingForTran = null;
-								releaseLocks();
-								
-								if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(message, e);
-								throw e;
-							}
-							set.add(other);
-							other = other.waitingForTran;
-						}
-					}
-					
-					boolean warn = false;
+			boolean locked = false;
+			while (!locked) {
+				locked = tran.tryLock();
+				if (!locked) {
+
 					try {
-						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("This " + this + " waiting for " + waitingForTran);
-						long pre = System.currentTimeMillis();
-						bean.wait(5000); 
-						long post = System.currentTimeMillis();
-						if ((post - pre) > 50000)
-							warn = true;
-					} catch(InterruptedException e) {
-						// Do nothing
-					}
-					other = (InMemoryTransaction) bean.getTransaction();
-					if (other != null && warn) {
-						//we have been waiting for a long time - this might imply a three way deadlock so error condition
-						if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("possible deadlock :" + this.toString() + " : " + bean.toString());
+						locked = tran.tryLock(5, TimeUnit.SECONDS);
+						if (!locked) {
+							if (log.isDebugEnabled())
+								log.debug("Waiting for bean lock 5 seconds");
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
-				
-				waitingForTran = null;
-				if(other == null) {
-					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug(this + " locking bean");
-					bean.setTransaction(this);
-					enlistedBeans.add(bean);
-				}
+
+				enlistedBeans.add(bean);
+
 			}
 		}
 		
@@ -141,10 +132,8 @@ public class InMemoryTransaction implements Transaction {
 		Iterator beans = enlistedBeans.iterator();
 		while(beans.hasNext()) {
 			RMBean bean = (RMBean) beans.next();
-			synchronized (bean) {
-				bean.setTransaction(null);
-				bean.notifyAll();
-			}
+			DummyTransaction tran = (DummyTransaction) bean.getTransaction();
+			tran.unlock();
 		}
 		enlistedBeans.clear();
 		
@@ -175,6 +164,7 @@ public class InMemoryTransaction implements Transaction {
 		return thread;
 	}
 }
+
 
 
 

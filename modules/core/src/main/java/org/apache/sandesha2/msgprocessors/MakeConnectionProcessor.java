@@ -291,24 +291,19 @@ public class MakeConnectionProcessor implements MsgProcessor {
 
 			SandeshaThread sender = storageManager.getSender();
 			WorkerLock lock = sender.getWorkerLock();
-			
+
 			String workId = matchingMessage.getMessageID();
-			SenderWorker worker = null;
-			synchronized(lock){
-				while (lock.isWorkPresent(workId)) {
-					try {
-						//wait on the lock.
-						lock.wait();
-					} catch (InterruptedException e) {
-							e.printStackTrace();
-					}
+			SenderWorker worker = new SenderWorker(pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
+			worker.setLock(lock);
+			worker.setWorkId(workId);
+			while (!lock.addWork(workId, worker)) {
+				try {
+					// wait on the lock.
+					lock.awaitRemoval(workId);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				
-				worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
-				worker.setLock(lock);
-				worker.setWorkId(workId);
-				
-				lock.addWork(workId, worker);
+
 			}
 			
 			setTransportProperties (returnMessage, pollMessage);

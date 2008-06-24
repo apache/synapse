@@ -19,8 +19,8 @@
 
 package org.apache.synapse.registry.url;
 
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +35,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -139,7 +141,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             RegistryEntryImpl wre = new RegistryEntryImpl();
             wre.setKey(key);
             wre.setName(url.getFile());
-            wre.setType(new URI(urlc.getContentType()));
+            wre.setType(urlc.getContentType());
             wre.setDescription("Resource at : " + url.toString());
             wre.setLastModified(urlc.getLastModified());
             wre.setVersion(urlc.getLastModified());
@@ -155,8 +157,6 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             handleException("Invalid URL reference " + root + key, e);
         } catch (IOException e) {
             handleException("IO Error reading from URL " + root + key, e);
-        } catch (URISyntaxException e) {
-            handleException("URI Syntax error reading from URL " + root + key, e);
         }
         return null;
     }
@@ -165,15 +165,12 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         super.init(properties);
         String value = properties.getProperty("root");
         if (value != null) {
-
             // if the root is folder, it should always end with '/'
             // therefore, property keys do not have to begin with '/', which could be misleading
             try {
-                URL url = new URL(value);
-                if (url.getProtocol().equals("file")) {
-                    if (!value.endsWith("/")) {
-                        value = value + "/";
-                    }
+                new URL(value);
+                if (!value.endsWith("/")) {
+                    value = value + "/";
                 }
             } catch (MalformedURLException e) {
                 // don't do any thing if this is not a valid URL

@@ -19,18 +19,32 @@
 
 package org.apache.synapse.endpoints;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.clustering.Member;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.algorithms.AlgorithmContext;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.InetAddress;
+import java.net.SocketAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.List;
+import java.util.TimerTask;
+import java.util.Timer;
+import java.util.ArrayList;
+import java.io.IOException;
 
 /**
  * Load balance endpoint can have multiple endpoints. It will route messages according to the
@@ -55,6 +69,16 @@ public class LoadbalanceEndpoint implements Endpoint {
      * interface could be used.
      */
     private List<Endpoint> endpoints = null;
+
+    /**
+     * List of currently available application members amongst which the load is distributed
+     */
+    private List<Member> activeMembers = null;
+
+    /**
+     * List of currently unavailable members
+     */
+    private List<Member> inactiveMembers = null;
 
     /**
      * Algorithm used for selecting the next endpoint to direct the load. Default is RoundRobin.
@@ -83,6 +107,11 @@ public class LoadbalanceEndpoint implements Endpoint {
      * algorithm
      */
     private final AlgorithmContext algorithmContext = new AlgorithmContext();
+
+    public void startApplicationMembershipTimer(){
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new MemberActivatorTask(), 1000, 500);
+    }
 
     public void send(MessageContext synMessageContext) {
 
@@ -131,6 +160,19 @@ public class LoadbalanceEndpoint implements Endpoint {
             }
         }
 
+        if (endpoints != null) {
+            sendToEndpoint(synMessageContext);
+        } else if (activeMembers != null) {
+            EndpointReference to = synMessageContext.getTo();
+            LoadbalanceFaultHandler faultHandler = new LoadbalanceFaultHandler(to);
+            if (failover) {
+                synMessageContext.pushFaultHandler(faultHandler);
+            }
+            sendToApplicationMember(synMessageContext, to, faultHandler);
+        }
+    }
+
+    private void sendToEndpoint(MessageContext synMessageContext) {
         Endpoint endpoint = algorithm.getNextEndpoint(synMessageContext, algorithmContext);
         if (endpoint != null) {
 
@@ -158,6 +200,54 @@ public class LoadbalanceEndpoint implements Endpoint {
         }
     }
 
+    private void sendToApplicationMember(MessageContext synCtx,
+                                         EndpointReference to,
+                                         LoadbalanceFaultHandler faultHandler) {
+        org.apache.axis2.context.MessageContext axis2MsgCtx =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+        String transport = axis2MsgCtx.getTransportIn().getName();
+        algorithm.setApplicationMembers(activeMembers);
+        Member currentMember = algorithm.getNextApplicationMember(algorithmContext);
+        faultHandler.setCurrentMember(currentMember);
+
+        if (currentMember != null) {
+
+            // URL rewrite
+            if (transport.equals("http") || transport.equals("https")) {
+                String address = to.getAddress();
+                if (address.indexOf(":") != -1) {
+                    try {
+                        address = new URL(address).getPath();
+                    } catch (MalformedURLException e) {
+                        String msg = "URL " + address + " is malformed";
+                        log.error(msg, e);
+                        throw new SynapseException(msg, e);
+                    }
+                }
+                EndpointReference epr =
+                        new EndpointReference(transport + "://" + currentMember.getHostName() +
+                                              ":" + currentMember.getHttpPort() + address);
+                synCtx.setTo(epr);
+                if (failover) {
+                    synCtx.getEnvelope().build();
+                }
+
+                AddressEndpoint endpoint = new AddressEndpoint();
+                EndpointDefinition definition = new EndpointDefinition();
+                endpoint.setEndpoint(definition);
+                endpoint.send(synCtx);
+            } else {
+                log.error("Cannot load balance for non-HTTP/S transport " + transport);
+            }
+        } else {
+            synCtx.getFaultStack().pop(); // Remove the LoadbalanceFaultHandler
+            String msg = "No application members available";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -172,6 +262,11 @@ public class LoadbalanceEndpoint implements Endpoint {
 
     public void setAlgorithm(LoadbalanceAlgorithm algorithm) {
         this.algorithm = algorithm;
+    }
+
+    public void setMembers(List<Member> members) {
+        this.activeMembers = members;
+        this.inactiveMembers = new ArrayList<Member>();
     }
 
     /**
@@ -244,6 +339,97 @@ public class LoadbalanceEndpoint implements Endpoint {
             if (o != null) {
                 ((FaultHandler) o).handleFault(synMessageContext);
             }
+        }
+    }
+
+    /**
+     * This FaultHandler will try to resend the message to another member if an error occurs
+     * while sending to some member. This is a failover mechanism
+     */
+    private class LoadbalanceFaultHandler extends FaultHandler {
+
+        private EndpointReference to;
+        private Member currentMember;
+
+        public void setCurrentMember(Member currentMember) {
+            this.currentMember = currentMember;
+        }
+
+        private LoadbalanceFaultHandler(EndpointReference to) {
+            this.to = to;
+        }
+
+        public void onFault(MessageContext synCtx) {
+            if (currentMember == null) {
+                return;
+            }
+            synCtx.pushFaultHandler(this);
+            activeMembers.remove(currentMember); // This member has to be inactivated
+            inactiveMembers.add(currentMember);
+            sendToApplicationMember(synCtx, to, this);
+        }
+    }
+
+    /**
+     * The task which checks whther inactive members have become available again 
+     */
+    private class MemberActivatorTask extends TimerTask{
+
+        public void run() {
+            try {
+                for(Member member: inactiveMembers){
+                    if(canConnect(member)){
+                        inactiveMembers.remove(member);
+                        activeMembers.add(member);
+                    }
+                }
+            } catch (Exception ignored) {
+                // Ignore all exceptions. The timer should continue to run
+            }
+        }
+
+        /**
+         * Before activating a member, we will try to verify whether we can connect to it
+         *
+         * @param member The member whose connectvity needs to be verified
+         * @return true, if the member can be contacted; false, otherwise.
+         */
+        private boolean canConnect(Member member) {
+            if(log.isDebugEnabled()){
+                log.debug("Trying to connect to member " + member.getHostName() + "...");
+            }
+            for (int retries = 30; retries > 0; retries--) {
+                try {
+                    InetAddress addr = InetAddress.getByName(member.getHostName());
+                    int httpPort = member.getHttpPort();
+                    if(log.isDebugEnabled()){
+                        log.debug("HTTP Port=" + httpPort);
+                    }
+                    if (httpPort != -1) {
+                        SocketAddress httpSockaddr = new InetSocketAddress(addr, httpPort);
+                        new Socket().connect(httpSockaddr, 10000);
+                    }
+                    int httpsPort = member.getHttpsPort();
+                    if(log.isDebugEnabled()){
+                        log.debug("HTTPS Port=" + httpPort);
+                    }
+                    if (httpsPort != -1) {
+                        SocketAddress httpsSockaddr = new InetSocketAddress(addr, httpsPort);
+                        new Socket().connect(httpsSockaddr, 10000);
+                    }
+                    return true;
+                } catch (IOException e) {
+                    if(log.isDebugEnabled()){
+                        log.debug("", e);
+                    }
+                    String msg = e.getMessage();
+                    if (msg.indexOf("Connection refused") == -1 &&
+                        msg.indexOf("connect timed out") == -1) {
+                        log.error("Cannot connect to member " + member, e);
+                    }
+                }
+            }
+            return false;
         }
     }
 }

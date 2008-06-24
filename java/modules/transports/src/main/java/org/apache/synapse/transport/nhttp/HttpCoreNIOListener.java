@@ -41,6 +41,7 @@ import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
+import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -82,53 +83,6 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private int state = BaseConstants.STOPPED;
     /** The ServerHandler */
     private ServerHandler handler = null;
-
-    /**
-     * configure and start the IO reactor on the specified port
-     * @param port port to start the listener on
-     */
-    private void startServerEngine(int port) {
-        HttpParams params = getServerParameters();
-        try {
-            ioReactor = new DefaultListeningIOReactor(
-                NHttpConfiguration.getInstance().getServerIOWorkers(), params);
-
-            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
-                public boolean handle(IOException ioException) {
-                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
-                        ioException.getMessage(), ioException);
-                    return true;
-                }
-
-                public boolean handle(RuntimeException runtimeException) {
-                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
-                        runtimeException.getMessage(), runtimeException);
-                    return true;
-                }
-            });
-        } catch (IOException e) {
-            log.error("Error starting the IOReactor", e);
-        }
-
-        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
-        IOEventDispatch ioEventDispatch = getEventDispatch(
-            handler, sslContext, sslIOSessionHandler, params);
-        state = BaseConstants.STARTED;
-        try {
-            if (bindAddress == null) {
-                ioReactor.listen(new InetSocketAddress(port));
-            } else {
-                ioReactor.listen(new InetSocketAddress(
-                    InetAddress.getByName(bindAddress), port));
-            }
-            ioReactor.execute(ioEventDispatch);
-        } catch (InterruptedIOException ex) {
-            log.fatal("Reactor Interrupted");
-        } catch (IOException e) {
-            log.fatal("Encountered an I/O error: " + e.getMessage(), e);
-        }
-        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Shutdown");
-    }
 
     protected IOEventDispatch getEventDispatch(
         NHttpServiceHandler handler, SSLContext sslContext, 
@@ -246,26 +200,83 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     /**
-     * Start the transport listener on a new thread
+     * Start the transport listener. This method returns when the listener is ready to
+     * accept connections.
      * @throws AxisFault
      */
     public void start() throws AxisFault {
         if (log.isDebugEnabled()) {
             log.debug("Starting Listener...");
         }
-        // start the Listener in a new seperate thread
+        
+        // configure the IO reactor on the specified port
+        HttpParams params = getServerParameters();
+        try {
+            ioReactor = new DefaultListeningIOReactor(
+                NHttpConfiguration.getInstance().getServerIOWorkers(), params);
+
+            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                public boolean handle(IOException ioException) {
+                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
+                        ioException.getMessage(), ioException);
+                    return true;
+                }
+
+                public boolean handle(RuntimeException runtimeException) {
+                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
+                        runtimeException.getMessage(), runtimeException);
+                    return true;
+                }
+            });
+        } catch (IOException e) {
+            handleException("Error starting the IOReactor", e);
+        }
+
+        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
+        final IOEventDispatch ioEventDispatch = getEventDispatch(
+            handler, sslContext, sslIOSessionHandler, params);
+        state = BaseConstants.STARTED;
+        
+        ListenerEndpoint endpoint;
+        try {
+            if (bindAddress == null) {
+                endpoint = ioReactor.listen(new InetSocketAddress(port));
+            } else {
+                endpoint = ioReactor.listen(new InetSocketAddress(
+                    InetAddress.getByName(bindAddress), port));
+            }
+        } catch (IOException e) {
+            handleException("Encountered an I/O error: " + e.getMessage(), e);
+            return;
+        }
+        
+        // start the IO reactor in a new separate thread
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
-                    startServerEngine(port);
+                    ioReactor.execute(ioEventDispatch);
+                } catch (InterruptedIOException ex) {
+                    log.fatal("Reactor Interrupted");
+                } catch (IOException e) {
+                    log.fatal("Encountered an I/O error: " + e.getMessage(), e);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.fatal("Unexpected exception in I/O reactor", e);
                 }
+                log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Shutdown");
             }
         }, "HttpCoreNIOListener");
 
         t.start();
-        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener starting on" +
+        
+        // Wait for the endpoint to become ready, i.e. for the listener to start accepting
+        // requests.
+        try {
+            endpoint.waitFor();
+        } catch (InterruptedException e) {
+            log.warn("HttpCoreNIOListener#start() was interrupted");
+        }
+        
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener started on" +
             (bindAddress != null ? " address : " + bindAddress : "") + " port : " + port);
     }
 

@@ -218,6 +218,10 @@
               <a href="#Sample57">Sample 57: Dynamic load balancing
               between 3 nodes</a>
             </li>
+              <li>
+              <a href="#Sample58">Sample 58: Static load balancing
+              between 3 nodes</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -2110,6 +2114,119 @@ Content-ID:
         the "enable" attribute of the "cluster" element. Also provide the IP
         address of you machine as the values of the "mcastBindAddress" and "localMemberHost"
         parameters. Then Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and
+      9003 and give some unique names to each server.
+    </p>
+    <p>
+      Example commands to run sample Axis2 servers from the &lt;Synapse
+      installation directory&gt;/samples/axis2Server directory in Linux are
+      listed below:
+    </p>
+<pre xml:space="preserve">./axis2server.sh -http 9001 -https 9005 -name MyServer1
+./axis2server.sh -http 9002 -https 9006 -name MyServer2
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</pre>
+    <p>
+      Now we are done with setting up the environment for load balance sample.
+      Start the load balance and failover client using the following command:
+    </p>
+<pre xml:space="preserve">ant loadbalancefailover -Di=100</pre>
+    <p>
+      This client sends 100 requests to the LoadbalanceFailoverService through
+      Synapse. Synapse will distribute the load among the three nodes
+      mentioned in the configuration in a round-robin manner.
+      LoadbalanceFailoverService appends the name of the server to the response,
+      so that client can determine which server has processed the message. If
+      you examine the console output of the client, you can see that requests
+      are processed by three servers as follows:
+    </p>
+<pre xml:space="preserve">[java] Request: 1 ==&gt; Response from server: MyServer1
+[java] Request: 2 ==&gt; Response from server: MyServer2
+[java] Request: 3 ==&gt; Response from server: MyServer3
+[java] Request: 4 ==&gt; Response from server: MyServer1
+[java] Request: 5 ==&gt; Response from server: MyServer2
+[java] Request: 6 ==&gt; Response from server: MyServer3
+[java] Request: 7 ==&gt; Response from server: MyServer1
+...</pre>
+    <p>
+      Now run the client without the -Di=100 parameter, i.e. ant loadbalancefailover,
+      to send infinite requests. While running the client shutdown the server named MyServer1.
+      You can observe that requests are only distributed among MyServer2 and
+      MyServer3 after shutting down MyServer1. Console output before and after
+      shutting down MyServer1 is listed below (MyServer1 was shutdown after
+      request 63):
+    </p>
+<pre xml:space="preserve">...
+[java] Request: 61 ==&gt; Response from server: MyServer1
+[java] Request: 62 ==&gt; Response from server: MyServer2
+[java] Request: 63 ==&gt; Response from server: MyServer3
+[java] Request: 64 ==&gt; Response from server: MyServer2
+[java] Request: 65 ==&gt; Response from server: MyServer3
+[java] Request: 66 ==&gt; Response from server: MyServer2
+[java] Request: 67 ==&gt; Response from server: MyServer3
+...</pre>
+    <p>
+      Now restart MyServer1. You can observe that requests will be again sent to
+      all three servers.
+    </p>
+
+<h2>
+      <a name="Sample58" id="Sample58">Sample 58: Static load balancing between 3 nodes</a>
+    </h2>
+<pre xml:space="preserve">
+
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;loadbalance failover="true"&gt;
+                        &lt;member ip="127.0.0.1" httpPort="9001" httpsPort="9005"/&gt;
+                        &lt;member ip="127.0.0.1" httpPort="9002" httpsPort="9006"/&gt;
+                        &lt;member ip="127.0.0.1" httpPort="9003" httpsPort="9007"/&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;
+
+</pre>
+    <p>
+      <strong>Objective: Demonstrate the simple static load balancing among a set of
+      nodes</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong>
+    </p>
+    <p>
+      Start Synapse with sample configuration 58. (i.e. synapse -sample 58)
+    </p>
+    <p>
+      Deploy the LoadbalanceFailoverService by switching to &lt;Synapse
+      installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService
+      directory and running ant.
+    </p>
+    <p>
+      Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and
       9003 and give some unique names to each server.
     </p>
     <p>

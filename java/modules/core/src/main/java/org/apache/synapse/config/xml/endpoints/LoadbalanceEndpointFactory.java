@@ -21,29 +21,36 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.clustering.Member;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * Creates {@link LoadbalanceEndpoint} using an XML configuration.
- *
+ * <p/>
  * &lt;endpoint [name="name"]&gt;
- *    &lt;loadbalance policy="load balance algorithm"&gt;
- *       &lt;endpoint&gt;+
- *    &lt;/loadbalance&gt;
+ * &lt;loadbalance policy="load balance algorithm"&gt;
+ * &lt;endpoint&gt;+
+ * &lt;/loadbalance&gt;
  * &lt;/endpoint&gt;
  */
 public class LoadbalanceEndpointFactory extends EndpointFactory {
 
     private static LoadbalanceEndpointFactory instance = new LoadbalanceEndpointFactory();
+    private static final QName MEMBER = new QName(SynapseConstants.SYNAPSE_NAMESPACE,
+                                    "member");
 
-    private LoadbalanceEndpointFactory() {}
+    private LoadbalanceEndpointFactory() {
+    }
 
     public static LoadbalanceEndpointFactory getInstance() {
         return instance;
@@ -56,7 +63,7 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
         OMElement loadbalanceElement = epConfig.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
 
-        if(loadbalanceElement != null) {
+        if (loadbalanceElement != null) {
 
             LoadbalanceEndpoint loadbalanceEndpoint = new LoadbalanceEndpoint();
 
@@ -68,13 +75,26 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
                 loadbalanceEndpoint.setName(name.getAttributeValue());
             }
 
-            // set endpoints
-            ArrayList<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
-            loadbalanceEndpoint.setEndpoints(endpoints);
+            LoadbalanceAlgorithm algorithm = null;
+
+            // set endpoints or members
+            if (loadbalanceElement.getFirstChildWithName(XMLConfigConstants.ENDPOINT_ELT) != null) {
+                ArrayList<Endpoint> endpoints
+                        = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
+                loadbalanceEndpoint.setEndpoints(endpoints);
+                algorithm =
+                        LoadbalanceAlgorithmFactory.
+                                createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
+            } else if (loadbalanceElement.getFirstChildWithName(MEMBER) != null) {
+                List<Member> members = getMembers(loadbalanceElement);
+                loadbalanceEndpoint.setMembers(members);
+                algorithm =
+                        LoadbalanceAlgorithmFactory.
+                                createLoadbalanceAlgorithm2(loadbalanceElement, members);
+                loadbalanceEndpoint.startApplicationMembershipTimer();
+            }
 
             // set load balance algorithm
-            LoadbalanceAlgorithm algorithm = LoadbalanceAlgorithmFactory.
-                    createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
             loadbalanceEndpoint.setAlgorithm(algorithm);
 
             // set if failover is turned off
@@ -87,5 +107,24 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
         }
 
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private List<Member> getMembers(OMElement loadbalanceElement) {
+        List<Member> members = new ArrayList<Member>();
+        for(Iterator memberIter = loadbalanceElement.getChildrenWithName(MEMBER);
+            memberIter.hasNext();){
+            OMElement memberEle = (OMElement) memberIter.next();
+            Member member = new Member(memberEle.getAttributeValue(new QName("ip")), -1);
+            String http = memberEle.getAttributeValue(new QName("httpPort"));
+            if (http != null) {
+                member.setHttpPort(Integer.parseInt(http));
+            }
+            String https = memberEle.getAttributeValue(new QName("httpsPort"));
+            if (https != null && https.trim().length() != 0) {
+                member.setHttpsPort(Integer.parseInt(https.trim()));
+            }
+            members.add(member);
+        }
+        return members;
     }
 }

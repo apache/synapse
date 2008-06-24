@@ -19,17 +19,22 @@
 
 package org.apache.synapse.registry;
 
-import org.apache.synapse.registry.RegistryEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 
-import java.net.URI;
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 import java.util.Date;
 
 public class RegistryEntryImpl implements RegistryEntry {
 
+    private static final Log log = LogFactory.getLog(RegistryEntry.class);
+    
     private String key = null;
     private String name = null;
     private long version = Long.MIN_VALUE;
-    private URI type = null;
+    private String type = null;
     private String description;
     private long created;
     private long lastModified;
@@ -59,12 +64,21 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.version = version;
     }
 
-    public URI getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(URI type) {
-        this.type = type;
+    public void setType(String type) {
+        try {
+            new ContentType(type);
+            if (log.isDebugEnabled()) {
+                log.debug("Content type :" + type);
+            }
+            this.type = type;
+        } catch (ParseException e) {
+            String msg = "Invalid content-type ' " + type + " '";
+            throw new SynapseException(msg, e);
+        }
     }
 
     public String getDescription() {

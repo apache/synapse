@@ -142,11 +142,6 @@ public class SynapseCommodityServiceTest extends TestCase {
     }
 
     public void testN2N() throws Exception {
-        try {
-            Thread.sleep(4000);
-            // ensure that the servers are up before we actually use them
-        } catch (InterruptedException ignore) {}
-        
         // Creating the Simple Commodity Client
         System.getProperties().remove(org.apache.axis2.Constants.AXIS2_CONF);
         ServiceClient businessClient = new ServiceClient(null, null);

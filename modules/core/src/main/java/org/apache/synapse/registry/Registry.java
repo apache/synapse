@@ -22,7 +22,6 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.config.Entry;
 
-import java.util.Map;
 import java.util.Properties;
 
 /**

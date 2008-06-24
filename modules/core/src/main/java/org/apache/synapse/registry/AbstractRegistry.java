@@ -27,9 +27,6 @@ import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -148,7 +145,7 @@ public abstract class AbstractRegistry implements Registry {
         return entry.getValue();
     }
 
-    private XMLToObjectMapper getMapper(URI type) {
+    private XMLToObjectMapper getMapper(String type) {
         return null;
     }
 

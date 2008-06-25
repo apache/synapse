@@ -128,13 +128,15 @@ public class FIXTransportSender extends AbstractTransportSender {
         }
     }
 
-    private boolean isTargetVald(Map<String, String> fieldValues, SessionID targetSession) {
+    private boolean isTargetVald(Map<String, String> fieldValues, SessionID targetSession,
+                                 boolean beginStrValidation) {
+
         String beginString = fieldValues.get(FIXConstants.BEGIN_STRING);
         String deliverToCompID = fieldValues.get(FIXConstants.DELIVER_TO_COMP_ID);
         String deliverToSubID = fieldValues.get(FIXConstants.DELIVER_TO_SUB_ID);
         String deliverToLocationID = fieldValues.get(FIXConstants.DELIVER_TO_LOCATION_ID);
 
-        if (!targetSession.getBeginString().equals(beginString)) {
+        if (beginStrValidation && !targetSession.getBeginString().equals(beginString)) {
             return false;
         } else if (!targetSession.getTargetCompID().equals(deliverToCompID)) {
             return false;
@@ -268,9 +270,12 @@ public class FIXTransportSender extends AbstractTransportSender {
         String beginString = fieldValues.get(FIXConstants.BEGIN_STRING);
         String deliverToCompID = fieldValues.get(FIXConstants.DELIVER_TO_COMP_ID);
 
+        AxisService service = cfgCtx.getAxisConfiguration().getService(serviceName);
+
         //match BeginString values
-        if (beginString != null && !beginString.equals(sessionID.getBeginString())) {
-            handleException("Cannot forward messages to a session with a different BeginString");
+        if (isValidationOn(service) && beginString != null && !beginString.equals(sessionID.getBeginString())) {
+            handleException("BeginString validation is on. Cannot forward messages to a session" +
+                    " with a different BeginString");
         }
 
         if (deliverToCompID != null) {
@@ -285,7 +290,6 @@ public class FIXTransportSender extends AbstractTransportSender {
 
         if (!Session.doesSessionExist(sessionID)) {
             //try to create initiator to send the message
-            AxisService service = cfgCtx.getAxisConfiguration().getService(serviceName);
             sessionFactory.createFIXInitiator(targetEPR, service, sessionID);
         }
 
@@ -319,9 +323,12 @@ public class FIXTransportSender extends AbstractTransportSender {
         String beginString = fieldValues.get(FIXConstants.BEGIN_STRING);
         String deliverToCompID = fieldValues.get(FIXConstants.DELIVER_TO_COMP_ID);
 
+        AxisService service = cfgCtx.getAxisConfiguration().getService(serviceName);
+
         //match BeginString values
-        if (beginString != null && !beginString.equals(sessionID.getBeginString())) {
-            handleException("Cannot forward messages to a session with a different BeginString");
+        if (isValidationOn(service) && beginString != null && !beginString.equals(sessionID.getBeginString())) {
+            handleException("BeginString validation is on. Cannot forward messages to a session" +
+                    " with a different BeginString");
         }
 
         if (deliverToCompID != null) {
@@ -330,7 +337,6 @@ public class FIXTransportSender extends AbstractTransportSender {
                 handleException("Cannot forward messages that do not have a valid DeliverToCompID field");
             } else {
                 prepareToForwardMessage(fixMessage, fieldValues);
-                AxisService service = cfgCtx.getAxisConfiguration().getService(serviceName);
                 setDeliverToXFields(fixMessage, service);
             }
         } else {
@@ -366,18 +372,20 @@ public class FIXTransportSender extends AbstractTransportSender {
         Acceptor acceptor = sessionFactory.getAccepter(serviceName);
         SessionID sessionID = null;
 
+        AxisService service = cfgCtx.getAxisConfiguration().getService(serviceName);
+
         if (acceptor != null) {
             ArrayList<SessionID> sessions = acceptor.getSessions();
             if (sessions.size() == 1) {
                 sessionID = sessions.get(0);
-                if (deliverToCompID != null && !isTargetVald(fieldValues, sessionID)) {
+                if (deliverToCompID != null && !isTargetVald(fieldValues, sessionID, isValidationOn(service))) {
                     sessionID = null;
                 }
 
             } else if (sessions.size() > 1 && deliverToCompID != null) {
                 for (int i = 0; i < sessions.size(); i++) {
                     sessionID = sessions.get(i);
-                    if (isTargetVald(fieldValues, sessionID)) {
+                    if (isTargetVald(fieldValues, sessionID, isValidationOn(service))) {
                         break;
                     }
                 }
@@ -388,6 +396,23 @@ public class FIXTransportSender extends AbstractTransportSender {
             //Found a valid session. Now forward the message...
             FIXOutTransportInfo fixOutInfo = new FIXOutTransportInfo(sessionID);
             return sendUsingTrpOutInfo(fixOutInfo, serviceName, fixMessage, srcSession, counter);
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether BeginString validation is on for the specified
+     * service.
+     *
+     * @param service the AxisService of the message
+     * @return a boolean value indicating the validation state
+     */
+    private boolean isValidationOn(AxisService service) {
+        Parameter validationParam = service.getParameter(FIXConstants.FIX_BEGIN_STRING_VALIDATION);
+        if (validationParam != null) {
+            if ("true".equals(validationParam.getValue().toString())) {
+                return true;
+            }
         }
         return false;
     }

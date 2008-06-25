@@ -117,7 +117,8 @@ public class SandeshaInHandler extends AbstractHandler {
 
 				SandeshaPolicyBean propertyBean = SandeshaUtil
 						.getPropertyBean(msgCtx.getAxisOperation());
-				if (propertyBean.isEnforceRM()) {
+				
+				if (propertyBean.isEnforceRM() && !Boolean.valueOf((String)msgCtx.getProperty(Sandesha2Constants.FORCE_ALLOW_UNRELIABLE_MSG))) {
 					String message = SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.rmEnforceFailure, msgCtx.getMessageID());
 					log.warn(message);

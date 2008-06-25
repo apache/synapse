@@ -170,6 +170,8 @@ public class SequenceProcessor {
 		}
 		
 		EndpointReference replyTo = rmMsgCtx.getReplyTo();
+		if (log.isDebugEnabled())
+			log.debug("SequenceProcessor::processReliableMessage replyTo = " + replyTo);
 		
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
@@ -236,8 +238,11 @@ public class SequenceProcessor {
 			//replied), the client may take this as a InOnly message and may avoid looking for the application
 			//response if using replay.
 			//Therefore we only send acks back in the anon InOnly case.
-			if (WSDLConstants.MEP_CONSTANT_IN_ONLY == rmMsgCtx.getMessageContext().getAxisOperation().getAxisSpecificMEPConstant() && 
-					(replyTo==null || replyTo.getAddress()==null || replyTo.isWSAddressingAnonymous() )) {
+			int msgExchangePattern = rmMsgCtx.getMessageContext().getAxisOperation().getAxisSpecificMEPConstant();
+			if (log.isDebugEnabled())
+				log.debug("SequenceProcessor:: mep= " + msgExchangePattern);	
+			if (WSDLConstants.MEP_CONSTANT_IN_ONLY ==  msgExchangePattern && 
+					(replyTo==null || replyTo.getAddress()==null || replyTo.isWSAddressingAnonymous() || replyTo.hasNoneAddress())) {
 				sendAckIfNeeded(bean, sequenceId, rmMsgCtx, storageManager, true, acksTo.hasAnonymousAddress());	
 			}
 			

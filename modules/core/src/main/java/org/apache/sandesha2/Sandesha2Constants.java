@@ -586,6 +586,8 @@ public interface Sandesha2Constants {
 	
 	static final String MSG_NO_OF_IN_MSG = "MsgNoOfInMsg";
 	
+	static final String FORCE_ALLOW_UNRELIABLE_MSG = "forceAllowUnreliableMessage";
+	
 	static final String MAKE_CONNECTION_RESPONSE = "MakeConnectionResponse";
 	
 	static final String SERVICE_CONTAINS_OUT_IN_MEPS = "ServiceContainsOutInMeps";

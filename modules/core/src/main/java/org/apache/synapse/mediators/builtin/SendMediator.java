@@ -19,10 +19,8 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
@@ -32,7 +30,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.clustering.ClusterManager;
 
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * SendMediator sends a message using specified semantics. If it contains an endpoint it will
@@ -53,15 +50,11 @@ public class SendMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Send mediator");
-
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
-            }
+        synLog.traceOrDebug("Start : Send mediator");
+        if (synLog.isTraceTraceEnabled()) {
+            synLog.traceTrace("Message : " + synCtx.getEnvelope());
         }
 
         if (synCtx.isResponse()) {
@@ -137,7 +130,7 @@ public class SendMediator extends AbstractMediator {
         // if no endpoints are defined, send where implicitly stated
         if (endpoint == null) {
 
-            if (traceOrDebugOn) {
+            if (synLog.isTraceOrDebugEnabled()) {
                 StringBuffer sb = new StringBuffer();
                 sb.append("Sending " + (synCtx.isResponse() ? "response" : "request")
                         + " message using implicit message properties..");
@@ -145,11 +138,11 @@ public class SendMediator extends AbstractMediator {
                         synCtx.getTo().getAddress() : "null"));
                 sb.append("\nSOAPAction: " + (synCtx.getWSAAction() != null ?
                         synCtx.getWSAAction() : "null"));
-                traceOrDebug(traceOn, sb.toString());
+                synLog.traceOrDebug(sb.toString());
             }
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Envelope : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Envelope : " + synCtx.getEnvelope());
             }
             synCtx.getEnvironment().send(null, synCtx);
 
@@ -157,9 +150,7 @@ public class SendMediator extends AbstractMediator {
             endpoint.send(synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Send mediator");
-        }
+        synLog.traceOrDebug("End : Send mediator");
 
         return true;
     }

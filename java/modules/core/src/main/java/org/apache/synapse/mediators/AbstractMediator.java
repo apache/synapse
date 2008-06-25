@@ -23,6 +23,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -89,6 +90,16 @@ public abstract class AbstractMediator implements Mediator {
         if (traceState != SynapseConstants.TRACING_UNSET) {
             synCtx.setTracingState(traceState);
         }
+    }
+
+    /**
+     * Get a SynapseLog instance appropriate for the given context.
+     * 
+     * @param synCtx
+     * @return
+     */
+    protected SynapseLog getLog(MessageContext synCtx) {
+        return new MediatorLog(log, isTraceOn(synCtx));
     }
 
     /**

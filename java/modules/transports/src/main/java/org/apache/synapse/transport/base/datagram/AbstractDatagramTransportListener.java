@@ -28,17 +28,20 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.transport.http.server.HttpUtils;
 import org.apache.synapse.transport.base.AbstractTransportListener;
 import org.apache.synapse.transport.base.ParamUtils;
 
-public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoint> extends AbstractTransportListener {
+public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoint>
+        extends AbstractTransportListener {
+    
     private final Map<String,E> endpoints = new HashMap<String,E>();
 	private DatagramDispatcher<E> dispatcher;
     private String defaultIp;
 	
 	@Override
-    public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn) throws AxisFault {
+    public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn)
+            throws AxisFault {
+        
         super.init(cfgCtx, transportIn);
         DatagramDispatcherCallback callback = new DatagramDispatcherCallback() {
             public void receive(DatagramEndpoint endpoint, byte[] data, int length) {
@@ -51,7 +54,7 @@ public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoi
             throw new AxisFault("Unable to create selector", ex);
         }
         try {
-            defaultIp = HttpUtils.getIpAddress(cfgCtx.getAxisConfiguration());
+            defaultIp = org.apache.axis2.util.Utils.getIpAddress(cfgCtx.getAxisConfiguration());
         } catch (SocketException ex) {
             throw new AxisFault("Unable to determine the host's IP address", ex);
         }
@@ -64,10 +67,12 @@ public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoi
         	endpoint = createEndpoint(service);
             endpoint.setListener(this);
             endpoint.setService(service);
-            endpoint.setContentType(ParamUtils.getRequiredParam(service, "transport." + getTransportName() + ".contentType"));
+            endpoint.setContentType(ParamUtils.getRequiredParam(
+                    service, "transport." + getTransportName() + ".contentType"));
             endpoint.setMetrics(metrics);
         } catch (AxisFault ex) {
-            log.warn("Error configuring the " + getTransportName() + " transport for service '" + service.getName() + "': " + ex.getMessage());
+            log.warn("Error configuring the " + getTransportName()
+                    + " transport for service '" + service.getName() + "': " + ex.getMessage());
             disableTransportForService(service);
             return;
         }
@@ -75,12 +80,15 @@ public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoi
         try {
             dispatcher.addEndpoint(endpoint);
         } catch (IOException ex) {
-            log.error("Unable to listen on endpoint " + endpoint.getEndpointReference(defaultIp), ex);
+            log.error("Unable to listen on endpoint "
+                    + endpoint.getEndpointReference(defaultIp), ex);
             disableTransportForService(service);
             return;
         }
         if (log.isDebugEnabled()) {
-            log.debug("Started listening on endpoint " + endpoint.getEndpointReference(defaultIp) + " [contentType=" + endpoint.getContentType() + "; service=" + service.getName() + "]");
+            log.debug("Started listening on endpoint " + endpoint.getEndpointReference(defaultIp)
+                    + " [contentType=" + endpoint.getContentType()
+                    + "; service=" + service.getName() + "]");
         }
         endpoints.put(service.getName(), endpoint);
     }
@@ -110,10 +118,13 @@ public abstract class AbstractDatagramTransportListener<E extends DatagramEndpoi
         if (endpoint == null) {
             return null;
         } else {
-            return new EndpointReference[] { endpoint.getEndpointReference(ip == null ? defaultIp : ip) };
+            return new EndpointReference[] {
+                    endpoint.getEndpointReference(ip == null ? defaultIp : ip) };
         }
     }
     
-	protected abstract DatagramDispatcher<E> createDispatcher(DatagramDispatcherCallback callback) throws IOException;
-	protected abstract E createEndpoint(AxisService service) throws AxisFault;
+	protected abstract DatagramDispatcher<E> createDispatcher(DatagramDispatcherCallback callback)
+            throws IOException;
+    
+    protected abstract E createEndpoint(AxisService service) throws AxisFault;
 }

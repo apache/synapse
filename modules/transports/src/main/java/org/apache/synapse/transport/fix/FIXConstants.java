@@ -96,4 +96,6 @@ public class FIXConstants {
 
     public static final String FIX_RESPONSE_HANDLER_APPROACH = "transport.fix.SendAllToInSequence";
 
+    public static final String FIX_BEGIN_STRING_VALIDATION = "transport.fix.BeginStringValidation";
+
 }

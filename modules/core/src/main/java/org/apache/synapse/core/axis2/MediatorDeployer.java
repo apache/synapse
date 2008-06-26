@@ -19,6 +19,18 @@
 
 package org.apache.synapse.core.axis2;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentClassLoader;
@@ -30,11 +42,8 @@ import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MediatorSerializer;
 import org.apache.synapse.config.xml.MediatorSerializerFinder;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
+import org.apache.synapse.config.xml.StartupFactory;
+import org.apache.synapse.config.xml.StartupFinder;
 
 /**
  * This will support the hot deployment and hot update of the mediators at runtime using the
@@ -72,83 +81,50 @@ public class MediatorDeployer implements Deployer {
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
-        log.info("Loading mediator from: " + deploymentFileData.getAbsolutePath());
+        log.info("Loading extensions from: " + deploymentFileData.getAbsolutePath());
 
         // get the context class loader for the later restore of the context class loader
         ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
 
         try {
+            boolean isDirectory = deploymentFileData.getFile().isDirectory();
+            deploymentFileData.setClassLoader(isDirectory, getClass().getClassLoader(),
+                    (File)cfgCtx.getAxisConfiguration().getParameterValue(
+                            Constants.Configuration.ARTIFACTS_TEMP_DIR));
 
-            DeploymentClassLoader urlCl = new DeploymentClassLoader(
-                    new URL[]{deploymentFileData.getFile().toURL()}, null, prevCl);
+            DeploymentClassLoader urlCl
+                = (DeploymentClassLoader)deploymentFileData.getClassLoader();
             Thread.currentThread().setContextClassLoader(urlCl);
 
+            // StartupFactory registration
+            for (StartupFactory factory : getProviders(StartupFactory.class, urlCl)) {
+                QName tagQName = factory.getTagQName();
+                Class<? extends StartupFactory> clazz = factory.getClass();
+                StartupFinder finder = StartupFinder.getInstance();
+                finder.getFactoryMap().put(tagQName, clazz);
+                finder.getSerializerMap().put(tagQName, factory.getSerializerClass());
+                log.info("Registered startup factory and serializer for " + tagQName);
+            }
+
             // MediatorFactory registration
-            URL facURL = urlCl.findResource(
-                    "META-INF/services/org.apache.synapse.config.xml.MediatorFactory");
-            if (facURL != null) {
-                InputStream facStream = facURL.openStream();
-                InputStreamReader facreader = new InputStreamReader(facStream);
-
-                StringBuffer facSB = new StringBuffer();
-                int c;
-                while ((c = facreader.read()) != -1) {
-                    facSB.append((char) c);
-                }
-
-                String[] facClassNames = facSB.toString().split("\n");
-                for (String facClassName : facClassNames) {
-                    log.info("Registering the Mediator factory: " + facClassName);
-                    Class facClass = urlCl.loadClass(facClassName);
-                    MediatorFactory facInst = (MediatorFactory) facClass.newInstance();
-                    MediatorFactoryFinder.getInstance()
-                            .getFactoryMap().put(facInst.getTagQName(), facClass);
-                    log.info("Mediator loaded and registered for " +
-                            "the tag name: " + facInst.getTagQName());
-                }
-            } else {
-                handleException("Unable to find the MediatorFactory implementation. " +
-                        "Unable to register the MediatorFactory with the FactoryFinder");
+            for (MediatorFactory factory : getProviders(MediatorFactory.class, urlCl)) {
+                QName tagQName = factory.getTagQName();
+                Class<? extends MediatorFactory> clazz = factory.getClass();
+                MediatorFactoryFinder.getInstance().getFactoryMap().put(tagQName, clazz);
+                log.info("Registered mediator factory " + clazz.getName() + " for " + tagQName);
             }
 
             // MediatorSerializer registration
-            URL serURL = urlCl.findResource(
-                    "META-INF/services/org.apache.synapse.config.xml.MediatorSerializer");
-            if (serURL != null) {
-                InputStream serStream = serURL.openStream();
-                InputStreamReader serReader = new InputStreamReader(serStream);
-
-                StringBuffer serSB = new StringBuffer();
-                int c;
-                while ((c = serReader.read()) != -1) {
-                    serSB.append((char) c);
-                }
-
-                String[] serClassNames = serSB.toString().split("\n");
-                for (String serClassName : serClassNames) {
-                    log.info("Registering the Mediator serializer: " + serClassName);
-                    Class serClass = urlCl.loadClass(serClassName);
-                    MediatorSerializer serInst = (MediatorSerializer) serClass.newInstance();
-                    MediatorSerializerFinder.getInstance()
-                            .getSerializerMap().put(serInst.getMediatorClassName(), serInst);
-                    log.info("Mediator loaded and registered for " +
-                            "the serialization as: " + serInst.getMediatorClassName());
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to find the MediatorSerializer implementation. " +
-                            "Unable to register the MediatorSerializer with the SerializerFinder");
-                }
+            for (MediatorSerializer serializer : getProviders(MediatorSerializer.class, urlCl)) {
+                String mediatorClassName = serializer.getMediatorClassName();
+                MediatorSerializerFinder.getInstance().getSerializerMap().put(
+                        mediatorClassName, serializer);
+                log.info("Registered mediator serializer " + serializer.getClass().getName()
+                        + " for " + mediatorClassName);
             }
-
+            
         } catch (IOException e) {
             handleException("I/O error in reading the mediator jar file", e);
-        } catch (ClassNotFoundException e) {
-            handleException("Unable to find the specified class on the path or in the jar file", e);
-        } catch (IllegalAccessException e) {
-            handleException("Unable to load the class from the jar", e);
-        } catch (InstantiationException e) {
-            handleException("Unable to instantiate the class specified", e);
         } finally {
             // restore the class loader back
             if (log.isDebugEnabled()) {
@@ -156,6 +132,40 @@ public class MediatorDeployer implements Deployer {
             }
             Thread.currentThread().setContextClassLoader(prevCl);
         }
+    }
+    
+    private <T> List<T> getProviders(Class<T> providerClass, URLClassLoader loader)
+            throws IOException {
+        
+        List<T> providers = new LinkedList<T>();
+        String providerClassName = providerClass.getName();
+        providerClassName = providerClassName.substring(providerClassName.indexOf('.')+1);
+        URL servicesURL = loader.findResource("META-INF/services/" + providerClass.getName());
+        if (servicesURL != null) {
+            BufferedReader in
+                = new BufferedReader(new InputStreamReader(servicesURL.openStream()));
+            try {
+                String className;
+                while ((className = in.readLine()) != null) {
+                    log.info("Loading the " + providerClassName + " implementation: " + className);
+                    try {
+                        Class<? extends T> clazz
+                            = loader.loadClass(className).asSubclass(providerClass);
+                        providers.add(clazz.newInstance());
+                    } catch (ClassNotFoundException e) {
+                        handleException("Unable to find the specified class on the path or " +
+                        		"in the jar file", e);
+                    } catch (IllegalAccessException e) {
+                        handleException("Unable to load the class from the jar", e);
+                    } catch (InstantiationException e) {
+                        handleException("Unable to instantiate the class specified", e);
+                    }
+                }
+            } finally {
+                in.close();
+            }
+        }
+        return providers;
     }
 
     /**

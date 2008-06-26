@@ -32,6 +32,7 @@ import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -75,7 +76,33 @@ import java.util.List;
  * 
  */
 public class XSLTMediator extends AbstractMediator {
-
+    
+    private static class ErrorListenerImpl implements ErrorListener {
+        private final SynapseLog synLog;
+        private final String activity;
+        
+        public ErrorListenerImpl(SynapseLog synLog, String activity) {
+            this.synLog = synLog;
+            this.activity = activity;
+        }
+        
+        public void warning(TransformerException e) throws TransformerException {
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebugWarn("Warning encountered during " + activity + " : " + e);
+            }
+        }
+        
+        public void error(TransformerException e) throws TransformerException {
+            synLog.error("Error occured in " + activity + " : " + e);
+            throw e;
+        }
+        
+        public void fatalError(TransformerException e) throws TransformerException {
+            synLog.error("Fatal error occured in " + activity + " : " + e);
+            throw e;
+        }
+    }
+    
     /**
      * The feature for which deciding swiching between DOM and Stream during the
      * transformation process
@@ -139,19 +166,15 @@ public class XSLTMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : XSLT mediator");
-
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
-            }
+        synLog.traceOrDebug("Start : XSLT mediator");
+        if (synLog.isTraceTraceEnabled()) {
+            synLog.traceTrace("Message : " + synCtx.getEnvelope());
         }
 
         try {
-            performXSLT(synCtx, traceOrDebugOn, traceOn);
+            performXSLT(synCtx, synLog);
 
         } catch (Exception e) {
             handleException("Unable to perform XSLT transformation using : " + xsltKey +
@@ -159,9 +182,7 @@ public class XSLTMediator extends AbstractMediator {
 
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : XSLT mediator");
-        }
+        synLog.traceOrDebug("End : XSLT mediator");
 
         return true;
     }
@@ -169,11 +190,9 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * Perform actual XSLT transformation
      * @param synCtx current message
-     * @param traceOrDebugOn is trace or debug on?
-     * @param traceOn is trace on?
+     * @param synLog the logger to be used
      */
-    private void performXSLT(MessageContext synCtx, final boolean traceOrDebugOn,
-        final boolean traceOn) {
+    private void performXSLT(MessageContext synCtx, SynapseLog synLog) {
 
         boolean reCreate = false;
         OMNode sourceNode = getTransformSource(synCtx);
@@ -182,38 +201,15 @@ public class XSLTMediator extends AbstractMediator {
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
-        ErrorListener errorListener = new ErrorListener() {
-
-            public void warning(TransformerException e) throws TransformerException {
-
-                if (traceOrDebugOn) {
-                    traceOrDebugWarn(
-                            traceOn, "Warning encountered during transformation : " + e);
-                }
-            }
-            
-            public void error(TransformerException e) throws TransformerException {
-                log.error("Error occured in XSLT transformation : " + e);
-                throw e;
-            }
-            
-            public void fatalError(TransformerException e) throws TransformerException {
-                log.error("Fatal error occured in the XSLT transformation : " + e);
-                throw e;
-            }
-        };
-
-        if (traceOrDebugOn) {
-            trace.trace("Transformation source : " + sourceNode.toString());
+        if (synLog.isTraceTraceEnabled()) {
+            synLog.traceTrace("Transformation source : " + sourceNode.toString());
         }
 
         Source transformSrc;
         Result transformTgt = null;
 
         if (useDOMSourceAndResults) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Using a DOMSource for transformation");
-            }
+            synLog.traceOrDebug("Using a DOMSource for transformation");
 
             // for fast transformations create a DOMSource - ** may not work always though **
             transformSrc = new DOMSource(
@@ -231,9 +227,7 @@ public class XSLTMediator extends AbstractMediator {
             }
 
         } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Using byte array serialization for transformation");
-            }
+            synLog.traceOrDebug("Using byte array serialization for transformation");
 
             transformSrc = AXIOMUtils.asSource(sourceNode);
             
@@ -243,9 +237,7 @@ public class XSLTMediator extends AbstractMediator {
         }
 
         if (transformTgt == null) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Was unable to get a javax.xml.transform.Result created");
-            }
+            synLog.traceOrDebug("Was unable to get a javax.xml.transform.Result created");
             return;
         }
 
@@ -262,7 +254,7 @@ public class XSLTMediator extends AbstractMediator {
         synchronized (transformerLock) {
             if (reCreate || cachedTemplates == null) {
                 // Set an error listener (SYNAPSE-307).
-                transFact.setErrorListener(errorListener);
+                transFact.setErrorListener(new ErrorListenerImpl(synLog, "stylesheet parsing"));
                 try {
                     cachedTemplates = transFact.newTemplates(
                         SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
@@ -289,11 +281,12 @@ public class XSLTMediator extends AbstractMediator {
                         } else {
                             value = prop.getExpression().stringValueOf(synCtx);
                         }
-                        if (traceOrDebugOn) {
+                        if (synLog.isTraceOrDebugEnabled()) {
                             if (value == null) {
-                                traceOrDebug(traceOn, "Not setting parameter '" + prop.getName() + "'");
+                                synLog.traceOrDebug("Not setting parameter '"
+                                                            + prop.getName() + "'");
                             } else {
-                                traceOrDebug(traceOn, "Setting parameter '" + prop.getName()
+                                synLog.traceOrDebug("Setting parameter '" + prop.getName()
                                                             + "' to '" + value + "'");
                             }
                         }
@@ -304,13 +297,11 @@ public class XSLTMediator extends AbstractMediator {
                 }
             }
 
-            transformer.setErrorListener(errorListener);
+            transformer.setErrorListener(new ErrorListenerImpl(synLog, "XSLT transformation"));
             
             transformer.transform(transformSrc, transformTgt);
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Transformation completed - processing result");
-            }
+            synLog.traceOrDebug("Transformation completed - processing result");
 
             // get the result OMElement
             OMElement result = null;
@@ -318,17 +309,13 @@ public class XSLTMediator extends AbstractMediator {
 
                 Node node = ((DOMResult) transformTgt).getNode();
                 if (node == null) {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, ("Transformation result (DOMResult) was null"));
-                    }
+                    synLog.traceOrDebug("Transformation result (DOMResult) was null");
                     return;
                 }
 
                 Node resultNode = node.getFirstChild();
                 if (resultNode == null) {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, ("Transformation result (DOMResult) was empty"));
-                    }
+                    synLog.traceOrDebug("Transformation result (DOMResult) was empty");
                     return;
                 }
 
@@ -340,14 +327,13 @@ public class XSLTMediator extends AbstractMediator {
                 String outputMethod = transformer.getOutputProperty(OutputKeys.METHOD);
                 String encoding = transformer.getOutputProperty(OutputKeys.ENCODING);
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "output method: " + outputMethod
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("output method: " + outputMethod
                             + "; encoding: " + encoding);
                 }
                 
                 if ("text".equals(outputMethod)) {
-                    result = handleNonXMLResult(tempTargetData, Charset.forName(encoding),
-                                                traceOrDebugOn, traceOn);
+                    result = handleNonXMLResult(tempTargetData, Charset.forName(encoding), synLog);
                 } else {
                     try {
                         XMLStreamReader reader = StAXUtils.createXMLStreamReader(
@@ -369,26 +355,24 @@ public class XSLTMediator extends AbstractMediator {
             }
 
             if (result == null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Transformation result was null");
-                }
+                synLog.traceOrDebug("Transformation result was null");
                 return;
             } else {
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace("Transformation result : " + result.toString());
+                if (synLog.isTraceTraceEnabled()) {
+                    synLog.traceTrace("Transformation result : " + result.toString());
                 }
             }
 
             if (targetPropertyName != null) {
                 // add result XML as a message context property to the message
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Adding result as message context property : " +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Adding result as message context property : " +
                         targetPropertyName);
                 }
                 synCtx.setProperty(targetPropertyName, result);
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Replace " +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Replace " +
                         (isSoapEnvelope ? "SOAP envelope" : isSoapBody ? "SOAP body" : "node")
                         + " with result");
                 }
@@ -499,19 +483,14 @@ public class XSLTMediator extends AbstractMediator {
      * to wrap the text payload so that other mediators could still process the result
      * @param tempData the encoded text payload
      * @param charset the encoding of the payload
-     * @param traceOrDebugOn is tracing on debug logging on?
-     * @param traceOn is tracing on?
+     * @param synLog the logger to be used
      * @return an OMElement wrapping the text payload
      */
     private OMElement handleNonXMLResult(TemporaryData tempData, Charset charset,
-        boolean traceOrDebugOn, boolean traceOn) {
+                                         SynapseLog synLog) {
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Processing non SOAP/XML (text) transformation result");
-        }
-        if (traceOn && trace.isTraceEnabled()) {
-            trace.trace("Wrapping text transformation result");
-        }
+        synLog.traceOrDebug("Processing non SOAP/XML (text) transformation result");
+        synLog.traceTrace("Wrapping text transformation result");
 
         return TextFileDataSource.createOMSourcedElement(tempData, charset);
     }

@@ -61,6 +61,19 @@ public class MediatorLog implements SynapseLog {
         defaultLog.debug(msg);
     }
 
+    /**
+     * Log a message at level WARN to the default log, if level DEBUG is enabled,
+     * and to the trace log, if trace is enabled for the mediator.
+     */
+    public void traceOrDebugWarn(Object msg) {
+        if (traceOn) {
+            traceLog.warn(msg);
+        }
+        if (defaultLog.isDebugEnabled()) {
+            defaultLog.warn(msg);
+        }
+    }
+    
     public boolean isTraceTraceEnabled() {
         return traceOn && traceLog.isTraceEnabled();
     }
@@ -71,6 +84,16 @@ public class MediatorLog implements SynapseLog {
     public void traceTrace(Object msg) {
         if (traceOn) {
             traceLog.trace(msg);
+        }
+    }
+
+    /**
+     * Log a message with level ERROR to the default log and to the trace, if trace is enabled.
+     */
+    public void error(Object msg) {
+        defaultLog.error(msg);
+        if (traceOn) {
+            traceLog.error(msg);
         }
     }
 }

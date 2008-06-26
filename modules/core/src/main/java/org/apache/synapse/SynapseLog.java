@@ -51,6 +51,18 @@ public interface SynapseLog {
     void traceOrDebug(Object msg);
     
     /**
+     * Log a message at level 'traceOrDebugWarn'.
+     * In mediators this method should be used to replace the following code:
+     * <pre>
+     * if (traceOrDebugOn) {
+     *     traceOrDebugWarn(...);
+     * }</pre>
+     *
+     * @param msg the message to be logged
+     */
+    void traceOrDebugWarn(Object msg);
+    
+    /**
      * Check whether a call to {@link #traceTrace(Object)} would actually cause a log
      * message to be written to the logs.
      */
@@ -67,4 +79,11 @@ public interface SynapseLog {
      * @param msg the message to be logged
      */
     void traceTrace(Object msg);
+    
+    /**
+     * Log a message at level 'error'.
+     * 
+     * @param msg the message to be logged
+     */
+    void error(Object msg);
 }

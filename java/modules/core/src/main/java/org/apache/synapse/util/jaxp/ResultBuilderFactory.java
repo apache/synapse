@@ -26,14 +26,44 @@ import org.apache.synapse.core.SynapseEnvironment;
  */
 public interface ResultBuilderFactory {
     /**
+     * Enumeration defining the output type to be expected by {@link ResultBuilder}.
+     * This influences the exact behavior of
+     * {@link ResultBuilder#getNode(java.nio.charset.Charset)}.
+     */
+    public enum Output {
+        /**
+         * The expected output is a simple {@link org.apache.axiom.om.OMElement}.
+         * In this case, the return value of
+         * {@link ResultBuilder#getNode(java.nio.charset.Charset)} will be
+         * the root element of the AXIOM tree representing the XML infoset written
+         * to the {@link javax.xml.transform.Result} object.
+         */
+        ELEMENT,
+        
+        /**
+         * The expected output is a SOAP envelope.
+         * If this output type is used, an invocation of {@link ResultBuilder#getNode()}
+         * must return a {@link org.apache.axiom.soap.SOAPEnvelope} object.
+         */
+        SOAP_ENVELOPE,
+        
+        /**
+         * The expected output is text. If this output type is used,
+         * {@link ResultBuilder#getNode(java.nio.charset.Charset)} must return a
+         * text wrapper with the output written to the {@link javax.xml.transform.Result}
+         * object.
+         */
+        TEXT
+    };
+    
+    /**
      * Create a new {@link ResultBuilder} instance.
      * 
      * @param synEnv the Synapse environment
-     * @param isSoapEnvelope
-     *           <code>true</code> if the expected output is a SOAP envelope. In this case an
-     *           invocation of {@link ResultBuilder#getNode()} on the returned instance must
-     *           return a {@link org.apache.axiom.soap.SOAPEnvelope}.
+     * @param expectedOutput specifies the expected type of output that will be written
+     *           to {@link javax.xml.transform.Result} objects produced by {@link ResultBuilder}
+     *           instances returned by this method
      * @return the newly created instance
      */
-    ResultBuilder createResultBuilder(SynapseEnvironment synEnv, boolean isSoapEnvelope);
+    ResultBuilder createResultBuilder(SynapseEnvironment synEnv, Output expectedOutput);
 }

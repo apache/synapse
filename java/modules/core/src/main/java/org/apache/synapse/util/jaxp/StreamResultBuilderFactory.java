@@ -26,7 +26,8 @@ import org.apache.synapse.core.SynapseEnvironment;
  * objects.
  */
 public class StreamResultBuilderFactory implements ResultBuilderFactory {
-    public ResultBuilder createResultBuilder(SynapseEnvironment synEnv, boolean isSoapEnvelope) {
-        return new StreamResultBuilder(synEnv, isSoapEnvelope);
+    public ResultBuilder createResultBuilder(SynapseEnvironment synEnv,
+            ResultBuilderFactory.Output expectedOutput) {
+        return new StreamResultBuilder(synEnv, expectedOutput);
     }
 }

@@ -26,7 +26,8 @@ import org.apache.synapse.core.SynapseEnvironment;
  * objects.
  */
 public class DOOMResultBuilderFactory implements ResultBuilderFactory {
-    public ResultBuilder createResultBuilder(SynapseEnvironment synEnv, boolean isSoapEnvelope) {
+    public ResultBuilder createResultBuilder(SynapseEnvironment synEnv,
+            ResultBuilderFactory.Output expectedOutput) {
         return new DOOMResultBuilder();
     }
 }

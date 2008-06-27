@@ -21,6 +21,7 @@ package org.apache.synapse.util.jaxp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.TemporaryData;
+import org.apache.synapse.util.TextFileDataSource;
 
 /**
  * {@link ResultBuilder} implementation that produces a {@link StreamResult} backed by a
@@ -45,13 +47,14 @@ public class StreamResultBuilder implements ResultBuilder {
     private static final Log log = LogFactory.getLog(StreamResultBuilder.class);
     
     private final SynapseEnvironment synEnv;
-    private final boolean isSoapEnvelope;
+    private final ResultBuilderFactory.Output expectedOutput;
     private TemporaryData tmp;
     private OutputStream out;
     
-    public StreamResultBuilder(SynapseEnvironment synEnv, boolean isSoapEnvelope) {
+    public StreamResultBuilder(SynapseEnvironment synEnv,
+            ResultBuilderFactory.Output expectedOutput) {
         this.synEnv = synEnv;
-        this.isSoapEnvelope = isSoapEnvelope;
+        this.expectedOutput = expectedOutput;
     }
 
     public Result getResult() {
@@ -60,31 +63,38 @@ public class StreamResultBuilder implements ResultBuilder {
         return new StreamResult(out);
     }
 
-    public OMElement getNode() {
+    public OMElement getNode(Charset charset) {
         try {
             out.close();
         } catch (IOException e) {
             handleException("Error while closing output stream", e);
         }
-        XMLStreamReader reader;
-        try {
-            reader = StAXUtils.createXMLStreamReader(tmp.getInputStream());
-        } catch (XMLStreamException e) {
-            handleException("Unable to parse the XML output", e);
-            return null;
-        } catch (IOException e) {
-            handleException("I/O error while reading temporary file", e);
-            return null;
-        }
-        if (isSoapEnvelope) {
-            return new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+        if (expectedOutput == ResultBuilderFactory.Output.TEXT) {
+            return TextFileDataSource.createOMSourcedElement(tmp, charset);
         } else {
-            return new StAXOMBuilder(reader).getDocumentElement();
+            XMLStreamReader reader;
+            try {
+                reader = StAXUtils.createXMLStreamReader(tmp.getInputStream());
+            } catch (XMLStreamException e) {
+                handleException("Unable to parse the XML output", e);
+                return null;
+            } catch (IOException e) {
+                handleException("I/O error while reading temporary file", e);
+                return null;
+            }
+            if (expectedOutput == ResultBuilderFactory.Output.SOAP_ENVELOPE) {
+                return new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+            } else {
+                return new StAXOMBuilder(reader).getDocumentElement();
+            }
         }
     }
 
     public void release() {
-        tmp.release();
+        if (tmp != null) {
+            tmp.release();
+            tmp = null;
+        }
     }
 
     private static void handleException(String message, Throwable ex) {

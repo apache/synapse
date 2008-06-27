@@ -19,6 +19,8 @@
 
 package org.apache.synapse.util.jaxp;
 
+import java.nio.charset.Charset;
+
 import javax.xml.transform.Result;
 
 import org.apache.axiom.om.OMElement;
@@ -47,12 +49,16 @@ public interface ResultBuilder {
     Result getResult();
     
     /**
-     * Get the root element of the AXIOM tree representing the XML infoset written
-     * to the {@link Result} object.
+     * Get the result written to the {@link Result} as an {@link OMElement}.
+     * Note that the exact behavior of this methos depends on the specified
+     * {@link ResultBuilderFactory.Output}.
      * 
+     * @param charset The charset encoding of the data that has been written
+     *                to the {@link Result} object. This information should only
+     *                be used in conjunction with {@link ResultBuilderFactory.Output#TEXT}.
      * @return the root element of the AXIOM tree
      */
-    OMElement getNode();
+    OMElement getNode(Charset charset);
     
     /**
      * Release any resources associated with this object.

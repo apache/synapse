@@ -19,40 +19,30 @@
 
 package org.apache.synapse.mediators.transform;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
-import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
-import org.apache.axiom.om.util.ElementHelper;
-import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
+import org.apache.synapse.util.jaxp.DOOMSourceBuilderFactory;
+import org.apache.synapse.util.jaxp.ResultBuilder;
+import org.apache.synapse.util.jaxp.ResultBuilderFactory;
+import org.apache.synapse.util.jaxp.SourceBuilder;
+import org.apache.synapse.util.jaxp.SourceBuilderFactory;
+import org.apache.synapse.util.jaxp.StreamResultBuilderFactory;
+import org.apache.synapse.util.jaxp.StreamSourceBuilderFactory;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.synapse.util.AXIOMUtils;
-import org.apache.synapse.util.TemporaryData;
-import org.apache.synapse.util.TextFileDataSource;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -103,11 +93,24 @@ public class XSLTMediator extends AbstractMediator {
     }
     
     /**
-     * The feature for which deciding swiching between DOM and Stream during the
+     * The feature for which deciding switching between DOM and Stream during the
      * transformation process
      */
     public static final String USE_DOM_SOURCE_AND_RESULTS =
         "http://ws.apache.org/ns/synapse/transform/feature/dom";
+    
+    /**
+     * The name of the attribute that allows to specify the {@link SourceBuilderFactory}.
+     */
+    public static final String SOURCE_BUILDER_FACTORY =
+        "http://ws.apache.org/ns/synapse/transform/attribute/sbf";
+    
+    /**
+     * The name of the attribute that allows to specify the {@link ResultBuilderFactory}.
+     */
+    public static final String RESULT_BUILDER_FACTORY =
+        "http://ws.apache.org/ns/synapse/transform/attribute/rbf";
+    
     /**
      * The resource key/name which refers to the XSLT to be used for the transformation
      */
@@ -158,9 +161,14 @@ public class XSLTMediator extends AbstractMediator {
     private final Object transformerLock = new Object();
 
     /**
-     *  Is it need to use DOMSource and DOMResult?
+     * The source builder factory to use.
      */
-    private boolean useDOMSourceAndResults = false;
+    private SourceBuilderFactory sourceBuilderFactory = new StreamSourceBuilderFactory();
+    
+    /**
+     * The result builder factory to use.
+     */
+    private ResultBuilderFactory resultBuilderFactory = new StreamResultBuilderFactory();
 
     /**
      * Transforms this message (or its element specified as the source) using the
@@ -200,44 +208,11 @@ public class XSLTMediator extends AbstractMediator {
     private void performXSLT(MessageContext synCtx, SynapseLog synLog) {
 
         OMNode sourceNode = source.selectOMNode(synCtx, synLog);
-        TemporaryData tempTargetData = null;
-        OutputStream osForTarget;
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
         if (synLog.isTraceTraceEnabled()) {
             synLog.traceTrace("Transformation source : " + sourceNode.toString());
-        }
-
-        Source transformSrc;
-        Result transformTgt;
-
-        if (useDOMSourceAndResults) {
-            synLog.traceOrDebug("Using a DOMSource for transformation");
-
-            // for fast transformations create a DOMSource - ** may not work always though **
-            transformSrc = new DOMSource(
-                ((Element) ElementHelper.importOMElement((OMElement) sourceNode,
-                DOOMAbstractFactory.getOMFactory())).getOwnerDocument());
-            DocumentBuilderFactoryImpl.setDOOMRequired(true);
-
-            try {
-                transformTgt = new DOMResult(
-                    DocumentBuilderFactoryImpl.newInstance().newDocumentBuilder().newDocument());
-            } catch (ParserConfigurationException e) {
-                throw new SynapseException("Error creating a DOMResult for the transformation," +
-                    " Consider setting optimization feature : " + USE_DOM_SOURCE_AND_RESULTS +
-                    " off", e, synLog);
-            }
-
-        } else {
-            synLog.traceOrDebug("Using byte array serialization for transformation");
-
-            transformSrc = AXIOMUtils.asSource(sourceNode);
-            
-            tempTargetData = synCtx.getEnvironment().createTemporaryData();
-            osForTarget = tempTargetData.getOutputStream();
-            transformTgt = new StreamResult(osForTarget);
         }
 
         // build transformer - if necessary
@@ -273,60 +248,40 @@ public class XSLTMediator extends AbstractMediator {
 
             transformer.setErrorListener(new ErrorListenerImpl(synLog, "XSLT transformation"));
             
-            transformer.transform(transformSrc, transformTgt);
+            String outputMethod = transformer.getOutputProperty(OutputKeys.METHOD);
+            String encoding = transformer.getOutputProperty(OutputKeys.ENCODING);
+
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("output method: " + outputMethod
+                        + "; encoding: " + encoding);
+            }
+            
+            ResultBuilderFactory.Output output;
+            if ("text".equals(outputMethod)) {
+                synLog.traceOrDebug("Processing non SOAP/XML (text) transformation result");
+                output = ResultBuilderFactory.Output.TEXT;
+            } else if (isSoapEnvelope) {
+                output = ResultBuilderFactory.Output.SOAP_ENVELOPE;
+            } else {
+                output = ResultBuilderFactory.Output.ELEMENT;
+            }
+            
+            SynapseEnvironment synEnv = synCtx.getEnvironment();
+            ResultBuilder resultBuilder =
+                    resultBuilderFactory.createResultBuilder(synEnv, output);
+            SourceBuilder sourceBuilder = sourceBuilderFactory.createSourceBuilder(synEnv);
+            
+            try {
+                transformer.transform(sourceBuilder.getSource((OMElement)sourceNode),
+                                      resultBuilder.getResult());
+            } finally {
+                sourceBuilder.release();
+            }
 
             synLog.traceOrDebug("Transformation completed - processing result");
 
             // get the result OMElement
-            OMElement result;
-            if (transformTgt instanceof DOMResult) {
-
-                Node node = ((DOMResult) transformTgt).getNode();
-                if (node == null) {
-                    synLog.traceOrDebug("Transformation result (DOMResult) was null");
-                    return;
-                }
-
-                Node resultNode = node.getFirstChild();
-                if (resultNode == null) {
-                    synLog.traceOrDebug("Transformation result (DOMResult) was empty");
-                    return;
-                }
-
-                result = ElementHelper.importOMElement(
-                    (OMElement) resultNode, OMAbstractFactory.getOMFactory());
-
-            } else {
-
-                String outputMethod = transformer.getOutputProperty(OutputKeys.METHOD);
-                String encoding = transformer.getOutputProperty(OutputKeys.ENCODING);
-
-                if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("output method: " + outputMethod
-                            + "; encoding: " + encoding);
-                }
-                
-                if ("text".equals(outputMethod)) {
-                    result = handleNonXMLResult(tempTargetData, Charset.forName(encoding), synLog);
-                } else {
-                    try {
-                        XMLStreamReader reader = StAXUtils.createXMLStreamReader(
-                            tempTargetData.getInputStream());
-                        if (isSoapEnvelope) {
-                            result = new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
-                        } else {
-                            result = new StAXOMBuilder(reader).getDocumentElement();
-                        }                        
-    
-                    } catch (XMLStreamException e) {
-                        throw new SynapseException(
-                            "Error building result element from XSLT transformation", e, synLog);
-    
-                    } catch (IOException e) {
-                        throw new SynapseException("Error reading temporary data", e, synLog);
-                    }
-                }
-            }
+            OMElement result = resultBuilder.getNode(Charset.forName(encoding));
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Transformation result : " + result.toString());
@@ -440,24 +395,27 @@ public class XSLTMediator extends AbstractMediator {
      * @see XSLTMediator
      */
     public void addFeature(String featureName, boolean isFeatureEnable) {
-        try {
-            MediatorProperty mp = new MediatorProperty();
-            mp.setName(featureName);
+        MediatorProperty mp = new MediatorProperty();
+        mp.setName(featureName);
+        if (isFeatureEnable) {
+            mp.setValue("true");
+        } else {
+            mp.setValue("false");
+        }
+        transformerFactoryFeatures.add(mp);
+        if (USE_DOM_SOURCE_AND_RESULTS.equals(featureName)) {
             if (isFeatureEnable) {
-                mp.setValue("true");
-            } else {
-                mp.setValue("false");
+                sourceBuilderFactory = new DOOMSourceBuilderFactory();
+                resultBuilderFactory = new DOOMResultBuilderFactory();
             }
-            transformerFactoryFeatures.add(mp);
-            if (USE_DOM_SOURCE_AND_RESULTS.equals(featureName)) {
-                useDOMSourceAndResults = isFeatureEnable;
-            } else {
+        } else {
+            try {
                 transFact.setFeature(featureName, isFeatureEnable);
+            } catch (TransformerConfigurationException e) {
+                String msg = "Error occured when setting features to the TransformerFactory";
+                log.error(msg, e);
+                throw new SynapseException(msg, e);
             }
-        } catch (TransformerConfigurationException e) {
-            String msg = "Error occured when setting features to the TransformerFactory";
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
         }
     }
 
@@ -477,30 +435,33 @@ public class XSLTMediator extends AbstractMediator {
         mp.setName(name);
         mp.setValue(value);
         transformerFactoryAttributes.add(mp);
-        try {
-            transFact.setAttribute(name, value);
-        } catch (IllegalArgumentException e) {
-            String msg = "Error occured when setting attribute to the TransformerFactory";
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
+        if (SOURCE_BUILDER_FACTORY.equals(name) || RESULT_BUILDER_FACTORY.equals(name)) {
+            Object instance;
+            try {
+                instance = Class.forName(value).newInstance();
+            } catch (ClassNotFoundException e) {
+                String msg = "The class specified by the " + name + " attribute was not found";
+                log.error(msg, e);
+                throw new SynapseException(msg, e);
+            } catch (Exception e) {
+                String msg = "The class " + value + " could not be instantiated";
+                log.error(msg, e);
+                throw new SynapseException(msg, e);
+            }
+            if (SOURCE_BUILDER_FACTORY.equals(name)) {
+                sourceBuilderFactory = (SourceBuilderFactory)instance;
+            } else {
+                resultBuilderFactory = (ResultBuilderFactory)instance;
+            }
+        } else {
+            try {
+                transFact.setAttribute(name, value);
+            } catch (IllegalArgumentException e) {
+                String msg = "Error occured when setting attribute to the TransformerFactory";
+                log.error(msg, e);
+                throw new SynapseException(msg, e);
+            }
         }
-    }
-
-    /**
-     * If the transformation results in a non-XML payload, use standard wrapper elements
-     * to wrap the text payload so that other mediators could still process the result
-     * @param tempData the encoded text payload
-     * @param charset the encoding of the payload
-     * @param synLog the logger to be used
-     * @return an OMElement wrapping the text payload
-     */
-    private OMElement handleNonXMLResult(TemporaryData tempData, Charset charset,
-                                         SynapseLog synLog) {
-
-        synLog.traceOrDebug("Processing non SOAP/XML (text) transformation result");
-        synLog.traceTrace("Wrapping text transformation result");
-
-        return TextFileDataSource.createOMSourcedElement(tempData, charset);
     }
 
     /**

@@ -19,7 +19,10 @@
 
 package org.apache.synapse.util.xpath;
 
+import org.apache.axiom.om.OMNode;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.jaxen.JaxenException;
 
 /**
@@ -67,20 +70,34 @@ public class SourceXPathSupport {
     }
     
     /**
-     * Select the first node selected by the configured XPath expression.
+     * Get the first node selected by the configured XPath expression.
      * If no XPath expression is set, the first child element of the SOAP body
      * is returned, i.e. in this case the method behaves as if the XPath expression is
      * <code>s11:Body/child::*[position()=1] | s12:Body/child::*[position()=1]</code>.
      * 
      * @param synCtx the message context
+     * @param synLog
      * @return the first node selected by the XPath expression
-     * @throws JaxenException
+     * @throws SynapseException
+     *            if the evaluation of the XPath expression failed or didn't result in an
+     *            {@link OMNode}
      */
-    public Object selectSingleNode(MessageContext synCtx) throws JaxenException {
+    public OMNode selectOMNode(MessageContext synCtx, SynapseLog synLog) {
         if (xpath == null) {
             return synCtx.getEnvelope().getBody().getFirstElement();
         } else {
-            return xpath.selectSingleNode(synCtx);
+            Object result;
+            try {
+                result = xpath.selectSingleNode(synCtx);
+            } catch (JaxenException e) {
+                throw new SynapseException("Error evaluating XPath expression : " + xpath, e, synLog);
+            }
+            if (result instanceof OMNode) {
+                return (OMNode) result;
+            } else {
+                throw new SynapseException("The evaluation of the XPath expression "
+                    + xpath + " did not result in an OMNode : " + result, synLog);
+            }
         }
     }
 

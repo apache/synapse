@@ -31,7 +31,6 @@ import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.jaxen.JaxenException;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -207,7 +206,7 @@ public class ValidateMediator extends AbstractListMediator {
     private Source getValidationSource(MessageContext synCtx, SynapseLog synLog) {
 
         try {
-            OMNode validateSource = getValidateSource(synCtx);
+            OMNode validateSource = source.selectOMNode(synCtx, synLog);
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Validation source : " + validateSource.toString());
             }
@@ -256,29 +255,6 @@ public class ValidateMediator extends AbstractListMediator {
         public void setValidationError(boolean validationError) {
             this.validationError = validationError;
         }
-    }
-
-    /**
-     * Return the OMNode to be validated. If a source XPath is not specified, this will
-     * default to the first child of the SOAP body i.e. - //*:Envelope/*:Body/child::*
-     *
-     * @param synCtx the message context
-     * @return the OMNode against which validation should be performed
-     */
-    private OMNode getValidateSource(MessageContext synCtx) {
-
-        try {
-            Object o = source.selectSingleNode(synCtx);  // Always fetches *only* the first
-            if (o instanceof OMNode) {
-                return (OMNode) o;
-            } else {
-                handleException("The evaluation of the XPath expression "
-                    + source + " did not result in an OMNode : " + o, synCtx);
-            }
-        } catch (JaxenException e) {
-            handleException("Error evaluating XPath expression : " + source, e, synCtx);
-        }
-        return null;
     }
 
     // setters and getters

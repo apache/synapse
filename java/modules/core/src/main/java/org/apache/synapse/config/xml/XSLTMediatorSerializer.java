@@ -27,12 +27,16 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 /**
  * Serializer for {@link XSLTMediator} instances.
  * 
  * @see XSLTMediatorFactory
  */
 public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
+    private static final QName ATTRIBUTE_Q
+                = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
@@ -76,6 +80,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
                 }
             }
         }
+        serializeMediatorProperties(xslt, mediator.getAttributes(), ATTRIBUTE_Q);
         if (parent != null) {
             parent.addChild(xslt);
         }

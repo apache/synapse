@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Factory for {@link ValidateMediator} instances.
@@ -109,31 +110,22 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         // set its common attributes such as tracing etc
         processTraceState(validateMediator,elem);
         // set the features
-        Iterator iter = elem.getChildrenWithName(FEATURE_Q);
-        while (iter.hasNext()) {
-            OMElement featureElem = (OMElement) iter.next();
-            OMAttribute attName = featureElem.getAttribute(ATT_NAME);
-            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE);
-            if (attName != null && attValue != null) {
-                String name = attName.getAttributeValue();
-                String value = attValue.getAttributeValue();
-                if (name != null && value != null) {
-                    try {
-                        if ("true".equals(value.trim())) {
-                            validateMediator.addFeature(name.trim(), true);
-                        } else if ("false".equals(value.trim())) {
-                            validateMediator.addFeature(name.trim(), false);
-                        } else {
-                            handleException("The feature must have value true or false");
-                        }
-                    } catch (SAXException e) {
-                        handleException("Error setting validation feature : " + name + " to : " + value, e);
-                    }
-                } else {
-                    handleException("The valid values for both of the name and value are need");
-                }
+        for (Map.Entry<String,String> entry : collectNameValuePairs(elem, FEATURE_Q).entrySet()) {
+            String value = entry.getValue();
+            boolean isFeatureEnabled;
+            if ("true".equals(value)) {
+                isFeatureEnabled = true;
+            } else if ("false".equals(value)) {
+                isFeatureEnabled = false;
             } else {
-                handleException("Both of the name and value attribute are required for a feature");
+                handleException("The feature must have value true or false");
+                break;
+            }
+            try {
+                validateMediator.addFeature(entry.getKey(), isFeatureEnabled);
+            } catch (SAXException e) {
+                handleException("Error setting validation feature : " + entry.getKey()
+                        + " to : " + value, e);
             }
         }
         return validateMediator;

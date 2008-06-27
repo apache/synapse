@@ -32,6 +32,8 @@ import javax.xml.namespace.QName;
  */
 public class MediatorProperty {
 
+    // TODO: these constants are related to a specific configuration language
+    //       and should be moved to a class in the related package
     public static final QName PROPERTY_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
     public static final QName ATT_NAME_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
     public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");

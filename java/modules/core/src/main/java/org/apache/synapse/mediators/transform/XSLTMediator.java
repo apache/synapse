@@ -129,9 +129,15 @@ public class XSLTMediator extends AbstractMediator {
     private List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
 
     /**
-     * Any features which should be set to the TransformerFactory by explicitly
+     * Any features which should be set to the TransformerFactory explicitly
      */
-    private List<MediatorProperty> explicitFeatures = new ArrayList<MediatorProperty>();
+    private List<MediatorProperty> transformerFactoryFeatures = new ArrayList<MediatorProperty>();
+
+    /**
+     * Any attributes which should be set to the TransformerFactory explicitly
+     */
+    private List<MediatorProperty> transformerFactoryAttributes
+                = new ArrayList<MediatorProperty>();
 
     /**
      * The Template instance used to create a Transformer object. This is  thread-safe
@@ -423,11 +429,16 @@ public class XSLTMediator extends AbstractMediator {
     }
     
     /**
-     * to add a feature which need to set to the TransformerFactory
-     * @param  featureName The name of the feature
-     * @param isFeatureEnable should this feature enable?
+     * Add a feature to be set on the {@link TransformerFactory} used by this mediator instance.
+     * This method can also be used to enable some Synapse specific optimizations and
+     * enhancements as described in the documentation of this class.
+     * 
+     * @param featureName The name of the feature
+     * @param isFeatureEnable the desired state of the feature
+     * 
+     * @see TransformerFactory#setFeature(String, boolean)
+     * @see XSLTMediator
      */
-    
     public void addFeature(String featureName, boolean isFeatureEnable) {
         try {
             MediatorProperty mp = new MediatorProperty();
@@ -437,7 +448,7 @@ public class XSLTMediator extends AbstractMediator {
             } else {
                 mp.setValue("false");
             }
-            explicitFeatures.add(mp);
+            transformerFactoryFeatures.add(mp);
             if (USE_DOM_SOURCE_AND_RESULTS.equals(featureName)) {
                 useDOMSourceAndResults = isFeatureEnable;
             } else {
@@ -445,6 +456,31 @@ public class XSLTMediator extends AbstractMediator {
             }
         } catch (TransformerConfigurationException e) {
             String msg = "Error occured when setting features to the TransformerFactory";
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
+    }
+
+    /**
+     * Add an attribute to be set on the {@link TransformerFactory} used by this mediator instance.
+     * This method can also be used to enable some Synapse specific optimizations and
+     * enhancements as described in the documentation of this class.
+     * 
+     * @param name The name of the feature
+     * @param value should this feature enable?
+     * 
+     * @see TransformerFactory#setAttribute(String, Object)
+     * @see XSLTMediator
+     */
+    public void addAttribute(String name, String value) {
+        MediatorProperty mp = new MediatorProperty();
+        mp.setName(name);
+        mp.setValue(value);
+        transformerFactoryAttributes.add(mp);
+        try {
+            transFact.setAttribute(name, value);
+        } catch (IllegalArgumentException e) {
+            String msg = "Error occured when setting attribute to the TransformerFactory";
             log.error(msg, e);
             throw new SynapseException(msg, e);
         }
@@ -468,11 +504,17 @@ public class XSLTMediator extends AbstractMediator {
     }
 
     /**
-     *
-     * @return Returns the features explicitly  set to the TransformerFactory through this mediator
+     * @return Return the features explicitly set to the TransformerFactory through this mediator.
      */
     public List<MediatorProperty> getFeatures(){
-        return explicitFeatures;
+        return transformerFactoryFeatures;
+    }
+
+    /**
+     * @return Return the attributes explicitly set to the TransformerFactory through this mediator.
+     */
+    public List<MediatorProperty> getAttributes(){
+        return transformerFactoryAttributes;
     }
 
     public void addAllProperties(List<MediatorProperty> list) {

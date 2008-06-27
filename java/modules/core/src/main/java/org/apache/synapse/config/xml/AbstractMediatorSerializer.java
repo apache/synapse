@@ -79,10 +79,11 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
     }
 
     protected void serializeMediatorProperties(OMElement parent,
-        Collection<MediatorProperty> props) {
+                                               Collection<MediatorProperty> props,
+                                               QName childElementName) {
 
         for (MediatorProperty mp : props) {
-            OMElement prop = fac.createOMElement("property", synNS, parent);
+            OMElement prop = fac.createOMElement(childElementName, parent);
             if (mp.getName() != null) {
                 prop.addAttribute(fac.createOMAttribute("name", nullNS, mp.getName()));
             } else {
@@ -99,6 +100,12 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
                 handleException("Mediator property must have a literal value or be an expression");
             }
         }
+    }
+    
+    protected void serializeMediatorProperties(OMElement parent,
+            Collection<MediatorProperty> props) {
+        
+        serializeMediatorProperties(parent, props, PROP_Q);
     }
 
     protected void serializeProperties(OMElement parent, Collection<MediatorProperty> props) {

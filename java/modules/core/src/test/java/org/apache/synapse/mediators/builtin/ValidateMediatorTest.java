@@ -22,21 +22,19 @@ package org.apache.synapse.mediators.builtin;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.config.Entry;
+import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.config.xml.ValidateMediatorFactory;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
-import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class ValidateMediatorTest extends TestCase {
 
@@ -124,205 +122,130 @@ public class ValidateMediatorTest extends TestCase {
             "   </on-fail>" +
             "</validate>";
 
-    private boolean onFailInvoked = false;
-    private TestMediator testMediator = null;
+    private SynapseXPath createXPath(String expression) throws JaxenException {
+        SynapseXPath xpath = new SynapseXPath(expression);
+        xpath.addNamespace("m0", "http://services.samples/xsd");
+        xpath.addNamespace("m1", "http://services.samples/xsd2");
+        return xpath;
+    }
 
-    public void setUp() {
-        testMediator = new TestMediator();
+    private void test(ValidateMediator validate, MessageContext synCtx, boolean expectFail) {
+        final MutableInt onFailInvoked = new MutableInt();
+        TestMediator testMediator = new TestMediator();
         testMediator.setHandler(
             new TestMediateHandler() {
                 public void handle(MessageContext synCtx) {
-                    setOnFailInvoked(true);
+                    onFailInvoked.setValue(1);
                 }
             });
-    }
-
-    public void setOnFailInvoked(boolean onFailInvoked) {
-        this.onFailInvoked = onFailInvoked;
+        // set dummy mediator to be called on fail
+        validate.addChild(testMediator);
+        validate.mediate(synCtx);
+        if (expectFail) {
+            assertTrue("Expected ValidateMediator to trigger fail sequence",
+                       onFailInvoked.intValue() == 1);
+        } else {
+            assertTrue("ValidateMediator unexpectedly triggered fail sequence",
+                       onFailInvoked.intValue() == 0);
+        }
     }
 
     public void testValidateMediatorValidCase() throws Exception {
-        setOnFailInvoked(false);
-
         // create a validate mediator
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://services.samples/xsd");
-        validate.setSource(source);
+        validate.setSchemaKeys(Collections.singletonList("xsd-key"));
+        validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
-        // set dummy mediator to be called on fail
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key", prop);
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .setBodyFromString(VALID_ENVELOPE).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE, props));
-
-        assertFalse(onFailInvoked);
+        test(validate, synCtx, false);
     }
 
     public void testValidateMediatorValidCaseTwoSchemas() throws Exception {
-        setOnFailInvoked(false);
-
         // create a validate mediator
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key-1");
-        keys.add("xsd-key-2");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:Outer");
-        source.addNamespace("m0", "http://services.samples/xsd2");
-        validate.setSource(source);
+        validate.setSchemaKeys(Arrays.asList(new String[] { "xsd-key-1", "xsd-key-2"}));
+        validate.setSource(createXPath("//m1:Outer"));
 
-        // set dummy mediator to be called on fail
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key-1", prop);
-        Entry prop2 = new Entry();
-        prop2.setType(Entry.URL_SRC);
-        prop2.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate2.xsd"));
-        props.put("xsd-key-2", prop2);
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key-1", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .addFileEntry("xsd-key-2", "./../../repository/conf/sample/resources/validate/validate2.xsd")
+                .setBodyFromString(VALID_ENVELOPE_TWO_SCHEMAS).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_TWO_SCHEMAS, props));
-
-        assertFalse(onFailInvoked);
+        test(validate, synCtx, false);
     }
 
     public void testValidateMediatorInvalidCaseTwoSchemas() throws Exception {
-        setOnFailInvoked(false);
-
         // create a validate mediator
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key-1");
-        keys.add("xsd-key-2");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:Outer");
-        source.addNamespace("m0", "http://services.samples/xsd2");
-        validate.setSource(source);
+        validate.setSchemaKeys(Arrays.asList(new String[] { "xsd-key-1", "xsd-key-2"}));
+        validate.setSource(createXPath("//m1:Outer"));
 
-        // set dummy mediator to be called on fail
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key-1", prop);
-        Entry prop2 = new Entry();
-        prop2.setType(Entry.URL_SRC);
-        prop2.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate2.xsd"));
-        props.put("xsd-key-2", prop2);
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key-1", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .addFileEntry("xsd-key-2", "./../../repository/conf/sample/resources/validate/validate2.xsd")
+                .setBodyFromString(INVALID_ENVELOPE_TWO_SCHEMAS).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(INVALID_ENVELOPE_TWO_SCHEMAS, props));
-
-        assertTrue(onFailInvoked);
+        test(validate, synCtx, true);
     }
 
     public void testValidateMediatorInvalidCase() throws Exception {
-        setOnFailInvoked(false);
-
         // create a validate mediator
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key-1");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://services.samples/xsd");
-        validate.setSource(source);
+        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
-        // set dummy mediator to be called on fail
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key-1", prop);
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key-1", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .setBodyFromString(IN_VALID_ENVELOPE).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE, props));
-
-        assertTrue(onFailInvoked);
+        test(validate, synCtx, true);
     }
 
     public void testValidateMediatorValidCaseNoNS() throws Exception {
-        setOnFailInvoked(false);
-
         // create a validate mediator
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key-1");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://services.samples/xsd");
-        validate.setSource(source);
+        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
-        // set dummy mediator to be called on fail
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key-1", prop);
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key-1", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .setBodyFromString(VALID_ENVELOPE_NO_NS).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_NO_NS, props));
-
-        assertFalse(onFailInvoked);
+        test(validate, synCtx, false);
     }
 
     public void testValidateMediatorInvalidCaseNoNS() throws Exception {
-        setOnFailInvoked(false);
-
         // create a validate mediator
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key-1");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://services.samples/xsd");
-        validate.setSource(source);
+        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
-        // set dummy mediator to be called on fail
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key-1", prop);
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key-1", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .setBodyFromString(IN_VALID_ENVELOPE_NO_NS).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE_NO_NS, props));
-
-        assertTrue(onFailInvoked);
+        test(validate, synCtx, true);
     }
 
     public void testValidateMediatorDefaultFeatures() throws Exception {
@@ -352,32 +275,16 @@ public class ValidateMediatorTest extends TestCase {
     }
 
     private void makeValidInvocation(ValidateMediator validate) throws Exception {
-
-        setOnFailInvoked(false);
-
         // set the schema url, source xpath and any name spaces
-        List<String> keys = new ArrayList<String>();
-        keys.add("xsd-key-1");
-        validate.setSchemaKeys(keys);
-        SynapseXPath source = new SynapseXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://services.samples/xsd");
-        validate.setSource(source);
+        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
-        // set dummy mediator to be called on fail
-        validate.removeChild(0);
-        validate.addChild(testMediator);
-
-        Map<String,Entry> props = new HashMap<String,Entry>();
-        Entry prop = new Entry();
-        prop.setType(Entry.URL_SRC);
-        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
-        props.put("xsd-key-1", prop);
-
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry("xsd-key-1", "./../../repository/conf/sample/resources/validate/validate.xsd")
+                .setBodyFromString(VALID_ENVELOPE).build();
 
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE, props));
-
-        assertFalse(onFailInvoked);
+        test(validate, synCtx, false);
     }
 
     private static OMElement createOMElement(String xml) {

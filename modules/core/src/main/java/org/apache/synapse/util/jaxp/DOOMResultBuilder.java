@@ -19,6 +19,8 @@
 
 package org.apache.synapse.util.jaxp;
 
+import java.nio.charset.Charset;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMResult;
@@ -54,7 +56,7 @@ public class DOOMResultBuilder implements ResultBuilder {
         return new DOMResult(document);
     }
 
-    public OMElement getNode() {
+    public OMElement getNode(Charset charset) {
         // TODO: we need to support SOAPEnvelope
         //       (not supported by the original code in XSLTMediator)
         return ElementHelper.importOMElement(

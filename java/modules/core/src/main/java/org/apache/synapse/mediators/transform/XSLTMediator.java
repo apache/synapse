@@ -42,7 +42,6 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.TextFileDataSource;
-import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -195,7 +194,7 @@ public class XSLTMediator extends AbstractMediator {
     private void performXSLT(MessageContext synCtx, SynapseLog synLog) {
 
         boolean reCreate = false;
-        OMNode sourceNode = getTransformSource(synCtx);
+        OMNode sourceNode = source.selectOMNode(synCtx, synLog);
         TemporaryData tempTargetData = null;
         OutputStream osForTarget;
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
@@ -405,29 +404,6 @@ public class XSLTMediator extends AbstractMediator {
         } catch (TransformerException e) {
             handleException("Error performing XSLT transformation using : " + xsltKey, e, synCtx);
         }
-    }
-
-    /**
-     * Return the OMNode to be used for the transformation. If a source XPath is not specified,
-     * this will default to the first child of the SOAP body i.e. - //*:Envelope/*:Body/child::*
-     *
-     * @param synCtx the message context
-     * @return the OMNode against which the transformation should be performed
-     */
-    private OMNode getTransformSource(MessageContext synCtx) {
-                                
-        try {
-            Object o = source.selectSingleNode(synCtx);  // Always fetches *only* the first
-            if (o instanceof OMNode) {
-                return (OMNode) o;
-            } else {
-                handleException("The evaluation of the XPath expression "
-                        + source + " did not result in an OMNode", synCtx);
-            }
-        } catch (JaxenException e) {
-            handleException("Error evaluating XPath expression : " + source, e, synCtx);
-        }
-        return null;
     }
 
     public SynapseXPath getSource() {

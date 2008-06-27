@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractListMediator;
@@ -90,19 +91,15 @@ public class ValidateMediator extends AbstractListMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Validate mediator");
-
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
-            }
+        synLog.traceOrDebug("Start : Validate mediator");
+        if (synLog.isTraceTraceEnabled()) {
+            synLog.traceTrace("Message : " + synCtx.getEnvelope());
         }
 
         // Input source for the validation
-        Source validateSrc = getValidationSource(synCtx, traceOrDebugOn, traceOn);
+        Source validateSrc = getValidationSource(synCtx, synLog);
 
         // flag to check if we need to initialize/re-initialize the schema
         boolean reCreate = false;
@@ -141,8 +138,8 @@ public class ValidateMediator extends AbstractListMediator {
                     //reset the errorhandler state
                     errorHandler.setValidationError(false);
 
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Error creating a new schema objects for " +
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("Error creating a new schema objects for " +
                             "schemas : " + schemaKeys.toString());
                     }
                 }
@@ -159,18 +156,18 @@ public class ValidateMediator extends AbstractListMediator {
 
             if (errorHandler.isValidationError()) {
 
-                if (traceOrDebugOn) {
+                if (synLog.isTraceOrDebugEnabled()) {
                     String msg = "Validation of element returned by XPath : " + source +
                         " failed against the given schema(s) " + schemaKeys +
                         "with error : " + errorHandler.getSaxParseException().getMessage() +
                         " Executing 'on-fail' sequence";
-                    traceOrDebug(traceOn, msg);
+                    synLog.traceOrDebug(msg);
 
                     // write a warning to the service log
                     synCtx.getServiceLog().warn(msg);
 
-                    if (traceOn && trace.isTraceEnabled()) {
-                        log.debug("Failed message envelope : " + synCtx.getEnvelope());
+                    if (synLog.isTraceTraceEnabled()) {
+                        synLog.traceTrace("Failed message envelope : " + synCtx.getEnvelope());
                     }
                 }
 
@@ -191,13 +188,10 @@ public class ValidateMediator extends AbstractListMediator {
             handleException("Error validating " + source + " element", e, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Validation of element returned by the XPath expression : "
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Validation of element returned by the XPath expression : "
                 + source + " succeeded against the given schemas and the current message");
-        }
-
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Validate mediator");
+            synLog.traceOrDebug("End : Validate mediator");
         }
 
         return true;
@@ -207,17 +201,15 @@ public class ValidateMediator extends AbstractListMediator {
      * Get the validation Source for the message context
      *
      * @param synCtx the current message to validate
-     * @param traceOrDebugOn is tracing or debugging on?
-     * @param traceOn is tracing on?
+     * @param synLog
      * @return the validation Source for the current message
      */
-    private Source getValidationSource(MessageContext synCtx,
-        boolean traceOrDebugOn, boolean traceOn) {
+    private Source getValidationSource(MessageContext synCtx, SynapseLog synLog) {
 
         try {
             OMNode validateSource = getValidateSource(synCtx);
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Validation source : " + validateSource.toString());
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Validation source : " + validateSource.toString());
             }
 
             return AXIOMUtils.asSource(validateSource);

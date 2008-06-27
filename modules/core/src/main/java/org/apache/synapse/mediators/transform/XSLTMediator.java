@@ -193,7 +193,6 @@ public class XSLTMediator extends AbstractMediator {
      */
     private void performXSLT(MessageContext synCtx, SynapseLog synLog) {
 
-        boolean reCreate = false;
         OMNode sourceNode = source.selectOMNode(synCtx, synLog);
         TemporaryData tempTargetData = null;
         OutputStream osForTarget;
@@ -205,7 +204,7 @@ public class XSLTMediator extends AbstractMediator {
         }
 
         Source transformSrc;
-        Result transformTgt = null;
+        Result transformTgt;
 
         if (useDOMSourceAndResults) {
             synLog.traceOrDebug("Using a DOMSource for transformation");
@@ -220,9 +219,9 @@ public class XSLTMediator extends AbstractMediator {
                 transformTgt = new DOMResult(
                     DocumentBuilderFactoryImpl.newInstance().newDocumentBuilder().newDocument());
             } catch (ParserConfigurationException e) {
-                handleException("Error creating a DOMResult for the transformation," +
+                throw new SynapseException("Error creating a DOMResult for the transformation," +
                     " Consider setting optimization feature : " + USE_DOM_SOURCE_AND_RESULTS +
-                    " off", e, synCtx);
+                    " off", e, synLog);
             }
 
         } else {
@@ -235,20 +234,11 @@ public class XSLTMediator extends AbstractMediator {
             transformTgt = new StreamResult(osForTarget);
         }
 
-        if (transformTgt == null) {
-            synLog.traceOrDebug("Was unable to get a javax.xml.transform.Result created");
-            return;
-        }
-
         // build transformer - if necessary
         Entry dp = synCtx.getConfiguration().getEntryDefinition(xsltKey);
 
         // if the xsltKey refers to a dynamic resource
-        if (dp != null && dp.isDynamic()) {
-            if (!dp.isCached() || dp.isExpired()) {
-                reCreate = true;
-            }
-        }
+        boolean reCreate = dp != null && dp.isDynamic() && (!dp.isCached() || dp.isExpired());
 
         synchronized (transformerLock) {
             if (reCreate || cachedTemplates == null) {
@@ -272,28 +262,7 @@ public class XSLTMediator extends AbstractMediator {
             Transformer transformer = cachedTemplates.newTransformer();
             if (!properties.isEmpty()) {
                 // set the parameters which will pass to the Transformation
-                for (MediatorProperty prop : properties) {
-                    if (prop != null) {
-                        String value;
-                        if (prop.getValue() != null) {
-                            value = prop.getValue();
-                        } else {
-                            value = prop.getExpression().stringValueOf(synCtx);
-                        }
-                        if (synLog.isTraceOrDebugEnabled()) {
-                            if (value == null) {
-                                synLog.traceOrDebug("Not setting parameter '"
-                                                            + prop.getName() + "'");
-                            } else {
-                                synLog.traceOrDebug("Setting parameter '" + prop.getName()
-                                                            + "' to '" + value + "'");
-                            }
-                        }
-                        if (value != null) {
-                            transformer.setParameter(prop.getName(), value);
-                        }
-                    }
-                }
+                applyProperties(transformer, synCtx, synLog);
             }
 
             transformer.setErrorListener(new ErrorListenerImpl(synLog, "XSLT transformation"));
@@ -303,7 +272,7 @@ public class XSLTMediator extends AbstractMediator {
             synLog.traceOrDebug("Transformation completed - processing result");
 
             // get the result OMElement
-            OMElement result = null;
+            OMElement result;
             if (transformTgt instanceof DOMResult) {
 
                 Node node = ((DOMResult) transformTgt).getNode();
@@ -344,22 +313,17 @@ public class XSLTMediator extends AbstractMediator {
                         }                        
     
                     } catch (XMLStreamException e) {
-                        handleException(
-                            "Error building result element from XSLT transformation", e, synCtx);
+                        throw new SynapseException(
+                            "Error building result element from XSLT transformation", e, synLog);
     
                     } catch (IOException e) {
-                        handleException("Error reading temporary data", e, synCtx);
+                        throw new SynapseException("Error reading temporary data", e, synLog);
                     }
                 }
             }
 
-            if (result == null) {
-                synLog.traceOrDebug("Transformation result was null");
-                return;
-            } else {
-                if (synLog.isTraceTraceEnabled()) {
-                    synLog.traceTrace("Transformation result : " + result.toString());
-                }
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Transformation result : " + result.toString());
             }
 
             if (targetPropertyName != null) {
@@ -424,6 +388,38 @@ public class XSLTMediator extends AbstractMediator {
 
     public void addProperty(MediatorProperty p) {
         properties.add(p);
+    }
+    
+    /**
+     * Set the properties defined in the mediator as parameters on the stylesheet.
+     * 
+     * @param transformer
+     * @param synCtx
+     * @param synLog
+     */
+    private void applyProperties(Transformer transformer, MessageContext synCtx,
+                                 SynapseLog synLog) {
+        for (MediatorProperty prop : properties) {
+            if (prop != null) {
+                String value;
+                if (prop.getValue() != null) {
+                    value = prop.getValue();
+                } else {
+                    value = prop.getExpression().stringValueOf(synCtx);
+                }
+                if (synLog.isTraceOrDebugEnabled()) {
+                    if (value == null) {
+                        synLog.traceOrDebug("Not setting parameter '" + prop.getName() + "'");
+                    } else {
+                        synLog.traceOrDebug("Setting parameter '" + prop.getName() + "' to '"
+                                + value + "'");
+                    }
+                }
+                if (value != null) {
+                    transformer.setParameter(prop.getName(), value);
+                }
+            }
+        }
     }
     
     /**

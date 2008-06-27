@@ -2180,9 +2180,9 @@ Content-ID:
             &lt;send&gt;
                 &lt;endpoint&gt;
                     &lt;loadbalance failover="true"&gt;
-                        &lt;member ip="127.0.0.1" httpPort="9001" httpsPort="9005"/&gt;
-                        &lt;member ip="127.0.0.1" httpPort="9002" httpsPort="9006"/&gt;
-                        &lt;member ip="127.0.0.1" httpPort="9003" httpsPort="9007"/&gt;
+                        &lt;member hostName="127.0.0.1" httpPort="9001" httpsPort="9005"/&gt;
+                        &lt;member hostName="127.0.0.1" httpPort="9002" httpsPort="9006"/&gt;
+                        &lt;member hostName="127.0.0.1" httpPort="9003" httpsPort="9007"/&gt;
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;

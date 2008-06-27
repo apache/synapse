@@ -21,8 +21,8 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.clustering.Member;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
@@ -69,8 +69,21 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
             loadbalanceElement.addAttribute("failover", "false", null);
         }
 
+        // Serialize endpoint elements which are children of the loadbalance element
         for (Endpoint childEndpoint : loadbalanceEndpoint.getEndpoints()) {
             loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
+        }
+
+        // Serialize member elements which are children of the loadbalance element
+        for (Member member : loadbalanceEndpoint.getAllMembers()) {
+            OMElement memberEle =
+                    fac.createOMElement("member",
+                                        SynapseConstants.SYNAPSE_OMNAMESPACE, loadbalanceElement);
+            memberEle.addAttribute(fac.createOMAttribute("hostName", null, member.getHostName()));
+            memberEle.addAttribute(fac.createOMAttribute("httpPort", null,
+                                                         String.valueOf(member.getHttpPort())));
+            memberEle.addAttribute(fac.createOMAttribute("httpsPort", null,
+                                                         String.valueOf(member.getHttpsPort())));
         }
 
         return endpointElement;

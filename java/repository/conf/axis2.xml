@@ -73,8 +73,9 @@
     <!-- Following parameter will completely disable REST handling in Axis2-->
     <parameter name="disableREST" locked="true">false</parameter>
 
-    <!-- Mediator deployer ***** Uncomment the following line to enable hot deployment of mediators ***** -->
-    <!--<deployer extension="jar" directory="mediators" class="org.apache.synapse.core.axis2.MediatorDeployer"/>-->
+    <!-- Extension deployer
+         ***** Uncomment the following line to enable (hot) deployment of Synapse extensions (mediators and startups) ***** -->
+    <!--<deployer extension="xar" directory="extensions" class="org.apache.synapse.core.axis2.ExtensionDeployer"/>-->
 
     <!-- Following parameter will set the host name for the epr-->
     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->

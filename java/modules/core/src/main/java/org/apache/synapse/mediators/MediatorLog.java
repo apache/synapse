@@ -21,6 +21,7 @@ package org.apache.synapse.mediators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 
@@ -39,11 +40,13 @@ public class MediatorLog implements SynapseLog {
     
     private final Log defaultLog;
     private final boolean traceOn;
+    private final MessageContext synCtx;
     
     // The definition of this constructor might change...
-    public MediatorLog(Log defaultLog, boolean traceOn) {
+    public MediatorLog(Log defaultLog, boolean traceOn, MessageContext synCtx) {
         this.defaultLog = defaultLog;
         this.traceOn = traceOn;
+        this.synCtx = synCtx;
     }
 
     public boolean isTraceOrDebugEnabled() {
@@ -88,12 +91,26 @@ public class MediatorLog implements SynapseLog {
     }
 
     /**
-     * Log a message with level ERROR to the default log and to the trace, if trace is enabled.
+     * Log a message at level ERROR to the default log and to the trace, if trace is enabled.
      */
     public void error(Object msg) {
         defaultLog.error(msg);
         if (traceOn) {
             traceLog.error(msg);
+        }
+    }
+
+    /**
+     * Log a message at level ERROR to the default log, the service log and the trace, if trace
+     * is enabled.
+     */
+    public void logSynapseException(String msg, Throwable cause) {
+        defaultLog.error(msg, cause);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().error(msg, cause);
+        }
+        if (traceOn) {
+            traceLog.error(msg, cause);
         }
     }
 }

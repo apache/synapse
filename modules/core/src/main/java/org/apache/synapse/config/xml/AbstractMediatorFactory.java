@@ -19,6 +19,10 @@
 
 package org.apache.synapse.config.xml;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
@@ -82,6 +86,35 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
                 }
             }
         }
+    }
+
+    /**
+     * Collect the <tt>name</tt> and <tt>value</tt> attributes from the children
+     * with a given QName.
+     *  
+     * @return
+     */
+    protected Map<String,String> collectNameValuePairs(OMElement elem, QName childElementName) {
+        Map<String,String> result = new LinkedHashMap<String,String>();
+        for (Iterator it = elem.getChildrenWithName(childElementName); it.hasNext(); ) {
+            OMElement child = (OMElement)it.next();
+            OMAttribute attName = child.getAttribute(ATT_NAME);
+            OMAttribute attValue = child.getAttribute(ATT_VALUE);
+            if (attName != null && attValue != null) {
+                String name = attName.getAttributeValue().trim();
+                String value = attValue.getAttributeValue().trim();
+                if (result.containsKey(attName)) {
+                    handleException("Duplicate " + childElementName.getLocalPart()
+                            + " with name " + name);
+                } else {
+                    result.put(name, value);
+                }
+            } else {
+                handleException("Both of the name and value attributes are required for a "
+                        + childElementName.getLocalPart());
+            }
+        }
+        return result;
     }
 
     protected void handleException(String message, Exception e) {

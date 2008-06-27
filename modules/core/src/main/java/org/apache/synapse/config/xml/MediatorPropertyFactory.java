@@ -27,7 +27,6 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,8 +49,7 @@ public class MediatorPropertyFactory {
 
         List<MediatorProperty> propertyList = new ArrayList<MediatorProperty>();
 
-        Iterator iter = elem.getChildrenWithName(
-            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property"));
+        Iterator iter = elem.getChildrenWithName(MediatorProperty.PROPERTY_Q);
 
         while (iter.hasNext()) {
 

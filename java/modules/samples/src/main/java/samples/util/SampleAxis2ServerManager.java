@@ -95,11 +95,6 @@ public class SampleAxis2ServerManager {
 
             configurePort(configctx);
 
-            listenerManager = new ListenerManager();
-            listenerManager.init(configctx);
-            listenerManager.start();
-            log.info("[SimpleAxisServer] Started");
-
             // Need to initialize the cluster manager at last since we are changing the servers
             // HTTP/S ports above. In the axis2.xml file, we need to set the "AvoidInitiation" param
             // to "true"
@@ -109,6 +104,12 @@ public class SampleAxis2ServerManager {
                 clusterManager.setConfigurationContext(configctx);
                 clusterManager.init();
             }
+
+            // Finally start the transport listeners
+            listenerManager = new ListenerManager();
+            listenerManager.init(configctx);
+            listenerManager.start();
+            log.info("[SimpleAxisServer] Started");
         } catch (Throwable t) {
             log.fatal("[SimpleAxisServer] Shutting down. Error starting SimpleAxisServer", t);
             System.exit(1); // must stop application

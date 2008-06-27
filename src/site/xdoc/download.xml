@@ -66,6 +66,10 @@
     </tr>
   </tbody>
 </table>
+
+    <p>Note that if you are upgrading from an older release, you should carefully read the
+    <a href="upgrading.html">upgrade guide</a> before starting to use a new release.</p>
+
 </section>
 
 </body>

@@ -99,7 +99,7 @@ public abstract class AbstractMediator implements Mediator {
      * @return
      */
     protected SynapseLog getLog(MessageContext synCtx) {
-        return new MediatorLog(log, isTraceOn(synCtx));
+        return new MediatorLog(log, isTraceOn(synCtx), synCtx);
     }
 
     /**

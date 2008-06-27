@@ -86,4 +86,13 @@ public interface SynapseLog {
      * @param msg the message to be logged
      */
     void error(Object msg);
+    
+    /**
+     * Log a fatal exception. This method should only be called when a
+     * {@link SynapseException} is being thrown.
+     * 
+     * @param msg the message of the exception
+     * @param cause the cause of the exception
+     */
+    void logSynapseException(String msg, Throwable cause);
 }

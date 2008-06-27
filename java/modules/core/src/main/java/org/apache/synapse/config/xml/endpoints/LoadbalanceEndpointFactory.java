@@ -40,14 +40,14 @@ import java.util.Iterator;
  * &lt;endpoint [name="name"]&gt;
  * &lt;loadbalance policy="load balance algorithm"&gt;
  * &lt;endpoint&gt;+
+ * &lt;member hostName="host" httpPort="port" httpsPort="port"&gt;+
  * &lt;/loadbalance&gt;
  * &lt;/endpoint&gt;
  */
 public class LoadbalanceEndpointFactory extends EndpointFactory {
 
     private static LoadbalanceEndpointFactory instance = new LoadbalanceEndpointFactory();
-    private static final QName MEMBER = new QName(SynapseConstants.SYNAPSE_NAMESPACE,
-                                    "member");
+    private static final QName MEMBER = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "member");
 
     private LoadbalanceEndpointFactory() {
     }
@@ -114,7 +114,7 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
         for(Iterator memberIter = loadbalanceElement.getChildrenWithName(MEMBER);
             memberIter.hasNext();){
             OMElement memberEle = (OMElement) memberIter.next();
-            Member member = new Member(memberEle.getAttributeValue(new QName("ip")), -1);
+            Member member = new Member(memberEle.getAttributeValue(new QName("hostName")), -1);
             String http = memberEle.getAttributeValue(new QName("httpPort"));
             if (http != null) {
                 member.setHttpPort(Integer.parseInt(http));

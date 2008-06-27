@@ -269,6 +269,25 @@ public class LoadbalanceEndpoint implements Endpoint {
         this.inactiveMembers = new ArrayList<Member>();
     }
 
+    public List<Member> getAllMembers() {
+        List<Member> members = new ArrayList<Member>();
+        if (activeMembers != null) {
+            for (Member member:activeMembers) {
+                if(!members.contains(member)){
+                    members.add(member);
+                }
+            }
+        }
+        if (inactiveMembers != null) {
+            for (Member member:inactiveMembers) {
+                if(!members.contains(member)){
+                    members.add(member);
+                }
+            }
+        }
+        return members;
+    }
+    
     /**
      * If this endpoint is in inactive state, checks if all immediate child endpoints are still
      * failed. If so returns false. If at least one child endpoint is in active state, sets this

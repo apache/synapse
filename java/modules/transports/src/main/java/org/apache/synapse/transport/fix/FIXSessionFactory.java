@@ -46,7 +46,7 @@ import java.util.Map;
  * and a MessageStoreFactroy. By default this implementation attempts to pass null as the LogFactory and a
  * MemoryStoreFactory as the MessageStoreFactory. These can be configured in the services.xml as follows.
  * <p/>
- * <parameter name="transport.fix.AcceptorLogger">file</parameter>
+ * <parameter name="transport.fix.AcceptorLogFactory">file</parameter>
  * (acceptable values: console, file, jdbc)
  * <p/>
  * <parameter name="transport.fix.AcceptorMessageStore">file</parameter>

@@ -3822,6 +3822,11 @@ Transfer-Encoding: chunked
       has to establish a session with the Executor. But all the subsequent messages
       will pass through almost instantaneously.
     </p>
+      <p>
+          To get an idea about the various transport parameters being used in this sample
+          see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
+          </a>.
+      </p>
     <h2>
       <a name="Sample258" id="Sample258">Sample 258: Switching from HTTP to FIX </a>
     </h2>

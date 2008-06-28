@@ -1107,6 +1107,7 @@
         <module>modules/mar</module>
         <module>modules/war</module>
         <module>modules/handler</module>
+        <module>modules/xar-maven-plugin</module>
     </modules>
 
     <properties>

@@ -19,7 +19,12 @@
 
 package org.apache.synapse.mediators.transform;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerFactory;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -34,6 +39,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.util.jaxp.AXIOMSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.SpringStaxSourceBuilderFactory;
@@ -45,7 +51,8 @@ public class XSLTMediatorTest extends TestCase {
     private static final Class[] sourceBuilderFactories = {
         DOOMSourceBuilderFactory.class,
         SpringStaxSourceBuilderFactory.class,
-        StreamSourceBuilderFactory.class };
+        StreamSourceBuilderFactory.class,
+        AXIOMSourceBuilderFactory.class };
     
     private static final Class[] resultBuilderFactories = {
         DOOMResultBuilderFactory.class,
@@ -61,20 +68,42 @@ public class XSLTMediatorTest extends TestCase {
         SOURCE +
         "</m:someOtherElement>";
 
-    // Create the test cases for the various source and result builder dynamically:
+    // Create the test cases for the various transformer factories, source builders and
+    // result builders dynamically:
     public static TestSuite suite() {
         TestSuite suite = new TestSuite(XSLTMediatorTest.class);
+        addGenericTests(suite, "Xalan", org.apache.xalan.processor.TransformerFactoryImpl.class);
+        addGenericTests(suite, "Saxon", net.sf.saxon.TransformerFactoryImpl.class);
+        return suite;
+    }
+    
+    private static Set<String> testsToExclude = new HashSet<String>(Arrays.asList(new String[] {
+            "testSaxonDOOMSourceDOOMResult",
+            "testSaxonDOOMSourceStreamResult",
+    }));
+    
+    private static void addGenericTests(TestSuite suite, final String processorName,
+            final Class<? extends TransformerFactory> transformerFactoryClass) {
+        
         for (final Class sbf : sourceBuilderFactories) {
             for (final Class rbf : resultBuilderFactories) {
-                suite.addTest(new TestCase("test" + shortName(sbf) + shortName(rbf)) {
-                    @Override
-                    public void runTest() throws Throwable {
-                        test(sbf, rbf);
-                    }
-                });
+                String testName = "test" + processorName + shortName(sbf) + shortName(rbf);
+                if (!testsToExclude.contains(testName)) {
+                    suite.addTest(new TestCase(testName) {
+                        @Override
+                        public void runTest() throws Throwable {
+                            String oldTransformerFactory =
+                                TransformerFactory.newInstance().getClass().getName();
+                            System.setProperty(TransformerFactory.class.getName(),
+                                    transformerFactoryClass.getName());
+                            test(sbf, rbf);
+                            System.setProperty(TransformerFactory.class.getName(),
+                                    oldTransformerFactory);
+                        }
+                    });
+                }
             }
         }
-        return suite;
     }
     
     private static String shortName(Class clazz) {

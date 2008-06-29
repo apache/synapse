@@ -57,15 +57,10 @@
     </proxy>
 
     <sequence name="errorHandler">
-
-        <makefault>
+        <makefault response="true">
             <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
             <reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/>
         </makefault>
-
-        <header name="To" action="remove"/>
-        <property name="RESPONSE" value="true"/>
-
         <send/>
     </sequence>
 

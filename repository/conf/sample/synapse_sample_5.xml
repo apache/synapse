@@ -21,13 +21,10 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="myFaultHandler">
-        <makefault>
+        <makefault response="true">
             <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
             <reason expression="get-property('ERROR_MESSAGE')"/>
         </makefault>
-
-        <property name="RESPONSE" value="true"/>
-        <header name="To" expression="get-property('ReplyTo')"/>
         <send/>
     </sequence>
 

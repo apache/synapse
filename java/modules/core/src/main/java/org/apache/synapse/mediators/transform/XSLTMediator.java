@@ -281,7 +281,8 @@ public class XSLTMediator extends AbstractMediator {
             synLog.traceOrDebug("Transformation completed - processing result");
 
             // get the result OMElement
-            OMElement result = resultBuilder.getNode(Charset.forName(encoding));
+            OMElement result =
+                resultBuilder.getNode(encoding == null ? null : Charset.forName(encoding));
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Transformation result : " + result.toString());

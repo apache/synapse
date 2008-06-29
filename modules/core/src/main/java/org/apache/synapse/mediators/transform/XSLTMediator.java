@@ -271,6 +271,11 @@ public class XSLTMediator extends AbstractMediator {
                     resultBuilderFactory.createResultBuilder(synEnv, output);
             SourceBuilder sourceBuilder = sourceBuilderFactory.createSourceBuilder(synEnv);
             
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Using " + sourceBuilder.getClass().getName());
+                synLog.traceOrDebug("Using " + resultBuilder.getClass().getName());
+            }
+            
             try {
                 transformer.transform(sourceBuilder.getSource((OMElement)sourceNode),
                                       resultBuilder.getResult());

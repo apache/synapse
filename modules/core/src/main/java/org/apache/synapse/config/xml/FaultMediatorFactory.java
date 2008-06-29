@@ -35,7 +35,7 @@ import java.net.URISyntaxException;
  * <p>
  * Configuration syntax:
  * <pre>
- * &lt;makefault [version="soap11|soap12|pox"]&gt;
+ * &lt;makefault [version="soap11|soap12|pox"] response=("true"|"false")&gt;
  *   &lt;code (value="literal" | expression="xpath")/&gt;?
  *   &lt;reason (value="literal" | expression="xpath")&gt;?
  *   &lt;node&gt;?
@@ -51,6 +51,8 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
     private static final QName ATT_VERSION_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "version");
+    private static final QName ATT_RESPONSE_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "response");
     private static final QName CODE_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "code");
     private static final QName REASON_Q
@@ -81,6 +83,19 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
             } else {
                 handleException("Invalid SOAP version");
             }
+        }
+
+        OMAttribute response = elem.getAttribute(ATT_RESPONSE_Q);
+        if (response != null) {
+            if ("true".equals(response.getAttributeValue())) {
+                faultMediator.setMarkAsResponse(true);
+            } else if ("false".equals(response.getAttributeValue())) {
+                faultMediator.setMarkAsResponse(false);
+            } else {
+                handleException("Invalid value '" + response.getAttributeValue()
+                        + "' passed as response. Expected 'true' or 'false'");
+            }
+            faultMediator.setSerializeResponse(true);
         }
 
         OMElement code = elem.getFirstChildWithName(CODE_Q);

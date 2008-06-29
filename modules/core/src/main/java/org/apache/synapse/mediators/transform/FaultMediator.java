@@ -58,6 +58,10 @@ public class FaultMediator extends AbstractMediator {
     public static final int POX = 3;
     /** Holds the SOAP version to be used to make the fault, if specified */
     private int soapVersion;
+    /** Whether to mark the created fault as a response or not */
+    private boolean markAsResponse = false;
+    /** Whether it is required to serialize the response attribute or not */
+    private boolean serializeResponse = false;
 
     // -- fault elements --
     /** The fault code QName to be used */
@@ -92,17 +96,17 @@ public class FaultMediator extends AbstractMediator {
 
         switch (soapVersion) {
             case SOAP11:
-                return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
             case SOAP12:
-                return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+                makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
             case POX:
-                return makePOXFault(synCtx, traceOrDebugOn, traceOn);
+                makePOXFault(synCtx, traceOrDebugOn, traceOn);
 
             default : {
                 // if this is a POX or REST message then make a POX fault
                 if (synCtx.isDoingPOX() || synCtx.isDoingGET()) {
                     
-                    return makePOXFault(synCtx, traceOrDebugOn, traceOn);
+                    makePOXFault(synCtx, traceOrDebugOn, traceOn);
 
                 } else {
                     
@@ -114,23 +118,31 @@ public class FaultMediator extends AbstractMediator {
                             envelop.getNamespace().getNamespaceURI())) {
 
                             soapVersion = SOAP12;
-                            return makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+                            makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
 
                         } else {
                             soapVersion = SOAP11;
-                            return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                            makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
                         }
                         
                     } else {
                         // default to SOAP 11
-                        return makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                        makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
                     }
                 }
             }
         }
+
+        // if the message has to be marked as a response mark it as response
+        if (markAsResponse) {
+            synCtx.setResponse(true);
+            synCtx.setTo(synCtx.getReplyTo());
+        }
+        
+        return true;
     }
 
-    private boolean makePOXFault(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+    private void makePOXFault(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
 
         OMFactory fac = synCtx.getEnvelope().getOMFactory();
         OMElement faultPayload = fac.createOMElement(new QName("Exception"));
@@ -198,8 +210,6 @@ public class FaultMediator extends AbstractMediator {
             
             body.addChild(faultPayload);
         }
-
-        return true;
     }
 
     /**
@@ -208,9 +218,8 @@ public class FaultMediator extends AbstractMediator {
      * @param soapVersion SOAP version of the resulting fault desired
      * @param traceOrDebugOn is trace or debug logging on?
      * @param traceOn is tracing on?
-     * @return true, always
      */
-    private boolean makeSOAPFault(MessageContext synCtx, int soapVersion,
+    private void makeSOAPFault(MessageContext synCtx, int soapVersion,
         boolean traceOrDebugOn, boolean traceOn) {
 
         if (traceOrDebugOn) {
@@ -293,8 +302,6 @@ public class FaultMediator extends AbstractMediator {
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Fault mediator");
         }
-        
-        return true;
     }
 
     private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
@@ -385,6 +392,22 @@ public class FaultMediator extends AbstractMediator {
 
     public void setSoapVersion(int soapVersion) {
         this.soapVersion = soapVersion;
+    }
+
+    public boolean isMarkAsResponse() {
+        return markAsResponse;
+    }
+
+    public void setMarkAsResponse(boolean markAsResponse) {
+        this.markAsResponse = markAsResponse;
+    }
+
+    public boolean isSerializeResponse() {
+        return serializeResponse;
+    }
+
+    public void setSerializeResponse(boolean serializeResponse) {
+        this.serializeResponse = serializeResponse;
     }
 
     public QName getFaultCodeValue() {

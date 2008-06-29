@@ -57,10 +57,18 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
                 "version", nullNS, POX));
         }
 
+        if (mediator.isSerializeResponse()) {
+            if (mediator.isMarkAsResponse()) {
+                fault.addAttribute(fac.createOMAttribute("response", nullNS, "true"));
+            } else {
+                fault.addAttribute(fac.createOMAttribute("response", nullNS, "false"));
+            }
+        }
+
         OMElement code = fac.createOMElement("code", synNS, fault);
         if (mediator.getFaultCodeValue() != null) {
             code.addAttribute(fac.createOMAttribute(
-                "value", nullNS, mediator.getFaultCodeValue().getPrefix() + ":"
+                    "value", nullNS, mediator.getFaultCodeValue().getPrefix() + ":"
                     + mediator.getFaultCodeValue().getLocalPart()));
             code.declareNamespace(mediator.getFaultCodeValue().getNamespaceURI(),
                     mediator.getFaultCodeValue().getPrefix());

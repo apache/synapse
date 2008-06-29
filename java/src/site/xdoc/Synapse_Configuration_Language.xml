@@ -1466,18 +1466,25 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
 <pre xml:space="preserve"> &lt;xslt key="string" [source="xpath"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
    &lt;feature name="string" value="true| false" /&gt;*
+   &lt;attribute name="string" value="string" /&gt;*
  &lt;/xslt&gt;</pre>
     <p>
       The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
       selected element of the current message payload. If the source element is
       not specified, it defaults to the first child of the soap body. Optionally
       parameters (XSLT) could be passed into the transformations through the
-      'property' elements. The 'feature' element defines any features which
+      'property' elements.
+    </p>
+      The 'feature' element defines any features which
       should be explicitly set to the TransformerFactory. The feature
       'http://ws.apache.org/ns/synapse/transform/feature/dom' turns on DOM based
       transformations instead of serializing elements into Byte streams and/or
       temporary files. Though this would be better in performance than using
       byte streams, sometimes it may not work for all transformations.
+    </p>
+    <p>
+      The 'attribute' element allows to define attributes which should be explicitly
+      set to the TransformerFactory.
     </p>
     <h4>
       <a name="xquery" id="xquery">XQuery</a>

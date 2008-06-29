@@ -19,12 +19,15 @@
 
 package org.apache.synapse.startup.tasks;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.Task;
 import org.apache.synapse.util.PayloadHelper;
@@ -49,12 +52,25 @@ public class MessageInjector implements Task, ManagedLifecycle {
      */
     private String to = null;
 
+    /**
+     * Could be one of either "soap11" | "soap12" | "pox" | "get"
+     */
+    private String format = null;
+
+    /**
+     * SOAPAction of the message to be set, in case of the format is soap11
+     */
     private String soapAction = null;
 
     /**
      * Holds the SynapseEnv to which the message will be injected
      */
     private SynapseEnvironment synapseEnvironment;
+
+    public static String SOAP11_FORMAT = "soap11";
+    public static String SOAP12_FORMAT = "soap12";
+    public static String POX_FORMAT = "pox";
+    public static String GET_FORMAT = "get";
 
     /**
      * Initializes the Injector
@@ -87,6 +103,20 @@ public class MessageInjector implements Task, ManagedLifecycle {
 		to = url;
 	}
 
+    /**
+     * Sets the format of the message
+     *
+     * @param format could be one of either "soap11" | "soap12" | "pox" | "get"
+     */
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    /**
+     * Sets the SOAPAction and valid only when the format is given as soap11
+     * 
+     * @param soapAction SOAPAction header value to be set
+     */
     public void setSoapAction(String soapAction) {
         this.soapAction = soapAction;
     }
@@ -113,7 +143,26 @@ public class MessageInjector implements Task, ManagedLifecycle {
 		}
         MessageContext mc = synapseEnvironment.createMessageContext();
         mc.setTo(new EndpointReference(to));
-        PayloadHelper.setXMLPayload(mc, message.cloneOMElement());
+        if (format == null) {
+            PayloadHelper.setXMLPayload(mc, message.cloneOMElement());
+        } else {
+            try {
+                if (SOAP11_FORMAT.equalsIgnoreCase(format)) {
+                    mc.setEnvelope(OMAbstractFactory.getSOAP11Factory().createSOAPEnvelope());
+                } else if (SOAP12_FORMAT.equalsIgnoreCase(format)) {
+                    mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
+                } else if (POX_FORMAT.equalsIgnoreCase(format)) {
+                    mc.setDoingPOX(true);
+                } else if (GET_FORMAT.equalsIgnoreCase(format)) {
+                    mc.setDoingGET(true);
+                }
+                PayloadHelper.setXMLPayload(mc, message.cloneOMElement());
+            } catch (AxisFault axisFault) {
+                String msg = "Error in setting the message payload : " + message;
+                log.error(msg, axisFault);
+                throw new SynapseException(msg, axisFault);
+            }
+        }
         if (soapAction != null) {
             mc.setSoapAction(soapAction);
         }

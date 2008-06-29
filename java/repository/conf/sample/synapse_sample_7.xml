@@ -46,13 +46,11 @@
             <schema key="validate_schema"/>
             <on-fail>
                 <!-- if the request does not validate againt schema throw a fault -->
-                <makefault>
+                <makefault response="true">
                     <code value="tns:Receiver"
                             xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
                     <reason value="Invalid custom quote request"/>
                 </makefault>
-				<property name="RESPONSE" value="true"/>
-		        <header name="To" expression="get-property('ReplyTo')"/>
             </on-fail>
         </validate>
     </in>

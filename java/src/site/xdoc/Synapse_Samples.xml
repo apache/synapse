@@ -809,13 +809,10 @@
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="myFaultHandler"&gt;
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
         &lt;/makefault&gt;
-
-        &lt;property name="RESPONSE" value="true"/&gt;
-        &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -931,13 +928,11 @@
             &lt;schema key="validate_schema"/&gt;
             &lt;on-fail&gt;
                 &lt;!-- if the request does not validate againt schema throw a fault --&gt;
-                &lt;makefault&gt;
+                &lt;makefault response="true"&gt;
                     &lt;code value="tns:Receiver"
                             xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
                     &lt;reason value="Invalid custom quote request"/&gt;
                 &lt;/makefault&gt;
-                &lt;property name="RESPONSE" value="true"/&gt;
-                &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
             &lt;/on-fail&gt;
         &lt;/validate&gt;
     &lt;/in&gt;
@@ -1542,15 +1537,10 @@ Content-ID:
     &lt;/sequence&gt;
 
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -1671,15 +1661,10 @@ Content-ID:
     &lt;/sequence&gt;
 
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -1782,15 +1767,10 @@ Content-ID:
     &lt;/sequence&gt;
 
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -1901,15 +1881,10 @@ Content-ID:
     &lt;/sequence&gt;
 
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -2071,15 +2046,10 @@ Content-ID:
     &lt;/sequence&gt;
 
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;eason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -2195,15 +2165,10 @@ Content-ID:
     &lt;/sequence&gt;
 
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 
@@ -2887,15 +2852,10 @@ Connection: Keep-Alive
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_2.wsdl"/&gt;
     &lt;/proxy&gt;
     &lt;sequence name="errorHandler"&gt;
-
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
         &lt;/makefault&gt;
-
-        &lt;header name="To" action="remove"/&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-
         &lt;send/&gt;
     &lt;/sequence&gt;
 &lt;/definitions&gt; </pre>
@@ -4282,13 +4242,10 @@ end
 <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="myFaultHandler"&gt;
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
         &lt;/makefault&gt;
-
-        &lt;property name="RESPONSE" value="true"/&gt;
-        &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
         &lt;send/&gt;
         &lt;drop/&gt;
     &lt;/sequence&gt;
@@ -4354,13 +4311,11 @@ end
                     &lt;log level="custom"&gt;
                         &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
                     &lt;/log&gt;
-                    &lt;makefault&gt;
+                    &lt;makefault response="true"&gt;
                         &lt;code value="tns:Receiver"
                               xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
                         &lt;reason value="** Unrecognized Company ID **"/&gt;
                     &lt;/makefault&gt;
-                    &lt;property name="RESPONSE" value="true"/&gt;
-                    &lt;header name="To" action="remove"/&gt;
                     &lt;send/&gt;
                     &lt;drop/&gt;
                 &lt;/default&gt;
@@ -4634,13 +4589,10 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
       &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
           &lt;sequence name="myFaultHandler"&gt;
-              &lt;makefault&gt;
+              &lt;makefault response="true"&gt;
                   &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
                   &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
               &lt;/makefault&gt;
-
-              &lt;property name="RESPONSE" value="true"/&gt;
-              &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
               &lt;send/&gt;
               &lt;drop/&gt;
           &lt;/sequence&gt;
@@ -4707,13 +4659,11 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
                           &lt;log level="custom"&gt;
                               &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
                           &lt;/log&gt;
-                          &lt;makefault&gt;
+                          &lt;makefault response="true"&gt;
                               &lt;code value="tns:Receiver"
                                     xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
                               &lt;reason value="** Unrecognized Company ID **"/&gt;
                           &lt;/makefault&gt;
-                          &lt;property name="RESPONSE" value="true"/&gt;
-                          &lt;header name="To" action="remove"/&gt;
                           &lt;send/&gt;
                           &lt;drop/&gt;
                       &lt;/default&gt;
@@ -4841,13 +4791,11 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
                     &lt;log level="custom"&gt;
                         &lt;property name="text" value="**Access Denied**"/&gt;
                     &lt;/log&gt;
-                    &lt;makefault&gt;
+                    &lt;makefault response="true"&gt;
                         &lt;code value="tns:Receiver"
                               xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
                         &lt;reason value="**Access Denied**"/&gt;
                     &lt;/makefault&gt;
-                    &lt;property name="RESPONSE" value="true"/&gt;
-                    &lt;header name="To" action="remove"/&gt;
                     &lt;send/&gt;
                     &lt;drop/&gt;
                 &lt;/onReject&gt;
@@ -4963,13 +4911,11 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
                     &lt;log level="custom"&gt;
                         &lt;property name="text" value="**Access Denied**"/&gt;
                     &lt;/log&gt;
-                    &lt;makefault&gt;
+                    &lt;makefault response="true"&gt;
                         &lt;code value="tns:Receiver"
                               xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
                         &lt;reason value="**Access Denied**"/&gt;
                     &lt;/makefault&gt;
-                    &lt;property name="RESPONSE" value="true"/&gt;
-                    &lt;header name="To" action="remove"/&gt;
                     &lt;send/&gt;
                     &lt;drop/&gt;
                 &lt;/onReject&gt;
@@ -5058,13 +5004,11 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
         &lt;log level="custom"&gt;
             &lt;property name="text" value="**Access Denied**"/&gt;
         &lt;/log&gt;
-        &lt;makefault&gt;
+        &lt;makefault response="true"&gt;
             &lt;code value="tns:Receiver"
                   xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
             &lt;reason value="**Access Denied**"/&gt;
         &lt;/makefault&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-        &lt;header name="To" action="remove"/&gt;
         &lt;send/&gt;
         &lt;drop/&gt;
     &lt;/sequence&gt;

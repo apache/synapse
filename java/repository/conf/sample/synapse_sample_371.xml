@@ -88,13 +88,11 @@
                     <log level="custom">
                         <property name="text" value="**Access Denied**"/>
                     </log>
-                    <makefault>
+                    <makefault response="true">
                         <code value="tns:Receiver"
                               xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
                         <reason value="**Access Denied**"/>
                     </makefault>
-                    <property name="RESPONSE" value="true"/>
-                    <header name="To" action="remove"/>
                     <send/>
                     <drop/>
                 </onReject>

@@ -44,7 +44,13 @@ public class FaultMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testFaultMediatorSerializationSOAP12() throws Exception {
-        String inputXml = getXmlOfMediatorForSOAP12(SOAP12, "soap:Sender", "reason", EMPTY, EMPTY, EMPTY);
+        String inputXml = getXmlOfMediatorForSOAP12(SOAP12, "soap:Sender", "reason", EMPTY, EMPTY, EMPTY, "false");
+        assertTrue(serialization(inputXml, faultMediatorFactory, faultMediatorSerializer));
+        assertTrue(serialization(inputXml, faultMediatorSerializer));
+    }
+
+    public void testFaultMediatorSerializationSOAP12withResponse() throws Exception {
+        String inputXml = getXmlOfMediatorForSOAP12(SOAP12, "soap:Sender", "reason", EMPTY, EMPTY, EMPTY, "true");
         assertTrue(serialization(inputXml, faultMediatorFactory, faultMediatorSerializer));
         assertTrue(serialization(inputXml, faultMediatorSerializer));
     }
@@ -57,8 +63,8 @@ public class FaultMediatorSerializationTest extends AbstractTestCase {
     }
 
     private String getXmlOfMediatorForSOAP12(String version, String attrOfCode, String attrOfReasion
-            , String node, String role, String details) throws Exception {
-        return "<makefault xmlns=\"http://ws.apache.org/ns/synapse\" version=\"" + version + "\"><code value=\"" + attrOfCode + "\" xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"/><reason value=\"" + attrOfReasion + "\"/>" +
+            , String node, String role, String details, String response) throws Exception {
+        return "<makefault xmlns=\"http://ws.apache.org/ns/synapse\" version=\"" + version + "\" response=\"" + response + "\"><code value=\"" + attrOfCode + "\" xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"/><reason value=\"" + attrOfReasion + "\"/>" +
                 "<node>" + node + "</node><role>" + role + "</role><detail>" + details + "</detail></makefault>";
 
     }

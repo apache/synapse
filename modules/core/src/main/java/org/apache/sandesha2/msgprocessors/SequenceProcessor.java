@@ -57,6 +57,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.workers.InvokerWorker;
+import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -339,11 +340,8 @@ public class SequenceProcessor {
 		} else if (!acksTo.hasAnonymousAddress()) {
 			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
 			long ackInterval = policyBean.getAcknowledgementInterval();
-			long timeToSend = System.currentTimeMillis() + ackInterval;
 			
-			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
-
-			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
+			((Sender)storageManager.getSender()).scheduleAddressableAcknowledgement(sequenceId, ackInterval, rmMsgCtx);
 			
 			// If the MEP doesn't need the backchannel, and nor do we, we should signal it so that it
 			// can close off as soon as possible.

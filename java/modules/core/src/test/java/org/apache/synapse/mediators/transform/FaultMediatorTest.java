@@ -23,10 +23,12 @@ import junit.framework.TestCase;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.TestUtils;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
+import java.util.HashMap;
 
 public class FaultMediatorTest extends TestCase {
 
@@ -45,7 +47,8 @@ public class FaultMediatorTest extends TestCase {
         faultMediator.setFaultDetail(F_DETAIL);
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getAxis2MessageContext(
+                "<empty/>", new HashMap<String, Entry>());
         faultMediator.mediate(synCtx);
 
         SOAPEnvelope envelope = synCtx.getEnvelope();

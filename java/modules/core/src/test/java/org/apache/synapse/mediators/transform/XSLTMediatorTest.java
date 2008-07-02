@@ -77,10 +77,8 @@ public class XSLTMediatorTest extends TestCase {
         return suite;
     }
     
-    private static Set<String> testsToExclude = new HashSet<String>(Arrays.asList(new String[] {
-            "testSaxonDOOMSourceDOOMResult",
-            "testSaxonDOOMSourceStreamResult",
-    }));
+    private static Set<String> testsToExclude = new HashSet<String>(
+            Arrays.asList("testSaxonDOOMSourceDOOMResult", "testSaxonDOOMSourceStreamResult"));
     
     private static void addGenericTests(TestSuite suite, final String processorName,
             final Class<? extends TransformerFactory> transformerFactoryClass) {
@@ -119,7 +117,7 @@ public class XSLTMediatorTest extends TestCase {
      * Check that the provided element is the result of the XSL transformation of
      * SOURCE by the stylesheet transform_unittest.xslt.
      * 
-     * @param element
+     * @param node result of the XSLT to be matched
      */
     private void assertQuoteElement(OMNode node) {
         assertTrue(node instanceof OMElement);
@@ -130,14 +128,15 @@ public class XSLTMediatorTest extends TestCase {
 
         OMElement symbolElem = element.getFirstElement();
         assertTrue("symbol".equals(symbolElem.getLocalName()));
-        assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getNamespaceURI()));
+        assertTrue("http://www.webserviceX.NET/".equals(
+                symbolElem.getNamespace().getNamespaceURI()));
 
         assertTrue("String".equals(symbolElem.getText()));
     }
     
     public void testTransformXSLTCustomSource() throws Exception {
 
-        // create a new switch mediator
+        // create a new XSLT mediator
         XSLTMediator transformMediator = new XSLTMediator();
 
         // set xpath condition to select source
@@ -148,9 +147,9 @@ public class XSLTMediatorTest extends TestCase {
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
 
-        MessageContext synCtx = new TestMessageContextBuilder()
-            .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
-            .setBodyFromString(SOURCE).addTextAroundBody().build();
+        MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
+                .setBodyFromString(SOURCE).addTextAroundBody().build();
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -159,19 +158,19 @@ public class XSLTMediatorTest extends TestCase {
 
     /**
      * If a source element for transformation is not found, default to soap body
-     * @throws Exception
+     * @throws Exception if there is an error in test
      */
     public void testTransformXSLTDefaultSource() throws Exception {
 
-        // create a new switch mediator
+        // create a new xslt mediator
         XSLTMediator transformMediator = new XSLTMediator();
 
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
 
-        MessageContext synCtx = new TestMessageContextBuilder()
-            .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
-            .setBodyFromString(SOURCE).addTextAroundBody().build();
+        MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
+                .setBodyFromString(SOURCE).addTextAroundBody().build();
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -188,10 +187,10 @@ public class XSLTMediatorTest extends TestCase {
         for (int i=0; i<2; i++) {
 
             // invoke transformation, with static enveope
-            MessageContext synCtx = new TestMessageContextBuilder()
-                .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_load.xml")
-                .setBodyFromFile("../../repository/conf/sample/resources/transform/message.xml")
-                .addTextAroundBody().build();
+            MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                    "../../repository/conf/sample/resources/transform/transform_load.xml")
+                    .setBodyFromFile("../../repository/conf/sample/resources/transform/message.xml")
+                    .addTextAroundBody().build();
             //MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
             transformMediator.mediate(synCtx);
 //            synCtx.getEnvelope().serializeAndConsume(new FileOutputStream("/tmp/out.xml"));
@@ -210,10 +209,10 @@ public class XSLTMediatorTest extends TestCase {
         for (int i=0; i<2; i++) {
 
             // invoke transformation, with static enveope
-            MessageContext synCtx = new TestMessageContextBuilder()
-                .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_load_3.xml")
-                .setBodyFromFile("../../repository/conf/sample/resources/transform/message.xml")
-                .addTextAroundBody().build();
+            MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                    "../../repository/conf/sample/resources/transform/transform_load_3.xml")
+                    .setBodyFromFile("../../repository/conf/sample/resources/transform/message.xml")
+                    .addTextAroundBody().build();
             //MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
             transformMediator.mediate(synCtx);
 //            System.gc();
@@ -229,11 +228,11 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
          // invoke transformation, with static enveope
-         MessageContext synCtx = new TestMessageContextBuilder()
-             .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_load_2.xml")
-             .setBodyFromFile("../../repository/conf/sample/resources/transform/med_message.xml")
-             .addTextAroundBody().build();
-        transformMediator.mediate(synCtx);
+         MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                 "../../repository/conf/sample/resources/transform/transform_load_2.xml")
+                 .setBodyFromFile("../../repository/conf/sample/resources/transform/med_message.xml")
+                 .addTextAroundBody().build();
+         transformMediator.mediate(synCtx);
 
          // validate result
          OMContainer body = synCtx.getEnvelope().getBody();
@@ -251,10 +250,10 @@ public class XSLTMediatorTest extends TestCase {
 
         for (int i=0; i<5; i++) {
             // invoke transformation, with static enveope
-            MessageContext synCtx = new TestMessageContextBuilder()
-                .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_load_2.xml")
-                .setBodyFromFile("../../repository/conf/sample/resources/transform/small_message.xml")
-                .addTextAroundBody().build();
+            MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                    "../../repository/conf/sample/resources/transform/transform_load_2.xml")
+                    .setBodyFromFile("../../repository/conf/sample/resources/transform/small_message.xml")
+                    .addTextAroundBody().build();
             //MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
             transformMediator.mediate(synCtx);
             //System.out.println("done : " + i + " :: " + Runtime.getRuntime().freeMemory());
@@ -275,10 +274,10 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = new TestMessageContextBuilder()
-            .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
-            .setBodyFromString(ENCLOSING_SOURCE)
-            .addTextAroundBody().build();
+        MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
+                .setBodyFromString(ENCLOSING_SOURCE)
+                .addTextAroundBody().build();
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -299,15 +298,17 @@ public class XSLTMediatorTest extends TestCase {
         XSLTMediator transformMediator = new XSLTMediator();
         transformMediator.setXsltKey("xslt-key");
         
-        MessageContext mc = new TestMessageContextBuilder()
-            .addFileEntry("xslt-key", "../../repository/conf/sample/resources/transform/encoding_test.xslt")
-            .setEnvelopeFromFile("../../repository/conf/sample/resources/transform/encoding_test.xml").build();
+        MessageContext mc = new TestMessageContextBuilder().addFileEntry("xslt-key",
+                "../../repository/conf/sample/resources/transform/encoding_test.xslt")
+                .setEnvelopeFromFile("../../repository/conf/sample/resources/transform" +
+                        "/encoding_test.xml").build();
         
         transformMediator.mediate(mc);
         
         OMElement resultElement = mc.getEnvelope().getBody().getFirstElement();
         assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, resultElement.getQName());
-        assertEquals("\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre", resultElement.getText());
+        assertEquals("\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre",
+                resultElement.getText());
     }
     
     // Test for SYNAPSE-307
@@ -333,6 +334,8 @@ public class XSLTMediatorTest extends TestCase {
      * source AXIOM tree.
      * This tests for regression against WSCOMMONS-338. It should work with
      * AXIOM versions above 1.2.7.
+     *
+     * @throws Exception in case of an error in tests
      */
     public void testWithCDATA() throws Exception {
         XSLTMediator transformMediator = new XSLTMediator();

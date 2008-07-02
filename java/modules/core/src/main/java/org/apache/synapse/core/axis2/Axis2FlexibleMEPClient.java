@@ -86,7 +86,7 @@ public class Axis2FlexibleMEPClient {
             outboundWsSecPolicyKey = endpoint.getOutboundWsSecPolicyKey();
             wsRMEnabled            = endpoint.isReliableMessagingOn();
             wsRMPolicyKey          = endpoint.getWsRMPolicyKey();
-            wsAddressingEnabled    = endpoint.isAddressingOn() || wsSecurityEnabled || wsRMEnabled;
+            wsAddressingEnabled    = endpoint.isAddressingOn() || wsRMEnabled;
             wsAddressingVersion    = endpoint.getAddressingVersion();
         }
 

@@ -416,19 +416,23 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      */
     public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
 
+        String trailler = "";
         //Strip out the operation name
         if (serviceName.indexOf('/') != -1) {
+            trailler += serviceName.substring(serviceName.indexOf("/"));
             serviceName = serviceName.substring(0, serviceName.indexOf('/'));
         }
         // strip out the endpoint name if present
         if (serviceName.indexOf('.') != -1) {
+            trailler += serviceName.substring(serviceName.indexOf("."));
             serviceName = serviceName.substring(0, serviceName.indexOf('.'));
         }
 
         if (serviceNameToEPRMap.containsKey(serviceName)) {
-            return new EndpointReference(customEPRPrefix + serviceNameToEPRMap.get(serviceName));
+            return new EndpointReference(
+                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailler);
         } else {
-            return new EndpointReference(serviceEPRPrefix + serviceName);
+            return new EndpointReference(serviceEPRPrefix + serviceName + trailler);
         }
     }
 
@@ -441,21 +445,25 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      */
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
 
+        String trailler = "";
         //Strip out the operation name
         if (serviceName.indexOf('/') != -1) {
+            trailler += serviceName.substring(serviceName.indexOf("/"));
             serviceName = serviceName.substring(0, serviceName.indexOf('/'));
         }
         // strip out the endpoint name if present
         if (serviceName.indexOf('.') != -1) {
+            trailler += serviceName.substring(serviceName.indexOf("."));
             serviceName = serviceName.substring(0, serviceName.indexOf('.'));
         }
 
         EndpointReference[] endpointReferences = new EndpointReference[1];
         if (serviceNameToEPRMap.containsKey(serviceName)) {
             endpointReferences[0] = new EndpointReference(
-                    customEPRPrefix + serviceNameToEPRMap.get(serviceName));
+                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailler);
         } else {
-            endpointReferences[0] = new EndpointReference(serviceEPRPrefix + serviceName);
+            endpointReferences[0]
+                    = new EndpointReference(serviceEPRPrefix + serviceName + trailler);
         }
         return endpointReferences;
     }

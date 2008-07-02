@@ -25,9 +25,9 @@
             <send>
                 <endpoint>
                     <loadbalance failover="true">
-                        <member ip="127.0.0.1" httpPort="9001" httpsPort="9005"/>
-                        <member ip="127.0.0.1" httpPort="9002" httpsPort="9006"/>
-                        <member ip="127.0.0.1" httpPort="9003" httpsPort="9007"/>
+                        <member hostName="127.0.0.1" httpPort="9001" httpsPort="9005"/>
+                        <member hostName="127.0.0.1" httpPort="9002" httpsPort="9006"/>
+                        <member hostName="127.0.0.1" httpPort="9003" httpsPort="9007"/>
                     </loadbalance>
                 </endpoint>
             </send>

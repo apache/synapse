@@ -604,17 +604,19 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </h4>
     <p>
       A Load balanced endpoint distributes the messages (load) arriving at it
-      among a set of listed endpoints by evaluating the load balancing policy
-      and any other relevant parameters. Policy attribute of the load balance
+      among a set of listed endpoints or static members by evaluating the load balancing policy
+      and any other relevant parameters. The policy attribute of the load balance
       element specifies the load balance policy (algorithm) to be used for
-      selecting the target endpoint. Currently only the roundRobin policy is
-      supported. failover attribute determines if the next endpoint should be
-      selected once the currently selected endpoint has failed, and defaults to
-      true. The set of endpoints among which the load is distributed can be
-      listed under the 'loadBalance' element. Those endpoints can belong to any
+      selecting the target endpoint or static member. Currently only the roundRobin policy is
+      supported. The failover attribute determines if the next endpoint or static member should be
+      selected once the currently selected endpoint or static member has failed, and defaults to
+      true. The set of endpoints or static members amongst which the load has to be distributed
+      can be listed under the 'loadBalance' element. These endpoints can belong to any
       endpoint type mentioned in this document. For example, failover endpoints
       can be listed inside the load balance endpoint to load balance between
-      failover groups etc.
+      failover groups etc. The loadbalance element cannot have both endpoint &amp; member child
+      elements in the same configuration. In the case of the member child element, the hostName,
+      httpPort and/or httpsPort attributes could be specified.
     </p>
     <p>
       The optional 'session' element makes the endpoint a session affinity based
@@ -629,10 +631,13 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       considered as set to false. If it is required to have failover behavior in session
       affinity based load balance endpoints, list failover endpoints as the target endpoints.
     </p>
-<pre xml:space="preserve">&lt;session type="http|simpleClientSession"/&gt;?
-&lt;loadBalance [policy="roundRobin"] [failover="true|false"]&gt;
-  &lt;endpoint .../&gt;+
-&lt;/loadBalance&gt;</pre>
+    <pre xml:space="preserve">
+    &lt;session type="http|simpleClientSession"/&gt;?
+    &lt;loadBalance [policy="roundRobin"] [failover="true|false"]&gt;
+      &lt;endpoint .../&gt;+
+      &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+  
+    &lt;/loadBalance&gt;
+    </pre>
     <h4>
       <a name="fail-over-endpoint" id="fail-over-endpoint">Failover Endpoint</a>
     </h4>
@@ -649,6 +654,37 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
 <pre xml:space="preserve">&lt;failover&gt;
   &lt;endpoint .../&gt;+
 &lt;/failover&gt;</pre>
+
+            <h4>
+      <a name="dynamic-load-balanced-endpoint" id="dynamic-load-balanced-endpoint">Dynamic Load
+      balance Endpoint</a>
+    </h4>
+    <p>
+      A Dynamic Load balanced endpoint distributes the messages (load) arriving at it
+      among a application members by evaluating the load balancing policy
+      and any other relevant parameters. These application members will be discovered
+      using the membershipHandler class. Generally, this class will use a group
+      communication mechanism to discover the application members. The class attribute of the
+      membershipHandler element should be an implementation of
+      org.apache.synapse.core.LoadBalanceMembershipHandler. membershipHandler specific properties
+      can be specified using the property elements.  The policy attribute of the
+      dynamicLoadbalance
+      element specifies the load balance policy (algorithm) to be used for
+      selecting the next member to which the message has to be forwaded to.
+      Currently only the roundRobin policy is
+      supported. The failover attribute determines if the next member should be
+      selected once the currently selected member has failed, and defaults to
+      true.
+    </p>
+        <!--TODO: Session affinity documentation-->
+    <pre xml:space="preserve">
+    &lt;dynamicLoadBalance [policy="roundRobin"] [failover="true|false"]&gt;
+          &lt;membershipHandler
+                    class="impl of org.apache.synapse.core.LoadBalanceMembershipHandler"&gt;
+                    &lt;property name="name" value="value"/&gt;+
+          &lt;/membershipHandler&gt;
+    &lt;/dynamicLoadBalance&gt;
+    </pre>
     <h2>
       <a name="proxy" id="proxy">Proxy service</a>
     </h2>

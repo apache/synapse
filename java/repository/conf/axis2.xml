@@ -456,6 +456,8 @@
         <phase name="Security"/>
         <phase name="PreDispatch"/>
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
+            <handler name="CustomURIBasedDispatcher"
+                     class="org.apache.synapse.core.axis2.CustomURIBasedDispatcher"/>
             <handler name="RequestURIBasedDispatcher"
                      class="org.apache.axis2.dispatchers.RequestURIBasedDispatcher"/>
             <handler name="SOAPActionBasedDispatcher"

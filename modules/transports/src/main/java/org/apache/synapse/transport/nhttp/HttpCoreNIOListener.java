@@ -18,21 +18,15 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.net.InetAddress;
-
-import javax.net.ssl.SSLContext;
-
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.engine.AxisObserver;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisEvent;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.SessionContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.context.SessionContext;
+import org.apache.axis2.description.*;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,10 +40,16 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-import org.apache.synapse.transport.base.ManagementSupport;
-import org.apache.synapse.transport.base.MetricsCollector;
-import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.base.TransportMBeanSupport;
+import org.apache.synapse.transport.base.*;
+import org.apache.axiom.om.OMElement;
+
+import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * NIO transport listener for Axis2 based on HttpCore and NIO extensions
@@ -60,11 +60,21 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /** The Axis2 configuration context */
     private ConfigurationContext cfgCtx;
+    /** The Axis2 Transport In Description for the transport */
+    private TransportInDescription transportIn;
     /** The IOReactor */
     private DefaultListeningIOReactor ioReactor = null;
 
     /** The EPR prefix for services available over this transport */
     private String serviceEPRPrefix;
+    /** The EPR prefix for services with custom URI available over this transport */
+    private String customEPRPrefix;
+    /** The custom URI map for the services if there are any */
+    private Map<String, String> serviceNameToEPRMap = new HashMap<String, String>();
+    /** The servicename map for the custom URI if there are any */
+    private Map<String, String> eprToServiceNameMap = new HashMap<String, String>();
+    /** the axis observer that gets notified of service life cycle events*/
+    private final AxisObserver axisObserver = new GenericAxisObserver();
     /** The port to listen on, defaults to 8280 */
     private int port = 8280;
     /** The hostname to use, defaults to localhost */
@@ -116,9 +126,12 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @param transprtIn the description of the http/s transport from Axis2 configuration
      * @throws AxisFault on error
      */
-    public void init(ConfigurationContext cfgCtx, TransportInDescription transprtIn) throws AxisFault {
+    public void init(ConfigurationContext cfgCtx, TransportInDescription transprtIn)
+            throws AxisFault {
 
         this.cfgCtx = cfgCtx;
+        this.transportIn = transprtIn;
+        cfgCtx.setProperty(NhttpConstants.EPR_TO_SERVICE_NAME_MAP, eprToServiceNameMap);
         Parameter param = transprtIn.getParameter(PARAM_PORT);
         if (param != null) {
             port = Integer.parseInt((String) param.getValue());
@@ -147,9 +160,14 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         param = transprtIn.getParameter(NhttpConstants.WSDL_EPR_PREFIX);
         if (param != null) {
             serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, (String) param.getValue());
+            customEPRPrefix = (String) param.getValue();
         } else {
             serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, host, port);
+            customEPRPrefix = transprtIn.getName() + "://" + host + ":" + (port == 80 ? "" : port) + "/";
         }
+
+        // register to receive updates on services for lifetime management
+        cfgCtx.getAxisConfiguration().addObservers(axisObserver);
 
         // register with JMX
         mbeanSupport
@@ -159,7 +177,10 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /**
      * Return the EPR prefix for services made available over this transport
-     * @return
+     * @param cfgCtx configuration context to retrieve the service context path
+     * @param host name of the host
+     * @param port listening port
+     * @return wsdlEPRPrefix for the listener
      */
     protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String host, int port) {
         return "http://" + host + (port == 80 ? "" : ":" + port) +
@@ -170,7 +191,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /**
      * Return the EPR prefix for services made available over this transport
-     * @return
+     * @param cfgCtx configuration context to retrieve the service context path
+     * @param wsdlEPRPrefix specified wsdlPrefix
+     * @return wsdlEPRPrefix for the listener
      */
     protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String wsdlEPRPrefix) {
         return wsdlEPRPrefix +
@@ -182,8 +205,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /**
      * Create the SSLContext to be used by this listener
-     * @param transportIn
+     * @param transportIn transport in description
      * @return always null
+     * @throws AxisFault never thrown
      */
     protected SSLContext getSSLContext(TransportInDescription transportIn) throws AxisFault {
         return null;
@@ -191,8 +215,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /**
      * Create the SSL IO Session handler to be used by this listener
-     * @param transportIn
+     * @param transportIn transport in descritption
      * @return always null
+     * @throws AxisFault never thrown
      */
     protected SSLIOSessionHandler getSSLIOSessionHandler(TransportInDescription transportIn)
         throws AxisFault {
@@ -217,14 +242,14 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
                 public boolean handle(IOException ioException) {
-                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
-                        ioException.getMessage(), ioException);
+                    log.warn("System may be unstable: IOReactor encountered a checked exception : "
+                            + ioException.getMessage(), ioException);
                     return true;
                 }
 
                 public boolean handle(RuntimeException runtimeException) {
-                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
-                        runtimeException.getMessage(), runtimeException);
+                    log.warn("System may be unstable: IOReactor encountered a runtime exception : "
+                            + runtimeException.getMessage(), runtimeException);
                     return true;
                 }
             });
@@ -232,9 +257,13 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             handleException("Error starting the IOReactor", e);
         }
 
+        for (Object obj : cfgCtx.getAxisConfiguration().getServices().values()) {
+            addToServiceURIMap((AxisService) obj);
+        }
+        
         handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
-        final IOEventDispatch ioEventDispatch = getEventDispatch(
-            handler, sslContext, sslIOSessionHandler, params);
+        final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
+                sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;
         
         ListenerEndpoint endpoint;
@@ -280,6 +309,23 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             (bindAddress != null ? " address : " + bindAddress : "") + " port : " + port);
     }
 
+    private void addToServiceURIMap(AxisService service) {
+        Parameter param = service.getParameter(NhttpConstants.SERVICE_URI_LOCATION);
+        if (param != null) {
+            String uriLocation = param.getValue().toString();
+            if (uriLocation.startsWith("/")) {
+                uriLocation = uriLocation.substring(1);
+            }
+            serviceNameToEPRMap.put(service.getName(), uriLocation);
+            eprToServiceNameMap.put(uriLocation, service.getName());
+        }
+    }
+
+    private void removeServiceFfromURIMap(AxisService service) {
+        eprToServiceNameMap.remove(serviceNameToEPRMap.get(service.getName()));
+        serviceNameToEPRMap.remove(service.getName());
+    }
+
     /**
      * Stop the listener
      * @throws AxisFault on error
@@ -289,6 +335,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         try {
             ioReactor.shutdown();
             state = BaseConstants.STOPPED;
+            for (Object obj : cfgCtx.getAxisConfiguration().getServices().values()) {
+                removeServiceFfromURIMap((AxisService) obj);
+            }
         } catch (IOException e) {
             handleException("Error shutting down IOReactor", e);
         }
@@ -366,7 +415,21 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * Return the EPR for the given service (implements deprecated method temporarily)
      */
     public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
-        return new EndpointReference(serviceEPRPrefix + serviceName);
+
+        //Strip out the operation name
+        if (serviceName.indexOf('/') != -1) {
+            serviceName = serviceName.substring(0, serviceName.indexOf('/'));
+        }
+        // strip out the endpoint name if present
+        if (serviceName.indexOf('.') != -1) {
+            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
+        }
+
+        if (serviceNameToEPRMap.containsKey(serviceName)) {
+            return new EndpointReference(customEPRPrefix + serviceNameToEPRMap.get(serviceName));
+        } else {
+            return new EndpointReference(serviceEPRPrefix + serviceName);
+        }
     }
 
     /**
@@ -377,16 +440,31 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @throws AxisFault on error
      */
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
+
+        //Strip out the operation name
+        if (serviceName.indexOf('/') != -1) {
+            serviceName = serviceName.substring(0, serviceName.indexOf('/'));
+        }
+        // strip out the endpoint name if present
+        if (serviceName.indexOf('.') != -1) {
+            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
+        }
+
         EndpointReference[] endpointReferences = new EndpointReference[1];
-        endpointReferences[0] = new EndpointReference(serviceEPRPrefix + serviceName);
+        if (serviceNameToEPRMap.containsKey(serviceName)) {
+            endpointReferences[0] = new EndpointReference(
+                    customEPRPrefix + serviceNameToEPRMap.get(serviceName));
+        } else {
+            endpointReferences[0] = new EndpointReference(serviceEPRPrefix + serviceName);
+        }
         return endpointReferences;
     }
 
     /**
      * TODO: Return session context from transport, this is an improvement in axis2 1.2 and
      * is not currently supported
-     * @param messageContext
-     * @return
+     * @param messageContext context to be used
+     * @return always null
      */
     public SessionContext getSessionContext(MessageContext messageContext) {
         return null;
@@ -394,18 +472,59 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     public void destroy() {
         ioReactor = null;
+        cfgCtx.getAxisConfiguration().getObserversList().remove(axisObserver);
         mbeanSupport.unregister();
+    }
+
+    /**
+     * An AxisObserver which will start listening for newly deployed or started services,
+     * and stop listening when services are undeployed or stopped.
+     */
+    class GenericAxisObserver implements AxisObserver {
+
+        // The initilization code will go here
+        public void init(AxisConfiguration axisConfig) {
+        }
+
+        public void serviceUpdate(AxisEvent event, AxisService service) {
+
+            if (!ignoreService(service)
+                    && BaseUtils.isUsingTransport(service, transportIn.getName())) {
+                switch (event.getEventType()) {
+                    case AxisEvent.SERVICE_DEPLOY :
+                        addToServiceURIMap(service);
+                        break;
+                    case AxisEvent.SERVICE_REMOVE :
+                        removeServiceFfromURIMap(service);
+                        break;
+                    case AxisEvent.SERVICE_START  :
+                        addToServiceURIMap(service);
+                        break;
+                    case AxisEvent.SERVICE_STOP   :
+                        removeServiceFfromURIMap(service);
+                        break;
+                }
+            }
+        }
+
+        public void moduleUpdate(AxisEvent event, AxisModule module) {}
+        public void addParameter(Parameter param) throws AxisFault {}
+        public void removeParameter(Parameter param) throws AxisFault {}
+        public void deserializeParameters(OMElement parameterElement) throws AxisFault {}
+        public Parameter getParameter(String name) { return null; }
+        public ArrayList getParameters() { return null; }
+        public boolean isParameterLocked(String parameterName) { return false; }
+        public void serviceGroupUpdate(AxisEvent event, AxisServiceGroup serviceGroup) {}
+    }
+
+    private boolean ignoreService(AxisService service) {
+        return service.getName().startsWith("__"); // these are "private" services
     }
 
     // -------------- utility methods -------------
     private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);
-    }
-
-    private void handleException(String msg) throws AxisFault {
-        log.error(msg);
-        throw new AxisFault(msg);
     }
 
     // -- jmx/management methods--

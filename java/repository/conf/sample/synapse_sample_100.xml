@@ -26,7 +26,6 @@
 			<endpoint name="secure">
 			    <address uri="http://localhost:9000/soap/SecureStockQuoteService">
 			        <enableSec policy="sec_policy"/>
-			        <enableAddressing/>
 			    </address>
 			</endpoint>
         </send>

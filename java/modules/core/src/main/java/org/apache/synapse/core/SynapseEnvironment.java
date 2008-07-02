@@ -20,6 +20,7 @@
 package org.apache.synapse.core;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.statistics.StatisticsCollector;
@@ -102,13 +103,22 @@ public interface SynapseEnvironment {
 
     /**
      * Has the Synapse Environment properly initialized?
+     * 
      * @return true if the environment is ready for processing
      */
     public boolean isInitialized();
 
     /**
      * Set the environment as ready for message processing
+     * 
      * @param state true means ready for processing
      */
     public void setInitialized(boolean state);
+
+    /**
+     * Retrieves the {@link SynapseConfiguration} from the <code>environment</code>
+     * 
+     * @return configuration of the synapse
+     */
+    public SynapseConfiguration getSynapseConfiguration();
 }

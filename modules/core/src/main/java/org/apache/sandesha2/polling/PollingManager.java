@@ -160,8 +160,14 @@ public class PollingManager extends SandeshaThread {
 			if (beanToPoll.getNextMessageNumber() > -1)
 				cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
 			long  repliesExpected = beanToPoll.getExpectedReplies();
-			if(beanToPoll.getSequenceID() != null && (force || !cleanAcks || repliesExpected > 0) && beanToPoll.getReferenceMessageStoreKey() != null)
-		            pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+			if(beanToPoll.getSequenceID() != null){
+				if((force || !cleanAcks || repliesExpected > 0) && beanToPoll.getReferenceMessageStoreKey() != null){
+					pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+				}
+			} else {
+				//If seqID is null on RMS bean then it must be an RMSBean waiting for a createSeqResponse and we want to poll for these
+		        pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+			}
 		}
 		
 

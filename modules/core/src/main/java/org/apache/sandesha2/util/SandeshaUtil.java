@@ -975,11 +975,12 @@ public class SandeshaUtil {
 		int executionChainLength = executionChain.size();
 		for(int i=0;i<executionChainLength;i++){
 			Handler handler = (Handler)executionChain.get(i);
-			if("Security".equals(handler.getName())||"MessageOut".equals(handler.getName())){
+			if("Security".equals(handler.getName())){
 				retransmittablePhases.add(handler);
 			}
 		}
 		executionChain.removeAll(retransmittablePhases);
+				
 		message.setProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES, retransmittablePhases);
 	}
 	

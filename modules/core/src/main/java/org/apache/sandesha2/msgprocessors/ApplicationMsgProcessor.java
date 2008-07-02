@@ -386,59 +386,58 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// set this as the response highest message.
 			rmsBean.setHighestOutMessageNumber(messageNumber);
 			
-			// saving the used message number, and the expected reply count
-			boolean startPolling = false;
+			// saving the used message number
+			//Save the expected replies if it's not a dummy msg and it's an outIn MEP
+			String specVersion = SequenceManager.getSpecVersion(rmMsgCtx.getMessageContext(), storageManager);
 			if (!dummyMessage) {
-				if (log.isDebugEnabled())
-					log.debug("Enter: ApplicationMsgProcessor:: not a dummy msg");
 				rmsBean.setNextMessageNumber(messageNumber);
-	
+				
 				// Identify the MEP associated with the message.
 				AxisOperation op = msgContext.getAxisOperation();
 				int mep = WSDLConstants.MEP_CONSTANT_INVALID;
 				if(op != null) {
 					mep = op.getAxisSpecificMEPConstant();
 				}
-	
-				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				
+				EndpointReference replyTo = msgContext.getReplyTo();
+				
+				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN){
 					// We only match up requests and replies when we are doing sync interactions
-					if (log.isDebugEnabled()) log.debug("MEP OUT_IN");
-					EndpointReference replyTo = msgContext.getReplyTo();
+					if (log.isDebugEnabled()) log.debug("MEP OUT_IN");	
 					if(replyTo == null || replyTo.hasAnonymousAddress()) {
 						long expectedReplies = rmsBean.getExpectedReplies();
 						rmsBean.setExpectedReplies(expectedReplies + 1);
 					}
-	
+					
 					// If we support the RM anonymous URI then rewrite the ws-a anon to use the RM equivalent.
 					//(do should be done only for WSRM 1.1)
-					
-					String specVersion = SequenceManager.getSpecVersion(rmMsgCtx.getMessageContext(), storageManager);
 					if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) {
 						if (log.isDebugEnabled()) log.debug("SPEC_1_1");
 						String oldAddress = (replyTo == null) ? null : replyTo.getAddress();
 						EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext
 								.getReplyTo(), configContext);
 						String newAddress = (newReplyTo == null) ? null : newReplyTo.getAddress();
-						if (newAddress != null && !newAddress.equals(oldAddress)) {
-							// We have rewritten the replyTo. If this is the first message that we have needed to
-							// rewrite then we should set the sequence up for polling, and once we have saved the
-							// changes to the sequence then we can start the polling thread.
-							
-							//Firstly, we are going to use make connection in this configuration so we should now ensure that
-							//WS-Adressing is enabled
-							if (log.isDebugEnabled()) log.debug("Ensuring that WS-A is enabled for msg " + msgContext);
-							msgContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,Boolean.FALSE);
+						if(newAddress != null && !newAddress.equals(oldAddress)){
 							msgContext.setReplyTo(newReplyTo);
-							
-							//start the polling process to pull back response messages
-							if (!rmsBean.isPollingMode()) {
-								rmsBean.setPollingMode(true);
-								startPolling = true;
-							}
 						}
 					}
 				}
+			} 
+			
+			boolean startPolling = false;
+			// We should poll for any reply-to that uses the anonymous URI, when MakeConnection
+			// is enabled.
+			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) {
+				SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(msgContext.getConfigurationContext().getAxisConfiguration());
+				if(policy.isEnableMakeConnection()) {
+					EndpointReference reference = rmsBean.getAcksToEndpointReference();
+					if(reference == null || reference.hasAnonymousAddress()) {
+						rmsBean.setPollingMode(true);
+						startPolling = true;
+					}
+				}
 			}
+
 			if (log.isDebugEnabled()) log.debug("App msg using replyTo EPR as " + msgContext.getReplyTo());
 			
 			RelatesTo relatesTo = msgContext.getRelatesTo();

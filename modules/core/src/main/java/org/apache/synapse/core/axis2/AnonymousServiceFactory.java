@@ -43,6 +43,7 @@ public class AnonymousServiceFactory {
 
     private static final String NONE            = "__NONE__";
     private static final String ADDR_ONLY       = "__ADDR_ONLY__";
+    private static final String SEC_ONLY        = "__SEC_ONLY__";
     private static final String RM_AND_ADDR     = "__RM_AND_ADDR__";
     private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
     private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
@@ -66,19 +67,38 @@ public class AnonymousServiceFactory {
                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
                                                   boolean wsRMOn, boolean wsSecOn) {
 
+        // if non of addressing, security and rm is engaged then checkbit is 0
+        int checkbit = 0;
+        // if addressing is on increase the checkbit by 1
+        if (wsAddrOn) { checkbit += 1; }
+        // if security is on increase the checkbit by 2
+        if (wsSecOn) { checkbit += 2; }
+        // if reliable messaging is on increase the checkbit by 4
+        if (wsRMOn) { checkbit += 4; }
+
         String servicekey;
-        if (!wsAddrOn) {
-            servicekey = NONE;
-        } else {
-            if (!wsSecOn && !wsRMOn) {
+        switch (checkbit) {
+            case 0 :
+                servicekey = NONE;
+                break;
+            case 1 :
                 servicekey = ADDR_ONLY;
-            } else if (wsRMOn && !wsSecOn) {
-                servicekey = RM_AND_ADDR;
-            } else if (wsSecOn && !wsRMOn) {
+                break;
+            case 2 :
+                servicekey = SEC_ONLY;
+                break;
+            case 3 :
                 servicekey = SEC_AND_ADDR;
-            } else {
+                break;
+            case 4 & 5 :
+                servicekey = RM_AND_ADDR;
+                break;
+            case 6 & 7 :
                 servicekey = RM_SEC_AND_ADDR;
-            }
+                break;
+            default :
+                servicekey = NONE;
+                break;
         }
 
         try {
@@ -102,12 +122,13 @@ public class AnonymousServiceFactory {
                             service.engageModule(axisCfg.getModule(
                                 SynapseConstants.MERCURY_MODULE_NAME), axisCfg);
                         }
-                        if (wsSecOn) {
-                            service.engageModule(axisCfg.getModule(
-                                SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
-                        }
                     }
-                    // if WS-A is off, WS-Sec and WS-RM should be too
+                    // if WS-A is off, WS-RM should be too
+
+                    if (wsSecOn) {
+                        service.engageModule(axisCfg.getModule(
+                                SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
+                    }
                 }
             }
             return service;

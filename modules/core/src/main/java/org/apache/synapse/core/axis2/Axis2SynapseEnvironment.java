@@ -179,12 +179,13 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     public void injectAsync(final MessageContext synCtx, SequenceMediator seq) {
+
         if (log.isDebugEnabled()) {
             log.debug("Injecting MessageContext for asynchronous mediation using the : "
                 + (seq.getName() == null? "Anonymous" : seq.getName()) + " Sequence");
         }
         synCtx.setEnvironment(this);
-        // todo: do we need to have this in here ? ruwan
+
         if (synCtx.isResponse()) {
             //Process statistics related to a sequence which has send mediator as a child,end point
             StatisticsUtils.processEndPointStatistics(synCtx);
@@ -193,7 +194,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         }
 
         executorService.execute(new MediatorWorker(seq, synCtx));
-
     }
 
     /**
@@ -321,6 +321,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /**
      * Has this environment properly initialized?
+     *
      * @return true if ready for processing
      */
     public boolean isInitialized() {
@@ -329,10 +330,29 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /**
      * Mark this environment as ready for processing
+     *
      * @param state true means ready for processing
      */
     public void setInitialized(boolean state) {
         this.initialized = state;
+    }
+
+    /**
+     * Retrieves the {@link SynapseConfiguration} from the <code>environment</code>
+     *
+     * @return synapseConfig associated with the enviorenment
+     */
+    public SynapseConfiguration getSynapseConfiguration() {
+        return this.synapseConfig;
+    }
+
+    /**
+     * Retrieves the {@link ConfigurationContext} associated with this <code>axis2SynapseEnv</code>
+     *
+     * @return configContext of the axis2 synapse environment
+     */
+    public ConfigurationContext getAxis2ConfigurationContext() {
+        return this.configContext;
     }
 
     private void handleException(String message, Throwable e) {

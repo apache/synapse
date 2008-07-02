@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.clustering.Member;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
@@ -79,6 +80,15 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
 
             // set endpoints or members
             if (loadbalanceElement.getFirstChildWithName(XMLConfigConstants.ENDPOINT_ELT) != null) {
+                if(loadbalanceElement.
+                        getChildrenWithName((MEMBER)).hasNext()){
+                    String msg =
+                            "Invalid Synapse configuration. " +
+                            "loadbalanceEndpoint element cannot have both member & endpoint " +
+                            "child elements";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
                 ArrayList<Endpoint> endpoints
                         = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
                 loadbalanceEndpoint.setEndpoints(endpoints);
@@ -86,6 +96,15 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
                         LoadbalanceAlgorithmFactory.
                                 createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
             } else if (loadbalanceElement.getFirstChildWithName(MEMBER) != null) {
+                if(loadbalanceElement.
+                        getChildrenWithName((XMLConfigConstants.ENDPOINT_ELT)).hasNext()){
+                    String msg =
+                            "Invalid Synapse configuration. " +
+                            "loadbalanceEndpoint element cannot have both member & endpoint " +
+                            "child elements";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
                 List<Member> members = getMembers(loadbalanceElement);
                 loadbalanceEndpoint.setMembers(members);
                 algorithm =

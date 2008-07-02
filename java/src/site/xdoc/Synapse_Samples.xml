@@ -2262,7 +2262,6 @@ Content-ID:
             &lt;endpoint name="secure"&gt;
                 &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"&gt;
                     &lt;enableSec policy="sec_policy"/&gt;
-                    &lt;enableAddressing/&gt;
                 &lt;/address&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;

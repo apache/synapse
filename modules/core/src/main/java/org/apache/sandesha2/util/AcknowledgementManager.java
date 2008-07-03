@@ -63,8 +63,6 @@ public class AcknowledgementManager {
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
 
-		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
-
 		// If this message is going to an anonymous address, and the inbound
 		// sequence has
 		// anonymous acksTo, then we add in an ack for the inbound sequence.

@@ -464,7 +464,7 @@ public class SandeshaUtil {
 	
 	public static void assertProofOfPossession(RMSequenceBean bean, MessageContext context, OMElement elementToCheck)throws SandeshaException{
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
-			log.debug("Enter: SandeshaUtil::assertProofOfPossession :" + bean + ", " + context + ", " + elementToCheck.getQName());
+			log.debug("Enter: SandeshaUtil::assertProofOfPossession :" + bean + ", " + context + ", " + (elementToCheck!=null ? elementToCheck.getQName() : null));
 		
 		String tokenData = null;
 		if(bean!=null){

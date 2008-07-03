@@ -160,6 +160,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
   private static void processApplicationMessage(RMMsgContext rmMsgCtx) throws AxisFault {
     if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
       log.debug("Enter: SandeshaGlobalInHandler::processApplicationMessage");
+    System.out.println("Processing Application Msg");
     // Check if this is a duplicate message
     Sequence sequence = rmMsgCtx.getSequence();
     String sequenceId = sequence.getIdentifier().getIdentifier();
@@ -263,6 +264,12 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       
       if(transaction != null && transaction.isActive()) transaction.commit();
       transaction = null;
+    }catch (RuntimeException e)
+    {
+    	
+        if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+            log.debug("Exit: SandeshaGlobalInHandler::processApplicationMessage", e);
+    	throw e;
     }
     finally {
       if (transaction != null && transaction.isActive())

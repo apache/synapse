@@ -80,8 +80,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 								new Exception(), null);
 					else
 						throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, msgCtx.getAxisService().getName()));
-					
-					log.debug("Exit: RMMessageReceiver::invokeBusinessLogic, Service has disabled RM ");
+					if (log.isDebugEnabled())
+						log.debug("Exit: RMMessageReceiver::invokeBusinessLogic, Service has disabled RM ");
 					return;
 				}
 			}

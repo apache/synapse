@@ -65,7 +65,7 @@ public class SandeshaUtilTest extends TestCase {
 		
 	}
 	
-	public void testGetAckRangesFromRangeStringOutOfOrder()throws SandeshaException{
+	public void testGetAckRangesFromRangeStringOutOfOrder() {
 		
 		RangeString rangeString = new RangeString();
 		rangeString.addRange(new Range(3));
@@ -102,7 +102,7 @@ public class SandeshaUtilTest extends TestCase {
 		assertFalse(it.hasNext());
 	}
 	
-	public void testGetAckRangesFromRangeStringGapFilling () throws SandeshaException {
+	public void testGetAckRangesFromRangeStringGapFilling () {
 		//build a range string to represent the completed messages
 		RangeString rangeString = new RangeString();
 		rangeString.addRange(new Range(1,3));

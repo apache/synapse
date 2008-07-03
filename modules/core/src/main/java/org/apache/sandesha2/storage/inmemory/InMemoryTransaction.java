@@ -74,12 +74,13 @@ public class InMemoryTransaction implements Transaction {
 	
 	private class DummyTransaction extends ReentrantLock implements Transaction {
 
+		private static final long serialVersionUID = -8095723965216941864L;
+
 		public void commit() throws SandeshaStorageException {
 			throw new SandeshaStorageException("Not supported");
 		}
 
 		public boolean isActive() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
@@ -89,7 +90,7 @@ public class InMemoryTransaction implements Transaction {
 
 	}
 	
-	public void enlist(RMBean bean) throws SandeshaStorageException {
+	public void enlist(RMBean bean) {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
 		if (bean != null) {
 			DummyTransaction tran = null;

@@ -180,13 +180,13 @@ public class MsgInitializer {
 				rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 			
 			sequenceID = sequence.getIdentifier().getIdentifier();
-		} else if (sequenceAcknowledgementsIter.hasNext()) {
-			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAcknowledgementsIter.next();
-			
-			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
-			if (!sequenceAcknowledgementsIter.hasNext())
-				sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
+		} else if (makeConnection != null){
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
+			if (makeConnection.getIdentifier()!=null) {
+				sequenceID = makeConnection.getIdentifier().getIdentifier();
+			} else if (makeConnection.getAddress()!=null){
+				//TODO get sequenceId based on the anonymous address.
+			} 
 		} else if (ackRequestedIter.hasNext()) {
 			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
 			AckRequested ackRequest = (AckRequested) ackRequestedIter.next();
@@ -200,13 +200,15 @@ public class MsgInitializer {
 		} else if (closeSequenceResponse != null) {
 			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE);
 			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier(); 
-		} else if (makeConnection != null){
-			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
-			if (makeConnection.getIdentifier()!=null) {
-				sequenceID = makeConnection.getIdentifier().getIdentifier();
-			} else if (makeConnection.getAddress()!=null){
-				//TODO get sequenceId based on the anonymous address.
-			} 
+			
+			// As an ACK can be piggybacked on all the other message types - check for ACK last.
+		} else if (sequenceAcknowledgementsIter.hasNext()) {
+			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAcknowledgementsIter.next();
+			
+			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
+			if (!sequenceAcknowledgementsIter.hasNext())
+				sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else
 			rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 		

@@ -138,7 +138,7 @@ public class SecretManager {
                 currentParent = secretRepository;
                 initialize = true;
             } else {
-                log.warn("Unsupported secret sepository type : " + type);
+                log.warn("Unsupported secret repository type : " + type);
             }
 
         }
@@ -153,6 +153,9 @@ public class SecretManager {
      */
     public String getSecret(String alias) {
         if (!initialize || parentRepository == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no secret repository. Returning alias itself");
+            }
             return alias;
         }
         return parentRepository.getSecret(alias);

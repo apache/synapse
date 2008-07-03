@@ -290,7 +290,7 @@
                 <exclude>axis:axis-ant:jar</exclude>
                 <exclude>javax.servlet:servlet-api:jar</exclude>
                 <exclude>commons-discovery:commons-discovery:jar</exclude>
-                <exclude>commons-cli:commons-cli:jar</exclude>
+                <!--<exclude>commons-cli:commons-cli:jar</exclude>-->
                 <exclude>org.apache.geronimo.specs:geronimo-javamail:jar</exclude>
                 <exclude>xml-apis:xml-apis:jar</exclude>
                 <exclude>xerces:xercesImpl:jar</exclude>

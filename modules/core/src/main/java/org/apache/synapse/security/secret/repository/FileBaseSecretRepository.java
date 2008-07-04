@@ -51,11 +51,15 @@ public class FileBaseSecretRepository implements SecretRepository {
     private final static String TRUSTED = "trusted";
     private final static String DEFAULT_CONF_LOCATION = "cipher-text.properties";
 
+    /* Parent secret repository */
     private SecretRepository parentRepository;
-
+    /*Map of secrets keyed by alias for property name */
     private final Map secrets = new HashMap();
+    /*Wrapper for Identity KeyStore */
     private IdentityKeyStoreWrapper identity;
+    /* Wrapper for trusted KeyStore */
     private TrustKeyStoreWrapper trust;
+    /* Whether this secrte repository has been initiated successfully*/
     private boolean initialize = false;
 
     public FileBaseSecretRepository(IdentityKeyStoreWrapper wrapper, TrustKeyStoreWrapper trust) {
@@ -122,7 +126,8 @@ public class FileBaseSecretRepository implements SecretRepository {
             String keyStorePropertyKey = buffer.toString();
 
             //Load keyStore
-            String keyStore = MiscellaneousUtil.getProperty(cipherProperties, keyStorePropertyKey, null);
+            String keyStore = MiscellaneousUtil.getProperty(cipherProperties,
+                    keyStorePropertyKey, null);
 
             StringBuffer sbTwo = new StringBuffer();
             sbTwo.append(propKey);
@@ -171,6 +176,11 @@ public class FileBaseSecretRepository implements SecretRepository {
         }
     }
 
+    /**
+     * @param alias Alias name for look up a secret
+     * @return Secret if there is any , otherwise ,alias itself
+     * @see org.apache.synapse.security.secret.SecretRepository
+     */
     public String getSecret(String alias) {
 
         if (alias == null || "".equals(alias)) {

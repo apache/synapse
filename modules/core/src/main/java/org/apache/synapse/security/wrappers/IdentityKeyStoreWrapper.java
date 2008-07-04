@@ -26,7 +26,8 @@ import java.security.PrivateKey;
 
 /**
  * Represents the private keyStore entry
- * To provide that abstraction , this class exposes both getter methods to public, private and secret keys
+ * To provide that abstraction , this class exposes both getter methods to public,
+ * private and secret keys
  */
 public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
 

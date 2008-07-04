@@ -18,12 +18,18 @@
 */
 package org.apache.synapse.security.bean;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+
 /**
  * Encapsulates the keyStore related information
  */
 public class KeyStoreInformation {
 
-    private String storeType;
+    private static final Log log = LogFactory.getLog(KeyStoreInformation.class);
+
+    private String storeType = "JKS";
     private String alias;
     private String location;
 
@@ -33,6 +39,11 @@ public class KeyStoreInformation {
     }
 
     public void setStoreType(String storeType) {
+        if (storeType == null || "".equals(storeType)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Given store type is null , using default type : JKS");
+            }
+        }
         this.storeType = storeType;
     }
 
@@ -41,6 +52,9 @@ public class KeyStoreInformation {
     }
 
     public void setAlias(String alias) {
+        if (alias == null || "".equals(alias)) {
+            handleException("Alias for a key entry or a certificate cannot be null");
+        }
         this.alias = alias;
     }
 
@@ -49,7 +63,15 @@ public class KeyStoreInformation {
     }
 
     public void setLocation(String location) {
+        if (location != null && "".equals(location)) {
+            handleException("KeyStore location can not be null");
+        }
         this.location = location;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
 }

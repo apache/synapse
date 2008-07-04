@@ -18,10 +18,17 @@
 */
 package org.apache.synapse.security.bean;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.security.tool.CipherTool;
+
 /**
  * Encapsulates the cipher related information
  */
 public class CipherInformation {
+
+    private static final Log log = LogFactory.getLog(CipherInformation.class);
 
     private static String DEFAULT_ALGORITHM = "RSA";
     private String algorithm = DEFAULT_ALGORITHM;
@@ -36,9 +43,12 @@ public class CipherInformation {
     }
 
     public void setAlgorithm(String algorithm) {
-        if (this.algorithm != null) {
-            this.algorithm = algorithm;
+        if (algorithm == null || "".equals(algorithm)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Given algorithm is null, using a defaut one : RSA");
+            }
         }
+        this.algorithm = algorithm;
     }
 
     public String getOperationMode() {
@@ -46,6 +56,13 @@ public class CipherInformation {
     }
 
     public void setOperationMode(String operationMode) {
+        if (operationMode == null || "".equals(operationMode)) {
+            handleException("Operation mode can not be null");
+        }
+        if (!CipherTool.ENCRYPT.equals(operationMode)
+                && !CipherTool.DECRYPT.equals(operationMode)) {
+            handleException("Invalid operation mode ' " + operationMode + " ' for cipher ");
+        }
         this.operationMode = operationMode;
     }
 
@@ -79,5 +96,10 @@ public class CipherInformation {
 
     public void setOutType(String outType) {
         this.outType = outType;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

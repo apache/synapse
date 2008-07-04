@@ -23,20 +23,35 @@ public class SecretManager {
 
     private static SecretManager ourInstance = new SecretManager();
 
+    /* Default configuration file path for secret manager*/
     private final static String DEFAULT_CONF_LOCATION = "secret-manager.properties";
-    private final static String SECRET_MANAGER_CONF = "secret-manage-conf";
+    /* If the location of the secret manager configuration is provided as a property- it's name */
+    private final static String SECRET_MANAGER_CONF = "secret.manager.conf";
+    /* Property key for secretRepositories*/
     private final static String SECRET_REPOSITORIES = "secretRepositories";
+    /* Type of the secret repository */
     private final static String TYPE = "type";
+    /* Private key entry KeyStore password */
     private final static String IDENTITY_KEY_STORE = "keystore.identity.location";
+    /* Private key entry KeyStore type  */
     private final static String IDENTITY_KEY_STORE_TYPE = "keystore.identity.type";
+    /*Alias for private key entry KeyStore  */
     private final static String IDENTITY_KEY_STORE_ALIAS = "keystore.identity.alias";
+    /* Trusted certificate KeyStore password */
     private final static String TRUST_KEY_STORE = "keystore.trust.location";
+    /* Trusted certificate KeyStore type*/
     private final static String TRUST_KEY_STORE_TYPE = "keystore.trust.type";
+    /* Alias for certificate KeyStore */
     private final static String TRUST_KEY_STORE_ALIAS = "keystore.trust.alias";
+
     private final static String DOT = ".";
+    /* Secret Repository type - file */
     private final static String REPO_TYPE_FILE = "file";
 
+    /*Root Secret Repository */
     private SecretRepository parentRepository;
+    /* True , if secret manage has been started up properly- need to have a at
+    least one Secret Repository*/
     private boolean initialize = false;
 
     public static SecretManager getInstance() {
@@ -86,23 +101,29 @@ public class SecretManager {
             return;
         }
 
+        //Create a KeyStore Information  for private key entry KeyStore
         KeyStoreInformation keyStoreInformation = new KeyStoreInformation();
 
         keyStoreInformation.setAlias(
-                MiscellaneousUtil.getProperty(configurationProperties, IDENTITY_KEY_STORE_ALIAS, null));
+                MiscellaneousUtil.getProperty(configurationProperties,
+                        IDENTITY_KEY_STORE_ALIAS, null));
         keyStoreInformation.setLocation(
                 MiscellaneousUtil.getProperty(configurationProperties, IDENTITY_KEY_STORE, null));
         keyStoreInformation.setStoreType(
-                MiscellaneousUtil.getProperty(configurationProperties, IDENTITY_KEY_STORE_TYPE, null));
+                MiscellaneousUtil.getProperty(configurationProperties,
+                        IDENTITY_KEY_STORE_TYPE, null));
 
+        // Create a KeyStore Information for trusted certificate KeyStore
         KeyStoreInformation trustInformation = new KeyStoreInformation();
 
         trustInformation.setAlias(
                 MiscellaneousUtil.getProperty(configurationProperties, TRUST_KEY_STORE, null));
         trustInformation.setLocation(
-                MiscellaneousUtil.getProperty(configurationProperties, TRUST_KEY_STORE_ALIAS, null));
+                MiscellaneousUtil.getProperty(configurationProperties,
+                        TRUST_KEY_STORE_ALIAS, null));
         trustInformation.setStoreType(
-                MiscellaneousUtil.getProperty(configurationProperties, TRUST_KEY_STORE_TYPE, null));
+                MiscellaneousUtil.getProperty(configurationProperties,
+                        TRUST_KEY_STORE_TYPE, null));
 
         IdentityKeyStoreWrapper identityKeyStoreWrapper = new IdentityKeyStoreWrapper();
         identityKeyStoreWrapper.init(keyStoreInformation, identityStorePass, identityKeyPass);
@@ -128,6 +149,11 @@ public class SecretManager {
             }
 
             if (REPO_TYPE_FILE.equals(type)) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Initiating a File Based Secret Repository");
+                }
+
                 SecretRepository secretRepository = new FileBaseSecretRepository(
                         identityKeyStoreWrapper, trustStoreWrapper);
                 secretRepository.init(configurationProperties, id);
@@ -137,6 +163,10 @@ public class SecretManager {
                 secretRepository.setParent(currentParent);
                 currentParent = secretRepository;
                 initialize = true;
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully Initiate a File Based Secret Repository");
+                }
             } else {
                 log.warn("Unsupported secret repository type : " + type);
             }

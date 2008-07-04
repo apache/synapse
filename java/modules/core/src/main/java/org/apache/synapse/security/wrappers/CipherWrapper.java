@@ -54,7 +54,7 @@ public class CipherWrapper {
      * providing those
      *
      * @param information Encapsulated object contains all information required to cipher
-     * @param key         The key that will be used by the cipher either for encryption and secryption
+     * @param key       The key that will be used by the cipher either for encryption and encryption
      */
     public CipherWrapper(CipherInformation information, Key key) {
         this.information = information;

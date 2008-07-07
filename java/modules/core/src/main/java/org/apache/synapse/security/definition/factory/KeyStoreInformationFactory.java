@@ -71,7 +71,7 @@ public class KeyStoreInformationFactory {
                 properties, IDENTITY_KEY_STORE, null);
         if (keyStoreLocation == null || "".equals(keyStoreLocation)) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot find a KeyStoreLocation");
+                log.debug("Cannot find a KeyStoreLocation for private key store");
             }
             return null;
         }
@@ -109,7 +109,7 @@ public class KeyStoreInformationFactory {
                         TRUST_STORE, null);
         if (keyStoreLocation == null || "".equals(keyStoreLocation)) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot find a KeyStoreLocation");
+                log.debug("Cannot find a KeyStoreLocation for trust store");
             }
             return null;
         }
@@ -132,17 +132,26 @@ public class KeyStoreInformationFactory {
     private static void parseParameter(String parameterString, KeyStoreInformation information) {
 
         if (parameterString == null || "".equals(parameterString)) {
+            if (log.isDebugEnabled()) {
+                log.debug("No additional parameter for KeyStore");
+            }
             return;
         }
 
         String[] parameterPairs = parameterString.split(";");
         if (parameterPairs == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("No additional parameter for KeyStore");
+            }
             return;
         }
 
         for (String parameterPairString : parameterPairs) {
             String[] parametersPair = parameterPairString.split("=");
-            if (parametersPair == null) {
+            if (parametersPair == null || parameterPairs.length != 2) {
+                if (log.isDebugEnabled()) {
+                    log.debug("A parameter with no (name,value) pair has been found ");
+                }
                 return;
             }
             information.addParameter(parametersPair[0], parametersPair[1]);

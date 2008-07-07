@@ -65,7 +65,13 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
         BufferedInputStream inputStream;
         try {
-            URLConnection connection = url.openConnection();
+            URLConnection connection = SynapseConfigUtils.getURLConnection(url);
+            if (connection == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot create a URLConnection for given URL : " + url);
+                }
+                return null;
+            }
             connection.connect();
             inputStream = new BufferedInputStream(connection.getInputStream());
         } catch (IOException e) {
@@ -126,39 +132,36 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
     public RegistryEntry getRegistryEntry(String key) {
+        
         if (log.isDebugEnabled()) {
             log.debug("Perform RegistryEntry lookup for key : " + key);
         }
-        try {
-            URL url = SynapseConfigUtils.getURLFromPath(root + key);
-            if (url == null) {
-                return null;
-            }
-            URLConnection urlc = url.openConnection();
-            urlc.setReadTimeout(30000);
-            urlc.setRequestProperty("Connection", "Close");
-
-            RegistryEntryImpl wre = new RegistryEntryImpl();
-            wre.setKey(key);
-            wre.setName(url.getFile());
-            wre.setType(urlc.getContentType());
-            wre.setDescription("Resource at : " + url.toString());
-            wre.setLastModified(urlc.getLastModified());
-            wre.setVersion(urlc.getLastModified());
-            if (urlc.getExpiration() > 0) {
-                wre.setCachableDuration(
-                        urlc.getExpiration() - System.currentTimeMillis());
-            } else {
-                wre.setCachableDuration(getCachableDuration(key));
-            }
-            return wre;
-
-        } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + root + key, e);
-        } catch (IOException e) {
-            handleException("IO Error reading from URL " + root + key, e);
+        URL url = SynapseConfigUtils.getURLFromPath(root + key);
+        if (url == null) {
+            return null;
         }
-        return null;
+        URLConnection connection = SynapseConfigUtils.getURLConnection(url);
+        if (connection == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot create a URLConnection for given URL : " + url);
+            }
+            return null;
+        }
+
+        RegistryEntryImpl wre = new RegistryEntryImpl();
+        wre.setKey(key);
+        wre.setName(url.getFile());
+        wre.setType(connection.getContentType());
+        wre.setDescription("Resource at : " + url.toString());
+        wre.setLastModified(connection.getLastModified());
+        wre.setVersion(connection.getLastModified());
+        if (connection.getExpiration() > 0) {
+            wre.setCachableDuration(
+                    connection.getExpiration() - System.currentTimeMillis());
+        } else {
+            wre.setCachableDuration(getCachableDuration(key));
+        }
+        return wre;
     }
 
     public void init(Properties properties) {

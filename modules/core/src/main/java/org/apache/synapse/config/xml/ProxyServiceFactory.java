@@ -43,27 +43,28 @@ import java.util.StringTokenizer;
  * <p/>
  * Configuration syntax:
  * <pre>
- * &lt;proxy name="string" [transports="(http |https |jms )+|all"] [pinnedServers="(serverName )+" [trace="enable|disable"]>
- *    &lt;description>..&lt;/description>?
- *    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
- *       &lt;endpoint>...&lt;/endpoint>?
- *       &lt;inSequence>...&lt;/inSequence>?
- *       &lt;outSequence>...&lt;/outSequence>?
- *       &lt;faultSequence>...&lt;/faultSequence>?
- *    &lt;/target>?
- *    &lt;publishWSDL uri=".." key="string">
- *       ( &lt;wsdl:definition>...&lt;/wsdl:definition> | &lt;wsdl20:description>...&lt;/wsdl20:description> )?
- *       &lt;resource location="..." key="..."/>*
- *    &lt;/publishWSDL>?
- *    &lt;enableSec/>?
- *    &lt;enableRM/>?
- *    &lt;policy key="string"/>?
- *    &lt;policy key="string" type=(in | out)/>?
+ * &lt;proxy name="string" [transports="(http |https |jms )+|all"] [pinnedServers="(serverName )+" [trace="enable|disable"]&gt;
+ *    &lt;description&gt;..&lt;/description&gt;?
+ *    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
+ *       &lt;endpoint&gt;...&lt;/endpoint&gt;?
+ *       &lt;inSequence&gt;...&lt;/inSequence&gt;?
+ *       &lt;outSequence&gt;...&lt;/outSequence&gt;?
+ *       &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
+ *    &lt;/target&gt;?
+ *    &lt;publishWSDL uri=".." key="string"&gt;
+ *       ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?
+ *       &lt;resource location="..." key="..."/&gt;*
+ *    &lt;/publishWSDL&gt;?
+ *    &lt;enableAddressing/&gt;?
+ *    &lt;enableSec/&gt;?
+ *    &lt;enableRM/&gt;?
+ *    &lt;policy key="string"/&gt;?
+ *    &lt;policy key="string" type=(in | out)/&gt;?
  *       // optional service parameters
- *    &lt;parameter name="string">
+ *    &lt;parameter name="string"&gt;
  *       text | xml
- *    &lt;/parameter>?
- * &lt;/proxy>
+ *    &lt;/parameter&gt;?
+ * &lt;/proxy&gt;
  * </pre>
  */
 public class ProxyServiceFactory {
@@ -333,6 +334,11 @@ public class ProxyServiceFactory {
             } else {
                 handleException("Invalid property specified for proxy service : " + name);
             }
+        }
+
+        if (elem.getFirstChildWithName(
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableAddressing")) != null) {
+            proxy.setWsAddrEnabled(true);
         }
 
         if (elem.getFirstChildWithName(

@@ -199,6 +199,9 @@ public class ProxyServiceSerializer {
             }
         }
 
+        if (service.isWsAddrEnabled()) {
+            proxy.addChild(fac.createOMElement("enableAddressing", synNS));
+        }
         if (service.isWsRMEnabled()) {
             proxy.addChild(fac.createOMElement("enableRM", synNS));
         }

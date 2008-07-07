@@ -1,5 +1,9 @@
 package org.apache.synapse.security.enumeration;
 
+/**
+ * KeyStore Types
+ */
+
 public enum KeyStoreType {
     JKS,
     PKCS8,

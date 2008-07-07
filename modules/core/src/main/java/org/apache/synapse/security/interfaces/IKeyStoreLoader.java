@@ -7,8 +7,7 @@ public interface IKeyStoreLoader {
     /**
      * returns an instance of KeyStore object
      *
-     * @return
-     * @throws Exception
+     * @return KeyStore Instance
      */
     public abstract KeyStore getKeyStore();
 }

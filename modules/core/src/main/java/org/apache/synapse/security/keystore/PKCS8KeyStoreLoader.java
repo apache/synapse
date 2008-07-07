@@ -6,10 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.security.interfaces.IKeyStoreLoader;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -34,9 +31,11 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
     /**
      * constructs an instance of KeyStoreLoader
      *
-     * @param pkcs8PrivateKeyPath - path to a private key file.  Key must be in PKCS8 format, PEM encoded and unencrypted.
+     * @param pkcs8PrivateKeyPath - path to a private key file.  Key must be in PKCS8 format,
+     *                            PEM encoded and unencrypted.
      * @param certFilePath        - path to certificate file.  File must be PEM encoded.
-     * @param keyPass             - password to secure the private key within the keystore.  This will be required later to retrieve the private key back from the keystore.
+     * @param keyPass             - password to secure the private key within the keystore.
+     *                            This will be required later to retrieve the private key back from the keystore.
      * @param entryAlias          - alias for the given entry within the keystore.
      */
     public PKCS8KeyStoreLoader(String pkcs8PrivateKeyPath, String certFilePath, String keyPass, String entryAlias) {
@@ -47,31 +46,65 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
     }
 
     /**
-     * returns a JKS keystore from the given private key, certificate path, key password and alias.
+     * Returns a JKS keyStore from the given private key, certificate path, key password and alias.
      */
     public KeyStore getKeyStore() {
-        FileInputStream keyFile = null;
+
+        File file = new File(pkPath);
+        if (!file.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no private key in the given path : " + pkPath);
+            }
+            return null;
+        }
+
+        File certFile = new File(certPath);
+        if (!certFile.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no certificate in the given path : " + certPath);
+            }
+            return null;
+        }
+
         try {
-            keyFile = new FileInputStream(pkPath);
-            BufferedInputStream kis = new BufferedInputStream(keyFile);
-            byte[] keyBytes = new byte[kis.available()];
 
-            kis.read(keyBytes);
+            if (log.isDebugEnabled()) {
+                log.debug("Reading a private key(unencrypted) from given path : " + pkPath);
+            }
 
-            kis.close();
-            keyFile.close();
+            FileInputStream fileInputStream = new FileInputStream(file);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
+            byte[] keyBytes = new byte[bufferedInputStream.available()];
+            bufferedInputStream.read(keyBytes);
+
+            bufferedInputStream.close();
+            fileInputStream.close();
+
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a private key in PKCS8Encoded using given" +
+                        " (unencrypted) RSA private key ");
+            }
             PrivateKey key = createPrivateKey(keyBytes);
 
-            FileInputStream certificateFile = new FileInputStream(certPath);
-            BufferedInputStream bis = new BufferedInputStream(certificateFile);
+            if (log.isDebugEnabled()) {
+                log.debug("Generating a X509 certificate form given certificate file");
+            }
+
+            FileInputStream certInputStream = new FileInputStream(certFile);
+            BufferedInputStream certBufferedInputStream = new BufferedInputStream(certInputStream);
 
             CertificateFactory certFactory = CertificateFactory.getInstance("X509");
+            Certificate cert = certFactory.generateCertificate(certBufferedInputStream);
 
-            Certificate cert = certFactory.generateCertificate(bis);
+            certBufferedInputStream.close();
+            certInputStream.close();
 
-            bis.close();
-            certificateFile.close();
+
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a KeyStore instance of type JKS from a" +
+                        " PKCS8 private key and X509 certificate");
+            }
 
             KeyStore newKeyStore = KeyStore.getInstance("JKS");
             newKeyStore.load(null, null);
@@ -102,7 +135,7 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
 
 
     /**
-     * takes the (unencrypted) RSA private key in pkcs8 format, and creates a private key out of it
+     * Takes the (unencrypted) RSA private key in pkcs8 format, and creates a private key out of it
      *
      * @param keyBytes
      * @return
@@ -116,26 +149,20 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
 
         System.arraycopy(keyBytes, dataStart, keyContent, 0, dataLength);
 
-        PKCS8EncodedKeySpec pkcs8SpecPriv = new PKCS8EncodedKeySpec(new Base64().decode(keyContent));
-
-        KeyFactory keyFactory = null;
+        PKCS8EncodedKeySpec pkcs8SpecPriv = new PKCS8EncodedKeySpec(
+                new Base64().decode(keyContent));
         try {
-            keyFactory = KeyFactory.getInstance("RSA");
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePrivate(pkcs8SpecPriv);
         } catch (NoSuchAlgorithmException e) {
-            handleException("Error getting KeyFactory instance", e);
+            handleException("Error getting a KeyFactory instance", e);
         } catch (InvalidKeySpecException e) {
-            handleException("Error generating private key", e);
+            handleException("Error generating a private key", e);
         }
         return null;
     }
 
-    protected void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    protected void handleException(String msg, Exception e) {
+    private void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }

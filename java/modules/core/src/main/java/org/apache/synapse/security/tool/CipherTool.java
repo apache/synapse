@@ -105,7 +105,6 @@ public class CipherTool {
             CommandLine cmd = parser.parse(options, args);
             // Loads the cipher relate information
             CipherInformation cipherInformation = getCipherInformation(cmd);
-
             //Key information must not contain any password
             //Password for access KeyStore
             String storePass = getArgument(cmd, STORE_PASS);
@@ -235,7 +234,7 @@ public class CipherTool {
     }
 
     /**
-     * Factoyr method to create a @see keyStoreInformation from command line options
+     * Factory method to create a @see keyStoreInformation from command line options
      *
      * @param cmd Command line which capture all command line arguments
      * @return KeyStoreInformation object

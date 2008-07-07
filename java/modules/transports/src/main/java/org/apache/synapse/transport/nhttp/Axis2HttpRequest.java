@@ -133,7 +133,7 @@ public class Axis2HttpRequest {
                     "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
                 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                messageFormatter.writeTo(msgContext, format, baos, false);
+                messageFormatter.writeTo(msgContext, format, baos, true);
                 BasicHttpEntity entity = new BasicHttpEntity();
                 entity.setContentLength(baos.toByteArray().length);
                 ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);

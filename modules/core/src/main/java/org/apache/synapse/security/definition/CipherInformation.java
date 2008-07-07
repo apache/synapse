@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.security.bean;
+package org.apache.synapse.security.definition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

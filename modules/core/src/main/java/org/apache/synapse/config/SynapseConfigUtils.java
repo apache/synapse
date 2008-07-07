@@ -23,12 +23,18 @@ import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.security.definition.KeyStoreInformation;
+import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
+import org.apache.synapse.security.definition.TrustKeyStoreInformation;
+import org.apache.synapse.security.definition.factory.KeyStoreInformationFactory;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 import org.xml.sax.InputSource;
 
+import sun.net.www.protocol.https.HttpsURLConnectionImpl;
+
+import javax.net.ssl.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -36,6 +42,9 @@ import javax.xml.transform.stream.StreamSource;
 import javax.activation.DataHandler;
 import java.io.*;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyManagementException;
+import java.util.Properties;
 
 public class SynapseConfigUtils {
 
@@ -239,12 +248,98 @@ public class SynapseConfigUtils {
         if (url == null) {
             return null;
         }
-        URLConnection conn = url.openConnection();
-        conn.setReadTimeout(getReadTimeout());
-        conn.setConnectTimeout(getConnectionTimeout());
-        conn.setRequestProperty("Connection", "close"); // if http is being used
-        BufferedInputStream urlInStream = new BufferedInputStream(
-                conn.getInputStream());
+
+        InputStream urlInStream = null;
+
+        if (url.getProtocol().equalsIgnoreCase("https")) {
+            Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
+            KeyManager[] keyManagers = null;
+            TrustManager[] trustManagers = null;
+
+            IdentityKeyStoreInformation identityInformation =
+                    KeyStoreInformationFactory.createIdentityKeyStoreInformation(synapseProperties);
+
+            if (identityInformation != null) {
+                KeyManagerFactory keyManagerFactory =
+                        identityInformation.getIdentityKeyManagerFactoryInstance();
+                if (keyManagerFactory != null) {
+                    keyManagers = keyManagerFactory.getKeyManagers();
+                }
+
+            }
+
+            TrustKeyStoreInformation trustInformation =
+                    KeyStoreInformationFactory.createTrustKeyStoreInformation(synapseProperties);
+
+            if (trustInformation != null) {
+                TrustManagerFactory trustManagerFactory =
+                        trustInformation.getTrustManagerFactoryInstance();
+                if (trustManagerFactory != null) {
+                    trustManagers = trustManagerFactory.getTrustManagers();
+                }
+            }
+
+            HttpsURLConnectionImpl connection = (HttpsURLConnectionImpl) url.openConnection();
+            try {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(keyManagers,
+                        trustManagers, null);
+                connection.setSSLSocketFactory(sslContext.getSocketFactory());
+                if (trustInformation != null) {
+                    boolean enableHostnameVerifier = true;
+                    String value =
+                            trustInformation.getParameter(
+                                    KeyStoreInformation.ENABLE_HOST_NAME_VERIFIER);
+                    if (value != null) {
+                        enableHostnameVerifier = Boolean.parseBoolean(value);
+                    }
+                    if (!enableHostnameVerifier) {
+                        connection.setHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
+                            public boolean verify(String hostname, javax.net.ssl.SSLSession session) {
+                                if (log.isTraceEnabled()) {
+                                    log.trace("HostName verification disabled");
+                                    log.trace("host:   " + hostname);
+                                    log.trace("peer host:  " + session.getPeerHost());
+                                }
+                                return true;
+                            }
+
+                            public boolean verify(String hostname, String certHostname) {
+                                if (log.isTraceEnabled()) {
+                                    log.trace("Hostname verification disabled");
+                                    log.trace("host:   " + hostname);
+                                    log.trace("cert hostname:  " + certHostname);
+                                }
+                                return true;
+                            }
+                        });
+                    }
+                }
+
+            } catch (NoSuchAlgorithmException e) {
+                handleException("Error loading SSLContext ");
+            } catch (KeyManagementException e) {
+                handleException("Error initiation SSLContext with KeyManagers");
+            }
+
+            connection.setReadTimeout(getReadTimeout());
+            connection.setConnectTimeout(getConnectionTimeout());
+            connection.setRequestProperty("Connection", "close"); // if http is being used
+            urlInStream = connection.getInputStream();
+
+        } else {
+
+            URLConnection conn = url.openConnection();
+            conn.setReadTimeout(getReadTimeout());
+            conn.setConnectTimeout(getConnectionTimeout());
+            conn.setRequestProperty("Connection", "close"); // if http is being used
+            urlInStream = conn.getInputStream();
+        }
+
+        if (urlInStream == null) {
+            return null;
+        }
+
         try {
             StAXOMBuilder builder = new StAXOMBuilder(urlInStream);
             OMElement doc = builder.getDocumentElement();

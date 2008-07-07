@@ -20,7 +20,7 @@ package org.apache.synapse.security.secret.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.security.bean.CipherInformation;
+import org.apache.synapse.security.definition.CipherInformation;
 import org.apache.synapse.security.secret.SecretRepository;
 import org.apache.synapse.security.tool.CipherTool;
 import org.apache.synapse.security.wrappers.CipherWrapper;
@@ -54,7 +54,7 @@ public class FileBaseSecretRepository implements SecretRepository {
     /* Parent secret repository */
     private SecretRepository parentRepository;
     /*Map of secrets keyed by alias for property name */
-    private final Map secrets = new HashMap();
+    private final Map<String, String> secrets = new HashMap<String, String>();
     /*Wrapper for Identity KeyStore */
     private IdentityKeyStoreWrapper identity;
     /* Wrapper for trusted KeyStore */
@@ -184,7 +184,7 @@ public class FileBaseSecretRepository implements SecretRepository {
     public String getSecret(String alias) {
 
         if (alias == null || "".equals(alias)) {
-            return alias; // TODO is it need to throw an error?
+            return alias; // TODO is it needed to throw an error?
         }
 
         if (!initialize || secrets.isEmpty()) {
@@ -199,7 +199,7 @@ public class FileBaseSecretRepository implements SecretRepository {
         sb.append(DOT);
         sb.append(SECRET);
 
-        String secret = (String) secrets.get(sb.toString());
+        String secret = secrets.get(sb.toString());
         if (secret == null || "".equals(secret)) {
             if (log.isDebugEnabled()) {
                 log.debug("There is no secret found for alias '" + alias + "' returning itself");

@@ -6,7 +6,10 @@ package org.apache.synapse.security.secret;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.security.bean.KeyStoreInformation;
+import org.apache.synapse.config.SynapsePropertiesLoader;
+import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
+import org.apache.synapse.security.definition.TrustKeyStoreInformation;
+import org.apache.synapse.security.definition.factory.KeyStoreInformationFactory;
 import org.apache.synapse.security.secret.repository.FileBaseSecretRepository;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
@@ -31,18 +34,6 @@ public class SecretManager {
     private final static String SECRET_REPOSITORIES = "secretRepositories";
     /* Type of the secret repository */
     private final static String TYPE = "type";
-    /* Private key entry KeyStore password */
-    private final static String IDENTITY_KEY_STORE = "keystore.identity.location";
-    /* Private key entry KeyStore type  */
-    private final static String IDENTITY_KEY_STORE_TYPE = "keystore.identity.type";
-    /*Alias for private key entry KeyStore  */
-    private final static String IDENTITY_KEY_STORE_ALIAS = "keystore.identity.alias";
-    /* Trusted certificate KeyStore password */
-    private final static String TRUST_KEY_STORE = "keystore.trust.location";
-    /* Trusted certificate KeyStore type*/
-    private final static String TRUST_KEY_STORE_TYPE = "keystore.trust.type";
-    /* Alias for certificate KeyStore */
-    private final static String TRUST_KEY_STORE_ALIAS = "keystore.trust.alias";
 
     private final static String DOT = ".";
     /* Secret Repository type - file */
@@ -71,6 +62,14 @@ public class SecretManager {
      * @param trustStorePass    Password to access trusted KeyStore
      */
     public void init(Properties properties, String identityStorePass, String identityKeyPass, String trustStorePass) {
+
+        Properties keyStoreProperties = SynapsePropertiesLoader.loadSynapseProperties();
+        if (keyStoreProperties == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("KeyStore configuration properties cannot be found");
+            }
+            return;
+        }
 
         String configurationFile = MiscellaneousUtil.getProperty(
                 properties, SECRET_MANAGER_CONF, DEFAULT_CONF_LOCATION);
@@ -102,34 +101,20 @@ public class SecretManager {
         }
 
         //Create a KeyStore Information  for private key entry KeyStore
-        KeyStoreInformation keyStoreInformation = new KeyStoreInformation();
-
-        keyStoreInformation.setAlias(
-                MiscellaneousUtil.getProperty(configurationProperties,
-                        IDENTITY_KEY_STORE_ALIAS, null));
-        keyStoreInformation.setLocation(
-                MiscellaneousUtil.getProperty(configurationProperties, IDENTITY_KEY_STORE, null));
-        keyStoreInformation.setStoreType(
-                MiscellaneousUtil.getProperty(configurationProperties,
-                        IDENTITY_KEY_STORE_TYPE, null));
+        IdentityKeyStoreInformation keyStoreInformation =
+                KeyStoreInformationFactory.createIdentityKeyStoreInformation(keyStoreProperties);
+        keyStoreInformation.setKeyStorePassword(identityStorePass);
 
         // Create a KeyStore Information for trusted certificate KeyStore
-        KeyStoreInformation trustInformation = new KeyStoreInformation();
-
-        trustInformation.setAlias(
-                MiscellaneousUtil.getProperty(configurationProperties, TRUST_KEY_STORE, null));
-        trustInformation.setLocation(
-                MiscellaneousUtil.getProperty(configurationProperties,
-                        TRUST_KEY_STORE_ALIAS, null));
-        trustInformation.setStoreType(
-                MiscellaneousUtil.getProperty(configurationProperties,
-                        TRUST_KEY_STORE_TYPE, null));
+        TrustKeyStoreInformation trustInformation =
+                KeyStoreInformationFactory.createTrustKeyStoreInformation(keyStoreProperties);
+        trustInformation.setKeyStorePassword(trustStorePass);
 
         IdentityKeyStoreWrapper identityKeyStoreWrapper = new IdentityKeyStoreWrapper();
-        identityKeyStoreWrapper.init(keyStoreInformation, identityStorePass, identityKeyPass);
+        identityKeyStoreWrapper.init(keyStoreInformation, identityKeyPass);
 
         TrustKeyStoreWrapper trustStoreWrapper = new TrustKeyStoreWrapper();
-        trustStoreWrapper.init(keyStoreInformation, trustStorePass);
+        trustStoreWrapper.init(trustInformation);
 
         SecretRepository currentParent = null;
         for (String secretRepo : repositories) {

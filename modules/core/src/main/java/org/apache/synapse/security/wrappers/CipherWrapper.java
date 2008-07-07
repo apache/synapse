@@ -21,7 +21,7 @@ package org.apache.synapse.security.wrappers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.security.bean.CipherInformation;
+import org.apache.synapse.security.definition.CipherInformation;
 import org.apache.synapse.security.tool.CipherTool;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -54,7 +54,7 @@ public class CipherWrapper {
      * providing those
      *
      * @param information Encapsulated object contains all information required to cipher
-     * @param key       The key that will be used by the cipher either for encryption and encryption
+     * @param key         The key that will be used by the cipher either for encryption and encryption
      */
     public CipherWrapper(CipherInformation information, Key key) {
         this.information = information;

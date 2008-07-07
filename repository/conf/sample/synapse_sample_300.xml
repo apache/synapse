@@ -21,7 +21,7 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice">
-        <property name="to" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
+        <property name="to" value="http://localhost:9000/services/SimpleStockQuoteService"/>
         <property name="soapAction" value="urn:getQuote"/>
         <property name="message">
             <m0:getQuote xmlns:m0="http://services.samples/xsd">

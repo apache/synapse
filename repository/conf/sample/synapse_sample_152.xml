@@ -22,7 +22,7 @@
     <proxy name="StockQuoteProxy" transports="https">
         <target>
             <endpoint>
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="pox"/>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="pox"/>
             </endpoint>
 			<outSequence>
 				<send/>

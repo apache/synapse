@@ -26,19 +26,19 @@
                 <endpoint>
                     <failover>
                         <endpoint>
-                            <address uri="http://localhost:9001/soap/LBService1">
+                            <address uri="http://localhost:9001/services/LBService1">
                                 <enableAddressing/>
                                 <suspendDurationOnFailure>60</suspendDurationOnFailure>
                             </address>
                         </endpoint>
                         <endpoint>
-                            <address uri="http://localhost:9002/soap/LBService1">
+                            <address uri="http://localhost:9002/services/LBService1">
                                 <enableAddressing/>
                                 <suspendDurationOnFailure>60</suspendDurationOnFailure>
                             </address>
                         </endpoint>
                         <endpoint>
-                            <address uri="http://localhost:9003/soap/LBService1">
+                            <address uri="http://localhost:9003/services/LBService1">
                                 <enableAddressing/>
                                 <suspendDurationOnFailure>60</suspendDurationOnFailure>
                             </address>

@@ -23,7 +23,7 @@
     <localEntry key="version">0.1</localEntry>
     <!-- define a reuseable endpoint definition -->
     <endpoint name="simple">
-        <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
     </endpoint>
 
     <!-- define a reusable sequence -->

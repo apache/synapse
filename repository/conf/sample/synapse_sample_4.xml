@@ -43,7 +43,7 @@
             <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd">
                 <case regex="IBM">
                     <send>
-                        <endpoint><address uri="http://localhost:9000/soap/SimpleStockQuoteService"/></endpoint>
+                        <endpoint><address uri="http://localhost:9000/services/SimpleStockQuoteService"/></endpoint>
                     </send>
                 </case>
                 <case regex="MSFT">

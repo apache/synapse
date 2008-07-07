@@ -109,7 +109,7 @@ public class LoadbalanceFailoverClient {
         value.setText("Sample string");
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/soap/LBService1"));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/services/LBService1"));
 
         options.setAction("urn:sampleOperation");
 
@@ -208,7 +208,7 @@ public class LoadbalanceFailoverClient {
         }
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/soap/LBService1"));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/services/LBService1"));
         options.setAction("urn:sampleOperation");
         options.setTimeOutInMilliSeconds(10000000);
 
@@ -288,7 +288,7 @@ public class LoadbalanceFailoverClient {
 
     private SOAPEnvelope buildSoapEnvelope(String clientID, String value) {
 
-        String targetEPR = "http://localhost:9000/soap/Service1";
+        String targetEPR = "http://localhost:9000/services/Service1";
         String opration = "sampleOperation";
 
         SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();

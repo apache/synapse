@@ -26,7 +26,7 @@
                 <property action="set" name="OUT_ONLY" value="true"/>
             </inSequence>
             <endpoint>
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
             </endpoint>
             <outSequence>
                 <send/>
@@ -41,7 +41,7 @@
                 <log level="full"/>
             </inSequence>
             <endpoint>
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
             </endpoint>
             <outSequence>
                 <send/>

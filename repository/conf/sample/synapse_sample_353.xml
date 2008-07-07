@@ -28,7 +28,7 @@
         <!-- send message to real endpoint referenced by name "stockquote" and stop -->
         <send>
             <endpoint name="stockquote">
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
             </endpoint>
         </send>
     </in>

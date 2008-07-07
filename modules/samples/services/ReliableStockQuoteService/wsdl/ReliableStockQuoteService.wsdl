@@ -150,19 +150,19 @@
     <wsdl:service name="ReliableStockQuoteService">
         <wsdl:port name="ReliableStockQuoteServiceSOAP11port_https"
                    binding="axis2:ReliableStockQuoteServiceSOAP11Binding">
-            <soap:address location="https://localhost:9002/soap/ReliableStockQuoteService"/>
+            <soap:address location="https://localhost:9002/services/ReliableStockQuoteService"/>
         </wsdl:port>
         <wsdl:port name="ReliableStockQuoteServiceSOAP11port_http1"
                    binding="axis2:ReliableStockQuoteServiceSOAP11Binding">
-            <soap:address location="http://localhost:9000/soap/ReliableStockQuoteService"/>
+            <soap:address location="http://localhost:9000/services/ReliableStockQuoteService"/>
         </wsdl:port>
         <wsdl:port name="ReliableStockQuoteServiceSOAP12port_https"
                    binding="axis2:ReliableStockQuoteServiceSOAP12Binding">
-            <soap12:address location="https://localhost:9002/soap/ReliableStockQuoteService"/>
+            <soap12:address location="https://localhost:9002/services/ReliableStockQuoteService"/>
         </wsdl:port>
         <wsdl:port name="ReliableStockQuoteServiceSOAP12port_http1"
                    binding="axis2:ReliableStockQuoteServiceSOAP12Binding">
-            <soap12:address location="http://localhost:9000/soap/ReliableStockQuoteService"/>
+            <soap12:address location="http://localhost:9000/services/ReliableStockQuoteService"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

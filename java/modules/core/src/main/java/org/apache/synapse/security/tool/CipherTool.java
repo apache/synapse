@@ -22,8 +22,9 @@ import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.security.bean.CipherInformation;
-import org.apache.synapse.security.bean.KeyStoreInformation;
+import org.apache.synapse.security.definition.CipherInformation;
+import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
+import org.apache.synapse.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.security.wrappers.CipherWrapper;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
@@ -104,8 +105,7 @@ public class CipherTool {
             CommandLine cmd = parser.parse(options, args);
             // Loads the cipher relate information
             CipherInformation cipherInformation = getCipherInformation(cmd);
-            // Loads the keyStore relate information
-            KeyStoreInformation keyStoreInformation = getKeyStoreInformation(cmd);
+
             //Key information must not contain any password
             //Password for access KeyStore
             String storePass = getArgument(cmd, STORE_PASS);
@@ -124,11 +124,11 @@ public class CipherTool {
             } else {
                 if (isTrusted) {
                     TrustKeyStoreWrapper trustKeyStoreWrapper = new TrustKeyStoreWrapper();
-                    trustKeyStoreWrapper.init(keyStoreInformation, storePass);
+                    trustKeyStoreWrapper.init(getTrustKeyStoreInformation(cmd));
                     key = trustKeyStoreWrapper.getPublicKey();
                 } else {
                     IdentityKeyStoreWrapper storeWrapper = new IdentityKeyStoreWrapper();
-                    storeWrapper.init(keyStoreInformation, storePass, keyPass);
+                    storeWrapper.init(getIdentityKeyStoreInformation(cmd), keyPass);
                     if (ENCRYPT.equals(cipherInformation.getOperationMode())) {
                         key = storeWrapper.getPrivateKey();
                     } else {
@@ -223,12 +223,30 @@ public class CipherTool {
      * @param cmd Command line which capture all command line arguments
      * @return KeyStoreInformation object
      */
-    private static KeyStoreInformation getKeyStoreInformation(CommandLine cmd) {
+    private static IdentityKeyStoreInformation getIdentityKeyStoreInformation(CommandLine cmd) {
 
-        KeyStoreInformation information = new KeyStoreInformation();
+        IdentityKeyStoreInformation information = new IdentityKeyStoreInformation();
         information.setAlias(getArgument(cmd, ALIAS));
         information.setLocation(getArgument(cmd, KEY_STORE));
         information.setStoreType(getArgument(cmd, STORE_TYPE));
+        information.setKeyStorePassword(getArgument(cmd, STORE_PASS));
+        return information;
+
+    }
+
+    /**
+     * Factoyr method to create a @see keyStoreInformation from command line options
+     *
+     * @param cmd Command line which capture all command line arguments
+     * @return KeyStoreInformation object
+     */
+    private static TrustKeyStoreInformation getTrustKeyStoreInformation(CommandLine cmd) {
+
+        TrustKeyStoreInformation information = new TrustKeyStoreInformation();
+        information.setAlias(getArgument(cmd, ALIAS));
+        information.setLocation(getArgument(cmd, KEY_STORE));
+        information.setStoreType(getArgument(cmd, STORE_TYPE));
+        information.setKeyStorePassword(getArgument(cmd, STORE_PASS));
         return information;
 
     }
@@ -310,7 +328,7 @@ public class CipherTool {
         } catch (IOException e) {
             handleException("Error reading ", e);
         } catch (ClassNotFoundException e) {
-            handleException("Canot load a key from the file" + filePath, e);
+            handleException("Cannot load a key from the file" + filePath, e);
         } finally {
             if (in != null) {
                 try {

@@ -52,9 +52,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         
         if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) {
             throw new SynapseException(
-                    "Wrong QName for this config factory " + definitions.getQName());
+                    "Wrong QName for this configuration factory " + definitions.getQName());
         }
-
         SynapseConfiguration config = new SynapseConfiguration();
         config.setDefaultQName(definitions.getQName());
 

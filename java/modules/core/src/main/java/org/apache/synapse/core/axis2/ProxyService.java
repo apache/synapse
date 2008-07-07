@@ -34,6 +34,7 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.security.definition.KeyStoreInformation;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -42,6 +43,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.PolicyInfo;
 import org.xml.sax.InputSource;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -232,6 +234,7 @@ public class ProxyService {
         InputStream wsdlInputStream = null;
         OMElement wsdlElement = null;
         boolean wsdlFound = false;
+        String publishWSDL = null;
 
         if (wsdlKey != null) {
             synCfg.getEntryDefinition(wsdlKey);
@@ -245,8 +248,10 @@ public class ProxyService {
             wsdlFound = true;
         } else if (wsdlURI != null) {
             try {
-                URL url = wsdlURI.toURL();
-                OMNode node = SynapseConfigUtils.getOMElementFromURL(url.toString());
+            	URL url = wsdlURI.toURL();
+                publishWSDL = url.toString();
+                
+                OMNode node = SynapseConfigUtils.getOMElementFromURL(publishWSDL);
                 if (node instanceof OMElement) {
                     wsdlElement = (OMElement) node;
                 }
@@ -254,7 +259,45 @@ public class ProxyService {
             } catch (MalformedURLException e) {
                 handleException("Malformed URI for wsdl", e);
             } catch (IOException e) {
-                handleException("Error reading from wsdl URI", e);
+            	//handleException("Error reading from wsdl URI", e);
+            	boolean enablePublishWSDLSafeMode = false;
+            	Map proxyParameters = null;
+                proxyParameters = this.getParameterMap();
+    	        if(!proxyParameters.isEmpty()){
+    	        	if(proxyParameters.containsKey("enablePublishWSDLSafeMode")){
+    	        		enablePublishWSDLSafeMode =
+                                Boolean.parseBoolean(
+                                        proxyParameters.get("enablePublishWSDLSafeMode").toString().toLowerCase());
+    	        	}else{
+    	        		if (trace()){
+                    		trace.info("WSDL was unable to load for: " + publishWSDL);
+                    		trace.info("Please add <syn:parameter name=\"enableURISafeMode\">true</syn:parameter> to proxy service.");
+                    	}
+                    	handleException("Error reading from wsdl URI", e);
+    	        	}
+    	        }
+                
+                if(enablePublishWSDLSafeMode){
+                	// this is if the wsdl cannot be loaded... create a dummy service and an operation for which
+	                // our SynapseDispatcher will properly dispatch to
+                	
+                	//!!!Need to add a reload function... And display that the wsdl/service is offline!!!
+                	if (trace()){
+                		trace.info("WSDL was unable to load for: " + publishWSDL);
+                		trace.info("enableURISafeMode: true");
+                	}
+	                
+	                proxyService = new AxisService();
+	                AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
+	                proxyService.addOperation(mediateOperation);
+                } else{
+                	if (trace()){
+                		trace.info("WSDL was unable to load for: " + publishWSDL);
+                		trace.info("enableURISafeMode: false");
+                	}
+                	
+                	handleException("Error reading from wsdl URI", e);
+                }
             }
         } else {
             // this is for POX... create a dummy service and an operation for which

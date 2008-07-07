@@ -20,7 +20,7 @@
 <!-- Manipulating SOAP headers, and filtering incoming and outgoing messages -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <in>
-        <header name="To" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
+        <header name="To" value="http://localhost:9000/services/SimpleStockQuoteService"/>
     </in>
     <send/>
 </definitions>

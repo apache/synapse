@@ -24,7 +24,7 @@
             <inSequence>
                 <send>
                     <endpoint>
-                        <address uri="http://localhost:9000/soap/SecureStockQuoteService"/>
+                        <address uri="http://localhost:9000/services/SecureStockQuoteService"/>
                     </endpoint>
                 </send>
             </inSequence>

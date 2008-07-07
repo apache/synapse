@@ -67,7 +67,7 @@
     <!--Our HTTP endpoints can handle both REST and SOAP. Following parameters can be used to distinguiush those endpoints-->
     <!--In case of a servlet, if you change this you have to manually change the settings of your servlet container to map this -->
     <!--context path to proper Axis2 servlets-->
-    <parameter name="servicePath" locked="false">soap</parameter>
+    <parameter name="servicePath" locked="false">services</parameter>
     <parameter name="restPath" locked="false">rest</parameter>
 
     <!-- Following parameter will completely disable REST handling in Axis2-->

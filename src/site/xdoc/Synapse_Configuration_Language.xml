@@ -534,7 +534,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <table border="1" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
       <tbody>
         <tr><th>Transport</th><th>Sample address</th></tr>
-        <tr><td>HTTP</td><td><tt>http://localhost:9000/soap/SimpleStockQuoteService</tt></td></tr>
+        <tr><td>HTTP</td><td><tt>http://localhost:9000/services/SimpleStockQuoteService</tt></td></tr>
         <tr><td>JMS</td><td><tt>jms:/SimpleStockQuoteService?<br/>
               &#160;&#160;&#160;transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;<br/>
               &#160;&#160;&#160;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;<br/>

@@ -16,26 +16,36 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.security.wrappers;
+package org.apache.synapse.config;
 
-import org.apache.synapse.security.definition.TrustKeyStoreInformation;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.util.MiscellaneousUtil;
 
-import java.security.KeyStore;
+import java.util.Properties;
 
 /**
- * Represents the abstraction for trusted KeyStore
- * Only expose to get public keys
+ * Provides a Factory method load synapse properties.
+ * Cache the properties to make sure properties loading only is occurred  onetime
  */
-public class TrustKeyStoreWrapper extends KeyStoreWrapper {
-    /**
-     * @see org.apache.synapse.security.wrappers.KeyStoreWrapper
-     *      There is no keyPassword as trusted Store doesn't keep private or secret keys
-     */
-    public void init(TrustKeyStoreInformation information) {
-        super.init(information, null);
+public class SynapsePropertiesLoader {
+
+    private SynapsePropertiesLoader() {
     }
 
-    public KeyStore getTrustKeyStore() {
-        return getKeyStore();
+    private static Properties properties;
+
+    /**
+     * Loads the properties
+     * This happen only cached properties are null.
+     *
+     * @return Synapse Properties
+     */
+    public static Properties loadSynapseProperties() {
+        if (properties == null) {
+            properties = MiscellaneousUtil.loadProperties(
+                    SynapseConstants.SYNAPSE_PROPERTIES);
+        }
+        return properties;
     }
+
 }

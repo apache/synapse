@@ -32,7 +32,6 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -72,7 +71,7 @@ public class SynapseConfigurationBuilder {
 
         // build the Synapse configuration parsing the XML config file
         try {
-            Properties synapseProperties = loadSynapseProperties();
+            Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
             DataSourceRegistrar.registerDataSources(synapseProperties);
             SynapseConfiguration synCfg
                     = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
@@ -87,50 +86,6 @@ public class SynapseConfigurationBuilder {
             handleException("Could not initialize Synapse : " + e.getMessage(), e);
         }
         return null;
-    }
-
-    private static Properties loadSynapseProperties() {
-
-        try {
-            Properties properties = new Properties();
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-            if (log.isDebugEnabled()) {
-                log.debug("synapse.properties file is loading from classpath");
-            }
-
-            InputStream in = cl.getResourceAsStream(SynapseConstants.SYNAPSE_PROPERTIES);
-            if (in == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to load synapse.propeties file");
-                }
-
-                String path = SynapseConstants.CONF_DIRECTORY +
-                        File.separatorChar + SynapseConstants.SYNAPSE_PROPERTIES;
-                if (log.isDebugEnabled()) {
-                    log.debug("synapse.properties file is loading from classpath" +
-                            " with resource path '" + path + " '");
-                }
-
-                in = cl.getResourceAsStream(path);
-                if (in == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Unable to load the synapse.properties file from classpath" +
-                                " with resource name '" + path + " '");
-                    }
-                }
-            }
-
-            if (in != null) {
-                properties.load(in);
-            }
-            
-            return properties;
-
-        } catch (Exception e) {
-            log.info("Using the default tuning parameters for Synapse");
-        }
-        return new Properties();
     }
 
     private static void handleException(String msg, Exception e) {

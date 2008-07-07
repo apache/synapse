@@ -16,26 +16,34 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.security.wrappers;
+package org.apache.synapse.security.definition;
 
-import org.apache.synapse.security.definition.TrustKeyStoreInformation;
-
+import javax.net.ssl.TrustManagerFactory;
 import java.security.KeyStore;
 
 /**
- * Represents the abstraction for trusted KeyStore
- * Only expose to get public keys
+ *
  */
-public class TrustKeyStoreWrapper extends KeyStoreWrapper {
-    /**
-     * @see org.apache.synapse.security.wrappers.KeyStoreWrapper
-     *      There is no keyPassword as trusted Store doesn't keep private or secret keys
-     */
-    public void init(TrustKeyStoreInformation information) {
-        super.init(information, null);
+public class TrustKeyStoreInformation extends KeyStoreInformation {
+
+    public TrustManagerFactory getTrustManagerFactoryInstance() {
+        try {
+            KeyStore trustStore = this.getKeyStore();
+            TrustManagerFactory trustManagerfactory = TrustManagerFactory.getInstance(
+                    TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerfactory.init(trustStore);
+
+            return trustManagerfactory;
+        } catch (Exception e) {
+            handleException("Error getting TrustManagerFactory: ", e);
+        }
+
+        return null;
     }
 
-    public KeyStore getTrustKeyStore() {
-        return getKeyStore();
+    public KeyStore getTrustStore() {
+        return super.getKeyStore();
+
     }
+
 }

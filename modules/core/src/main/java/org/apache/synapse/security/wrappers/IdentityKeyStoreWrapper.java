@@ -18,10 +18,11 @@
 */
 package org.apache.synapse.security.wrappers;
 
-import org.apache.synapse.security.bean.KeyStoreInformation;
+import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.security.KeyStore;
 import java.security.PrivateKey;
 
 /**
@@ -32,13 +33,11 @@ import java.security.PrivateKey;
 public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
 
     /**
-     * @param information   @see KeyStoreWrapper
-     * @param storePassword @see KeyStoreWrapper
-     * @param keyPassword   @see KeyStoreWrapper
      * @see org.apache.synapse.security.wrappers.KeyStoreWrapper
+     *      #init(org.apache.synapse.security.bean.KeyStoreInformation, String, String)
      */
-    public void init(KeyStoreInformation information, String storePassword, String keyPassword) {
-        super.init(information, storePassword, keyPassword);
+    public void init(IdentityKeyStoreInformation information, String keyPassword) {
+        super.init(information, keyPassword);
     }
 
     /**
@@ -95,5 +94,9 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
             return (SecretKey) key;
         }
         return null;
+    }
+
+    public KeyStore getIdentityKeyStore() {
+        return getKeyStore();
     }
 }

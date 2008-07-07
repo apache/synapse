@@ -21,15 +21,12 @@ package org.apache.synapse.security.wrappers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.security.bean.KeyStoreInformation;
+import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
+import org.apache.synapse.security.definition.KeyStoreInformation;
+import org.apache.synapse.security.definition.TrustKeyStoreInformation;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 
 /**
  * Wraps the keyStore and provide abstraction need for ciphering in the synapse.
@@ -50,57 +47,25 @@ public abstract class KeyStoreWrapper {
     /**
      * Initialize the KeyStore wrapper based on provided KeyStoreinformation and passwords
      *
-     * @param information   The object that has encapsulated all information for a
-     *                      keyStore excepts passwords
-     * @param storePassword Specifies the password for the keyStore file
-     * @param keyPassword   Specifies the password of the key within the keyStore
+     * @param information The object that has encapsulated all information for a
+     *                    keyStore excepts passwords
+     * @param keyPassword Specifies the password of the key within the keyStore
      */
-    protected void init(KeyStoreInformation information, String storePassword, String keyPassword) {
+    protected void init(KeyStoreInformation information, String keyPassword) {
 
         if (information == null) {
             handleException("KeyStore information cannot be found");
         }
-
-        if (storePassword == null || "".equals(storePassword)) {
-            handleException("KeyStore password need to be provided ");
-        }
-
         this.keyStoreInformation = information;
         this.keyPassword = keyPassword;
 
-        String store = information.getLocation();
-        File keyStoreFile = new File(store);
-        if (!keyStoreFile.exists()) {
-            handleException("KeyStore can not be found at ' " + keyStoreFile + " '");
+        if (information instanceof TrustKeyStoreInformation) {
+            this.keyStore = ((TrustKeyStoreInformation) information).getTrustStore();
+        } else if (information instanceof IdentityKeyStoreInformation) {
+            this.keyStore = ((IdentityKeyStoreInformation) information).getIdentityKeyStore();
+        } else {
+            handleException("Invalid KeyStore type");
         }
-
-        String storeType = information.getStoreType();
-        BufferedInputStream bis = null;
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Loading KeyStore form : " + store);
-            }
-            bis = new BufferedInputStream(new FileInputStream(keyStoreFile));
-            keyStore = KeyStore.getInstance(storeType);
-            keyStore.load(bis, storePassword.toCharArray());
-
-        } catch (KeyStoreException e) {
-            handleException("Error loading keyStore from ' " + store + " ' ", e);
-        } catch (IOException e) {
-            handleException("IOError loading keyStore from ' " + store + " ' ", e);
-        } catch (NoSuchAlgorithmException e) {
-            handleException("Error loading keyStore from ' " + store + " ' ", e);
-        } catch (CertificateException e) {
-            handleException("Error loading keyStore from ' " + store + " ' ", e);
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-
     }
 
     /**
@@ -195,5 +160,9 @@ public abstract class KeyStoreWrapper {
     protected void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    protected KeyStore getKeyStore() {
+        return keyStore;
     }
 }

@@ -169,10 +169,16 @@ public class SynapseConfigUtils {
             if (url == null) {
                 return null;
             }
-            URLConnection urlc = url.openConnection();
+            URLConnection connection = getURLConnection(url);
+            if (connection == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot create a URLConnection for given URL : " + url);
+                }
+                return null;
+            }
             XMLToObjectMapper xmlToObject =
-                    getXmlToObjectMapper(urlc.getContentType());
-            InputStream inputStream = urlc.getInputStream();
+                    getXmlToObjectMapper(connection.getContentType());
+            InputStream inputStream = connection.getInputStream();
             try {
                 XMLStreamReader parser = XMLInputFactory.newInstance().
                         createXMLStreamReader(inputStream);
@@ -219,7 +225,13 @@ public class SynapseConfigUtils {
 
         try {
             // Open a new connection
-            URLConnection newConnection = url.openConnection();
+            URLConnection newConnection = getURLConnection(url);
+            if (newConnection == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot create a URLConnection for given URL : " + url);
+                }
+                return null;
+            }
 
             BufferedInputStream newInputStream = new BufferedInputStream(
                     newConnection.getInputStream());
@@ -248,100 +260,16 @@ public class SynapseConfigUtils {
         if (url == null) {
             return null;
         }
-
-        InputStream urlInStream = null;
-
-        if (url.getProtocol().equalsIgnoreCase("https")) {
-            Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
-            KeyManager[] keyManagers = null;
-            TrustManager[] trustManagers = null;
-
-            IdentityKeyStoreInformation identityInformation =
-                    KeyStoreInformationFactory.createIdentityKeyStoreInformation(synapseProperties);
-
-            if (identityInformation != null) {
-                KeyManagerFactory keyManagerFactory =
-                        identityInformation.getIdentityKeyManagerFactoryInstance();
-                if (keyManagerFactory != null) {
-                    keyManagers = keyManagerFactory.getKeyManagers();
-                }
-
+        URLConnection connection = getURLConnection(url);
+        if (connection == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot create a URLConnection for given URL : " + urlStr);
             }
-
-            TrustKeyStoreInformation trustInformation =
-                    KeyStoreInformationFactory.createTrustKeyStoreInformation(synapseProperties);
-
-            if (trustInformation != null) {
-                TrustManagerFactory trustManagerFactory =
-                        trustInformation.getTrustManagerFactoryInstance();
-                if (trustManagerFactory != null) {
-                    trustManagers = trustManagerFactory.getTrustManagers();
-                }
-            }
-
-            HttpsURLConnectionImpl connection = (HttpsURLConnectionImpl) url.openConnection();
-            try {
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(keyManagers,
-                        trustManagers, null);
-                connection.setSSLSocketFactory(sslContext.getSocketFactory());
-                if (trustInformation != null) {
-                    boolean enableHostnameVerifier = true;
-                    String value =
-                            trustInformation.getParameter(
-                                    KeyStoreInformation.ENABLE_HOST_NAME_VERIFIER);
-                    if (value != null) {
-                        enableHostnameVerifier = Boolean.parseBoolean(value);
-                    }
-                    if (!enableHostnameVerifier) {
-                        connection.setHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
-                            public boolean verify(String hostname, javax.net.ssl.SSLSession session) {
-                                if (log.isTraceEnabled()) {
-                                    log.trace("HostName verification disabled");
-                                    log.trace("host:   " + hostname);
-                                    log.trace("peer host:  " + session.getPeerHost());
-                                }
-                                return true;
-                            }
-
-                            public boolean verify(String hostname, String certHostname) {
-                                if (log.isTraceEnabled()) {
-                                    log.trace("Hostname verification disabled");
-                                    log.trace("host:   " + hostname);
-                                    log.trace("cert hostname:  " + certHostname);
-                                }
-                                return true;
-                            }
-                        });
-                    }
-                }
-
-            } catch (NoSuchAlgorithmException e) {
-                handleException("Error loading SSLContext ");
-            } catch (KeyManagementException e) {
-                handleException("Error initiation SSLContext with KeyManagers");
-            }
-
-            connection.setReadTimeout(getReadTimeout());
-            connection.setConnectTimeout(getConnectionTimeout());
-            connection.setRequestProperty("Connection", "close"); // if http is being used
-            urlInStream = connection.getInputStream();
-
-        } else {
-
-            URLConnection conn = url.openConnection();
-            conn.setReadTimeout(getReadTimeout());
-            conn.setConnectTimeout(getConnectionTimeout());
-            conn.setRequestProperty("Connection", "close"); // if http is being used
-            urlInStream = conn.getInputStream();
-        }
-
-        if (urlInStream == null) {
             return null;
         }
-
+        InputStream inStream = connection.getInputStream();
         try {
-            StAXOMBuilder builder = new StAXOMBuilder(urlInStream);
+            StAXOMBuilder builder = new StAXOMBuilder(inStream);
             OMElement doc = builder.getDocumentElement();
             doc.build();
             return doc;
@@ -356,7 +284,7 @@ public class SynapseConfigUtils {
             }
         } finally {
             try {
-                urlInStream.close();
+                inStream.close();
             } catch (IOException ignore) {
             }
         }
@@ -364,6 +292,7 @@ public class SynapseConfigUtils {
     }
 
     public static InputSource getInputSourceFormURI(URI uri) {
+
         if (uri == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Can not create a URL from 'null' ");
@@ -377,17 +306,19 @@ public class SynapseConfigUtils {
             if (protocol == null || "".equals(protocol)) {
                 url = new URL("file:" + path);
             }
-            URLConnection conn = url.openConnection();
-            conn.setReadTimeout(getReadTimeout());
-            conn.setConnectTimeout(getConnectionTimeout());
-            conn.setRequestProperty("Connection", "close"); // if http is being used
-            BufferedInputStream urlInStream = new BufferedInputStream(
-                    conn.getInputStream());
+            URLConnection connection = getURLConnection(url);
+            if (connection == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot create a URLConnection for give URL : " + uri);
+                }
+                return null;
+            }
+            BufferedInputStream urlInStream = new BufferedInputStream(connection.getInputStream());
             return new InputSource(urlInStream);
         } catch (MalformedURLException e) {
             handleException("Invalid URL ' " + uri + " '", e);
         } catch (IOException e) {
-            handleException("Error reading at URI ' " + uri + " ' ", e);
+            handleException("IOError when getting a stream from given url : " + uri, e);
         }
         return null;
     }
@@ -403,6 +334,121 @@ public class SynapseConfigUtils {
     private static void handleException(String msg, Exception e) {
         log.warn(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    private static HttpsURLConnection getHttpsURLConnection(URL url) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating a HttpsURL Connection from given URL : " + url);
+        }
+
+        KeyManager[] keyManagers = null;
+        TrustManager[] trustManagers = null;
+
+        Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
+
+        IdentityKeyStoreInformation identityInformation =
+                KeyStoreInformationFactory.createIdentityKeyStoreInformation(synapseProperties);
+
+        if (identityInformation != null) {
+            KeyManagerFactory keyManagerFactory =
+                    identityInformation.getIdentityKeyManagerFactoryInstance();
+            if (keyManagerFactory != null) {
+                keyManagers = keyManagerFactory.getKeyManagers();
+            }
+
+        }
+
+        TrustKeyStoreInformation trustInformation =
+                KeyStoreInformationFactory.createTrustKeyStoreInformation(synapseProperties);
+
+        if (trustInformation != null) {
+            TrustManagerFactory trustManagerFactory =
+                    trustInformation.getTrustManagerFactoryInstance();
+            if (trustManagerFactory != null) {
+                trustManagers = trustManagerFactory.getTrustManagers();
+            }
+        }
+
+        try {
+            HttpsURLConnectionImpl connection = (HttpsURLConnectionImpl) url.openConnection();
+            //Create a SSLContext
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(keyManagers,
+                    trustManagers, null);
+            connection.setSSLSocketFactory(sslContext.getSocketFactory());
+
+            if (trustInformation != null) {
+                // Determine is it need to overwrite default Host Name verifier
+                boolean enableHostnameVerifier = true;
+                String value =
+                        trustInformation.getParameter(
+                                KeyStoreInformation.ENABLE_HOST_NAME_VERIFIER);
+                if (value != null) {
+                    enableHostnameVerifier = Boolean.parseBoolean(value);
+                }
+
+                if (!enableHostnameVerifier) {
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Overriding default HostName Verifier." +
+                                "HostName verification disabled");
+                    }
+
+                    connection.setHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
+                        public boolean verify(String hostname, javax.net.ssl.SSLSession session) {
+                            if (log.isTraceEnabled()) {
+                                log.trace("HostName verification disabled");
+                                log.trace("Host:   " + hostname);
+                                log.trace("Peer Host:  " + session.getPeerHost());
+                            }
+                            return true;
+                        }
+
+                        public boolean verify(String hostname, String certHostname) {
+                            if (log.isTraceEnabled()) {
+                                log.trace("HostName verification disabled");
+                                log.trace("Host:   " + hostname);
+                                log.trace("Cert HostName:  " + certHostname);
+                            }
+                            return true;
+                        }
+                    });
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Using default HostName verifier...");
+                    }
+                }
+            }
+            return connection;
+
+        } catch (NoSuchAlgorithmException e) {
+            handleException("Error loading SSLContext ", e);
+        } catch (KeyManagementException e) {
+            handleException("Error initiation SSLContext with KeyManagers", e);
+        } catch (IOException e) {
+            handleException("Error opening a https connection from URL : " + url, e);
+        }
+        return null;
+    }
+
+    public static URLConnection getURLConnection(URL url) {
+
+        try {
+            URLConnection connection;
+            if (url.getProtocol().equalsIgnoreCase("https")) {
+                connection = getHttpsURLConnection(url);
+            } else {
+                connection = url.openConnection();
+            }
+            connection.setReadTimeout(getReadTimeout());
+            connection.setConnectTimeout(getConnectionTimeout());
+            connection.setRequestProperty("Connection", "close"); // if http is being used
+            return connection;
+        } catch (IOException e) {
+            handleException("Error reading at URI ' " + url + " ' ", e);
+        }
+        return null;
     }
 
     private static void handleException(String msg) {
@@ -503,7 +549,7 @@ public class SynapseConfigUtils {
         if (parentLocation == null) {
             return importUri.toString();
         } else {
-            // if the importuri is absolute
+            // if the import-uri is absolute
             if (relativeLocation.startsWith("/") || relativeLocation.startsWith("\\")) {
                 if (importUri != null && !importUri.isAbsolute()) {
                     try {

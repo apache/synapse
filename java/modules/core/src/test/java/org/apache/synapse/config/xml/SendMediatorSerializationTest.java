@@ -47,7 +47,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                      "<endpoint>" +
-                          "<address uri='http://localhost:9000/soap/MyService1'>" +
+                          "<address uri='http://localhost:9000/services/MyService1'>" +
                                "<enableAddressing/>" +
                                 "<timeout>" +
                                     "<duration>60</duration>" +
@@ -123,17 +123,17 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "<endpoint>" +
                     "<loadbalance>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9001/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9001/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9002/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9002/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9003/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9003/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
@@ -163,7 +163,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/soap/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
+                "http://localhost:9001/services/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
     }
 
     public void testSimpleFailoverSendSerialization() {
@@ -172,17 +172,17 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "<endpoint>" +
                     "<failover>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9001/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9001/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9002/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9002/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9003/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9003/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
@@ -212,7 +212,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/soap/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
+                "http://localhost:9001/services/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
     }
 
     public void testNestedLoadbalanceFailoverSendSerialization() {
@@ -221,19 +221,19 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "<endpoint>" +
                     "<loadbalance>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9001/soap/Service1\">" +
+                            "<address uri=\"http://localhost:9001/services/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
                             "<failover>" +
                                 "<endpoint>" +
-                                    "<address uri=\"http://localhost:9002/soap/Service1\">" +
+                                    "<address uri=\"http://localhost:9002/services/Service1\">" +
                                         "<enableAddressing/>" +
                                     "</address>" +
                                 "</endpoint>" +
                                 "<endpoint>" +
-                                    "<address uri=\"http://localhost:9003/soap/Service1\">" +
+                                    "<address uri=\"http://localhost:9003/services/Service1\">" +
                                         "<enableAddressing/>" +
                                     "</address>" +
                                 "</endpoint>" +

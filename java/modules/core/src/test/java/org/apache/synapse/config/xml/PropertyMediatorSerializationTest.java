@@ -34,7 +34,7 @@ public class PropertyMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testPropertyMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\" name=\"To\" value=\"http://127.0.0.1:10001/soap/Services\" action=\"remove\" />";
+        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\" name=\"To\" value=\"http://127.0.0.1:10001/services/Services\" action=\"remove\" />";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }

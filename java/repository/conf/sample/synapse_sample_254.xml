@@ -31,7 +31,7 @@
 
 		<target>
 			<endpoint>
-				<address format="soap12" uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+				<address format="soap12" uri="http://localhost:9000/services/SimpleStockQuoteService"/>
 		        </endpoint>
 			<outSequence>
 				<property name="transport.vfs.ReplyFileName"

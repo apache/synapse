@@ -17,7 +17,7 @@ public class SynapseSample_51_Integration extends AbstractAutomationTestCase {
     public void testSample() throws Exception {
         System.setProperty("opt_mode", "mtom");
         OMElement response = MTOMSwAClient.sendUsingMTOM(
-                "./../../repository/conf/sample/resources/mtom/asf-logo.gif", "http://localhost:8280/soap/MTOMSwASampleService");
+                "./../../repository/conf/sample/resources/mtom/asf-logo.gif", "http://localhost:8280/services/MTOMSwASampleService");
 //        assertXpathExists("ns:getQuoteResponse", resultString);
 //        assertXpathExists("ns:getQuoteResponse/ns:return", resultString);
     }

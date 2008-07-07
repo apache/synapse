@@ -15,15 +15,15 @@ public class SynapseSample_102_Integration extends AbstractAutomationTestCase {
     }
 
     public void testSample() throws Exception {
-        System.setProperty("trpurl", "http://localhost:8280/soap/StockQuoteProxy");
+        System.setProperty("trpurl", "http://localhost:8280/services/StockQuoteProxy");
         try {
             getStringResultOfTest(StockQuoteClient.executeTestClient());
         } catch (AxisFault f) {
             assertEquals("The service cannot be found for the endpoint reference (EPR) " +
-                    "/soap/StockQuoteProxy", f.getReason());
+                    "/services/StockQuoteProxy", f.getReason());
         }
 
-        System.setProperty("trpurl", "https://localhost:8243/soap/StockQuoteProxy");
+        System.setProperty("trpurl", "https://localhost:8243/services/StockQuoteProxy");
         String resultString = getStringResultOfTest(StockQuoteClient.executeTestClient());
         assertXpathExists("ns:getQuoteResponse", resultString);
         assertXpathExists("ns:getQuoteResponse/ns:return", resultString);

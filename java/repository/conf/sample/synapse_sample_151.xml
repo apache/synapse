@@ -22,14 +22,14 @@
 
     <sequence name="proxy_1">
         <send>
-            <endpoint><address uri="http://localhost:9000/soap/SimpleStockQuoteService"/></endpoint>
+            <endpoint><address uri="http://localhost:9000/services/SimpleStockQuoteService"/></endpoint>
         </send>
     </sequence>
 	<sequence name="out">
         <send/>
     </sequence>
     <endpoint name="proxy_2_endpoint">
-		<address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+		<address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
 	</endpoint>
     <localEntry key="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
 

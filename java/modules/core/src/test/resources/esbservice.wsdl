@@ -71,13 +71,13 @@
     </wsdl:binding>
     <wsdl:service name="esbservice">
         <wsdl:port name="esbserviceSOAP11port_http" binding="axis2:esbserviceSOAP11Binding">
-            <soap:address location="http://localhost:9001/soap/Service1" />
+            <soap:address location="http://localhost:9001/services/Service1" />
         </wsdl:port>
         <wsdl:port name="esbserviceSOAP12port_http" binding="axis2:esbserviceSOAP12Binding">
-            <soap12:address location="http://localhost:9001/soap/Service1" />
+            <soap12:address location="http://localhost:9001/services/Service1" />
         </wsdl:port>
         <wsdl:port name="esbserviceHttpport1" binding="axis2:esbserviceHttpBinding">
-            <http:address location="http://localhost:9001/soap/Service1" />
+            <http:address location="http://localhost:9001/services/Service1" />
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

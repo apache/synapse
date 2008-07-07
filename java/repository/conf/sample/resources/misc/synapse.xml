@@ -28,7 +28,7 @@
 
     <sequence name="commodityQuote">
         <!-- set the To address to the real endpoint -->
-        <header name="To" value="http://127.0.0.1:10101/soap/Services"/>
+        <header name="To" value="http://127.0.0.1:10101/services/Services"/>
         <header name="Action" value="urn:commodity"/>
     </sequence>
 
@@ -41,7 +41,7 @@
     <proxy name="StockQuoteProxy">
         <target>
             <endpoint>
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
             </endpoint>
             <outSequence>
                 <send/>

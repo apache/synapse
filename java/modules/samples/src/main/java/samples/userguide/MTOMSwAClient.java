@@ -51,7 +51,7 @@ public class MTOMSwAClient {
 
     public static void main(String[] args) throws Exception {
 
-        String targetEPR = getProperty("opt_url", "http://localhost:8280/soap/MTOMSwASampleService");
+        String targetEPR = getProperty("opt_url", "http://localhost:8280/services/MTOMSwASampleService");
         String fileName = getProperty("opt_file", "./../../repository/conf/sample/resources/mtom/asf-logo.gif");
         String mode = getProperty("opt_mode", "mtom");
 

@@ -24,7 +24,7 @@
         <RMSequence single="true" version="1.0"/>
         <send>
         	<endpoint name="reliable">
-    			<address uri="http://localhost:9000/soap/ReliableStockQuoteService">
+    			<address uri="http://localhost:9000/services/ReliableStockQuoteService">
 	    			<enableRM/>
 		    		<enableAddressing/>
 			    </address>

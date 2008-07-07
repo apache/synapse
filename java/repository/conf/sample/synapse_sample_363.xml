@@ -61,7 +61,7 @@
                     </log>
                     <send>
                         <endpoint>
-                            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
                         </endpoint>
                     </send>
                 </case>
@@ -72,7 +72,7 @@
                     </log>
                     <send>
                         <endpoint>
-                            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
                         </endpoint>
                     </send>
                 </case>
@@ -83,7 +83,7 @@
                     </log>
                     <send>
                         <endpoint>
-                            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
                         </endpoint>
                     </send>
                 </case>

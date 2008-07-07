@@ -10,7 +10,7 @@ public class SynapseSample_112_Integration extends AbstractAutomationTestCase {
 
     protected void setUp() throws Exception {
         System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_1.xml");
-        System.setProperty("addurl", "http://localhost:9000/soap/SimpleStockQuoteService");
+        System.setProperty("addurl", "http://localhost:9000/services/SimpleStockQuoteService");
         System.setProperty("mode", "placeorder");
         super.setUp();
     }

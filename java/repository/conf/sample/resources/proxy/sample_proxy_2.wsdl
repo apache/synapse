@@ -266,24 +266,24 @@
     </wsdl:binding>
     <wsdl:service name="LBService1">
         <wsdl:port name="LBService1SOAP11port_https" binding="ns0:LBService1SOAP11Binding">
-            <soap:address location="https://indika:9005/soap/LBService1"/>
+            <soap:address location="https://localhost:9005/services/LBService1"/>
         </wsdl:port>
         <wsdl:port name="LBService1SOAP11port_http1" binding="ns0:LBService1SOAP11Binding">
-            <soap:address location="http://indika:9001/soap/LBService1"/>
+            <soap:address location="http://localhost:9001/services/LBService1"/>
         </wsdl:port>
 
         <wsdl:port name="LBService1SOAP12port_https" binding="ns0:LBService1SOAP12Binding">
-            <soap12:address location="https://indika:9005/soap/LBService1"/>
+            <soap12:address location="https://localhost:9005/services/LBService1"/>
         </wsdl:port>
         <wsdl:port name="LBService1SOAP12port_http1" binding="ns0:LBService1SOAP12Binding">
-            <soap12:address location="http://indika:9001/soap/LBService1"/>
+            <soap12:address location="http://localhost:9001/services/LBService1"/>
         </wsdl:port>
         <wsdl:port name="LBService1Httpport" binding="ns0:LBService1HttpBinding">
-            <http:address location="https://indika:9005/soap/LBService1"/>
+            <http:address location="https://localhost:9005/services/LBService1"/>
         </wsdl:port>
 
         <wsdl:port name="LBService1Httpport1" binding="ns0:LBService1HttpBinding">
-            <http:address location="http://indika:9001/soap/LBService1"/>
+            <http:address location="http://localhost:9001/services/LBService1"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

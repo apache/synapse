@@ -168,6 +168,10 @@ public class ProxyService {
      */
     private List<String> outMessagePolicies = new ArrayList<String>();
     /**
+     * Should WS Addressing be engaged on this service
+     */
+    private boolean wsAddrEnabled = false;
+    /**
      * Should WS RM be engaged on this service
      */
     private boolean wsRMEnabled = false;
@@ -499,6 +503,17 @@ public class ProxyService {
             handleException("Error adding Proxy service to the Axis2 engine", axisFault);
         }
 
+        // should Addressing be engaged on this service?
+        if (wsAddrEnabled) {
+            auditInfo("WS-Addressing is enabled for service : " + name);
+            try {
+                proxyService.engageModule(axisCfg.getModule(
+                    SynapseConstants.ADDRESSING_MODULE_NAME), axisCfg);
+            } catch (AxisFault axisFault) {
+                handleException("Error loading WS Addressing module on proxy service : " + name, axisFault);
+            }
+        }
+
         // should RM be engaged on this service?
         if (wsRMEnabled) {
             auditInfo("WS-Reliable messaging is enabled for service : " + name);
@@ -716,6 +731,14 @@ public class ProxyService {
 
     public void addServiceLevelPolicy(String serviceLevelPolicy) {
         this.serviceLevelPolicies.add(serviceLevelPolicy);
+    }
+
+    public boolean isWsAddrEnabled() {
+        return wsAddrEnabled;
+    }
+
+    public void setWsAddrEnabled(boolean wsAddrEnabled) {
+        this.wsAddrEnabled = wsAddrEnabled;
     }
 
     public boolean isWsRMEnabled() {

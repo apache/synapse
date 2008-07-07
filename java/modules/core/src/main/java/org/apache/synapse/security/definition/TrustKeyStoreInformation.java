@@ -22,12 +22,21 @@ import javax.net.ssl.TrustManagerFactory;
 import java.security.KeyStore;
 
 /**
- *
+ * Represents the abstraction - Trusted Certificate Store Information
  */
 public class TrustKeyStoreInformation extends KeyStoreInformation {
 
+    /**
+     * Returns the TrustManagerFactory instance
+     *
+     * @return TrustManagerFactory instance
+     */
     public TrustManagerFactory getTrustManagerFactoryInstance() {
+
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a TrustManagerFactory instance");
+            }
             KeyStore trustStore = this.getKeyStore();
             TrustManagerFactory trustManagerfactory = TrustManagerFactory.getInstance(
                     TrustManagerFactory.getDefaultAlgorithm());
@@ -41,6 +50,11 @@ public class TrustKeyStoreInformation extends KeyStoreInformation {
         return null;
     }
 
+    /**
+     * Returns a KeyStore instance that has been created using trust store
+     *
+     * @return KeyStore Instance
+     */
     public KeyStore getTrustStore() {
         return super.getKeyStore();
 

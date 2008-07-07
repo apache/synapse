@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public abstract class KeyStoreInformation {
 
-    private static final Log log = LogFactory.getLog(KeyStoreInformation.class);
+    protected final Log log;
 
     public static final String KEYSTORE_CERTIFICATE_FILE_PATH = "keyStoreCertificateFilePath";
     public static final String ENABLE_HOST_NAME_VERIFIER = "enableHostnameVerifier";
@@ -49,6 +49,10 @@ public abstract class KeyStoreInformation {
     private String provider;
 
     private final Map parameters = new HashMap();
+
+    protected KeyStoreInformation() {
+        log = LogFactory.getLog(this.getClass());
+    }
 
     public void setStoreType(String storeType) {
         if (storeType == null || "".equals(storeType)) {
@@ -84,14 +88,12 @@ public abstract class KeyStoreInformation {
         this.location = location;
     }
 
-    protected void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
+    public void setKeyStorePassword(String keyStorePassword) {
+        this.keyStorePassword = keyStorePassword;
     }
 
     public void addParameter(String name, String value) {
@@ -102,6 +104,11 @@ public abstract class KeyStoreInformation {
         return (String) parameters.get(name);
     }
 
+    /**
+     * Constructs the KeyStore according to the store type
+     *
+     * @return KeyStore Instance
+     */
     protected KeyStore getKeyStore() {
         switch (storeType) {
             case JKS:
@@ -126,12 +133,14 @@ public abstract class KeyStoreInformation {
         }
     }
 
-    public void setProvider(String provider) {
-        this.provider = provider;
+    protected void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
-    public void setKeyStorePassword(String keyStorePassword) {
-        this.keyStorePassword = keyStorePassword;
+    protected void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 
 }

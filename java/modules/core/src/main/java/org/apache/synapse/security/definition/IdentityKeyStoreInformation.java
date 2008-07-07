@@ -22,18 +22,29 @@ import javax.net.ssl.KeyManagerFactory;
 import java.security.KeyStore;
 
 /**
- *
+ * Represents the abstraction private key entry store (identity) information
  */
 public class IdentityKeyStoreInformation extends KeyStoreInformation {
 
+    /* Password for access private key*/
     private String keyPassword;
 
     public void setKeyPassword(String keyPassword) {
         this.keyPassword = keyPassword;
     }
 
+    /**
+     * Returns the IdentityKeyManagerFactory instance
+     *
+     * @return IdentityKeyManagerFactory instance
+     */
     public KeyManagerFactory getIdentityKeyManagerFactoryInstance() {
+
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a IdentityKeyManagerFactory instance");
+            }
+
             KeyStore keyStore = this.getIdentityKeyStore();
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(
                     KeyManagerFactory.getDefaultAlgorithm());
@@ -47,6 +58,11 @@ public class IdentityKeyStoreInformation extends KeyStoreInformation {
         return null;
     }
 
+    /**
+     * Returns a KeyStore instance that has been created from identity keystore
+     *
+     * @return KeyStore Instance
+     */
     public KeyStore getIdentityKeyStore() {
         return super.getKeyStore();
     }

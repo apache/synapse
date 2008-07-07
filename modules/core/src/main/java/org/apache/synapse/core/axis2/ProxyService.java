@@ -215,7 +215,7 @@ public class ProxyService {
     /**
      * Build the underlying Axis2 service from the Proxy service definition
      *
-     * @param synCfg the Synapse configuration
+     * @param synCfg  the Synapse configuration
      * @param axisCfg the Axis2 configuration
      * @return the Axis2 service for the Proxy
      */
@@ -250,7 +250,7 @@ public class ProxyService {
             try {
             	URL url = wsdlURI.toURL();
                 publishWSDL = url.toString();
-                
+
                 OMNode node = SynapseConfigUtils.getOMElementFromURL(publishWSDL);
                 if (node instanceof OMElement) {
                     wsdlElement = (OMElement) node;
@@ -259,44 +259,46 @@ public class ProxyService {
             } catch (MalformedURLException e) {
                 handleException("Malformed URI for wsdl", e);
             } catch (IOException e) {
-            	//handleException("Error reading from wsdl URI", e);
-            	boolean enablePublishWSDLSafeMode = false;
-            	Map proxyParameters = null;
+                //handleException("Error reading from wsdl URI", e);
+                boolean enablePublishWSDLSafeMode = false;
+                Map proxyParameters = null;
                 proxyParameters = this.getParameterMap();
-    	        if(!proxyParameters.isEmpty()){
-    	        	if(proxyParameters.containsKey("enablePublishWSDLSafeMode")){
-    	        		enablePublishWSDLSafeMode =
+                if (!proxyParameters.isEmpty()) {
+                    if (proxyParameters.containsKey("enablePublishWSDLSafeMode")) {
+                        enablePublishWSDLSafeMode =
                                 Boolean.parseBoolean(
-                                        proxyParameters.get("enablePublishWSDLSafeMode").toString().toLowerCase());
-    	        	}else{
-    	        		if (trace()){
-                    		trace.info("WSDL was unable to load for: " + publishWSDL);
-                    		trace.info("Please add <syn:parameter name=\"enableURISafeMode\">true</syn:parameter> to proxy service.");
-                    	}
-                    	handleException("Error reading from wsdl URI", e);
-    	        	}
-    	        }
-                
-                if(enablePublishWSDLSafeMode){
-                	// this is if the wsdl cannot be loaded... create a dummy service and an operation for which
-	                // our SynapseDispatcher will properly dispatch to
-                	
-                	//!!!Need to add a reload function... And display that the wsdl/service is offline!!!
-                	if (trace()){
-                		trace.info("WSDL was unable to load for: " + publishWSDL);
-                		trace.info("enableURISafeMode: true");
-                	}
-	                
-	                proxyService = new AxisService();
-	                AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
-	                proxyService.addOperation(mediateOperation);
-                } else{
-                	if (trace()){
-                		trace.info("WSDL was unable to load for: " + publishWSDL);
-                		trace.info("enableURISafeMode: false");
-                	}
-                	
-                	handleException("Error reading from wsdl URI", e);
+                                        proxyParameters.get("enablePublishWSDLSafeMode").
+                                                toString().toLowerCase());
+                    } else {
+                        if (trace()) {
+                            trace.info("WSDL was unable to load for: " + publishWSDL);
+                            trace.info("Please add <syn:parameter name=\"enableURISafeMode\">true" +
+                                    "</syn:parameter> to proxy service.");
+                        }
+                        handleException("Error reading from wsdl URI", e);
+                    }
+                }
+
+                if (enablePublishWSDLSafeMode) {
+                    // this is if the wsdl cannot be loaded... create a dummy service and an operation for which
+                    // our SynapseDispatcher will properly dispatch to
+
+                    //!!!Need to add a reload function... And display that the wsdl/service is offline!!!
+                    if (trace()) {
+                        trace.info("WSDL was unable to load for: " + publishWSDL);
+                        trace.info("enableURISafeMode: true");
+                    }
+
+                    proxyService = new AxisService();
+                    AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
+                    proxyService.addOperation(mediateOperation);
+                } else {
+                    if (trace()) {
+                        trace.info("WSDL was unable to load for: " + publishWSDL);
+                        trace.info("enableURISafeMode: false");
+                    }
+
+                    handleException("Error reading from wsdl URI", e);
                 }
             }
         } else {
@@ -304,7 +306,8 @@ public class ProxyService {
             // our SynapseDispatcher will properly dispatch to
             if (trace()) trace.info("Did not find a WSDL. Assuming a POX or Legacy service");
             proxyService = new AxisService();
-            AxisOperation mediateOperation = new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
+            AxisOperation mediateOperation = new InOutAxisOperation(
+                    SynapseConstants.SYNAPSE_OPERATION_NAME);
             // Set the names of the two messages so that Axis2 is able to produce a WSDL (see SYNAPSE-366):
             mediateOperation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE).setName("in");
             mediateOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE).setName("out");
@@ -479,7 +482,7 @@ public class ProxyService {
                         handleException("Couldn't find the operation specified " +
                                 "by the QName : " + pi.getOperation());
                     }
-                    
+
                 } else if (pi.isMessagePolicy()) {
 
                     if (pi.getOperation() != null) {
@@ -493,7 +496,7 @@ public class ProxyService {
                             handleException("Couldn't find the operation " +
                                     "specified by the QName : " + pi.getOperation());
                         }
-                        
+
                     } else {
                         // operation is not specified and hence apply to all the applicable messages
                         for (Iterator itr = proxyService.getOperations(); itr.hasNext();) {
@@ -598,7 +601,7 @@ public class ProxyService {
     public void start(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         if (axisConfig != null) {
-            
+
             Parameter param = axisConfig.getParameter(SynapseConstants.SYNAPSE_ENV);
             if (param != null && param.getValue() instanceof SynapseEnvironment)  {
                 SynapseEnvironment env = (SynapseEnvironment) param.getValue();
@@ -622,7 +625,7 @@ public class ProxyService {
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
         } else {
-            auditWarn("Unable to start proxy service : " + name + 
+            auditWarn("Unable to start proxy service : " + name +
                 ". Couldn't access Axis configuration");
         }
     }
@@ -909,11 +912,11 @@ public class ProxyService {
     }
 
     public List getPinnedServers() {
-      return pinnedServers;
+        return pinnedServers;
     }
 
     public void setPinnedServers(List pinnedServers) {
-      this.pinnedServers = pinnedServers;
+        this.pinnedServers = pinnedServers;
     }
 
     public ResourceMap getResourceMap() {

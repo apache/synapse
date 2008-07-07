@@ -53,7 +53,8 @@ public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
         BufferedInputStream bis = null;
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Loading KeyStore form : " + location);
+                log.debug("Loading KeyStore from : " + location + " Store-Type : " +
+                        storeType + " Provider : " + provider);
             }
             bis = new BufferedInputStream(new FileInputStream(keyStoreFile));
             KeyStore keyStore;

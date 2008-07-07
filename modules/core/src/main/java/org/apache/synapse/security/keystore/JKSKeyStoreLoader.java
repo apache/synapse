@@ -6,7 +6,7 @@ package org.apache.synapse.security.keystore;
 import java.security.KeyStore;
 
 /**
- *
+ * Loads KeyStore from JKS file
  */
 public class JKSKeyStoreLoader extends AbstractKeyStoreLoader {
 
@@ -25,6 +25,11 @@ public class JKSKeyStoreLoader extends AbstractKeyStoreLoader {
         this.keyStorePassword = keyStorePassword;
     }
 
+    /**
+     * Returns KeyStore to be used
+     *
+     * @return KeyStore instance
+     */
     public KeyStore getKeyStore() {
         return getKeyStore(keyStorePath, keyStorePassword, "JKS", null);
     }

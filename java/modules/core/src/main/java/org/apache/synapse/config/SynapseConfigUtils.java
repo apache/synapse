@@ -309,7 +309,7 @@ public class SynapseConfigUtils {
             URLConnection connection = getURLConnection(url);
             if (connection == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Cannot create a URLConnection for give URL : " + uri);
+                    log.debug("Cannot create a URLConnection for given URL : " + uri);
                 }
                 return null;
             }
@@ -336,6 +336,12 @@ public class SynapseConfigUtils {
         throw new SynapseException(msg, e);
     }
 
+    /**
+     * Helper method to create a HttpSURLCOnnection with provided KeyStores
+     *
+     * @param url Https URL
+     * @return
+     */
     private static HttpsURLConnection getHttpsURLConnection(URL url) {
 
         if (log.isDebugEnabled()) {
@@ -357,6 +363,11 @@ public class SynapseConfigUtils {
                 keyManagers = keyManagerFactory.getKeyManagers();
             }
 
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no private key entry store configuration." +
+                        " Will use JDK's default one");
+            }
         }
 
         TrustKeyStoreInformation trustInformation =
@@ -367,6 +378,11 @@ public class SynapseConfigUtils {
                     trustInformation.getTrustManagerFactoryInstance();
             if (trustManagerFactory != null) {
                 trustManagers = trustManagerFactory.getTrustManagers();
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no trusted certificate store configuration." +
+                        " Will use JDK's default one");
             }
         }
 
@@ -432,9 +448,22 @@ public class SynapseConfigUtils {
         return null;
     }
 
+    /**
+     * Returns a URLCOnnection for given URL. If the URL is https one , then URLConnectin is a
+     * HttpsURLCOnnection and it is configured with KeyStores given in the synapse.properties file
+     *
+     * @param url URL
+     * @return URLConnection for given URL
+     */
     public static URLConnection getURLConnection(URL url) {
 
         try {
+            if (url == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Provided URL is null");
+                }
+                return null;
+            }
             URLConnection connection;
             if (url.getProtocol().equalsIgnoreCase("https")) {
                 connection = getHttpsURLConnection(url);
@@ -510,7 +539,7 @@ public class SynapseConfigUtils {
                             handleException("Invalid URL reference " + url.getPath() + e);
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Faild to resolve an absolute path of the " +
+                                log.debug("Failed to resolve an absolute path of the " +
                                         " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL : " + url.getPath() + e);
@@ -533,7 +562,8 @@ public class SynapseConfigUtils {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Resolving import URI ' " + parentLocation + " '  against base URI ' " + relativeLocation + " '  ");
+            log.debug("Resolving import URI ' " + parentLocation + " '  " +
+                    "against base URI ' " + relativeLocation + " '  ");
         }
 
         URI importUri = null;

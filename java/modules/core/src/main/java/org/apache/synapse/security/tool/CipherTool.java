@@ -266,7 +266,7 @@ public class CipherTool {
         Option alias = new Option(ALIAS, true, "Alias name for identify key owner");
         Option trusted = new Option(TRUSTED, false, "Is this KeyStore trusted one");
 
-        Option keyFile = new Option(KEY_FILE, true, "private key from a file");
+        Option keyFile = new Option(KEY_FILE, true, "Private key from a file");
         Option cipherType = new Option(CIPHER_TYPE, true, "Cipher type");
         Option opMode = new Option(OP_MODE, true, "encrypt or decrypt");
 
@@ -274,8 +274,8 @@ public class CipherTool {
         Option source = new Option(SOURCE_IN_LINED, true, "Plain text in-lined");
         Option sourceFile = new Option(SOURCE_FILE, true, "Plain text from a file");
         Option targetFile = new Option(TARGET_FILE, true, "Target file");
-        Option outType = new Option(OUT_TYPE, true, "encode type for output");
-        Option intType = new Option(IN_TYPE, true, "encode type of input source");
+        Option outType = new Option(OUT_TYPE, true, "Encode type for output");
+        Option intType = new Option(IN_TYPE, true, "Encode type of input source");
 
         options.addOption(keyStore);
         options.addOption(storeType);
@@ -325,9 +325,9 @@ public class CipherTool {
             }
 
         } catch (IOException e) {
-            handleException("Error reading ", e);
+            handleException("Error reading key from given path : " + filePath, e);
         } catch (ClassNotFoundException e) {
-            handleException("Cannot load a key from the file" + filePath, e);
+            handleException("Cannot load a key from the file : " + filePath, e);
         } finally {
             if (in != null) {
                 try {

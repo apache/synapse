@@ -37,12 +37,12 @@ public class TrustKeyStoreInformation extends KeyStoreInformation {
             if (log.isDebugEnabled()) {
                 log.debug("Creating a TrustManagerFactory instance");
             }
-            KeyStore trustStore = this.getKeyStore();
-            TrustManagerFactory trustManagerfactory = TrustManagerFactory.getInstance(
+            KeyStore trustStore = this.getTrustStore();
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
                     TrustManagerFactory.getDefaultAlgorithm());
-            trustManagerfactory.init(trustStore);
+            trustManagerFactory.init(trustStore);
 
-            return trustManagerfactory;
+            return trustManagerFactory;
         } catch (Exception e) {
             handleException("Error getting TrustManagerFactory: ", e);
         }

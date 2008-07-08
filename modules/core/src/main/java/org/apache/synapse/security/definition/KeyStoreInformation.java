@@ -110,6 +110,7 @@ public abstract class KeyStoreInformation {
      * @return KeyStore Instance
      */
     protected KeyStore getKeyStore() {
+
         switch (storeType) {
             case JKS:
                 IKeyStoreLoader jksKeyStoreLoader = new JKSKeyStoreLoader(location,
@@ -129,6 +130,9 @@ public abstract class KeyStoreInformation {
                 ICACertsLoader caCertsLoader = new CACertsLoader();
                 return caCertsLoader.loadTrustStore(location);
             default:
+                if (log.isDebugEnabled()) {
+                    log.debug("No KeyStore Found");
+                }
                 return null;
         }
     }

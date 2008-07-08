@@ -177,6 +177,8 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             !javax.xml.soap,
+                            !org.apache.woden.*,
+                            !org.apache.commons.io,
                             javax.xml.namespace; version=0.0.0,
                             javax.activation,
                             javax.crypto,
@@ -193,17 +195,15 @@
                             javax.xml.validation,
                             org.apache.axiom.*,
                             org.apache.axis2.*,
-                            org.apache.commons.cli,
                             org.apache.commons.dbcp,
                             org.apache.commons.dbcp.datasources,
-                            org.apache.commons.io,
-                            org.apache.commons.lang,
+                            org.apache.commons.io; version=0.0.0,
                             org.apache.commons.logging,
                             org.apache.log4j,
                             org.apache.neethi,
                             org.apache.synapse.transport.*,
                             org.apache.synapse.format.*,
-                            org.apache.woden.*,
+                            org.apache.woden.*; version=0.0.0,
                             org.apache.ws.commons.schema.resolver,
                             org.jaxen.*,
                             org.quartz.*,
@@ -211,7 +211,7 @@
                             org.w3c.dom,
                             org.wso2.caching.*,
                             org.xml.sax.*,
-                            sun.misc
+                            *;resolution:=optional,
                         </Import-Package>
                     </instructions>
                 </configuration>

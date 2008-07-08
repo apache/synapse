@@ -59,7 +59,7 @@ public class FileBaseSecretRepository implements SecretRepository {
     private IdentityKeyStoreWrapper identity;
     /* Wrapper for trusted KeyStore */
     private TrustKeyStoreWrapper trust;
-    /* Whether this secrte repository has been initiated successfully*/
+    /* Whether this secret repository has been initiated successfully*/
     private boolean initialize = false;
 
     public FileBaseSecretRepository(IdentityKeyStoreWrapper wrapper, TrustKeyStoreWrapper trust) {

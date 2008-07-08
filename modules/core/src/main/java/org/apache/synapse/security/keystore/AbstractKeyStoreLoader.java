@@ -34,7 +34,7 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 
 /**
- *
+ * Provides the base for loading KeyStores 
  */
 public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
     protected static Log log;
@@ -43,6 +43,15 @@ public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
         log = LogFactory.getLog(this.getClass());
     }
 
+    /**
+     * Constructs a KeyStore based on keystore location , keystore password , keystore type and 
+     * provider
+     * @param location      The location of the KeyStore
+     * @param storePassword Password to unlock KeyStore
+     * @param storeType     KeyStore type
+     * @param provider      Provider
+     * @return KeyStore Instance
+     */
     protected KeyStore getKeyStore(String location, String storePassword, String storeType, String provider) {
 
         File keyStoreFile = new File(location);

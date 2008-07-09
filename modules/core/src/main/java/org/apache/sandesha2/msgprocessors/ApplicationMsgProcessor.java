@@ -22,6 +22,7 @@ package org.apache.sandesha2.msgprocessors;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -433,6 +434,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					if(reference == null || reference.hasAnonymousAddress()) {
 						rmsBean.setPollingMode(true);
 						startPolling = true;
+						//ensure addressing is turned on since we require it if we want to use makeConnection
+						if (log.isDebugEnabled()) log.debug("Ensuring that WS-A is enabled for msg " + msgContext);
+						msgContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,Boolean.FALSE);
 					}
 				}
 			}

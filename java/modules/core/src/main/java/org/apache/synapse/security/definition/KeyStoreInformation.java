@@ -40,15 +40,20 @@ public abstract class KeyStoreInformation {
 
     protected final Log log;
 
-    public static final String KEYSTORE_CERTIFICATE_FILE_PATH = "keyStoreCertificateFilePath";
+    public static final String KEY_STORE_CERTIFICATE_FILE_PATH = "keyStoreCertificateFilePath";
     public static final String ENABLE_HOST_NAME_VERIFIER = "enableHostnameVerifier";
+    /* KeyStore type */
     private KeyStoreType storeType;
+    /* Alias who belong this key */
     private String alias;
+    /* KeyStore location */
     private String location;
+    /* KeyStore Password to unlock KeyStore */
     private String keyStorePassword;
+    /* KeyStore provider */
     private String provider;
 
-    private final Map parameters = new HashMap();
+    private final Map<String, String> parameters = new HashMap<String, String>();
 
     protected KeyStoreInformation() {
         log = LogFactory.getLog(this.getClass());
@@ -101,7 +106,7 @@ public abstract class KeyStoreInformation {
     }
 
     public String getParameter(String name) {
-        return (String) parameters.get(name);
+        return parameters.get(name);
     }
 
     /**
@@ -110,6 +115,10 @@ public abstract class KeyStoreInformation {
      * @return KeyStore Instance
      */
     protected KeyStore getKeyStore() {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Loading KeyStore with type : " + storeType);
+        }
 
         switch (storeType) {
             case JKS:
@@ -123,7 +132,7 @@ public abstract class KeyStoreInformation {
                 return pkcs12KeyStoreLoader.getKeyStore();
             case PKCS8:
                 IKeyStoreLoader pkcs8KeyStoreLoader = new PKCS8KeyStoreLoader(location,
-                        (String) parameters.get(KEYSTORE_CERTIFICATE_FILE_PATH),
+                        parameters.get(KEY_STORE_CERTIFICATE_FILE_PATH),
                         keyStorePassword, alias);
                 return pkcs8KeyStoreLoader.getKeyStore();
             case CA_CERTIFICATES_PATH:

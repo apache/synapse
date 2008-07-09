@@ -294,7 +294,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     /**
      * This method returns the StatisticsCollector
      *
-     * @return Retruns the StatisticsCollector
+     * @return Returns the StatisticsCollector
      */
     public StatisticsCollector getStatisticsCollector() {
         return statisticsCollector;

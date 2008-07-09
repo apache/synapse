@@ -30,12 +30,19 @@ public class CipherInformation {
 
     private static final Log log = LogFactory.getLog(CipherInformation.class);
 
+    /* Default cipher algorithm*/
     private static String DEFAULT_ALGORITHM = "RSA";
+    /*Cipher algorithm */
     private String algorithm = DEFAULT_ALGORITHM;
+    /* Cipher operation mode - encrypt or decrypt */
     private String operationMode;
+    /* Mode of operation - ECB,CCB,etc*/
     private String mode;
+    /* Type of the input to the cipher */
     private String inType;
+    /* Type of the output from the cipher - base64*/
     private String outType;
+    /* Ciphering type - asymmetric , symmetric*/
     private String type;
 
     public String getAlgorithm() {
@@ -45,7 +52,7 @@ public class CipherInformation {
     public void setAlgorithm(String algorithm) {
         if (algorithm == null || "".equals(algorithm)) {
             if (log.isDebugEnabled()) {
-                log.debug("Given algorithm is null, using a defaut one : RSA");
+                log.debug("Given algorithm is null, using a default one : RSA");
             }
         }
         this.algorithm = algorithm;

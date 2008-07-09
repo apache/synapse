@@ -96,6 +96,11 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
         return null;
     }
 
+    /**
+     * Abstraction for getting Private Entry KeyStore(Identity)
+     *
+     * @return KeyStore Instance
+     */
     public KeyStore getIdentityKeyStore() {
         return getKeyStore();
     }

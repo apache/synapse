@@ -11,7 +11,7 @@ public class PKCS12KeyStoreLoader extends AbstractKeyStoreLoader {
     /**
      * constructs an instance of KeyStoreLoader
      *
-     * @param keystorePath     - path to Keystore file.  KeyStore must be in pkcs12 format.
+     * @param keystorePath     - path to KeyStore file.  KeyStore must be in pkcs12 format.
      * @param keyStorePassword - password to access keyStore
      */
     public PKCS12KeyStoreLoader(String keystorePath, String keyStorePassword) {

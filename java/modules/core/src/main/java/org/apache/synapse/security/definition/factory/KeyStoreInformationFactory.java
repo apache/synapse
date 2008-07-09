@@ -28,7 +28,7 @@ import org.apache.synapse.util.MiscellaneousUtil;
 import java.util.Properties;
 
 /**
- * Factory for creating KeyStoreInformation
+ * Factory for creating KeyStoreInformation based on properties
  */
 public class KeyStoreInformationFactory {
 
@@ -75,6 +75,7 @@ public class KeyStoreInformationFactory {
             }
             return null;
         }
+
         IdentityKeyStoreInformation keyStoreInformation = new IdentityKeyStoreInformation();
         keyStoreInformation.setAlias(
                 MiscellaneousUtil.getProperty(properties,
@@ -91,6 +92,8 @@ public class KeyStoreInformationFactory {
                         properties, IDENTITY_KEY_PASSWORD, null));
         String parameterString = MiscellaneousUtil.getProperty(
                 properties, KEY_STORE_PARAMETERS, null);
+
+        //Adds optional parameters
         parseParameter(parameterString, keyStoreInformation);
         return keyStoreInformation;
     }
@@ -125,10 +128,18 @@ public class KeyStoreInformationFactory {
                 MiscellaneousUtil.getProperty(properties, TRUST_STORE_PASSWORD, null));
         String parameterString = MiscellaneousUtil.getProperty(
                 properties, TRUST_STORE_PARAMETERS, null);
+
+        //Adds optional parameters
         parseParameter(parameterString, trustInformation);
         return trustInformation;
     }
 
+    /**
+     * Helper method to parse parameter values (String ) and add those to KeyStoreInformation
+     *
+     * @param parameterString Parameter String
+     * @param information     KeyStoreInformation
+     */
     private static void parseParameter(String parameterString, KeyStoreInformation information) {
 
         if (parameterString == null || "".equals(parameterString)) {

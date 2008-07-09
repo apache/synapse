@@ -3,7 +3,7 @@ package org.apache.synapse.security.interfaces;
 import java.security.KeyStore;
 
 /**
- * Provides way to load KeyStore
+ * Provides a way to load KeyStore
  */
 public interface IKeyStoreLoader {
 

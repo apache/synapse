@@ -35,6 +35,11 @@ public class TrustKeyStoreWrapper extends KeyStoreWrapper {
         super.init(information, null);
     }
 
+    /**
+     * Abstraction for getting Trusted KeyStore
+     *
+     * @return KeyStore instance
+     */
     public KeyStore getTrustKeyStore() {
         return getKeyStore();
     }

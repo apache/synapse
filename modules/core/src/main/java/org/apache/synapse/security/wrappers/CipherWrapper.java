@@ -117,7 +117,7 @@ public class CipherWrapper {
                 out.write(buffer, 0, length);
             }
         } catch (IOException e) {
-            handleException("IOError !! ", e);
+            handleException("IOError when reading the input stream for cipher ", e);
         } finally {
             try {
                 inputStream.close();

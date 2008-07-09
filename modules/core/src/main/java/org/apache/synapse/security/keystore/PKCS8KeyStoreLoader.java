@@ -35,7 +35,8 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
      *                            PEM encoded and unencrypted.
      * @param certFilePath        - path to certificate file.  File must be PEM encoded.
      * @param keyPass             - password to secure the private key within the keystore.
-     *                            This will be required later to retrieve the private key back from the keystore.
+     *                            This will be required later to retrieve the private key
+     *                            back from the keystore.
      * @param entryAlias          - alias for the given entry within the keystore.
      */
     public PKCS8KeyStoreLoader(String pkcs8PrivateKeyPath, String certFilePath, String keyPass, String entryAlias) {
@@ -74,18 +75,31 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
 
             FileInputStream fileInputStream = new FileInputStream(file);
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-            byte[] keyBytes = new byte[bufferedInputStream.available()];
-            bufferedInputStream.read(keyBytes);
+            byte[] buffer = new byte[1024];
+            int length;
+            try {
+                while ((length = bufferedInputStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, length);
+                }
+            } catch (IOException e) {
+                handleException("IOError reading from file :  " + pkPath, e);
+            } finally {
+                try {
+                    bufferedInputStream.close();
+                    fileInputStream.close();
+                    outStream.close();
+                } catch (IOException ignored) {
 
-            bufferedInputStream.close();
-            fileInputStream.close();
+                }
+            }
 
             if (log.isDebugEnabled()) {
                 log.debug("Creating a private key in PKCS8Encoded using given" +
                         " (unencrypted) RSA private key ");
             }
-            PrivateKey key = createPrivateKey(keyBytes);
+            PrivateKey key = createPrivateKey(outStream.toByteArray());
 
             if (log.isDebugEnabled()) {
                 log.debug("Generating a X509 certificate form given certificate file");
@@ -137,8 +151,8 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
     /**
      * Takes the (unencrypted) RSA private key in pkcs8 format, and creates a private key out of it
      *
-     * @param keyBytes
-     * @return
+     * @param keyBytes Byte Array of the private key
+     * @return PKCS8Encoded PrivateKey
      */
     private PrivateKey createPrivateKey(byte[] keyBytes) {
 
@@ -149,11 +163,11 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
 
         System.arraycopy(keyBytes, dataStart, keyContent, 0, dataLength);
 
-        PKCS8EncodedKeySpec pkcs8SpecPriv = new PKCS8EncodedKeySpec(
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
                 new Base64().decode(keyContent));
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePrivate(pkcs8SpecPriv);
+            return keyFactory.generatePrivate(pkcs8EncodedKeySpec);
         } catch (NoSuchAlgorithmException e) {
             handleException("Error getting a KeyFactory instance", e);
         } catch (InvalidKeySpecException e) {

@@ -162,6 +162,11 @@ public abstract class KeyStoreWrapper {
         throw new SynapseException(msg);
     }
 
+    /**
+     * Returns KeyStore Information
+     *
+     * @return KeyStore Instance
+     */
     protected KeyStore getKeyStore() {
         return keyStore;
     }

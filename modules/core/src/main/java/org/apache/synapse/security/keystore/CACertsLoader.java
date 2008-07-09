@@ -3,16 +3,19 @@ package org.apache.synapse.security.keystore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.security.interfaces.ICACertsLoader;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.security.interfaces.ICACertsLoader;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 
 /**
  * Constructs a keyStore from CA certificates
@@ -47,7 +50,6 @@ public class CACertsLoader implements ICACertsLoader {
                 BufferedInputStream bis = new BufferedInputStream(inStream);
 
                 CertificateFactory certFactory = CertificateFactory.getInstance("X509");
-
                 Certificate cert = certFactory.generateCertificate(bis);
 
                 trustStore.setCertificateEntry(currentCert.getName(), cert);
@@ -58,7 +60,8 @@ public class CACertsLoader implements ICACertsLoader {
 
             return trustStore;
         } catch (IOException e) {
-            handleException("IOError", e);
+            handleException("IOError when reading certificates from " +
+                    "directory : " + CACertificateFilesPath, e);
         } catch (NoSuchAlgorithmException e) {
             handleException("Error creating a KeyStore", e);
         } catch (KeyStoreException e) {

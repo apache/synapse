@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This interface is responsible for providing the next member to which a message has to be sent to.
- * Generally, this interface will work with a GCF or other membership doscovery mechanism
+ * Generally, this interface will work with a GCF or other membership discovery mechanism
  */
 public interface LoadBalanceMembershipHandler {
 

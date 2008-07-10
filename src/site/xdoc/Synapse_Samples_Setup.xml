@@ -597,6 +597,13 @@ synapse.sh -sample &lt;n&gt;</pre>
 	EndTime=00:00:00
 	HeartBtInt=30
 	ReconnectInterval=5
+    SenderCompID=SYNAPSE
+    TargetCompID=EXEC
+    ConnectionType=initiator
+
+    [session]
+    BeginString=FIX.4.0
+    SocketConnectPort=19876
       </pre>
     </p>
     <p/>
@@ -755,7 +762,6 @@ synapse.sh -sample &lt;n&gt;</pre>
        be forwarded to a FIX session with a different BeginString value this parameter can be
        set to 'true'. Setting this parameter to 'true' will enforce this restriction.
       </li>
-
     </ul>
     <p/>
     <h2 id="script">

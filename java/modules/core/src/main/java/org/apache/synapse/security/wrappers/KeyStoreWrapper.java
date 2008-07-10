@@ -113,7 +113,7 @@ public abstract class KeyStoreWrapper {
     }
 
     /**
-     * Retunrs the key based on default alias or password
+     * Returns the key based on default alias or password
      *
      * @return Key , if there is a one , otherwise null
      */

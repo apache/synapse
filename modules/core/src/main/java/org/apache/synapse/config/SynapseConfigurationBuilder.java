@@ -52,11 +52,13 @@ public class SynapseConfigurationBuilder {
         SequenceMediator mainmediator = new SequenceMediator();
         mainmediator.addChild(new LogMediator());
         mainmediator.addChild(new DropMediator());
+        mainmediator.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
         config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, mainmediator);
         SequenceMediator faultmediator = new SequenceMediator();
         LogMediator fault = new LogMediator();
         fault.setLogLevel(LogMediator.FULL);
         faultmediator.addChild(fault);
+        faultmediator.setName(SynapseConstants.FAULT_SEQUENCE_KEY);
         config.addSequence(SynapseConstants.FAULT_SEQUENCE_KEY, faultmediator);
         return config;
     }

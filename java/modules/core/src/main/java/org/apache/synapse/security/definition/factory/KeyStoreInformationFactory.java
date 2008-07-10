@@ -158,14 +158,14 @@ public class KeyStoreInformationFactory {
         }
 
         for (String parameterPairString : parameterPairs) {
-            String[] parametersPair = parameterPairString.split("=");
-            if (parametersPair == null || parameterPairs.length != 2) {
+            String[] values = parameterPairString.split("=");
+            if (values == null || values.length != 2) {
                 if (log.isDebugEnabled()) {
                     log.debug("A parameter with no (name,value) pair has been found ");
                 }
                 return;
             }
-            information.addParameter(parametersPair[0], parametersPair[1]);
+            information.addParameter(values[0], values[1]);
         }
     }
 }

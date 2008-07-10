@@ -332,6 +332,65 @@ public class FIXUtils {
         return EPRList;
     }
 
+    public static String[] getEPRs(SessionSettings settings) throws FieldConvertError, ConfigError {
+        Iterator<SessionID> sessions = settings.sectionIterator();
+        String[] EPRs = new String[settings.size()];
+        int i = 0;
+        while (sessions.hasNext()) {
+            SessionID session = sessions.next();
+            String EPR = FIXConstants.FIX_PREFIX;
+            String paramValue = null;
+
+            EPR += settings.getString(session, FIXConstants.SOCKET_CONNECT_HOST);
+            EPR += ":" + settings.getString(session, FIXConstants.SOCKET_CONNECT_PORT);
+            EPR += "?" + FIXConstants.BEGIN_STRING + "=";
+            EPR += settings.getString(session, FIXConstants.BEGIN_STRING);
+            EPR += "&" + FIXConstants.SENDER_COMP_ID + "=";
+            EPR += settings.getString(session, FIXConstants.SENDER_COMP_ID);
+            EPR += "&" + FIXConstants.TARGET_COMP_ID + "=";
+            EPR += settings.getString(session, FIXConstants.TARGET_COMP_ID);
+
+            try {
+                paramValue = settings.getString(session, FIXConstants.SENDER_SUB_ID);
+                if (paramValue != null) {
+                   EPR += "&" + FIXConstants.SENDER_SUB_ID + "=";
+                   EPR += paramValue;
+                }
+            }
+            catch (ConfigError ignore) { }
+
+            try {
+                paramValue = settings.getString(session, FIXConstants.SENDER_LOCATION_ID);
+                if (paramValue != null) {
+                   EPR += "&" + FIXConstants.SENDER_LOCATION_ID + "=";
+                   EPR += paramValue;
+                }
+            }
+            catch (ConfigError ignore) { }
+
+            try {
+                paramValue = settings.getString(session, FIXConstants.TARGET_SUB_ID);
+                if (paramValue != null) {
+                   EPR += "&" + FIXConstants.TARGET_SUB_ID + "=";
+                   EPR += paramValue;
+                }
+            }
+            catch (ConfigError ignore) { }
+
+            try {
+                paramValue = settings.getString(session, FIXConstants.TARGET_LOCATION_ID);
+                if (paramValue != null) {
+                   EPR += "&" + FIXConstants.TARGET_LOCATION_ID + "=";
+                   EPR += paramValue;
+                }
+            }
+            catch (ConfigError ignore) { }
+
+            EPRs[i] = EPR;
+        }
+        return EPRs;
+    }
+
     /**
      * Extracts parameters embedded in FIX EPRs
      *
@@ -352,6 +411,36 @@ public class FIXUtils {
             }
         }
         return h;
+    }
+
+    /**
+     * Compares two given FIX URL strings. The second URL is considered equal to the
+     * first URL if all the properties in the first URL also exist in the second URL
+     * and if they have equals values.
+     *
+     * @param url1 a FIX URL String
+     * @param url2 a FIX URL String
+     * @return a boolean value
+     */
+    public static boolean compareURLs(String url1, String url2) {
+        if (!url1.substring(0, url1.indexOf("?")).equals(url2.substring(0, url2.indexOf("?")))) {
+             return false;
+        }
+        else {
+            Hashtable<String,String> properties1 = getProperties(url1);
+            Hashtable<String, String> properties2 = getProperties(url2);
+            Iterator<String> keys = properties1.keySet().iterator();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if (!properties2.containsKey(key)) {
+                    return false;
+                }
+                else if (!properties1.get(key).equals(properties2.get(key))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /*

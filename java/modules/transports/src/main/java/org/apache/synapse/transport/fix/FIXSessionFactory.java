@@ -61,7 +61,7 @@ public class FIXSessionFactory {
     private Map<String,Acceptor> acceptorStore;
     /** A Map containing all the FIX Initiators created by this factory, keyed by FIX EPR */
     private Map<String,Initiator> initiatorStore;
-    /** A Map containing all the FIX application created for initiators, keyed by FIX EPR */
+    /** A Map containing all the FIX applications created for initiators, keyed by FIX EPR */
     private Map<String, Application> applicationStore;
     /** An ApplicationFactory handles creating FIX Applications (FIXIncomingMessageHandler Objects) */
     private FIXApplicationFactory applicationFactory;
@@ -116,7 +116,7 @@ public class FIXSessionFactory {
                         "FIX session for the service " + service.getName(), e);
             }
         }
-        log.error("Unable to initialize a FIX session for the service " + service.getName());
+        log.info("Unable to initialize a FIX acceptor session for the service " + service.getName());
     }
 
     /**
@@ -146,8 +146,8 @@ public class FIXSessionFactory {
             try {
                 settings = new SessionSettings(fixConfigStream);
             } catch (ConfigError e) {
-                throw new AxisFault("Error in the specified FIX configuration. Unable to initialize a " +
-                        "FIX session for the service " + service.getName(), e);
+                throw new AxisFault("Error in the specified FIX configuration for the initiaotr. Unable " +
+                        "to initialize a FIX session for the service " + service.getName(), e);
             }
         }
 
@@ -187,10 +187,62 @@ public class FIXSessionFactory {
             fixMessageHandler.acquire();
 
         } catch (ConfigError e) {
-            throw new AxisFault("Error in the specified FIX configuration. Unable to initialize a " +
-                    "FIX initiator.", e);
+            throw new AxisFault("Error in the specified FIX configuration for the initiator. Unable " +
+                    "to initialize a FIX initiator.", e);
         } catch (InterruptedException ignore) { }
     }
+
+    public void createFIXInitiator(AxisService service) {
+
+        InputStream fixConfigStream = getFIXConfigAsStream(service, false);
+        if (fixConfigStream != null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Attempting to initialize a new FIX initiator " +
+                    "for the service " + service.getName());
+            }
+
+            try {
+                SessionSettings settings = new SessionSettings(fixConfigStream);
+
+                MessageStoreFactory storeFactory = getMessageStoreFactory(service, settings, true);
+                MessageFactory messageFactory = new DefaultMessageFactory();
+                quickfix.LogFactory logFactory = getLogFactory(service, settings, true);
+                //Get a new FIX Application
+                Application messageHandler = applicationFactory.getFIXApplication(service, false);
+
+                Initiator initiator = new SocketInitiator(
+                    messageHandler,
+                    storeFactory,
+                    settings,
+                    logFactory,
+                    messageFactory);
+
+                String[] EPRs = FIXUtils.getEPRs(settings);
+                for (int i=0; i<EPRs.length; i++) {
+                    initiatorStore.put(EPRs[i], initiator);
+                    applicationStore.put(EPRs[i], messageHandler);
+                }
+                initiator.start();
+            }
+            catch (FieldConvertError e) {
+                log.info("FIX configuration file for the initiator session of the service " +
+                        service.getName() + " is either incomplete or invalid." +
+                        " Not creating the initiator session at this stage.");
+            }
+            catch (ConfigError e) {
+                log.info("FIX configuration file for the initiator session of the service " +
+                        service.getName() + " is either incomplete or invalid." +
+                        " Not creating the initiator session at this stage.");
+            }
+
+        }
+        else {
+            log.info("The " + FIXConstants.FIX_INITIATOR_CONFIG_URL_PARAM + " parameter is not specified. " +
+                    "Unable to initialize the initiator session at this stage.");
+        }
+    }
+
 
     /**
      * Get the FIX Acceptor for the specified service from the sessionStore Map and
@@ -282,7 +334,7 @@ public class FIXSessionFactory {
                 log.error("Error while reading from the URL " + fixConfigURLValue, e);
             }
         } else {
-            log.error("FIX configuration URL is not specified for the service " + service.getName());
+            log.info("FIX configuration URL is not specified for the service " + service.getName());
         }
 
         return fixConfigStream;
@@ -368,6 +420,21 @@ public class FIXSessionFactory {
     }
     
     public Application getApplication(String fixEPR) {
-        return applicationStore.get(fixEPR);
+        Application app = applicationStore.get(fixEPR);
+        if (app == null) {
+            Iterator<String> keys = applicationStore.keySet().iterator();
+            while (keys.hasNext()) {
+                String epr = keys.next();
+                if (FIXUtils.compareURLs(epr, fixEPR)) {
+                    app = applicationStore.get(epr);
+                    applicationStore.remove(epr);
+                    applicationStore.put(fixEPR, app);
+                    break;
+                }
+            }
+        }
+        return app;
     }
 }
+
+

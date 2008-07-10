@@ -3768,18 +3768,15 @@ Transfer-Encoding: chunked
       fix-synapse.cfg file you created. Also make sure that transport.fix.
       InitiatorConfigURL property points to the synapse-sender.cfg file you
       created. Once done you can start the Synapse configuration numbered 257:
-      i.e. synapse -sample 257. Note that Synapse creates a new FIX session with
-      Banzai at this point.
+      i.e. synapse -sample 257. Note that Synapse creates new FIX sessions with
+      Banzai and Executor at this point.
     </p>
     <p>
       Send an order request from Banzai to Synapse.
     </p>
     <p>
-      Synapse will create a session with Executor and forward the order request. The
-      responses coming from the Executor will be sent back to Banzai. It will take a
-      couple of seconds for the responses to arrive for the first request since Synapse
-      has to establish a session with the Executor. But all the subsequent messages
-      will pass through almost instantaneously.
+      Synapse will forward the order request to the session with the Executor. The
+      responses coming from the Executor will be sent back to Banzai.
     </p>
       <p>
           To get an idea about the various transport parameters being used in this sample
@@ -3847,7 +3844,7 @@ Transfer-Encoding: chunked
       <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8280/services/FIXProxy</pre>
     </p>
     <p>
-      Synapse will create a session with Executor and forward the order request. The
+      Synapse will forward the order request to the session with the Executor. The
       first response coming from the Executor will be sent back over HTTP. Executor 
       generally sends two responses for each incoming order request. But since the
       response has to be forwarded over HTTP only one can be sent back to the client. 

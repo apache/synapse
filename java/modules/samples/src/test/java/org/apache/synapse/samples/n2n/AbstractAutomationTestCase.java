@@ -59,8 +59,8 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
 
     protected void setUpNSContext() {
         Map m = new HashMap();
-        m.put("ms", "http://services.samples/xsd");
-        m.put("ns", "http://services.samples/xsd");
+        m.put("ms", "http://services.samples");
+        m.put("ns", "http://services.samples");
         NamespaceContext nsCtx = new SimpleNamespaceContext(m);
         XMLUnit.setXpathNamespaceContext(nsCtx);
     }

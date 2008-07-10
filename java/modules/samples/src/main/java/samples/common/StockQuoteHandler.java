@@ -39,7 +39,7 @@ public class StockQuoteHandler {
 
     /**
      * Create a new custom quote request with a body as follows
-     * <m0:CheckPriceRequest xmlns:m0="http://services.samples/xsd">
+     * <m0:CheckPriceRequest xmlns:m0="http://services.samples">
      *   <m0:Code>symbol</m0:Code>
      * </m0:CheckPriceRequest>
      * @param symbol the stock symbol
@@ -48,7 +48,7 @@ public class StockQuoteHandler {
     public static OMElement createCustomQuoteRequest(String symbol) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
         OMNamespace ns      = factory.createOMNamespace(
-            "http://services.samples/xsd", "m0");
+            "http://services.samples", "m0");
         OMElement chkPrice  = factory.createOMElement("CheckPriceRequest", ns);
         OMElement code      = factory.createOMElement("Code", ns);
         chkPrice.addChild(code);
@@ -58,7 +58,7 @@ public class StockQuoteHandler {
 
     /**
      * Create a new quote request with a body as follows
-     *  <m:GetQuote xmlns:m="http://services.samples/xsd">
+     *  <m:GetQuote xmlns:m="http://services.samples">
      *      <m:request>
      *          <m:symbol>IBM</m:symbol>
      *      </m:request>
@@ -68,7 +68,7 @@ public class StockQuoteHandler {
      */
     public static OMElement createStandardQuoteRequest(String symbol, int itrCount) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
-        OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns      = factory.createOMNamespace("http://services.samples", "m0");
         OMElement getQuote  = factory.createOMElement("getQuote", ns);
         for (int i =0; i<itrCount; i++) {
             OMElement request   = factory.createOMElement("request", ns);
@@ -82,7 +82,7 @@ public class StockQuoteHandler {
 
     /**
      * Create a new full quote request with a body as follows
-     *  <m:GetFullQuote xmlns:m="http://services.samples/xsd">
+     *  <m:GetFullQuote xmlns:m="http://services.samples">
      *      <m:request>
      *          <m:symbol>IBM</m:symbol>
      *      </m:request>
@@ -92,7 +92,7 @@ public class StockQuoteHandler {
      */
     public static OMElement createFullQuoteRequest(String symbol) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
-        OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns      = factory.createOMNamespace("http://services.samples", "m0");
         OMElement getQuote  = factory.createOMElement("getFullQuote", ns);
         OMElement request   = factory.createOMElement("request", ns);
         OMElement symb      = factory.createOMElement("symbol", ns);
@@ -104,7 +104,7 @@ public class StockQuoteHandler {
 
     /**
      * Create a new market activity request with a body as follows
-     *  <m:getMarketActivity xmlns:m="http://services.samples/xsd">
+     *  <m:getMarketActivity xmlns:m="http://services.samples">
      *      <m:request>
      *          <m:symbol>IBM</m:symbol>
      *          ...
@@ -115,7 +115,7 @@ public class StockQuoteHandler {
      */
     public static OMElement createMarketActivityRequest() {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
-        OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns      = factory.createOMNamespace("http://services.samples", "m0");
         OMElement getQuote  = factory.createOMElement("getMarketActivity", ns);
         OMElement request   = factory.createOMElement("request", ns);
 
@@ -132,7 +132,7 @@ public class StockQuoteHandler {
 
     /**
      * Create a new order for a quantiry of a stock at a given price
-     * <m:placeOrder xmlns:m="http://services.samples/xsd">
+     * <m:placeOrder xmlns:m="http://services.samples">
      *	  <m:order>
      *	      <m:price>3.141593E0</m:price>
      *	      <m:quantity>4</m:quantity>
@@ -147,7 +147,7 @@ public class StockQuoteHandler {
      */
     public static OMElement createPlaceOrderRequest(double purchPrice, int qty, String symbol) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
-        OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns      = factory.createOMNamespace("http://services.samples", "m0");
         OMElement placeOrder= factory.createOMElement("placeOrder", ns);
         OMElement order     = factory.createOMElement("order", ns);
         OMElement price     = factory.createOMElement("price", ns);
@@ -169,7 +169,7 @@ public class StockQuoteHandler {
      * @return
      * @throws javax.xml.stream.XMLStreamException
      *
-     *  <ns:getQuoteResponse xmlns:ns="http://services.samples/xsd">
+     *  <ns:getQuoteResponse xmlns:ns="http://services.samples">
      *      <ns:return>
      *          <ns:change>-2.3238706829151026</ns:change>
      *          ...
@@ -191,9 +191,9 @@ public class StockQuoteHandler {
     }
 
     /**
-     * <ns:getFullQuoteResponse xmlns:ns="http://services.samples/xsd">
+     * <ns:getFullQuoteResponse xmlns:ns="http://services.samples">
             <ns:return>
-               <tradeHistory xmlns="http://services.samples/xsd">
+               <tradeHistory xmlns="http://services.samples">
                   <day>0</day>
                   <quote>
                      <change>-2.367492989603466</change>
@@ -212,7 +212,7 @@ public class StockQuoteHandler {
                      <volume>8935</volume>
                   </quote>
                </tradeHistory>
-               <tradeHistory xmlns="http://services.samples/xsd">
+               <tradeHistory xmlns="http://services.samples">
                   <day>1</day>
                   <quote>
                      <change>3.794122022240518</change>
@@ -263,9 +263,9 @@ public class StockQuoteHandler {
     }
 
     /**
-     * <ns:getMarketActivityResponse xmlns:ns="http://services.samples/xsd">
+     * <ns:getMarketActivityResponse xmlns:ns="http://services.samples">
             <ns:return>
-               <quotes xmlns="http://services.samples/xsd">
+               <quotes xmlns="http://services.samples">
                   <change>4.183958555301184</change>
                   <earnings>-8.585281368244686</earnings>
                   <high>-158.70528805517333</high>
@@ -281,7 +281,7 @@ public class StockQuoteHandler {
                   <symbol>EHM</symbol>
                   <volume>6319</volume>
                </quotes>
-               <quotes xmlns="http://services.samples/xsd">
+               <quotes xmlns="http://services.samples">
                   ....
                   <volume>7613</volume>
                </quotes>

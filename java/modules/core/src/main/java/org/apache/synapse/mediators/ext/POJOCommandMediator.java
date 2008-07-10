@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -146,8 +147,7 @@ public class POJOCommandMediator extends AbstractMediator {
             try {
                 ((Command) commandObject).execute();
             } catch (Exception e) {
-                handleException("Error invoking POJO command class : "
-                    + command.getClass(), e, synCtx);
+                handleException(e.getMessage(), e, synCtx);
             }
 
         } else {
@@ -160,8 +160,7 @@ public class POJOCommandMediator extends AbstractMediator {
                 handleException("Cannot locate an execute() method on POJO class : " +
                     command.getClass(), e, synCtx);
             } catch (Exception e) {
-                handleException("Error invoking the execute() method on POJO class : " +
-                    command.getClass(), e, synCtx);
+                handleException(e.getMessage(), e, synCtx);
             }
         }
 

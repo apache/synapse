@@ -87,7 +87,7 @@ public class MTOMSwAClient {
 
         SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope env = factory.getDefaultEnvelope();
-        OMNamespace ns = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns = factory.createOMNamespace("http://services.samples", "m0");
         OMElement payload = factory.createOMElement("uploadFileUsingSwA", ns);
         OMElement request = factory.createOMElement("request", ns);
         OMElement imageId = factory.createOMElement("imageId", ns);
@@ -103,9 +103,9 @@ public class MTOMSwAClient {
 
         SOAPBody body = response.getEnvelope().getBody();
         String imageContentId = body.
-                getFirstChildWithName(new QName("http://services.samples/xsd", "uploadFileUsingSwAResponse")).
-                getFirstChildWithName(new QName("http://services.samples/xsd", "response")).
-                getFirstChildWithName(new QName("http://services.samples/xsd", "imageId")).
+                getFirstChildWithName(new QName("http://services.samples", "uploadFileUsingSwAResponse")).
+                getFirstChildWithName(new QName("http://services.samples", "response")).
+                getFirstChildWithName(new QName("http://services.samples", "imageId")).
                 getText();
 
         Attachments attachment = response.getAttachmentMap();
@@ -123,7 +123,7 @@ public class MTOMSwAClient {
 
     public static OMElement sendUsingMTOM(String fileName, String targetEPR) throws IOException {
         OMFactory factory = OMAbstractFactory.getOMFactory();
-        OMNamespace ns = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns = factory.createOMNamespace("http://services.samples", "m0");
         OMElement payload = factory.createOMElement("uploadFileUsingMTOM", ns);
         OMElement request = factory.createOMElement("request", ns);
         OMElement image = factory.createOMElement("image", ns);
@@ -146,8 +146,8 @@ public class MTOMSwAClient {
         OMElement response = serviceClient.sendReceive(payload);
 
         OMText binaryNode = (OMText) response.
-                getFirstChildWithName(new QName("http://services.samples/xsd", "response")).
-                getFirstChildWithName(new QName("http://services.samples/xsd", "image")).
+                getFirstChildWithName(new QName("http://services.samples", "response")).
+                getFirstChildWithName(new QName("http://services.samples", "image")).
                 getFirstOMChild();
         dataHandler = (DataHandler) binaryNode.getDataHandler();
         InputStream is = dataHandler.getInputStream();

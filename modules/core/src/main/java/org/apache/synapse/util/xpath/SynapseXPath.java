@@ -32,7 +32,7 @@ import org.apache.synapse.SynapseException;
 import org.jaxen.*;
 import org.jaxen.util.SingletonList;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>XPath that has been used inside Synapse xpath processing. This has a extension function named
@@ -88,6 +88,44 @@ public class SynapseXPath extends AXIOMXPath {
      */
     public SynapseXPath(String xpathString) throws JaxenException {
         super(xpathString);
+    }
+
+    public static SynapseXPath parseXPathString(String xPathStr) throws JaxenException {
+        if (xPathStr.indexOf('{') == -1) {
+            return new SynapseXPath(xPathStr);
+        }
+        
+        int count = 0;
+        StringBuffer newXPath = new StringBuffer();
+
+        Map<String, String> nameSpaces = new HashMap<String, String>();
+        String curSegment = null;
+        boolean xPath = false;
+
+        StringTokenizer st = new StringTokenizer(xPathStr, "{}", true);
+        while (st.hasMoreTokens()) {
+            String s = st.nextToken();
+            if ("{".equals(s)) {
+                xPath = true;
+            } else if ("}".equals(s)) {
+                xPath = false;
+                String prefix = "rp" + count++;
+                nameSpaces.put(prefix, curSegment);
+                newXPath.append(prefix + ":");
+            } else {
+                if (xPath) {
+                    curSegment = s;
+                } else {
+                    newXPath.append(s);
+                }
+            }
+        }
+
+        SynapseXPath synXPath = new SynapseXPath(newXPath.toString());
+        for (String prefix : nameSpaces.keySet()) {
+            synXPath.addNamespace(prefix, nameSpaces.get(prefix));
+        }
+        return synXPath;
     }
 
     /**

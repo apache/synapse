@@ -40,6 +40,18 @@ public class SynapseXPathTest extends TestCase {
 
     String message = "This is XPath test";    
 
+    public void testStringXPath() throws Exception {
+        SynapseXPath xpath = SynapseXPath.parseXPathString("$body//{http://somens}test");
+        MessageContext ctx =  TestUtils.getTestContext("<m0:test xmlns:m0=\"http://somens\">" + message + "</m0:test>");
+        assertEquals(message, xpath.stringValueOf(ctx));
+    }
+
+    public void testStringXPath2() throws Exception {
+        SynapseXPath xpath = SynapseXPath.parseXPathString("$body//{http://somens}test/{http://someother}another");
+        MessageContext ctx =  TestUtils.getTestContext("<m0:test xmlns:m0=\"http://somens\"><m1:another xmlns:m1=\"http://someother\">" + message + "</m1:another></m0:test>");
+        assertEquals(message, xpath.stringValueOf(ctx));
+    }
+
     public void testAbsoluteXPath() throws Exception {
         SynapseXPath xpath = new SynapseXPath("//test");
         MessageContext ctx =  TestUtils.getTestContext("<test>" + message + "</test>");

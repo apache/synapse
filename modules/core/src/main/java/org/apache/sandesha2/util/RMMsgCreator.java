@@ -486,50 +486,56 @@ public class RMMsgCreator {
 		
 		String rmVersion = rmdBean.getRMVersion();
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-
-		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
-		Identifier id = new Identifier(rmNamespaceValue);
-		id.setIndentifer(sequenceId);
-		sequenceAck.setIdentifier(id);
-
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
-		sequenceAck.setAckRanges(ackRangeArrayList);
+		if(ackRangeArrayList!=null && ackRangeArrayList.size()!=0){
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+				log.debug("RMMsgCreator::addAckMessage : there are messages to ack " + ackRangeArrayList);
+			//there are actually messages to ack
+			SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
+			Identifier id = new Identifier(rmNamespaceValue);
+			id.setIndentifer(sequenceId);
+			sequenceAck.setIdentifier(id);
 
-		if (rmdBean.isClosed()) {
-			// sequence is closed. so add the 'Final' part.
-			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
-				sequenceAck.setAckFinal(true);
+			sequenceAck.setAckRanges(ackRangeArrayList);
+			
+			if (rmdBean.isClosed()) {
+				// sequence is closed. so add the 'Final' part.
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+					log.debug("RMMsgCreator::addAckMessage : sequence closed");
+				if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
+					sequenceAck.setAckFinal(true);
+				}
 			}
-		}
 
-		applicationMsg.addSequenceAcknowledgement(sequenceAck);
+			applicationMsg.addSequenceAcknowledgement(sequenceAck);
 
-		if (applicationMsg.getWSAAction()==null) {
-			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(rmVersion));
-			applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(rmVersion));
-		}
-		if(applicationMsg.getMessageId() == null) {
-			applicationMsg.setMessageId(SandeshaUtil.getUUID());
-		}
-		
-		if(addToEnvelope){
-			// Write the ack into the soap envelope
-			try {
-				applicationMsg.addSOAPEnvelope();
-			} catch(AxisFault e) {
-				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Caught AxisFault", e);
-				throw new SandeshaException(e.getMessage(), e);
+			if (applicationMsg.getWSAAction()==null) {
+				applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(rmVersion));
+				applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(rmVersion));
 			}
-		}else{
-			// Should use a constant in the final fix.
-			applicationMsg.setProperty(ACK_TO_BE_WRITTEN, Boolean.TRUE);
+			if(applicationMsg.getMessageId() == null) {
+				applicationMsg.setMessageId(SandeshaUtil.getUUID());
+			}
+			
+			if(addToEnvelope){
+				// Write the ack into the soap envelope
+				try {
+					applicationMsg.addSOAPEnvelope();
+				} catch(AxisFault e) {
+					if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Caught AxisFault", e);
+					throw new SandeshaException(e.getMessage(), e);
+				}
+			}else{
+				// Should use a constant in the final fix.
+				applicationMsg.setProperty(ACK_TO_BE_WRITTEN, Boolean.TRUE);
+			}
+			
+			// Ensure the message also contains the token that needs to be used
+			secureOutboundMessage(rmdBean, applicationMsg.getMessageContext());
 		}
-		
-		// Ensure the message also contains the token that needs to be used
-		secureOutboundMessage(rmdBean, applicationMsg.getMessageContext());
 		
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
-			log.debug("Exit: RMMsgCreator::addAckMessage");
+			log.debug("Exit: RMMsgCreator::addAckMessage " + applicationMsg);
 	}
 	
 	

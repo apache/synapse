@@ -30,6 +30,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -90,6 +91,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	}
 	
 	private String getSequenceID(RMMsgContext rmMsgCtx, boolean serverSide, boolean forceNewSequence)throws SandeshaException{
+		if (log.isDebugEnabled())
+			log.debug("Enter: ApplicationMsgProcessor::getSequenceID " + rmMsgCtx + ", " + serverSide + ", " + forceNewSequence);
+		
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 		
@@ -114,8 +118,18 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			String to = toEPR.getAddress();
 			String sequenceKey = null;
 			if(forceNewSequence){
-				sequenceKey = SandeshaUtil.getUUID();
-				msgContext.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
+				//try to set a new sequence key
+				try{
+					sequenceKey = SandeshaUtil.getUUID();
+					msgContext.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
+					configContext.getAxisConfiguration().addParameter(new Parameter(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey));					
+				}
+				catch(AxisFault e){
+					if (log.isDebugEnabled())
+						log.debug("Enter: ApplicationMsgProcessor::getSequenceID " + e);
+					throw new SandeshaException(e);
+				}
+
 			}
 			else{
 				sequenceKey = (String) msgContext.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
@@ -126,6 +140,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			
 			internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
 		}
+		if (log.isDebugEnabled())
+			log.debug("Exit: ApplicationMsgProcessor::getSequenceID " + internalSequenceId);
 		return internalSequenceId;
 	}
 	
@@ -221,7 +237,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			if(rmsBean.isSequenceClosedClient() || rmsBean.isTerminateAdded() || rmsBean.isTimedOut()){
 				if(SandeshaUtil.isAutoStartNewSequence(msgContext)){
 					internalSequenceId = getSequenceID(rmMsgCtx, serverSide, true); //require a new sequence
+					if (log.isDebugEnabled())
+						log.debug("ApplicationMsgProcessor: auto start new sequence " + internalSequenceId + " :: " + rmsBean);
+					//set this new internal sequence ID on the msg
 					rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+					rmsBean = null;
 				}
 				else if(rmsBean.isSequenceClosedClient()){
 					throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));

@@ -365,6 +365,27 @@ public class RangeString implements Serializable{
 		
 	}
 	
+	public boolean equals(Object o){
+		//this method is called by unit tests. It is not generally called in common paths.
+		if(o==null){
+			return false;
+		}
+		else if(o == this){
+			return true; //we know we must be the same since we are the exact same object
+		}
+		else{
+			if(!o.getClass().equals(this.getClass())){
+				//we are two different classes so we interpret that as not equivalent
+				return false;
+			}
+			else{
+				//these are two seperate range strings - if there string form is the same then
+				//they are equivalent
+				return o.toString().equals(this.toString());
+			}
+		}
+	}
+	
 	
 
 }

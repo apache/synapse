@@ -251,6 +251,17 @@ public class RangeString implements Serializable{
 		return returnList;
 	}
 	
+	public static RangeString clone(RangeString original){
+		RangeString newString = new RangeString();
+		if(original!=null){
+			Range[] ranges = original.getRanges();
+			for(int i = 0; i<ranges.length; i++){
+				newString.addRange(ranges[i]);
+			}
+		}
+		return newString;
+	}
+	
 	/**
 	 * Adds the Range into the existing RangeString
 	 * Any existing Ranges that are encompassed in this new Range are removed.

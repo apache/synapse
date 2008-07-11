@@ -41,6 +41,7 @@
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                     <include>**/*.xsl</include>
+					<include>**/*.dat</include>
                 </includes>
             </testResource>
         </testResources>

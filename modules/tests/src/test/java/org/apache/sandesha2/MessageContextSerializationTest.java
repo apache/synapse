@@ -91,7 +91,9 @@ public class MessageContextSerializationTest extends SandeshaTestCase{
 			FileInputStream fis = new FileInputStream(resourceDir + File.separator + msgCtxDatFileName);
 			ObjectInputStream msgCtxData = new ObjectInputStream(fis);
 			MessageContext msg = (MessageContext)msgCtxData.readObject();	
-			//TODO any extra properties set earlier should be read and verified here
+			assertEquals(expectedMessageContext.getFrom().getAddress(), msg.getFrom().getAddress());
+			assertEquals(expectedMessageContext.getMessageID(), msg.getMessageID());
+			assertEquals(expectedMessageContext.getReplyTo().getAddress(), msg.getReplyTo().getAddress());
 		}
 	}
 	
@@ -159,7 +161,9 @@ public class MessageContextSerializationTest extends SandeshaTestCase{
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 		expectedMessageContext = configContext.createMessageContext();
-		//TODO this could be improved by adding some RM sequence headers
+		expectedMessageContext.setFrom(epr);
+		expectedMessageContext.setMessageID("someMessageID");
+		expectedMessageContext.setReplyTo(epr);
 	}
 	
 	/**
@@ -211,10 +215,10 @@ public class MessageContextSerializationTest extends SandeshaTestCase{
 	 * This main method, when run, will setup the .dat files that this test expects.
 	 * These files should be checked into SVN when generated/modified
 	 */
-//	public static void main(String[] args)throws Exception{
-//		MessageContextSerializationTest test = new MessageContextSerializationTest("");
-//		test.setUp();
-//		test.produceDataSet();
-//	}
+	public static void main(String[] args)throws Exception{
+		MessageContextSerializationTest test = new MessageContextSerializationTest("");
+		test.setUp();
+		test.produceDataSet();
+	}
 
 }

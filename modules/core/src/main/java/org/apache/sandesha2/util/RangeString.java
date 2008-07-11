@@ -47,7 +47,7 @@ public class RangeString implements Serializable{
 	 * Creates an empty range string
 	 */
 	public RangeString(){
-		this(null);
+		this((String)null);
 	}
 	
 	/**
@@ -70,6 +70,16 @@ public class RangeString implements Serializable{
 			}			
 		}
 		
+	}
+	
+	public RangeString(RangeString rs){
+		rangeMap = new TreeMap();
+		Iterator iter = rs.rangeMap.entrySet().iterator(); 
+		while(iter.hasNext()){
+			Entry e = (Entry)iter.next(); // Long, Range
+			Range sr = (Range)e.getValue();
+			rangeMap.put(e.getKey(), new Range(sr.lowerValue, sr.upperValue));
+		}
 	}
 	
 	

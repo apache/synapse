@@ -174,7 +174,7 @@ public class RMSBean extends RMSequenceBean {
 	public RMSBean(RMSBean beanToCopy) {
 		super(beanToCopy);
 		 anonymousUUID = beanToCopy.getAnonymousUUID();
-		 clientCompletedMessages = RangeString.clone(beanToCopy.getClientCompletedMessages());
+		 clientCompletedMessages = new RangeString(beanToCopy.getClientCompletedMessages());
 		 createSeqMsgID = beanToCopy.getCreateSeqMsgID();
 		 createSequenceMsgStoreKey = beanToCopy.getCreateSequenceMsgStoreKey();
 		 expectedReplies = beanToCopy.getExpectedReplies();

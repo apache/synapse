@@ -85,31 +85,7 @@
                                 <mkdir dir="target/test_repos/synapse/services"/>
                                 <mkdir dir="target/test_repos/client/modules"/>
 
-                                <echo message="*** Creating synapse.mar ***"/>
-                                <mkdir dir="target/modules/synapse/META-INF"/>
-                                <copy file="src/main/resources/module.xml" tofile="target/modules/synapse/META-INF/module.xml"/>
-
-                                <manifest file="target/MANIFEST.MF">
-                                    <attribute name="Extension-Name" value="org.apache.synapse"/>
-                                    <attribute name="Specification-Title" value="synapse"/>
-                                    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
-                                    <attribute name="Specification-Version" value="${pom.version}"/>
-                                    <attribute name="Implementation-Title" value="Apache Synapse"/>
-                                    <attribute name="Implementation-Vendor-Id" value="org.apache"/>
-                                    <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
-                                    <attribute name="Implementation-Version" value="${pom.version}"/>
-                                </manifest>
-
-                                <jar jarfile="target/synapse-${version}.mar" manifest="target/MANIFEST.MF">
-                                    <fileset dir="target/modules/synapse">
-                                         <include name="**"/>
-                                    </fileset>
-                                    <!--<fileset dir="target/classes">
-                                        <include name="**"/>
-                                    </fileset>-->
-                                </jar>
-
-                                <copy file="target/synapse-${version}.mar"
+                                <copy file="../mar/target/synapse-${version}.mar"
                                     tofile="target/test_repos/synapse/modules/synapse-${version}.mar"/>
 
                             </tasks>

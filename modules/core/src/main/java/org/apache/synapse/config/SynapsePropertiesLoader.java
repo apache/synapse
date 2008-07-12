@@ -20,6 +20,8 @@ package org.apache.synapse.config;
 
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.util.MiscellaneousUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Properties;
 
@@ -29,10 +31,12 @@ import java.util.Properties;
  */
 public class SynapsePropertiesLoader {
 
+    private static Log log = LogFactory.getLog(SynapsePropertiesLoader.class);
+
     private SynapsePropertiesLoader() {
     }
 
-    private static Properties properties;
+    private static Properties cacheProperties;
 
     /**
      * Loads the properties
@@ -41,11 +45,26 @@ public class SynapsePropertiesLoader {
      * @return Synapse Properties
      */
     public static Properties loadSynapseProperties() {
-        if (properties == null) {
-            properties = MiscellaneousUtil.loadProperties(
-                    SynapseConstants.SYNAPSE_PROPERTIES);
-        }
-        return properties;
-    }
 
+        if (cacheProperties == null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Loading synapse properties from a property file");
+            }
+
+            cacheProperties = MiscellaneousUtil.loadProperties(
+                    SynapseConstants.SYNAPSE_PROPERTIES);
+
+        } else {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving synapse properties from the cache");
+            }
+        }
+
+        // Original properties needed to be preserved
+        Properties tempProperties = new Properties();
+        tempProperties.putAll(cacheProperties);
+        return tempProperties;
+    }
 }

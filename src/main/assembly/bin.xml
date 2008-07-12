@@ -110,7 +110,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/core/target</directory>
+            <directory>modules/mar/target</directory>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
                 <include>synapse-${synapse.version}.mar</include>

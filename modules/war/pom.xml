@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
-        <artifactId>synapse</artifactId>
+        <artifactId>Apache-Synapse</artifactId>
         <version>1.3-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>

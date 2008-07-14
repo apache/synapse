@@ -288,6 +288,8 @@ public class JMSUtils extends BaseUtils {
                 jmsConFactory.setConnFactoryJNDIName((String) p.getValue());
                 jmsConFactory.addJNDIContextProperty(
                         JMSConstants.CONFAC_JNDI_NAME_PARAM, (String) p.getValue());
+            } else {
+                jmsConFactory.addJNDIContextProperty( p.getName(), (String) p.getValue());
             }
         }
     }

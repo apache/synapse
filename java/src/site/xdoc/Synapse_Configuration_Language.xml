@@ -1308,12 +1308,6 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
         Mercury2LastMessage - 'true' will make this the last message and
         terminate the sequence
       </li>
-    </ul>
-    <p>
-      There are some Axis2 client side properties/options that are useful which
-      are set at scope="axis2-client"
-    </p>
-    <ul>
       <li>
         FORCE_HTTP_1.0 - forces outgoing http/s messages to use HTTP 1.0
         (instead of the default 1.1)

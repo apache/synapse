@@ -1318,6 +1318,10 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
         FORCE_HTTP_1.0 - forces outgoing http/s messages to use HTTP 1.0
         (instead of the default 1.1)
       </li>
+      <li>
+        POST_TO_PATH - forces outgoing http/s messages to use the PATH segment in a POST
+        (instead of the default full URL)
+      </li>
     </ul>
     <h5>
       The synapse:get-property() XPath extension function

@@ -46,6 +46,7 @@ import java.io.OutputStream;
 import java.nio.channels.ClosedChannelException;
 import java.util.Iterator;
 import java.util.Map;
+import java.net.URL;
 
 /**
  * Represents an outgoing Axis2 HTTP/s request. It holds the EPR of the destination, the
@@ -128,9 +129,14 @@ public class Axis2HttpRequest {
                     msgContext, epr.getAddress()), HttpVersion.HTTP_1_0);
                 
             } else {
-                
-                httpRequest = new BasicHttpEntityEnclosingRequest(
-                    "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
+
+                if (msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH)) {
+                    httpRequest = new BasicHttpEntityEnclosingRequest(
+                        "POST", new URL(epr.getAddress()).getPath(), HttpVersion.HTTP_1_0);
+                } else {
+                   httpRequest = new BasicHttpEntityEnclosingRequest(
+                        "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
+                }
                 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 messageFormatter.writeTo(msgContext, format, baos, true);
@@ -148,7 +154,12 @@ public class Axis2HttpRequest {
                     "GET", RESTUtil.getURI(msgContext, epr.getAddress()));
 
             } else {
-                httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());
+                if (msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH)) {
+                    httpRequest = new BasicHttpEntityEnclosingRequest(
+                        "POST", new URL(epr.getAddress()).getPath());
+                } else {
+                    httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());    
+                }
                 ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(new BasicHttpEntity());
             }
         }
@@ -162,7 +173,9 @@ public class Axis2HttpRequest {
                 Object header = iter.next();
                 Object value = headers.get(header);
                 if (header instanceof String && value != null && value instanceof String) {
-                    httpRequest.setHeader((String) header, (String) value);
+                    if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) header)) {
+                        httpRequest.setHeader((String) header, (String) value);
+                    }
                 }
             }
         }

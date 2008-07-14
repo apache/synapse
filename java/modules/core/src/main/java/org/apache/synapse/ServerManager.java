@@ -312,7 +312,11 @@ public class ServerManager {
     }
 
     public String getSynapseHome() {
-        return synapseHome;
+        if (synapseHome != null) {
+            return synapseHome;
+        } else {
+            return getParamValue(SynapseConstants.Axis2Param.SYNAPSE_HOME);
+        }
     }
 
     public void setSynapseHome(String synapseHome) {
@@ -320,7 +324,11 @@ public class ServerManager {
     }
 
     public String getResolveRoot() {
-        return resolveRoot;
+        if (resolveRoot != null) {
+            return resolveRoot;
+        } else {
+            return getParamValue(SynapseConstants.Axis2Param.SYNAPSE_RESOLVE_ROOT);
+        }
     }
 
     public void setResolveRoot(String resolveRoot) {
@@ -332,15 +340,27 @@ public class ServerManager {
     }
 
     public String getServerName() {
-        return serverName;
+        if (serverName != null) {
+            return serverName;
+        } else {
+            return getParamValue(SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
+        }
     }
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
     }
 
+    public void setConfigurationContext(ConfigurationContext configctx) {
+        this.configctx = configctx;
+    }
+
     public String getSynapseXMLPath() {
-        return synapseXMLPath;
+        if (synapseXMLPath != null) {
+            return synapseXMLPath;
+        } else {
+            return getParamValue(SynapseConstants.Axis2Param.SYNAPSE_CONFIG_LOCATION);
+        }
     }
 
     public void setSynapseXMLPath(String synapseXMLPath) {
@@ -385,5 +405,14 @@ public class ServerManager {
             return synConfig.getProperty(
                 SynapseConstants.GLOBAL_TIMEOUT_INTERVAL, SynapseConstants.DEFAULT_GLOBAL_TIMEOUT);
         }
+    }
+
+    private String getParamValue(String paramKey) {
+        Parameter synCfgParam = configctx.getAxisConfiguration().getParameter(paramKey);
+        if (synCfgParam != null && synCfgParam.getValue() != null
+                && synCfgParam.getValue() instanceof String) {
+            return synCfgParam.getValue().toString();
+        }
+        return null;
     }
 }

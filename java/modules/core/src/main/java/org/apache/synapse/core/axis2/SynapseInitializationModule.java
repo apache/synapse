@@ -75,6 +75,11 @@ public class SynapseInitializationModule implements Module {
             log.warn("Unable to determine hostname or IP address of the server for logging", e);
         }
 
+        // incase of an existing running axis2 instance is used to deploy synapse
+        if (ServerManager.getInstance().getConfigurationContext() == null) {
+            ServerManager.getInstance().setConfigurationContext(configurationContext);
+        }
+
         // this will deploy the mediators in the mediator extensions folder
         log.info("Loading mediator extensions...");
         configurationContext.getAxisConfiguration().getConfigurator().loadServices();

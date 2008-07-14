@@ -93,6 +93,18 @@ public final class SynapseConstants {
     /** The Axis2 client options property name for the Sandesha policy */
 	public static final String SANDESHA_POLICY = "sandeshaPolicy";
 
+    /** Parameter names in the axis2.xml that can be used to configure the synapse */
+    public static final class Axis2Param {
+        /** Synapse Configuration file location */
+        public static final String SYNAPSE_CONFIG_LOCATION = "SynapseConfig.ConfigurationFile";
+        /** Synapse Home directory */
+        public static final String SYNAPSE_HOME = "SynapseConfig.HomeDirectory";
+        /** Synapse resolve root */
+        public static final String SYNAPSE_RESOLVE_ROOT = "SynapseConfig.ResolveRoot";
+        /** Synapse server name */
+        public static final String SYNAPSE_SERVER_NAME = "SynapseConfig.ServerName";
+    }
+    
     /** The name of the Parameter set on the Axis2Configuration to hold the Synapse Configuration */
     public static final String SYNAPSE_CONFIG = "synapse.config";
     /** The name of the Parameter set on the Axis2Configuration to hold the Synapse Environment */

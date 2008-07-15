@@ -137,13 +137,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
 				}
 			}
-				
 
 			MessageContext outMessage = null;
 	
 			// Create the new sequence id, as well as establishing the beans that handle the
 			// sequence state.
 			RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
+			if(rmdBean==null){
+				// This did not work. Return false if an Exception hasn't been thrown.
+				if (log.isDebugEnabled())
+					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+				return false;
+			}
 				
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean);
 			outMessage = createSeqResponse.getMessageContext();

@@ -244,5 +244,6 @@ public class SandeshaMessageKeys {
 	public final static String noPollingProtocol="noPollingProtocol";
 	public final static String freeingTransport="freeingTransport";
 	public final static String couldNotSendFaultDueToException="couldNotSendFaultDueToException";
+	public final static String acksToInvalid="acksToInvalid";
 
 }

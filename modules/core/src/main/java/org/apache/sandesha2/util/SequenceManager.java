@@ -88,9 +88,13 @@ public class SequenceManager {
 		EndpointReference acksTo = createSequence.getAcksTo().getEPR();
 
 		if (acksTo == null) {
+			log.error(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToInvalid, ""));
 			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence), new Exception(), null);
+			return null;
 		} else if (acksTo.getAddress().equals(AddressingConstants.Final.WSA_NONE_URI)){
+			log.error(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToInvalid, acksTo.getAddress()));
 			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, "AcksTo can not be " + AddressingConstants.Final.WSA_NONE_URI, new Exception(), null);
+			return null;
 		}
 
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();

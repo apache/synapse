@@ -74,12 +74,7 @@ public class MsgInitializer {
 	 */
 	private static void populateRMMsgContext(MessageContext msgCtx, RMMsgContext rmMsgContext) throws AxisFault {
 
-		// if client side and the addressing version is not set. assuming the
-		// default addressing version
-		String addressingNamespace = (String) msgCtx.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-		if (addressingNamespace == null && !msgCtx.isServerSide())
-			addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
-
+	
 		rmMsgContext.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
 
 		String sequenceID = null;

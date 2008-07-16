@@ -46,6 +46,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.engine.Handler.InvocationResponse;
@@ -887,9 +888,20 @@ public class FaultManager {
 
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
 		
-		if(log.isWarnEnabled())
-			log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, rmMsgCtx.getMessageContext().getAxisService().getName()));
-
+		if(log.isWarnEnabled()){
+			String name = "NOT_SET";
+			if(rmMsgCtx != null){
+				MessageContext mCtx = rmMsgCtx.getMessageContext();
+				if(mCtx != null){
+					AxisService axisSvc = mCtx.getAxisService();
+					if(axisSvc != null){
+						name = axisSvc.getName();
+					}
+				}
+			}
+			log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, name));
+		}
+			
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
 

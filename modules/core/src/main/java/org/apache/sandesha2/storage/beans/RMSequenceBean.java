@@ -39,21 +39,18 @@ public class RMSequenceBean extends RMBean {
 	 * @deprecated use toEndpointReference instead
 	 */
 	private String toEPR;
-	private EndpointReference toEndpointReference;
 
 	/**
 	 * @deprecated use replyToEndpointReference instead
 	 */
 	private String replyToEPR;
-	private EndpointReference replyToEndpointReference;
 	
 	/**
 	 * @deprecated use acksToEndpointRef instead
 	 */
 	private String acksToEPR;
-	private EndpointReference acksToEndpointRef;
 	
-	private String RMVersion;
+	private String rMVersion;
 	
 	/**
 	 * Comment for <code>securityTokenData</code>
@@ -88,6 +85,11 @@ public class RMSequenceBean extends RMBean {
 	 * be ignored within the match method.
 	 */
 	private int flags = 0;
+	
+	private EndpointReference acksToEndpointRef;
+	private EndpointReference toEndpointReference;
+	private EndpointReference replyToEndpointReference;
+
 	public static final int LAST_ACTIVATED_TIME_FLAG    = 0x00000001;
 	public static final int CLOSED_FLAG                 = 0x00000010;
 	public static final int TERMINATED_FLAG             = 0x00000100;
@@ -109,7 +111,7 @@ public class RMSequenceBean extends RMBean {
 		pollingMode = beanToCopy.isPollingMode();
 		replyToEPR = beanToCopy.getReplyToEPR();
 		replyToEndpointReference = beanToCopy.getReplyToEndpointReference();
-		RMVersion = beanToCopy.getRMVersion();
+		rMVersion = beanToCopy.getRMVersion();
 		securityTokenData = beanToCopy.getSecurityTokenData();		
 		sequenceID = beanToCopy.getSequenceID();
 		terminated = beanToCopy.isTerminated();
@@ -257,11 +259,11 @@ public class RMSequenceBean extends RMBean {
 	}
 
 	public String getRMVersion() {
-		return RMVersion;
+		return rMVersion;
 	}
 
 	public void setRMVersion(String version) {
-		RMVersion = version;
+		rMVersion = version;
 	}
 
 	public String getSecurityTokenData() {
@@ -298,7 +300,7 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nClosed       : "); result.append(closed);		
 		result.append("\nTerminated       : "); result.append(terminated);		
 		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);	
-		result.append("\nRMVersion        : "); result.append(RMVersion);	
+		result.append("\nRMVersion        : "); result.append(rMVersion);	
 		result.append("\nServiceName        : "); result.append(serviceName);	
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		return result.toString();

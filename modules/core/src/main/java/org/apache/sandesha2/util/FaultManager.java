@@ -326,7 +326,7 @@ public class FaultManager {
 		data.setExceptionString(SandeshaUtil.getStackTraceFromException(e));
 		
 		if(log.isWarnEnabled())
-			log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, messageContext.getAxisService().getName()));
+			log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused));
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::makeCreateSequenceRefusedFault");

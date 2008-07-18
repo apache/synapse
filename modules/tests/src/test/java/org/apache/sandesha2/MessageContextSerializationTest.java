@@ -20,22 +20,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.RangeString;
 
 /**
@@ -53,6 +43,8 @@ public class MessageContextSerializationTest extends SandeshaTestCase{
 	
 	private static final String rmsDatFileName = "RMSBean.dat";
 	private static final String rmdDatFileName = "RMDBean.dat";
+	private static final String rms1_2DatFileName = "RMSBean1_2.dat";
+	private static final String rmd1_2DatFileName = "RMDBean1_2.dat";
 	private static final String msgCtxDatFileName = "MessageContext.dat";
 	
 	private static RMSBean expectedRMSBean;
@@ -95,6 +87,26 @@ public class MessageContextSerializationTest extends SandeshaTestCase{
 			assertEquals(expectedMessageContext.getMessageID(), msg.getMessageID());
 			assertEquals(expectedMessageContext.getReplyTo().getAddress(), msg.getReplyTo().getAddress());
 		}
+	}
+	
+	public void test1_2Beans() throws Exception {
+		//ensure we can deserialize the rms bean serialized at 1.2 level
+		{
+			FileInputStream fis = new FileInputStream(resourceDir + File.separator + rms1_2DatFileName);
+			ObjectInputStream rmsBeanData = new ObjectInputStream(fis);
+			RMSBean bean = (RMSBean)rmsBeanData.readObject();	
+			assertTrue(expectedRMSBean.match(bean));
+		}
+		
+		//ensure we can deserialize the rmd bean serialized at 1.2 level
+		{
+			FileInputStream fis = new FileInputStream(resourceDir + File.separator + rmd1_2DatFileName);
+			ObjectInputStream rmdBeanData = new ObjectInputStream(fis);
+			RMDBean bean = (RMDBean)rmdBeanData.readObject();	
+			assertTrue(expectedRMDBean.match(bean));
+		}
+
+	
 	}
 	
 	public void setUp()throws Exception

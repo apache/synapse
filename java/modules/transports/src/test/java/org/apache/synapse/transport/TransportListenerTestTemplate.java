@@ -71,6 +71,16 @@ import org.apache.synapse.transport.base.BaseConstants;
  */
 public abstract class TransportListenerTestTemplate extends TestCase {
     public static abstract class TestStrategy {
+        private final String name;
+        
+        public TestStrategy() {
+            name = null;
+        }
+        
+        public TestStrategy(String name) {
+            this.name = name;
+        }
+        
         /**
          * Create a TransportInDescription for the transport under test.
          * 
@@ -112,6 +122,14 @@ public abstract class TransportListenerTestTemplate extends TestCase {
          * @throws Exception
          */
         protected abstract void sendMessage(String endpointReference, String contentType, byte[] content) throws Exception;
+        
+        public String getTestName(String baseName) {
+            if (name == null) {
+                return "test" + baseName;
+            } else {
+                return "test" + name + baseName;
+            }
+        }
     }
     
     private static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
@@ -196,19 +214,19 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static void addSOAP11Tests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase("testSOAP11ASCII") {
+        suite.addTest(new TestCase(strategy.getTestName("SOAP11ASCII")) {
             @Override
             protected void runTest() throws Throwable {
                 testSOAP11(strategy, "test string", "us-ascii");
             }
         });
-        suite.addTest(new TestCase("testSOAP11UTF8") {
+        suite.addTest(new TestCase(strategy.getTestName("SOAP11UTF8")) {
             @Override
             protected void runTest() throws Throwable {
                 testSOAP11(strategy, testString, "UTF-8");
             }
         });
-        suite.addTest(new TestCase("testSOAP11Latin1") {
+        suite.addTest(new TestCase(strategy.getTestName("SOAP11Latin1")) {
             @Override
             protected void runTest() throws Throwable {
                 testSOAP11(strategy, testString, "ISO-8859-1");
@@ -218,7 +236,7 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
     public static void addSwATests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase("testSOAPWithAttachments") {
+        suite.addTest(new TestCase(strategy.getTestName("SOAPWithAttachments")) {
             @Override
             protected void runTest() throws Throwable {
                 SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
@@ -258,19 +276,19 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static void addTextPlainTests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase("testTextPlainASCII") {
+        suite.addTest(new TestCase(strategy.getTestName("TextPlainASCII")) {
             @Override
             public void runTest() throws Exception {
                 testTextPlain(strategy, "test string", "us-ascii");
             }
         });
-        suite.addTest(new TestCase("testTextPlainUTF8") {
+        suite.addTest(new TestCase(strategy.getTestName("TextPlainUTF8")) {
             @Override
             public void runTest() throws Exception {
                 testTextPlain(strategy, testString, "UTF-8");
             }
         });
-        suite.addTest(new TestCase("testTextPlainLatin1") {
+        suite.addTest(new TestCase(strategy.getTestName("TextPlainLatin1")) {
             @Override
             public void runTest() throws Exception {
                 testTextPlain(strategy, testString, "ISO-8859-1");
@@ -279,7 +297,7 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static void addBinaryTest(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase("testBinary") {
+        suite.addTest(new TestCase(strategy.getTestName("Binary")) {
             @Override
             public void runTest() throws Exception {
                 byte[] content = new byte[8192];

@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.jms;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.jms.BytesMessage;
@@ -28,6 +29,11 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
@@ -46,11 +52,19 @@ import org.mockejb.jndi.MockContextFactory;
 import com.mockrunner.jms.ConfigurationManager;
 import com.mockrunner.jms.DestinationManager;
 import com.mockrunner.mock.jms.MockQueueConnectionFactory;
+import com.mockrunner.mock.jms.MockTopicConnectionFactory;
 
 public class JMSListenerTest extends TransportListenerTestTemplate {
     public static class TestStrategyImpl extends TestStrategy {
         private final OMFactory factory = OMAbstractFactory.getOMFactory();
         
+        private final boolean useTopic;
+        
+        public TestStrategyImpl(boolean useTopic) {
+            super(useTopic ? "Topic" : "Queue");
+            this.useTopic = useTopic;
+        }
+
         private OMElement createParameterElement(String name, String value) {
             OMElement element = factory.createOMElement(new QName("parameter"));
             element.addAttribute("name", name, null);
@@ -66,14 +80,24 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
             Context context = new InitialContext();
             DestinationManager destinationManager = new DestinationManager();
             ConfigurationManager configurationManager = new ConfigurationManager();
-            context.bind("QueueConnectionFactory", new MockQueueConnectionFactory(destinationManager, configurationManager));
-            context.bind("TestService", destinationManager.createQueue("TestService"));
+            if (useTopic) {
+                context.bind("ConnectionFactory",
+                        new MockTopicConnectionFactory(destinationManager, configurationManager));
+                context.bind("TestService", destinationManager.createTopic("TestService"));
+            } else {
+                context.bind("ConnectionFactory",
+                        new MockQueueConnectionFactory(destinationManager, configurationManager));
+                context.bind("TestService", destinationManager.createQueue("TestService"));
+            }
             
             TransportInDescription trpInDesc = new TransportInDescription(JMSListener.TRANSPORT_NAME);
             OMElement element = createParameterElement(JMSConstants.DEFAULT_CONFAC_NAME, null);
-            element.addChild(createParameterElement("java.naming.factory.initial", MockContextFactory.class.getName()));
-            element.addChild(createParameterElement("transport.jms.ConnectionFactoryJNDIName", "QueueConnectionFactory"));
-            element.addChild(createParameterElement("transport.jms.ConnectionFactoryType", "queue"));
+            element.addChild(createParameterElement(Context.INITIAL_CONTEXT_FACTORY,
+                    MockContextFactory.class.getName()));
+            element.addChild(createParameterElement(JMSConstants.CONFAC_JNDI_NAME_PARAM,
+                    "ConnectionFactory"));
+            element.addChild(createParameterElement(JMSConstants.CONFAC_TYPE,
+                    useTopic ? "topic" : "queue"));
             trpInDesc.addParameter(new Parameter(JMSConstants.DEFAULT_CONFAC_NAME, element));
             trpInDesc.setReceiver(new JMSListener());
             return trpInDesc;
@@ -81,7 +105,11 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
     
         @Override
         protected List<Parameter> getServiceParameters(String contentType) throws Exception {
-            return null;
+            List<Parameter> params = new LinkedList<Parameter>();
+            params.add(new Parameter(JMSConstants.DEST_PARAM_TYPE,
+                    useTopic ? JMSConstants.DESTINATION_TYPE_TOPIC
+                             : JMSConstants.DESTINATION_TYPE_QUEUE));
+            return params;
         }
     
         @Override
@@ -89,27 +117,44 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
                                    String contentType,
                                    byte[] content) throws Exception {
             Context context = new InitialContext();
-            QueueConnectionFactory connFactory
-                = (QueueConnectionFactory)context.lookup("QueueConnectionFactory");
-            Queue queue = (Queue)context.lookup("TestService");
-            QueueConnection connection = connFactory.createQueueConnection();
-            QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-            QueueSender sender = session.createSender(queue);
-            BytesMessage message = session.createBytesMessage();
-            message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
-            message.writeBytes(content);
-            sender.send(message);
+            if (useTopic) {
+                TopicConnectionFactory connFactory
+                    = (TopicConnectionFactory)context.lookup("ConnectionFactory");
+                Topic topic = (Topic)context.lookup("TestService");
+                TopicConnection connection = connFactory.createTopicConnection();
+                TopicSession session
+                    = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+                TopicPublisher publisher = session.createPublisher(topic);
+                BytesMessage message = session.createBytesMessage();
+                message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+                message.writeBytes(content);
+                publisher.send(message);
+            } else {
+                QueueConnectionFactory connFactory
+                    = (QueueConnectionFactory)context.lookup("ConnectionFactory");
+                Queue queue = (Queue)context.lookup("TestService");
+                QueueConnection connection = connFactory.createQueueConnection();
+                QueueSession session
+                    = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+                QueueSender sender = session.createSender(queue);
+                BytesMessage message = session.createBytesMessage();
+                message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+                message.writeBytes(content);
+                sender.send(message);
+            }
         }
     }
     
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
-        TestStrategy strategy = new TestStrategyImpl();
-        addSOAP11Tests(strategy, suite);
-        addSwATests(strategy, suite);
-        // TODO: these tests are temporarily disabled because of SYNAPSE-304
-        // addTextPlainTests(strategy, suite);
-        addBinaryTest(strategy, suite);
+        for (boolean useTopic : new boolean[] { false, true }) {
+            TestStrategy strategy = new TestStrategyImpl(useTopic);
+            addSOAP11Tests(strategy, suite);
+            addSwATests(strategy, suite);
+            // TODO: these tests are temporarily disabled because of SYNAPSE-304
+            // addTextPlainTests(strategy, suite);
+            addBinaryTest(strategy, suite);
+        }
         return suite;
     }
 }

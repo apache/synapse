@@ -24,29 +24,45 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import junit.framework.TestSuite;
+
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
+import org.apache.synapse.transport.TransportListenerTestTemplate.TestStrategy;
+import org.apache.synapse.transport.mail.MailTransportListenerTest.TestStrategyImpl;
 
 public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
-    @Override
-    protected TransportInDescription createTransportInDescription() {
-        TransportInDescription trpInDesc = new TransportInDescription("http");
-        trpInDesc.setReceiver(new HttpCoreNIOListener());
-        return trpInDesc;
-    }
+    public static class TestStrategyImpl extends TestStrategy {
+        @Override
+        protected TransportInDescription createTransportInDescription() {
+            TransportInDescription trpInDesc = new TransportInDescription("http");
+            trpInDesc.setReceiver(new HttpCoreNIOListener());
+            return trpInDesc;
+        }
 
-    @Override
-    protected void sendMessage(String endpointReference, String contentType, byte[] content) throws Exception {
-        URLConnection connection = new URL(endpointReference).openConnection();
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestProperty("Content-Type", contentType);
-        OutputStream out = connection.getOutputStream();
-        out.write(content);
-        out.close();
-        InputStream in = connection.getInputStream();
-        IOUtils.copy(in, System.out);
-        in.close();
+        @Override
+        protected void sendMessage(String endpointReference, String contentType, byte[] content) throws Exception {
+            URLConnection connection = new URL(endpointReference).openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestProperty("Content-Type", contentType);
+            OutputStream out = connection.getOutputStream();
+            out.write(content);
+            out.close();
+            InputStream in = connection.getInputStream();
+            IOUtils.copy(in, System.out);
+            in.close();
+        }
+    }
+    
+    public static TestSuite suite() {
+        TestSuite suite = new TestSuite();
+        TestStrategy strategy = new TestStrategyImpl();
+        addSOAP11Tests(strategy, suite);
+        addSwATests(strategy, suite);
+        addTextPlainTests(strategy, suite);
+        addBinaryTest(strategy, suite);
+        return suite;
     }
 }

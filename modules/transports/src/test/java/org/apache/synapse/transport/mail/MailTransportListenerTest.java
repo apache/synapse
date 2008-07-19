@@ -32,54 +32,61 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
+import junit.framework.TestSuite;
+
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
 
 public class MailTransportListenerTest extends TransportListenerTestTemplate {
-    private static final String ADDRESS = "test-account@localhost";
+    public static class TestStrategyImpl extends TestStrategy {
+        private static final String ADDRESS = "test-account@localhost";
+        
+        @Override
+        protected TransportInDescription createTransportInDescription() {
+            TransportInDescription trpInDesc
+                = new TransportInDescription(MailConstants.TRANSPORT_NAME);
+            trpInDesc.setReceiver(new MailTransportListener());
+            return trpInDesc;
+        }
     
-    @Override
-    protected TransportInDescription createTransportInDescription() {
-        TransportInDescription trpInDesc
-            = new TransportInDescription(MailConstants.TRANSPORT_NAME);
-        trpInDesc.setReceiver(new MailTransportListener());
-        return trpInDesc;
-    }
-
-    @Override
-    protected List<Parameter> getServiceParameters(String contentType) throws Exception {
-        List<Parameter> parameters = new ArrayList<Parameter>();
-        parameters.add(new Parameter("transport.mail.Protocol", "test-store"));
-        parameters.add(new Parameter("transport.mail.Address", ADDRESS));
-        parameters.add(new Parameter("transport.PollInterval", "1"));
-        // TODO: logically, this should be mail.test-store.user and mail.test-store.password
-        parameters.add(new Parameter("mail.pop3.user", ADDRESS));
-        parameters.add(new Parameter("mail.pop3.password", "dummy"));
-        return parameters;
-    }
-
-    @Override
-    protected void sendMessage(String endpointReference,
-                               String contentType,
-                               byte[] content) throws Exception {
-        Properties props = new Properties();
-        props.put("mail.smtp.class", TestTransport.class.getName());
-        Session session = Session.getInstance(props);
-        MimeMessage msg = new MimeMessage(session);
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(ADDRESS));
-        msg.setFrom(new InternetAddress("test-sender@localhost"));
-        msg.setSentDate(new Date());
-        msg.setDataHandler(new DataHandler(new ByteArrayDataSource(content, contentType)));
-        Transport.send(msg);
+        @Override
+        protected List<Parameter> getServiceParameters(String contentType) throws Exception {
+            List<Parameter> parameters = new ArrayList<Parameter>();
+            parameters.add(new Parameter("transport.mail.Protocol", "test-store"));
+            parameters.add(new Parameter("transport.mail.Address", ADDRESS));
+            parameters.add(new Parameter("transport.PollInterval", "1"));
+            // TODO: logically, this should be mail.test-store.user and mail.test-store.password
+            parameters.add(new Parameter("mail.pop3.user", ADDRESS));
+            parameters.add(new Parameter("mail.pop3.password", "dummy"));
+            return parameters;
+        }
+    
+        @Override
+        protected void sendMessage(String endpointReference,
+                                   String contentType,
+                                   byte[] content) throws Exception {
+            Properties props = new Properties();
+            props.put("mail.smtp.class", TestTransport.class.getName());
+            Session session = Session.getInstance(props);
+            MimeMessage msg = new MimeMessage(session);
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(ADDRESS));
+            msg.setFrom(new InternetAddress("test-sender@localhost"));
+            msg.setSentDate(new Date());
+            msg.setDataHandler(new DataHandler(new ByteArrayDataSource(content, contentType)));
+            Transport.send(msg);
+        }
     }
     
-    // Temporarily skip the following tests until SYNAPSE-359 is solved
-    @Override public void testBinary() throws Exception {}
-    @Override public void testTextPlainASCII() throws Exception {}
-    @Override public void testTextPlainLatin1() throws Exception {}
-    @Override public void testTextPlainUTF8() throws Exception {}
-    
-    // Temporarily skip this test until we know why it fails.
-    @Override public void testSOAPWithAttachments() {}
+    public static TestSuite suite() {
+        TestSuite suite = new TestSuite();
+        TestStrategy strategy = new TestStrategyImpl();
+        addSOAP11Tests(strategy, suite);
+        // Temporarily skip this test until we know why it fails.
+        // addSwATests(strategy, suite);
+        // Temporarily skip the following tests until SYNAPSE-359 is solved
+        // addTextPlainTests(strategy, suite);
+        // addBinaryTest(strategy, suite);
+        return suite;
+    }
 }

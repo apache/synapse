@@ -32,6 +32,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
 
+import junit.framework.TestSuite;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -46,60 +48,68 @@ import com.mockrunner.jms.DestinationManager;
 import com.mockrunner.mock.jms.MockQueueConnectionFactory;
 
 public class JMSListenerTest extends TransportListenerTestTemplate {
-    private final OMFactory factory = OMAbstractFactory.getOMFactory();
-    
-    private OMElement createParameterElement(String name, String value) {
-        OMElement element = factory.createOMElement(new QName("parameter"));
-        element.addAttribute("name", name, null);
-        if (value != null) {
-            element.setText(value);
-        }
-        return element;
-    }
-    
-    @Override
-    protected TransportInDescription createTransportInDescription() throws Exception {
-        MockContextFactory.setAsInitial();
-        Context context = new InitialContext();
-        DestinationManager destinationManager = new DestinationManager();
-        ConfigurationManager configurationManager = new ConfigurationManager();
-        context.bind("QueueConnectionFactory", new MockQueueConnectionFactory(destinationManager, configurationManager));
-        context.bind("TestService", destinationManager.createQueue("TestService"));
+    public static class TestStrategyImpl extends TestStrategy {
+        private final OMFactory factory = OMAbstractFactory.getOMFactory();
         
-        TransportInDescription trpInDesc = new TransportInDescription(JMSListener.TRANSPORT_NAME);
-        OMElement element = createParameterElement(JMSConstants.DEFAULT_CONFAC_NAME, null);
-        element.addChild(createParameterElement("java.naming.factory.initial", MockContextFactory.class.getName()));
-        element.addChild(createParameterElement("transport.jms.ConnectionFactoryJNDIName", "QueueConnectionFactory"));
-        element.addChild(createParameterElement("transport.jms.ConnectionFactoryType", "queue"));
-        trpInDesc.addParameter(new Parameter(JMSConstants.DEFAULT_CONFAC_NAME, element));
-        trpInDesc.setReceiver(new JMSListener());
-        return trpInDesc;
+        private OMElement createParameterElement(String name, String value) {
+            OMElement element = factory.createOMElement(new QName("parameter"));
+            element.addAttribute("name", name, null);
+            if (value != null) {
+                element.setText(value);
+            }
+            return element;
+        }
+        
+        @Override
+        protected TransportInDescription createTransportInDescription() throws Exception {
+            MockContextFactory.setAsInitial();
+            Context context = new InitialContext();
+            DestinationManager destinationManager = new DestinationManager();
+            ConfigurationManager configurationManager = new ConfigurationManager();
+            context.bind("QueueConnectionFactory", new MockQueueConnectionFactory(destinationManager, configurationManager));
+            context.bind("TestService", destinationManager.createQueue("TestService"));
+            
+            TransportInDescription trpInDesc = new TransportInDescription(JMSListener.TRANSPORT_NAME);
+            OMElement element = createParameterElement(JMSConstants.DEFAULT_CONFAC_NAME, null);
+            element.addChild(createParameterElement("java.naming.factory.initial", MockContextFactory.class.getName()));
+            element.addChild(createParameterElement("transport.jms.ConnectionFactoryJNDIName", "QueueConnectionFactory"));
+            element.addChild(createParameterElement("transport.jms.ConnectionFactoryType", "queue"));
+            trpInDesc.addParameter(new Parameter(JMSConstants.DEFAULT_CONFAC_NAME, element));
+            trpInDesc.setReceiver(new JMSListener());
+            return trpInDesc;
+        }
+    
+        @Override
+        protected List<Parameter> getServiceParameters(String contentType) throws Exception {
+            return null;
+        }
+    
+        @Override
+        protected void sendMessage(String endpointReference,
+                                   String contentType,
+                                   byte[] content) throws Exception {
+            Context context = new InitialContext();
+            QueueConnectionFactory connFactory
+                = (QueueConnectionFactory)context.lookup("QueueConnectionFactory");
+            Queue queue = (Queue)context.lookup("TestService");
+            QueueConnection connection = connFactory.createQueueConnection();
+            QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+            QueueSender sender = session.createSender(queue);
+            BytesMessage message = session.createBytesMessage();
+            message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+            message.writeBytes(content);
+            sender.send(message);
+        }
     }
-
-    @Override
-    protected List<Parameter> getServiceParameters(String contentType) throws Exception {
-        return null;
+    
+    public static TestSuite suite() {
+        TestSuite suite = new TestSuite();
+        TestStrategy strategy = new TestStrategyImpl();
+        addSOAP11Tests(strategy, suite);
+        addSwATests(strategy, suite);
+        // TODO: these tests are temporarily disabled because of SYNAPSE-304
+        // addTextPlainTests(strategy, suite);
+        addBinaryTest(strategy, suite);
+        return suite;
     }
-
-    @Override
-    protected void sendMessage(String endpointReference,
-                               String contentType,
-                               byte[] content) throws Exception {
-        Context context = new InitialContext();
-        QueueConnectionFactory connFactory
-            = (QueueConnectionFactory)context.lookup("QueueConnectionFactory");
-        Queue queue = (Queue)context.lookup("TestService");
-        QueueConnection connection = connFactory.createQueueConnection();
-        QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-        QueueSender sender = session.createSender(queue);
-        BytesMessage message = session.createBytesMessage();
-        message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
-        message.writeBytes(content);
-        sender.send(message);
-    }
-
-    // TODO: these tests are temporarily disabled because of SYNAPSE-304
-    @Override public void testTextPlainASCII() {}
-    @Override public void testTextPlainLatin1() {}
-    @Override public void testTextPlainUTF8() {}
 }

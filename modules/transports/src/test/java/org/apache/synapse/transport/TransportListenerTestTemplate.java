@@ -132,113 +132,182 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         }
     }
     
+    public static abstract class TransportListenerTestCase extends TestCase {
+        protected final TestStrategy strategy;
+        protected final String contentType;
+        
+        public TransportListenerTestCase(TestStrategy strategy, String baseName, String contentType) {
+            super(strategy.getTestName(baseName));
+            this.strategy = strategy;
+            this.contentType = contentType;
+        }
+
+        @Override
+        protected void runTest() throws Throwable {
+            UtilsTransportServer server = new UtilsTransportServer();
+            
+            TransportInDescription trpInDesc = strategy.createTransportInDescription();
+            server.addTransport(trpInDesc);
+            
+            AxisConfiguration axisConfiguration = server.getAxisConfiguration();
+            
+            // Add a DefaultOperationDispatcher to the InFlow phase. This is necessary because
+            // we want to receive all messages through the same operation.
+            DispatchPhase dispatchPhase = null;
+            for (Object phase : axisConfiguration.getInFlowPhases()) {
+                if (phase instanceof DispatchPhase) {
+                    dispatchPhase = (DispatchPhase)phase;
+                    break;
+                }
+            }
+            DefaultOperationDispatcher dispatcher = new DefaultOperationDispatcher();
+            dispatcher.initDispatcher();
+            dispatchPhase.addHandler(dispatcher);
+            
+            // Set up a test service with a default operation backed by a mock message
+            // receiver. The service is configured using the parameters specified by the
+            // implementation.
+            AxisService service = new AxisService("TestService");
+            AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+            MockMessageReceiver messageReceiver = new MockMessageReceiver();
+            operation.setMessageReceiver(messageReceiver);
+            service.addOperation(operation);
+            List<Parameter> parameters = strategy.getServiceParameters(contentType);
+            if (parameters != null) {
+                for (Parameter parameter : parameters) {
+                    service.addParameter(parameter);
+                }
+            }
+            axisConfiguration.addService(service);
+            
+            // Run the test.
+            strategy.beforeStartup();
+            server.start();
+            MessageData messageData;
+            try {
+                EndpointReference[] endpointReferences
+                    = trpInDesc.getReceiver().getEPRsForService(service.getName(), "localhost");
+                sendMessage(endpointReferences != null && endpointReferences.length > 0
+                                        ? endpointReferences[0].getAddress() : null);
+                messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
+                if (messageData == null) {
+                    fail("Failed to get message");
+                }
+            }
+            finally {
+                server.stop();
+                Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
+            }
+            checkMessageData(messageData);
+        }
+        
+        protected abstract void sendMessage(String endpointReference) throws Exception;
+        protected abstract void checkMessageData(MessageData messageData) throws Exception;
+    }
+    
+    public static class SOAP11TestCaseImpl extends TransportListenerTestCase {
+        private final String text;
+        private final String charset;
+        private final boolean pox;
+        private SOAPFactory factory;
+        private OMElement orgElement;
+        
+        public SOAP11TestCaseImpl(TestStrategy strategy, String baseName, String text, String charset, boolean pox) {
+            super(strategy, baseName, (pox ? "application/xml" : "text/xml") + "; charset=\"" + charset + "\"");
+            this.text = text;
+            this.charset = charset;
+            this.pox = pox;
+        }
+
+        @Override
+        protected void setUp() throws Exception {
+            factory = OMAbstractFactory.getSOAP11Factory();
+            orgElement = factory.createOMElement(new QName("root"));
+            orgElement.setText(text);
+        }
+
+        @Override
+        protected void sendMessage(String endpointReference) throws Exception {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            OMOutputFormat outputFormat = new OMOutputFormat();
+            outputFormat.setCharSetEncoding(charset);
+            outputFormat.setIgnoreXMLDeclaration(true);
+            if (pox) {
+                orgElement.serializeAndConsume(baos, outputFormat);
+            } else {
+                SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
+                SOAPBody orgBody = factory.createSOAPBody();
+                orgBody.addChild(orgElement);
+                orgEnvelope.addChild(orgBody);
+                orgEnvelope.serializeAndConsume(baos, outputFormat);
+            }
+            strategy.sendMessage(endpointReference, contentType, baos.toByteArray());
+        }
+        
+        @Override
+        protected void checkMessageData(MessageData messageData) throws Exception {
+            SOAPEnvelope envelope = messageData.getEnvelope();
+            OMElement element = envelope.getBody().getFirstElement();
+            assertEquals(orgElement.getQName(), element.getQName());
+            assertEquals(text, element.getText());
+        }
+    }
+    
+    public static class TextPlainTestCaseImpl extends TransportListenerTestCase {
+        private final String text;
+        private final String charset;
+
+        public TextPlainTestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
+            super(strategy, baseName, "text/plain; charset=\"" + charset + "\"");
+            this.text = text;
+            this.charset = charset;
+        }
+
+        @Override
+        protected void sendMessage(String endpointReference) throws Exception {
+            strategy.sendMessage(endpointReference, contentType, text.getBytes(charset));
+        }
+        
+        @Override
+        protected void checkMessageData(MessageData messageData) throws Exception {
+            SOAPEnvelope envelope = messageData.getEnvelope();
+            OMElement wrapper = envelope.getBody().getFirstElement();
+            assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, wrapper.getQName());
+            assertEquals(text, wrapper.getText());
+        }
+    }
+    
     private static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
     
     private static final Random random = new Random();
 
-    private static MessageData runTest(TestStrategy strategy, String contentType, byte[] content) throws Exception {
-        UtilsTransportServer server = new UtilsTransportServer();
-        
-        TransportInDescription trpInDesc = strategy.createTransportInDescription();
-        server.addTransport(trpInDesc);
-        
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        
-        // Add a DefaultOperationDispatcher to the InFlow phase. This is necessary because
-        // we want to receive all messages through the same operation.
-        DispatchPhase dispatchPhase = null;
-        for (Object phase : axisConfiguration.getInFlowPhases()) {
-            if (phase instanceof DispatchPhase) {
-                dispatchPhase = (DispatchPhase)phase;
-                break;
-            }
-        }
-        DefaultOperationDispatcher dispatcher = new DefaultOperationDispatcher();
-        dispatcher.initDispatcher();
-        dispatchPhase.addHandler(dispatcher);
-        
-        // Set up a test service with a default operation backed by a mock message
-        // receiver. The service is configured using the parameters specified by the
-        // implementation.
-        AxisService service = new AxisService("TestService");
-        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
-        MockMessageReceiver messageReceiver = new MockMessageReceiver();
-        operation.setMessageReceiver(messageReceiver);
-        service.addOperation(operation);
-        List<Parameter> parameters = strategy.getServiceParameters(contentType);
-        if (parameters != null) {
-            for (Parameter parameter : parameters) {
-                service.addParameter(parameter);
-            }
-        }
-        axisConfiguration.addService(service);
-        
-        // Run the test.
-        strategy.beforeStartup();
-        server.start();
-        try {
-            EndpointReference[] endpointReferences
-                = trpInDesc.getReceiver().getEPRsForService(service.getName(), "localhost");
-            strategy.sendMessage(endpointReferences != null && endpointReferences.length > 0
-                                    ? endpointReferences[0].getAddress() : null,
-                                            contentType, content);
-            MessageData messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
-            if (messageData == null) {
-                fail("Failed to get message");
-            }
-            return messageData;
-        }
-        finally {
-            server.stop();
-            Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
-        }
-    }
-    
-    private static void testSOAP11(TestStrategy strategy, String text, String charset) throws Exception {
-        SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
-        SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
-        SOAPBody orgBody = factory.createSOAPBody();
-        OMElement orgElement = factory.createOMElement(new QName("root"));
-        orgElement.setText(text);
-        orgBody.addChild(orgElement);
-        orgEnvelope.addChild(orgBody);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OMOutputFormat outputFormat = new OMOutputFormat();
-        outputFormat.setCharSetEncoding(charset);
-        outputFormat.setIgnoreXMLDeclaration(true);
-        orgEnvelope.serializeAndConsume(baos, outputFormat);
-        SOAPEnvelope envelope = runTest(strategy, "text/xml; charset=\"" + charset + "\"", baos.toByteArray()).getEnvelope();
-        OMElement element = envelope.getBody().getFirstElement();
-        assertEquals(orgElement.getQName(), element.getQName());
-        assertEquals(text, element.getText());
-    }
-    
     public static void addSOAP11Tests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase(strategy.getTestName("SOAP11ASCII")) {
-            @Override
-            protected void runTest() throws Throwable {
-                testSOAP11(strategy, "test string", "us-ascii");
-            }
-        });
-        suite.addTest(new TestCase(strategy.getTestName("SOAP11UTF8")) {
-            @Override
-            protected void runTest() throws Throwable {
-                testSOAP11(strategy, testString, "UTF-8");
-            }
-        });
-        suite.addTest(new TestCase(strategy.getTestName("SOAP11Latin1")) {
-            @Override
-            protected void runTest() throws Throwable {
-                testSOAP11(strategy, testString, "ISO-8859-1");
-            }
-        });
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii", false));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8", false));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1", false));
+    }
+    
+    public static void addPOXTests(final TestStrategy strategy, TestSuite suite) {
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "POXASCII", "test string", "us-ascii", true));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "POXUTF8", testString, "UTF-8", true));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "POXLatin1", testString, "ISO-8859-1", true));
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public static void addSwATests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase(strategy.getTestName("SOAPWithAttachments")) {
+    public static void addSwATests(TestStrategy strategy, TestSuite suite) {
+        suite.addTest(new TransportListenerTestCase(strategy, "SOAPWithAttachments", null) {
+            private byte[] attachmentContent;
+            private String contentID;
+            
             @Override
-            protected void runTest() throws Throwable {
+            protected void setUp() throws Exception {
+                attachmentContent = new byte[8192];
+                random.nextBytes(attachmentContent);
+                contentID = UUIDGenerator.getUUID();
+            }
+
+            @Override
+            protected void sendMessage(String endpointReference) throws Exception {
                 SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
                 SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
                 SOAPBody orgBody = factory.createSOAPBody();
@@ -250,59 +319,49 @@ public abstract class TransportListenerTestTemplate extends TestCase {
                 outputFormat.setIgnoreXMLDeclaration(true);
                 StringWriter writer = new StringWriter();
                 orgEnvelope.serializeAndConsume(writer);
-                byte[] attachmentContent = new byte[8192];
-                random.nextBytes(attachmentContent);
-                String contentID = UUIDGenerator.getUUID();
                 Attachments orgAttachments = new Attachments();
                 orgAttachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, orgAttachments, outputFormat);
-                MessageData messageData = TransportListenerTestTemplate.runTest(strategy, outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
+                strategy.sendMessage(endpointReference, outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
+            }
+
+            @Override
+            protected void checkMessageData(MessageData messageData) throws Exception {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 Attachments attachments = messageData.getAttachments();
                 DataHandler dataHandler = attachments.getDataHandler(contentID);
                 assertNotNull(dataHandler);
-                baos.reset();
                 dataHandler.writeTo(baos);
                 assertTrue(Arrays.equals(attachmentContent, baos.toByteArray()));
             }
         });
     }
     
-    private static void testTextPlain(TestStrategy strategy, String text, String charset) throws Exception {
-        SOAPEnvelope envelope = runTest(strategy, "text/plain; charset=" + charset, text.getBytes(charset)).getEnvelope();
-        OMElement wrapper = envelope.getBody().getFirstElement();
-        assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, wrapper.getQName());
-        assertEquals(text, wrapper.getText());
-    }
-    
     public static void addTextPlainTests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase(strategy.getTestName("TextPlainASCII")) {
-            @Override
-            public void runTest() throws Exception {
-                testTextPlain(strategy, "test string", "us-ascii");
-            }
-        });
-        suite.addTest(new TestCase(strategy.getTestName("TextPlainUTF8")) {
-            @Override
-            public void runTest() throws Exception {
-                testTextPlain(strategy, testString, "UTF-8");
-            }
-        });
-        suite.addTest(new TestCase(strategy.getTestName("TextPlainLatin1")) {
-            @Override
-            public void runTest() throws Exception {
-                testTextPlain(strategy, testString, "ISO-8859-1");
-            }
-        });
+        suite.addTest(new TextPlainTestCaseImpl(strategy, "TextPlainASCII", "test string", "us-ascii"));
+        suite.addTest(new TextPlainTestCaseImpl(strategy, "TextPlainUTF8", testString, "UTF-8"));
+        suite.addTest(new TextPlainTestCaseImpl(strategy, "TextPlainLatin1", testString, "ISO-8859-1"));
     }
     
     public static void addBinaryTest(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TestCase(strategy.getTestName("Binary")) {
+        suite.addTest(new TransportListenerTestCase(strategy, "Binary", "application/octet-stream") {
+            private byte[] content;
+            
             @Override
-            public void runTest() throws Exception {
-                byte[] content = new byte[8192];
+            protected void setUp() throws Exception {
+                content = new byte[8192];
                 random.nextBytes(content);
-                SOAPEnvelope envelope = TransportListenerTestTemplate.runTest(strategy, "application/octet-stream", content).getEnvelope();
+            }
+
+            @Override
+            protected void sendMessage(String endpointReference) throws Exception {
+                strategy.sendMessage(endpointReference, contentType, content);
+            }
+            
+            @Override
+            protected void checkMessageData(MessageData messageData) throws Exception {
+                SOAPEnvelope envelope = messageData.getEnvelope();
                 OMElement wrapper = envelope.getBody().getFirstElement();
                 assertEquals(BaseConstants.DEFAULT_BINARY_WRAPPER, wrapper.getQName());
                 OMNode child = wrapper.getFirstOMChild();

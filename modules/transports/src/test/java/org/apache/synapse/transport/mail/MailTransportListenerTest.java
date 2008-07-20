@@ -29,7 +29,9 @@ import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
 import junit.framework.TestSuite;
@@ -37,12 +39,18 @@ import junit.framework.TestSuite;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
-import org.apache.synapse.transport.TransportListenerTestTemplate.SOAP11TestCaseImpl;
 
 public class MailTransportListenerTest extends TransportListenerTestTemplate {
     public static class TestStrategyImpl extends TestStrategy {
         private static final String ADDRESS = "test-account@localhost";
         
+        private boolean useMultipart;
+        
+        public TestStrategyImpl(boolean useMultipart) {
+            super(useMultipart ? "Multipart" : null);
+            this.useMultipart = useMultipart;
+        }
+
         @Override
         protected TransportInDescription createTransportInDescription() {
             TransportInDescription trpInDesc
@@ -74,26 +82,43 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(ADDRESS));
             msg.setFrom(new InternetAddress("test-sender@localhost"));
             msg.setSentDate(new Date());
-            msg.setDataHandler(new DataHandler(new ByteArrayDataSource(content, contentType)));
+            DataHandler dh = new DataHandler(new ByteArrayDataSource(content, contentType));
+            if (useMultipart) {
+                MimeMultipart multipart = new MimeMultipart();
+                MimeBodyPart part1 = new MimeBodyPart();
+                part1.setContent("This is an automated message.", "text/plain");
+                multipart.addBodyPart(part1);
+                MimeBodyPart part2 = new MimeBodyPart();
+                part2.setDataHandler(dh);
+                multipart.addBodyPart(part2);
+                msg.setContent(multipart);
+            } else {
+                msg.setDataHandler(dh);
+            }
             Transport.send(msg);
         }
     }
     
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
-        TestStrategy strategy = new TestStrategyImpl();
-        // TODO: SOAP 1.2 tests don't work yet for mail transport
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii"));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8"));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1"));
-        // addSOAPTests(strategy, suite);
-        // TODO: POX tests don't work yet for mail transport
-        // addPOXTests(strategy, suite);
-        // Temporarily skip this test until we know why it fails.
-        // addSwATests(strategy, suite);
-        // Temporarily skip the following tests until SYNAPSE-359 is solved
-        // addTextPlainTests(strategy, suite);
-        // addBinaryTest(strategy, suite);
+        for (boolean useMultipart : new boolean[] { false, true }) {
+            TestStrategy strategy = new TestStrategyImpl(useMultipart);
+            // TODO: SOAP 1.2 tests don't work yet for mail transport
+            suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii"));
+            suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8"));
+            // TODO: this test fails when using multipart
+            if (!useMultipart) {
+                suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1"));
+            }
+            // addSOAPTests(strategy, suite);
+            // TODO: POX tests don't work yet for mail transport
+            // addPOXTests(strategy, suite);
+            // Temporarily skip this test until we know why it fails.
+            // addSwATests(strategy, suite);
+            // Temporarily skip the following tests until SYNAPSE-359 is solved
+            // addTextPlainTests(strategy, suite);
+            // addBinaryTest(strategy, suite);
+        }
         return suite;
     }
 }

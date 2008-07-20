@@ -30,6 +30,8 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeBodyPart;
+
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -105,8 +107,7 @@ public class MailUtils extends BaseUtils {
     @Override
     public String getMessageTextPayload(Object message) {
         try {
-            return new String(
-                getBytesFromInputStream(getInputStream(message), ((Message) message).getSize()));
+            return new String(getBytesFromInputStream(getInputStream(message)));
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error reading message payload as text for : " +
@@ -119,7 +120,7 @@ public class MailUtils extends BaseUtils {
     @Override
     public byte[] getMessageBinaryPayload(Object message) {
         try {
-            return getBytesFromInputStream(getInputStream(message), ((Message) message).getSize());
+            return getBytesFromInputStream(getInputStream(message));
         } catch (Exception e) {
             handleException("Error reading message payload as a byte[] for : " +
                 ((Message) message).getMessageNumber(), e);
@@ -127,28 +128,21 @@ public class MailUtils extends BaseUtils {
         return new byte[0];
     }
 
-    public static byte[] getBytesFromInputStream(InputStream is, int length) throws IOException {
-
-        byte[] bytes = new byte[length];
-        int offset = 0;
-        int numRead = 0;
+    public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
 
         try {
-            while (offset < bytes.length &&
-                (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-                offset += numRead;
+            byte[] buffer = new byte[4096];
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int c;
+            while ((c = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, c);
             }
-
-            // Ensure all the bytes have been read in
-            if (offset < bytes.length) {
-                handleException("Could not completely read the stream to conver to a byte[]");
-            }
+            return baos.toByteArray();
         } finally {
             try {
                 is.close();
             } catch (IOException ignore) {}
         }
-        return bytes;
     }
 
 }

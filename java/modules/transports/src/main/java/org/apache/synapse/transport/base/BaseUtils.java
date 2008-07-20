@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.builder.StAXBuilder;
@@ -228,15 +229,19 @@ public abstract class BaseUtils {
             try {
                 builder = new StAXOMBuilder(StAXUtils.createXMLStreamReader(in, charSetEnc));
                 builder.setOMBuilderFactory(OMAbstractFactory.getOMFactory());
-                String ns = builder.getDocumentElement().getNamespace().getNamespaceURI();
+                OMNamespace ns = builder.getDocumentElement().getNamespace();
+                if (ns != null) {
+                    String nsUri = ns.getNamespaceURI();
 
-                if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(ns)) {
-                    envelope = BaseUtils.getEnvelope(in, SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-
-                } else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(ns)) {
-                    envelope = BaseUtils.getEnvelope(in, SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-
-                } else {
+                    if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(nsUri)) {
+                        envelope = BaseUtils.getEnvelope(in, SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+    
+                    } else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(nsUri)) {
+                        envelope = BaseUtils.getEnvelope(in, SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+    
+                    }
+                }
+                if (envelope == null) {
                     // this is POX ... mark message as REST
                     msgContext.setDoingREST(true);
                     envelope = soapFactory.getDefaultEnvelope();

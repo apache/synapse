@@ -36,11 +36,13 @@ import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.MIMEOutputUtils;
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -205,43 +207,23 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         protected abstract void checkMessageData(MessageData messageData) throws Exception;
     }
     
-    public static class SOAP11TestCaseImpl extends TransportListenerTestCase {
+    public static abstract class XMLMessageTestCase extends TransportListenerTestCase {
         private final String text;
         private final String charset;
-        private final boolean pox;
-        private SOAPFactory factory;
         private OMElement orgElement;
+        protected OMFactory factory;
         
-        public SOAP11TestCaseImpl(TestStrategy strategy, String baseName, String text, String charset, boolean pox) {
-            super(strategy, baseName, (pox ? "application/xml" : "text/xml") + "; charset=\"" + charset + "\"");
+        public XMLMessageTestCase(TestStrategy strategy, String baseName, String baseContentType, String text, String charset) {
+            super(strategy, baseName, baseContentType + "; charset=\"" + charset + "\"");
             this.text = text;
             this.charset = charset;
-            this.pox = pox;
         }
-
+        
         @Override
         protected void setUp() throws Exception {
-            factory = OMAbstractFactory.getSOAP11Factory();
+            factory = getOMFactory();
             orgElement = factory.createOMElement(new QName("root"));
             orgElement.setText(text);
-        }
-
-        @Override
-        protected void sendMessage(String endpointReference) throws Exception {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            OMOutputFormat outputFormat = new OMOutputFormat();
-            outputFormat.setCharSetEncoding(charset);
-            outputFormat.setIgnoreXMLDeclaration(true);
-            if (pox) {
-                orgElement.serializeAndConsume(baos, outputFormat);
-            } else {
-                SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
-                SOAPBody orgBody = factory.createSOAPBody();
-                orgBody.addChild(orgElement);
-                orgEnvelope.addChild(orgBody);
-                orgEnvelope.serializeAndConsume(baos, outputFormat);
-            }
-            strategy.sendMessage(endpointReference, contentType, baos.toByteArray());
         }
         
         @Override
@@ -250,6 +232,75 @@ public abstract class TransportListenerTestTemplate extends TestCase {
             OMElement element = envelope.getBody().getFirstElement();
             assertEquals(orgElement.getQName(), element.getQName());
             assertEquals(text, element.getText());
+        }
+
+        @Override
+        protected void sendMessage(String endpointReference) throws Exception {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            OMOutputFormat outputFormat = new OMOutputFormat();
+            outputFormat.setCharSetEncoding(charset);
+            outputFormat.setIgnoreXMLDeclaration(true);
+            getMessage(orgElement).serializeAndConsume(baos, outputFormat);
+            strategy.sendMessage(endpointReference, contentType, baos.toByteArray());
+        }
+        
+        protected abstract OMFactory getOMFactory();
+        protected abstract OMElement getMessage(OMElement payload);
+    }
+    
+    public static abstract class SOAPTestCase extends XMLMessageTestCase {
+        public SOAPTestCase(TestStrategy strategy, String baseName, String baseContentType, String text, String charset) {
+            super(strategy, baseName, baseContentType, text, charset);
+        }
+
+        @Override
+        protected abstract SOAPFactory getOMFactory();
+
+        @Override
+        protected OMElement getMessage(OMElement payload) {
+            SOAPEnvelope envelope = ((SOAPFactory)factory).createSOAPEnvelope();
+            SOAPBody body = ((SOAPFactory)factory).createSOAPBody();
+            body.addChild(payload);
+            envelope.addChild(body);
+            return envelope;
+        }
+    }
+    
+    public static class SOAP11TestCaseImpl extends SOAPTestCase {
+        public SOAP11TestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
+            super(strategy, baseName, SOAP11Constants.SOAP_11_CONTENT_TYPE, text, charset);
+        }
+
+        @Override
+        protected SOAPFactory getOMFactory() {
+            return OMAbstractFactory.getSOAP11Factory();
+        }
+    }
+    
+    public static class SOAP12TestCaseImpl extends SOAPTestCase {
+        public SOAP12TestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
+            super(strategy, baseName, SOAP12Constants.SOAP_12_CONTENT_TYPE, text, charset);
+        }
+
+        @Override
+        protected SOAPFactory getOMFactory() {
+            return OMAbstractFactory.getSOAP12Factory();
+        }
+    }
+    
+    public static class POXTestCaseImpl extends XMLMessageTestCase {
+        public POXTestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
+            super(strategy, baseName, "application/xml", text, charset);
+        }
+
+        @Override
+        protected OMFactory getOMFactory() {
+            return OMAbstractFactory.getOMFactory();
+        }
+
+        @Override
+        protected OMElement getMessage(OMElement payload) {
+            return payload;
         }
     }
     
@@ -277,20 +328,23 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         }
     }
     
-    private static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
+    public static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
     
     private static final Random random = new Random();
 
-    public static void addSOAP11Tests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii", false));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8", false));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1", false));
+    public static void addSOAPTests(final TestStrategy strategy, TestSuite suite) {
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii"));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8"));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1"));
+        suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12ASCII", "test string", "us-ascii"));
+        suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12UTF8", testString, "UTF-8"));
+        suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12Latin1", testString, "ISO-8859-1"));
     }
     
     public static void addPOXTests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "POXASCII", "test string", "us-ascii", true));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "POXUTF8", testString, "UTF-8", true));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "POXLatin1", testString, "ISO-8859-1", true));
+        suite.addTest(new POXTestCaseImpl(strategy, "POXASCII", "test string", "us-ascii"));
+        suite.addTest(new POXTestCaseImpl(strategy, "POXUTF8", testString, "UTF-8"));
+        suite.addTest(new POXTestCaseImpl(strategy, "POXLatin1", testString, "ISO-8859-1"));
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header

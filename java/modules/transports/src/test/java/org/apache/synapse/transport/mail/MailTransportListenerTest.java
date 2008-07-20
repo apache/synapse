@@ -81,7 +81,7 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
-        addSOAP11Tests(strategy, suite);
+        addSOAPTests(strategy, suite);
         // TODO: POX tests don't work yet for mail transport
         // addPOXTests(strategy, suite);
         // Temporarily skip this test until we know why it fails.

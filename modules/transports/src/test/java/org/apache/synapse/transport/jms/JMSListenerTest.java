@@ -160,8 +160,7 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
                 TestStrategy strategy = new TestStrategyImpl(useTopic, useContentTypeHeader);
                 if (useContentTypeHeader) {
                     addSOAPTests(strategy, suite);
-                    // TODO: POX tests don't work yet for JMS
-                    // addPOXTests(strategy, suite);
+                    addPOXTests(strategy, suite);
                     addSwATests(strategy, suite);
                 } else {
                     // If no content type header is used, SwA can't be used and the JMS transport
@@ -169,6 +168,8 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
                     suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11", testString,
                             MessageContext.DEFAULT_CHAR_SET_ENCODING));
                     suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12", testString,
+                            MessageContext.DEFAULT_CHAR_SET_ENCODING));
+                    suite.addTest(new POXTestCaseImpl(strategy, "POX", testString,
                             MessageContext.DEFAULT_CHAR_SET_ENCODING));
                 }
                 // TODO: these tests are temporarily disabled because of SYNAPSE-304

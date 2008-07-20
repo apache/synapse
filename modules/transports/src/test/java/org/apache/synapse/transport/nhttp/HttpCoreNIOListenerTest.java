@@ -28,9 +28,9 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.io.IOUtils;
+import org.apache.synapse.transport.DefaultOperationDispatcher;
+import org.apache.synapse.transport.MessageData;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
-import org.apache.synapse.transport.TransportListenerTestTemplate.TestStrategy;
-import org.apache.synapse.transport.mail.MailTransportListenerTest.TestStrategyImpl;
 
 public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
     public static class TestStrategyImpl extends TestStrategy {
@@ -60,9 +60,25 @@ public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
         addSOAP11Tests(strategy, suite);
+        addPOXTests(strategy, suite);
         addSwATests(strategy, suite);
         addTextPlainTests(strategy, suite);
         addBinaryTest(strategy, suite);
+        suite.addTest(new TransportListenerTestCase(strategy, "REST", null) {
+            @Override
+            protected void sendMessage(String endpointReference) throws Exception {
+                URLConnection connection = new URL(endpointReference + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
+                connection.setDoInput(true);
+                InputStream in = connection.getInputStream();
+                IOUtils.copy(in, System.out);
+                in.close();
+            }
+        
+            @Override
+            protected void checkMessageData(MessageData messageData) throws Exception {
+                // TODO
+            }
+        });
         return suite;
     }
 }

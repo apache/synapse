@@ -74,6 +74,7 @@ public class VFSTransportListenerTest extends TransportListenerTestTemplate {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
         addSOAP11Tests(strategy, suite);
+        addPOXTests(strategy, suite);
         // Since VFS has no Content-Type header, SwA is not supported.
         addTextPlainTests(strategy, suite);
         addBinaryTest(strategy, suite);

@@ -150,6 +150,8 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
         for (boolean useTopic : new boolean[] { false, true }) {
             TestStrategy strategy = new TestStrategyImpl(useTopic);
             addSOAP11Tests(strategy, suite);
+            // TODO: POX tests don't work yet for JMS
+            // addPOXTests(strategy, suite);
             addSwATests(strategy, suite);
             // TODO: these tests are temporarily disabled because of SYNAPSE-304
             // addTextPlainTests(strategy, suite);

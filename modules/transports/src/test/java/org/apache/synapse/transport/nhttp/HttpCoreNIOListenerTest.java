@@ -59,7 +59,7 @@ public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
-        addSOAP11Tests(strategy, suite);
+        addSOAPTests(strategy, suite);
         addPOXTests(strategy, suite);
         addSwATests(strategy, suite);
         addTextPlainTests(strategy, suite);

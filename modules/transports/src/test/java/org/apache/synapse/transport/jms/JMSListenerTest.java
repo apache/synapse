@@ -43,6 +43,7 @@ import junit.framework.TestSuite;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
@@ -59,10 +60,13 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
         private final OMFactory factory = OMAbstractFactory.getOMFactory();
         
         private final boolean useTopic;
+        private final boolean useContentTypeHeader;
         
-        public TestStrategyImpl(boolean useTopic) {
-            super(useTopic ? "Topic" : "Queue");
+        public TestStrategyImpl(boolean useTopic, boolean useContentTypeHeader) {
+            super((useTopic ? "Topic" : "Queue") +
+                    (useContentTypeHeader ? "WithContentTypeHeader" : "WithoutContentTypeHeader"));
             this.useTopic = useTopic;
+            this.useContentTypeHeader = useContentTypeHeader;
         }
 
         private OMElement createParameterElement(String name, String value) {
@@ -126,7 +130,9 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
                     = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
                 TopicPublisher publisher = session.createPublisher(topic);
                 BytesMessage message = session.createBytesMessage();
-                message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+                if (useContentTypeHeader) {
+                    message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+                }
                 message.writeBytes(content);
                 publisher.send(message);
             } else {
@@ -138,7 +144,9 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
                     = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
                 QueueSender sender = session.createSender(queue);
                 BytesMessage message = session.createBytesMessage();
-                message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+                if (useContentTypeHeader) {
+                    message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+                }
                 message.writeBytes(content);
                 sender.send(message);
             }
@@ -148,14 +156,25 @@ public class JMSListenerTest extends TransportListenerTestTemplate {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
         for (boolean useTopic : new boolean[] { false, true }) {
-            TestStrategy strategy = new TestStrategyImpl(useTopic);
-            addSOAP11Tests(strategy, suite);
-            // TODO: POX tests don't work yet for JMS
-            // addPOXTests(strategy, suite);
-            addSwATests(strategy, suite);
-            // TODO: these tests are temporarily disabled because of SYNAPSE-304
-            // addTextPlainTests(strategy, suite);
-            addBinaryTest(strategy, suite);
+            for (boolean useContentTypeHeader : new boolean[] { false, true }) {
+                TestStrategy strategy = new TestStrategyImpl(useTopic, useContentTypeHeader);
+                if (useContentTypeHeader) {
+                    addSOAPTests(strategy, suite);
+                    // TODO: POX tests don't work yet for JMS
+                    // addPOXTests(strategy, suite);
+                    addSwATests(strategy, suite);
+                } else {
+                    // If no content type header is used, SwA can't be used and the JMS transport
+                    // always uses the default charset encoding
+                    suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11", testString,
+                            MessageContext.DEFAULT_CHAR_SET_ENCODING));
+                    suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12", testString,
+                            MessageContext.DEFAULT_CHAR_SET_ENCODING));
+                }
+                // TODO: these tests are temporarily disabled because of SYNAPSE-304
+                // addTextPlainTests(strategy, suite);
+                addBinaryTest(strategy, suite);
+            }
         }
         return suite;
     }

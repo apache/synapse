@@ -82,6 +82,8 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
         addSOAP11Tests(strategy, suite);
+        // TODO: POX tests don't work yet for mail transport
+        // addPOXTests(strategy, suite);
         // Temporarily skip this test until we know why it fails.
         // addSwATests(strategy, suite);
         // Temporarily skip the following tests until SYNAPSE-359 is solved

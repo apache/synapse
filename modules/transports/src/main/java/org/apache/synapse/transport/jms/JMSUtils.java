@@ -309,6 +309,7 @@ public class JMSUtils extends BaseUtils {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
 
                 BytesMessage byteMsg = (BytesMessage) message;
+                byteMsg.reset();
                 for (int bytesRead = byteMsg.readBytes(buffer); bytesRead != -1;
                      bytesRead = byteMsg.readBytes(buffer)) {
                     out.write(buffer, 0, bytesRead);

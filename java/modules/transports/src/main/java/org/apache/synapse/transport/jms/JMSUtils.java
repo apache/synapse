@@ -324,7 +324,8 @@ public class JMSUtils extends BaseUtils {
                     return new ByteArrayInputStream(
                         txtMsg.getText().getBytes(BuilderUtil.getCharSetEncoding(contentType)));
                 } else {
-                    return new ByteArrayInputStream(txtMsg.getText().getBytes());
+                    return new ByteArrayInputStream(
+                            txtMsg.getText().getBytes(MessageContext.DEFAULT_CHAR_SET_ENCODING));
                 }
 
             } else {

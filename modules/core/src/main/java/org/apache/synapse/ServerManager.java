@@ -408,10 +408,12 @@ public class ServerManager {
     }
 
     private String getParamValue(String paramKey) {
-        Parameter synCfgParam = configctx.getAxisConfiguration().getParameter(paramKey);
-        if (synCfgParam != null && synCfgParam.getValue() != null
-                && synCfgParam.getValue() instanceof String) {
-            return synCfgParam.getValue().toString();
+        if (configctx != null) {
+            Parameter synCfgParam = configctx.getAxisConfiguration().getParameter(paramKey);
+            if (synCfgParam != null && synCfgParam.getValue() != null
+                    && synCfgParam.getValue() instanceof String) {
+                return synCfgParam.getValue().toString();
+            }
         }
         return null;
     }

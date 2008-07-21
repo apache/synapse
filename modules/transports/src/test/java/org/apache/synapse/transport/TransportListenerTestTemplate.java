@@ -22,7 +22,6 @@ package org.apache.synapse.transport;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -102,28 +101,29 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         }
         
         /**
-         * Get the parameters necessary to configure a service to receive messages of
-         * a given content type through the transport under test.
+         * Set up the service so that it can receive messages through the transport under test.
+         * Implementations will typically call {@link AxisService#addParameter(Parameter)} to
+         * setup the service parameters required by the transport.
+         * The default implementation does nothing.
          * 
-         * @param contentType the content type
-         * @return a list of service parameters
+         * @param service
          * @throws Exception
          */
-        protected List<Parameter> getServiceParameters(String contentType) throws Exception {
-            return null;
+        protected void setupService(AxisService service) throws Exception {
         }
         
         /**
-         * Send a message to the transport listener. It is not recommended to use the
-         * corresponding transport sender to achieve this. Instead the implementation
-         * should use protocol specific libraries or APIs.
+         * Set up the expected content type on the given service. This method should only be
+         * implemented for transports that support {@link ContentTypeMode#SERVICE}.
+         * The default implementation throws an {@link UnsupportedOperationException}.
          * 
-         * @param endpointReference the endpoint reference of the service
-         * @param contentType the content type of the message
-         * @param content the content of the message
+         * @param service
+         * @param contentType the content type
          * @throws Exception
          */
-        protected abstract void sendMessage(String endpointReference, String contentType, byte[] content) throws Exception;
+        protected void setupContentType(AxisService service, String contentType) throws Exception {
+            throw new UnsupportedOperationException();
+        }
         
         public String getTestName(String baseName) {
             if (name == null) {
@@ -136,11 +136,13 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     
     public static abstract class TransportListenerTestCase extends TestCase {
         protected final TestStrategy strategy;
-        protected final String contentType;
+        private final ContentTypeMode contentTypeMode;
+        private final String contentType;
         
-        public TransportListenerTestCase(TestStrategy strategy, String baseName, String contentType) {
-            super(strategy.getTestName(baseName));
+        public TransportListenerTestCase(TestStrategy strategy, String baseName, ContentTypeMode contentTypeMode, String contentType) {
+            super(strategy.getTestName(baseName) + "_" + contentTypeMode);
             this.strategy = strategy;
+            this.contentTypeMode = contentTypeMode;
             this.contentType = contentType;
         }
 
@@ -174,11 +176,9 @@ public abstract class TransportListenerTestTemplate extends TestCase {
             MockMessageReceiver messageReceiver = new MockMessageReceiver();
             operation.setMessageReceiver(messageReceiver);
             service.addOperation(operation);
-            List<Parameter> parameters = strategy.getServiceParameters(contentType);
-            if (parameters != null) {
-                for (Parameter parameter : parameters) {
-                    service.addParameter(parameter);
-                }
+            strategy.setupService(service);
+            if (contentTypeMode == ContentTypeMode.SERVICE) {
+                strategy.setupContentType(service, contentType);
             }
             axisConfiguration.addService(service);
             
@@ -190,7 +190,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
                 EndpointReference[] endpointReferences
                     = trpInDesc.getReceiver().getEPRsForService(service.getName(), "localhost");
                 sendMessage(endpointReferences != null && endpointReferences.length > 0
-                                        ? endpointReferences[0].getAddress() : null);
+                                        ? endpointReferences[0].getAddress() : null,
+                                                contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
                 messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
                 if (messageData == null) {
                     fail("Failed to get message");
@@ -203,18 +204,47 @@ public abstract class TransportListenerTestTemplate extends TestCase {
             checkMessageData(messageData);
         }
         
-        protected abstract void sendMessage(String endpointReference) throws Exception;
+        protected abstract void sendMessage(String endpointReference, String contentType) throws Exception;
         protected abstract void checkMessageData(MessageData messageData) throws Exception;
     }
     
+    public interface XMLMessageSender {
+        void sendMessage(TestStrategy strategy, String endpointReference, String contentType, String charset, OMElement message) throws Exception;
+    }
+    
+    public static abstract class MessageSender implements XMLMessageSender {
+        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, String charset, OMElement message) throws Exception {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            OMOutputFormat outputFormat = new OMOutputFormat();
+            outputFormat.setCharSetEncoding(charset);
+            outputFormat.setIgnoreXMLDeclaration(true);
+            message.serializeAndConsume(baos, outputFormat);
+            sendMessage(strategy, endpointReference, contentType, baos.toByteArray());
+        }
+
+        /**
+         * Send a message to the transport listener. It is not recommended to use the
+         * corresponding transport sender to achieve this. Instead the implementation
+         * should use protocol specific libraries or APIs.
+         * 
+         * @param endpointReference the endpoint reference of the service
+         * @param contentType the content type of the message
+         * @param content the content of the message
+         * @throws Exception
+         */
+        public abstract void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception;
+    }
+    
     public static abstract class XMLMessageTestCase extends TransportListenerTestCase {
+        private final XMLMessageSender sender;
         private final String text;
         private final String charset;
         private OMElement orgElement;
         protected OMFactory factory;
         
-        public XMLMessageTestCase(TestStrategy strategy, String baseName, String baseContentType, String text, String charset) {
-            super(strategy, baseName, baseContentType + "; charset=\"" + charset + "\"");
+        public XMLMessageTestCase(TestStrategy strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, String text, String charset) {
+            super(strategy, baseName, contentTypeMode, baseContentType + "; charset=\"" + charset + "\"");
+            this.sender = sender;
             this.text = text;
             this.charset = charset;
         }
@@ -235,13 +265,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         }
 
         @Override
-        protected void sendMessage(String endpointReference) throws Exception {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            OMOutputFormat outputFormat = new OMOutputFormat();
-            outputFormat.setCharSetEncoding(charset);
-            outputFormat.setIgnoreXMLDeclaration(true);
-            getMessage(orgElement).serializeAndConsume(baos, outputFormat);
-            strategy.sendMessage(endpointReference, contentType, baos.toByteArray());
+        protected void sendMessage(String endpointReference, String contentType) throws Exception {
+            sender.sendMessage(strategy, endpointReference, contentType, charset, getMessage(orgElement));
         }
         
         protected abstract OMFactory getOMFactory();
@@ -249,8 +274,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static abstract class SOAPTestCase extends XMLMessageTestCase {
-        public SOAPTestCase(TestStrategy strategy, String baseName, String baseContentType, String text, String charset) {
-            super(strategy, baseName, baseContentType, text, charset);
+        public SOAPTestCase(TestStrategy strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, String text, String charset) {
+            super(strategy, sender, baseName, contentTypeMode, baseContentType, text, charset);
         }
 
         @Override
@@ -267,8 +292,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static class SOAP11TestCaseImpl extends SOAPTestCase {
-        public SOAP11TestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
-            super(strategy, baseName, SOAP11Constants.SOAP_11_CONTENT_TYPE, text, charset);
+        public SOAP11TestCaseImpl(TestStrategy strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String text, String charset) {
+            super(strategy, sender, baseName, contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, text, charset);
         }
 
         @Override
@@ -278,8 +303,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static class SOAP12TestCaseImpl extends SOAPTestCase {
-        public SOAP12TestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
-            super(strategy, baseName, SOAP12Constants.SOAP_12_CONTENT_TYPE, text, charset);
+        public SOAP12TestCaseImpl(TestStrategy strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String text, String charset) {
+            super(strategy, sender, baseName, contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, text, charset);
         }
 
         @Override
@@ -289,8 +314,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static class POXTestCaseImpl extends XMLMessageTestCase {
-        public POXTestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
-            super(strategy, baseName, "application/xml", text, charset);
+        public POXTestCaseImpl(TestStrategy strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String text, String charset) {
+            super(strategy, sender, baseName, contentTypeMode, "application/xml", text, charset);
         }
 
         @Override
@@ -305,18 +330,20 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     }
     
     public static class TextPlainTestCaseImpl extends TransportListenerTestCase {
+        private final MessageSender sender;
         private final String text;
         private final String charset;
 
-        public TextPlainTestCaseImpl(TestStrategy strategy, String baseName, String text, String charset) {
-            super(strategy, baseName, "text/plain; charset=\"" + charset + "\"");
+        public TextPlainTestCaseImpl(TestStrategy strategy, MessageSender sender, String baseName, ContentTypeMode contentTypeMode, String text, String charset) {
+            super(strategy, baseName, contentTypeMode, "text/plain; charset=\"" + charset + "\"");
+            this.sender = sender;
             this.text = text;
             this.charset = charset;
         }
 
         @Override
-        protected void sendMessage(String endpointReference) throws Exception {
-            strategy.sendMessage(endpointReference, contentType, text.getBytes(charset));
+        protected void sendMessage(String endpointReference, String contentType) throws Exception {
+            sender.sendMessage(strategy, endpointReference, contentType, text.getBytes(charset));
         }
         
         @Override
@@ -332,24 +359,24 @@ public abstract class TransportListenerTestTemplate extends TestCase {
     
     private static final Random random = new Random();
 
-    public static void addSOAPTests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii"));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8"));
-        suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1"));
-        suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12ASCII", "test string", "us-ascii"));
-        suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12UTF8", testString, "UTF-8"));
-        suite.addTest(new SOAP12TestCaseImpl(strategy, "SOAP12Latin1", testString, "ISO-8859-1"));
+    public static void addSOAPTests(TestStrategy strategy, XMLMessageSender sender, TestSuite suite, ContentTypeMode contentTypeMode) {
+        suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11ASCII", contentTypeMode, "test string", "us-ascii"));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11UTF8", contentTypeMode, testString, "UTF-8"));
+        suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11Latin1", contentTypeMode, testString, "ISO-8859-1"));
+        suite.addTest(new SOAP12TestCaseImpl(strategy, sender, "SOAP12ASCII", contentTypeMode, "test string", "us-ascii"));
+        suite.addTest(new SOAP12TestCaseImpl(strategy, sender, "SOAP12UTF8", contentTypeMode, testString, "UTF-8"));
+        suite.addTest(new SOAP12TestCaseImpl(strategy, sender, "SOAP12Latin1", contentTypeMode, testString, "ISO-8859-1"));
     }
     
-    public static void addPOXTests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new POXTestCaseImpl(strategy, "POXASCII", "test string", "us-ascii"));
-        suite.addTest(new POXTestCaseImpl(strategy, "POXUTF8", testString, "UTF-8"));
-        suite.addTest(new POXTestCaseImpl(strategy, "POXLatin1", testString, "ISO-8859-1"));
+    public static void addPOXTests(TestStrategy strategy, XMLMessageSender sender, TestSuite suite, ContentTypeMode contentTypeMode) {
+        suite.addTest(new POXTestCaseImpl(strategy, sender, "POXASCII", contentTypeMode, "test string", "us-ascii"));
+        suite.addTest(new POXTestCaseImpl(strategy, sender, "POXUTF8", contentTypeMode, testString, "UTF-8"));
+        suite.addTest(new POXTestCaseImpl(strategy, sender, "POXLatin1", contentTypeMode, testString, "ISO-8859-1"));
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public static void addSwATests(TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TransportListenerTestCase(strategy, "SOAPWithAttachments", null) {
+    public static void addSwATests(final TestStrategy strategy, final MessageSender sender, TestSuite suite) {
+        suite.addTest(new TransportListenerTestCase(strategy, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
             private byte[] attachmentContent;
             private String contentID;
             
@@ -361,7 +388,7 @@ public abstract class TransportListenerTestTemplate extends TestCase {
             }
 
             @Override
-            protected void sendMessage(String endpointReference) throws Exception {
+            protected void sendMessage(String endpointReference, String contentType) throws Exception {
                 SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
                 SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
                 SOAPBody orgBody = factory.createSOAPBody();
@@ -377,7 +404,7 @@ public abstract class TransportListenerTestTemplate extends TestCase {
                 orgAttachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, orgAttachments, outputFormat);
-                strategy.sendMessage(endpointReference, outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
+                sender.sendMessage(strategy, endpointReference, outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
             }
 
             @Override
@@ -392,14 +419,14 @@ public abstract class TransportListenerTestTemplate extends TestCase {
         });
     }
     
-    public static void addTextPlainTests(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TextPlainTestCaseImpl(strategy, "TextPlainASCII", "test string", "us-ascii"));
-        suite.addTest(new TextPlainTestCaseImpl(strategy, "TextPlainUTF8", testString, "UTF-8"));
-        suite.addTest(new TextPlainTestCaseImpl(strategy, "TextPlainLatin1", testString, "ISO-8859-1"));
+    public static void addTextPlainTests(TestStrategy strategy, MessageSender sender, TestSuite suite, ContentTypeMode contentTypeMode) {
+        suite.addTest(new TextPlainTestCaseImpl(strategy, sender, "TextPlainASCII", contentTypeMode, "test string", "us-ascii"));
+        suite.addTest(new TextPlainTestCaseImpl(strategy, sender, "TextPlainUTF8", contentTypeMode, testString, "UTF-8"));
+        suite.addTest(new TextPlainTestCaseImpl(strategy, sender, "TextPlainLatin1", contentTypeMode, testString, "ISO-8859-1"));
     }
     
-    public static void addBinaryTest(final TestStrategy strategy, TestSuite suite) {
-        suite.addTest(new TransportListenerTestCase(strategy, "Binary", "application/octet-stream") {
+    public static void addBinaryTest(final TestStrategy strategy, final MessageSender sender, TestSuite suite, ContentTypeMode contentTypeMode) {
+        suite.addTest(new TransportListenerTestCase(strategy, "Binary", contentTypeMode, "application/octet-stream") {
             private byte[] content;
             
             @Override
@@ -409,8 +436,8 @@ public abstract class TransportListenerTestTemplate extends TestCase {
             }
 
             @Override
-            protected void sendMessage(String endpointReference) throws Exception {
-                strategy.sendMessage(endpointReference, contentType, content);
+            protected void sendMessage(String endpointReference, String contentType) throws Exception {
+                sender.sendMessage(strategy, endpointReference, contentType, content);
             }
             
             @Override

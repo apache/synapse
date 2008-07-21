@@ -28,6 +28,7 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.io.IOUtils;
+import org.apache.synapse.transport.ContentTypeMode;
 import org.apache.synapse.transport.DefaultOperationDispatcher;
 import org.apache.synapse.transport.MessageData;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
@@ -40,9 +41,11 @@ public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
             trpInDesc.setReceiver(new HttpCoreNIOListener());
             return trpInDesc;
         }
-
+    }
+    
+    public static class JavaNetSender extends MessageSender {
         @Override
-        protected void sendMessage(String endpointReference, String contentType, byte[] content) throws Exception {
+        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception {
             URLConnection connection = new URL(endpointReference).openConnection();
             connection.setDoOutput(true);
             connection.setDoInput(true);
@@ -59,14 +62,15 @@ public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
-        addSOAPTests(strategy, suite);
-        addPOXTests(strategy, suite);
-        addSwATests(strategy, suite);
-        addTextPlainTests(strategy, suite);
-        addBinaryTest(strategy, suite);
-        suite.addTest(new TransportListenerTestCase(strategy, "REST", null) {
+        MessageSender sender = new JavaNetSender();
+        addSOAPTests(strategy, sender, suite, ContentTypeMode.TRANSPORT);
+        addPOXTests(strategy, sender, suite, ContentTypeMode.TRANSPORT);
+        addSwATests(strategy, sender, suite);
+        addTextPlainTests(strategy, sender, suite, ContentTypeMode.TRANSPORT);
+        addBinaryTest(strategy, sender, suite, ContentTypeMode.TRANSPORT);
+        suite.addTest(new TransportListenerTestCase(strategy, "REST", ContentTypeMode.TRANSPORT, null) {
             @Override
-            protected void sendMessage(String endpointReference) throws Exception {
+            protected void sendMessage(String endpointReference, String contentType) throws Exception {
                 URLConnection connection = new URL(endpointReference + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
                 connection.setDoInput(true);
                 InputStream in = connection.getInputStream();

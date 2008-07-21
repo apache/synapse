@@ -19,9 +19,7 @@
 
 package org.apache.synapse.transport.mail;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -36,21 +34,15 @@ import javax.mail.util.ByteArrayDataSource;
 
 import junit.framework.TestSuite;
 
-import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.synapse.transport.ContentTypeMode;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
 
 public class MailTransportListenerTest extends TransportListenerTestTemplate {
+    private static final String ADDRESS = "test-account@localhost";
+    
     public static class TestStrategyImpl extends TestStrategy {
-        private static final String ADDRESS = "test-account@localhost";
-        
-        private boolean useMultipart;
-        
-        public TestStrategyImpl(boolean useMultipart) {
-            super(useMultipart ? "Multipart" : null);
-            this.useMultipart = useMultipart;
-        }
-
         @Override
         protected TransportInDescription createTransportInDescription() {
             TransportInDescription trpInDesc
@@ -60,21 +52,19 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
         }
     
         @Override
-        protected List<Parameter> getServiceParameters(String contentType) throws Exception {
-            List<Parameter> parameters = new ArrayList<Parameter>();
-            parameters.add(new Parameter("transport.mail.Protocol", "test-store"));
-            parameters.add(new Parameter("transport.mail.Address", ADDRESS));
-            parameters.add(new Parameter("transport.PollInterval", "1"));
+        protected void setupService(AxisService service) throws Exception {
+            service.addParameter("transport.mail.Protocol", "test-store");
+            service.addParameter("transport.mail.Address", ADDRESS);
+            service.addParameter("transport.PollInterval", "1");
             // TODO: logically, this should be mail.test-store.user and mail.test-store.password
-            parameters.add(new Parameter("mail.pop3.user", ADDRESS));
-            parameters.add(new Parameter("mail.pop3.password", "dummy"));
-            return parameters;
+            service.addParameter("mail.pop3.user", ADDRESS);
+            service.addParameter("mail.pop3.password", "dummy");
         }
+    }
     
+    private static abstract class MailSender extends MessageSender {
         @Override
-        protected void sendMessage(String endpointReference,
-                                   String contentType,
-                                   byte[] content) throws Exception {
+        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception {
             Properties props = new Properties();
             props.put("mail.smtp.class", TestTransport.class.getName());
             Session session = Session.getInstance(props);
@@ -83,32 +73,44 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
             msg.setFrom(new InternetAddress("test-sender@localhost"));
             msg.setSentDate(new Date());
             DataHandler dh = new DataHandler(new ByteArrayDataSource(content, contentType));
-            if (useMultipart) {
-                MimeMultipart multipart = new MimeMultipart();
-                MimeBodyPart part1 = new MimeBodyPart();
-                part1.setContent("This is an automated message.", "text/plain");
-                multipart.addBodyPart(part1);
-                MimeBodyPart part2 = new MimeBodyPart();
-                part2.setDataHandler(dh);
-                multipart.addBodyPart(part2);
-                msg.setContent(multipart);
-            } else {
-                msg.setDataHandler(dh);
-            }
+            setupMessage(msg, dh);
             Transport.send(msg);
+        }
+        
+        protected abstract void setupMessage(MimeMessage msg, DataHandler dh) throws Exception;
+    }
+    
+    private static class MimeSender extends MailSender {
+        @Override
+        protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
+            msg.setDataHandler(dh);
+        }
+    }
+    
+    private static class MultipartSender extends MailSender {
+        @Override
+        protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
+            MimeMultipart multipart = new MimeMultipart();
+            MimeBodyPart part1 = new MimeBodyPart();
+            part1.setContent("This is an automated message.", "text/plain");
+            multipart.addBodyPart(part1);
+            MimeBodyPart part2 = new MimeBodyPart();
+            part2.setDataHandler(dh);
+            multipart.addBodyPart(part2);
+            msg.setContent(multipart);
         }
     }
     
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
-        for (boolean useMultipart : new boolean[] { false, true }) {
-            TestStrategy strategy = new TestStrategyImpl(useMultipart);
+        TestStrategy strategy = new TestStrategyImpl();
+        for (MessageSender sender : new MessageSender[] { new MimeSender(), new MultipartSender() }) {
             // TODO: SOAP 1.2 tests don't work yet for mail transport
-            suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11ASCII", "test string", "us-ascii"));
-            suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11UTF8", testString, "UTF-8"));
+            suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11ASCII", ContentTypeMode.TRANSPORT, "test string", "us-ascii"));
+            suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11UTF8", ContentTypeMode.TRANSPORT, testString, "UTF-8"));
             // TODO: this test fails when using multipart
-            if (!useMultipart) {
-                suite.addTest(new SOAP11TestCaseImpl(strategy, "SOAP11Latin1", testString, "ISO-8859-1"));
+            if (sender instanceof MimeSender) {
+                suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11Latin1", ContentTypeMode.TRANSPORT, testString, "ISO-8859-1"));
             }
             // addSOAPTests(strategy, suite);
             // TODO: POX tests don't work yet for mail transport

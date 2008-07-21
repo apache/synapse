@@ -22,13 +22,12 @@ package org.apache.synapse.transport.vfs;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.TestSuite;
 
-import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.synapse.transport.ContentTypeMode;
 import org.apache.synapse.transport.TransportListenerTestTemplate;
 
 /**
@@ -53,17 +52,21 @@ public class VFSTransportListenerTest extends TransportListenerTestTemplate {
         }
         
         @Override
-        protected List<Parameter> getServiceParameters(String contentType) throws Exception {
-            List<Parameter> parameters = new ArrayList<Parameter>();
-            parameters.add(new Parameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL()));
-            parameters.add(new Parameter("transport.vfs.ContentType", contentType));
-            parameters.add(new Parameter("transport.PollInterval", "1"));
-            parameters.add(new Parameter("transport.vfs.ActionAfterProcess", "DELETE"));
-            return parameters;
+        protected void setupService(AxisService service) throws Exception {
+            service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());
+            service.addParameter("transport.PollInterval", "1");
+            service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");
         }
-        
+
         @Override
-        protected void sendMessage(String endpointReference, String contentType, byte[] content) throws Exception {
+        protected void setupContentType(AxisService service, String contentType) throws Exception {
+            service.addParameter("transport.vfs.ContentType", contentType);
+        }
+    }
+    
+    private static class MessageSenderImpl extends MessageSender {
+        @Override
+        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception {
             OutputStream out = new FileOutputStream("target/vfs3/req/in");
             out.write(content);
             out.close();
@@ -73,11 +76,12 @@ public class VFSTransportListenerTest extends TransportListenerTestTemplate {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
         TestStrategy strategy = new TestStrategyImpl();
-        addSOAPTests(strategy, suite);
-        addPOXTests(strategy, suite);
+        MessageSender sender = new MessageSenderImpl();
+        addSOAPTests(strategy, sender, suite, ContentTypeMode.SERVICE);
+        addPOXTests(strategy, sender, suite, ContentTypeMode.SERVICE);
         // Since VFS has no Content-Type header, SwA is not supported.
-        addTextPlainTests(strategy, suite);
-        addBinaryTest(strategy, suite);
+        addTextPlainTests(strategy, sender, suite, ContentTypeMode.SERVICE);
+        addBinaryTest(strategy, sender, suite, ContentTypeMode.SERVICE);
         return suite;
     }
 }

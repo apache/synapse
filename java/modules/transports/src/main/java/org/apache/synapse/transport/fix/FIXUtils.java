@@ -21,6 +21,7 @@ package org.apache.synapse.transport.fix;
 
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -181,9 +182,29 @@ public class FIXUtils {
             log.debug("Extracting FIX message from the message context (Message ID: " + msgCtx.getMessageID() + ")");
         }
 
+        boolean withNs = false;
+        String nsPrefix = null;
+        String nsURI = null;
+        
         Message message = new Message();
         SOAPBody soapBody = msgCtx.getEnvelope().getBody();
-        OMElement messageNode = soapBody.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
+
+        //find namespace information embedded in the FIX payload
+        OMNamespace ns = getNamespaceOfFIXPayload(soapBody);
+        if (ns != null) {
+            withNs = true;
+            nsPrefix = ns.getPrefix();
+            nsURI = ns.getNamespaceURI();
+        }
+
+        OMElement messageNode;
+        if (withNs) {
+            messageNode = soapBody.getFirstChildWithName(new QName(nsURI, FIXConstants.FIX_MESSAGE,
+                    nsPrefix));
+        } else {
+            messageNode = soapBody.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
+        }
+
         Iterator<OMElement> messageElements = messageNode.getChildElements();
 
         while (messageElements.hasNext()) {
@@ -193,13 +214,26 @@ public class FIXUtils {
                 Iterator<OMElement> headerElements = node.getChildElements();
                 while (headerElements.hasNext()) {
                     OMElement headerNode = headerElements.next();
-                    String tag = headerNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                    String tag;
+                    if (withNs) {
+                        tag = headerNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID,
+                                nsPrefix));
+                    } else {
+                        tag = headerNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                    }
                     String value = null;
 
                     OMElement child = headerNode.getFirstElement();
                     if (child != null) {
-                        String href = headerNode.getFirstElement().
+                        String href;
+                        if (withNs) {
+                            href = headerNode.getFirstElement().
+                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_MESSAGE_REFERENCE, nsPrefix));    
+                        } else {
+                            href = headerNode.getFirstElement().
                                 getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
+                        }
+
                         if (href != null) {
                             DataHandler binaryDataHandler = msgCtx.getAttachment(href.substring(4));
                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -220,13 +254,26 @@ public class FIXUtils {
                 Iterator<OMElement> bodyElements = node.getChildElements();
                 while (bodyElements.hasNext()) {
                     OMElement bodyNode = bodyElements.next();
-                    String tag = bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                    String tag;
+                    if (withNs) {
+                        tag = bodyNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID,
+                                nsPrefix));
+                    } else {
+                        tag = bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                    }
+
                     String value = null;
 
                     OMElement child = bodyNode.getFirstElement();
                     if (child != null) {
-                        String href = bodyNode.getFirstElement().
-                                getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
+                        String href;
+                        if (withNs) {
+                            href = bodyNode.getFirstElement().
+                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix)) ;
+                        } else {
+                            href = bodyNode.getFirstElement().
+                                    getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
+                        }
                         if (href != null) {
                             DataHandler binaryDataHandler = msgCtx.getAttachment(href.substring(4));
                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -246,13 +293,24 @@ public class FIXUtils {
                 Iterator<OMElement> trailerElements = node.getChildElements();
                 while (trailerElements.hasNext()) {
                     OMElement trailerNode = trailerElements.next();
-                    String tag = trailerNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                    String tag;
+                    if (withNs) {
+                        tag = trailerNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
+                    } else {
+                        tag = trailerNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                    }
                     String value = null;
 
                     OMElement child = trailerNode.getFirstElement();
                     if (child != null) {
-                        String href = trailerNode.getFirstElement().
+                        String href;
+                        if (withNs) {
+                            href = trailerNode.getFirstElement().
+                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
+                        } else {
+                             href = trailerNode.getFirstElement().
                                 getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
+                        }
                         if (href != null) {
                             DataHandler binaryDataHandler = msgCtx.getAttachment(href.substring(4));
                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -339,7 +397,7 @@ public class FIXUtils {
         while (sessions.hasNext()) {
             SessionID session = sessions.next();
             String EPR = FIXConstants.FIX_PREFIX;
-            String paramValue = null;
+            String paramValue;
 
             EPR += settings.getString(session, FIXConstants.SOCKET_CONNECT_HOST);
             EPR += ":" + settings.getString(session, FIXConstants.SOCKET_CONNECT_PORT);
@@ -425,8 +483,7 @@ public class FIXUtils {
     public static boolean compareURLs(String url1, String url2) {
         if (!url1.substring(0, url1.indexOf("?")).equals(url2.substring(0, url2.indexOf("?")))) {
              return false;
-        }
-        else {
+        } else {
             Hashtable<String,String> properties1 = getProperties(url1);
             Hashtable<String, String> properties2 = getProperties(url2);
             Iterator<String> keys = properties1.keySet().iterator();
@@ -434,8 +491,7 @@ public class FIXUtils {
                 String key = keys.next();
                 if (!properties2.containsKey(key)) {
                     return false;
-                }
-                else if (!properties1.get(key).equals(properties2.get(key))) {
+                } else if (!properties1.get(key).equals(properties2.get(key))) {
                     return false;
                 }
             }
@@ -520,7 +576,7 @@ public class FIXUtils {
             }
         }
 
-        Map<String, String> trpHeaders = (Map) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
+        Map<String, String> trpHeaders = (Map<String, String>) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
         //try to get the service from the transport headers
         if (trpHeaders != null) {
             String serviceName = (trpHeaders.get(FIXConstants.FIX_MESSAGE_SERVICE));
@@ -587,13 +643,40 @@ public class FIXUtils {
      * @return application level sequence number or -1
      */
     public static int getSequenceNumber(MessageContext msgCtx) {
+        int seqNum;
         SOAPBody body = msgCtx.getEnvelope().getBody();
-        OMElement messageNode = body.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
-        String value = messageNode.getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_COUNTER));
+        OMNamespace ns = getNamespaceOfFIXPayload(body);
+        if (ns == null) {
+            OMElement messageNode = body.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
+            String value = messageNode.getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_COUNTER));
+            if (value != null) {
+                seqNum = Integer.parseInt(value);
+            } else {
+                seqNum = -1;
+            }
+        }
+        else {
+            seqNum = getSequenceNumber(body, ns);
+        }
+        return seqNum;
+    }
+
+    /**
+     * Reads the SOAP body of a message and attempts to retreive the application level sequence number
+     *
+     * @param body Body of the SOAP message
+     * @param ns Namespace
+     * @return application level sequence number or -1
+     */
+    private static int getSequenceNumber(SOAPBody body, OMNamespace ns) {
+        OMElement messageNode = body.getFirstChildWithName(new QName(ns.getNamespaceURI(),
+                FIXConstants.FIX_MESSAGE, ns.getPrefix()));
+        String value = messageNode.getAttributeValue(new QName(ns.getNamespaceURI(),
+                FIXConstants.FIX_MESSAGE_COUNTER, ns.getPrefix()));
         if (value != null) {
-            return Integer.parseInt(value);
+             return Integer.parseInt(value);
         } else {
-            return -1;
+             return -1;
         }
     }
 
@@ -604,8 +687,39 @@ public class FIXUtils {
      * @return a String uniquely identifying a session or null
      */
     public static String getSourceSession(MessageContext msgCtx) {
+        String srcSession;
         SOAPBody body = msgCtx.getEnvelope().getBody();
-        OMElement messageNode = body.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
-        return messageNode.getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_INCOMING_SESSION));
+        OMNamespace ns = getNamespaceOfFIXPayload(body);
+        if (ns == null) {
+            OMElement messageNode = body.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
+            srcSession = messageNode.getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_INCOMING_SESSION));
+        } else {
+            srcSession = getSourceSession(body, ns);
+        }
+        return srcSession;
+    }
+
+    /**
+     * Reads the SOAP body of a message and attempts to retreive the session identifier string with a namesapce
+     *
+     * @param body Body of the SOAP message
+     * @param ns Namespace
+     * @return a String uniquely identifying a session or null
+     */
+    private static String getSourceSession(SOAPBody body, OMNamespace ns) {
+           OMElement messageNode = body.getFirstChildWithName(new QName(ns.getNamespaceURI(),
+                   FIXConstants.FIX_MESSAGE, ns.getPrefix()));
+           return messageNode.getAttributeValue(new QName(ns.getNamespaceURI(),
+                   FIXConstants.FIX_MESSAGE_INCOMING_SESSION, ns.getPrefix()));
+    }
+
+    /**
+     * Read the FIX message payload and identify the namespace if exists
+     *
+     * @param fixBody FIX message payload
+     * @return  namespace as a OMNamespace
+     */
+    public static OMNamespace getNamespaceOfFIXPayload(SOAPBody fixBody){
+        return fixBody.getFirstElementNS();
     }
 }

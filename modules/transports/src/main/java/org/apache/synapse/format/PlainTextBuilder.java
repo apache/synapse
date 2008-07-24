@@ -20,6 +20,7 @@ package org.apache.synapse.format;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 import javax.xml.namespace.QName;
 
@@ -27,7 +28,6 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
@@ -42,19 +42,19 @@ import org.apache.synapse.transport.base.BaseUtils;
  * the text in a wrapper element. The name of the wrapper element can
  * be configured as a service parameter (see {@link BaseConstants#WRAPPER_PARAM}).
  * It defaults to {@link BaseConstants#DEFAULT_TEXT_WRAPPER}.
- * If the provided content type specifies a <tt>charset</tt> parameter
- * (e.g. <tt>text/plain; charset=ISO-8859-15</tt>) it is used to decode the text.
- * Otherwise the default charset encoding specified by
+ * If the content is provided as an {@link InputStream} and the content type specifies a
+ * <tt>charset</tt> parameter (e.g. <tt>text/plain; charset=ISO-8859-15</tt>),
+ * this information is used to decode the text.
+ * If the content is provided as an {@link InputStream} but no <tt>charset</tt> parameter
+ * is specified on the content type, the default charset encoding specified by
  * {@link MessageContext#DEFAULT_CHAR_SET_ENCODING} is used.
  */
-public class PlainTextBuilder implements Builder {
-    public OMElement processDocument(InputStream inputStream,
-                                     String contentType,
-                                     MessageContext msgContext) throws AxisFault {
-
+public class PlainTextBuilder implements TextMessageBuilder {
+    private OMElement buildMessage(String textPayload, MessageContext msgContext) {
         QName wrapperQName = BaseConstants.DEFAULT_TEXT_WRAPPER;
         if (msgContext.getAxisService() != null) {
-            Parameter wrapperParam = msgContext.getAxisService().getParameter(BaseConstants.WRAPPER_PARAM);
+            Parameter wrapperParam
+                    = msgContext.getAxisService().getParameter(BaseConstants.WRAPPER_PARAM);
             if (wrapperParam != null) {
                 wrapperQName = BaseUtils.getQNameFromString(wrapperParam.getValue());
             }
@@ -62,14 +62,35 @@ public class PlainTextBuilder implements Builder {
 
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement wrapper = factory.createOMElement(wrapperQName, null);
+        wrapper.addChild(factory.createOMText(textPayload));
+        return wrapper;
+    }
+    
+    public OMElement processDocument(InputStream inputStream,
+                                     String contentType,
+                                     MessageContext msgContext) throws AxisFault {
+
         String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
-        String textPayload;
         try {
-            textPayload = IOUtils.toString(inputStream, charSetEnc);
+            return buildMessage(IOUtils.toString(inputStream, charSetEnc), msgContext);
         } catch (IOException ex) {
             throw new AxisFault("Unable to read message payload", ex);
         }
-        wrapper.addChild(factory.createOMText(textPayload));
-        return wrapper;
+    }
+
+    public OMElement processDocument(Reader reader,
+                                     String contentType,
+                                     MessageContext msgContext) throws AxisFault {
+        try {
+            return buildMessage(IOUtils.toString(reader), msgContext);
+        } catch (IOException ex) {
+            throw new AxisFault("Unable to read message payload", ex);
+        }
+    }
+
+    public OMElement processDocument(String content,
+                                     String contentType,
+                                     MessageContext msgContext) throws AxisFault {
+        return buildMessage(content, msgContext);
     }
 }

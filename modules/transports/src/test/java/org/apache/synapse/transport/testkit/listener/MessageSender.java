@@ -19,30 +19,8 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import java.io.ByteArrayOutputStream;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMOutputFormat;
-
-public abstract class MessageSender implements XMLMessageSender {
-    public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, String charset, OMElement message) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OMOutputFormat outputFormat = new OMOutputFormat();
-        outputFormat.setCharSetEncoding(charset);
-        outputFormat.setIgnoreXMLDeclaration(true);
-        message.serializeAndConsume(baos, outputFormat);
-        sendMessage(strategy, endpointReference, contentType, baos.toByteArray());
-    }
-
-    /**
-     * Send a message to the transport listener. It is not recommended to use the
-     * corresponding transport sender to achieve this. Instead the implementation
-     * should use protocol specific libraries or APIs.
-     * 
-     * @param endpointReference the endpoint reference of the service
-     * @param contentType the content type of the message
-     * @param content the content of the message
-     * @throws Exception
-     */
-    public abstract void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception;
+public interface MessageSender {
+    void buildName(NameBuilder nameBuilder);
+    void setUp(ListenerTestSetup setup) throws Exception;
+    void tearDown() throws Exception;
 }

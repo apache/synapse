@@ -40,7 +40,7 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
-import org.apache.synapse.transport.testkit.listener.MessageSender;
+import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
 
 public class MailTransportListenerTest extends TestCase {
     private static final String ADDRESS = "test-account@localhost";
@@ -65,9 +65,9 @@ public class MailTransportListenerTest extends TestCase {
         }
     }
     
-    private static abstract class MailSender extends MessageSender {
+    private static abstract class MailSender extends BinaryPayloadSender {
         @Override
-        public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception {
+        public void sendMessage(ListenerTestSetup setup, String endpointReference, String contentType, byte[] content) throws Exception {
             Properties props = new Properties();
             props.put("mail.smtp.class", TestTransport.class.getName());
             Session session = Session.getInstance(props);
@@ -107,7 +107,7 @@ public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
         ListenerTestSetup setup = new TestStrategyImpl();
-        for (MessageSender sender : new MessageSender[] { new MimeSender(), new MultipartSender() }) {
+        for (BinaryPayloadSender sender : new BinaryPayloadSender[] { new MimeSender(), new MultipartSender() }) {
             // TODO: SOAP 1.2 tests don't work yet for mail transport
             suite.addSOAP11Test(setup, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.ASCII_TEST_DATA);
             suite.addSOAP11Test(setup, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.UTF8_TEST_DATA);

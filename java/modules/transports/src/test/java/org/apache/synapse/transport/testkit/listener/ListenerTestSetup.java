@@ -22,6 +22,7 @@ package org.apache.synapse.transport.testkit.listener;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 
 public abstract class ListenerTestSetup {
     private final String name;
@@ -41,6 +42,10 @@ public abstract class ListenerTestSetup {
      * @throws Exception
      */
     public abstract TransportInDescription createTransportInDescription() throws Exception;
+    
+    public TransportOutDescription createTransportOutDescription() throws Exception {
+        throw new UnsupportedOperationException();
+    }
     
     /**
      * Carry out initialization before server startup. This method is called
@@ -77,11 +82,7 @@ public abstract class ListenerTestSetup {
         throw new UnsupportedOperationException();
     }
     
-    public String getTestName(String baseName) {
-        if (name == null) {
-            return "test" + baseName;
-        } else {
-            return "test" + name + baseName;
-        }
+    public void buildName(NameBuilder nameBuilder) {
+        nameBuilder.addComponent("setup", name);
     }
 }

@@ -20,7 +20,10 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -49,6 +52,7 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.base.BaseConstants;
 
 public class ListenerTestSuite extends TestSuite {
@@ -77,7 +81,7 @@ public class ListenerTestSuite extends TestSuite {
     }
 
     public void addSOAP11Test(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new SOAPTestCase(strategy, sender, "SOAP11" + data.getName(), contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data) {
+        addTest(new SOAPTestCase(strategy, sender, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data) {
             @Override
             protected SOAPFactory getOMFactory() {
                 return OMAbstractFactory.getSOAP11Factory();
@@ -86,7 +90,7 @@ public class ListenerTestSuite extends TestSuite {
     }
     
     public void addSOAP12Test(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new SOAPTestCase(strategy, sender, "SOAP12" + data.getName(), contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data) {
+        addTest(new SOAPTestCase(strategy, sender, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data) {
             @Override
             protected SOAPFactory getOMFactory() {
                 return OMAbstractFactory.getSOAP12Factory();
@@ -102,7 +106,7 @@ public class ListenerTestSuite extends TestSuite {
     }
     
     public void addPOXTest(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLMessageTestCase(strategy, sender, "POX" + data.getName(), contentTypeMode, "application/xml", data) {
+        addTest(new XMLMessageTestCase(strategy, sender, "POX", contentTypeMode, "application/xml", data) {
             @Override
             protected OMFactory getOMFactory() {
                 return OMAbstractFactory.getOMFactory();
@@ -122,8 +126,8 @@ public class ListenerTestSuite extends TestSuite {
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public void addSwATests(final ListenerTestSetup setup, final MessageSender sender) {
-        addTest(new ListenerTestCase(setup, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
+    public void addSwATests(final ListenerTestSetup setup, BinaryPayloadSender sender) {
+        addTest(new ListenerTestCase<BinaryPayloadSender>(setup, sender, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
             private byte[] attachmentContent;
             private String contentID;
             
@@ -136,7 +140,7 @@ public class ListenerTestSuite extends TestSuite {
             }
 
             @Override
-            protected void sendMessage(String endpointReference, String contentType) throws Exception {
+            protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
                 SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
                 SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
                 SOAPBody orgBody = factory.createSOAPBody();
@@ -167,10 +171,16 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addTextPlainTest(ListenerTestSetup strategy, final MessageSender sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
-        addTest(new ListenerTestCase(strategy, "TextPlain" + data.getName(), contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"") {
+    public void addTextPlainTest(ListenerTestSetup strategy, BinaryPayloadSender sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
+        addTest(new ListenerTestCase<BinaryPayloadSender>(strategy, sender, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"") {
             @Override
-            protected void sendMessage(String endpointReference, String contentType) throws Exception {
+            protected void buildName(NameBuilder name) {
+                super.buildName(name);
+                data.buildName(name);
+            }
+            
+            @Override
+            protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
                 sender.sendMessage(getSetup(), endpointReference, contentType, data.getText().getBytes(data.getCharset()));
             }
             
@@ -184,14 +194,14 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addTextPlainTests(ListenerTestSetup setup, MessageSender sender, ContentTypeMode contentTypeMode) {
+    public void addTextPlainTests(ListenerTestSetup setup, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
             addTextPlainTest(setup, sender, contentTypeMode, data);
         }
     }
     
-    public void addBinaryTest(final ListenerTestSetup setup, final MessageSender sender, ContentTypeMode contentTypeMode) {
-        addTest(new ListenerTestCase(setup, "Binary", contentTypeMode, "application/octet-stream") {
+    public void addBinaryTest(final ListenerTestSetup setup, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
+        addTest(new ListenerTestCase<BinaryPayloadSender>(setup, sender, "Binary", contentTypeMode, "application/octet-stream") {
             private byte[] content;
             
             @Override
@@ -202,7 +212,7 @@ public class ListenerTestSuite extends TestSuite {
             }
 
             @Override
-            protected void sendMessage(String endpointReference, String contentType) throws Exception {
+            protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
                 sender.sendMessage(setup, endpointReference, contentType, content);
             }
             
@@ -216,6 +226,20 @@ public class ListenerTestSuite extends TestSuite {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ((DataHandler)((OMText)child).getDataHandler()).writeTo(baos);
                 assertTrue(Arrays.equals(content, baos.toByteArray()));
+            }
+        });
+    }
+
+    public void addRESTTests(final ListenerTestSetup setup, RESTSender sender) {
+        addTest(new ListenerTestCase<RESTSender>(setup, sender, "REST", ContentTypeMode.TRANSPORT, null) {
+            @Override
+            protected void sendMessage(RESTSender sender, String endpointReference, String contentType) throws Exception {
+                sender.sendMessage(endpointReference);
+            }
+        
+            @Override
+            protected void checkMessageData(MessageData messageData) throws Exception {
+                // TODO
             }
         });
     }

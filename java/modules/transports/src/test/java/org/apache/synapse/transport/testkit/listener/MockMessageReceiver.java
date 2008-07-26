@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport;
+package org.apache.synapse.transport.testkit.listener;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

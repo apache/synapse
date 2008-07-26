@@ -24,19 +24,23 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.io.IOUtils;
-import org.apache.synapse.transport.ContentTypeMode;
-import org.apache.synapse.transport.DefaultOperationDispatcher;
-import org.apache.synapse.transport.MessageData;
-import org.apache.synapse.transport.TransportListenerTestTemplate;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
+import org.apache.synapse.transport.testkit.listener.ListenerTestCase;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
+import org.apache.synapse.transport.testkit.listener.MessageData;
+import org.apache.synapse.transport.testkit.listener.MessageSender;
 
-public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
-    public static class TestStrategyImpl extends TestStrategy {
+public class HttpCoreNIOListenerTest extends TestCase {
+    public static class TestStrategyImpl extends ListenerTestSetup {
         @Override
-        protected TransportInDescription createTransportInDescription() {
+        public TransportInDescription createTransportInDescription() {
             TransportInDescription trpInDesc = new TransportInDescription("http");
             trpInDesc.setReceiver(new HttpCoreNIOListener());
             return trpInDesc;
@@ -45,7 +49,7 @@ public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
     
     public static class JavaNetSender extends MessageSender {
         @Override
-        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception {
+        public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception {
             URLConnection connection = new URL(endpointReference).openConnection();
             connection.setDoOutput(true);
             connection.setDoInput(true);
@@ -60,15 +64,15 @@ public class HttpCoreNIOListenerTest extends TransportListenerTestTemplate {
     }
     
     public static TestSuite suite() {
-        TestSuite suite = new TestSuite();
-        TestStrategy strategy = new TestStrategyImpl();
+        ListenerTestSuite suite = new ListenerTestSuite();
+        ListenerTestSetup setup = new TestStrategyImpl();
         MessageSender sender = new JavaNetSender();
-        addSOAPTests(strategy, sender, suite, ContentTypeMode.TRANSPORT);
-        addPOXTests(strategy, sender, suite, ContentTypeMode.TRANSPORT);
-        addSwATests(strategy, sender, suite);
-        addTextPlainTests(strategy, sender, suite, ContentTypeMode.TRANSPORT);
-        addBinaryTest(strategy, sender, suite, ContentTypeMode.TRANSPORT);
-        suite.addTest(new TransportListenerTestCase(strategy, "REST", ContentTypeMode.TRANSPORT, null) {
+        suite.addSOAPTests(setup, sender, ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(setup, sender, ContentTypeMode.TRANSPORT);
+        suite.addSwATests(setup, sender);
+        suite.addTextPlainTests(setup, sender, ContentTypeMode.TRANSPORT);
+        suite.addBinaryTest(setup, sender, ContentTypeMode.TRANSPORT);
+        suite.addTest(new ListenerTestCase(setup, "REST", ContentTypeMode.TRANSPORT, null) {
             @Override
             protected void sendMessage(String endpointReference, String contentType) throws Exception {
                 URLConnection connection = new URL(endpointReference + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();

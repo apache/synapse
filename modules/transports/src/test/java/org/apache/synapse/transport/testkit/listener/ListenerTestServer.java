@@ -27,8 +27,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.DispatchPhase;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
-import org.apache.synapse.transport.base.event.TransportErrorListener;
-import org.apache.synapse.transport.base.event.TransportErrorSource;
+//import org.apache.synapse.transport.base.event.TransportErrorListener;
+//import org.apache.synapse.transport.base.event.TransportErrorSource;
 
 public class ListenerTestServer extends UtilsTransportServer {
     private final TransportListener listener;
@@ -54,17 +54,17 @@ public class ListenerTestServer extends UtilsTransportServer {
         dispatchPhase.addHandler(dispatcher);
     }
     
-    public void addErrorListener(TransportErrorListener listener) {
-        if (listener instanceof TransportErrorSource) {
-            ((TransportErrorSource)listener).addErrorListener(listener);
-        }
-    }
-    
-    public void removeErrorListener(TransportErrorListener listener) {
-        if (listener instanceof TransportErrorSource) {
-            ((TransportErrorSource)listener).removeErrorListener(listener);
-        }
-    }
+//    public void addErrorListener(TransportErrorListener listener) {
+//        if (listener instanceof TransportErrorSource) {
+//            ((TransportErrorSource)listener).addErrorListener(listener);
+//        }
+//    }
+//    
+//    public void removeErrorListener(TransportErrorListener listener) {
+//        if (listener instanceof TransportErrorSource) {
+//            ((TransportErrorSource)listener).removeErrorListener(listener);
+//        }
+//    }
 
     public String getEPR(AxisService service) throws AxisFault {
         EndpointReference[] endpointReferences =

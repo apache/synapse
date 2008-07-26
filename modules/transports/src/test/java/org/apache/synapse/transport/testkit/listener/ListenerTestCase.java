@@ -30,7 +30,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 
 public abstract class ListenerTestCase<S extends MessageSender> extends TestCase {
     private final String name;
-    private final ListenerTestSetup setup;
+    private final Channel<?> channel;
     private final S sender;
     private final ContentTypeMode contentTypeMode;
     private final String contentType;
@@ -38,8 +38,8 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
     private ListenerTestServer server;
     private boolean manageServer = true;
     
-    public ListenerTestCase(ListenerTestSetup setup, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
-        this.setup = setup;
+    public ListenerTestCase(Channel<?> channel, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
+        this.channel = channel;
         this.sender = sender;
         this.name = name;
         this.contentTypeMode = contentTypeMode;
@@ -52,7 +52,7 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
         if (testName == null) {
             NameBuilder nameBuilder = new NameBuilder();
             nameBuilder.addComponent("test", name);
-            setup.buildName(nameBuilder);
+            channel.buildName(nameBuilder);
             buildName(nameBuilder);
             nameBuilder.addComponent("contentTypeMode", contentTypeMode.toString().toLowerCase());
             testName = nameBuilder.toString();
@@ -65,8 +65,12 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
         sender.buildName(name);
     }
     
+    public Channel<?> getChannel() {
+        return channel;
+    }
+
     public ListenerTestSetup getSetup() {
-        return setup;
+        return channel.getSetup();
     }
     
     public void setServer(ListenerTestServer server){
@@ -77,11 +81,10 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
     @Override
     protected void setUp() throws Exception {
         if (manageServer) {
-            server = new ListenerTestServer(setup);
-            setup.beforeStartup();
+            server = new ListenerTestServer(channel);
             server.start();
         }
-        sender.setUp(setup);
+        sender.setUp(channel);
     }
 
     @Override
@@ -94,9 +97,9 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
         MockMessageReceiver messageReceiver = new MockMessageReceiver();
         operation.setMessageReceiver(messageReceiver);
         service.addOperation(operation);
-        setup.setupService(service);
+        channel.setupService(service);
         if (contentTypeMode == ContentTypeMode.SERVICE) {
-            setup.setupContentType(service, contentType);
+            channel.getSetup().setupContentType(service, contentType);
         }
         
         // Run the test.
@@ -125,7 +128,6 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
         sender.tearDown();
         if (manageServer) {
             server.stop();
-            Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
             server = null;
         }
     }

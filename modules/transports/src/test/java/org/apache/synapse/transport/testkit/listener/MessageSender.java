@@ -21,6 +21,6 @@ package org.apache.synapse.transport.testkit.listener;
 
 public interface MessageSender {
     void buildName(NameBuilder nameBuilder);
-    void setUp(ListenerTestSetup setup) throws Exception;
+    void setUp(Channel<?> channel) throws Exception;
     void tearDown() throws Exception;
 }

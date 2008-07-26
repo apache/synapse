@@ -33,13 +33,13 @@ public abstract class BinaryPayloadSender extends AbstractMessageSender implemen
         super(name);
     }
 
-    public void sendMessage(ListenerTestSetup setup, String endpointReference, String contentType, String charset, OMElement message) throws Exception {
+    public void sendMessage(Channel<?> channel, String endpointReference, String contentType, String charset, OMElement message) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OMOutputFormat outputFormat = new OMOutputFormat();
         outputFormat.setCharSetEncoding(charset);
         outputFormat.setIgnoreXMLDeclaration(true);
         message.serializeAndConsume(baos, outputFormat);
-        sendMessage(setup, endpointReference, contentType, baos.toByteArray());
+        sendMessage(channel, endpointReference, contentType, baos.toByteArray());
     }
 
     /**
@@ -52,5 +52,5 @@ public abstract class BinaryPayloadSender extends AbstractMessageSender implemen
      * @param content the content of the message
      * @throws Exception
      */
-    public abstract void sendMessage(ListenerTestSetup setup, String endpointReference, String contentType, byte[] content) throws Exception;
+    public abstract void sendMessage(Channel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception;
 }

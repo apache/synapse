@@ -160,9 +160,9 @@ public class JMSListener extends AbstractTransportListener implements Management
 
         // compute service EPR and keep for later use
         String destinationName = JMSUtils.getJNDIDestinationNameForService(service);
-        serviceNameToEPRMap.put(service.getName(), JMSUtils.getEPR(cf, destinationName));
-
         String destinationType = JMSUtils.getDestinationTypeForService(service);
+        serviceNameToEPRMap.put(service.getName(),
+                JMSUtils.getEPR(cf, destinationType, destinationName));
         
         log.info("Starting to listen on destination : " + destinationName + " of type "
                 + destinationType + " for service " + service.getName());

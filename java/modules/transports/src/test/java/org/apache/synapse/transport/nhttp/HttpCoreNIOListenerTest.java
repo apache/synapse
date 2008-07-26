@@ -24,23 +24,22 @@ import junit.framework.TestSuite;
 
 import org.apache.synapse.transport.testkit.listener.AxisMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
-        ListenerTestSetup setup = new HttpCoreNIOListenerSetup();
+        HttpChannel channel = new HttpChannel();
         JavaNetSender javaNetSender = new JavaNetSender();
         for (XMLMessageSender sender : new XMLMessageSender[] { javaNetSender, new AxisMessageSender() }) {
-            suite.addSOAPTests(setup, sender, ContentTypeMode.TRANSPORT);
-            suite.addPOXTests(setup, sender, ContentTypeMode.TRANSPORT);
+            suite.addSOAPTests(channel, sender, ContentTypeMode.TRANSPORT);
+            suite.addPOXTests(channel, sender, ContentTypeMode.TRANSPORT);
         }
-        suite.addSwATests(setup, javaNetSender);
-        suite.addTextPlainTests(setup, javaNetSender, ContentTypeMode.TRANSPORT);
-        suite.addBinaryTest(setup, javaNetSender, ContentTypeMode.TRANSPORT);
-        suite.addRESTTests(setup, javaNetSender);
+        suite.addSwATests(channel, javaNetSender);
+        suite.addTextPlainTests(channel, javaNetSender, ContentTypeMode.TRANSPORT);
+        suite.addBinaryTest(channel, javaNetSender, ContentTypeMode.TRANSPORT);
+        suite.addRESTTests(channel, javaNetSender);
         return suite;
     }
 }

@@ -17,24 +17,43 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.nhttp;
+package org.apache.synapse.transport.testkit.listener;
 
-import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 
-public class HttpCoreNIOListenerSetup extends ListenerTestSetup {
-    @Override
-    public TransportInDescription createTransportInDescription() {
-        TransportInDescription trpInDesc = new TransportInDescription("http");
-        trpInDesc.setReceiver(new HttpCoreNIOListener());
-        return trpInDesc;
+public abstract class AbstractChannel<T extends ListenerTestSetup> implements Channel<T> {
+    private final String name;
+    protected final T setup;
+    
+    public AbstractChannel(String name, T setup) {
+        this.name = name;
+        this.setup = setup;
     }
 
-    @Override
+    public AbstractChannel(T setup) {
+        this(null, setup);
+    }
+    
+    public final T getSetup() {
+        return setup;
+    }
+
+    public void buildName(NameBuilder nameBuilder) {
+        setup.buildName(nameBuilder);
+        nameBuilder.addComponent("channel", name);
+    }
+
     public TransportOutDescription createTransportOutDescription() throws Exception {
-        TransportOutDescription trpOutDesc = new TransportOutDescription("http");
-        trpOutDesc.setSender(new HttpCoreNIOSender());
-        return trpOutDesc;
+        throw new UnsupportedOperationException();
+    }
+
+    public void setupService(AxisService service) throws Exception {
+    }
+    
+    public void setUp() throws Exception {
+    }
+
+    public void tearDown() throws Exception {
     }
 }

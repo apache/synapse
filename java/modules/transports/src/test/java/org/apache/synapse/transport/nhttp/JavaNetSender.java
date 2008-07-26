@@ -25,9 +25,9 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
+import org.apache.synapse.transport.testkit.listener.Channel;
+import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
 import org.apache.synapse.transport.testkit.listener.RESTSender;
 
 public class JavaNetSender extends BinaryPayloadSender implements RESTSender {
@@ -36,7 +36,7 @@ public class JavaNetSender extends BinaryPayloadSender implements RESTSender {
     }
     
     @Override
-    public void sendMessage(ListenerTestSetup setup, String endpointReference, String contentType, byte[] content) throws Exception {
+    public void sendMessage(Channel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception {
         URLConnection connection = new URL(endpointReference).openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);

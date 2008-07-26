@@ -28,7 +28,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
 
 public class JMSTextMessageSender extends AbstractMessageSender implements XMLMessageSender {
@@ -36,11 +36,11 @@ public class JMSTextMessageSender extends AbstractMessageSender implements XMLMe
         super("TextMessage");
     }
 
-    public void sendMessage(ListenerTestSetup _setup,
+    public void sendMessage(Channel<?> _channel,
             String endpointReference, String contentType, String charset,
             OMElement omMessage) throws Exception {
-        JMSListenerSetup setup = (JMSListenerSetup)_setup;
-        Session session = setup.createSession();
+        JMSChannel channel = (JMSChannel)_channel;
+        Session session = channel.createSession();
         TextMessage message = session.createTextMessage();
         if (contentType != null) {
             message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
@@ -50,6 +50,6 @@ public class JMSTextMessageSender extends AbstractMessageSender implements XMLMe
         StringWriter sw = new StringWriter();
         omMessage.serializeAndConsume(sw, format);
         message.setText(sw.toString());
-        setup.send(session, message);
+        channel.send(session, message);
     }
 }

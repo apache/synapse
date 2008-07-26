@@ -20,11 +20,10 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 
 public abstract class ListenerTestSetup {
+    public static final ListenerTestSetup DEFAULT = new ListenerTestSetup() {};
+    
     private final String name;
     
     public ListenerTestSetup() {
@@ -36,18 +35,6 @@ public abstract class ListenerTestSetup {
     }
     
     /**
-     * Create a TransportInDescription for the transport under test.
-     * 
-     * @return the transport description
-     * @throws Exception
-     */
-    public abstract TransportInDescription createTransportInDescription() throws Exception;
-    
-    public TransportOutDescription createTransportOutDescription() throws Exception {
-        throw new UnsupportedOperationException();
-    }
-    
-    /**
      * Carry out initialization before server startup. This method is called
      * immediately before the test server is started and can be used by subclasses
      * to set up the test environment.
@@ -55,18 +42,6 @@ public abstract class ListenerTestSetup {
      * @throws Exception
      */
     public void beforeStartup() throws Exception {
-    }
-    
-    /**
-     * Set up the service so that it can receive messages through the transport under test.
-     * Implementations will typically call {@link AxisService#addParameter(Parameter)} to
-     * setup the service parameters required by the transport.
-     * The default implementation does nothing.
-     * 
-     * @param service
-     * @throws Exception
-     */
-    public void setupService(AxisService service) throws Exception {
     }
     
     /**

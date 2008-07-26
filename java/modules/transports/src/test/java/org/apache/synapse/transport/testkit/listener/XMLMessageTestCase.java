@@ -30,8 +30,8 @@ public abstract class XMLMessageTestCase extends ListenerTestCase<XMLMessageSend
     private OMElement orgElement;
     protected OMFactory factory;
     
-    public XMLMessageTestCase(ListenerTestSetup setup, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
-        super(setup, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"");
+    public XMLMessageTestCase(Channel<?> channel, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+        super(channel, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"");
         this.data = data;
     }
     
@@ -59,7 +59,7 @@ public abstract class XMLMessageTestCase extends ListenerTestCase<XMLMessageSend
 
     @Override
     protected void sendMessage(XMLMessageSender sender, String endpointReference, String contentType) throws Exception {
-        sender.sendMessage(getSetup(), endpointReference, contentType, data.getCharset(), getMessage(orgElement));
+        sender.sendMessage(getChannel(), endpointReference, contentType, data.getCharset(), getMessage(orgElement));
     }
     
     protected abstract OMFactory getOMFactory();

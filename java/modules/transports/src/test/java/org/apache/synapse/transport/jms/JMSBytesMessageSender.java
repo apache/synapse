@@ -23,8 +23,8 @@ import javax.jms.BytesMessage;
 import javax.jms.Session;
 
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
+import org.apache.synapse.transport.testkit.listener.Channel;
 
 public class JMSBytesMessageSender extends BinaryPayloadSender {
     public JMSBytesMessageSender() {
@@ -32,17 +32,17 @@ public class JMSBytesMessageSender extends BinaryPayloadSender {
     }
     
     @Override
-    public void sendMessage(ListenerTestSetup _setup,
+    public void sendMessage(Channel<?> _channel,
                             String endpointReference,
                             String contentType,
                             byte[] content) throws Exception {
-        JMSListenerSetup setup = (JMSListenerSetup)_setup;
-        Session session = setup.createSession();
+        JMSChannel channel = (JMSChannel)_channel;
+        Session session = channel.createSession();
         BytesMessage message = session.createBytesMessage();
         if (contentType != null) {
             message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
         }
         message.writeBytes(content);
-        setup.send(session, message);
+        channel.send(session, message);
     }
 }

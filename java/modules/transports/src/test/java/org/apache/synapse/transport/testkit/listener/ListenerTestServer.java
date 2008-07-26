@@ -31,10 +31,37 @@ import org.apache.synapse.transport.UtilsTransportServer;
 //import org.apache.synapse.transport.base.event.TransportErrorSource;
 
 public class ListenerTestServer extends UtilsTransportServer {
-    private final TransportListener listener;
+    private static ListenerTestServer activeServer;
     
-    public ListenerTestServer(ListenerTestSetup setup) throws Exception {
-        TransportInDescription trpInDesc = setup.createTransportInDescription();
+    private final Channel<?> channel;
+    private TransportListener listener;
+    
+    public ListenerTestServer(Channel<?> channel) throws Exception {
+        this.channel = channel;
+    }
+    
+//    public void addErrorListener(TransportErrorListener listener) {
+//        if (listener instanceof TransportErrorSource) {
+//            ((TransportErrorSource)listener).addErrorListener(listener);
+//        }
+//    }
+//    
+//    public void removeErrorListener(TransportErrorListener listener) {
+//        if (listener instanceof TransportErrorSource) {
+//            ((TransportErrorSource)listener).removeErrorListener(listener);
+//        }
+//    }
+
+    @Override
+    public void start() throws Exception {
+        if (activeServer != null) {
+            throw new IllegalStateException();
+        }
+        activeServer = this;
+        
+        channel.getSetup().beforeStartup();
+        
+        TransportInDescription trpInDesc = channel.createTransportInDescription();
         listener = trpInDesc.getReceiver();
         addTransport(trpInDesc);
         
@@ -52,19 +79,18 @@ public class ListenerTestServer extends UtilsTransportServer {
         DefaultOperationDispatcher dispatcher = new DefaultOperationDispatcher();
         dispatcher.initDispatcher();
         dispatchPhase.addHandler(dispatcher);
+        
+        channel.setUp();
+        super.start();
     }
-    
-//    public void addErrorListener(TransportErrorListener listener) {
-//        if (listener instanceof TransportErrorSource) {
-//            ((TransportErrorSource)listener).addErrorListener(listener);
-//        }
-//    }
-//    
-//    public void removeErrorListener(TransportErrorListener listener) {
-//        if (listener instanceof TransportErrorSource) {
-//            ((TransportErrorSource)listener).removeErrorListener(listener);
-//        }
-//    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        channel.tearDown();
+        Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
+        activeServer = null;
+    }
 
     public String getEPR(AxisService service) throws AxisFault {
         EndpointReference[] endpointReferences =

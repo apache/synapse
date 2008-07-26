@@ -17,26 +17,14 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.mail;
 
-public abstract class AbstractMessageSender implements MessageSender {
-    private final String name;
-    
-    public AbstractMessageSender(String name) {
-        this.name = name;
-    }
-    
-    public AbstractMessageSender() {
-        this(null);
-    }
-    
-    public void buildName(NameBuilder nameBuilder) {
-        nameBuilder.addComponent("sender", name);
-    }
-    
-    public void setUp(Channel<?> channel) throws Exception {
-    }
-    
-    public void tearDown() throws Exception {
+import javax.activation.DataHandler;
+import javax.mail.internet.MimeMessage;
+
+class MimeSender extends MailSender {
+    @Override
+    protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
+        msg.setDataHandler(dh);
     }
 }

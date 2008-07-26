@@ -32,19 +32,22 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.synapse.transport.ContentTypeMode;
-import org.apache.synapse.transport.TransportListenerTestTemplate;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
+import org.apache.synapse.transport.testkit.listener.MessageSender;
 
-public class MailTransportListenerTest extends TransportListenerTestTemplate {
+public class MailTransportListenerTest extends TestCase {
     private static final String ADDRESS = "test-account@localhost";
     
-    public static class TestStrategyImpl extends TestStrategy {
+    public static class TestStrategyImpl extends ListenerTestSetup {
         @Override
-        protected TransportInDescription createTransportInDescription() {
+        public TransportInDescription createTransportInDescription() {
             TransportInDescription trpInDesc
                 = new TransportInDescription(MailConstants.TRANSPORT_NAME);
             trpInDesc.setReceiver(new MailTransportListener());
@@ -52,7 +55,7 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
         }
     
         @Override
-        protected void setupService(AxisService service) throws Exception {
+        public void setupService(AxisService service) throws Exception {
             service.addParameter("transport.mail.Protocol", "test-store");
             service.addParameter("transport.mail.Address", ADDRESS);
             service.addParameter("transport.PollInterval", "1");
@@ -64,7 +67,7 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
     
     private static abstract class MailSender extends MessageSender {
         @Override
-        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception {
+        public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception {
             Properties props = new Properties();
             props.put("mail.smtp.class", TestTransport.class.getName());
             Session session = Session.getInstance(props);
@@ -102,15 +105,15 @@ public class MailTransportListenerTest extends TransportListenerTestTemplate {
     }
     
     public static TestSuite suite() {
-        TestSuite suite = new TestSuite();
-        TestStrategy strategy = new TestStrategyImpl();
+        ListenerTestSuite suite = new ListenerTestSuite();
+        ListenerTestSetup setup = new TestStrategyImpl();
         for (MessageSender sender : new MessageSender[] { new MimeSender(), new MultipartSender() }) {
             // TODO: SOAP 1.2 tests don't work yet for mail transport
-            suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11ASCII", ContentTypeMode.TRANSPORT, "test string", "us-ascii"));
-            suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11UTF8", ContentTypeMode.TRANSPORT, testString, "UTF-8"));
+            suite.addSOAP11Test(setup, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.ASCII_TEST_DATA);
+            suite.addSOAP11Test(setup, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.UTF8_TEST_DATA);
             // TODO: this test fails when using multipart
             if (sender instanceof MimeSender) {
-                suite.addTest(new SOAP11TestCaseImpl(strategy, sender, "SOAP11Latin1", ContentTypeMode.TRANSPORT, testString, "ISO-8859-1"));
+                suite.addSOAP11Test(setup, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.LATIN1_TEST_DATA);
             }
             // addSOAPTests(strategy, suite);
             // TODO: POX tests don't work yet for mail transport

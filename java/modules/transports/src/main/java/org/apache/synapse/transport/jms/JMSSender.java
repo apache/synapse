@@ -39,6 +39,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -414,7 +415,11 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
             } else {
                 message = session.createTextMessage();  // default
                 TextMessage txtMsg = (TextMessage) message;
-                txtMsg.setText(new String(baos.toByteArray()));
+                try {
+                    txtMsg.setText(new String(baos.toByteArray(), format.getCharSetEncoding()));
+                } catch (UnsupportedEncodingException ex) {
+                    handleException("Unsupported encoding " + format.getCharSetEncoding(), ex);
+                }
             }
             message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
 

@@ -28,19 +28,41 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 
-public abstract class ListenerTestCase extends TestCase {
+public abstract class ListenerTestCase<S extends MessageSender> extends TestCase {
+    private final String name;
     private final ListenerTestSetup setup;
+    private final S sender;
     private final ContentTypeMode contentTypeMode;
     private final String contentType;
     
     private ListenerTestServer server;
     private boolean manageServer = true;
     
-    public ListenerTestCase(ListenerTestSetup setup, String baseName, ContentTypeMode contentTypeMode, String contentType) {
-        super(setup.getTestName(baseName) + "_" + contentTypeMode);
+    public ListenerTestCase(ListenerTestSetup setup, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
         this.setup = setup;
+        this.sender = sender;
+        this.name = name;
         this.contentTypeMode = contentTypeMode;
         this.contentType = contentType;
+    }
+    
+    @Override
+    public String getName() {
+        String testName = super.getName();
+        if (testName == null) {
+            NameBuilder nameBuilder = new NameBuilder();
+            nameBuilder.addComponent("test", name);
+            setup.buildName(nameBuilder);
+            buildName(nameBuilder);
+            nameBuilder.addComponent("contentTypeMode", contentTypeMode.toString().toLowerCase());
+            testName = nameBuilder.toString();
+            setName(testName);
+        }
+        return testName;
+    }
+
+    protected void buildName(NameBuilder name) {
+        sender.buildName(name);
     }
     
     public ListenerTestSetup getSetup() {
@@ -59,6 +81,7 @@ public abstract class ListenerTestCase extends TestCase {
             setup.beforeStartup();
             server.start();
         }
+        sender.setUp(setup);
     }
 
     @Override
@@ -80,8 +103,9 @@ public abstract class ListenerTestCase extends TestCase {
         MessageData messageData;
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();
         axisConfiguration.addService(service);
+        server.addErrorListener(messageReceiver);
         try {
-            sendMessage(server.getEPR(service),
+            sendMessage(sender, server.getEPR(service),
                     contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
             messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
             if (messageData == null) {
@@ -89,6 +113,7 @@ public abstract class ListenerTestCase extends TestCase {
             }
         }
         finally {
+            server.removeErrorListener(messageReceiver);
             axisConfiguration.removeService(service.getName());
         }
         
@@ -97,6 +122,7 @@ public abstract class ListenerTestCase extends TestCase {
     
     @Override
     protected void tearDown() throws Exception {
+        sender.tearDown();
         if (manageServer) {
             server.stop();
             Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
@@ -104,6 +130,6 @@ public abstract class ListenerTestCase extends TestCase {
         }
     }
 
-    protected abstract void sendMessage(String endpointReference, String contentType) throws Exception;
+    protected abstract void sendMessage(S sender, String endpointReference, String contentType) throws Exception;
     protected abstract void checkMessageData(MessageData messageData) throws Exception;
 }

@@ -28,12 +28,18 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.synapse.transport.base.event.TransportError;
+import org.apache.synapse.transport.base.event.TransportErrorListener;
 
 /**
  * A mock message receiver that puts the message data in a queue.
  */
-public class MockMessageReceiver implements MessageReceiver {
-    private final BlockingQueue<MessageData> queue = new LinkedBlockingQueue<MessageData>();
+public class MockMessageReceiver implements MessageReceiver, TransportErrorListener {
+    private interface Event {
+        MessageData process() throws Throwable;
+    }
+    
+    private final BlockingQueue<Event> queue = new LinkedBlockingQueue<Event>();
     
     public void receive(MessageContext messageCtx) throws AxisFault {
         SOAPEnvelope envelope = messageCtx.getEnvelope();
@@ -41,10 +47,24 @@ public class MockMessageReceiver implements MessageReceiver {
         Attachments attachments = messageCtx.getAttachmentMap();
         // Make sure that all attachments are read
         attachments.getAllContentIDs();
-        queue.add(new MessageData(envelope, attachments));
+        final MessageData messageData = new MessageData(envelope, attachments);
+        queue.add(new Event() {
+            public MessageData process() throws Throwable {
+                return messageData;
+            }
+        });
+    }
+
+    public void error(final TransportError error) {
+        queue.add(new Event() {
+            public MessageData process() throws Throwable {
+                throw error.getException();
+            }
+        });
     }
     
-    public MessageData waitForMessage(long timeout, TimeUnit unit) throws InterruptedException {
-        return queue.poll(timeout, unit);
+    public MessageData waitForMessage(long timeout, TimeUnit unit) throws Throwable {
+        Event event = queue.poll(timeout, unit);
+        return event == null ? null : event.process();
     }
 }

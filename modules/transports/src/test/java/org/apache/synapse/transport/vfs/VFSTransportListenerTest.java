@@ -28,10 +28,13 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.synapse.transport.testkit.listener.AxisMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
-import org.apache.synapse.transport.testkit.listener.MessageSender;
+import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
+import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.
@@ -48,6 +51,14 @@ public class VFSTransportListenerTest extends TestCase {
             return trpInDesc;
         }
         
+        @Override
+        public TransportOutDescription createTransportOutDescription() throws Exception {
+            TransportOutDescription trpOutDesc =
+                new TransportOutDescription(VFSTransportSender.TRANSPORT_NAME);
+            trpOutDesc.setSender(new VFSTransportSender());
+            return trpOutDesc;
+        }
+
         @Override
         public void beforeStartup() throws Exception {
             requestFile.getParentFile().mkdirs();
@@ -67,9 +78,9 @@ public class VFSTransportListenerTest extends TestCase {
         }
     }
     
-    private static class MessageSenderImpl extends MessageSender {
+    private static class MessageSenderImpl extends BinaryPayloadSender {
         @Override
-        public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception {
+        public void sendMessage(ListenerTestSetup setup, String endpointReference, String contentType, byte[] content) throws Exception {
             OutputStream out = new FileOutputStream("target/vfs3/req/in");
             out.write(content);
             out.close();
@@ -80,12 +91,14 @@ public class VFSTransportListenerTest extends TestCase {
         // TODO: the VFS listener doesn't like reuseServer == true...
         ListenerTestSuite suite = new ListenerTestSuite(false);
         ListenerTestSetup setup = new TestStrategyImpl();
-        MessageSender sender = new MessageSenderImpl();
-        suite.addSOAPTests(setup, sender, ContentTypeMode.SERVICE);
-        suite.addPOXTests(setup, sender, ContentTypeMode.SERVICE);
-        // Since VFS has no Content-Type header, SwA is not supported.
-        suite.addTextPlainTests(setup, sender, ContentTypeMode.SERVICE);
-        suite.addBinaryTest(setup, sender, ContentTypeMode.SERVICE);
+        BinaryPayloadSender vfsSender = new MessageSenderImpl();
+        for (XMLMessageSender sender : new XMLMessageSender[] { vfsSender, new AxisMessageSender() }) {
+            suite.addSOAPTests(setup, sender, ContentTypeMode.SERVICE);
+            suite.addPOXTests(setup, sender, ContentTypeMode.SERVICE);
+            // Since VFS has no Content-Type header, SwA is not supported.
+        }
+        suite.addTextPlainTests(setup, vfsSender, ContentTypeMode.SERVICE);
+        suite.addBinaryTest(setup, vfsSender, ContentTypeMode.SERVICE);
         return suite;
     }
 }

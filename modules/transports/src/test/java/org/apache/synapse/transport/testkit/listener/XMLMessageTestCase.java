@@ -25,18 +25,22 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
 
-public abstract class XMLMessageTestCase extends ListenerTestCase {
-    private final XMLMessageSender sender;
+public abstract class XMLMessageTestCase extends ListenerTestCase<XMLMessageSender> {
     private final MessageTestData data;
     private OMElement orgElement;
     protected OMFactory factory;
     
-    public XMLMessageTestCase(ListenerTestSetup strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
-        super(strategy, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"");
-        this.sender = sender;
+    public XMLMessageTestCase(ListenerTestSetup setup, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+        super(setup, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"");
         this.data = data;
     }
     
+    @Override
+    protected void buildName(NameBuilder name) {
+        super.buildName(name);
+        data.buildName(name);
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -54,7 +58,7 @@ public abstract class XMLMessageTestCase extends ListenerTestCase {
     }
 
     @Override
-    protected void sendMessage(String endpointReference, String contentType) throws Exception {
+    protected void sendMessage(XMLMessageSender sender, String endpointReference, String contentType) throws Exception {
         sender.sendMessage(getSetup(), endpointReference, contentType, data.getCharset(), getMessage(orgElement));
     }
     

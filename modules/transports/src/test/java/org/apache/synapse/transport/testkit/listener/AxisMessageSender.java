@@ -50,19 +50,19 @@ public class AxisMessageSender extends AbstractMessageSender implements XMLMessa
     }
 
     @Override
-    public void setUp(ListenerTestSetup setup) throws Exception {
-        super.setUp(setup);
+    public void setUp(Channel<?> channel) throws Exception {
+        super.setUp(channel);
         cfgCtx =
             ConfigurationContextFactory.createConfigurationContextFromFileSystem(
                     new File("target/test_rep").getAbsolutePath());
         AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
 
-        trpOutDesc = setup.createTransportOutDescription();
+        trpOutDesc = channel.createTransportOutDescription();
         axisCfg.addTransportOut(trpOutDesc);
         trpOutDesc.getSender().init(cfgCtx, trpOutDesc);
     }
 
-    public void sendMessage(ListenerTestSetup setup,
+    public void sendMessage(Channel<?> channel,
             String endpointReference, String contentType, String charset,
             OMElement message) throws Exception {
         

@@ -25,8 +25,8 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 
 public abstract class SOAPTestCase extends XMLMessageTestCase {
-    public SOAPTestCase(ListenerTestSetup strategy, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
-        super(strategy, sender, baseName, contentTypeMode, baseContentType, data);
+    public SOAPTestCase(Channel<?> channel, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+        super(channel, sender, baseName, contentTypeMode, baseContentType, data);
     }
 
     @Override

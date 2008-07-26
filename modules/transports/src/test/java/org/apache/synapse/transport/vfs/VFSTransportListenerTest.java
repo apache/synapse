@@ -27,13 +27,12 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AxisMessageSender;
+import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
+import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
-import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
 import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
 
 /**
@@ -41,37 +40,6 @@ import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
  */
 public class VFSTransportListenerTest extends TestCase {
     public static class TestStrategyImpl extends ListenerTestSetup {
-        private final File requestFile = new File("target/vfs3/req/in").getAbsoluteFile();
-        
-        @Override
-        public TransportInDescription createTransportInDescription() {
-            TransportInDescription trpInDesc =
-                new TransportInDescription(VFSTransportListener.TRANSPORT_NAME);
-            trpInDesc.setReceiver(new VFSTransportListener());
-            return trpInDesc;
-        }
-        
-        @Override
-        public TransportOutDescription createTransportOutDescription() throws Exception {
-            TransportOutDescription trpOutDesc =
-                new TransportOutDescription(VFSTransportSender.TRANSPORT_NAME);
-            trpOutDesc.setSender(new VFSTransportSender());
-            return trpOutDesc;
-        }
-
-        @Override
-        public void beforeStartup() throws Exception {
-            requestFile.getParentFile().mkdirs();
-            requestFile.delete();
-        }
-        
-        @Override
-        public void setupService(AxisService service) throws Exception {
-            service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());
-            service.addParameter("transport.PollInterval", "1");
-            service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");
-        }
-
         @Override
         public void setupContentType(AxisService service, String contentType) throws Exception {
             service.addParameter("transport.vfs.ContentType", contentType);
@@ -80,8 +48,8 @@ public class VFSTransportListenerTest extends TestCase {
     
     private static class MessageSenderImpl extends BinaryPayloadSender {
         @Override
-        public void sendMessage(ListenerTestSetup setup, String endpointReference, String contentType, byte[] content) throws Exception {
-            OutputStream out = new FileOutputStream("target/vfs3/req/in");
+        public void sendMessage(Channel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception {
+            OutputStream out = new FileOutputStream(((VFSFileChannel)channel).getRequestFile());
             out.write(content);
             out.close();
         }
@@ -90,15 +58,16 @@ public class VFSTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         // TODO: the VFS listener doesn't like reuseServer == true...
         ListenerTestSuite suite = new ListenerTestSuite(false);
-        ListenerTestSetup setup = new TestStrategyImpl();
+        TestStrategyImpl setup = new TestStrategyImpl();
+        VFSFileChannel channel = new VFSFileChannel(setup, new File("target/vfs3/req/in").getAbsoluteFile());
         BinaryPayloadSender vfsSender = new MessageSenderImpl();
         for (XMLMessageSender sender : new XMLMessageSender[] { vfsSender, new AxisMessageSender() }) {
-            suite.addSOAPTests(setup, sender, ContentTypeMode.SERVICE);
-            suite.addPOXTests(setup, sender, ContentTypeMode.SERVICE);
+            suite.addSOAPTests(channel, sender, ContentTypeMode.SERVICE);
+            suite.addPOXTests(channel, sender, ContentTypeMode.SERVICE);
             // Since VFS has no Content-Type header, SwA is not supported.
         }
-        suite.addTextPlainTests(setup, vfsSender, ContentTypeMode.SERVICE);
-        suite.addBinaryTest(setup, vfsSender, ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(channel, vfsSender, ContentTypeMode.SERVICE);
+        suite.addBinaryTest(channel, vfsSender, ContentTypeMode.SERVICE);
         return suite;
     }
 }

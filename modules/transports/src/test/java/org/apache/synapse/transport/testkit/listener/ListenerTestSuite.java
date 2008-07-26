@@ -80,8 +80,8 @@ public class ListenerTestSuite extends TestSuite {
         this(true);
     }
 
-    public void addSOAP11Test(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new SOAPTestCase(strategy, sender, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data) {
+    public void addSOAP11Test(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new SOAPTestCase(channel, sender, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data) {
             @Override
             protected SOAPFactory getOMFactory() {
                 return OMAbstractFactory.getSOAP11Factory();
@@ -89,8 +89,8 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addSOAP12Test(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new SOAPTestCase(strategy, sender, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data) {
+    public void addSOAP12Test(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new SOAPTestCase(channel, sender, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data) {
             @Override
             protected SOAPFactory getOMFactory() {
                 return OMAbstractFactory.getSOAP12Factory();
@@ -98,15 +98,15 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addSOAPTests(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode) {
+    public void addSOAPTests(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addSOAP11Test(strategy, sender, contentTypeMode, data);
-            addSOAP12Test(strategy, sender, contentTypeMode, data);
+            addSOAP11Test(channel, sender, contentTypeMode, data);
+            addSOAP12Test(channel, sender, contentTypeMode, data);
         }
     }
     
-    public void addPOXTest(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLMessageTestCase(strategy, sender, "POX", contentTypeMode, "application/xml", data) {
+    public void addPOXTest(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLMessageTestCase(channel, sender, "POX", contentTypeMode, "application/xml", data) {
             @Override
             protected OMFactory getOMFactory() {
                 return OMAbstractFactory.getOMFactory();
@@ -119,15 +119,15 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addPOXTests(ListenerTestSetup strategy, XMLMessageSender sender, ContentTypeMode contentTypeMode) {
+    public void addPOXTests(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addPOXTest(strategy, sender, contentTypeMode, data);
+            addPOXTest(channel, sender, contentTypeMode, data);
         }
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public void addSwATests(final ListenerTestSetup setup, BinaryPayloadSender sender) {
-        addTest(new ListenerTestCase<BinaryPayloadSender>(setup, sender, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
+    public void addSwATests(Channel<?> channel, BinaryPayloadSender sender) {
+        addTest(new ListenerTestCase<BinaryPayloadSender>(channel, sender, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
             private byte[] attachmentContent;
             private String contentID;
             
@@ -156,7 +156,7 @@ public class ListenerTestSuite extends TestSuite {
                 orgAttachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, orgAttachments, outputFormat);
-                sender.sendMessage(setup, endpointReference, outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
+                sender.sendMessage(getChannel(), endpointReference, outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE), baos.toByteArray());
             }
 
             @Override
@@ -171,8 +171,8 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addTextPlainTest(ListenerTestSetup strategy, BinaryPayloadSender sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
-        addTest(new ListenerTestCase<BinaryPayloadSender>(strategy, sender, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"") {
+    public void addTextPlainTest(Channel<?> channel, BinaryPayloadSender sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
+        addTest(new ListenerTestCase<BinaryPayloadSender>(channel, sender, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"") {
             @Override
             protected void buildName(NameBuilder name) {
                 super.buildName(name);
@@ -181,7 +181,7 @@ public class ListenerTestSuite extends TestSuite {
             
             @Override
             protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
-                sender.sendMessage(getSetup(), endpointReference, contentType, data.getText().getBytes(data.getCharset()));
+                sender.sendMessage(getChannel(), endpointReference, contentType, data.getText().getBytes(data.getCharset()));
             }
             
             @Override
@@ -194,14 +194,14 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addTextPlainTests(ListenerTestSetup setup, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
+    public void addTextPlainTests(Channel<?> channel, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addTextPlainTest(setup, sender, contentTypeMode, data);
+            addTextPlainTest(channel, sender, contentTypeMode, data);
         }
     }
     
-    public void addBinaryTest(final ListenerTestSetup setup, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
-        addTest(new ListenerTestCase<BinaryPayloadSender>(setup, sender, "Binary", contentTypeMode, "application/octet-stream") {
+    public void addBinaryTest(Channel<?> channel, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
+        addTest(new ListenerTestCase<BinaryPayloadSender>(channel, sender, "Binary", contentTypeMode, "application/octet-stream") {
             private byte[] content;
             
             @Override
@@ -213,7 +213,7 @@ public class ListenerTestSuite extends TestSuite {
 
             @Override
             protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
-                sender.sendMessage(setup, endpointReference, contentType, content);
+                sender.sendMessage(getChannel(), endpointReference, contentType, content);
             }
             
             @Override
@@ -230,8 +230,8 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
 
-    public void addRESTTests(final ListenerTestSetup setup, RESTSender sender) {
-        addTest(new ListenerTestCase<RESTSender>(setup, sender, "REST", ContentTypeMode.TRANSPORT, null) {
+    public void addRESTTests(Channel<?> channel, RESTSender sender) {
+        addTest(new ListenerTestCase<RESTSender>(channel, sender, "REST", ContentTypeMode.TRANSPORT, null) {
             @Override
             protected void sendMessage(RESTSender sender, String endpointReference, String contentType) throws Exception {
                 sender.sendMessage(endpointReference);
@@ -259,12 +259,11 @@ public class ListenerTestSuite extends TestSuite {
                 }
                 Test test = tests.removeFirst();
                 if (test instanceof ListenerTestCase) {
-                    ListenerTestCase listenerTest = (ListenerTestCase)test;
-                    ListenerTestSetup setup = listenerTest.getSetup();
+                    ListenerTestCase<?> listenerTest = (ListenerTestCase<?>)test;
+                    Channel<?> channel = listenerTest.getChannel();
                     ListenerTestServer server;
                     try {
-                        server = new ListenerTestServer(setup);
-                        setup.beforeStartup();
+                        server = new ListenerTestServer(channel);
                         server.start();
                     } catch (Throwable t) {
                         result.addError(this, t);
@@ -278,8 +277,8 @@ public class ListenerTestSuite extends TestSuite {
                         }
                         test = it.next();
                         if (test instanceof ListenerTestCase) {
-                            listenerTest = (ListenerTestCase)test;
-                            if (listenerTest.getSetup() == setup) {
+                            listenerTest = (ListenerTestCase<?>)test;
+                            if (listenerTest.getChannel() == channel) {
                                 it.remove();
                                 listenerTest.setServer(server);
                                 runTest(test, result);
@@ -288,7 +287,6 @@ public class ListenerTestSuite extends TestSuite {
                     }
                     try {
                         server.stop();
-                        Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
                     } catch (Throwable t) {
                         result.addError(this, t);
                         return;

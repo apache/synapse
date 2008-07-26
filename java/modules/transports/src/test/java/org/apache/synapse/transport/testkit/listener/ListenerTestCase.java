@@ -103,7 +103,7 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
         MessageData messageData;
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();
         axisConfiguration.addService(service);
-        server.addErrorListener(messageReceiver);
+//        server.addErrorListener(messageReceiver);
         try {
             sendMessage(sender, server.getEPR(service),
                     contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
@@ -113,7 +113,7 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
             }
         }
         finally {
-            server.removeErrorListener(messageReceiver);
+//            server.removeErrorListener(messageReceiver);
             axisConfiguration.removeService(service.getName());
         }
         

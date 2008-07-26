@@ -41,4 +41,8 @@ public class MessageTestData {
     public String getCharset() {
         return charset;
     }
+
+    public void buildName(NameBuilder nameBuilder) {
+        nameBuilder.addComponent("data", name);
+    }
 }

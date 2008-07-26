@@ -19,74 +19,28 @@
 
 package org.apache.synapse.transport.nhttp;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.commons.io.IOUtils;
+import org.apache.synapse.transport.testkit.listener.AxisMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
-import org.apache.synapse.transport.testkit.listener.ListenerTestCase;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
-import org.apache.synapse.transport.testkit.listener.MessageData;
-import org.apache.synapse.transport.testkit.listener.MessageSender;
+import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
 
 public class HttpCoreNIOListenerTest extends TestCase {
-    public static class TestStrategyImpl extends ListenerTestSetup {
-        @Override
-        public TransportInDescription createTransportInDescription() {
-            TransportInDescription trpInDesc = new TransportInDescription("http");
-            trpInDesc.setReceiver(new HttpCoreNIOListener());
-            return trpInDesc;
-        }
-    }
-    
-    public static class JavaNetSender extends MessageSender {
-        @Override
-        public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception {
-            URLConnection connection = new URL(endpointReference).openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestProperty("Content-Type", contentType);
-            OutputStream out = connection.getOutputStream();
-            out.write(content);
-            out.close();
-            InputStream in = connection.getInputStream();
-            IOUtils.copy(in, System.out);
-            in.close();
-        }
-    }
-    
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
-        ListenerTestSetup setup = new TestStrategyImpl();
-        MessageSender sender = new JavaNetSender();
-        suite.addSOAPTests(setup, sender, ContentTypeMode.TRANSPORT);
-        suite.addPOXTests(setup, sender, ContentTypeMode.TRANSPORT);
-        suite.addSwATests(setup, sender);
-        suite.addTextPlainTests(setup, sender, ContentTypeMode.TRANSPORT);
-        suite.addBinaryTest(setup, sender, ContentTypeMode.TRANSPORT);
-        suite.addTest(new ListenerTestCase(setup, "REST", ContentTypeMode.TRANSPORT, null) {
-            @Override
-            protected void sendMessage(String endpointReference, String contentType) throws Exception {
-                URLConnection connection = new URL(endpointReference + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
-                connection.setDoInput(true);
-                InputStream in = connection.getInputStream();
-                IOUtils.copy(in, System.out);
-                in.close();
-            }
-        
-            @Override
-            protected void checkMessageData(MessageData messageData) throws Exception {
-                // TODO
-            }
-        });
+        ListenerTestSetup setup = new HttpCoreNIOListenerSetup();
+        JavaNetSender javaNetSender = new JavaNetSender();
+        for (XMLMessageSender sender : new XMLMessageSender[] { javaNetSender, new AxisMessageSender() }) {
+            suite.addSOAPTests(setup, sender, ContentTypeMode.TRANSPORT);
+            suite.addPOXTests(setup, sender, ContentTypeMode.TRANSPORT);
+        }
+        suite.addSwATests(setup, javaNetSender);
+        suite.addTextPlainTests(setup, javaNetSender, ContentTypeMode.TRANSPORT);
+        suite.addBinaryTest(setup, javaNetSender, ContentTypeMode.TRANSPORT);
+        suite.addRESTTests(setup, javaNetSender);
         return suite;
     }
 }

@@ -197,11 +197,10 @@ public class JMSUtils extends BaseUtils {
      * @return the EPR as a String
      */
     // TODO: duplicate code (see JMSConnectionFactory#getEPRForDestination)
-    static String getEPR(JMSConnectionFactory cf, String destination) {
+    static String getEPR(JMSConnectionFactory cf, String destinationType, String destination) {
         StringBuffer sb = new StringBuffer();
         sb.append(JMSConstants.JMS_PREFIX).append(destination);
-        sb.append("?").append(JMSConstants.CONFAC_JNDI_NAME_PARAM).
-                append("=").append(cf.getConnFactoryJNDIName());
+        sb.append("?").append(JMSConstants.DEST_PARAM_TYPE).append("=").append(destinationType);
         for (Map.Entry<String,String> entry : cf.getJndiProperties().entrySet()) {
             sb.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }

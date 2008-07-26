@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport;
+package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.soap.SOAPEnvelope;

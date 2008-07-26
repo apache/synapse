@@ -23,22 +23,25 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.synapse.transport.ContentTypeMode;
-import org.apache.synapse.transport.TransportListenerTestTemplate;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
+import org.apache.synapse.transport.testkit.listener.MessageSender;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.
  */
-public class VFSTransportListenerTest extends TransportListenerTestTemplate {
-    public static class TestStrategyImpl extends TestStrategy {
+public class VFSTransportListenerTest extends TestCase {
+    public static class TestStrategyImpl extends ListenerTestSetup {
         private final File requestFile = new File("target/vfs3/req/in").getAbsoluteFile();
         
         @Override
-        protected TransportInDescription createTransportInDescription() {
+        public TransportInDescription createTransportInDescription() {
             TransportInDescription trpInDesc =
                 new TransportInDescription(VFSTransportListener.TRANSPORT_NAME);
             trpInDesc.setReceiver(new VFSTransportListener());
@@ -46,27 +49,27 @@ public class VFSTransportListenerTest extends TransportListenerTestTemplate {
         }
         
         @Override
-        protected void beforeStartup() throws Exception {
+        public void beforeStartup() throws Exception {
             requestFile.getParentFile().mkdirs();
             requestFile.delete();
         }
         
         @Override
-        protected void setupService(AxisService service) throws Exception {
+        public void setupService(AxisService service) throws Exception {
             service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());
             service.addParameter("transport.PollInterval", "1");
             service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");
         }
 
         @Override
-        protected void setupContentType(AxisService service, String contentType) throws Exception {
+        public void setupContentType(AxisService service, String contentType) throws Exception {
             service.addParameter("transport.vfs.ContentType", contentType);
         }
     }
     
     private static class MessageSenderImpl extends MessageSender {
         @Override
-        public void sendMessage(TestStrategy strategy, String endpointReference, String contentType, byte[] content) throws Exception {
+        public void sendMessage(ListenerTestSetup strategy, String endpointReference, String contentType, byte[] content) throws Exception {
             OutputStream out = new FileOutputStream("target/vfs3/req/in");
             out.write(content);
             out.close();
@@ -74,14 +77,15 @@ public class VFSTransportListenerTest extends TransportListenerTestTemplate {
     }
     
     public static TestSuite suite() {
-        TestSuite suite = new TestSuite();
-        TestStrategy strategy = new TestStrategyImpl();
+        // TODO: the VFS listener doesn't like reuseServer == true...
+        ListenerTestSuite suite = new ListenerTestSuite(false);
+        ListenerTestSetup setup = new TestStrategyImpl();
         MessageSender sender = new MessageSenderImpl();
-        addSOAPTests(strategy, sender, suite, ContentTypeMode.SERVICE);
-        addPOXTests(strategy, sender, suite, ContentTypeMode.SERVICE);
+        suite.addSOAPTests(setup, sender, ContentTypeMode.SERVICE);
+        suite.addPOXTests(setup, sender, ContentTypeMode.SERVICE);
         // Since VFS has no Content-Type header, SwA is not supported.
-        addTextPlainTests(strategy, sender, suite, ContentTypeMode.SERVICE);
-        addBinaryTest(strategy, sender, suite, ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(setup, sender, ContentTypeMode.SERVICE);
+        suite.addBinaryTest(setup, sender, ContentTypeMode.SERVICE);
         return suite;
     }
 }

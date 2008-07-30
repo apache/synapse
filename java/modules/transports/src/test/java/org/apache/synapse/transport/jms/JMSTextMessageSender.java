@@ -28,18 +28,17 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
-import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
+import org.apache.synapse.transport.testkit.listener.XMLAsyncMessageSender;
+import org.apache.synapse.transport.testkit.listener.XMLMessageType;
 
-public class JMSTextMessageSender extends AbstractMessageSender implements XMLMessageSender {
+public class JMSTextMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements XMLAsyncMessageSender<JMSAsyncChannel> {
     public JMSTextMessageSender() {
         super("TextMessage");
     }
 
-    public void sendMessage(Channel<?> _channel,
+    public void sendMessage(JMSAsyncChannel channel,
             String endpointReference, String contentType, String charset,
-            OMElement omMessage) throws Exception {
-        JMSChannel channel = (JMSChannel)_channel;
+            XMLMessageType xmlMessageType, OMElement payload) throws Exception {
         Session session = channel.createSession();
         TextMessage message = session.createTextMessage();
         if (contentType != null) {
@@ -48,7 +47,7 @@ public class JMSTextMessageSender extends AbstractMessageSender implements XMLMe
         OMOutputFormat format = new OMOutputFormat();
         format.setIgnoreXMLDeclaration(true);
         StringWriter sw = new StringWriter();
-        omMessage.serializeAndConsume(sw, format);
+        xmlMessageType.getMessage(payload).serializeAndConsume(sw, format);
         message.setText(sw.toString());
         channel.send(session, message);
     }

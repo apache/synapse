@@ -17,10 +17,12 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.jms;
 
-public interface MessageSender<C extends Channel<?>> {
-    void buildName(NameBuilder nameBuilder);
-    void setUp(C channel) throws Exception;
-    void tearDown() throws Exception;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+
+public class JMSAsyncChannel extends JMSChannel implements AsyncChannel<JMSListenerSetup> {
+    public JMSAsyncChannel(JMSListenerSetup setup, String destinationType) {
+        super(setup, destinationType, destinationType);
+    }
 }

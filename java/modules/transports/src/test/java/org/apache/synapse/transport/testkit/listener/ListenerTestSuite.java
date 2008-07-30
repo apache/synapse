@@ -20,10 +20,7 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -41,7 +38,6 @@ import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
@@ -52,7 +48,6 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.base.BaseConstants;
 
 public class ListenerTestSuite extends TestSuite {
@@ -80,54 +75,44 @@ public class ListenerTestSuite extends TestSuite {
         this(true);
     }
 
-    public void addSOAP11Test(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new SOAPTestCase(channel, sender, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data) {
-            @Override
-            protected SOAPFactory getOMFactory() {
-                return OMAbstractFactory.getSOAP11Factory();
-            }
-        });
+    public <C extends AsyncChannel<?>> void addSOAP11Test(C channel, XMLAsyncMessageSender<? super C> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, XMLMessageType.SOAP11, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
     }
     
-    public void addSOAP12Test(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new SOAPTestCase(channel, sender, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data) {
-            @Override
-            protected SOAPFactory getOMFactory() {
-                return OMAbstractFactory.getSOAP12Factory();
-            }
-        });
+    public <C extends AsyncChannel<?>> void addSOAP12Test(C channel, XMLAsyncMessageSender<? super C> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, XMLMessageType.SOAP12, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
     }
     
-    public void addSOAPTests(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode) {
+    public <C extends AsyncChannel<?>> void addSOAPTests(C channel, XMLAsyncMessageSender<? super C> sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
             addSOAP11Test(channel, sender, contentTypeMode, data);
             addSOAP12Test(channel, sender, contentTypeMode, data);
         }
     }
     
-    public void addPOXTest(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLMessageTestCase(channel, sender, "POX", contentTypeMode, "application/xml", data) {
-            @Override
-            protected OMFactory getOMFactory() {
-                return OMAbstractFactory.getOMFactory();
-            }
-
-            @Override
-            protected OMElement getMessage(OMElement payload) {
-                return payload;
-            }
-        });
+    public <C extends AsyncChannel<?>> void addPOXTest(C channel, XMLAsyncMessageSender<? super C> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, XMLMessageType.POX, "POX", contentTypeMode, "application/xml", data));
     }
     
-    public void addPOXTests(Channel<?> channel, XMLMessageSender sender, ContentTypeMode contentTypeMode) {
+    public <C extends AsyncChannel<?>> void addPOXTests(C channel, XMLAsyncMessageSender<? super C> sender, ContentTypeMode contentTypeMode) {
+        for (MessageTestData data : messageTestData) {
+            addPOXTest(channel, sender, contentTypeMode, data);
+        }
+    }
+    
+    public <C extends RequestResponseChannel<?>> void addPOXTest(C channel, XMLRequestResponseMessageSender<? super C> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLRequestResponseMessageTestCase<C>(channel, sender, "POXEcho", contentTypeMode, "application/xml", XMLMessageType.POX, data));
+    }
+    
+    public <C extends RequestResponseChannel<?>> void addPOXTests(C channel, XMLRequestResponseMessageSender<? super C> sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
             addPOXTest(channel, sender, contentTypeMode, data);
         }
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public void addSwATests(Channel<?> channel, BinaryPayloadSender sender) {
-        addTest(new ListenerTestCase<BinaryPayloadSender>(channel, sender, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
+    public <C extends AsyncChannel<?>> void addSwATests(C channel, BinaryPayloadSender<? super C> sender) {
+        addTest(new AsyncMessageTestCase<C,BinaryPayloadSender<? super C>>(channel, sender, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null) {
             private byte[] attachmentContent;
             private String contentID;
             
@@ -140,7 +125,7 @@ public class ListenerTestSuite extends TestSuite {
             }
 
             @Override
-            protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
+            protected void sendMessage(BinaryPayloadSender<? super C> sender, String endpointReference, String contentType) throws Exception {
                 SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
                 SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
                 SOAPBody orgBody = factory.createSOAPBody();
@@ -171,8 +156,8 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addTextPlainTest(Channel<?> channel, BinaryPayloadSender sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
-        addTest(new ListenerTestCase<BinaryPayloadSender>(channel, sender, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"") {
+    public <C extends AsyncChannel<?>> void addTextPlainTest(C channel, BinaryPayloadSender<? super C> sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
+        addTest(new AsyncMessageTestCase<C,BinaryPayloadSender<? super C>>(channel, sender, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"") {
             @Override
             protected void buildName(NameBuilder name) {
                 super.buildName(name);
@@ -180,7 +165,7 @@ public class ListenerTestSuite extends TestSuite {
             }
             
             @Override
-            protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
+            protected void sendMessage(BinaryPayloadSender<? super C> sender, String endpointReference, String contentType) throws Exception {
                 sender.sendMessage(getChannel(), endpointReference, contentType, data.getText().getBytes(data.getCharset()));
             }
             
@@ -194,14 +179,14 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public void addTextPlainTests(Channel<?> channel, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
+    public <C extends AsyncChannel<?>> void addTextPlainTests(C channel, BinaryPayloadSender<? super C> sender, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
             addTextPlainTest(channel, sender, contentTypeMode, data);
         }
     }
     
-    public void addBinaryTest(Channel<?> channel, BinaryPayloadSender sender, ContentTypeMode contentTypeMode) {
-        addTest(new ListenerTestCase<BinaryPayloadSender>(channel, sender, "Binary", contentTypeMode, "application/octet-stream") {
+    public <C extends AsyncChannel<?>> void addBinaryTest(C channel, BinaryPayloadSender<? super C> sender, ContentTypeMode contentTypeMode) {
+        addTest(new AsyncMessageTestCase<C, BinaryPayloadSender<? super C>>(channel, sender, "Binary", contentTypeMode, "application/octet-stream") {
             private byte[] content;
             
             @Override
@@ -212,7 +197,7 @@ public class ListenerTestSuite extends TestSuite {
             }
 
             @Override
-            protected void sendMessage(BinaryPayloadSender sender, String endpointReference, String contentType) throws Exception {
+            protected void sendMessage(BinaryPayloadSender<? super C> sender, String endpointReference, String contentType) throws Exception {
                 sender.sendMessage(getChannel(), endpointReference, contentType, content);
             }
             
@@ -230,10 +215,10 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
 
-    public void addRESTTests(Channel<?> channel, RESTSender sender) {
-        addTest(new ListenerTestCase<RESTSender>(channel, sender, "REST", ContentTypeMode.TRANSPORT, null) {
+    public <C extends AsyncChannel<?>> void addRESTTests(C channel, RESTSender<? super C> sender) {
+        addTest(new AsyncMessageTestCase<C,RESTSender<? super C>>(channel, sender, "REST", ContentTypeMode.TRANSPORT, null) {
             @Override
-            protected void sendMessage(RESTSender sender, String endpointReference, String contentType) throws Exception {
+            protected void sendMessage(RESTSender<? super C> sender, String endpointReference, String contentType) throws Exception {
                 sender.sendMessage(endpointReference);
             }
         
@@ -250,7 +235,7 @@ public class ListenerTestSuite extends TestSuite {
             super.run(result);
         } else {
             LinkedList<Test> tests = new LinkedList<Test>();
-            for (Enumeration e = tests(); e.hasMoreElements(); ) {
+            for (Enumeration<?> e = tests(); e.hasMoreElements(); ) {
                 tests.add((Test)e.nextElement());
             }
             while (!tests.isEmpty()) {
@@ -258,8 +243,8 @@ public class ListenerTestSuite extends TestSuite {
                     return;
                 }
                 Test test = tests.removeFirst();
-                if (test instanceof ListenerTestCase) {
-                    ListenerTestCase<?> listenerTest = (ListenerTestCase<?>)test;
+                if (test instanceof AsyncMessageTestCase) {
+                    AsyncMessageTestCase<?,?> listenerTest = (AsyncMessageTestCase<?,?>)test;
                     Channel<?> channel = listenerTest.getChannel();
                     ListenerTestServer server;
                     try {
@@ -276,8 +261,8 @@ public class ListenerTestSuite extends TestSuite {
                             return;
                         }
                         test = it.next();
-                        if (test instanceof ListenerTestCase) {
-                            listenerTest = (ListenerTestCase<?>)test;
+                        if (test instanceof AsyncMessageTestCase) {
+                            listenerTest = (AsyncMessageTestCase<?,?>)test;
                             if (listenerTest.getChannel() == channel) {
                                 it.remove();
                                 listenerTest.setServer(server);

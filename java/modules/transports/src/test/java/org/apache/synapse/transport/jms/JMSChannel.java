@@ -42,30 +42,24 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.mockejb.jndi.MockContextFactory;
 
-import com.mockrunner.jms.DestinationManager;
 import com.mockrunner.mock.jms.MockDestination;
 
-public class JMSChannel extends AbstractChannel<JMSListenerSetup>{
+public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
     private static final OMFactory factory = OMAbstractFactory.getOMFactory();
     
-    private final boolean useTopic;
+    private final String destinationType;
     private String destinationName;
     private MockDestination destination;
     
-    public JMSChannel(JMSListenerSetup setup, boolean useTopic) {
-        super(useTopic ? "Topic" : "Queue", setup);
-        this.useTopic = useTopic;
+    public JMSChannel(JMSListenerSetup setup, String name, String destinationType) {
+        super(name, setup);
+        this.destinationType = destinationType;
     }
     
     @Override
     public void setUp() throws Exception {
-        DestinationManager destinationManager = setup.getDestinationManager();
-        destinationName = "dest";
-        if (useTopic) {
-            destination = destinationManager.createTopic(destinationName);
-        } else {
-            destination = destinationManager.createQueue(destinationName);
-        }
+        destinationName = "request";
+        destination = setup.createDestination(destinationType, destinationName);
         setup.getContext().bind(destinationName, destination);
     }
 
@@ -110,24 +104,20 @@ public class JMSChannel extends AbstractChannel<JMSListenerSetup>{
     @Override
     public TransportOutDescription createTransportOutDescription() throws Exception {
         TransportOutDescription trpOutDesc = new TransportOutDescription(JMSSender.TRANSPORT_NAME);
-        setupTransport(trpOutDesc);
+//        setupTransport(trpOutDesc);
         trpOutDesc.setSender(new JMSSender());
         return trpOutDesc;
     }
 
     @Override
     public void setupService(AxisService service) throws Exception {
-        service.addParameter(JMSConstants.CONFAC_PARAM,
-                useTopic ? JMSConstants.DESTINATION_TYPE_TOPIC
-                         : JMSConstants.DESTINATION_TYPE_QUEUE);
-        service.addParameter(JMSConstants.DEST_PARAM_TYPE,
-                useTopic ? JMSConstants.DESTINATION_TYPE_TOPIC
-                         : JMSConstants.DESTINATION_TYPE_QUEUE);
+        service.addParameter(JMSConstants.CONFAC_PARAM, destinationType);
+        service.addParameter(JMSConstants.DEST_PARAM_TYPE, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM, destinationName);
     }
 
     public Session createSession() throws JMSException {
-        if (useTopic) {
+        if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
             TopicConnection connection = setup.getTopicConnectionFactory().createTopicConnection();
             return connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         } else {
@@ -137,7 +127,7 @@ public class JMSChannel extends AbstractChannel<JMSListenerSetup>{
     }
 
     public void send(Session session, Message message) throws JMSException {
-        if (useTopic) {
+        if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
             ((TopicSession)session).createPublisher((Topic)destination).send(message);
         } else {
             ((QueueSession)session).createProducer(destination).send(message);

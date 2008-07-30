@@ -22,18 +22,19 @@ package org.apache.synapse.transport.vfs;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.AxisMessageSender;
+import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
-import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
-import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
+import org.apache.synapse.transport.testkit.listener.XMLAsyncMessageSender;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.
@@ -46,10 +47,10 @@ public class VFSTransportListenerTest extends TestCase {
         }
     }
     
-    private static class MessageSenderImpl extends BinaryPayloadSender {
+    private static class MessageSenderImpl extends BinaryPayloadSender<VFSFileChannel> {
         @Override
-        public void sendMessage(Channel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception {
-            OutputStream out = new FileOutputStream(((VFSFileChannel)channel).getRequestFile());
+        public void sendMessage(VFSFileChannel channel, String endpointReference, String contentType, byte[] content) throws Exception {
+            OutputStream out = new FileOutputStream(channel.getRequestFile());
             out.write(content);
             out.close();
         }
@@ -60,8 +61,11 @@ public class VFSTransportListenerTest extends TestCase {
         ListenerTestSuite suite = new ListenerTestSuite(false);
         TestStrategyImpl setup = new TestStrategyImpl();
         VFSFileChannel channel = new VFSFileChannel(setup, new File("target/vfs3/req/in").getAbsoluteFile());
-        BinaryPayloadSender vfsSender = new MessageSenderImpl();
-        for (XMLMessageSender sender : new XMLMessageSender[] { vfsSender, new AxisMessageSender() }) {
+        MessageSenderImpl vfsSender = new MessageSenderImpl();
+        List<XMLAsyncMessageSender<? super VFSFileChannel>> senders = new LinkedList<XMLAsyncMessageSender<? super VFSFileChannel>>();
+        senders.add(vfsSender);
+        senders.add(new AxisAsyncMessageSender());
+        for (XMLAsyncMessageSender<? super VFSFileChannel> sender : senders) {
             suite.addSOAPTests(channel, sender, ContentTypeMode.SERVICE);
             suite.addPOXTests(channel, sender, ContentTypeMode.SERVICE);
             // Since VFS has no Content-Type header, SwA is not supported.

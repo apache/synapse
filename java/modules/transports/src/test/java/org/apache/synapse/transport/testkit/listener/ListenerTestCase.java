@@ -19,33 +19,26 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import java.util.concurrent.TimeUnit;
-
 import junit.framework.TestCase;
 
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.InOnlyAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
-
-public abstract class ListenerTestCase<S extends MessageSender> extends TestCase {
+public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSender<? super C>> extends TestCase {
     private final String name;
-    private final Channel<?> channel;
-    private final S sender;
-    private final ContentTypeMode contentTypeMode;
-    private final String contentType;
+    protected final C channel;
+    protected final S sender;
+    protected final ContentTypeMode contentTypeMode;
+    protected final String contentType;
     
-    private ListenerTestServer server;
+    protected ListenerTestServer server;
     private boolean manageServer = true;
-    
-    public ListenerTestCase(Channel<?> channel, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
+
+    public ListenerTestCase(C channel, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
         this.channel = channel;
         this.sender = sender;
         this.name = name;
         this.contentTypeMode = contentTypeMode;
         this.contentType = contentType;
     }
-    
+
     @Override
     public String getName() {
         String testName = super.getName();
@@ -65,7 +58,7 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
         sender.buildName(name);
     }
     
-    public Channel<?> getChannel() {
+    public C getChannel() {
         return channel;
     }
 
@@ -88,42 +81,6 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
     }
 
     @Override
-    protected void runTest() throws Throwable {
-        // Set up a test service with a default operation backed by a mock message
-        // receiver. The service is configured using the parameters specified by the
-        // implementation.
-        AxisService service = new AxisService("TestService");
-        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
-        MockMessageReceiver messageReceiver = new MockMessageReceiver();
-        operation.setMessageReceiver(messageReceiver);
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentTypeMode == ContentTypeMode.SERVICE) {
-            channel.getSetup().setupContentType(service, contentType);
-        }
-        
-        // Run the test.
-        MessageData messageData;
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
-//        server.addErrorListener(messageReceiver);
-        try {
-            sendMessage(sender, server.getEPR(service),
-                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
-            messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
-            if (messageData == null) {
-                fail("Failed to get message");
-            }
-        }
-        finally {
-//            server.removeErrorListener(messageReceiver);
-            axisConfiguration.removeService(service.getName());
-        }
-        
-        checkMessageData(messageData);
-    }
-    
-    @Override
     protected void tearDown() throws Exception {
         sender.tearDown();
         if (manageServer) {
@@ -131,7 +88,4 @@ public abstract class ListenerTestCase<S extends MessageSender> extends TestCase
             server = null;
         }
     }
-
-    protected abstract void sendMessage(S sender, String endpointReference, String contentType) throws Exception;
-    protected abstract void checkMessageData(MessageData messageData) throws Exception;
 }

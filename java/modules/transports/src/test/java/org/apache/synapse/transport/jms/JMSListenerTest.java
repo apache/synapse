@@ -19,16 +19,18 @@
 
 package org.apache.synapse.transport.jms;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.transport.testkit.listener.AxisMessageSender;
+import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
-import org.apache.synapse.transport.testkit.listener.XMLMessageSender;
+import org.apache.synapse.transport.testkit.listener.XMLAsyncMessageSender;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
@@ -36,10 +38,15 @@ public class JMSListenerTest extends TestCase {
         JMSListenerSetup setup = new JMSListenerSetup();
         JMSBytesMessageSender bytesMessageSender = new JMSBytesMessageSender();
         JMSTextMessageSender textMessageSender = new JMSTextMessageSender();
-        for (boolean useTopic : new boolean[] { false, true }) {
-            JMSChannel channel = new JMSChannel(setup, useTopic);
+        List<XMLAsyncMessageSender<? super JMSAsyncChannel>> senders = new LinkedList<XMLAsyncMessageSender<? super JMSAsyncChannel>>();
+        senders.add(bytesMessageSender);
+        senders.add(textMessageSender);
+        senders.add(new AxisAsyncMessageSender());
+//        suite.addPOXTests(new JMSRequestResponseChannel(setup, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
+        for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
+            JMSAsyncChannel channel = new JMSAsyncChannel(setup, destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {
-                for (XMLMessageSender sender : new XMLMessageSender[] { bytesMessageSender, textMessageSender, new AxisMessageSender() }) {
+                for (XMLAsyncMessageSender<? super JMSAsyncChannel> sender : senders) {
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {
                         suite.addSOAPTests(channel, sender, contentTypeMode);
                         suite.addPOXTests(channel, sender, contentTypeMode);

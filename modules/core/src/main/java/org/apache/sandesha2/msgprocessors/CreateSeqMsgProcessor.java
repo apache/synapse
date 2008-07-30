@@ -193,15 +193,17 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						String addressingNamespace = (String) createSeqRMMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
 						String endpointAddress = endpoint.getEPR().getAddress();
 						if(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace).equals(endpointAddress)){
-							//Don't accept the offer
+							//We will still accept this offer but we should warn the user that this MEP is not always reliable or efficient
 							if (log.isDebugEnabled())
-								log.debug("Offer Refused as it included a WSA Anonymous endpoint");	
-							offerAccepted = false;
-						} else {
-							rMSBean = new RMSBean();
-							//Set the offered EP
-							rMSBean.setOfferedEndPoint(endpointAddress);
-						}
+								log.debug("CSeq msg contains offer with an anonymous EPR");	
+							log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceMEPWarning, createSeqRMMsg.getMessageContext().getMessageID(), 
+									offeredSequenceID));
+						} 
+						
+						rMSBean = new RMSBean();
+						//Set the offered EP
+						rMSBean.setOfferedEndPoint(endpointAddress);
+						
 					} else {
 						//Don't accept the offer
 						if (log.isDebugEnabled())

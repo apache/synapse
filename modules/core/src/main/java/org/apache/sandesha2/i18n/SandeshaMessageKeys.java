@@ -50,6 +50,7 @@ public class SandeshaMessageKeys {
 	public static final String cannotSendMsgAsSequenceTerminated="cannotSendMsgAsSequenceTerminated";
 	public static final String cannotSendMsgAsSequenceTimedout="cannotSendMsgAsSequenceTimedout";
 	public static final String cannotSendMsgAsEPRWrong = "cannotSendMsgAsEPRWrong";
+	public static final String sequenceMEPWarning="sequenceMEPWarning";
 	public static final String noValidSyncResponse="noValidSyncResponse";
 	public static final String classLoaderNotFound="classLoaderNotFound";
 

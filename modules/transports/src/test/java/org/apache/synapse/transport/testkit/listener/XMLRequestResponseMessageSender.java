@@ -21,6 +21,6 @@ package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.axiom.om.OMElement;
 
-public interface XMLMessageSender extends MessageSender {
-    void sendMessage(Channel<?> channel, String endpointReference, String contentType, String charset, OMElement message) throws Exception;
+public interface XMLRequestResponseMessageSender<C extends RequestResponseChannel<?>> extends MessageSender<C> {
+    OMElement sendMessage(C channel, String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
 }

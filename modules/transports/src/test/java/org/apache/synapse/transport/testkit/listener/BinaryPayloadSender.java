@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 
-public abstract class BinaryPayloadSender extends AbstractMessageSender implements XMLMessageSender {
+public abstract class BinaryPayloadSender<C extends AsyncChannel<?>> extends AbstractMessageSender<C> implements XMLAsyncMessageSender<C> {
     public BinaryPayloadSender() {
         super();
     }
@@ -33,12 +33,12 @@ public abstract class BinaryPayloadSender extends AbstractMessageSender implemen
         super(name);
     }
 
-    public void sendMessage(Channel<?> channel, String endpointReference, String contentType, String charset, OMElement message) throws Exception {
+    public void sendMessage(C channel, String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OMOutputFormat outputFormat = new OMOutputFormat();
         outputFormat.setCharSetEncoding(charset);
         outputFormat.setIgnoreXMLDeclaration(true);
-        message.serializeAndConsume(baos, outputFormat);
+        xmlMessageType.getMessage(payload).serializeAndConsume(baos, outputFormat);
         sendMessage(channel, endpointReference, contentType, baos.toByteArray());
     }
 
@@ -52,5 +52,5 @@ public abstract class BinaryPayloadSender extends AbstractMessageSender implemen
      * @param content the content of the message
      * @throws Exception
      */
-    public abstract void sendMessage(Channel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception;
+    public abstract void sendMessage(C channel, String endpointReference, String contentType, byte[] content) throws Exception;
 }

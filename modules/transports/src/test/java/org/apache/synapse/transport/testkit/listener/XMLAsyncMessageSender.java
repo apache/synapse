@@ -19,8 +19,8 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-public interface MessageSender<C extends Channel<?>> {
-    void buildName(NameBuilder nameBuilder);
-    void setUp(C channel) throws Exception;
-    void tearDown() throws Exception;
+import org.apache.axiom.om.OMElement;
+
+public interface XMLAsyncMessageSender<C extends AsyncChannel<?>> extends MessageSender<C> {
+    void sendMessage(C channel, String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
 }

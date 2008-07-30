@@ -153,6 +153,12 @@ public class RMMsgCreator {
 		boolean autoOffer = false;
 		if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) {
 			autoOffer = twoWayService;
+                        //There may not have been a way to confirm if an OUT_IN MEP is being used.
+			//Therefore doing an extra check to see what Axis is using.  If it's OUT_IN then we must offer.
+			if(applicationMsgContext.getOperationContext().getAxisOperation().getAxisSpecificMEPConstant() == org.apache.axis2.wsdl.WSDLConstants.MEP_CONSTANT_OUT_IN
+			     || applicationMsgContext.getOperationContext().getAxisOperation().getAxisSpecificMEPConstant() == org.apache.axis2.wsdl.WSDLConstants.MEP_CONSTANT_OUT_OPTIONAL_IN){
+				autoOffer = true;
+			}
 		} else {
 			// We also do some checking at this point to see if MakeConection is required to
 			// enable WS-RM 1.1, and write a warning to the log if it has been disabled.

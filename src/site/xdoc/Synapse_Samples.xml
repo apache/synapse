@@ -310,12 +310,16 @@
               <a href="#Sample256">Sample 256: Proxy services with the mail
               transport</a>
             </li>
-	    <li>
+	        <li>
               <a href="#Sample257">Sample 257: Proxy services with the FIX
               transport</a>
             </li>
-	    <li>
+	        <li>
               <a href="#Sample258">Sample 258: Switching from HTTP to FIX
+              </a>
+            </li>
+            <li>
+              <a href="#Sample259">Sample 259: Switching from FIX to HTTP
               </a>
             </li>
           </ul>
@@ -3849,6 +3853,97 @@ Transfer-Encoding: chunked
       generally sends two responses for each incoming order request. But since the
       response has to be forwarded over HTTP only one can be sent back to the client. 
     </p>
+      <h2>
+          <a name="Sample259" id="Sample259">Sample 259: Switch from FIX to HTTP </a>
+      </h2>
+      <pre xml:space="preserve">
+          &lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;localEntry key=&quot;xslt-key-req&quot;
+		src=&quot;file:repository/conf/sample/resources/transform/transform_fix_to_http.xslt&quot; /&gt;
+	        &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
+		        &lt;target&gt;
+			        &lt;endpoint&gt;
+				        &lt;address
+					        uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot; /&gt;
+			        &lt;/endpoint&gt;
+			        &lt;inSequence&gt;
+				        &lt;log level=&quot;full&quot; /&gt;
+				        &lt;xslt key=&quot;xslt-key-req&quot; /&gt;
+				        &lt;log level=&quot;full&quot; /&gt;
+			        &lt;/inSequence&gt;
+			        &lt;outSequence&gt;
+				        &lt;log level=&quot;full&quot; /&gt;
+			        &lt;/outSequence&gt;
+		        &lt;/target&gt;
+		    &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
+			    file:repository/conf/sample/resources/fix/fix-synapse.cfg
+		    &lt;/parameter&gt;
+		    &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
+			    file
+		    &lt;/parameter&gt;
+	       &lt;/proxy&gt;
+        &lt;/definitions&gt;
+      </pre>
+      <p>
+          <strong>Objective: Demonstrate the capability of switching between FIX to HTTP</strong>
+      </p>
+      <p>
+          <strong>Prerequisites:</strong><br/>
+          You will need the sample FIX blotter that come with Quickfix/J
+          (Banzai). Configure the blotter to establish
+          sessions with Synapse. See <a href="Synapse_Samples_Setup.html#fixsamplesconfig">
+          Configuring Sample FIX Applications</a>
+      </p>
+      <p>
+          Start the Axis2 server and deploy the SimpleStockQuoteService if not already deployed
+      </p>
+      <p>
+          Start Banzai
+      </p>
+      <p>
+          Enable FIX transport in the Synapse axis2.xml. See <a
+          href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
+          </a>
+      </p>
+      <p>
+          Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.html#fixsamples">
+          Configuring Synapse for FIX Samples</a>
+      </p>
+      <p>
+          Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_259.xml file
+          and make sure that transport.fix.AcceptorConfigURL property points to the
+          fix-synapse.cfg file you created. Once done you can start the Synapse configuration numbered 259:
+          i.e. synapse -sample 259. Note that Synapse creates a new FIX session with
+          Banzai at this point.
+      </p>
+      <p>
+          Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ 100. User has to send a 'Limit'
+          Order because price is a mandatory field for 'placeOrder' operation.
+      </p>
+      <p>
+          Synapse will forward the order request to one-way 'placeOrder' operation on the SimpleStockQuoteService. Synapse uses a simple XSLT mediator to transform the incoming FIX to a SOAP message.
+      </p>
+      <pre xml:space="preserve">
+          &lt;xsl:stylesheet version=&quot;2.0&quot;
+	        xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+	        xmlns:fn=&quot;http://www.w3.org/2005/02/xpath-functions&quot;&gt;
+	        &lt;xsl:output method=&quot;xml&quot; omit-xml-declaration=&quot;yes&quot; indent=&quot;yes&quot; /&gt;
+	      &lt;xsl:template match=&quot;/&quot;&gt;
+		    &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+			    &lt;m0:order&gt;
+				    &lt;m0:price&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='44']&quot;/&gt;&lt;/m0:price&gt;
+				    &lt;m0:quantity&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='38']&quot;/&gt;&lt;/m0:quantity&gt;
+				    &lt;m0:symbol&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='55']&quot;/&gt;&lt;/m0:symbol&gt;
+			    &lt;/m0:order&gt;
+		    &lt;/m0:placeOrder&gt;
+	       &lt;/xsl:template&gt;
+        &lt;/xsl:stylesheet&gt;
+      </pre>
+      <p>
+        To get an idea about the various transport parameters being used in this sample
+        see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
+        </a>.
+      </p>
 
     <h1>
       <a name="Task" id="Task">Introduction to Synapse Tasks</a>

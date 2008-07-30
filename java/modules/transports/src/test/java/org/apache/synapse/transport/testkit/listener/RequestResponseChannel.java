@@ -19,25 +19,5 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPBody;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
-
-public abstract class SOAPTestCase extends XMLMessageTestCase {
-    public SOAPTestCase(Channel<?> channel, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
-        super(channel, sender, baseName, contentTypeMode, baseContentType, data);
-    }
-
-    @Override
-    protected abstract SOAPFactory getOMFactory();
-
-    @Override
-    protected OMElement getMessage(OMElement payload) {
-        SOAPEnvelope envelope = ((SOAPFactory)factory).createSOAPEnvelope();
-        SOAPBody body = ((SOAPFactory)factory).createSOAPBody();
-        body.addChild(payload);
-        envelope.addChild(body);
-        return envelope;
-    }
+public interface RequestResponseChannel<T extends ListenerTestSetup> extends Channel<T> {
 }

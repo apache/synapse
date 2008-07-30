@@ -19,7 +19,7 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-public abstract class AbstractMessageSender implements MessageSender {
+public abstract class AbstractMessageSender<C extends Channel<?>> implements MessageSender<C> {
     private final String name;
     
     public AbstractMessageSender(String name) {
@@ -34,7 +34,7 @@ public abstract class AbstractMessageSender implements MessageSender {
         nameBuilder.addComponent("sender", name);
     }
     
-    public void setUp(Channel<?> channel) throws Exception {
+    public void setUp(C channel) throws Exception {
     }
     
     public void tearDown() throws Exception {

@@ -19,6 +19,18 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-public interface RESTSender<C extends AsyncChannel<?>> extends MessageSender<C> {
-    void sendMessage(String endpointReference) throws Exception;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.client.ServiceClient;
+
+public class AxisAsyncMessageSender extends AxisMessageSender<AsyncChannel<?>> implements XMLAsyncMessageSender<AsyncChannel<?>> {
+    public AxisAsyncMessageSender() {
+        super("axis");
+    }
+
+    public void sendMessage(AsyncChannel<?> channel,
+            String endpointReference, String contentType, String charset,
+            XMLMessageType xmlMessageType, OMElement payload) throws Exception {
+        
+        createClient(endpointReference, ServiceClient.ANON_OUT_ONLY_OP, xmlMessageType, payload, charset).execute(false);
+    }
 }

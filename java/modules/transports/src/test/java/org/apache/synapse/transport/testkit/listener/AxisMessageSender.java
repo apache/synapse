@@ -21,11 +21,10 @@ package org.apache.synapse.transport.testkit.listener;
 
 import java.io.File;
 
-import org.apache.axiom.om.OMAbstractFactory;
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
@@ -39,18 +38,18 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class AxisMessageSender extends AbstractMessageSender implements XMLMessageSender {
+public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<C> {
     private static final Log log = LogFactory.getLog(AxisMessageSender.class);
     
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
-    public AxisMessageSender() {
-        super("axis");
+    public AxisMessageSender(String name) {
+        super(name);
     }
-
+    
     @Override
-    public void setUp(Channel<?> channel) throws Exception {
+    public void setUp(C channel) throws Exception {
         super.setUp(channel);
         cfgCtx =
             ConfigurationContextFactory.createConfigurationContextFromFileSystem(
@@ -62,9 +61,14 @@ public class AxisMessageSender extends AbstractMessageSender implements XMLMessa
         trpOutDesc.getSender().init(cfgCtx, trpOutDesc);
     }
 
-    public void sendMessage(Channel<?> channel,
-            String endpointReference, String contentType, String charset,
-            OMElement message) throws Exception {
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        trpOutDesc.getSender().stop();
+    }
+    
+    protected OperationClient createClient(String endpointReference, QName operationQName, XMLMessageType xmlMessageType, OMElement payload, String charset) throws AxisFault {
+        log.info("Sending to " + endpointReference);
         
         Options options = new Options();
         options.setTo(new EndpointReference(endpointReference));
@@ -72,33 +76,12 @@ public class AxisMessageSender extends AbstractMessageSender implements XMLMessa
         ServiceClient serviceClient = new ServiceClient(cfgCtx, null);
         serviceClient.setOptions(options);
         
-        OperationClient mepClient = serviceClient.createClient(ServiceClient.ANON_OUT_ONLY_OP);
-        MessageContext mc = new MessageContext();
-        SOAPEnvelope envelope;
-        String messageType;
-        if (message instanceof SOAPEnvelope) {
-            envelope = (SOAPEnvelope)message;
-            String ns = message.getNamespace().getNamespaceURI();
-            if (ns.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-                messageType = SOAP12Constants.SOAP_12_CONTENT_TYPE;
-            } else {
-                messageType = SOAP11Constants.SOAP_11_CONTENT_TYPE;
-            }
-        } else {
-            envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
-            envelope.getBody().addChild(message);
-            messageType = "application/xml";
-        }
-        mc.setEnvelope(envelope);
-        mc.setProperty(Constants.Configuration.MESSAGE_TYPE, messageType);
+        OperationClient mepClient = serviceClient.createClient(operationQName);
+        MessageContext mc = xmlMessageType.createMessageContext(payload);
         mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charset);
+        mc.setServiceContext(serviceClient.getServiceContext());
         mepClient.addMessageContext(mc);
-        log.info("Sending to " + endpointReference);
-        mepClient.execute(false);
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        trpOutDesc.getSender().stop();
+        
+        return mepClient;
     }
 }

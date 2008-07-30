@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.DispatchPhase;
 import org.apache.axis2.transport.TransportListener;
@@ -61,9 +62,16 @@ public class ListenerTestServer extends UtilsTransportServer {
         
         channel.getSetup().beforeStartup();
         
+        TransportOutDescription trpOutDesc;
+        if (channel instanceof RequestResponseChannel) {
+            trpOutDesc = ((RequestResponseChannel<?>)channel).createTransportOutDescription();
+        } else {
+            trpOutDesc = null;
+        }
+        
         TransportInDescription trpInDesc = channel.createTransportInDescription();
         listener = trpInDesc.getReceiver();
-        addTransport(trpInDesc);
+        addTransport(trpInDesc, trpOutDesc);
         
         AxisConfiguration axisConfiguration = getAxisConfiguration();
         

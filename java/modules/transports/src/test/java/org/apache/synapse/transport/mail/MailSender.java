@@ -31,16 +31,15 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
-import org.apache.synapse.transport.testkit.listener.Channel;
 
-public abstract class MailSender extends BinaryPayloadSender {
+public abstract class MailSender extends BinaryPayloadSender<MailChannel> {
     @Override
-    public void sendMessage(Channel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception {
+    public void sendMessage(MailChannel channel, String endpointReference, String contentType, byte[] content) throws Exception {
         Properties props = new Properties();
         props.put("mail.smtp.class", TestTransport.class.getName());
         Session session = Session.getInstance(props);
         MimeMessage msg = new MimeMessage(session);
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(((MailChannel)channel).getAddress()));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getAddress()));
         msg.setFrom(new InternetAddress("test-sender@localhost"));
         msg.setSentDate(new Date());
         DataHandler dh = new DataHandler(new ByteArrayDataSource(content, contentType));

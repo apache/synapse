@@ -24,19 +24,17 @@ import javax.jms.Session;
 
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
-import org.apache.synapse.transport.testkit.listener.Channel;
 
-public class JMSBytesMessageSender extends BinaryPayloadSender {
+public class JMSBytesMessageSender extends BinaryPayloadSender<JMSAsyncChannel> {
     public JMSBytesMessageSender() {
         super("ByteMessage");
     }
     
     @Override
-    public void sendMessage(Channel<?> _channel,
+    public void sendMessage(JMSAsyncChannel channel,
                             String endpointReference,
                             String contentType,
                             byte[] content) throws Exception {
-        JMSChannel channel = (JMSChannel)_channel;
         Session session = channel.createSession();
         BytesMessage message = session.createBytesMessage();
         if (contentType != null) {

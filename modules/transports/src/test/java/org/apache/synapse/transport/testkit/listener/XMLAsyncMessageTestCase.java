@@ -25,13 +25,14 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
 
-public abstract class XMLMessageTestCase extends ListenerTestCase<XMLMessageSender> {
+public class XMLAsyncMessageTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,XMLAsyncMessageSender<? super C>> {
+    private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     private OMElement orgElement;
-    protected OMFactory factory;
     
-    public XMLMessageTestCase(Channel<?> channel, XMLMessageSender sender, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+    public XMLAsyncMessageTestCase(C channel, XMLAsyncMessageSender<? super C> sender, XMLMessageType xmlMessageType, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
         super(channel, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"");
+        this.xmlMessageType = xmlMessageType;
         this.data = data;
     }
     
@@ -44,7 +45,7 @@ public abstract class XMLMessageTestCase extends ListenerTestCase<XMLMessageSend
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        factory = getOMFactory();
+        OMFactory factory = xmlMessageType.getOMFactory();
         orgElement = factory.createOMElement(new QName("root"));
         orgElement.setText(data.getText());
     }
@@ -58,10 +59,7 @@ public abstract class XMLMessageTestCase extends ListenerTestCase<XMLMessageSend
     }
 
     @Override
-    protected void sendMessage(XMLMessageSender sender, String endpointReference, String contentType) throws Exception {
-        sender.sendMessage(getChannel(), endpointReference, contentType, data.getCharset(), getMessage(orgElement));
+    protected void sendMessage(XMLAsyncMessageSender<? super C> sender, String endpointReference, String contentType) throws Exception {
+        sender.sendMessage(getChannel(), endpointReference, contentType, data.getCharset(), xmlMessageType, orgElement);
     }
-    
-    protected abstract OMFactory getOMFactory();
-    protected abstract OMElement getMessage(OMElement payload);
 }

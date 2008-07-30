@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.mail;
 
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -31,7 +33,10 @@ public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
         MailChannel channel = new MailChannel("test-account@localhost");
-        for (BinaryPayloadSender sender : new BinaryPayloadSender[] { new MimeSender(), new MultipartSender() }) {
+        List<BinaryPayloadSender<? super MailChannel>> senders = new LinkedList<BinaryPayloadSender<? super MailChannel>>();
+        senders.add(new MimeSender());
+        senders.add(new MultipartSender());
+        for (BinaryPayloadSender<? super MailChannel> sender : senders) {
             // TODO: SOAP 1.2 tests don't work yet for mail transport
             suite.addSOAP11Test(channel, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.ASCII_TEST_DATA);
             suite.addSOAP11Test(channel, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.UTF8_TEST_DATA);

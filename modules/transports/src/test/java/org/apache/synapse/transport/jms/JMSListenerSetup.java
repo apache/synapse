@@ -30,6 +30,7 @@ import org.mockejb.jndi.MockContextFactory;
 
 import com.mockrunner.jms.ConfigurationManager;
 import com.mockrunner.jms.DestinationManager;
+import com.mockrunner.mock.jms.MockDestination;
 import com.mockrunner.mock.jms.MockQueueConnectionFactory;
 import com.mockrunner.mock.jms.MockTopicConnectionFactory;
 
@@ -65,8 +66,12 @@ public class JMSListenerSetup extends ListenerTestSetup {
         return context;
     }
 
-    public DestinationManager getDestinationManager() {
-        return destinationManager;
+    public MockDestination createDestination(String destinationType, String name) {
+        if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
+            return destinationManager.createTopic(name);
+        } else {
+            return destinationManager.createQueue(name);
+        }
     }
 
     public QueueConnectionFactory getQueueConnectionFactory() {

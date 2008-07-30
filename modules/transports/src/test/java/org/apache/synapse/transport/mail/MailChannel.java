@@ -22,9 +22,10 @@ package org.apache.synapse.transport.mail;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 
-public class MailChannel extends AbstractChannel<ListenerTestSetup> {
+public class MailChannel extends AbstractChannel<ListenerTestSetup> implements AsyncChannel<ListenerTestSetup> {
     private final String address;
     
     public MailChannel(String address) {

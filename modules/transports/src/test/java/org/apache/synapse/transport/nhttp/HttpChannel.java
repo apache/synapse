@@ -22,9 +22,11 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 
-public class HttpChannel extends AbstractChannel<ListenerTestSetup> {
+public class HttpChannel extends AbstractChannel<ListenerTestSetup> implements AsyncChannel<ListenerTestSetup>, RequestResponseChannel<ListenerTestSetup> {
     public HttpChannel() {
         super(ListenerTestSetup.DEFAULT);
     }

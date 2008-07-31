@@ -156,10 +156,18 @@ public class Sender extends SandeshaThread {
 			// Check that the sequence is still valid
 			boolean found = false;
 			if (entry.isRmSource()) {
-				RMSBean matcher = new RMSBean();
-				matcher.setInternalSequenceID(sequenceId);
-				matcher.setTerminated(false);
-				RMSBean rms = storageManager.getRMSBeanMgr().findUnique(matcher);
+				RMSBean rms = null;
+				if (entry.rmsKey == null) {
+					RMSBean matcher = new RMSBean();
+					matcher.setInternalSequenceID(sequenceId);
+					matcher.setTerminated(false);
+					rms = storageManager.getRMSBeanMgr().findUnique(matcher);
+					if (rms != null) {
+						entry.rmsKey = rms.getCreateSeqMsgID();
+					}
+				} else {
+					rms = storageManager.getRMSBeanMgr().retrieve(entry.rmsKey);
+				}
 				if (rms != null && !rms.isTerminated() && !rms.isTimedOut()) {
 					sequenceId = rms.getSequenceID();
 					if (SequenceManager.hasSequenceTimedOut(rms, sequenceId, storageManager))

@@ -26,6 +26,8 @@ public class SequenceEntry implements Serializable {
 
 	private String  sequenceId;
 	private boolean rmSource;
+
+	public String rmsKey;
 	
 	public SequenceEntry(String sequenceId, boolean rmSource) {
 		this.sequenceId = sequenceId;

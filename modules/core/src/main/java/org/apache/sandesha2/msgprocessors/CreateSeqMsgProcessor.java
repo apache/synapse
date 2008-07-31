@@ -181,12 +181,13 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				// offered seq id
 				String offeredSequenceID = offer.getIdentifer().getIdentifier(); 
 				
-				boolean offerAccepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
-	
+				boolean isValidseqID = isValidseqID(offeredSequenceID, context, createSeqRMMsg, storageManager);
+				boolean offerAccepted = true;
+				
 				RMSBean rMSBean = null;
 				//Before processing this offer any further we need to perform some extra checks 
 				//on the offered EP if WS-RM Spec 1.1 is being used
-				if(offerAccepted && Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmdBean.getRMVersion())){
+				if(isValidseqID && Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmdBean.getRMVersion())){
 					Endpoint endpoint = offer.getEndpoint();
 					if (endpoint!=null) {
 						//Check to see if the offer endpoint has a value of WSA Anonymous
@@ -210,20 +211,28 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 							log.debug("Offer Refused as it included a null endpoint");	
 						offerAccepted = false;
 					}
-				} else if (offerAccepted && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmdBean.getRMVersion())){
+				} else if (isValidseqID && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmdBean.getRMVersion())){
 					rMSBean = new RMSBean(); 
 				}
 				
-				if (offerAccepted) {
+				String outgoingSideInternalSequenceId = SandeshaUtil
+				.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
+				
+				if(isValidseqID){
 					// Setting the CreateSequence table entry for the outgoing
 					// side.
-					rMSBean.setSequenceID(offeredSequenceID);
-					String outgoingSideInternalSequenceId = SandeshaUtil
-							.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
+					rMSBean.setSequenceID(offeredSequenceID);	
 					rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
 					// this is a dummy value
 					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
 					
+					//Try inserting the new RMSBean
+					if(!storageManager.getRMSBeanMgr().insert(rMSBean)){
+						offerAccepted = false;
+					}
+				}
+				
+				if (offerAccepted) {
 					if(rmdBean.getToEndpointReference() != null){
 						rMSBean.setToEndpointReference(rmdBean.getToEndpointReference());
 					} else {
@@ -263,7 +272,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// Set the SOAP Version for this sequence.
 					rMSBean.setSoapVersion(SandeshaUtil.getSOAPVersion(createSeqRMMsg.getSOAPEnvelope()));
 
-					storageManager.getRMSBeanMgr().insert(rMSBean);
+					storageManager.getRMSBeanMgr().update(rMSBean);
 					
 					SandeshaUtil.startWorkersForSequence(context, rMSBean);
 					
@@ -371,34 +380,25 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	private boolean offerAccepted(String sequenceId, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,
+	private boolean isValidseqID(String sequenceId, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,
 			StorageManager storageManager) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: CreateSeqMsgProcessor::offerAccepted, " + sequenceId);
+			log.debug("Enter: CreateSeqMsgProcessor::isValidseqID, " + sequenceId);
 
 		if ("".equals(sequenceId)) {
 			if (log.isDebugEnabled())
-				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
+				log.debug("Exit: CreateSeqMsgProcessor::isValidseqID, " + false);
 			return false;
 		}
-
-		RMSBean createSeqFindBean = new RMSBean();
-		createSeqFindBean.setSequenceID(sequenceId);
-		Collection arr = storageManager.getRMSBeanMgr().find(createSeqFindBean);
-
-		if (arr.size() > 0) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
-			return false;
-		}
+		
 		if (sequenceId.length() <= 1) {
 			if (log.isDebugEnabled())
-				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
+				log.debug("Exit: CreateSeqMsgProcessor::isValidseqID, " + false);
 			return false; // Single character offers are NOT accepted.
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + true);
+			log.debug("Exit: CreateSeqMsgProcessor::isValidseqID, " + true);
 		return true;
 	}
 

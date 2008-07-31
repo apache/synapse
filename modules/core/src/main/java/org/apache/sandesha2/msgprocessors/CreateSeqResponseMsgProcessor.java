@@ -46,6 +46,7 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 
@@ -132,7 +133,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 						"Existing id:" + rmsBean.getSequenceID() + ", new id:" + newOutSequenceId);
 			return false;
 		}
-
+			
 		// Store the new sequence id
 		rmsBean.setSequenceID(newOutSequenceId);
 
@@ -147,110 +148,119 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				}
 			}
 		}
-
-    // Get the CreateSeqBean based on the message id to take a lock on the bean
-    SenderBean createSeqBean = retransmitterMgr.retrieve(createSeqMsgId);
-    
-		// deleting the create sequence sender bean entry.
-		retransmitterMgr.delete(createSeqBean.getMessageID());
-		
-		// Remove the create sequence message
-		storageManager.removeMessageContext(rmsBean.getCreateSequenceMsgStoreKey());
-				
-		// processing for accept (offer has been sent)
-		Accept accept = createSeqResponsePart.getAccept();
-		if (accept != null) {
-
-			// TODO this should be detected in the Fault manager.
-			if (rmsBean.getOfferedSequence() == null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.accptButNoSequenceOffered);
-				log.debug(message);
-				throw new SandeshaException(message);
-			}
-
-			RMDBean rMDBean = new RMDBean();
 			
-			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
-			rMDBean.setAcksToEndpointReference(acksToEPR);
-			rMDBean.setSequenceID(rmsBean.getOfferedSequence());
-			rMDBean.setNextMsgNoToProcess(1);
-			rMDBean.setOutboundInternalSequence(rmsBean.getInternalSequenceID());
-
-			rMDBean.setServiceName(createSeqResponseRMMsgCtx.getMessageContext().getAxisService().getName());
-			
-			//Storing the referenceMessage of the sending side sequence as the reference message
-			//of the receiving side as well.
-			//This can be used when creating new outgoing messages.
-			
-			String referenceMsgStoreKey = rmsBean.getReferenceMessageStoreKey();
-			MessageContext referenceMsg = storageManager.retrieveMessageContext(referenceMsgStoreKey, configCtx);
-			
-			String newMessageStoreKey = SandeshaUtil.getUUID();
-			storageManager.storeMessageContext(newMessageStoreKey,referenceMsg);
-			
-			rMDBean.setReferenceMessageKey(newMessageStoreKey);
-
-			// If this is an offered sequence that needs polling then we need to setup the
-			// rmdBean for polling too, so that it still gets serviced after the outbound
-			// sequence terminates.
-			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-				if(rmsBean.isPollingMode()) {
-					rMDBean.setPollingMode(true);
-				}
-			}
-			
-			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
-			rMDBean.setRMVersion(rmSpecVersion);
-			
-			EndpointReference toEPR = createSeqResponseRMMsgCtx.getTo();
-			if (toEPR==null) {
-				//Most probably this is a sync response message, using the replyTo of the request message
-				OperationContext operationContext = createSeqResponseRMMsgCtx.getMessageContext().getOperationContext();
-				if (operationContext!=null) {
-					MessageContext createSequnceMessage = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
-					if (createSequnceMessage!=null)
-						toEPR = createSequnceMessage.getReplyTo();
-				}
-			}
-			
-			if (toEPR!=null) 
-				rMDBean.setToAddress(toEPR.getAddress());
-			
-			rMDBean.setServerCompletedMessages(new RangeString());
-			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-
-			// Store the security token for the offered sequence
-			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
-			
-			rMDBean.setLastActivatedTime(System.currentTimeMillis());
-			
-			rmdBeanMgr.insert(rMDBean);
-			SandeshaUtil.startWorkersForSequence(configCtx, rMDBean);
-		}
-		
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
-		rmsBeanMgr.update(rmsBean);
-		SandeshaUtil.startWorkersForSequence(configCtx, rmsBean);
-
-		// Locate and update all of the messages for this sequence, now that we know
-		// the sequence id.
-		SenderBean target = new SenderBean();
-		target.setInternalSequenceID(internalSequenceId);
-		target.setSend(false);
 		
-		Iterator iterator = retransmitterMgr.find(target).iterator();
-		while (iterator.hasNext()) {
-			SenderBean tempBean = (SenderBean) iterator.next();
+		if(!rmsBeanMgr.update(rmsBean)){			
+			//Im not setting the createSeqBean sender bean to resend true as the reallocation of msgs will do this
+			try{
+				TerminateManager.terminateSendingSide(rmsBean, storageManager, true);
+			} catch(Exception e){
+				if (log.isDebugEnabled())
+					log.debug(e);					
+			}
+		} else {
+			// processing for accept (offer has been sent)
+			Accept accept = createSeqResponsePart.getAccept();
+			if (accept != null) {
 
-			// asking to send the application msssage
-			tempBean.setSend(true);
-			tempBean.setSequenceID(newOutSequenceId);
-			retransmitterMgr.update(tempBean);
+				// TODO this should be detected in the Fault manager.
+				if (rmsBean.getOfferedSequence() == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.accptButNoSequenceOffered);
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
+
+				RMDBean rMDBean = new RMDBean();
+				
+				EndpointReference acksToEPR = accept.getAcksTo().getEPR();
+				rMDBean.setAcksToEndpointReference(acksToEPR);
+				rMDBean.setSequenceID(rmsBean.getOfferedSequence());
+				rMDBean.setNextMsgNoToProcess(1);
+				rMDBean.setOutboundInternalSequence(rmsBean.getInternalSequenceID());
+
+				rMDBean.setServiceName(createSeqResponseRMMsgCtx.getMessageContext().getAxisService().getName());
+				
+				//Storing the referenceMessage of the sending side sequence as the reference message
+				//of the receiving side as well.
+				//This can be used when creating new outgoing messages.
+				
+				String referenceMsgStoreKey = rmsBean.getReferenceMessageStoreKey();
+				MessageContext referenceMsg = storageManager.retrieveMessageContext(referenceMsgStoreKey, configCtx);
+				
+				String newMessageStoreKey = SandeshaUtil.getUUID();
+				storageManager.storeMessageContext(newMessageStoreKey,referenceMsg);
+				
+				rMDBean.setReferenceMessageKey(newMessageStoreKey);
+
+				// If this is an offered sequence that needs polling then we need to setup the
+				// rmdBean for polling too, so that it still gets serviced after the outbound
+				// sequence terminates.
+				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
+					if(rmsBean.isPollingMode()) {
+						rMDBean.setPollingMode(true);
+					}
+				}
+				
+				String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
+				rMDBean.setRMVersion(rmSpecVersion);
+				
+				EndpointReference toEPR = createSeqResponseRMMsgCtx.getTo();
+				if (toEPR==null) {
+					//Most probably this is a sync response message, using the replyTo of the request message
+					OperationContext operationContext = createSeqResponseRMMsgCtx.getMessageContext().getOperationContext();
+					if (operationContext!=null) {
+						MessageContext createSequnceMessage = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+						if (createSequnceMessage!=null)
+							toEPR = createSequnceMessage.getReplyTo();
+					}
+				}
+				
+				if (toEPR!=null) 
+					rMDBean.setToAddress(toEPR.getAddress());
+				
+				rMDBean.setServerCompletedMessages(new RangeString());
+				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+
+				// Store the security token for the offered sequence
+				rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
+				
+				rMDBean.setLastActivatedTime(System.currentTimeMillis());
+				
+				rmdBeanMgr.insert(rMDBean);
+				SandeshaUtil.startWorkersForSequence(configCtx, rMDBean);
+			}
+			
+			// Get the CreateSeqBean based on the message id to take a lock on the bean
+		    SenderBean createSeqBean = retransmitterMgr.retrieve(createSeqMsgId);
+		    
+			// deleting the create sequence sender bean entry.
+			retransmitterMgr.delete(createSeqBean.getMessageID());
+				
+			// Remove the create sequence message
+			storageManager.removeMessageContext(rmsBean.getCreateSequenceMsgStoreKey());
+			SandeshaUtil.startWorkersForSequence(configCtx, rmsBean);
+	
+			// Locate and update all of the messages for this sequence, now that we know
+			// the sequence id.
+			SenderBean target = new SenderBean();
+			target.setInternalSequenceID(internalSequenceId);
+			target.setSend(false);
+			
+			Iterator iterator = retransmitterMgr.find(target).iterator();
+			while (iterator.hasNext()) {
+				SenderBean tempBean = (SenderBean) iterator.next();
+	
+				// asking to send the application msssage
+				tempBean.setSend(true);
+				tempBean.setSequenceID(newOutSequenceId);
+				retransmitterMgr.update(tempBean);
+			}
+	
+			// TODO - does this do anything?
+			createSeqResponseRMMsgCtx.pause();
 		}
-
-		// TODO - does this do anything?
-		createSeqResponseRMMsgCtx.pause();
-
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: CreateSeqResponseMsgProcessor::processInMessage " + Boolean.TRUE);
 		return true;

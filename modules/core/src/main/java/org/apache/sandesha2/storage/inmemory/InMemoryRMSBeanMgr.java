@@ -26,6 +26,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -36,27 +39,46 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 	
 	private ConcurrentHashMap seqID2csm = new ConcurrentHashMap();
 	private ConcurrentHashMap intSeqID2csm = new ConcurrentHashMap();
+	private ConcurrentHashMap inUseSeqIDs = new ConcurrentHashMap();
 
 	public InMemoryRMSBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
+	}
+	
+	private boolean isSeqIDUsable(String seqID, String createSeqMsgID, boolean isInsert){
+		boolean isUsable = true;
+		if(seqID != null) {
+			Object o = inUseSeqIDs.putIfAbsent(seqID, createSeqMsgID);
+			
+			if(isInsert && o!= null){
+				isUsable = false;
+			}
+			
+			if(o != null && !o.equals(createSeqMsgID)){
+				isUsable = false;
+			}
+		}
+		return isUsable;
 	}
 
 	public boolean insert(RMSBean bean) throws SandeshaStorageException {
 		boolean res = false;
 		lock.lock();
-		if(intSeqID2csm.get(bean.getInternalSequenceID())==null){
-			res = super.insert(bean.getCreateSeqMsgID(), bean);
-			if(res){
-				if(bean.getInternalSequenceID()!=null){
-					intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
+		if(isSeqIDUsable(bean.getSequenceID(), bean.getCreateSeqMsgID(), true)){
+			if(intSeqID2csm.get(bean.getInternalSequenceID())==null){
+				res = super.insert(bean.getCreateSeqMsgID(), bean);
+				if(res){
+					if(bean.getInternalSequenceID()!=null){
+						intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
+					}
+					if(bean.getSequenceID()!=null){
+						seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
+					}
 				}
-				if(bean.getSequenceID()!=null){
-					seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
-				}
-			}
-		}			
-		lock.unlock();
+			}			
+		} 
 
+		lock.unlock();
 
 		return res;
 	}
@@ -65,7 +87,8 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 		RMSBean removed = (RMSBean) super.delete(msgId);
 		if(removed!=null){
 			seqID2csm.remove(removed.getSequenceID());
-			intSeqID2csm.remove(removed.getInternalSequenceID());
+			intSeqID2csm.remove(removed.getInternalSequenceID());			
+			inUseSeqIDs.remove(removed.getSequenceID());
 		}
 		return removed!=null;
 
@@ -76,15 +99,19 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 	}
 
 	public boolean update(RMSBean bean) throws SandeshaStorageException {
-		boolean result = super.update(bean.getCreateSeqMsgID(), bean);
-		if(bean.getInternalSequenceID()!=null){
-			intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
-		}
-		if(bean.getSequenceID()!=null){
-			seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
-		}
-		return result;
+		boolean result = false;
 		
+		if(isSeqIDUsable(bean.getSequenceID(), bean.getCreateSeqMsgID(), false)){
+			result = super.update(bean.getCreateSeqMsgID(), bean);
+			if(bean.getInternalSequenceID()!=null){
+				intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
+			}
+			if(bean.getSequenceID()!=null){
+				seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
+			}
+		} 
+
+		return result;		
 	}
 
 	public List find(RMSBean bean) throws SandeshaStorageException {

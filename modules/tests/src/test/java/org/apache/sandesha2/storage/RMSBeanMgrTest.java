@@ -82,22 +82,18 @@ public class RMSBeanMgrTest extends SandeshaTestCase {
     	createSeqBean2.setCreateSeqMsgID("CreateSeqMsgId2");
     	createSeqBean2.setSequenceID("SeqId1");
     	
-        mgr.insert(createSeqBean1);
-        mgr.insert(createSeqBean2);
+    	assertTrue(mgr.insert(createSeqBean1));
+        
+        //This RMSBean won't get added 
+        //as we protect against adding two RMSBeans with identical Seq ID's
+        assertFalse(mgr.insert(createSeqBean2));
 
         RMSBean target = new RMSBean();
         target.setSequenceID("SeqId1");
 
         Iterator iter = mgr.find(target).iterator();
         RMSBean tmp = (RMSBean) iter.next();
-        if (tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1")) {
-            tmp = (RMSBean) iter.next();
-            assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId2"));
-
-        }   else {
-            tmp = (RMSBean) iter.next();
-            assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1"));
-        }
+        assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1"));
     }
 
     public void testInsert() throws SandeshaStorageException{

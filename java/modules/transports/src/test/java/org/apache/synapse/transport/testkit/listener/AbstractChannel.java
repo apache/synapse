@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportOutDescription;
 
@@ -51,6 +53,13 @@ public abstract class AbstractChannel<T extends ListenerTestSetup> implements Ch
     public void setupService(AxisService service) throws Exception {
     }
     
+    public void setupRequestMessageContext(MessageContext msgContext) {
+    }
+
+    public EndpointReference createEndpointReference(String address) {
+        return new EndpointReference(address);
+    }
+
     public void setUp() throws Exception {
     }
 

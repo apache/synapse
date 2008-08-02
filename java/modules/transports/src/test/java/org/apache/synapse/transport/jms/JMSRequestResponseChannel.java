@@ -19,15 +19,17 @@
 
 package org.apache.synapse.transport.jms;
 
+import javax.jms.Destination;
+
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-
-import com.mockrunner.mock.jms.MockDestination;
 
 public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel<JMSListenerSetup> {
     private final String replyDestinationType;
     private String replyDestinationName;
-    private MockDestination replyDestination;
+    private Destination replyDestination;
     
     public JMSRequestResponseChannel(JMSListenerSetup setup, String destinationType, String replyDestinationType) {
         super(setup, destinationType + "-" + replyDestinationType, destinationType);
@@ -37,7 +39,7 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        replyDestinationName = "response";
+        replyDestinationName = "response" + replyDestinationType;
         replyDestination = setup.createDestination(replyDestinationType, replyDestinationName);
         setup.getContext().bind(replyDestinationName, replyDestination);
     }
@@ -55,5 +57,16 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
         super.setupService(service);
         service.addParameter(JMSConstants.REPLY_PARAM_TYPE, replyDestinationType);
         service.addParameter(JMSConstants.REPLY_PARAM, replyDestinationName);
+    }
+
+    @Override
+    public void setupRequestMessageContext(MessageContext msgContext) {
+        super.setupRequestMessageContext(msgContext);
+//        msgContext.setProperty(JMSConstants.JMS_REPLY_TO, replyDestinationName);
+    }
+
+    @Override
+    public EndpointReference createEndpointReference(String address) {
+        return new EndpointReference(address + "&" + JMSConstants.REPLY_PARAM_TYPE + "=" + replyDestinationType + "&" + JMSConstants.REPLY_PARAM + "=" + replyDestinationName);
     }
 }

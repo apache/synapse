@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.jms;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.QueueConnection;
@@ -42,14 +43,12 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.mockejb.jndi.MockContextFactory;
 
-import com.mockrunner.mock.jms.MockDestination;
-
 public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
     private static final OMFactory factory = OMAbstractFactory.getOMFactory();
     
     private final String destinationType;
     private String destinationName;
-    private MockDestination destination;
+    private Destination destination;
     
     public JMSChannel(JMSListenerSetup setup, String name, String destinationType) {
         super(name, setup);
@@ -58,7 +57,7 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
     
     @Override
     public void setUp() throws Exception {
-        destinationName = "request";
+        destinationName = "request" + destinationType;
         destination = setup.createDestination(destinationType, destinationName);
         setup.getContext().bind(destinationName, destination);
     }

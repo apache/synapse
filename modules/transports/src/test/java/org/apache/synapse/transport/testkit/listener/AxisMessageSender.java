@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -41,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<C> {
     private static final Log log = LogFactory.getLog(AxisMessageSender.class);
     
+    private C channel;
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
@@ -51,6 +51,8 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
     @Override
     public void setUp(C channel) throws Exception {
         super.setUp(channel);
+        this.channel = channel;
+        
         cfgCtx =
             ConfigurationContextFactory.createConfigurationContextFromFileSystem(
                     new File("target/test_rep").getAbsolutePath());
@@ -71,13 +73,14 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
         log.info("Sending to " + endpointReference);
         
         Options options = new Options();
-        options.setTo(new EndpointReference(endpointReference));
+        options.setTo(channel.createEndpointReference(endpointReference));
 
         ServiceClient serviceClient = new ServiceClient(cfgCtx, null);
         serviceClient.setOptions(options);
         
         OperationClient mepClient = serviceClient.createClient(operationQName);
         MessageContext mc = xmlMessageType.createMessageContext(payload);
+        channel.setupRequestMessageContext(mc);
         mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charset);
         mc.setServiceContext(serviceClient.getServiceContext());
         mepClient.addMessageContext(mc);

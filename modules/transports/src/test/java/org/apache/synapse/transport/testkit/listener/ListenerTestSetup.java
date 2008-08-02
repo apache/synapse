@@ -41,7 +41,10 @@ public abstract class ListenerTestSetup {
      * 
      * @throws Exception
      */
-    public void beforeStartup() throws Exception {
+    public void setUp() throws Exception {
+    }
+    
+    public void tearDown() throws Exception {
     }
     
     /**

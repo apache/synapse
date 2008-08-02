@@ -19,7 +19,10 @@
 
 package org.apache.synapse.transport.jms;
 
+import javax.jms.Destination;
+import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
+import javax.jms.Topic;
 import javax.jms.TopicConnectionFactory;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -28,33 +31,27 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.mockejb.jndi.MockContextFactory;
 
-import com.mockrunner.jms.ConfigurationManager;
-import com.mockrunner.jms.DestinationManager;
-import com.mockrunner.mock.jms.MockDestination;
-import com.mockrunner.mock.jms.MockQueueConnectionFactory;
-import com.mockrunner.mock.jms.MockTopicConnectionFactory;
-
-public class JMSListenerSetup extends ListenerTestSetup {
+public abstract class JMSListenerSetup extends ListenerTestSetup {
     public static final String QUEUE_CONNECTION_FACTORY = "QueueConnectionFactory";
     public static final String TOPIC_CONNECTION_FACTORY = "TopicConnectionFactory";
     
     private Context context;
-    private DestinationManager destinationManager;
     private QueueConnectionFactory queueConnectionFactory;
     private TopicConnectionFactory topicConnectionFactory;
     
     @Override
-    public void beforeStartup() throws Exception {
+    public void setUp() throws Exception {
         MockContextFactory.setAsInitial();
         context = new InitialContext();
-        destinationManager = new DestinationManager();
-        ConfigurationManager configurationManager = new ConfigurationManager();
-        topicConnectionFactory = new MockTopicConnectionFactory(destinationManager, configurationManager);
-        queueConnectionFactory = new MockQueueConnectionFactory(destinationManager, configurationManager);
+        queueConnectionFactory = createQueueConnectionFactory();
+        topicConnectionFactory = createTopicConnectionFactory();
         context.bind(QUEUE_CONNECTION_FACTORY, queueConnectionFactory);
         context.bind(TOPIC_CONNECTION_FACTORY, topicConnectionFactory);
     }
-
+    
+    protected abstract QueueConnectionFactory createQueueConnectionFactory() throws Exception;
+    protected abstract TopicConnectionFactory createTopicConnectionFactory() throws Exception;
+    
     @Override
     public void setupContentType(AxisService service, String contentType) throws Exception {
         service.addParameter("transport.jms.contentType", contentType);
@@ -66,14 +63,17 @@ public class JMSListenerSetup extends ListenerTestSetup {
         return context;
     }
 
-    public MockDestination createDestination(String destinationType, String name) {
+    public Destination createDestination(String destinationType, String name) {
         if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
-            return destinationManager.createTopic(name);
+            return createTopic(name);
         } else {
-            return destinationManager.createQueue(name);
+            return createQueue(name);
         }
     }
 
+    public abstract Queue createQueue(String name);
+    public abstract Topic createTopic(String name);
+    
     public QueueConnectionFactory getQueueConnectionFactory() {
         return queueConnectionFactory;
     }

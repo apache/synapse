@@ -60,7 +60,7 @@ public class ListenerTestServer extends UtilsTransportServer {
         }
         activeServer = this;
         
-        channel.getSetup().beforeStartup();
+        channel.getSetup().setUp();
         
         TransportOutDescription trpOutDesc;
         if (channel instanceof RequestResponseChannel) {
@@ -96,6 +96,7 @@ public class ListenerTestServer extends UtilsTransportServer {
     public void stop() throws Exception {
         super.stop();
         channel.tearDown();
+        channel.getSetup().tearDown();
         Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
         activeServer = null;
     }

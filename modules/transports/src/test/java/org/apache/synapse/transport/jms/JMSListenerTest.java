@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
+import org.apache.synapse.transport.testkit.listener.AxisRequestResponseMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
@@ -35,14 +36,14 @@ import org.apache.synapse.transport.testkit.listener.XMLAsyncMessageSender;
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
-        JMSListenerSetup setup = new JMSListenerSetup();
+        JMSListenerSetup setup = new QpidTestSetup();
         JMSBytesMessageSender bytesMessageSender = new JMSBytesMessageSender();
         JMSTextMessageSender textMessageSender = new JMSTextMessageSender();
         List<XMLAsyncMessageSender<? super JMSAsyncChannel>> senders = new LinkedList<XMLAsyncMessageSender<? super JMSAsyncChannel>>();
         senders.add(bytesMessageSender);
         senders.add(textMessageSender);
         senders.add(new AxisAsyncMessageSender());
-//        suite.addPOXTests(new JMSRequestResponseChannel(setup, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(new JMSRequestResponseChannel(setup, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
             JMSAsyncChannel channel = new JMSAsyncChannel(setup, destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {

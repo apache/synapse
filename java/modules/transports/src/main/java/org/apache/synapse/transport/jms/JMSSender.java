@@ -515,7 +515,7 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
         String contentType = JMSUtils.getInstace().getProperty(message, BaseConstants.CONTENT_TYPE);
 
         JMSUtils.getInstace().setSOAPEnvelope(message, responseMsgCtx, contentType);
-        responseMsgCtx.setServerSide(true);
+//        responseMsgCtx.setServerSide(true);
 
         handleIncomingMessage(
             responseMsgCtx,

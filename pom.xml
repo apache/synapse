@@ -1030,6 +1030,13 @@
             <version>${saxon.version}</version>
         </dependency>
 
+        <!--commons-cli -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>${commons-cli.version}</version>
+        </dependency>
+
     </dependencies>
 
     <reporting>
@@ -1178,6 +1185,7 @@
         <wrapper.version>3.2.3</wrapper.version>
         <saxon.version>8.9</saxon.version>
         <commons_io.version>1.4</commons_io.version>
+        <commons-cli.version>1.0</commons-cli.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

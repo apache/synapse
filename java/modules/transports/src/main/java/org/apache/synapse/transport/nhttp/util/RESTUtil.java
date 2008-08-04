@@ -82,36 +82,33 @@ public class RESTUtil {
 
         firstElement = messageContext.getEnvelope().getBody().getFirstElement();
         String params = "";
-
         if (firstElement != null) {
-
             // first element corresponds to the operation name
             address = address + "/" + firstElement.getLocalName();
-
-            Iterator iter = firstElement.getChildElements();
-
-            String legalCharacters = WSDL2Constants
-                    .LEGAL_CHARACTERS_IN_QUERY.replaceAll(queryParameterSeparator, "");
-            StringBuffer buff = new StringBuffer(params);
-
-            // iterate through the child elements and find the request parameters
-            while (iter.hasNext()) {
-                OMElement element = (OMElement) iter.next();
-                try {
-                    buff.append(URIEncoderDecoder.quoteIllegal(element.getLocalName(),
-                            legalCharacters)).append("=").append(URIEncoderDecoder.quoteIllegal(element.getText(),
-                            legalCharacters)).append(queryParameterSeparator);
-                } catch (UnsupportedEncodingException e) {
-                    throw new AxisFault("URI Encoding error : " + element.getLocalName()
-                            + "=" + element.getText(), e);
-                }
-            }
-
-            params = buff.toString();
         } else {
-            throw new AxisFault("Cannot convert SOAP infoset to a GET URL-encoded format");
+            firstElement = messageContext.getEnvelope().getBody();
         }
 
+        Iterator iter = firstElement.getChildElements();
+
+        String legalCharacters = WSDL2Constants
+                .LEGAL_CHARACTERS_IN_QUERY.replaceAll(queryParameterSeparator, "");
+        StringBuffer buff = new StringBuffer(params);
+
+        // iterate through the child elements and find the request parameters
+        while (iter.hasNext()) {
+            OMElement element = (OMElement) iter.next();
+            try {
+                buff.append(URIEncoderDecoder.quoteIllegal(element.getLocalName(),
+                        legalCharacters)).append("=").append(URIEncoderDecoder.quoteIllegal(element.getText(),
+                        legalCharacters)).append(queryParameterSeparator);
+            } catch (UnsupportedEncodingException e) {
+                throw new AxisFault("URI Encoding error : " + element.getLocalName()
+                        + "=" + element.getText(), e);
+            }
+        }
+
+        params = buff.toString();
         if (params.trim().length() != 0) {
             int index = address.indexOf("?");
             if (index == -1) {
@@ -130,7 +127,7 @@ public class RESTUtil {
 
     /**
      * Processes the HTTP GET request and builds the SOAP info-set of the REST message
-     * 
+     *
      * @param msgContext The MessageContext of the Request Message
      * @param out The output stream of the response
      * @param soapAction SoapAction of the request
@@ -141,9 +138,9 @@ public class RESTUtil {
      * @throws AxisFault - Thrown in case a fault occurs
      */
     public static boolean processURLRequest(MessageContext msgContext, OutputStream out,
-        String soapAction, String requestURI, ConfigurationContext configurationContext,
-        Map requestParameters) throws AxisFault {
-        
+                                            String soapAction, String requestURI, ConfigurationContext configurationContext,
+                                            Map requestParameters) throws AxisFault {
+
         if ((soapAction != null) && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
             soapAction = soapAction.substring(1, soapAction.length() - 1);
         }
@@ -168,7 +165,7 @@ public class RESTUtil {
     /**
      * Creates the {@link SOAPEnvelope} from the GET URL request. REST message building inside
      * synapse will be handled in this manner
-     * 
+     *
      * @param requestUrl GET URL of the request
      * @param map query parameters of the GET request
      * @param configCtx axis configuration context
@@ -176,7 +173,7 @@ public class RESTUtil {
      * @throws AxisFault if the service represented by the GET request URL cannot be found
      */
     public static SOAPEnvelope createEnvelopeFromGetRequest(String requestUrl, Map map,
-        ConfigurationContext configCtx) throws AxisFault {
+                                                            ConfigurationContext configCtx) throws AxisFault {
 
         String[] values = Utils.parseRequestURLForServiceAndOperation(
                 requestUrl, configCtx.getServiceContextPath());
@@ -198,7 +195,13 @@ public class RESTUtil {
                     service.getSchemaTargetNamespacePrefix());
             soapFactory.createOMNamespace(service.getSchemaTargetNamespace(),
                     service.getSchemaTargetNamespacePrefix());
-            OMElement opElement = soapFactory.createOMElement(operation, omNs);
+            OMElement opElement;
+            if (operation.length() == 0) {
+                opElement = envelope.getBody();
+            } else {
+                opElement = soapFactory.createOMElement(operation, omNs);
+                envelope.getBody().addChild(opElement);
+            }
 
             for (Object o : map.keySet()) {
                 String name = (String) o;
@@ -208,9 +211,6 @@ public class RESTUtil {
                 omEle.setText(value);
                 opElement.addChild(omEle);
             }
-
-            envelope.getBody().addChild(opElement);
-
             return envelope;
         } else {
             return null;

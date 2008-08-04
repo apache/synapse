@@ -59,7 +59,7 @@ public class FaultMediator extends AbstractMediator {
     /** Holds the SOAP version to be used to make the fault, if specified */
     private int soapVersion;
     /** Whether to mark the created fault as a response or not */
-    private boolean markAsResponse = false;
+    private boolean markAsResponse = true;
     /** Whether it is required to serialize the response attribute or not */
     private boolean serializeResponse = false;
 

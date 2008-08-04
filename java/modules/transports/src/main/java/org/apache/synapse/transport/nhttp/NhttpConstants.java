@@ -34,4 +34,5 @@ public class NhttpConstants {
     public static final String SERVICE_URI_LOCATION = "ServiceURI";
     public static final String EPR_TO_SERVICE_NAME_MAP = "service.epr.map";
     public static final String NON_BLOCKING_TRANSPORT = "NonBlockingTransport";
+    public static final String SERIALIZED_BYTES = "SerializedBytes";
 }

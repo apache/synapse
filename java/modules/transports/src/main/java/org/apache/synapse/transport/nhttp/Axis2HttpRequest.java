@@ -141,8 +141,11 @@ public class Axis2HttpRequest {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 messageFormatter.writeTo(msgContext, format, baos, true);
                 BasicHttpEntity entity = new BasicHttpEntity();
-                entity.setContentLength(baos.toByteArray().length);
+                byte[] bytes = baos.toByteArray();
+                msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, bytes);
+                entity.setContentLength(bytes.length);
                 ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
+
             }
 
 
@@ -231,7 +234,11 @@ public class Axis2HttpRequest {
         if (!completed) {
             OutputStream out = new ContentOutputStream(outputBuffer);
             try {
-                messageFormatter.writeTo(msgContext, format, out, false);
+                if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
+                    out.write((byte[])msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES));
+                } else {
+                    messageFormatter.writeTo(msgContext, format, out, false);
+                }        
             } catch (Exception e) {
                 Throwable t = e.getCause();
                 if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {

@@ -106,26 +106,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         sslContext = getSSLContext(transportOut);
         sslIOSessionHandler = getSSLIOSessionHandler(transportOut);
 
-        // start the Sender in a new seperate thread
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                executeClientEngine();
-            }
-        }, "HttpCoreNIOSender");
-        t.start();
-        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender starting");
-
-        // register with JMX
-        mbeanSupport
-            = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
-        mbeanSupport.register();
-    }
-
-    /**
-     * Configure and start the IOReactor
-     */
-    private void executeClientEngine() {
-
         HttpParams params = getClientParameters();
         try {
             ioReactor = new DefaultConnectingIOReactor(
@@ -148,18 +128,31 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         handler = new ClientHandler(cfgCtx, params, metrics);
-        IOEventDispatch ioEventDispatch = getEventDispatch(
+        final IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslIOSessionHandler, params);
 
+        // start the Sender in a new seperate thread
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    ioReactor.execute(ioEventDispatch);
+                } catch (InterruptedIOException ex) {
+                    log.fatal("Reactor Interrupted");
+                } catch (IOException e) {
+                    log.fatal("Encountered an I/O error: " + e.getMessage(), e);
+                }
+                log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender Shutdown");
+            }
+        }, "HttpCoreNIOSender");
+        t.start();
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender starting");
+
+        // register with JMX
+        mbeanSupport
+            = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
+        mbeanSupport.register();
+        
         state = BaseConstants.STARTED;
-        try {
-            ioReactor.execute(ioEventDispatch);
-        } catch (InterruptedIOException ex) {
-            log.fatal("Reactor Interrupted");
-        } catch (IOException e) {
-            log.fatal("Encountered an I/O error: " + e.getMessage(), e);
-        }
-        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender Shutdown");
     }
 
     /**

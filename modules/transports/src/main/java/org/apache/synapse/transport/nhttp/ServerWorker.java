@@ -400,6 +400,25 @@ public class ServerWorker implements Runnable {
                 }
             }
 
+        }
+        else if (serviceName != null && parameters.containsKey("info")) {
+            AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+                    getServices().get(serviceName);
+            if (service != null) {
+                try {
+                    response.addHeader(CONTENT_TYPE, TEXT_HTML);
+                    serverHandler.commitResponse(conn, response);
+                    os.write(HTTPTransportReceiver.printServiceHTML(
+                            serviceName, cfgCtx).getBytes());
+
+                } catch (IOException e) {
+                    handleException("Error writing service HTML to client", e);
+                    return;
+                }
+            } else {
+                handleException("Invalid service : " + serviceName, null);
+                return;
+            }
         } else if (serviceName == null || serviceName.length() == 0) {
 
             try {
@@ -412,43 +431,19 @@ public class ServerWorker implements Runnable {
             }
 
         } else {
-
-            if (parameters.isEmpty() && operation == null) {
-                AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
-                    getServices().get(serviceName);
-                if (service != null) {
-                    try {
-                        response.addHeader(CONTENT_TYPE, TEXT_HTML);
-                        serverHandler.commitResponse(conn, response);
-                        os.write(HTTPTransportReceiver.printServiceHTML(
-                                serviceName, cfgCtx).getBytes());
-
-                    } catch (IOException e) {
-                        handleException("Error writing service HTML to client", e);
-                        return;
-                    }
-                } else {
-                    handleException("Invalid service : " + serviceName, null);
-                    return;
-                }
-
-            } else {
-                try {
-
-                    RESTUtil.processURLRequest(
-                            msgContext, os, (request.getFirstHeader(SOAPACTION) != null ?
-                            request.getFirstHeader(SOAPACTION).getValue() : null),
-                            request.getRequestLine().getUri(), cfgCtx, parameters);
-                    // do not let the output stream close (as by default below) since
-                    // we are serving this GET request through the Synapse engine
-                    return;
+            try {
+                RESTUtil.processURLRequest(
+                        msgContext, os, (request.getFirstHeader(SOAPACTION) != null ?
+                        request.getFirstHeader(SOAPACTION).getValue() : null),
+                        request.getRequestLine().getUri(), cfgCtx, parameters);
+                // do not let the output stream close (as by default below) since
+                // we are serving this GET request through the Synapse engine
+                return;
                     
-                } catch (AxisFault axisFault) {
-                    handleException("Error processing GET request for: " +
-                            request.getRequestLine().getUri(), axisFault);
-                }
+            } catch (AxisFault axisFault) {
+                handleException("Error processing GET request for: " +
+                        request.getRequestLine().getUri(), axisFault);
             }
-
         }
 
         // make sure that the output stream is flushed and closed properly

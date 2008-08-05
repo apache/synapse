@@ -25,13 +25,12 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
 
-public class XMLAsyncMessageTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,XMLAsyncMessageSender<? super C>> {
+public class XMLAsyncMessageTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,XMLMessage> {
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
-    private OMElement orgElement;
     
-    public XMLAsyncMessageTestCase(C channel, XMLAsyncMessageSender<? super C> sender, XMLMessageType xmlMessageType, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
-        super(channel, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"");
+    public XMLAsyncMessageTestCase(C channel, AsyncMessageSender<? super C,XMLMessage> sender, XMLMessageType xmlMessageType, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+        super(channel, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"", data.getCharset());
         this.xmlMessageType = xmlMessageType;
         this.data = data;
     }
@@ -43,23 +42,19 @@ public class XMLAsyncMessageTestCase<C extends AsyncChannel<?>> extends AsyncMes
     }
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected XMLMessage prepareMessage() throws Exception {
         OMFactory factory = xmlMessageType.getOMFactory();
-        orgElement = factory.createOMElement(new QName("root"));
+        OMElement orgElement = factory.createOMElement(new QName("root"));
         orgElement.setText(data.getText());
-    }
-    
-    @Override
-    protected void checkMessageData(MessageData messageData) throws Exception {
-        SOAPEnvelope envelope = messageData.getEnvelope();
-        OMElement element = envelope.getBody().getFirstElement();
-        assertEquals(orgElement.getQName(), element.getQName());
-        assertEquals(data.getText(), element.getText());
+        return new XMLMessage(contentType, orgElement, xmlMessageType);
     }
 
     @Override
-    protected void sendMessage(XMLAsyncMessageSender<? super C> sender, String endpointReference, String contentType) throws Exception {
-        sender.sendMessage(getChannel(), endpointReference, contentType, data.getCharset(), xmlMessageType, orgElement);
+    protected void checkMessageData(XMLMessage message, MessageData messageData) throws Exception {
+        SOAPEnvelope envelope = messageData.getEnvelope();
+        OMElement element = envelope.getBody().getFirstElement();
+        OMElement orgElement = message.getPayload();
+        assertEquals(orgElement.getQName(), element.getQName());
+        assertEquals(data.getText(), element.getText());
     }
 }

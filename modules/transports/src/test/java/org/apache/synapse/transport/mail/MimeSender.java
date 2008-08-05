@@ -22,7 +22,7 @@ package org.apache.synapse.transport.mail;
 import javax.activation.DataHandler;
 import javax.mail.internet.MimeMessage;
 
-class MimeSender extends MailSender {
+public class MimeSender extends MailSender {
     @Override
     protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
         msg.setDataHandler(dh);

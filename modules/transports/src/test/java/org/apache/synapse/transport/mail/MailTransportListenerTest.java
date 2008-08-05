@@ -25,24 +25,27 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
+import org.apache.synapse.transport.testkit.listener.Adapter;
+import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
+import org.apache.synapse.transport.testkit.listener.XMLMessage;
 
 public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
         MailChannel channel = new MailChannel("test-account@localhost");
-        List<BinaryPayloadSender<? super MailChannel>> senders = new LinkedList<BinaryPayloadSender<? super MailChannel>>();
+        List<MailSender> senders = new LinkedList<MailSender>();
         senders.add(new MimeSender());
         senders.add(new MultipartSender());
-        for (BinaryPayloadSender<? super MailChannel> sender : senders) {
+        for (MailSender sender : senders) {
+            AsyncMessageSender<MailChannel,XMLMessage> xmlSender = new Adapter<MailChannel>(sender);
             // TODO: SOAP 1.2 tests don't work yet for mail transport
-            suite.addSOAP11Test(channel, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.ASCII_TEST_DATA);
-            suite.addSOAP11Test(channel, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.UTF8_TEST_DATA);
+            suite.addSOAP11Test(channel, xmlSender, ContentTypeMode.TRANSPORT, ListenerTestSuite.ASCII_TEST_DATA);
+            suite.addSOAP11Test(channel, xmlSender, ContentTypeMode.TRANSPORT, ListenerTestSuite.UTF8_TEST_DATA);
             // TODO: this test fails when using multipart
             if (sender instanceof MimeSender) {
-                suite.addSOAP11Test(channel, sender, ContentTypeMode.TRANSPORT, ListenerTestSuite.LATIN1_TEST_DATA);
+                suite.addSOAP11Test(channel, xmlSender, ContentTypeMode.TRANSPORT, ListenerTestSuite.LATIN1_TEST_DATA);
             }
             // addSOAPTests(strategy, suite);
             // TODO: POX tests don't work yet for mail transport

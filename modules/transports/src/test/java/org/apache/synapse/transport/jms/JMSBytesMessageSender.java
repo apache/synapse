@@ -23,24 +23,25 @@ import javax.jms.BytesMessage;
 import javax.jms.Session;
 
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
+import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
+import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
+import org.apache.synapse.transport.testkit.listener.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.listener.SenderOptions;
 
-public class JMSBytesMessageSender extends BinaryPayloadSender<JMSAsyncChannel> {
+public class JMSBytesMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,ByteArrayMessage> {
     public JMSBytesMessageSender() {
         super("ByteMessage");
     }
     
-    @Override
     public void sendMessage(JMSAsyncChannel channel,
-                            String endpointReference,
-                            String contentType,
-                            byte[] content) throws Exception {
+                            SenderOptions options,
+                            ByteArrayMessage message) throws Exception {
         Session session = channel.createSession();
-        BytesMessage message = session.createBytesMessage();
-        if (contentType != null) {
-            message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+        BytesMessage jmsMessage = session.createBytesMessage();
+        if (message.getContentType() != null) {
+            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
         }
-        message.writeBytes(content);
-        channel.send(session, message);
+        jmsMessage.writeBytes(message.getContent());
+        channel.send(session, jmsMessage);
     }
 }

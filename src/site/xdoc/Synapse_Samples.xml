@@ -322,6 +322,10 @@
               <a href="#Sample259">Sample 259: Switching from FIX to HTTP
               </a>
             </li>
+            <li>
+              <a href="#Sample260">Sample 260: Switching from FIX to AMQP
+              </a>
+            </li>
           </ul>
         </li>
         <li>
@@ -3944,7 +3948,85 @@ Transfer-Encoding: chunked
         see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
         </a>.
       </p>
-
+      <h2>
+        <a name="Sample260" id="Sample260">Sample 260: Switch from FIX to AMQP </a>
+      </h2>
+       <pre xml:space="preserve">
+&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+	&lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
+		&lt;target&gt;
+			&lt;endpoint&gt;
+				&lt;address uri=&quot;jms:/QpidStockQuoteService?transport.jms.ConnectionFactoryJNDIName=qpidConnectionfactory&amp;amp;java.naming.factory.initial=org.apache.qpid.jndi.PropertiesFileInitialContextFactory&amp;amp;java.naming.provider.url=repository/conf/sample/resources/fix/con.properties&amp;amp;transport.jms.ReplyDestination=replyQueue&quot;/&gt;
+			&lt;/endpoint&gt;
+			&lt;inSequence&gt;
+				&lt;log level=&quot;full&quot; /&gt;
+			&lt;/inSequence&gt;
+			&lt;outSequence&gt;
+			    &lt;property name=&quot;transport.fix.ServiceName&quot;
+					value=&quot;FIXProxy&quot; scope=&quot;axis2-client&quot; /&gt;
+				&lt;log level=&quot;full&quot; /&gt;
+		                &lt;send /&gt;
+			&lt;/outSequence&gt;
+		&lt;/target&gt;
+		&lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
+			file:repository/conf/sample/resources/fix/fix-synapse.cfg
+		&lt;/parameter&gt;
+		&lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
+			file
+		&lt;/parameter&gt;
+	&lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+        <p>
+          <strong>Objective: Demonstrate the capability of switching between FIX and AMQP protocols</strong>
+        </p>
+        <p>
+          <strong>Prerequisites:</strong><br/>
+           You will need the sample FIX blotter that comes with Quickfix/J
+           (Banzai). Configure the blotter to establish
+           sessions with Synapse. See <a href="Synapse_Samples_Setup.html#fixsamplesconfig">
+           Configuring Sample FIX Applications</a>
+        </p>
+        <p>
+           Configure the AMQP transport for Synapse. See <a href="Synapse_Samples_Setup.html#setupamqpjms">
+           Configure Synapse for AMQP Transport</a>
+        </p>
+        <p>
+           Start the AMQP consumer, by switching to samples/axis2Client directory and running the consumer
+           using the following command. Consumer will listen to the queue 'QpidStockQuoteService', accept the orders and
+           reply to the queue 'replyQueue'.
+        </p>
+        <pre xml:space="preserve">ant amqpconsumer -Dpropfile=$SYNAPSE_HOME/repository/conf/sample/resources/fix/direct.properties</pre>
+        <p>
+          Start Banzai
+        </p>
+        <p>
+          Enable FIX transport in the Synapse axis2.xml. See <a
+          href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
+          </a>
+        </p>
+        <p>
+          Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.html#fixsamples">
+          Configuring Synapse for FIX Samples</a>
+        </p>
+        <p>
+          Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_260.xml file
+          and make sure that the transport.fix.AcceptorConfigURL property points to the
+          fix-synapse.cfg file you created. Once done you can start the Synapse configuration numbered 260:
+          i.e. synapse -sample 260. Note that Synapse creates a new FIX session with
+          Banzai at this point.
+        </p>
+        <p>
+          Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ MKT.
+        </p>
+        <p>
+          Synapse will forward the order request by binding it to a JMS message payload and sending it to the
+          AMQP consumer. AMQP consumer will send a execution back to Banzai.
+        </p>
+        <p>
+          To get an idea about the various transport parameters being used in this sample
+          see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
+          </a>.
+        </p>
     <h1>
       <a name="Task" id="Task">Introduction to Synapse Tasks</a>
     </h1>

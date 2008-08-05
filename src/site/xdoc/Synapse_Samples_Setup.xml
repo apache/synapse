@@ -500,6 +500,65 @@ synapse.sh -sample &lt;n&gt;</pre>
         &lt;/parameter&gt;
     &lt;/transportReceiver&gt;</pre>
     <p/>
+    <h2 id="setupamqpjms">
+      Configure Synapse for AMQP Transport
+    </h2>
+    <p/>
+    <p>
+      The samples used in this guide assumes the existence of a local QPid
+      (1.0-M2 or higher) installation properly installed and started up. You also
+      need to copy the following client JAR files into the Synapse 'lib' folder
+      to support AMQP. These files are found in the 'lib' directory of the
+      QPid installation.
+    </p>
+    <ul>
+      <li>qpid-client-1.0-incubating-M2.jar</li>
+      <li>qpid-common-1.0-incubating-M2.jar</li>
+      <li>geronimo-jms_1.1_spec-1.0.jar</li>
+      <li>slf4j-api-1.4.0.jar    **</li>
+      <li>slf4j-log4j12-1.4.0.jar  **</li>
+    </ul>
+        <p>
+          ** To configure FIX (Quickfix/J 1.3) with AMQP (QPid-1.0-M2) copy the sl4j-* libraries comes with QPid and ignore the sl4j-* libraries with Quickfix/J.
+        </p>
+    <p>
+      To enable the AMQP over JMS transport, you need to uncomment the JMS transport
+      listener configuration. To enable AMQP over JMS for synapse, the repository/conf/axis2.xml must be updated,
+      while to enable JMS support for the sample Axis2 server the
+      samples/axis2Server/repository/conf/axis2.xml file must be updated.
+    </p>
+    <pre xml:space="preserve">    &lt;!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment --&gt;
+        &lt;transportReceiver name="jms" class="org.apache.synapse.transport.jms.JMSListener"&gt;
+        &lt;/transportReceiver&gt;
+
+        &lt;transportSender name="jms" class="org.apache.synapse.transport.jms.JMSSender"&gt;
+        &lt;/transportReceiver&gt;</pre>
+
+    <p/>
+    <p>
+        Locate and edit the AMQP connection settings file for the message consumer, this fle is usually named direct.properties.
+        <pre>
+            java.naming.factory.initial = org.apache.qpid.jndi.PropertiesFileInitialContextFactory
+            # register some connection factories
+            # connectionfactory.[jndiname] = [ConnectionURL]
+            connectionfactory.qpidConnectionfactory = amqp://guest:guest@clientid/test?brokerlist='tcp://localhost:5672'
+            # Register an AMQP destination in JNDI
+            # destination.[jniName] = [BindingURL]
+            destination.directQueue = direct://amq.direct//QpidStockQuoteService?routingkey='QpidStockQuoteService'
+            destination.replyQueue = direct://amq.direct//replyQueue?routingkey='replyQueue'</pre>
+    </p>
+    <p>
+        Locate and edit the AMQP connection settings file for Synapse, this fle is usually named con.properties.
+        <pre>
+            #initial context factory
+            #java.naming.factory.initial =org.apache.qpid.jndi.PropertiesFileInitialContextFactory
+            # register some connection factories
+            # connectionfactory.[jndiname] = [ConnectionURL]
+            connectionfactory.qpidConnectionfactory=amqp://guest:guest@clientid/test?brokerlist='tcp://localhost:5672'
+            # Register an AMQP destination in JNDI
+            # destination.[jndiName] = [BindingURL]
+            destination.directQueue=direct://amq.direct//QpidStockQuoteService</pre>
+    </p>
     <h2 id="mailsender">
       Setting up Mail Transport Sender
     </h2>
@@ -509,7 +568,7 @@ synapse.sh -sample &lt;n&gt;</pre>
       the MailTransportSender sample configuration and make sure it points to a
       valid SMTP configuration for any actual scenarios.
     </p>
-<pre xml:space="preserve">    &lt;transportSender name="mailto" class="org.apache.synapse.transport.mail.MailTransportSender"&gt;
+    <pre xml:space="preserve">    &lt;transportSender name="mailto" class="org.apache.synapse.transport.mail.MailTransportSender"&gt;
         &lt;parameter name="mail.smtp.host"&gt;smtp.gmail.com&lt;/parameter&gt;
         &lt;parameter name="mail.smtp.port"&gt;587&lt;/parameter&gt;
         &lt;parameter name="mail.smtp.starttls.enable"&gt;true&lt;/parameter&gt;

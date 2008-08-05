@@ -67,6 +67,13 @@
 
 	example:
         ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8280/services/FIXProxy
+
+    ant amqpconsumer
+        A JMS based amqp consumer that accept orders and generates executions.
+        [-Dpropfile=/etc/direct.properties]
+
+	example:
+        ant amqpconsumer
     </echo>
     </target>
 
@@ -90,6 +97,7 @@
     <property name="opt_file" value=""/>
     <property name="class.dir" value="target/classes"/>
     <property name="qty" value=""/>
+    <property name="propfile" value=""/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
@@ -130,6 +138,13 @@
             <sysproperty key="addurl" value="http://localhost:9000/services/SimpleStockQuoteService"/>
             <sysproperty key="trpurl" value="http://localhost:8280/"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+        </java>
+    </target>
+
+    <target name="amqpconsumer" depends="compile">
+        <java classname="samples.userguide.AMQPConsumer"
+             classpathref="javac.classpath" fork="true">
+            <sysproperty key="propfile" value="${propfile}"/>
         </java>
     </target>
 

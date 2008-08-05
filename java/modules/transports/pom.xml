@@ -148,6 +148,7 @@
                                 <exclude>**/MailEchoRawXMLTest.java</exclude>
                                 <exclude>**/AbstractTransportTest.java</exclude>
                                 <exclude>org/apache/synapse/transport/mail/Test*.java</exclude>                                
+                                <exclude>org/apache/synapse/transport/testkit/**/*.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>

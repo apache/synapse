@@ -25,33 +25,25 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.BinaryPayloadSender;
-import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
-import org.apache.synapse.transport.testkit.listener.RESTSender;
+import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
+import org.apache.synapse.transport.testkit.listener.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.listener.SenderOptions;
 
-public class JavaNetSender extends BinaryPayloadSender<AsyncChannel<?>> implements RESTSender<AsyncChannel<?>> {
+public class JavaNetSender extends AbstractMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,ByteArrayMessage> {
     public JavaNetSender() {
         super("java.net");
     }
     
-    @Override
-    public void sendMessage(AsyncChannel<?> channel, String endpointReference, String contentType, byte[] content) throws Exception {
-        URLConnection connection = new URL(endpointReference).openConnection();
+    public void sendMessage(AsyncChannel<?> channel, SenderOptions options, ByteArrayMessage message) throws Exception {
+        URLConnection connection = new URL(options.getEndpointReference()).openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);
-        connection.setRequestProperty("Content-Type", contentType);
+        connection.setRequestProperty("Content-Type", message.getContentType());
         OutputStream out = connection.getOutputStream();
-        out.write(content);
+        out.write(message.getContent());
         out.close();
-        InputStream in = connection.getInputStream();
-        IOUtils.copy(in, System.out);
-        in.close();
-    }
-    
-    public void sendMessage(String endpointReference) throws Exception {
-        URLConnection connection = new URL(endpointReference + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
-        connection.setDoInput(true);
         InputStream in = connection.getInputStream();
         IOUtils.copy(in, System.out);
         in.close();

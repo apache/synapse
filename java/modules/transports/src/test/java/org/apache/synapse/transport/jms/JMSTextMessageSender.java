@@ -24,31 +24,29 @@ import java.io.StringWriter;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
-import org.apache.synapse.transport.testkit.listener.XMLAsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.XMLMessageType;
+import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
+import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.listener.XMLMessage;
 
-public class JMSTextMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements XMLAsyncMessageSender<JMSAsyncChannel> {
+public class JMSTextMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,XMLMessage> {
     public JMSTextMessageSender() {
         super("TextMessage");
     }
 
-    public void sendMessage(JMSAsyncChannel channel,
-            String endpointReference, String contentType, String charset,
-            XMLMessageType xmlMessageType, OMElement payload) throws Exception {
+    public void sendMessage(JMSAsyncChannel channel, SenderOptions options, XMLMessage message) throws Exception {
         Session session = channel.createSession();
-        TextMessage message = session.createTextMessage();
-        if (contentType != null) {
-            message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+        TextMessage jmsMessage = session.createTextMessage();
+        if (message.getContentType() != null) {
+            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
         }
         OMOutputFormat format = new OMOutputFormat();
         format.setIgnoreXMLDeclaration(true);
         StringWriter sw = new StringWriter();
-        xmlMessageType.getMessage(payload).serializeAndConsume(sw, format);
-        message.setText(sw.toString());
-        channel.send(session, message);
+        message.getXmlMessageType().getMessage(message.getPayload()).serializeAndConsume(sw, format);
+        jmsMessage.setText(sw.toString());
+        channel.send(session, jmsMessage);
     }
 }

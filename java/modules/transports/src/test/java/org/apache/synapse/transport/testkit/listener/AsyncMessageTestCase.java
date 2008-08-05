@@ -26,9 +26,12 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 
-public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,S extends MessageSender<? super C>> extends ListenerTestCase<C,S> {
-    public AsyncMessageTestCase(C channel, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
+public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M> extends ListenerTestCase<C,AsyncMessageSender<? super C,M>> {
+    private final String charset;
+    
+    public AsyncMessageTestCase(C channel, AsyncMessageSender<? super C,M> sender, String name, ContentTypeMode contentTypeMode, String contentType, String charset) {
         super(channel, sender, name, contentTypeMode, contentType);
+        this.charset = charset;
     }
 
     @Override
@@ -46,14 +49,17 @@ public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,S extends M
             channel.getSetup().setupContentType(service, contentType);
         }
         
+        M message = prepareMessage();
+        
         // Run the test.
         MessageData messageData;
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();
         axisConfiguration.addService(service);
 //        server.addErrorListener(messageReceiver);
         try {
-            sendMessage(sender, server.getEPR(service),
-                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
+            SenderOptions options = new SenderOptions(server.getEPR(service), charset);
+//                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
+            sender.sendMessage(channel, options, message);
             messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
             if (messageData == null) {
                 fail("Failed to get message");
@@ -64,9 +70,9 @@ public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,S extends M
             axisConfiguration.removeService(service.getName());
         }
         
-        checkMessageData(messageData);
+        checkMessageData(message, messageData);
     }
     
-    protected abstract void sendMessage(S sender, String endpointReference, String contentType) throws Exception;
-    protected abstract void checkMessageData(MessageData messageData) throws Exception;
+    protected abstract M prepareMessage() throws Exception;
+    protected abstract void checkMessageData(M message, MessageData messageData) throws Exception;
 }

@@ -25,21 +25,23 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.synapse.transport.testkit.listener.Adapter;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.AxisRequestResponseMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
-import org.apache.synapse.transport.testkit.listener.XMLAsyncMessageSender;
+import org.apache.synapse.transport.testkit.listener.XMLMessage;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
         HttpChannel channel = new HttpChannel();
         JavaNetSender javaNetSender = new JavaNetSender();
-        List<XMLAsyncMessageSender<? super HttpChannel>> senders = new LinkedList<XMLAsyncMessageSender<? super HttpChannel>>();
-        senders.add(javaNetSender);
+        List<AsyncMessageSender<? super HttpChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super HttpChannel,XMLMessage>>();
+        senders.add(new Adapter<AsyncChannel<?>>(javaNetSender));
         senders.add(new AxisAsyncMessageSender());
-        for (XMLAsyncMessageSender<? super HttpChannel> sender : senders) {
+        for (AsyncMessageSender<? super HttpChannel,XMLMessage> sender : senders) {
             suite.addSOAPTests(channel, sender, ContentTypeMode.TRANSPORT);
             suite.addPOXTests(channel, sender, ContentTypeMode.TRANSPORT);
         }
@@ -47,7 +49,7 @@ public class HttpCoreNIOListenerTest extends TestCase {
         suite.addSwATests(channel, javaNetSender);
         suite.addTextPlainTests(channel, javaNetSender, ContentTypeMode.TRANSPORT);
         suite.addBinaryTest(channel, javaNetSender, ContentTypeMode.TRANSPORT);
-        suite.addRESTTests(channel, javaNetSender);
+        suite.addRESTTests(channel, new JavaNetRESTSender());
         return suite;
     }
 }

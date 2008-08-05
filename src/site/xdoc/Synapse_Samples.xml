@@ -4027,6 +4027,89 @@ Transfer-Encoding: chunked
           see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
           </a>.
         </p>
+        <h2>
+            <a name="Sample261" id="Sample261">Sample 261: Switch between FIX versions </a>
+        </h2>
+        <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;proxy name=&quot;OrderProcesserProxy41&quot; transports=&quot;fix&quot;&gt;
+            &lt;target&gt;
+               &lt;endpoint&gt;
+                  &lt;address uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot;/&gt;
+               &lt;/endpoint&gt;
+               &lt;inSequence&gt;&lt;log level=&quot;full&quot;/&gt;&lt;/inSequence&gt;
+               &lt;outSequence&gt;&lt;log level=&quot;full&quot;/&gt;&lt;send/&gt;&lt;/outSequence&gt;
+            &lt;/target&gt;
+            &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;file:repository/conf/sample/resources/fix/fix-synapse-m40.cfg&lt;/parameter&gt;
+            &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;file&lt;/parameter&gt;
+            &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:repository/conf/sample/resources/fix/synapse-sender-m.cfg&lt;/parameter&gt;
+            &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;file&lt;/parameter&gt;
+         &lt;/proxy&gt;
+      &lt;/definitions&gt;</pre>
+        <p>
+            <strong>Objective: Demonstrate the capability of switching between FIX versions e.g. FIX4.0 to FIX4.1</strong>
+        </p>
+        <p>
+            <strong>Prerequisites:</strong><br/>
+            You will need the two sample FIX applications that come with Quickfix/J
+            (Banzai and Executor). Configure the two applications to establish
+            sessions with Synapse. See <a href="Synapse_Samples_Setup.html#fixsamplesconfig">
+            Configuring Sample FIX Applications.</a>
+        </p>
+        <p>
+            Add the following lines to the Banzai configuration file (banzai.cfg).
+        </p>
+        <pre xml:space="preserve">DataDictionary=~/etc/spec/FIX40-synapse.xml</pre>
+        <p>
+            Note: FIX40-synapse.xml can be found at $SYNAPSE_HOME/repository/conf/samples/resources/fix.
+            This is a custom FIX data dictionary file that has added tag 150,151 to the
+            execution messages (35=8) of FIX4.0. Make sure the DataDictionary property of the banzai.cfg points
+            to this data dictionary file.
+        </p>
+        <p>
+            Add the following lines to the Executor configuration file (executor.cfg).
+        </p>
+       <pre xml:space="preserve">
+            [session]
+            BeginString=FIX.4.1
+            SocketAcceptPort=19877</pre>
+        <p>
+            Start Banzai and Executor using the custom configuration files.
+        </p>
+        <p>
+            Enable FIX transport in the Synapse axis2.xml. See <a
+            href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
+            </a>
+        </p>
+        <p>
+            Configure Synapse for FIX samples. We will be using two custom configuration files
+            for Synapse in this sample. These two custom configuration files can be found at
+            SYNAPSE_HOME/repository/conf/sample/resources/fix directory. The two files are called
+            fix-synapse-m40.cfg and synapse-sender-m.cfg. You can point your Synapse configuration
+            to these two files (this is already done in the supplied synapse_sample_261.xml file)
+            or you may create copies of them and point the Synapse configuration to the copies.
+            In either case make sure that the properties like FileStorePath and FileLogPath in the
+            two files point to valid locations in your local file system.
+        </p>
+        <p>
+            Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_261.xml file
+            and make sure that transport.fix.AcceptorConfigURL property points to the
+            fix-synapse-m40.cfg file described above and transport.fix.InitiatorConfigURL points
+            to the synapse-sender-m.cfg file described above. Once done you can start the
+            Synapse configuration numbered 261: i.e. synapse -sample 261. Note that Synapse
+            creates a new FIX session with Banzai at this point.
+        </p>
+        <p>
+            Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ MKT.
+        </p>
+        <p>
+            Synapse will forward the order request from FIX4.0 to the Executor that accepts
+            FIX4.1 messages. Executor will send an ack and an execution back to Banzai.
+        </p>
+        <p>
+            To get an idea about the various transport parameters being used in this sample
+            see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
+            </a>.
+        </p>
     <h1>
       <a name="Task" id="Task">Introduction to Synapse Tasks</a>
     </h1>

@@ -24,7 +24,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-class MultipartSender extends MailSender {
+public class MultipartSender extends MailSender {
     @Override
     protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
         MimeMultipart multipart = new MimeMultipart();

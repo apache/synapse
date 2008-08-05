@@ -19,18 +19,14 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.client.ServiceClient;
 
-public class AxisAsyncMessageSender extends AxisMessageSender<AsyncChannel<?>> implements XMLAsyncMessageSender<AsyncChannel<?>> {
+public class AxisAsyncMessageSender extends AxisMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,XMLMessage> {
     public AxisAsyncMessageSender() {
         super("axis");
     }
 
-    public void sendMessage(AsyncChannel<?> channel,
-            String endpointReference, String contentType, String charset,
-            XMLMessageType xmlMessageType, OMElement payload) throws Exception {
-        
-        createClient(endpointReference, ServiceClient.ANON_OUT_ONLY_OP, xmlMessageType, payload, charset).execute(false);
+    public void sendMessage(AsyncChannel<?> channel, SenderOptions options, XMLMessage message) throws Exception {
+        createClient(options.getEndpointReference(), ServiceClient.ANON_OUT_ONLY_OP, message.getXmlMessageType(), message.getPayload(), options.getCharset()).execute(false);
     }
 }

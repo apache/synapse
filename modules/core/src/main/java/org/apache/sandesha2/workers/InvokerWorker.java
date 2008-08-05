@@ -38,6 +38,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.context.ContextManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
+import org.apache.sandesha2.storage.SandeshaStorageTransientException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -338,6 +339,14 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					return messageInvoked;
 				}
 
+			} catch (SandeshaStorageTransientException e){
+				if (log.isDebugEnabled())
+					log.debug("SandeshaStorageTransientException :", e);
+				
+				if (transaction != null && transaction.isActive())
+					transaction.rollback();
+				messageInvoked = false;
+				
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception :", e);
@@ -345,8 +354,9 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				if (transaction != null && transaction.isActive())
 					transaction.rollback();
 				messageInvoked = false;
-				
+
 				handleFault(rmMsg, e);
+				
 			}
 			if(transaction != null && transaction.isActive()) transaction.commit();
 			transaction = null;

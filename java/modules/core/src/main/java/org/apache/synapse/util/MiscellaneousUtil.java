@@ -24,9 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 
 import java.util.Properties;
-import java.io.InputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 /**
  *
@@ -42,24 +40,90 @@ public class MiscellaneousUtil {
      *
      * @param dsProperties The property collection
      * @param name         The name of the property
-     * @param def          The default value for the property
+     * @param defaultValue The default value for the property
      * @return The value of the property if it is found , otherwise , default value
      */
-    public static String getProperty(Properties dsProperties, String name, String def) {
+    public static String getProperty(Properties dsProperties, String name, String defaultValue) {
 
         String result = dsProperties.getProperty(name);
-        if ((result == null || result.length() == 0 || "".equals(result)) && def != null) {
+        if ((result == null || result.length() == 0 || "".equals(result)) && defaultValue != null) {
             if (log.isDebugEnabled()) {
                 log.debug("The name with ' " + name + " ' cannot be found. " +
-                        "Using default value " + def);
+                        "Using default value " + defaultValue);
             }
-            result = def;
+            result = defaultValue;
         }
         if (result != null) {
             return result.trim();
         } else {
-            return def;
+            return defaultValue;
         }
+    }
+
+    /**
+     * Helper method to get the value of the property from a given property bag
+     * This method will return a value with the type equal to the type
+     * given by the Class type parameter. Therefore, The user of this method
+     * can ensure that  he is get what he request
+     *
+     * @param properties   Properties bag
+     * @param name         Name of the property
+     * @param defaultValue Default value
+     * @param type         Expected Type using Class
+     * @return Value corresponding to the given property name
+     */
+    public static Object getProperty(Properties properties, String name, Object defaultValue, Class type) {
+
+        Object result = properties.getProperty(name);
+        if (result == null && defaultValue != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("The name with ' " + name + " ' cannot be found. " +
+                        "Using default value " + defaultValue);
+            }
+            result = defaultValue;
+        }
+
+        if (result == null || type == null) {
+            return result;
+        }
+
+        if (String.class.equals(type)) {
+
+            if (result instanceof String) {
+                return result;
+            } else {
+                handleException("Invalid type , expect String");
+            }
+
+        } else if (Boolean.class.equals(type)) {
+            if (result instanceof String) {
+                return Boolean.parseBoolean((String) result);
+            } else if (result instanceof Boolean) {
+                return result;
+            } else {
+                handleException("Invalid type , expect Boolean");
+            }
+
+        } else if (Integer.class.equals(type)) {
+            if (result instanceof String) {
+                return Integer.parseInt((String) result);
+            } else if (result instanceof Integer) {
+                return result;
+            } else {
+                handleException("Invalid type , expect Integer");
+            }
+        } else if (Long.class.equals(type)) {
+            if (result instanceof String) {
+                return Long.parseLong((String) result);
+            } else if (result instanceof Long) {
+                return result;
+            } else {
+                handleException("Invalid type , expect Long");
+            }
+        } else {
+            return result;
+        }
+        return null;
     }
 
     /**
@@ -108,4 +172,49 @@ public class MiscellaneousUtil {
         return properties;
     }
 
+    /**
+     * Helper method to serialize object into a byte array
+     *
+     * @param data The object to be serialized
+     * @return The byte array representation of the provided object
+     */
+    public static byte[] serialize(Object data) {
+
+        ObjectOutputStream outputStream = null;
+        ByteArrayOutputStream binOut = null;
+        byte[] result = null;
+        try {
+            binOut = new ByteArrayOutputStream();
+            outputStream = new ObjectOutputStream(binOut);
+            outputStream.writeObject(data);
+            result = binOut.toByteArray();
+        } catch (IOException e) {
+            handleException("Error serializing object :" + data);
+        } finally {
+            if (binOut != null) {
+                try {
+                    binOut.close();
+                } catch (IOException ex) {
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Helper methods for handle errors.
+     *
+     * @param msg The error message
+     */
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
 }

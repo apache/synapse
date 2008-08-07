@@ -41,7 +41,7 @@ goto setupArgs
 rem is there is a -xdebug in the options
 :xdebug
 
-set _XDEBUG="wrapper.java.additional.10=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
+set _XDEBUG="wrapper.java.additional.4=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
 shift
 goto setupArgs
 

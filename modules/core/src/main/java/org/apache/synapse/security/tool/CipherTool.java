@@ -217,7 +217,7 @@ public class CipherTool {
     }
 
     /**
-     * Factoyr method to create a @see keyStoreInformation from command line options
+     * Factory method to create a @see keyStoreInformation from command line options
      *
      * @param cmd Command line which capture all command line arguments
      * @return KeyStoreInformation object

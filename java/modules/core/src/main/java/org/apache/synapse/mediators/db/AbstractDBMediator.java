@@ -115,7 +115,11 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @return a unique name or URL to refer to the DataSource being used
      */
     protected String getDSName() {
-        return (String) dataSourceProps.get(AbstractDBMediatorFactory.URL_Q);
+        String name = (String) dataSourceProps.get(AbstractDBMediatorFactory.URL_Q);
+        if (name == null) {
+            name = (String) dataSourceProps.get(AbstractDBMediatorFactory.DSNAME_Q);
+        }
+        return name;
     }
 
     public DataSource getDataSource() {

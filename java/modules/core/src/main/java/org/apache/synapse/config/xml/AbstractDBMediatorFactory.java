@@ -25,20 +25,19 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.util.datasource.DataSourceFinder;
 import org.jaxen.JaxenException;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import java.sql.Connection;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Base class for factories for database related mediators.
- * 
+ * <p/>
  * <pre>
  * &lt;dbreport | dblookup | .. etc>
  *   &lt;connection>
@@ -48,7 +47,7 @@ import java.util.Iterator;
  *       &lt;url/>
  *       &lt;user/>
  *       &lt;password/>
- *     | 
+ *     |
  *       &lt;dsName/>
  *       &lt;icClass/>
  *       &lt;url/>
@@ -65,14 +64,14 @@ import java.util.Iterator;
  *   &lt;/statement>+
  * &lt;/dbreport | dblookup | .. etc>
  * </pre>
- * 
+ * <p/>
  * Supported properties for custom DataSources
  * autocommit = true | false
  * isolation = Connection.TRANSACTION_NONE
- *           | Connection.TRANSACTION_READ_COMMITTED
- *           | Connection.TRANSACTION_READ_UNCOMMITTED 
- *           | Connection.TRANSACTION_REPEATABLE_READ 
- *           | Connection.TRANSACTION_SERIALIZABLE
+ * | Connection.TRANSACTION_READ_COMMITTED
+ * | Connection.TRANSACTION_READ_UNCOMMITTED
+ * | Connection.TRANSACTION_REPEATABLE_READ
+ * | Connection.TRANSACTION_SERIALIZABLE
  * initialsize = int
  * maxactive = int
  * maxidle = int
@@ -88,20 +87,20 @@ import java.util.Iterator;
 public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory {
 
     public static final QName URL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "url");
-    static final QName DRIVER_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "driver");
-    static final QName USER_Q     = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "user");
-    static final QName PASS_Q     = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "password");
+    static final QName DRIVER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "driver");
+    static final QName USER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "user");
+    static final QName PASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "password");
 
-    static final QName DSNAME_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "dsName");
-    static final QName ICCLASS_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "icClass");
+    public static final QName DSNAME_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "dsName");
+    static final QName ICCLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "icClass");
 
-    static final QName STMNT_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "statement");
-    static final QName SQL_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sql");
-    static final QName PARAM_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
-    static final QName RESULT_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "result");
+    static final QName STMNT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "statement");
+    static final QName SQL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sql");
+    static final QName PARAM_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
+    static final QName RESULT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "result");
 
     static final QName ATT_COLUMN = new QName("column");
-    static final QName ATT_TYPE   = new QName("type");
+    static final QName ATT_TYPE = new QName("type");
 
     protected void buildDataSource(OMElement elem, AbstractDBMediator mediator) {
 
@@ -116,13 +115,11 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
             if (pool.getFirstChildWithName(DRIVER_Q) != null) {
                 mediator.setDataSource(createCustomDataSource(pool, mediator));
 
-            } else if (
-                pool.getFirstChildWithName(ICCLASS_Q) != null &&
-                pool.getFirstChildWithName(DSNAME_Q) != null) {
+            } else if (pool.getFirstChildWithName(DSNAME_Q) != null) {
                 mediator.setDataSource(lookupDataSource(pool, mediator));
             } else {
                 handleException("The DataSource connection information must be specified for " +
-                    "using a custom DataSource connection pool or for a JNDI lookup");
+                        "using a custom DataSource connection pool or for a JNDI lookup");
             }
 
         } catch (JaxenException e) {
@@ -132,47 +129,43 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
     /**
      * Lookup the DataSource on JNDI using the specified properties
-     * @param pool the toplevel 'pool' element that holds DataSource information
+     *
+     * @param pool     the toplevel 'pool' element that holds DataSource information
      * @param mediator the mediator to store properties for serialization
      * @return a DataSource looked up using specified properties
      */
     private DataSource lookupDataSource(OMElement pool, AbstractDBMediator mediator) {
 
-        Hashtable props = new Hashtable();
+        String dsName = getValue(pool, DSNAME_Q);
+        mediator.addDataSourceProperty(DSNAME_Q, dsName);
+        DataSource dataSource = DataSourceFinder.find(dsName);
+        if (dataSource != null) {
+            return dataSource;
+        }
+        Properties props = new Properties();
         // load the minimum required properties
         props.put(Context.INITIAL_CONTEXT_FACTORY, (getValue(pool, ICCLASS_Q)));
         props.put(Context.SECURITY_PRINCIPAL, getValue(pool, USER_Q));
         props.put(Context.SECURITY_CREDENTIALS, getValue(pool, PASS_Q));
         props.put(Context.PROVIDER_URL, getValue(pool, URL_Q));
-        String dsName = getValue(pool, DSNAME_Q);
 
+        dataSource = DataSourceFinder.find(dsName, props);
+        if (dataSource == null) {
+            handleException("Cannot find a DataSource for given properties :" + props);
+        }
         //save loaded properties for later
         mediator.addDataSourceProperty(ICCLASS_Q, getValue(pool, ICCLASS_Q));
-        mediator.addDataSourceProperty(DSNAME_Q,  getValue(pool, DSNAME_Q));
-        mediator.addDataSourceProperty(URL_Q,  getValue(pool, URL_Q));
+        mediator.addDataSourceProperty(URL_Q, getValue(pool, URL_Q));
         mediator.addDataSourceProperty(USER_Q, getValue(pool, USER_Q));
         mediator.addDataSourceProperty(PASS_Q, getValue(pool, PASS_Q));
 
-        try {
-            Context ctx = new InitialContext(props);
-            Object ds = ctx.lookup(dsName);
-            if (ds != null && ds instanceof DataSource) {
-                return (DataSource) ds;
-            } else {
-                handleException("DataSource : " + dsName + " not found when looking up" +
-                        " using JNDI properties : " + props);
-            }
-
-        } catch (NamingException e) {
-            handleException("Error looking up DataSource : " + dsName +
-                    " using JNDI properties : " + props, e);
-        }
-        return null;
+        return dataSource;
     }
 
     /**
      * Create a custom DataSource using the specified properties and Apache DBCP
-     * @param pool the toplevel 'pool' element that holds DataSource information
+     *
+     * @param pool     the toplevel 'pool' element that holds DataSource information
      * @param mediator the mediator to store properties for serialization
      * @return a DataSource created using specified properties
      */
@@ -188,7 +181,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
         //save loaded properties for later
         mediator.addDataSourceProperty(DRIVER_Q, getValue(pool, DRIVER_Q));
-        mediator.addDataSourceProperty(URL_Q,  getValue(pool, URL_Q));
+        mediator.addDataSourceProperty(URL_Q, getValue(pool, URL_Q));
         mediator.addDataSourceProperty(USER_Q, getValue(pool, USER_Q));
         mediator.addDataSourceProperty(PASS_Q, getValue(pool, PASS_Q));
 
@@ -196,7 +189,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         while (props.hasNext()) {
 
             OMElement prop = (OMElement) props.next();
-            String name  = prop.getAttribute(ATT_NAME).getAttributeValue();
+            String name = prop.getAttribute(ATT_NAME).getAttributeValue();
             String value = prop.getAttribute(ATT_VALUE).getAttributeValue();
             // save property for later
             mediator.addDataSourceProperty(name, value);
@@ -220,31 +213,38 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
                     } else if ("Connection.TRANSACTION_SERIALIZABLE".equals(value)) {
                         ds.setDefaultTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                     }
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("initialsize".equals(name)) {
                 try {
                     ds.setInitialSize(Integer.parseInt(value));
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("maxactive".equals(name)) {
                 try {
                     ds.setMaxActive(Integer.parseInt(value));
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("maxidle".equals(name)) {
                 try {
                     ds.setMaxIdle(Integer.parseInt(value));
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("maxopenstatements".equals(name)) {
                 try {
                     ds.setMaxOpenPreparedStatements(Integer.parseInt(value));
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("maxwait".equals(name)) {
                 try {
                     ds.setMaxWait(Long.parseLong(value));
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("minidle".equals(name)) {
                 try {
                     ds.setMinIdle(Integer.parseInt(value));
-                } catch (NumberFormatException ignore) {}
+                } catch (NumberFormatException ignore) {
+                }
             } else if ("poolstatements".equals(name)) {
                 if ("true".equals(value)) {
                     ds.setPoolPreparedStatements(true);
@@ -292,7 +292,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
                 String value = getAttribute(paramElt, ATT_VALUE);
 
                 if (xpath != null || value != null) {
-                    
+
                     SynapseXPath xp = null;
                     if (xpath != null) {
                         try {
@@ -315,8 +315,8 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
                 OMElement resultElt = (OMElement) resultIter.next();
                 statement.addResult(
-                    getAttribute(resultElt, ATT_NAME),
-                    getAttribute(resultElt, ATT_COLUMN));
+                        getAttribute(resultElt, ATT_NAME),
+                        getAttribute(resultElt, ATT_COLUMN));
             }
 
             mediator.addStatement(statement);

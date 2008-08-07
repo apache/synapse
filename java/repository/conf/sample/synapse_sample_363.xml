@@ -39,16 +39,12 @@
                 <connection>
                     <pool>
                         <dsName>lookupdb</dsName>
-                        <icClass>com.sun.jndi.rmi.registry.RegistryContextFactory</icClass>
-                        <url>rmi://localhost:2199</url>
-                        <user>synapse</user>
-                        <password>synapse</password>
                     </pool>
                 </connection>
                 <statement>
                     <sql>select * from company where name =?</sql>
                     <parameter expression="//m0:getQuote/m0:request/m0:symbol"
-                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/>
+                               xmlns:m0="http://services.samples" type="VARCHAR"/>
                     <result name="company_id" column="id"/>
                 </statement>
             </dblookup>
@@ -112,18 +108,16 @@
                 <connection>
                     <pool>
                         <dsName>reportdb</dsName>
-                        <icClass>com.sun.jndi.rmi.registry.RegistryContextFactory</icClass>
-                        <url>rmi://localhost:2199</url>
-                        <user>synapse</user>
-                        <password>synapse</password>
                     </pool>
                 </connection>
                 <statement>
                     <sql>update company set price=? where name =?</sql>
-                    <parameter expression="//m0:return/m0:last/child::text()"
-                               xmlns:m0="http://services.samples/xsd" type="DOUBLE"/>
-                    <parameter expression="//m0:return/m0:symbol/child::text()"
-                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/>
+                    <parameter expression="//m0:return/m1:last/child::text()"
+                               xmlns:m0="http://services.samples"
+                               xmlns:m1="http://services.samples/xsd" type="DOUBLE"/>
+                    <parameter expression="//m0:return/m1:symbol/child::text()"
+                               xmlns:m0="http://services.samples"
+                               xmlns:m1="http://services.samples/xsd" type="VARCHAR"/>
                 </statement>
             </dbreport>
             <log level="custom">
@@ -134,16 +128,13 @@
                 <connection>
                     <pool>
                         <dsName>reportdb</dsName>
-                        <icClass>com.sun.jndi.rmi.registry.RegistryContextFactory</icClass>
-                        <url>rmi://localhost:2199</url>
-                        <user>synapse</user>
-                        <password>synapse</password>
                     </pool>
                 </connection>
                 <statement>
                     <sql>select * from company where name =?</sql>
-                    <parameter expression="//m0:return/m0:symbol/child::text()"
-                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/>
+                    <parameter expression="//m0:return/m1:symbol/child::text()"
+                               xmlns:m0="http://services.samples"
+                               xmlns:m1="http://services.samples/xsd" type="VARCHAR"/>
                     <result name="stock_price" column="price"/>
                 </statement>
             </dblookup>

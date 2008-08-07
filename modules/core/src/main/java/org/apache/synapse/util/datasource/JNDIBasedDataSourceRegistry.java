@@ -47,10 +47,22 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
 
         if (!initialize) {
 
+            if (jndiEnv == null) {
+                handleException("JNDI environment properties cannot be found");
+            }
+
             indiEnv.putAll(jndiEnv);
+
             try {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Initilating a Naming conext with JNDI " +
+                            "environment properties :  " + jndiEnv);
+                }
+
                 initialContext = new InitialContext(jndiEnv);
                 initialize = true;
+
             } catch (NamingException e) {
                 handleException("Error creating a InitialConext" +
                         " with JNDI env properties : " + jndiEnv);
@@ -62,6 +74,11 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
     private JNDIBasedDataSourceRegistry() {
     }
 
+    /**
+     * Register a DataSource in the JNDI tree
+     *
+     * @see org.apache.synapse.util.datasource.DataSourceRegistry#register(DataSourceInformation)
+     */
     public void register(DataSourceInformation information) {
 
         String dsType = information.getType();
@@ -73,6 +90,11 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
         String maxIdle = String.valueOf(information.getMaxIdle());
         String maxWait = String.valueOf(information.getMaxWait());
         String dataSourceName = information.getName();
+
+        if (dataSourceName == null || "".equals(dataSourceName)) {
+            handleException("Invalid DataSource configuration !! -" +
+                    "DataSource Name cannot be found ");
+        }
 
         //populates context tree
         populateContextTree(initialContext, dataSourceName);
@@ -94,7 +116,13 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
             setBasicDataSourceParameters(ref, information);
             //set default properties for reference
             setCommonParameters(ref, information);
+
             try {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Registering a DataSource with name : " +
+                            dataSourceName + " in the JNDI tree with properties : " + indiEnv);
+                }
 
                 initialContext.rebind(dataSourceName, ref);
             } catch (NamingException e) {
@@ -154,6 +182,12 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
             setCommonParameters(ref, information);
 
             try {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Registering a DataSource with name : " +
+                            dataSourceName + " in the JNDI tree with properties : " + indiEnv);
+                }
+
                 initialContext.rebind(dataSourceName, ref);
             } catch (NamingException e) {
                 String msg = "Error binding name ' " + dataSourceName + " ' to " +
@@ -166,7 +200,16 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
         }
     }
 
+    /**
+     * Get a DatSource which has been registered in the JNDI tree
+     *
+     * @see org.apache.synapse.util.datasource.DataSourceRegistry#lookUp(String)
+     */
     public DataSource lookUp(String dsName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Getting a DataSource with name : " + dsName + " from the JNDI tree.");
+        }
         return DataSourceFinder.find(dsName, initialContext);
     }
 
@@ -197,7 +240,9 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
         reference.add(new StringRefAddr(
                 DataSourceInformationFactory.PROP_TESTWHILEIDLE,
                 String.valueOf(information.isTestWhileIdle())));
+
         String validationQuery = information.getValidationQuery();
+
         if (validationQuery != null && !"".equals(validationQuery)) {
             reference.add(new StringRefAddr(
                     DataSourceInformationFactory.PROP_VALIDATIONQUERY, validationQuery));

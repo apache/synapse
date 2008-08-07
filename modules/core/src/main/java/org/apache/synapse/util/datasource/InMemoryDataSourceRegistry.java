@@ -21,6 +21,9 @@
  */
 package org.apache.synapse.util.datasource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.datasource.factory.DataSourceFactory;
 
 import javax.sql.DataSource;
@@ -32,6 +35,8 @@ import java.util.Map;
  */
 public class InMemoryDataSourceRegistry implements DataSourceRegistry {
 
+    private final static Log log = LogFactory.getLog(InMemoryDataSourceRegistry.class);
+
     private static final InMemoryDataSourceRegistry ourInstance = new InMemoryDataSourceRegistry();
     private final static Map<String, DataSource> dataSources = new HashMap<String, DataSource>();
 
@@ -42,13 +47,52 @@ public class InMemoryDataSourceRegistry implements DataSourceRegistry {
     private InMemoryDataSourceRegistry() {
     }
 
+    /**
+     * Keep DataSource in the Local store
+     *
+     * @see org.apache.synapse.util.datasource.DataSourceRegistry#register(DataSourceInformation)
+     */
     public void register(DataSourceInformation information) {
+
+        if (information == null) {
+            handleException("DataSourceInformation cannot be found.");
+        }
+
         DataSource dataSource = DataSourceFactory.createDataSource(information);
+
+        if (dataSource == null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("DataSource cannot be created or" +
+                        " found for DataSource Information " + information);
+            }
+            return;
+        }
+
         String name = information.getName();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Registering a DatSource with name : " + name + " in Local Pool");
+        }
+
         dataSources.put(name, dataSource);
     }
 
+    /**
+     * Get a DataSource from Local store
+     *
+     * @see org.apache.synapse.util.datasource.DataSourceRegistry#lookUp(String)
+     */
     public DataSource lookUp(String name) {
+
+        if (name == null || "".equals(name)) {
+            handleException("DataSorce name cannot be found.");
+        }
         return dataSources.get(name);
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

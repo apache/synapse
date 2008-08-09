@@ -23,14 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
+import org.apache.synapse.transport.testkit.server.Endpoint;
 
 public class XMLRequestResponseMessageTestCase<C extends RequestResponseChannel<?>> extends ListenerTestCase<C,XMLRequestResponseMessageSender<? super C>> {
     private final XMLMessageType xmlMessageType;
@@ -45,34 +38,17 @@ public class XMLRequestResponseMessageTestCase<C extends RequestResponseChannel<
 
     @Override
     protected void runTest() throws Throwable {
-        AxisService service = new AxisService("EchoService");
-        AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
-        operation.setMessageReceiver(new AbstractInOutMessageReceiver() {
-            @Override
-            public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
-                System.out.println(inMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
-                System.out.println(inMessage.getEnvelope());
-                outMessage.setEnvelope(inMessage.getEnvelope());
-            }
-        });
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentTypeMode == ContentTypeMode.SERVICE) {
-            channel.getSetup().setupContentType(service, contentType);
-        }
-        
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
+        Endpoint endpoint = channel.getServer().createEchoEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         try {
             OMFactory factory = xmlMessageType.getOMFactory();
             OMElement orgElement = factory.createOMElement(new QName("root"));
             orgElement.setText(data.getText());
-            OMElement element = sender.sendMessage(channel, server.getEPR(service), contentType, data.getCharset(), xmlMessageType, orgElement);
+            OMElement element = sender.sendMessage(channel, endpoint.getEPR(), contentType, data.getCharset(), xmlMessageType, orgElement);
             assertEquals(orgElement.getQName(), element.getQName());
             assertEquals(orgElement.getText(), element.getText());
         } finally {
             Thread.sleep(1000);
-            axisConfiguration.removeService(service.getName());
+            endpoint.remove();
         }
     }
 }

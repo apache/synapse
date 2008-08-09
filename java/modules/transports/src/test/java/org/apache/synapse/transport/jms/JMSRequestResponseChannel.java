@@ -25,14 +25,15 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.server.Server;
 
 public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel<JMSListenerSetup> {
     private final String replyDestinationType;
     private String replyDestinationName;
     private Destination replyDestination;
     
-    public JMSRequestResponseChannel(JMSListenerSetup setup, String destinationType, String replyDestinationType) {
-        super(setup, destinationType + "-" + replyDestinationType, destinationType);
+    public JMSRequestResponseChannel(Server<JMSListenerSetup> server, String destinationType, String replyDestinationType) {
+        super(server, destinationType + "-" + replyDestinationType, destinationType);
         this.replyDestinationType = replyDestinationType;
     }
     
@@ -40,14 +41,14 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     public void setUp() throws Exception {
         super.setUp();
         replyDestinationName = "response" + replyDestinationType;
-        replyDestination = setup.createDestination(replyDestinationType, replyDestinationName);
-        setup.getContext().bind(replyDestinationName, replyDestination);
+        replyDestination = getSetup().createDestination(replyDestinationType, replyDestinationName);
+        getSetup().getContext().bind(replyDestinationName, replyDestination);
     }
 
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        setup.getContext().unbind(replyDestinationName);
+        getSetup().getContext().unbind(replyDestinationName);
         replyDestinationName = null;
         replyDestination = null;
     }
@@ -68,5 +69,9 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     @Override
     public EndpointReference createEndpointReference(String address) {
         return new EndpointReference(address + "&" + JMSConstants.REPLY_PARAM_TYPE + "=" + replyDestinationType + "&" + JMSConstants.REPLY_PARAM + "=" + replyDestinationName);
+    }
+
+    public Destination getReplyDestination() {
+        return replyDestination;
     }
 }

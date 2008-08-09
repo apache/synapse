@@ -25,8 +25,11 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.synapse.transport.testkit.server.Server;
 
 public interface Channel<T extends ListenerTestSetup> {
+    Server<T> getServer();
+    
     T getSetup();
     
     void buildName(NameBuilder nameBuilder);

@@ -222,6 +222,7 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
 
+/*
     @Override
     public void run(TestResult result) {
         if (!reuseServer) {
@@ -241,8 +242,8 @@ public class ListenerTestSuite extends TestSuite {
                     Channel<?> channel = listenerTest.getChannel();
                     ListenerTestServer server;
                     try {
-                        server = new ListenerTestServer(channel);
-                        server.start();
+                        server = new ListenerTestServer();
+                        server.start(channel);
                     } catch (Throwable t) {
                         result.addError(this, t);
                         return;
@@ -275,4 +276,5 @@ public class ListenerTestSuite extends TestSuite {
             }
         }
     }
+*/
 }

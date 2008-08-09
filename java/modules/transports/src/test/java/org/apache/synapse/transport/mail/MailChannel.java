@@ -24,12 +24,13 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class MailChannel extends AbstractChannel<ListenerTestSetup> implements AsyncChannel<ListenerTestSetup> {
     private final String address;
     
     public MailChannel(String address) {
-        super(ListenerTestSetup.DEFAULT);
+        super(AxisServer.DEFAULT);
         this.address = address;
     }
 

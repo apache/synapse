@@ -34,20 +34,24 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.listener.XMLMessage;
+import org.apache.synapse.transport.testkit.server.Server;
+import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
         JMSListenerSetup setup = new QpidTestSetup();
+        Server<JMSListenerSetup> server = new AxisServer<JMSListenerSetup>(setup);
         JMSBytesMessageSender bytesMessageSender = new JMSBytesMessageSender();
         JMSTextMessageSender textMessageSender = new JMSTextMessageSender();
         List<AsyncMessageSender<? super JMSAsyncChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super JMSAsyncChannel,XMLMessage>>();
         senders.add(new Adapter<JMSAsyncChannel>(bytesMessageSender));
         senders.add(textMessageSender);
         senders.add(new AxisAsyncMessageSender());
-        suite.addPOXTests(new JMSRequestResponseChannel(setup, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(new JMSRequestResponseChannel(server, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(new JMSRequestResponseChannel(new MockServer(setup), JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
-            JMSAsyncChannel channel = new JMSAsyncChannel(setup, destinationType);
+            JMSAsyncChannel channel = new JMSAsyncChannel(server, destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {
                 for (AsyncMessageSender<? super JMSAsyncChannel,XMLMessage> sender : senders) {
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {

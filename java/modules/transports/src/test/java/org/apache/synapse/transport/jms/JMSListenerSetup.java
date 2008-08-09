@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.jms;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
@@ -80,5 +81,13 @@ public abstract class JMSListenerSetup extends ListenerTestSetup {
     
     public TopicConnectionFactory getTopicConnectionFactory() {
         return topicConnectionFactory;
+    }
+    
+    public ConnectionFactory getConnectionFactory(Destination destination) {
+        if (destination instanceof Queue) {
+            return queueConnectionFactory;
+        } else {
+            return topicConnectionFactory;
+        }
     }
 }

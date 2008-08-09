@@ -326,6 +326,14 @@
               <a href="#Sample260">Sample 260: Switching from FIX to AMQP
               </a>
             </li>
+            <li>
+              <a href="#Sample261">Sample 261: Switch between FIX versions
+              </a>
+            </li>
+            <li>
+              <a href="#Sample262">Sample 262: CBR of FIX messages
+              </a>
+            </li>
           </ul>
         </li>
         <li>
@@ -4110,7 +4118,110 @@ Transfer-Encoding: chunked
             see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
             </a>.
         </p>
-    <h1>
+        <h2>
+            <a name="Sample262" id="Sample262">Sample 262: Switch between FIX versions </a>
+        </h2>
+        <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+	    &lt;sequence name=&quot;CBR_SEQ&quot;&gt;
+		    &lt;in&gt;
+			    &lt;switch source=&quot;//message/body/field[@id='55']&quot;&gt;
+				    &lt;case regex=&quot;GOOG&quot;&gt;
+					    &lt;send&gt;
+						    &lt;endpoint&gt;
+							    &lt;address
+								    uri=&quot;fix://localhost:19876?BeginString=FIX.4.0&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot; /&gt;
+    						&lt;/endpoint&gt;
+	    				&lt;/send&gt;
+		    		&lt;/case&gt;
+			    	&lt;case regex=&quot;MSFT&quot;&gt;
+				    	&lt;send&gt;
+					    	&lt;endpoint&gt;
+						    	&lt;address
+							    	uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot; /&gt;
+						    &lt;/endpoint&gt;
+    					&lt;/send&gt;
+	     			&lt;/case&gt;
+                    &lt;default&gt;&lt;/default&gt;
+    			&lt;/switch&gt;
+	    	&lt;/in&gt;
+    		&lt;out&gt;
+	    		&lt;send /&gt;
+    		&lt;/out&gt;
+	    &lt;/sequence&gt;
+	    &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
+		    &lt;target inSequence=&quot;CBR_SEQ&quot; /&gt;
+		    &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
+			    file:repository/conf/sample/resources/fix/fix-synapse.cfg
+		    &lt;/parameter&gt;
+		    &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
+			    file
+		    &lt;/parameter&gt;
+		    &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;
+			    file:repository/conf/sample/resources/fix/synapse-sender.cfg
+		    &lt;/parameter&gt;
+		    &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;
+			    file
+		    &lt;/parameter&gt;
+	    &lt;/proxy&gt;
+       &lt;/definitions&gt;</pre>
+       <p>
+           <strong>Objective: Demonstrate the capability of CBR FIX messages</strong>
+       </p>
+       <p>
+           <strong>Prerequisites:</strong><br/>
+            You will need the two sample FIX applications that come with Quickfix/J
+            (Banzai and Executor). Configure the two applications to establish
+            sessions with Synapse. See <a href="Synapse_Samples_Setup.html#fixsamplesconfig">
+            Configuring Sample FIX Applications</a>
+       </p>
+       <p>
+            Add the following lines to banzai.cfg.
+       </p>
+       <pre xml:space="preserve">DataDictionary=~/etc/spec/FIX40-synapse.xml</pre>
+       <p>
+            Note: FIX40-synapse.xml can be found at $SYNAPSE_HOME/repository/conf/samples/resources/fix.
+            This is a custom FIX data dictionary file that has added tag 150,151 to the
+            execution messages (35=8) of FIX4.0. Make sure the DataDictionary property of the banzai.cfg points
+            to this data dictionary file.
+       </p>
+       <p>
+           Add the following lines to executor.cfg
+       </p>
+       <pre xml:space="preserve">[session]
+               BeginString=FIX.4.1
+               SocketAcceptPort=19877</pre>
+       <p>
+           Start Banzai and Executor using the custom config files.
+       </p>
+       <p>
+           Enable FIX transport in the Synapse axis2.xml. See <a
+           href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport
+           </a>
+       </p>
+       <p>
+           Configure Synapse for FIX samples. See <a href="Synapse_Samples_Setup.html#fixsamples">
+           Configuring Synapse for FIX Samples</a>
+       </p>
+       <p>
+           Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_262.xml file
+           and make sure that transport.fix.AcceptorConfigURL property points to the
+           fix-synapse.cfg file you created and transport.fix.InitiatorConfigURL points
+           to the synapse-sender.cfg file you created. Once done you can start the Synapse
+           configuration numbered 262: i.e. synapse -sample 262. Note that Synapse creates
+           a new FIX session with Banzai at this point.
+       </p>
+       <p>
+           Send an order request from Banzai to Synapse. e.g. Buy GOOG 1000 @ MKT, Buy MSFT 3000 @ MKT, Buy SUNW 500 @ 100.20
+       </p>
+       <p>Synapse will forward the order requests with symbol 'GOOG' to FIX endpoint FIX-4.0 @ localhost:19876.</p>
+       <p>Synapse will forward the order requests with symbol 'MSFT' to FIX endpoint FIX-4.1 @ localhost:19877.</p>
+       <p>Synapse will not forward the orders with other symbols to any endpoint. (default case has kept blank in the configuration)</p>
+       <p>
+          To get an idea about the various transport parameters being used in this sample
+          see <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters
+          </a>.
+       </p>
+   <h1>
       <a name="Task" id="Task">Introduction to Synapse Tasks</a>
     </h1>
     <h2>

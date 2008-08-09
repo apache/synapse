@@ -39,6 +39,8 @@ import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
 import org.apache.synapse.transport.testkit.listener.XMLMessage;
+import org.apache.synapse.transport.testkit.server.Server;
+import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.
@@ -63,7 +65,8 @@ public class VFSTransportListenerTest extends TestCase {
         // TODO: the VFS listener doesn't like reuseServer == true...
         ListenerTestSuite suite = new ListenerTestSuite(false);
         TestStrategyImpl setup = new TestStrategyImpl();
-        VFSFileChannel channel = new VFSFileChannel(setup, new File("target/vfs3/req/in").getAbsoluteFile());
+        Server<TestStrategyImpl> server = new AxisServer<TestStrategyImpl>(setup);
+        VFSFileChannel channel = new VFSFileChannel(server, new File("target/vfs3/req/in").getAbsoluteFile());
         MessageSenderImpl vfsSender = new MessageSenderImpl();
         List<AsyncMessageSender<? super VFSFileChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super VFSFileChannel,XMLMessage>>();
         senders.add(new Adapter<VFSFileChannel>(vfsSender));

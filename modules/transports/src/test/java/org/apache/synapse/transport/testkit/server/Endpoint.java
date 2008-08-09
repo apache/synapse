@@ -17,13 +17,9 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.jms;
+package org.apache.synapse.transport.testkit.server;
 
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.server.Server;
-
-public class JMSAsyncChannel extends JMSChannel implements AsyncChannel<JMSListenerSetup> {
-    public JMSAsyncChannel(Server<JMSListenerSetup> server, String destinationType) {
-        super(server, destinationType, destinationType);
-    }
+public interface Endpoint {
+    String getEPR() throws Exception;
+    void remove() throws Exception;
 }

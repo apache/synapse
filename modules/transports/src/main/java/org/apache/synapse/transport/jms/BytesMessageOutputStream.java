@@ -15,55 +15,40 @@
 */
 package org.apache.synapse.transport.jms;
 
-import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
-import javax.jms.MessageEOFException;
 
-/**
- * Input stream that reads data from a JMS {@link BytesMessage}.
- */
-public class BytesMessageInputStream extends InputStream {
+public class BytesMessageOutputStream extends OutputStream {
     private final BytesMessage message;
 
-    public BytesMessageInputStream(BytesMessage message) {
+    public BytesMessageOutputStream(BytesMessage message) {
         this.message = message;
     }
 
     @Override
-    public int read() throws JMSExceptionWrapper {
+    public void write(int b) throws JMSExceptionWrapper {
         try {
-            return message.readByte() & 0xFF;
-        } catch (MessageEOFException ex) {
-            return -1;
+            message.writeByte((byte)b);
         } catch (JMSException ex) {
             throw new JMSExceptionWrapper(ex);
         }
     }
 
     @Override
-    public int read(byte[] b, int off, int len) throws JMSExceptionWrapper {
-        if (off == 0) {
-            try {
-                return message.readBytes(b, len);
-            } catch (JMSException ex) {
-                throw new JMSExceptionWrapper(ex);
-            }
-        } else {
-            byte[] b2 = new byte[len];
-            int c = read(b2);
-            if (c > 0) {
-                System.arraycopy(b2, 0, b, off, c); 
-            }
-            return c;
+    public void write(byte[] b, int off, int len) throws JMSExceptionWrapper {
+        try {
+            message.writeBytes(b, off, len);
+        } catch (JMSException ex) {
+            new JMSExceptionWrapper(ex);
         }
     }
 
     @Override
-    public int read(byte[] b) throws JMSExceptionWrapper {
+    public void write(byte[] b) throws JMSExceptionWrapper {
         try {
-            return message.readBytes(b);
+            message.writeBytes(b);
         } catch (JMSException ex) {
             throw new JMSExceptionWrapper(ex);
         }

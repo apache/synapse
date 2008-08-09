@@ -17,13 +17,25 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.jms;
+package org.apache.synapse.transport.testkit.server.axis2;
 
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.server.Server;
+import org.apache.axis2.description.AxisService;
+import org.apache.synapse.transport.testkit.server.Endpoint;
 
-public class JMSAsyncChannel extends JMSChannel implements AsyncChannel<JMSListenerSetup> {
-    public JMSAsyncChannel(Server<JMSListenerSetup> server, String destinationType) {
-        super(server, destinationType, destinationType);
+public class EndpointImpl implements Endpoint {
+    private final AxisServer<?> server;
+    private final AxisService service;
+    
+    public EndpointImpl(AxisServer<?> server, AxisService service) {
+        this.server = server;
+        this.service = service;
+    }
+
+    public String getEPR() throws Exception {
+        return server.getEPR(service);
+    }
+
+    public void remove() throws Exception {
+        server.getAxisConfiguration().removeService(service.getName());
     }
 }

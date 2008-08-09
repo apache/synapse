@@ -28,7 +28,6 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
     
-    protected ListenerTestServer server;
     private boolean manageServer = true;
 
     public ListenerTestCase(C channel, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
@@ -66,16 +65,15 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
         return channel.getSetup();
     }
     
-    public void setServer(ListenerTestServer server){
-        this.server = server;
-        manageServer = false;
-    }
+//    public void setServer(ListenerTestServer server){
+//        this.server = server;
+//        manageServer = false;
+//    }
     
     @Override
     protected void setUp() throws Exception {
         if (manageServer) {
-            server = new ListenerTestServer(channel);
-            server.start();
+            channel.getServer().start(channel);
         }
         sender.setUp(channel);
     }
@@ -84,8 +82,7 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
     protected void tearDown() throws Exception {
         sender.tearDown();
         if (manageServer) {
-            server.stop();
-            server = null;
+            channel.getServer().stop();
         }
     }
 }

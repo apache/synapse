@@ -23,26 +23,31 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.synapse.transport.testkit.server.Server;
 
 public abstract class AbstractChannel<T extends ListenerTestSetup> implements Channel<T> {
     private final String name;
-    protected final T setup;
+    private final Server<T> server;
     
-    public AbstractChannel(String name, T setup) {
+    public AbstractChannel(String name, Server<T> server) {
         this.name = name;
-        this.setup = setup;
+        this.server = server;
     }
 
-    public AbstractChannel(T setup) {
-        this(null, setup);
+    public AbstractChannel(Server<T> server) {
+        this(null, server);
     }
     
     public final T getSetup() {
-        return setup;
+        return server.getSetup();
+    }
+
+    public Server<T> getServer() {
+        return server;
     }
 
     public void buildName(NameBuilder nameBuilder) {
-        setup.buildName(nameBuilder);
+        getSetup().buildName(nameBuilder);
         nameBuilder.addComponent("channel", name);
     }
 

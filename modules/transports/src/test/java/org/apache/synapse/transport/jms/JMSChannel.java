@@ -41,6 +41,7 @@ import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
+import org.apache.synapse.transport.testkit.server.Server;
 import org.mockejb.jndi.MockContextFactory;
 
 public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
@@ -50,23 +51,35 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
     private String destinationName;
     private Destination destination;
     
-    public JMSChannel(JMSListenerSetup setup, String name, String destinationType) {
-        super(name, setup);
+    public JMSChannel(Server<JMSListenerSetup> server, String name, String destinationType) {
+        super(name, server);
         this.destinationType = destinationType;
     }
     
     @Override
     public void setUp() throws Exception {
         destinationName = "request" + destinationType;
-        destination = setup.createDestination(destinationType, destinationName);
-        setup.getContext().bind(destinationName, destination);
+        destination = getSetup().createDestination(destinationType, destinationName);
+        getSetup().getContext().bind(destinationName, destination);
     }
 
     @Override
     public void tearDown() throws Exception {
-        setup.getContext().unbind(destinationName);
+        getSetup().getContext().unbind(destinationName);
         destinationName = null;
         destination = null;
+    }
+
+    public String getDestinationType() {
+        return destinationType;
+    }
+
+    public String getDestinationName() {
+        return destinationName;
+    }
+
+    public Destination getDestination() {
+        return destination;
     }
 
     private OMElement createParameterElement(String name, String value) {
@@ -117,10 +130,10 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
 
     public Session createSession() throws JMSException {
         if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
-            TopicConnection connection = setup.getTopicConnectionFactory().createTopicConnection();
+            TopicConnection connection = getSetup().getTopicConnectionFactory().createTopicConnection();
             return connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         } else {
-            QueueConnection connection = setup.getQueueConnectionFactory().createQueueConnection();
+            QueueConnection connection = getSetup().getQueueConnectionFactory().createQueueConnection();
             return connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         }
     }

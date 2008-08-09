@@ -21,10 +21,7 @@ package org.apache.synapse.transport.testkit.listener;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.InOnlyAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M> extends ListenerTestCase<C,AsyncMessageSender<? super C,M>> {
     private final String charset;
@@ -36,38 +33,23 @@ public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M> extends 
 
     @Override
     protected void runTest() throws Throwable {
-        // Set up a test service with a default operation backed by a mock message
-        // receiver. The service is configured using the parameters specified by the
-        // implementation.
-        AxisService service = new AxisService("TestService");
-        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
-        MockMessageReceiver messageReceiver = new MockMessageReceiver();
-        operation.setMessageReceiver(messageReceiver);
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentTypeMode == ContentTypeMode.SERVICE) {
-            channel.getSetup().setupContentType(service, contentType);
-        }
+        AsyncEndpoint endpoint = channel.getServer().createAsyncEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         
         M message = prepareMessage();
         
         // Run the test.
         MessageData messageData;
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
-//        server.addErrorListener(messageReceiver);
         try {
-            SenderOptions options = new SenderOptions(server.getEPR(service), charset);
+            SenderOptions options = new SenderOptions(endpoint.getEPR(), charset);
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
             sender.sendMessage(channel, options, message);
-            messageData = messageReceiver.waitForMessage(8, TimeUnit.SECONDS);
+            messageData = endpoint.waitForMessage(8, TimeUnit.SECONDS);
             if (messageData == null) {
                 fail("Failed to get message");
             }
         }
         finally {
-//            server.removeErrorListener(messageReceiver);
-            axisConfiguration.removeService(service.getName());
+            endpoint.remove();
         }
         
         checkMessageData(message, messageData);

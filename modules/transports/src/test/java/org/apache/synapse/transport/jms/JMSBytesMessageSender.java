@@ -25,8 +25,8 @@ import javax.jms.Session;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
 public class JMSBytesMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,ByteArrayMessage> {
     public JMSBytesMessageSender() {

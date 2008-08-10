@@ -17,8 +17,31 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.message;
 
-public class RESTMessage {
-    // TODO
+import org.apache.axiom.om.OMElement;
+
+public class XMLMessage {
+    private final String contentType;
+    private final XMLMessageType xmlMessageType;
+    private final OMElement payload;
+    
+    public XMLMessage(String contentType, OMElement payload,
+            XMLMessageType xmlMessageType) {
+        this.contentType = contentType;
+        this.payload = payload;
+        this.xmlMessageType = xmlMessageType;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public XMLMessageType getXmlMessageType() {
+        return xmlMessageType;
+    }
+
+    public OMElement getPayload() {
+        return payload;
+    }
 }

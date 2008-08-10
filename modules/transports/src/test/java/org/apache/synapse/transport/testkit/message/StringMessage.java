@@ -17,13 +17,13 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.message;
 
-public class ByteArrayMessage {
+public class StringMessage {
     private final String contentType;
-    private final byte[] content;
+    private final String content;
 
-    public ByteArrayMessage(String contentType, byte[] content) {
+    public StringMessage(String contentType, String content) {
         this.contentType = contentType;
         this.content = content;
     }
@@ -32,7 +32,7 @@ public class ByteArrayMessage {
         return contentType;
     }
 
-    public byte[] getContent() {
+    public String getContent() {
         return content;
     }
 }

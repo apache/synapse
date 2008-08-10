@@ -17,17 +17,14 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.vfs;
 
-import org.apache.axis2.client.ServiceClient;
-import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.axis2.description.AxisService;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 
-public class AxisAsyncMessageSender extends AxisMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,XMLMessage> {
-    public AxisAsyncMessageSender() {
-        super("axis");
-    }
-
-    public void sendMessage(AsyncChannel<?> channel, SenderOptions options, XMLMessage message) throws Exception {
-        createClient(options.getEndpointReference(), ServiceClient.ANON_OUT_ONLY_OP, message.getXmlMessageType(), message.getPayload(), options.getCharset()).execute(false);
+public class VFSTestSetup extends ListenerTestSetup {
+    @Override
+    public void setupContentType(AxisService service, String contentType) throws Exception {
+        service.addParameter("transport.vfs.ContentType", contentType);
     }
 }

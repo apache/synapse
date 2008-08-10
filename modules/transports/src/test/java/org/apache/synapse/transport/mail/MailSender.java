@@ -32,8 +32,8 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
 public abstract class MailSender extends AbstractMessageSender<MailChannel> implements AsyncMessageSender<MailChannel,ByteArrayMessage> {
     public void sendMessage(MailChannel channel, SenderOptions options, ByteArrayMessage message) throws Exception {

@@ -24,6 +24,7 @@ import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
 public class AxisRequestResponseMessageSender extends AxisMessageSender<RequestResponseChannel<?>> implements XMLRequestResponseMessageSender<RequestResponseChannel<?>> {
     public AxisRequestResponseMessageSender() {

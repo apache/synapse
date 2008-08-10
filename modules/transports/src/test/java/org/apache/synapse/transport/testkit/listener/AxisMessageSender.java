@@ -36,6 +36,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
 public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<C> {
     private static final Log log = LogFactory.getLog(AxisMessageSender.class);

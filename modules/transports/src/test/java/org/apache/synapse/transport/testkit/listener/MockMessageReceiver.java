@@ -30,6 +30,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
 //import org.apache.synapse.transport.base.event.TransportError;
 //import org.apache.synapse.transport.base.event.TransportErrorListener;
+import org.apache.synapse.transport.testkit.message.MessageData;
 
 /**
  * A mock message receiver that puts the message data in a queue.

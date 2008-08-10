@@ -19,10 +19,6 @@
 
 package org.apache.synapse.transport.testkit.server;
 
-import java.util.concurrent.TimeUnit;
-
-import org.apache.synapse.transport.testkit.listener.MessageData;
-
-public interface AsyncEndpoint extends Endpoint {
-    MessageData waitForMessage(long timeout, TimeUnit unit) throws Throwable;
+public interface AsyncEndpoint<M> extends Endpoint {
+    M waitForMessage(int timeout) throws Throwable;
 }

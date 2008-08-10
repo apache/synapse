@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.jms;
 
+import static org.apache.synapse.transport.testkit.AdapterUtils.adapt;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,26 +28,25 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.transport.testkit.listener.Adapter;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AxisRequestResponseMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
-import org.apache.synapse.transport.testkit.listener.XMLMessage;
-import org.apache.synapse.transport.testkit.server.Server;
+import org.apache.synapse.transport.testkit.message.MessageConverter;
+import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
         ListenerTestSuite suite = new ListenerTestSuite();
         JMSListenerSetup setup = new QpidTestSetup();
-        Server<JMSListenerSetup> server = new AxisServer<JMSListenerSetup>(setup);
+        AxisServer<JMSListenerSetup> server = new AxisServer<JMSListenerSetup>(setup);
         JMSBytesMessageSender bytesMessageSender = new JMSBytesMessageSender();
         JMSTextMessageSender textMessageSender = new JMSTextMessageSender();
         List<AsyncMessageSender<? super JMSAsyncChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super JMSAsyncChannel,XMLMessage>>();
-        senders.add(new Adapter<JMSAsyncChannel>(bytesMessageSender));
+        senders.add(adapt(bytesMessageSender, MessageConverter.XML_TO_BYTE));
         senders.add(textMessageSender);
         senders.add(new AxisAsyncMessageSender());
         suite.addPOXTests(new JMSRequestResponseChannel(server, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
@@ -55,25 +56,25 @@ public class JMSListenerTest extends TestCase {
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {
                 for (AsyncMessageSender<? super JMSAsyncChannel,XMLMessage> sender : senders) {
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                        suite.addSOAPTests(channel, sender, contentTypeMode);
-                        suite.addPOXTests(channel, sender, contentTypeMode);
+                        suite.addSOAPTests(channel, sender, server, contentTypeMode);
+                        suite.addPOXTests(channel, sender, server, contentTypeMode);
                     } else {
                         // If no content type header is used, SwA can't be used and the JMS transport
                         // always uses the default charset encoding
-                        suite.addSOAP11Test(channel, sender, contentTypeMode, new MessageTestData(null, ListenerTestSuite.testString,
+                        suite.addSOAP11Test(channel, sender, server, contentTypeMode, new MessageTestData(null, ListenerTestSuite.testString,
                                 MessageContext.DEFAULT_CHAR_SET_ENCODING));
-                        suite.addSOAP12Test(channel, sender, contentTypeMode, new MessageTestData(null, ListenerTestSuite.testString,
+                        suite.addSOAP12Test(channel, sender, server, contentTypeMode, new MessageTestData(null, ListenerTestSuite.testString,
                                 MessageContext.DEFAULT_CHAR_SET_ENCODING));
-                        suite.addPOXTest(channel, sender, contentTypeMode, new MessageTestData(null, ListenerTestSuite.testString,
+                        suite.addPOXTest(channel, sender, server, contentTypeMode, new MessageTestData(null, ListenerTestSuite.testString,
                                 MessageContext.DEFAULT_CHAR_SET_ENCODING));
                     }
                 }
                 if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                    suite.addSwATests(channel, bytesMessageSender);
+                    suite.addSwATests(channel, bytesMessageSender, server);
                 }
                 // TODO: these tests are temporarily disabled because of SYNAPSE-304
                 // addTextPlainTests(strategy, suite);
-                suite.addBinaryTest(channel, bytesMessageSender, contentTypeMode);
+                suite.addBinaryTest(channel, bytesMessageSender, adapt(server, MessageConverter.AXIS_TO_BYTE), contentTypeMode);
             }
         }
         return suite;

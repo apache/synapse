@@ -19,31 +19,32 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M> extends ListenerTestCase<C,AsyncMessageSender<? super C,M>> {
+public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M,N> extends ListenerTestCase<C,AsyncMessageSender<? super C,M>> {
     private final String charset;
+    private final AsyncEndpointFactory<? super C,N> endpointFactory;
     
-    public AsyncMessageTestCase(C channel, AsyncMessageSender<? super C,M> sender, String name, ContentTypeMode contentTypeMode, String contentType, String charset) {
+    public AsyncMessageTestCase(C channel, AsyncMessageSender<? super C,M> sender, AsyncEndpointFactory<? super C,N> endpointFactory, String name, ContentTypeMode contentTypeMode, String contentType, String charset) {
         super(channel, sender, name, contentTypeMode, contentType);
+        this.endpointFactory = endpointFactory;
         this.charset = charset;
     }
 
     @Override
     protected void runTest() throws Throwable {
-        AsyncEndpoint endpoint = channel.getServer().createAsyncEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
+        AsyncEndpoint<N> endpoint = endpointFactory.createAsyncEndpoint(channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         
         M message = prepareMessage();
         
         // Run the test.
-        MessageData messageData;
+        N messageData;
         try {
             SenderOptions options = new SenderOptions(endpoint.getEPR(), charset);
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
             sender.sendMessage(channel, options, message);
-            messageData = endpoint.waitForMessage(8, TimeUnit.SECONDS);
+            messageData = endpoint.waitForMessage(8000);
             if (messageData == null) {
                 fail("Failed to get message");
             }
@@ -56,5 +57,5 @@ public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M> extends 
     }
     
     protected abstract M prepareMessage() throws Exception;
-    protected abstract void checkMessageData(M message, MessageData messageData) throws Exception;
+    protected abstract void checkMessageData(M message, N messageData) throws Exception;
 }

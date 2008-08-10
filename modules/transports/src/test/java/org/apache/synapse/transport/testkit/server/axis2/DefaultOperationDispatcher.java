@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.server.axis2;
 
 import javax.xml.namespace.QName;
 

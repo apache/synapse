@@ -2927,7 +2927,7 @@ Transfer-Encoding: chunked
     </h2>
 <pre xml:space="preserve">&lt;!-- Introduction to the script mediator --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/&gt;
+    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransformRequest.js"/&gt;
 
     &lt;in&gt;
         &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;

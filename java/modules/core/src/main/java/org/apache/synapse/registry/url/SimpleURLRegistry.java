@@ -118,8 +118,10 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
                 result = SynapseConfigUtils.readNonXML(url);
 
             } finally {
-
                 try {
+                    if (result != null && result.getParent() != null) {
+                        result.detach();
+                    }
                     inputStream.close();
                 } catch (IOException e) {
                     log.error("Error in closing the input stream.", e);

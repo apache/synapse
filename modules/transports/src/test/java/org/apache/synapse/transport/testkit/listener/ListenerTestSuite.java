@@ -69,8 +69,10 @@ public class ListenerTestSuite extends TestSuite {
     
     public <C extends AsyncChannel<?>> void addSOAPTests(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addSOAP11Test(channel, sender, endpointFactory, contentTypeMode, data);
-            addSOAP12Test(channel, sender, endpointFactory, contentTypeMode, data);
+            addTest(new XMLAsyncMessageTestCase<C>(channel, sender, endpointFactory, XMLMessageType.SOAP11, contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
+            addTest(new XMLAsyncMessageTestCase<C>(channel, sender, endpointFactory, XMLMessageType.SOAP12, contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
+//            addSOAP11Test(channel, sender, endpointFactory, contentTypeMode, data);
+//            addSOAP12Test(channel, sender, endpointFactory, contentTypeMode, data);
         }
     }
     
@@ -80,7 +82,8 @@ public class ListenerTestSuite extends TestSuite {
     
     public <C extends AsyncChannel<?>> void addPOXTests(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addPOXTest(channel, sender, endpointFactory, contentTypeMode, data);
+            addTest(new XMLAsyncMessageTestCase<C>(channel, sender, endpointFactory, XMLMessageType.POX, contentTypeMode, "application/xml", data));
+//            addPOXTest(channel, sender, endpointFactory, contentTypeMode, data);
         }
     }
     
@@ -90,7 +93,8 @@ public class ListenerTestSuite extends TestSuite {
     
     public <C extends RequestResponseChannel<?>> void addPOXTests(C channel, XMLRequestResponseMessageSender<? super C> sender, EndpointFactory<? super C> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addPOXTest(channel, sender, endpointFactory, contentTypeMode, data);
+//            addPOXTest(channel, sender, endpointFactory, contentTypeMode, data);
+            addTest(new XMLRequestResponseMessageTestCase<C>(channel, sender, endpointFactory, contentTypeMode, "application/xml", XMLMessageType.POX, data));
         }
     }
     
@@ -105,7 +109,8 @@ public class ListenerTestSuite extends TestSuite {
     
     public <C extends AsyncChannel<?>> void addTextPlainTests(C channel, AsyncMessageSender<? super C,StringMessage> sender, AsyncEndpointFactory<? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addTextPlainTest(channel, sender, endpointFactory, contentTypeMode, data);
+//            addTextPlainTest(channel, sender, endpointFactory, contentTypeMode, data);
+            addTest(new TextPlainTestCase<C>(channel, sender, endpointFactory, contentTypeMode, data));
         }
     }
     

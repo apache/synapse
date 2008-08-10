@@ -33,7 +33,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.Server;
 
@@ -57,11 +56,6 @@ public class MockServer extends Server<JMSListenerSetup> {
     public void stop() throws Exception {
         channel.tearDown();
         channel.getSetup().tearDown();
-    }
-
-    @Override
-    public AsyncEndpoint createAsyncEndpoint(String contentType) throws Exception {
-        throw new UnsupportedOperationException();
     }
 
     @Override

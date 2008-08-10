@@ -27,9 +27,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
-import org.apache.synapse.transport.testkit.listener.RESTMessage;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.message.RESTMessage;
+import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 
 public class JavaNetRESTSender extends AbstractMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,RESTMessage> {
     public JavaNetRESTSender() {

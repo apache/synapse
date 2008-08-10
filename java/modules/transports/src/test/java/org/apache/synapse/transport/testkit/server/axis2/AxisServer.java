@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.testkit.server.axis2;
 
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -35,16 +34,18 @@ import org.apache.axis2.engine.DispatchPhase;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.listener.DefaultOperationDispatcher;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.MockMessageReceiver;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.message.MessageData;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class AxisServer<T extends ListenerTestSetup> extends Server<T> {
+public class AxisServer<T extends ListenerTestSetup> extends Server<T> implements AsyncEndpointFactory<AsyncChannel<?>,MessageData> {
     public static final AxisServer<ListenerTestSetup> DEFAULT = new AxisServer<ListenerTestSetup>(ListenerTestSetup.DEFAULT);
     
     private static Server<?> activeServer;
@@ -120,8 +121,7 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> {
                             ? endpointReferences[0].getAddress() : null;
     }
     
-    @Override
-    public AsyncEndpoint createAsyncEndpoint(String contentType) throws Exception {
+    public AsyncEndpoint<MessageData> createAsyncEndpoint(AsyncChannel<?> channel, String contentType) throws Exception {
         // Set up a test service with a default operation backed by a mock message
         // receiver. The service is configured using the parameters specified by the
         // implementation.

@@ -29,7 +29,7 @@ import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
-import org.apache.synapse.transport.testkit.listener.XMLMessage;
+import org.apache.synapse.transport.testkit.message.XMLMessage;
 
 public class JMSTextMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,XMLMessage> {
     public JMSTextMessageSender() {

@@ -19,24 +19,19 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import java.io.ByteArrayOutputStream;
+import org.apache.synapse.transport.testkit.message.MessageConverter;
 
-import org.apache.axiom.om.OMOutputFormat;
+public class AsyncMessageSenderAdapter<C extends AsyncChannel<?>,M,N> implements AsyncMessageSender<C,M> {
+    private final AsyncMessageSender<C,N> parent;
+    private final MessageConverter<M,N> converter;
 
-public class Adapter<C extends AsyncChannel<?>> implements AsyncMessageSender<C,XMLMessage> {
-    private final AsyncMessageSender<C,ByteArrayMessage> parent;
-
-    public Adapter(AsyncMessageSender<C, ByteArrayMessage> parent) {
+    public AsyncMessageSenderAdapter(AsyncMessageSender<C,N> parent, MessageConverter<M,N> converter) {
         this.parent = parent;
+        this.converter = converter;
     }
     
-    public void sendMessage(C channel, SenderOptions options, XMLMessage message) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OMOutputFormat outputFormat = new OMOutputFormat();
-        outputFormat.setCharSetEncoding(options.getCharset());
-        outputFormat.setIgnoreXMLDeclaration(true);
-        message.getXmlMessageType().getMessage(message.getPayload()).serializeAndConsume(baos, outputFormat);
-        parent.sendMessage(channel, options, new ByteArrayMessage(message.getContentType(), baos.toByteArray()));
+    public void sendMessage(C channel, SenderOptions options, M message) throws Exception {
+        parent.sendMessage(channel, options, converter.convert(options, message));
     }
 
     public void buildName(NameBuilder nameBuilder) {

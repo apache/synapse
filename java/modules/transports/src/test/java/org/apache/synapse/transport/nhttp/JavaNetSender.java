@@ -28,8 +28,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
 public class JavaNetSender extends AbstractMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,ByteArrayMessage> {
     public JavaNetSender() {

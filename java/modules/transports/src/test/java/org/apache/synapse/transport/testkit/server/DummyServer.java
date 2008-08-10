@@ -17,17 +17,33 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.server;
 
-import org.apache.axis2.client.ServiceClient;
-import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.listener.Channel;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 
-public class AxisAsyncMessageSender extends AxisMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,XMLMessage> {
-    public AxisAsyncMessageSender() {
-        super("axis");
+public class DummyServer<T extends ListenerTestSetup> extends Server<T> {
+    private Channel<?> channel;
+    
+    public DummyServer(T setup) {
+        super(setup);
     }
 
-    public void sendMessage(AsyncChannel<?> channel, SenderOptions options, XMLMessage message) throws Exception {
-        createClient(options.getEndpointReference(), ServiceClient.ANON_OUT_ONLY_OP, message.getXmlMessageType(), message.getPayload(), options.getCharset()).execute(false);
+    @Override
+    public void start(Channel<?> channel) throws Exception {
+        this.channel = channel;
+        channel.getSetup().setUp();
+        channel.setUp();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        channel.tearDown();
+        channel.getSetup().tearDown();
+    }
+
+    @Override
+    public Endpoint createEchoEndpoint(String contentType) throws Exception {
+        throw new UnsupportedOperationException();
     }
 }

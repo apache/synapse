@@ -22,25 +22,18 @@ package org.apache.synapse.transport.testkit.listener;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Random;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.MIMEOutputUtils;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -48,7 +41,13 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.message.MessageData;
+import org.apache.synapse.transport.testkit.message.RESTMessage;
+import org.apache.synapse.transport.testkit.message.StringMessage;
+import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.message.XMLMessageType;
+import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 public class ListenerTestSuite extends TestSuite {
     public static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
@@ -75,28 +74,28 @@ public class ListenerTestSuite extends TestSuite {
         this(true);
     }
 
-    public <C extends AsyncChannel<?>> void addSOAP11Test(C channel, AsyncMessageSender<? super C,XMLMessage> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, XMLMessageType.SOAP11, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
+    public <C extends AsyncChannel<?>> void addSOAP11Test(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, endpointFactory, XMLMessageType.SOAP11, "SOAP11", contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
     }
     
-    public <C extends AsyncChannel<?>> void addSOAP12Test(C channel, AsyncMessageSender<? super C,XMLMessage> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, XMLMessageType.SOAP12, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
+    public <C extends AsyncChannel<?>> void addSOAP12Test(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, endpointFactory, XMLMessageType.SOAP12, "SOAP12", contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
     }
     
-    public <C extends AsyncChannel<?>> void addSOAPTests(C channel, AsyncMessageSender<? super C,XMLMessage> sender, ContentTypeMode contentTypeMode) {
+    public <C extends AsyncChannel<?>> void addSOAPTests(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addSOAP11Test(channel, sender, contentTypeMode, data);
-            addSOAP12Test(channel, sender, contentTypeMode, data);
+            addSOAP11Test(channel, sender, endpointFactory, contentTypeMode, data);
+            addSOAP12Test(channel, sender, endpointFactory, contentTypeMode, data);
         }
     }
     
-    public <C extends AsyncChannel<?>> void addPOXTest(C channel, AsyncMessageSender<? super C,XMLMessage> sender, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, XMLMessageType.POX, "POX", contentTypeMode, "application/xml", data));
+    public <C extends AsyncChannel<?>> void addPOXTest(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase<C>(channel, sender, endpointFactory, XMLMessageType.POX, "POX", contentTypeMode, "application/xml", data));
     }
     
-    public <C extends AsyncChannel<?>> void addPOXTests(C channel, AsyncMessageSender<? super C,XMLMessage> sender, ContentTypeMode contentTypeMode) {
+    public <C extends AsyncChannel<?>> void addPOXTests(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addPOXTest(channel, sender, contentTypeMode, data);
+            addPOXTest(channel, sender, endpointFactory, contentTypeMode, data);
         }
     }
     
@@ -111,8 +110,8 @@ public class ListenerTestSuite extends TestSuite {
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public <C extends AsyncChannel<?>> void addSwATests(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender) {
-        addTest(new AsyncMessageTestCase<C,ByteArrayMessage>(channel, sender, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null, null) {
+    public <C extends AsyncChannel<?>> void addSwATests(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory) {
+        addTest(new AsyncMessageTestCase<C,ByteArrayMessage,MessageData>(channel, sender, endpointFactory, "SOAPWithAttachments", ContentTypeMode.TRANSPORT, null, null) {
             private byte[] attachmentContent;
             private String contentID;
             
@@ -156,8 +155,8 @@ public class ListenerTestSuite extends TestSuite {
         });
     }
     
-    public <C extends AsyncChannel<?>> void addTextPlainTest(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, ContentTypeMode contentTypeMode, final MessageTestData data) {
-        addTest(new AsyncMessageTestCase<C,ByteArrayMessage>(channel, sender, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset()) {
+    public <C extends AsyncChannel<?>> void addTextPlainTest(C channel, AsyncMessageSender<? super C,StringMessage> sender, AsyncEndpointFactory<? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode, final MessageTestData data) {
+        addTest(new AsyncMessageTestCase<C,StringMessage,StringMessage>(channel, sender, endpointFactory, "TextPlain", contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset()) {
             @Override
             protected void buildName(NameBuilder name) {
                 super.buildName(name);
@@ -165,28 +164,25 @@ public class ListenerTestSuite extends TestSuite {
             }
             
             @Override
-            protected ByteArrayMessage prepareMessage() throws Exception {
-                return new ByteArrayMessage(contentType, data.getText().getBytes(data.getCharset()));
+            protected StringMessage prepareMessage() throws Exception {
+                return new StringMessage(contentType, data.getText());
             }
 
             @Override
-            protected void checkMessageData(ByteArrayMessage message, MessageData messageData) throws Exception {
-                SOAPEnvelope envelope = messageData.getEnvelope();
-                OMElement wrapper = envelope.getBody().getFirstElement();
-                assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, wrapper.getQName());
-                assertEquals(data.getText(), wrapper.getText());
+            protected void checkMessageData(StringMessage message, StringMessage messageData) throws Exception {
+                assertEquals(message.getContent(), messageData.getContent());
             }
         });
     }
     
-    public <C extends AsyncChannel<?>> void addTextPlainTests(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, ContentTypeMode contentTypeMode) {
+    public <C extends AsyncChannel<?>> void addTextPlainTests(C channel, AsyncMessageSender<? super C,StringMessage> sender, AsyncEndpointFactory<? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addTextPlainTest(channel, sender, contentTypeMode, data);
+            addTextPlainTest(channel, sender, endpointFactory, contentTypeMode, data);
         }
     }
     
-    public <C extends AsyncChannel<?>> void addBinaryTest(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, ContentTypeMode contentTypeMode) {
-        addTest(new AsyncMessageTestCase<C,ByteArrayMessage>(channel, sender, "Binary", contentTypeMode, "application/octet-stream", null) {
+    public <C extends AsyncChannel<?>> void addBinaryTest(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
+        addTest(new AsyncMessageTestCase<C,ByteArrayMessage,ByteArrayMessage>(channel, sender, endpointFactory, "Binary", contentTypeMode, "application/octet-stream", null) {
             @Override
             protected ByteArrayMessage prepareMessage() throws Exception {
                 byte[] content = new byte[8192];
@@ -195,21 +191,14 @@ public class ListenerTestSuite extends TestSuite {
             }
 
             @Override
-            protected void checkMessageData(ByteArrayMessage message, MessageData messageData) throws Exception {
-                SOAPEnvelope envelope = messageData.getEnvelope();
-                OMElement wrapper = envelope.getBody().getFirstElement();
-                assertEquals(BaseConstants.DEFAULT_BINARY_WRAPPER, wrapper.getQName());
-                OMNode child = wrapper.getFirstOMChild();
-                assertTrue(child instanceof OMText);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ((DataHandler)((OMText)child).getDataHandler()).writeTo(baos);
-                assertTrue(Arrays.equals(message.getContent(), baos.toByteArray()));
+            protected void checkMessageData(ByteArrayMessage message, ByteArrayMessage messageData) throws Exception {
+                assertTrue(Arrays.equals(message.getContent(), messageData.getContent()));
             }
         });
     }
 
-    public <C extends AsyncChannel<?>> void addRESTTests(C channel, AsyncMessageSender<? super C,RESTMessage> sender) {
-        addTest(new AsyncMessageTestCase<C,RESTMessage>(channel, sender, "REST", ContentTypeMode.TRANSPORT, null, null) {
+    public <C extends AsyncChannel<?>> void addRESTTests(C channel, AsyncMessageSender<? super C,RESTMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory) {
+        addTest(new AsyncMessageTestCase<C,RESTMessage,MessageData>(channel, sender, endpointFactory, "REST", ContentTypeMode.TRANSPORT, null, null) {
             @Override
             protected RESTMessage prepareMessage() throws Exception {
                 return new RESTMessage();

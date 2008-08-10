@@ -27,12 +27,11 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.server.Server;
-import org.apache.synapse.transport.vfs.VFSTransportListenerTest.TestStrategyImpl;
 
-public class VFSFileChannel extends AbstractChannel<VFSTransportListenerTest.TestStrategyImpl> implements AsyncChannel<VFSTransportListenerTest.TestStrategyImpl> {
+public class VFSFileChannel extends AbstractChannel<VFSTestSetup> implements AsyncChannel<VFSTestSetup> {
     private final File requestFile;
     
-    public VFSFileChannel(Server<TestStrategyImpl> server, File requestFile) {
+    public VFSFileChannel(Server<VFSTestSetup> server, File requestFile) {
         super(server);
         this.requestFile = requestFile;
     }

@@ -17,30 +17,10 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.server;
 
-import org.apache.axiom.attachments.Attachments;
-import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
-/**
- * Class encapsulating a SOAP envelope and an attachment map.
- * This class is used by {@link MockMessageReceiver} because it is not safe to
- * keep a reference to the {@link org.apache.axis2.context.MessageContext} object.
- */
-public class MessageData {
-    private final SOAPEnvelope envelope;
-    private final Attachments attachments;
-    
-    public MessageData(SOAPEnvelope envelope, Attachments attachments) {
-        this.envelope = envelope;
-        this.attachments = attachments;
-    }
-
-    public SOAPEnvelope getEnvelope() {
-        return envelope;
-    }
-
-    public Attachments getAttachments() {
-        return attachments;
-    }
+public interface AsyncEndpointFactory<C extends AsyncChannel<?>,M> {
+    AsyncEndpoint<M> createAsyncEndpoint(C channel, String contentType) throws Exception;
 }

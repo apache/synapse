@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.vfs;
 
+import static org.apache.synapse.transport.testkit.AdapterUtils.adapt;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -28,31 +30,21 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
-import org.apache.synapse.transport.testkit.listener.Adapter;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
-import org.apache.synapse.transport.testkit.listener.XMLMessage;
-import org.apache.synapse.transport.testkit.server.Server;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.message.MessageConverter;
+import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.
  */
 public class VFSTransportListenerTest extends TestCase {
-    public static class TestStrategyImpl extends ListenerTestSetup {
-        @Override
-        public void setupContentType(AxisService service, String contentType) throws Exception {
-            service.addParameter("transport.vfs.ContentType", contentType);
-        }
-    }
-    
     private static class MessageSenderImpl extends AbstractMessageSender<VFSFileChannel> implements AsyncMessageSender<VFSFileChannel,ByteArrayMessage> {
         public void sendMessage(VFSFileChannel channel, SenderOptions options, ByteArrayMessage message) throws Exception {
             OutputStream out = new FileOutputStream(channel.getRequestFile());
@@ -64,20 +56,20 @@ public class VFSTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         // TODO: the VFS listener doesn't like reuseServer == true...
         ListenerTestSuite suite = new ListenerTestSuite(false);
-        TestStrategyImpl setup = new TestStrategyImpl();
-        Server<TestStrategyImpl> server = new AxisServer<TestStrategyImpl>(setup);
+        VFSTestSetup setup = new VFSTestSetup();
+        AxisServer<VFSTestSetup> server = new AxisServer<VFSTestSetup>(setup);
         VFSFileChannel channel = new VFSFileChannel(server, new File("target/vfs3/req/in").getAbsoluteFile());
         MessageSenderImpl vfsSender = new MessageSenderImpl();
         List<AsyncMessageSender<? super VFSFileChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super VFSFileChannel,XMLMessage>>();
-        senders.add(new Adapter<VFSFileChannel>(vfsSender));
+        senders.add(adapt(vfsSender, MessageConverter.XML_TO_BYTE));
         senders.add(new AxisAsyncMessageSender());
         for (AsyncMessageSender<? super VFSFileChannel,XMLMessage> sender : senders) {
-            suite.addSOAPTests(channel, sender, ContentTypeMode.SERVICE);
-            suite.addPOXTests(channel, sender, ContentTypeMode.SERVICE);
+            suite.addSOAPTests(channel, sender, server, ContentTypeMode.SERVICE);
+            suite.addPOXTests(channel, sender, server, ContentTypeMode.SERVICE);
             // Since VFS has no Content-Type header, SwA is not supported.
         }
-        suite.addTextPlainTests(channel, vfsSender, ContentTypeMode.SERVICE);
-        suite.addBinaryTest(channel, vfsSender, ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(channel, adapt(vfsSender, MessageConverter.STRING_TO_BYTE), adapt(server, MessageConverter.AXIS_TO_STRING), ContentTypeMode.SERVICE);
+        suite.addBinaryTest(channel, vfsSender, adapt(server, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.SERVICE);
         return suite;
     }
 }

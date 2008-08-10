@@ -24,13 +24,17 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.synapse.transport.testkit.message.MessageData;
+import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.message.XMLMessageType;
+import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-public class XMLAsyncMessageTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,XMLMessage> {
+public class XMLAsyncMessageTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,XMLMessage,MessageData> {
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
-    public XMLAsyncMessageTestCase(C channel, AsyncMessageSender<? super C,XMLMessage> sender, XMLMessageType xmlMessageType, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
-        super(channel, sender, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"", data.getCharset());
+    public XMLAsyncMessageTestCase(C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory, XMLMessageType xmlMessageType, String baseName, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+        super(channel, sender, endpointFactory, baseName, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"", data.getCharset());
         this.xmlMessageType = xmlMessageType;
         this.data = data;
     }

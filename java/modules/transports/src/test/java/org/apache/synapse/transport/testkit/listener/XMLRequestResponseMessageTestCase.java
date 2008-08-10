@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
+import org.apache.synapse.transport.testkit.message.XMLMessageType;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 
 public class XMLRequestResponseMessageTestCase<C extends RequestResponseChannel<?>> extends ListenerTestCase<C,XMLRequestResponseMessageSender<? super C>> {

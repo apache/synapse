@@ -19,10 +19,11 @@
 
 package org.apache.synapse.transport.testkit.server;
 
+import org.apache.synapse.transport.testkit.Adapter;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 
-public class AsyncEndpointFactoryAdapter<C extends AsyncChannel<?>,M,N> implements AsyncEndpointFactory<C,M> {
+public class AsyncEndpointFactoryAdapter<C extends AsyncChannel<?>,M,N> implements AsyncEndpointFactory<C,M>, Adapter {
     private final AsyncEndpointFactory<C,N> targetFactory;
     private final MessageConverter<N,M> converter;
     
@@ -31,6 +32,14 @@ public class AsyncEndpointFactoryAdapter<C extends AsyncChannel<?>,M,N> implemen
         this.converter = converter;
     }
     
+    public AsyncEndpointFactory<C,N> getTarget() {
+        return targetFactory;
+    }
+
+    public Server<?> getServer() {
+        return targetFactory.getServer();
+    }
+
     public AsyncEndpoint<M> createAsyncEndpoint(C channel, String contentType) throws Exception {
         final AsyncEndpoint<N> targetEndpoint = targetFactory.createAsyncEndpoint(channel, contentType);
         final MessageConverter<N,M> converter = this.converter;

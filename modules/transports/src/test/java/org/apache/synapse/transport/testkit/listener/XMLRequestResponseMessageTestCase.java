@@ -24,22 +24,28 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
+import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.Endpoint;
+import org.apache.synapse.transport.testkit.server.EndpointFactory;
+import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
-public class XMLRequestResponseMessageTestCase<C extends RequestResponseChannel<?>> extends ListenerTestCase<C,XMLRequestResponseMessageSender<? super C>> {
+@DisplayName("EchoXML")
+public class XMLRequestResponseMessageTestCase<C extends RequestResponseChannel<?>> extends TransportTestCase<C,XMLRequestResponseMessageSender<? super C>> {
+    private final EndpointFactory<? super C> endpointFactory;
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
     // TODO: realign order of arguments with XMLAsyncMessageTestCase constructor
-    public XMLRequestResponseMessageTestCase(C channel, XMLRequestResponseMessageSender<? super C> sender, String name, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
-        super(channel, sender, name, contentTypeMode, contentType);
+    public XMLRequestResponseMessageTestCase(C channel, XMLRequestResponseMessageSender<? super C> sender, EndpointFactory<? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
+        super(channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
+        this.endpointFactory = endpointFactory;
         this.xmlMessageType = xmlMessageType;
         this.data = data;
     }
 
     @Override
     protected void runTest() throws Throwable {
-        Endpoint endpoint = channel.getServer().createEchoEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
+        Endpoint endpoint = endpointFactory.createEchoEndpoint(channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         try {
             OMFactory factory = xmlMessageType.getOMFactory();
             OMElement orgElement = factory.createOMElement(new QName("root"));

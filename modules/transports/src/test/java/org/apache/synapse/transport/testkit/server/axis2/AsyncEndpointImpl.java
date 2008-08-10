@@ -22,7 +22,6 @@ package org.apache.synapse.transport.testkit.server.axis2;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.MockMessageReceiver;
 import org.apache.synapse.transport.testkit.message.MessageData;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 

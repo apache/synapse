@@ -17,23 +17,32 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.tests;
+
+import org.apache.synapse.transport.testkit.listener.Channel;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.listener.MessageSender;
+import org.apache.synapse.transport.testkit.listener.NameBuilder;
+import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.NameUtils;
+import org.apache.synapse.transport.testkit.server.Server;
 
 import junit.framework.TestCase;
 
-public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSender<? super C>> extends TestCase {
-    private final String name;
+public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSender<? super C>> extends TestCase {
     protected final C channel;
     protected final S sender;
+    private final Server<?> server;
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
     
     private boolean manageServer = true;
 
-    public ListenerTestCase(C channel, S sender, String name, ContentTypeMode contentTypeMode, String contentType) {
+    public TransportTestCase(C channel, S sender, Server<?> server, ContentTypeMode contentTypeMode, String contentType) {
         this.channel = channel;
         this.sender = sender;
-        this.name = name;
+        this.server = server;
         this.contentTypeMode = contentTypeMode;
         this.contentType = contentType;
     }
@@ -43,7 +52,8 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
         String testName = super.getName();
         if (testName == null) {
             NameBuilder nameBuilder = new NameBuilder();
-            nameBuilder.addComponent("test", name);
+            nameBuilder.addComponent("test", NameUtils.getName(this));
+            NameUtils.getNameComponents(nameBuilder, this);
             channel.buildName(nameBuilder);
             buildName(nameBuilder);
             nameBuilder.addComponent("contentTypeMode", contentTypeMode.toString().toLowerCase());
@@ -57,8 +67,14 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
         sender.buildName(name);
     }
     
+    @NameComponent("channel")
     public C getChannel() {
         return channel;
+    }
+
+    @NameComponent("sender")
+    public S getSender() {
+        return sender;
     }
 
     public ListenerTestSetup getSetup() {
@@ -72,8 +88,8 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
     
     @Override
     protected void setUp() throws Exception {
-        if (manageServer) {
-            channel.getServer().start(channel);
+        if (server != null && manageServer) {
+            server.start(channel);
         }
         sender.setUp(channel);
     }
@@ -81,8 +97,8 @@ public abstract class ListenerTestCase<C extends Channel<?>,S extends MessageSen
     @Override
     protected void tearDown() throws Exception {
         sender.tearDown();
-        if (manageServer) {
-            channel.getServer().stop();
+        if (server != null && manageServer) {
+            server.stop();
         }
     }
 }

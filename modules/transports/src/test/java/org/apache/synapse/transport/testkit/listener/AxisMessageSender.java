@@ -45,10 +45,6 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
-    public AxisMessageSender(String name) {
-        super(name);
-    }
-    
     @Override
     public void setUp(C channel) throws Exception {
         super.setUp(channel);

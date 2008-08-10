@@ -19,30 +19,35 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
+import org.apache.synapse.transport.testkit.Adapter;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 
-public class AsyncMessageSenderAdapter<C extends AsyncChannel<?>,M,N> implements AsyncMessageSender<C,M> {
-    private final AsyncMessageSender<C,N> parent;
+public class AsyncMessageSenderAdapter<C extends AsyncChannel<?>,M,N> implements AsyncMessageSender<C,M>, Adapter {
+    private final AsyncMessageSender<C,N> target;
     private final MessageConverter<M,N> converter;
 
-    public AsyncMessageSenderAdapter(AsyncMessageSender<C,N> parent, MessageConverter<M,N> converter) {
-        this.parent = parent;
+    public AsyncMessageSenderAdapter(AsyncMessageSender<C,N> target, MessageConverter<M,N> converter) {
+        this.target = target;
         this.converter = converter;
     }
     
+    public AsyncMessageSender<C,N> getTarget() {
+        return target;
+    }
+
     public void sendMessage(C channel, SenderOptions options, M message) throws Exception {
-        parent.sendMessage(channel, options, converter.convert(options, message));
+        target.sendMessage(channel, options, converter.convert(options, message));
     }
 
     public void buildName(NameBuilder nameBuilder) {
-        parent.buildName(nameBuilder);
+        target.buildName(nameBuilder);
     }
 
     public void setUp(C channel) throws Exception {
-        parent.setUp(channel);
+        target.setUp(channel);
     }
 
     public void tearDown() throws Exception {
-        parent.tearDown();
+        target.tearDown();
     }
 }

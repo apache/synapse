@@ -25,6 +25,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.Server;
 
 public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel<JMSListenerSetup> {
@@ -33,7 +34,7 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     private Destination replyDestination;
     
     public JMSRequestResponseChannel(Server<JMSListenerSetup> server, String destinationType, String replyDestinationType) {
-        super(server, destinationType + "-" + replyDestinationType, destinationType);
+        super(server, destinationType);
         this.replyDestinationType = replyDestinationType;
     }
     
@@ -69,6 +70,11 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     @Override
     public EndpointReference createEndpointReference(String address) {
         return new EndpointReference(address + "&" + JMSConstants.REPLY_PARAM_TYPE + "=" + replyDestinationType + "&" + JMSConstants.REPLY_PARAM + "=" + replyDestinationName);
+    }
+
+    @NameComponent("replyDestType")
+    public String getReplyDestinationType() {
+        return replyDestinationType;
     }
 
     public Destination getReplyDestination() {

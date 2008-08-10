@@ -30,12 +30,10 @@ import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.name.DisplayName;
 
+@DisplayName("java.net")
 public class JavaNetSender extends AbstractMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,ByteArrayMessage> {
-    public JavaNetSender() {
-        super("java.net");
-    }
-    
     public void sendMessage(AsyncChannel<?> channel, SenderOptions options, ByteArrayMessage message) throws Exception {
         URLConnection connection = new URL(options.getEndpointReference()).openConnection();
         connection.setDoOutput(true);

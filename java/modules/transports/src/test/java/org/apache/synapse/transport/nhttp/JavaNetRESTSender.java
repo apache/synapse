@@ -29,13 +29,11 @@ import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
+import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 
+@DisplayName("java.net")
 public class JavaNetRESTSender extends AbstractMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,RESTMessage> {
-    public JavaNetRESTSender() {
-        super("java.net");
-    }
-    
     public void sendMessage(AsyncChannel<?> channel, SenderOptions options, RESTMessage message) throws Exception {
         URLConnection connection = new URL(options.getEndpointReference() + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
         connection.setDoInput(true);

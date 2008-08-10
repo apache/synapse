@@ -17,15 +17,15 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.name;
 
-public abstract class AbstractMessageSender<C extends Channel<?>> implements MessageSender<C> {
-    public void buildName(NameBuilder nameBuilder) {
-    }
-    
-    public void setUp(C channel) throws Exception {
-    }
-    
-    public void tearDown() throws Exception {
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DisplayName {
+    String value();
 }

@@ -24,6 +24,6 @@ import org.apache.synapse.transport.testkit.server.Server;
 
 public class JMSAsyncChannel extends JMSChannel implements AsyncChannel<JMSListenerSetup> {
     public JMSAsyncChannel(Server<JMSListenerSetup> server, String destinationType) {
-        super(server, destinationType, destinationType);
+        super(server, destinationType);
     }
 }

@@ -32,38 +32,26 @@ import javax.jms.TextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.testkit.listener.Channel;
+import org.apache.synapse.transport.testkit.server.DummyServer;
 import org.apache.synapse.transport.testkit.server.Endpoint;
+import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class MockServer extends Server<JMSListenerSetup> {
-    static Log log = LogFactory.getLog(MockServer.class);
+public class MockEchoEndpointFactory implements EndpointFactory<JMSRequestResponseChannel> {
+    static Log log = LogFactory.getLog(MockEchoEndpointFactory.class);
     
-    private Channel<?> channel;
+    private final JMSListenerSetup setup;
     
-    public MockServer(JMSListenerSetup setup) {
-        super(setup);
+    public MockEchoEndpointFactory(JMSListenerSetup setup) {
+        this.setup = setup;
     }
 
-    @Override
-    public void start(Channel<?> channel) throws Exception {
-        this.channel = channel;
-        channel.getSetup().setUp();
-        channel.setUp();
+    public Server<?> getServer() {
+        return new DummyServer<JMSListenerSetup>(setup);
     }
 
-    @Override
-    public void stop() throws Exception {
-        channel.tearDown();
-        channel.getSetup().tearDown();
-    }
-
-    @Override
-    public Endpoint createEchoEndpoint(String contentType) throws Exception {
-        // TODO: should not have cast here
-        final JMSRequestResponseChannel channel = (JMSRequestResponseChannel)this.channel;
-        JMSListenerSetup setup = getSetup();
-        
+    public Endpoint createEchoEndpoint(final JMSRequestResponseChannel channel, String contentType) throws Exception {
+        JMSListenerSetup setup = channel.getSetup();
         Destination destination = channel.getDestination();
         Destination replyDestination = channel.getReplyDestination();
         final Connection connection = setup.getConnectionFactory(destination).createConnection();

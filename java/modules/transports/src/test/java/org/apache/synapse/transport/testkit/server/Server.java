@@ -47,5 +47,4 @@ public abstract class Server<T extends ListenerTestSetup> {
 
     public abstract void start(Channel<?> channel) throws Exception;
     public abstract void stop() throws Exception;
-    public abstract Endpoint createEchoEndpoint(String contentType) throws Exception;
 }

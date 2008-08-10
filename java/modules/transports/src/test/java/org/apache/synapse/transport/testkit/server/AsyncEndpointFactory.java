@@ -22,5 +22,6 @@ package org.apache.synapse.transport.testkit.server;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
 public interface AsyncEndpointFactory<C extends AsyncChannel<?>,M> {
+    Server<?> getServer();
     AsyncEndpoint<M> createAsyncEndpoint(C channel, String contentType) throws Exception;
 }

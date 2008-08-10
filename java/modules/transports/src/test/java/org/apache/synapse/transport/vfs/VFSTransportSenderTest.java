@@ -34,6 +34,7 @@ import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.DummyServer;
+import org.apache.synapse.transport.testkit.server.Server;
 
 public class VFSTransportSenderTest extends TestCase {
     public static TestSuite suite() {
@@ -42,8 +43,14 @@ public class VFSTransportSenderTest extends TestCase {
         
         VFSTestSetup setup = new VFSTestSetup();
         
+        final Server<VFSTestSetup> server = new DummyServer<VFSTestSetup>(setup);
+        
         AsyncEndpointFactory<VFSFileChannel,ByteArrayMessage> endpointFactory =
             new AsyncEndpointFactory<VFSFileChannel,ByteArrayMessage>() {
+
+            public Server<?> getServer() {
+                return server;
+            }
             
             public AsyncEndpoint<ByteArrayMessage> createAsyncEndpoint(
                     VFSFileChannel channel, String contentType)
@@ -53,7 +60,7 @@ public class VFSTransportSenderTest extends TestCase {
             }
         };
         
-        VFSFileChannel channel = new VFSFileChannel(new DummyServer<VFSTestSetup>(setup), new File("target/vfs3/req/in").getAbsoluteFile());
+        VFSFileChannel channel = new VFSFileChannel(server, new File("target/vfs3/req/in").getAbsoluteFile());
         AxisAsyncMessageSender sender = new AxisAsyncMessageSender();
         
         suite.addBinaryTest(channel, adapt(sender, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);

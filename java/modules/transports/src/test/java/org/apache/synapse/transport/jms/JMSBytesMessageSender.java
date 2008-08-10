@@ -27,12 +27,10 @@ import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.name.DisplayName;
 
+@DisplayName("BytesMessage")
 public class JMSBytesMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,ByteArrayMessage> {
-    public JMSBytesMessageSender() {
-        super("ByteMessage");
-    }
-    
     public void sendMessage(JMSAsyncChannel channel,
                             SenderOptions options,
                             ByteArrayMessage message) throws Exception {

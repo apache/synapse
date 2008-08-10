@@ -21,13 +21,14 @@ package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
-public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M,N> extends ListenerTestCase<C,AsyncMessageSender<? super C,M>> {
+public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M,N> extends TransportTestCase<C,AsyncMessageSender<? super C,M>> {
     private final String charset;
     private final AsyncEndpointFactory<? super C,N> endpointFactory;
     
-    public AsyncMessageTestCase(C channel, AsyncMessageSender<? super C,M> sender, AsyncEndpointFactory<? super C,N> endpointFactory, String name, ContentTypeMode contentTypeMode, String contentType, String charset) {
-        super(channel, sender, name, contentTypeMode, contentType);
+    public AsyncMessageTestCase(C channel, AsyncMessageSender<? super C,M> sender, AsyncEndpointFactory<? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
+        super(channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.charset = charset;
     }

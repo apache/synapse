@@ -17,15 +17,11 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.server;
 
-public abstract class AbstractMessageSender<C extends Channel<?>> implements MessageSender<C> {
-    public void buildName(NameBuilder nameBuilder) {
-    }
-    
-    public void setUp(C channel) throws Exception {
-    }
-    
-    public void tearDown() throws Exception {
-    }
+import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+
+public interface EndpointFactory<C extends RequestResponseChannel<?>> {
+    Server<?> getServer();
+    Endpoint createEchoEndpoint(C channel, String contentType) throws Exception;
 }

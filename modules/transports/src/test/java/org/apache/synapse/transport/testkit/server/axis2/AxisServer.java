@@ -37,15 +37,15 @@ import org.apache.synapse.transport.UtilsTransportServer;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
-import org.apache.synapse.transport.testkit.listener.MockMessageReceiver;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.MessageData;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.Endpoint;
+import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class AxisServer<T extends ListenerTestSetup> extends Server<T> implements AsyncEndpointFactory<AsyncChannel<?>,MessageData> {
+public class AxisServer<T extends ListenerTestSetup> extends Server<T> implements AsyncEndpointFactory<AsyncChannel<?>,MessageData>, EndpointFactory<RequestResponseChannel<?>> {
     public static final AxisServer<ListenerTestSetup> DEFAULT = new AxisServer<ListenerTestSetup>(ListenerTestSetup.DEFAULT);
     
     private static Server<?> activeServer;
@@ -121,6 +121,10 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
                             ? endpointReferences[0].getAddress() : null;
     }
     
+    public Server<?> getServer() {
+        return this;
+    }
+
     public AsyncEndpoint<MessageData> createAsyncEndpoint(AsyncChannel<?> channel, String contentType) throws Exception {
         // Set up a test service with a default operation backed by a mock message
         // receiver. The service is configured using the parameters specified by the
@@ -140,8 +144,7 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
         return new AsyncEndpointImpl(this, service, messageReceiver);
     }
     
-    @Override
-    public Endpoint createEchoEndpoint(String contentType) throws Exception {
+    public Endpoint createEchoEndpoint(RequestResponseChannel<?> channel, String contentType) throws Exception {
         AxisService service = new AxisService("EchoService");
         AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
         operation.setMessageReceiver(new AbstractInOutMessageReceiver() {

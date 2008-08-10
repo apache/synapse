@@ -41,6 +41,7 @@ import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.Server;
 import org.mockejb.jndi.MockContextFactory;
 
@@ -51,8 +52,8 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
     private String destinationName;
     private Destination destination;
     
-    public JMSChannel(Server<JMSListenerSetup> server, String name, String destinationType) {
-        super(name, server);
+    public JMSChannel(Server<JMSListenerSetup> server, String destinationType) {
+        super(server);
         this.destinationType = destinationType;
     }
     
@@ -70,6 +71,7 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
         destination = null;
     }
 
+    @NameComponent("destType")
     public String getDestinationType() {
         return destinationType;
     }

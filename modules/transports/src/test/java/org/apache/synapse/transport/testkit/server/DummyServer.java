@@ -41,9 +41,4 @@ public class DummyServer<T extends ListenerTestSetup> extends Server<T> {
         channel.tearDown();
         channel.getSetup().tearDown();
     }
-
-    @Override
-    public Endpoint createEchoEndpoint(String contentType) throws Exception {
-        throw new UnsupportedOperationException();
-    }
 }

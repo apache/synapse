@@ -36,6 +36,7 @@ import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.server.DummyServer;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class JMSListenerTest extends TestCase {
@@ -49,8 +50,8 @@ public class JMSListenerTest extends TestCase {
         senders.add(adapt(bytesMessageSender, MessageConverter.XML_TO_BYTE));
         senders.add(textMessageSender);
         senders.add(new AxisAsyncMessageSender());
-        suite.addPOXTests(new JMSRequestResponseChannel(server, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
-        suite.addPOXTests(new JMSRequestResponseChannel(new MockServer(setup), JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(new JMSRequestResponseChannel(server, JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), server, ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(new JMSRequestResponseChannel(new DummyServer<JMSListenerSetup>(setup), JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), new MockEchoEndpointFactory(setup), ContentTypeMode.TRANSPORT);
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
             JMSAsyncChannel channel = new JMSAsyncChannel(server, destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {

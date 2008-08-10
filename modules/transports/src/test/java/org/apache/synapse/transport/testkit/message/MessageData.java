@@ -21,7 +21,7 @@ package org.apache.synapse.transport.testkit.message;
 
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.synapse.transport.testkit.listener.MockMessageReceiver;
+import org.apache.synapse.transport.testkit.server.axis2.MockMessageReceiver;
 
 /**
  * Class encapsulating a SOAP envelope and an attachment map.

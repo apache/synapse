@@ -26,29 +26,18 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.server.Server;
 
 public abstract class AbstractChannel<T extends ListenerTestSetup> implements Channel<T> {
-    private final String name;
     private final Server<T> server;
     
-    public AbstractChannel(String name, Server<T> server) {
-        this.name = name;
+    public AbstractChannel(Server<T> server) {
         this.server = server;
     }
 
-    public AbstractChannel(Server<T> server) {
-        this(null, server);
-    }
-    
     public final T getSetup() {
         return server.getSetup();
     }
 
-    public Server<T> getServer() {
-        return server;
-    }
-
     public void buildName(NameBuilder nameBuilder) {
         getSetup().buildName(nameBuilder);
-        nameBuilder.addComponent("channel", name);
     }
 
     public TransportOutDescription createTransportOutDescription() throws Exception {

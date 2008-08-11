@@ -17,35 +17,51 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.tests.echo;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
+import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.listener.MessageTestData;
+import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.listener.XMLRequestResponseMessageSender;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
 @DisplayName("EchoXML")
-public class XMLRequestResponseMessageTestCase<C extends RequestResponseChannel<?>> extends TransportTestCase<C,XMLRequestResponseMessageSender<? super C>> {
-    private final EndpointFactory<? super C> endpointFactory;
+public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C extends RequestResponseChannel<? super E>> extends TransportTestCase<E,C,XMLRequestResponseMessageSender<? super C>> {
+    private final EndpointFactory<? super E,? super C> endpointFactory;
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
     // TODO: realign order of arguments with XMLAsyncMessageTestCase constructor
-    public XMLRequestResponseMessageTestCase(C channel, XMLRequestResponseMessageSender<? super C> sender, EndpointFactory<? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
-        super(channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
+    public XMLRequestResponseMessageTestCase(E env, C channel, XMLRequestResponseMessageSender<? super C> sender, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
+        super(env, channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.xmlMessageType = xmlMessageType;
         this.data = data;
     }
 
+    @NameComponent("messageType")
+    public XMLMessageType getXmlMessageType() {
+        return xmlMessageType;
+    }
+
+    @NameComponent("data")
+    public MessageTestData getData() {
+        return data;
+    }
+
     @Override
     protected void runTest() throws Throwable {
-        Endpoint endpoint = endpointFactory.createEchoEndpoint(channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
+        Endpoint endpoint = endpointFactory.createEchoEndpoint(env, channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         try {
             OMFactory factory = xmlMessageType.getOMFactory();
             OMElement orgElement = factory.createOMElement(new QName("root"));

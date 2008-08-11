@@ -29,8 +29,10 @@ import org.apache.qpid.client.AMQQueue;
 import org.apache.qpid.client.AMQTopic;
 import org.apache.qpid.client.transport.TransportConnection;
 import org.apache.qpid.framing.AMQShortString;
+import org.apache.synapse.transport.testkit.name.DisplayName;
 
-public class QpidTestSetup extends JMSListenerSetup {
+@DisplayName("qpid")
+public class QpidTestEnvironment extends JMSTestEnvironment {
     @Override
     public void setUp() throws Exception {
         TransportConnection.createVMBroker(1);

@@ -17,22 +17,13 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit;
 
 import org.apache.axis2.description.AxisService;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 
-public abstract class ListenerTestSetup {
-    public static final ListenerTestSetup DEFAULT = new ListenerTestSetup() {};
-    
-    private final String name;
-    
-    public ListenerTestSetup() {
-        name = null;
-    }
-    
-    public ListenerTestSetup(String name) {
-        this.name = name;
-    }
+public abstract class TestEnvironment {
+    public static final TestEnvironment DEFAULT = new TestEnvironment() {};
     
     /**
      * Carry out initialization before server startup. This method is called
@@ -58,9 +49,5 @@ public abstract class ListenerTestSetup {
      */
     public void setupContentType(AxisService service, String contentType) throws Exception {
         throw new UnsupportedOperationException();
-    }
-    
-    public void buildName(NameBuilder nameBuilder) {
-        nameBuilder.addComponent("setup", name);
     }
 }

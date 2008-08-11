@@ -19,32 +19,25 @@
 
 package org.apache.synapse.transport.jms;
 
-import java.io.StringWriter;
-
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.axiom.om.OMOutputFormat;
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
-import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.message.StringMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("TextMessage")
-public class JMSTextMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,XMLMessage> {
-    public void sendMessage(JMSAsyncChannel channel, SenderOptions options, XMLMessage message) throws Exception {
+public class JMSTextMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,StringMessage> {
+    public void sendMessage(JMSAsyncChannel channel, SenderOptions options, StringMessage message) throws Exception {
         Session session = channel.createSession();
         TextMessage jmsMessage = session.createTextMessage();
         if (message.getContentType() != null) {
             jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
         }
-        OMOutputFormat format = new OMOutputFormat();
-        format.setIgnoreXMLDeclaration(true);
-        StringWriter sw = new StringWriter();
-        message.getXmlMessageType().getMessage(message.getPayload()).serializeAndConsume(sw, format);
-        jmsMessage.setText(sw.toString());
+        jmsMessage.setText(message.getContent());
         channel.send(session, jmsMessage);
     }
 }

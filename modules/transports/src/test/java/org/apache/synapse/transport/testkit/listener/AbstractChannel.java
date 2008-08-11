@@ -23,23 +23,9 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.synapse.transport.testkit.server.Server;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 
-public abstract class AbstractChannel<T extends ListenerTestSetup> implements Channel<T> {
-    private final Server<T> server;
-    
-    public AbstractChannel(Server<T> server) {
-        this.server = server;
-    }
-
-    public final T getSetup() {
-        return server.getSetup();
-    }
-
-    public void buildName(NameBuilder nameBuilder) {
-        getSetup().buildName(nameBuilder);
-    }
-
+public abstract class AbstractChannel<E extends TestEnvironment> implements Channel<E> {
     public TransportOutDescription createTransportOutDescription() throws Exception {
         throw new UnsupportedOperationException();
     }
@@ -54,7 +40,7 @@ public abstract class AbstractChannel<T extends ListenerTestSetup> implements Ch
         return new EndpointReference(address);
     }
 
-    public void setUp() throws Exception {
+    public void setUp(E env) throws Exception {
     }
 
     public void tearDown() throws Exception {

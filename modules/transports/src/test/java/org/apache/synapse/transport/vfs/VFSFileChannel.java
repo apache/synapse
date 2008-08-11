@@ -26,13 +26,11 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.server.Server;
 
-public class VFSFileChannel extends AbstractChannel<VFSTestSetup> implements AsyncChannel<VFSTestSetup> {
+public class VFSFileChannel extends AbstractChannel<VFSTestEnvironment> implements AsyncChannel<VFSTestEnvironment> {
     private final File requestFile;
     
-    public VFSFileChannel(Server<VFSTestSetup> server, File requestFile) {
-        super(server);
+    public VFSFileChannel(File requestFile) {
         this.requestFile = requestFile;
     }
 
@@ -63,7 +61,7 @@ public class VFSFileChannel extends AbstractChannel<VFSTestSetup> implements Asy
     }
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp(VFSTestEnvironment env) throws Exception {
         requestFile.getParentFile().mkdirs();
         requestFile.delete();
     }

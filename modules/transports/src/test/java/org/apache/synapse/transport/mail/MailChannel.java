@@ -21,16 +21,14 @@ package org.apache.synapse.transport.mail;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
-import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
-public class MailChannel extends AbstractChannel<ListenerTestSetup> implements AsyncChannel<ListenerTestSetup> {
+public class MailChannel extends AbstractChannel<TestEnvironment> implements AsyncChannel<TestEnvironment> {
     private final String address;
     
     public MailChannel(String address) {
-        super(AxisServer.DEFAULT);
         this.address = address;
     }
 

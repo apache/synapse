@@ -32,31 +32,23 @@ import javax.jms.TextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.testkit.server.DummyServer;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class MockEchoEndpointFactory implements EndpointFactory<JMSRequestResponseChannel> {
+public class MockEchoEndpointFactory implements EndpointFactory<JMSTestEnvironment,JMSRequestResponseChannel> {
     static Log log = LogFactory.getLog(MockEchoEndpointFactory.class);
     
-    private final JMSListenerSetup setup;
-    
-    public MockEchoEndpointFactory(JMSListenerSetup setup) {
-        this.setup = setup;
+    public Server<JMSTestEnvironment> getServer() {
+        return null;
     }
 
-    public Server<?> getServer() {
-        return new DummyServer<JMSListenerSetup>(setup);
-    }
-
-    public Endpoint createEchoEndpoint(final JMSRequestResponseChannel channel, String contentType) throws Exception {
-        JMSListenerSetup setup = channel.getSetup();
+    public Endpoint createEchoEndpoint(JMSTestEnvironment env, final JMSRequestResponseChannel channel, String contentType) throws Exception {
         Destination destination = channel.getDestination();
         Destination replyDestination = channel.getReplyDestination();
-        final Connection connection = setup.getConnectionFactory(destination).createConnection();
+        final Connection connection = env.getConnectionFactory(destination).createConnection();
         connection.start();
-        final Connection replyConnection = setup.getConnectionFactory(replyDestination).createConnection();
+        final Connection replyConnection = env.getConnectionFactory(replyDestination).createConnection();
         final Session replySession = replyConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         final MessageProducer producer = replySession.createProducer(replyDestination);
         MessageConsumer consumer = connection.createSession(false, Session.AUTO_ACKNOWLEDGE).createConsumer(destination);

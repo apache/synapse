@@ -22,6 +22,7 @@ package org.apache.synapse.transport.testkit.tests.async;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
@@ -31,11 +32,11 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("AsyncBinary")
-public class BinaryTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,ByteArrayMessage,ByteArrayMessage> {
+public class BinaryTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,ByteArrayMessage,ByteArrayMessage> {
     private static final Random random = new Random();
     
-    public BinaryTestCase(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
-        super(channel, sender, endpointFactory, contentTypeMode, "application/octet-stream", null);
+    public BinaryTestCase(E env, C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
+        super(env, channel, sender, endpointFactory, contentTypeMode, "application/octet-stream", null);
     }
     
     @Override

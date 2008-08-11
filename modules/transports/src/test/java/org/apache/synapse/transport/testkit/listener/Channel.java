@@ -25,12 +25,9 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 
-public interface Channel<T extends ListenerTestSetup> {
-    T getSetup();
-    
-    void buildName(NameBuilder nameBuilder);
-    
+public interface Channel<E extends TestEnvironment> {
     TransportOutDescription createTransportOutDescription() throws Exception;
     
     /**
@@ -56,6 +53,6 @@ public interface Channel<T extends ListenerTestSetup> {
     
     EndpointReference createEndpointReference(String address);
     
-    void setUp() throws Exception;
+    void setUp(E env) throws Exception;
     void tearDown() throws Exception;
 }

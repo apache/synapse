@@ -39,10 +39,6 @@ public class AsyncMessageSenderAdapter<C extends AsyncChannel<?>,M,N> implements
         target.sendMessage(channel, options, converter.convert(options, message));
     }
 
-    public void buildName(NameBuilder nameBuilder) {
-        target.buildName(nameBuilder);
-    }
-
     public void setUp(C channel) throws Exception {
         target.setUp(channel);
     }

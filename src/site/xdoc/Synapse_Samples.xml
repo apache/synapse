@@ -2630,7 +2630,7 @@ Transfer-Encoding: chunked
 <p>To get an idea about the various transport parameters being used in this sample see 
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
 <h2>
-<a name="Sample262" id="Sample262">Sample 262: Switch between FIX versions </a></h2>
+<a name="Sample262" id="Sample262">Sample 262: CBR of FIX messages</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
 	    &lt;sequence name=&quot;CBR_SEQ&quot;&gt;
 		    &lt;in&gt;

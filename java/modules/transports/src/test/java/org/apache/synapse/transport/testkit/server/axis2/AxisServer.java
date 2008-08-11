@@ -34,9 +34,9 @@ import org.apache.axis2.engine.DispatchPhase;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.MessageData;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
@@ -45,8 +45,8 @@ import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class AxisServer<T extends ListenerTestSetup> extends Server<T> implements AsyncEndpointFactory<AsyncChannel<?>,MessageData>, EndpointFactory<RequestResponseChannel<?>> {
-    public static final AxisServer<ListenerTestSetup> DEFAULT = new AxisServer<ListenerTestSetup>(ListenerTestSetup.DEFAULT);
+public class AxisServer<E extends TestEnvironment> extends Server<E> implements AsyncEndpointFactory<E,AsyncChannel<? super E>,MessageData>, EndpointFactory<E,RequestResponseChannel<? super E>> {
+    public static final AxisServer<TestEnvironment> DEFAULT = new AxisServer<TestEnvironment>(TestEnvironment.DEFAULT);
     
     private static Server<?> activeServer;
     
@@ -54,12 +54,12 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
     private TransportListener listener;
     UtilsTransportServer server;
     
-    public AxisServer(T setup) {
+    public AxisServer(E setup) {
         super(setup);
     }
 
     @Override
-    public void start(Channel<?> channel) throws Exception {
+    public void start(E env, Channel<?> channel) throws Exception {
         server = new UtilsTransportServer();
         this.channel = channel;
         
@@ -67,8 +67,6 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
             throw new IllegalStateException();
         }
         activeServer = this;
-        
-        channel.getSetup().setUp();
         
         TransportOutDescription trpOutDesc;
         if (channel instanceof RequestResponseChannel) {
@@ -96,15 +94,12 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
         dispatcher.initDispatcher();
         dispatchPhase.addHandler(dispatcher);
         
-        channel.setUp();
         server.start();
     }
     
     @Override
     public void stop() throws Exception {
         server.stop();
-        channel.tearDown();
-        channel.getSetup().tearDown();
         Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
         server = null;
         activeServer = null;
@@ -121,11 +116,11 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
                             ? endpointReferences[0].getAddress() : null;
     }
     
-    public Server<?> getServer() {
+    public Server<E> getServer() {
         return this;
     }
 
-    public AsyncEndpoint<MessageData> createAsyncEndpoint(AsyncChannel<?> channel, String contentType) throws Exception {
+    public AsyncEndpoint<MessageData> createAsyncEndpoint(E env, AsyncChannel<? super E> channel, String contentType) throws Exception {
         // Set up a test service with a default operation backed by a mock message
         // receiver. The service is configured using the parameters specified by the
         // implementation.
@@ -136,7 +131,7 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
         service.addOperation(operation);
         channel.setupService(service);
         if (contentType != null) {
-            channel.getSetup().setupContentType(service, contentType);
+            env.setupContentType(service, contentType);
         }
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();
         axisConfiguration.addService(service);
@@ -144,7 +139,7 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
         return new AsyncEndpointImpl(this, service, messageReceiver);
     }
     
-    public Endpoint createEchoEndpoint(RequestResponseChannel<?> channel, String contentType) throws Exception {
+    public Endpoint createEchoEndpoint(E env, RequestResponseChannel<? super E> channel, String contentType) throws Exception {
         AxisService service = new AxisService("EchoService");
         AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
         operation.setMessageReceiver(new AbstractInOutMessageReceiver() {
@@ -158,7 +153,7 @@ public class AxisServer<T extends ListenerTestSetup> extends Server<T> implement
         service.addOperation(operation);
         channel.setupService(service);
         if (contentType != null) {
-            channel.getSetup().setupContentType(service, contentType);
+            env.setupContentType(service, contentType);
         }
         
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();

@@ -20,7 +20,6 @@
 package org.apache.synapse.transport.testkit.listener;
 
 public interface MessageSender<C extends Channel<?>> {
-    void buildName(NameBuilder nameBuilder);
     void setUp(C channel) throws Exception;
     void tearDown() throws Exception;
 }

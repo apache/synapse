@@ -19,9 +19,9 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 import org.apache.synapse.transport.testkit.listener.MessageSender;
 import org.apache.synapse.transport.testkit.listener.NameBuilder;
 import org.apache.synapse.transport.testkit.name.NameComponent;
@@ -30,16 +30,18 @@ import org.apache.synapse.transport.testkit.server.Server;
 
 import junit.framework.TestCase;
 
-public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSender<? super C>> extends TestCase {
+public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,S extends MessageSender<? super C>> extends TestCase {
+    protected final E env;
     protected final C channel;
     protected final S sender;
-    private final Server<?> server;
+    private final Server<? super E> server;
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
     
     private boolean manageServer = true;
 
-    public TransportTestCase(C channel, S sender, Server<?> server, ContentTypeMode contentTypeMode, String contentType) {
+    public TransportTestCase(E env, C channel, S sender, Server<? super E> server, ContentTypeMode contentTypeMode, String contentType) {
+        this.env = env;
         this.channel = channel;
         this.sender = sender;
         this.server = server;
@@ -54,8 +56,6 @@ public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSe
             NameBuilder nameBuilder = new NameBuilder();
             nameBuilder.addComponent("test", NameUtils.getName(this));
             NameUtils.getNameComponents(nameBuilder, this);
-            channel.buildName(nameBuilder);
-            buildName(nameBuilder);
             nameBuilder.addComponent("contentTypeMode", contentTypeMode.toString().toLowerCase());
             testName = nameBuilder.toString();
             setName(testName);
@@ -63,10 +63,6 @@ public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSe
         return testName;
     }
 
-    protected void buildName(NameBuilder name) {
-        sender.buildName(name);
-    }
-    
     @NameComponent("channel")
     public C getChannel() {
         return channel;
@@ -77,8 +73,9 @@ public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSe
         return sender;
     }
 
-    public ListenerTestSetup getSetup() {
-        return channel.getSetup();
+    @NameComponent("setup")
+    public E getSetup() {
+        return env;
     }
     
 //    public void setServer(ListenerTestServer server){
@@ -88,8 +85,12 @@ public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSe
     
     @Override
     protected void setUp() throws Exception {
+        if (env != null) {
+            env.setUp();
+        }
+        channel.setUp(env);
         if (server != null && manageServer) {
-            server.start(channel);
+            server.start(env, channel);
         }
         sender.setUp(channel);
     }
@@ -99,6 +100,10 @@ public abstract class TransportTestCase<C extends Channel<?>,S extends MessageSe
         sender.tearDown();
         if (server != null && manageServer) {
             server.stop();
+        }
+        channel.tearDown();
+        if (env != null) {
+            env.tearDown();
         }
     }
 }

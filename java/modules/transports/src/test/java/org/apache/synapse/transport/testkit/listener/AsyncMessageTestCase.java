@@ -19,23 +19,24 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
-public abstract class AsyncMessageTestCase<C extends AsyncChannel<?>,M,N> extends TransportTestCase<C,AsyncMessageSender<? super C,M>> {
+public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> extends TransportTestCase<E,C,AsyncMessageSender<? super C,M>> {
     private final String charset;
-    private final AsyncEndpointFactory<? super C,N> endpointFactory;
+    private final AsyncEndpointFactory<? super E,? super C,N> endpointFactory;
     
-    public AsyncMessageTestCase(C channel, AsyncMessageSender<? super C,M> sender, AsyncEndpointFactory<? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
-        super(channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
+    public AsyncMessageTestCase(E env, C channel, AsyncMessageSender<? super C,M> sender, AsyncEndpointFactory<? super E,? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
+        super(env, channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.charset = charset;
     }
 
     @Override
     protected void runTest() throws Throwable {
-        AsyncEndpoint<N> endpoint = endpointFactory.createAsyncEndpoint(channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
+        AsyncEndpoint<N> endpoint = endpointFactory.createAsyncEndpoint(env, channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         
         M message = prepareMessage();
         

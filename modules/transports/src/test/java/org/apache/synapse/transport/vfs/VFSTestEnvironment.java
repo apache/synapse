@@ -20,9 +20,9 @@
 package org.apache.synapse.transport.vfs;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 
-public class VFSTestSetup extends ListenerTestSetup {
+public class VFSTestEnvironment extends TestEnvironment {
     @Override
     public void setupContentType(AxisService service, String contentType) throws Exception {
         service.addParameter("transport.vfs.ContentType", contentType);

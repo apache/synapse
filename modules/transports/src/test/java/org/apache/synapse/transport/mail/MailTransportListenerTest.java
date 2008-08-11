@@ -27,16 +27,17 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() {
-        ListenerTestSuite suite = new ListenerTestSuite();
+        TransportTestSuite<TestEnvironment> suite = new TransportTestSuite<TestEnvironment>();
         MailChannel channel = new MailChannel("test-account@localhost");
         List<MailSender> senders = new LinkedList<MailSender>();
         senders.add(new MimeSender());
@@ -44,11 +45,11 @@ public class MailTransportListenerTest extends TestCase {
         for (MailSender sender : senders) {
             AsyncMessageSender<MailChannel,XMLMessage> xmlSender = adapt(sender, MessageConverter.XML_TO_BYTE);
             // TODO: SOAP 1.2 tests don't work yet for mail transport
-            suite.addSOAP11Test(channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, ListenerTestSuite.ASCII_TEST_DATA);
-            suite.addSOAP11Test(channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, ListenerTestSuite.UTF8_TEST_DATA);
+            suite.addSOAP11Test(null, channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, TransportTestSuite.ASCII_TEST_DATA);
+            suite.addSOAP11Test(null, channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, TransportTestSuite.UTF8_TEST_DATA);
             // TODO: this test fails when using multipart
             if (sender instanceof MimeSender) {
-                suite.addSOAP11Test(channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, ListenerTestSuite.LATIN1_TEST_DATA);
+                suite.addSOAP11Test(null, channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, TransportTestSuite.LATIN1_TEST_DATA);
             }
             // addSOAPTests(strategy, suite);
             // TODO: POX tests don't work yet for mail transport

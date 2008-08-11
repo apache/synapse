@@ -42,31 +42,31 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.NameComponent;
-import org.apache.synapse.transport.testkit.server.Server;
 import org.mockejb.jndi.MockContextFactory;
 
-public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
+public abstract class JMSChannel extends AbstractChannel<JMSTestEnvironment> {
     private static final OMFactory factory = OMAbstractFactory.getOMFactory();
     
     private final String destinationType;
+    protected JMSTestEnvironment env;
     private String destinationName;
     private Destination destination;
     
-    public JMSChannel(Server<JMSListenerSetup> server, String destinationType) {
-        super(server);
+    public JMSChannel(String destinationType) {
         this.destinationType = destinationType;
     }
     
     @Override
-    public void setUp() throws Exception {
+    public void setUp(JMSTestEnvironment env) throws Exception {
+        this.env = env;
         destinationName = "request" + destinationType;
-        destination = getSetup().createDestination(destinationType, destinationName);
-        getSetup().getContext().bind(destinationName, destination);
+        destination = env.createDestination(destinationType, destinationName);
+        env.getContext().bind(destinationName, destination);
     }
 
     @Override
     public void tearDown() throws Exception {
-        getSetup().getContext().unbind(destinationName);
+        env.getContext().unbind(destinationName);
         destinationName = null;
         destination = null;
     }
@@ -104,8 +104,8 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
     }
     
     private void setupTransport(ParameterInclude trpDesc) throws AxisFault {
-        setupConnectionFactoryConfig(trpDesc, "queue", JMSListenerSetup.QUEUE_CONNECTION_FACTORY, "queue");
-        setupConnectionFactoryConfig(trpDesc, "topic", JMSListenerSetup.TOPIC_CONNECTION_FACTORY, "topic");
+        setupConnectionFactoryConfig(trpDesc, "queue", JMSTestEnvironment.QUEUE_CONNECTION_FACTORY, "queue");
+        setupConnectionFactoryConfig(trpDesc, "topic", JMSTestEnvironment.TOPIC_CONNECTION_FACTORY, "topic");
     }
     
     public TransportInDescription createTransportInDescription() throws Exception {
@@ -132,10 +132,10 @@ public abstract class JMSChannel extends AbstractChannel<JMSListenerSetup> {
 
     public Session createSession() throws JMSException {
         if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
-            TopicConnection connection = getSetup().getTopicConnectionFactory().createTopicConnection();
+            TopicConnection connection = env.getTopicConnectionFactory().createTopicConnection();
             return connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         } else {
-            QueueConnection connection = getSetup().getQueueConnectionFactory().createQueueConnection();
+            QueueConnection connection = env.getQueueConnectionFactory().createQueueConnection();
             return connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         }
     }

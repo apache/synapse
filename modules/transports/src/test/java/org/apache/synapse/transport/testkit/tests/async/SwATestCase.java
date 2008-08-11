@@ -38,6 +38,7 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
@@ -48,14 +49,14 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("AsyncSwA")
-public class SwATestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,ByteArrayMessage,MessageData> {
+public class SwATestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,ByteArrayMessage,MessageData> {
     private static final Random random = new Random();
     
     private byte[] attachmentContent;
     private String contentID;
     
-    public SwATestCase(C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory) {
-        super(channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
+    public SwATestCase(E env, C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+        super(env, channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
     }
     
     @Override

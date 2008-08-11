@@ -20,9 +20,6 @@
 package org.apache.synapse.transport.testkit.listener;
 
 public abstract class AbstractMessageSender<C extends Channel<?>> implements MessageSender<C> {
-    public void buildName(NameBuilder nameBuilder) {
-    }
-    
     public void setUp(C channel) throws Exception {
     }
     

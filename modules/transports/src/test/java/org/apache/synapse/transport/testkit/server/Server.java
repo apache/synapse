@@ -19,10 +19,10 @@
 
 package org.apache.synapse.transport.testkit.server;
 
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
 
-public abstract class Server<T extends ListenerTestSetup> {
+public abstract class Server<T extends TestEnvironment> {
     private final T setup;
     
     public Server(T setup) {
@@ -45,6 +45,6 @@ public abstract class Server<T extends ListenerTestSetup> {
         return setup;
     }
 
-    public abstract void start(Channel<?> channel) throws Exception;
+    public abstract void start(T env, Channel<?> channel) throws Exception;
     public abstract void stop() throws Exception;
 }

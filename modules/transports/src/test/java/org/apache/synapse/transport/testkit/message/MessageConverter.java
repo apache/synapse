@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.testkit.message;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
 
 import javax.activation.DataHandler;
 import javax.mail.internet.ContentType;
@@ -73,6 +74,18 @@ public interface MessageConverter<T,U> {
             outputFormat.setIgnoreXMLDeclaration(true);
             message.getXmlMessageType().getMessage(message.getPayload()).serializeAndConsume(baos, outputFormat);
             return new ByteArrayMessage(message.getContentType(), baos.toByteArray());
+        }
+    };
+    
+    MessageConverter<XMLMessage,StringMessage> XML_TO_STRING =
+        new MessageConverter<XMLMessage,StringMessage>() {
+
+        public StringMessage convert(SenderOptions options, XMLMessage message) throws Exception {
+            OMOutputFormat format = new OMOutputFormat();
+            format.setIgnoreXMLDeclaration(true);
+            StringWriter sw = new StringWriter();
+            message.getXmlMessageType().getMessage(message.getPayload()).serializeAndConsume(sw, format);
+            return new StringMessage(message.getContentType(), sw.toString());
         }
     };
     

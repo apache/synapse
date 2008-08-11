@@ -31,7 +31,7 @@ public class AdapterUtils {
         return new AsyncMessageSenderAdapter<C,M,N>(parent, converter);
     }
 
-    public static <C extends AsyncChannel<?>,M,N> AsyncEndpointFactory<C,M> adapt(AsyncEndpointFactory<C,N> targetFactory, MessageConverter<N,M> converter) {
-        return new AsyncEndpointFactoryAdapter<C,M,N>(targetFactory, converter);
+    public static <E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> AsyncEndpointFactory<E,C,M> adapt(AsyncEndpointFactory<E,C,N> targetFactory, MessageConverter<N,M> converter) {
+        return new AsyncEndpointFactoryAdapter<E,C,M,N>(targetFactory, converter);
     }
 }

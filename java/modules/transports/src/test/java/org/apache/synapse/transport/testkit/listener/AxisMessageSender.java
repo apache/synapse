@@ -78,10 +78,14 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
         OperationClient mepClient = serviceClient.createClient(operationQName);
         MessageContext mc = xmlMessageType.createMessageContext(payload);
         channel.setupRequestMessageContext(mc);
+        setupRequestMessageContext(mc);
         mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charset);
         mc.setServiceContext(serviceClient.getServiceContext());
         mepClient.addMessageContext(mc);
         
         return mepClient;
+    }
+    
+    protected void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
     }
 }

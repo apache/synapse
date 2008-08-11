@@ -19,5 +19,7 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-public interface RequestResponseChannel<T extends ListenerTestSetup> extends Channel<T> {
+import org.apache.synapse.transport.testkit.TestEnvironment;
+
+public interface RequestResponseChannel<T extends TestEnvironment> extends Channel<T> {
 }

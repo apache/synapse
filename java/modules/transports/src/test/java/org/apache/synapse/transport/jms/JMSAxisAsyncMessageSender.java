@@ -17,31 +17,30 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.jms;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
+import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 
-public class MessageTestData {
-    private final String name;
-    private final String text;
-    private final String charset;
+@DisplayName("axis")
+public class JMSAxisAsyncMessageSender extends AxisAsyncMessageSender {
+    private final String jmsMessageType;
     
-    public MessageTestData(String name, String text, String charset) {
-        this.name = name;
-        this.text = text;
-        this.charset = charset;
-    }
-    
-    @NameComponent("data")
-    public String getName() {
-        return name;
+    public JMSAxisAsyncMessageSender(String jmsMessageType) {
+        this.jmsMessageType = jmsMessageType;
     }
 
-    public String getText() {
-        return text;
+    @NameComponent(JMSConstants.JMS_MESSAGE_TYPE)
+    public String getJmsMessageType() {
+        return jmsMessageType;
     }
 
-    public String getCharset() {
-        return charset;
+    @Override
+    protected void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
+        super.setupRequestMessageContext(msgContext);
+        msgContext.setProperty(JMSConstants.JMS_MESSAGE_TYPE, jmsMessageType);
     }
 }

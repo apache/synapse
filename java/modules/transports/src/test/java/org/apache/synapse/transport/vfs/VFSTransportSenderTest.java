@@ -26,45 +26,41 @@ import java.io.File;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSuite;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.server.DummyServer;
 import org.apache.synapse.transport.testkit.server.Server;
 
 public class VFSTransportSenderTest extends TestCase {
     public static TestSuite suite() {
-        // TODO: ListenerTestSuite is inappropriate!
-        ListenerTestSuite suite = new ListenerTestSuite();
+        TransportTestSuite<VFSTestEnvironment> suite = new TransportTestSuite<VFSTestEnvironment>();
         
-        VFSTestSetup setup = new VFSTestSetup();
+        VFSTestEnvironment env = new VFSTestEnvironment();
         
-        final Server<VFSTestSetup> server = new DummyServer<VFSTestSetup>(setup);
-        
-        AsyncEndpointFactory<VFSFileChannel,ByteArrayMessage> endpointFactory =
-            new AsyncEndpointFactory<VFSFileChannel,ByteArrayMessage>() {
+        AsyncEndpointFactory<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage> endpointFactory =
+            new AsyncEndpointFactory<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage>() {
 
-            public Server<?> getServer() {
-                return server;
+            public Server<VFSTestEnvironment> getServer() {
+                return null;
             }
             
             public AsyncEndpoint<ByteArrayMessage> createAsyncEndpoint(
-                    VFSFileChannel channel, String contentType)
+                    VFSTestEnvironment env, VFSFileChannel channel, String contentType)
                     throws Exception {
                 
                 return new VFSMockAsyncEndpoint(channel, contentType);
             }
         };
         
-        VFSFileChannel channel = new VFSFileChannel(server, new File("target/vfs3/req/in").getAbsoluteFile());
+        VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
         AxisAsyncMessageSender sender = new AxisAsyncMessageSender();
         
-        suite.addBinaryTest(channel, adapt(sender, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);
-        suite.addTextPlainTests(channel, adapt(sender, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE);
+        suite.addBinaryTest(env, channel, adapt(sender, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(env, channel, adapt(sender, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE);
         
         return suite;
     }

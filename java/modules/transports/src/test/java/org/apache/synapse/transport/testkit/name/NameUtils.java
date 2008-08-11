@@ -43,21 +43,24 @@ public class NameUtils {
             if (ann != null) {
                 Object component;
                 try {
+                    method.setAccessible(true);
                     component = method.invoke(object);
                 } catch (Throwable ex) {
-                    throw new Error(ex);
+                    throw new Error("Error invoking " + method, ex);
                 }
-                while (component instanceof Adapter) {
-                    component = ((Adapter)component).getTarget();
-                }
-                if (component instanceof String) {
-                    nameBuilder.addComponent(ann.value(), (String)component);
-                } else {
-                    DisplayName displayName = component.getClass().getAnnotation(DisplayName.class);
-                    if (displayName != null) {
-                        nameBuilder.addComponent(ann.value(), displayName.value());
+                if (component != null) {
+                    while (component instanceof Adapter) {
+                        component = ((Adapter)component).getTarget();
                     }
-                    getNameComponents(nameBuilder, component);
+                    if (component instanceof String) {
+                        nameBuilder.addComponent(ann.value(), (String)component);
+                    } else {
+                        DisplayName displayName = component.getClass().getAnnotation(DisplayName.class);
+                        if (displayName != null) {
+                            nameBuilder.addComponent(ann.value(), displayName.value());
+                        }
+                        getNameComponents(nameBuilder, component);
+                    }
                 }
             }
         }

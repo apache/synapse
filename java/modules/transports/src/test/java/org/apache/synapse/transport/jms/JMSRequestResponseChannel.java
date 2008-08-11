@@ -26,30 +26,29 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.name.NameComponent;
-import org.apache.synapse.transport.testkit.server.Server;
 
-public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel<JMSListenerSetup> {
+public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel<JMSTestEnvironment> {
     private final String replyDestinationType;
     private String replyDestinationName;
     private Destination replyDestination;
     
-    public JMSRequestResponseChannel(Server<JMSListenerSetup> server, String destinationType, String replyDestinationType) {
-        super(server, destinationType);
+    public JMSRequestResponseChannel(String destinationType, String replyDestinationType) {
+        super(destinationType);
         this.replyDestinationType = replyDestinationType;
     }
     
     @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp(JMSTestEnvironment env) throws Exception {
+        super.setUp(env);
         replyDestinationName = "response" + replyDestinationType;
-        replyDestination = getSetup().createDestination(replyDestinationType, replyDestinationName);
-        getSetup().getContext().bind(replyDestinationName, replyDestination);
+        replyDestination = env.createDestination(replyDestinationType, replyDestinationName);
+        env.getContext().bind(replyDestinationName, replyDestination);
     }
 
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        getSetup().getContext().unbind(replyDestinationName);
+        env.getContext().unbind(replyDestinationName);
         replyDestinationName = null;
         replyDestination = null;
     }

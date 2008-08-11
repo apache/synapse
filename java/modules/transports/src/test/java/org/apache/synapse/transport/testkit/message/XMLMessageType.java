@@ -30,15 +30,23 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 
 public interface XMLMessageType {
     class SOAP implements XMLMessageType {
+        private final String name;
         private final SOAPFactory factory;
         private final String messageType;
 
-        public SOAP(SOAPFactory factory, String messageType) {
+        public SOAP(String name, SOAPFactory factory, String messageType) {
+            this.name = name;
             this.factory = factory;
             this.messageType = messageType;
+        }
+        
+        @NameComponent("messageType")
+        public String getName() {
+            return name;
         }
 
         public OMFactory getOMFactory() {
@@ -61,11 +69,16 @@ public interface XMLMessageType {
         }
     }
     
-    XMLMessageType SOAP11 = new SOAP(OMAbstractFactory.getSOAP11Factory(), SOAP11Constants.SOAP_11_CONTENT_TYPE);
-    XMLMessageType SOAP12 = new SOAP(OMAbstractFactory.getSOAP12Factory(), SOAP12Constants.SOAP_12_CONTENT_TYPE);
+    XMLMessageType SOAP11 = new SOAP("SOAP11", OMAbstractFactory.getSOAP11Factory(), SOAP11Constants.SOAP_11_CONTENT_TYPE);
+    XMLMessageType SOAP12 = new SOAP("SOAP12", OMAbstractFactory.getSOAP12Factory(), SOAP12Constants.SOAP_12_CONTENT_TYPE);
     
     XMLMessageType POX = new XMLMessageType() {
         private final OMFactory factory = OMAbstractFactory.getOMFactory();
+
+        @NameComponent("messageType")
+        public String getName() {
+            return "POX";
+        }
 
         public OMFactory getOMFactory() {
             return factory;

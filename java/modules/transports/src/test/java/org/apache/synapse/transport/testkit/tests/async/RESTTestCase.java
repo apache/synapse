@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.testkit.tests.async;
 
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
@@ -29,9 +30,9 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("REST")
-public class RESTTestCase<C extends AsyncChannel<?>> extends AsyncMessageTestCase<C,RESTMessage,MessageData> {
-    public RESTTestCase(C channel, AsyncMessageSender<? super C,RESTMessage> sender, AsyncEndpointFactory<? super C,MessageData> endpointFactory) {
-        super(channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
+public class RESTTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,RESTMessage,MessageData> {
+    public RESTTestCase(E env, C channel, AsyncMessageSender<? super C,RESTMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+        super(env, channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
     }
     
     @Override

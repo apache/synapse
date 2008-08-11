@@ -29,10 +29,10 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.ListenerTestSetup;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.mockejb.jndi.MockContextFactory;
 
-public abstract class JMSListenerSetup extends ListenerTestSetup {
+public abstract class JMSTestEnvironment extends TestEnvironment {
     public static final String QUEUE_CONNECTION_FACTORY = "QueueConnectionFactory";
     public static final String TOPIC_CONNECTION_FACTORY = "TopicConnectionFactory";
     

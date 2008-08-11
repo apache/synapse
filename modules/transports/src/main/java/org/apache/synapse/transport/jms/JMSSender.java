@@ -162,7 +162,7 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                         }
 
                     } catch (JMSException e) {
-                        handleException("Error creating a connection/session for : " + targetAddress);
+                        handleException("Error creating a connection/session for : " + targetAddress, e);
                     }
                 }
                 destination = jmsOut.getDestination();

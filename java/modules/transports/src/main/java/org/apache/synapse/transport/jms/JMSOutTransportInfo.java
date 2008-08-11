@@ -146,7 +146,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
                 handleException("Connection Factory JNDI name cannot be determined");
             }
         } catch (NamingException e) {
-            handleException("Connection Factory JNDI name cannot be determined");
+            handleException("Failed to look up connection factory from JNDI", e);
         }
         return null;
     }

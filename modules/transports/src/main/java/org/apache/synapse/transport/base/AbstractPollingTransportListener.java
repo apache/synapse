@@ -18,8 +18,10 @@
 */
 package org.apache.synapse.transport.base;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.AxisFault;
 
 import java.util.TimerTask;
@@ -36,14 +38,29 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
 
     /** default interval in ms before polls */
     protected int pollInterval = DEFAULT_POLL_INTERVAL;
-    /** The main timer that runs as a daemon thread */
-    protected final Timer timer = new Timer("PollTimer", true);
+    /** The main timer. */
+    protected Timer timer;
     /** is a poll already executing? */
     protected boolean pollInProgress = false;
     /** a lock to prevent concurrent execution of polling */
     protected final Object pollLock = new Object();
     /** a map that keeps track of services to the timer tasks created for them */
     protected Map serviceToTimerTaskMap = new HashMap();
+
+    @Override
+    public void init(ConfigurationContext cfgCtx,
+            TransportInDescription transportIn) throws AxisFault {
+        
+        timer = new Timer("PollTimer");
+        super.init(cfgCtx, transportIn);
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        timer.cancel();
+        timer = null;
+    }
 
     /**
      * Schedule a repeated poll at the specified interval for the given service

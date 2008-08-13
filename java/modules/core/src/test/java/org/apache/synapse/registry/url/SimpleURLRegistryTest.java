@@ -20,22 +20,41 @@
 package org.apache.synapse.registry.url;
 
 import junit.framework.TestCase;
+
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNode;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.registry.Registry;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.Properties;
 
 public class SimpleURLRegistryTest extends TestCase {
 
     private static final String FILE = "target/text.xml";
+    private static final String FILE2 = "target/large_file.xml";
     private static final String TEXT_1 = "<text1 />";
     private static final String TEXT_2 = "<text2 />";
 
     public void setUp() throws Exception {
         writeToFile(TEXT_1);
+        
+        OMFactory factory = OMAbstractFactory.getOMFactory();
+        OMElement root = factory.createOMElement("root", null);
+        for (int i=0; i<1000; i++) {
+            OMElement child = factory.createOMElement("child", null);
+            child.setText("some text");
+            root.addChild(child);
+        }
+        FileOutputStream out = new FileOutputStream(FILE2);
+        root.serialize(out);
+        out.close();
     }
 
     public void testRegistry() throws Exception {
@@ -83,9 +102,21 @@ public class SimpleURLRegistryTest extends TestCase {
         Thread.sleep(500);
         assertEquals(TEXT_1, reg.getResource(prop).toString());
     }
+    
+    public void testLargeFile() throws Exception {
+        Registry reg = new SimpleURLRegistry();
+        Properties props = new Properties();
+        props.put("root", "file:./");
+        props.put("cachableDuration", "1500");
+        reg.init(props);
+        
+        OMNode node = reg.lookup(FILE2);
+        node.serialize(new NullOutputStream());
+    }
 
     public void tearDown() throws Exception {
         new File(FILE).delete();
+        new File(FILE2).delete();
     }
 
     private void writeToFile(String content) throws Exception {

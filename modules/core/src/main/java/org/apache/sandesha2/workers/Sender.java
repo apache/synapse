@@ -178,13 +178,13 @@ public class Sender extends SandeshaThread {
 				}
 
 			} else {
-				RMDBean matcher = new RMDBean();
-				matcher.setSequenceID(sequenceId);
-				matcher.setTerminated(false);
-				RMDBean rmd = storageManager.getRMDBeanMgr().findUnique(matcher);
+				RMDBean rmd = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 				if (rmd != null) {
-					found = true;
-					rmVersion = rmd.getRMVersion();
+					if (!rmd.isTerminated()) {
+						found = true;
+						rmVersion = rmd.getRMVersion();
+					}
+
 				}
 			}
 			if (!found) {

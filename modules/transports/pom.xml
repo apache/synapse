@@ -107,6 +107,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             !org.apache.commons.io.*,
+                            !org.apache.synapse.*,
                             javax.xml.namespace; version=0.0.0,
                             javax.activation,
                             javax.jms,

@@ -141,7 +141,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
 
             String conFacJndiName = props.get(JMSConstants.CONFAC_JNDI_NAME_PARAM);
             if (conFacJndiName != null) {
-                return (ConnectionFactory) context.lookup(conFacJndiName);
+                return JMSUtils.lookup(context, ConnectionFactory.class, conFacJndiName);
             } else {
                 handleException("Connection Factory JNDI name cannot be determined");
             }
@@ -161,7 +161,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     private Destination getDestination(Context context, String url) {
         String destinationName = JMSUtils.getDestination(url);
         try {
-            return (Destination) context.lookup(destinationName);
+            return JMSUtils.lookup(context, Destination.class, destinationName);
         } catch (NameNotFoundException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Cannot locate destination : " + destinationName + " using " + url);
@@ -185,7 +185,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             return null;
         }
         try {
-            return (Destination) context.lookup(replyDestinationName);
+            return JMSUtils.lookup(context, Destination.class, replyDestinationName);
         } catch (NameNotFoundException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Cannot locate destination : " + replyDestinationName + " using " + url);
@@ -203,7 +203,8 @@ public class JMSOutTransportInfo implements OutTransportInfo {
      */
     public Destination getReplyDestination(String replyDest) {
         try {
-            return (Destination) jmsConnectionFactory.getContext().lookup(replyDest);
+            return JMSUtils.lookup(jmsConnectionFactory.getContext(), Destination.class,
+                    replyDest);
         } catch (NameNotFoundException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Cannot locate reply destination : " + replyDest, e);

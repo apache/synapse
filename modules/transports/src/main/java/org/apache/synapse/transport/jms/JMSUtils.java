@@ -30,6 +30,9 @@ import org.apache.synapse.transport.base.BaseUtils;
 import javax.jms.*;
 import javax.jms.Queue;
 import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.Reference;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -826,5 +829,28 @@ public class JMSUtils extends BaseUtils {
             }
         } catch (JMSException ignore) {}
         return length;
+    }
+    
+    public static <T> T lookup(Context context, Class<T> clazz, String name)
+        throws NamingException {
+        
+        Object object = context.lookup(name);
+        try {
+            return clazz.cast(object);
+        } catch (ClassCastException ex) {
+            // Instead of a ClassCastException, throw an exception with some
+            // more information.
+            if (object instanceof Reference) {
+                Reference ref = (Reference)object;
+                handleException("JNDI failed to de-reference Reference with name " +
+                        name + "; is the factory " + ref.getFactoryClassName() +
+                        " in your classpath?");
+                return null;
+            } else {
+                handleException("JNDI lookup of name " + name + " returned a " +
+                        object.getClass().getName() + " while a " + clazz + " was expected");
+                return null;
+            }
+        }
     }
 }

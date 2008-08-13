@@ -213,7 +213,7 @@ public class JMSConnectionFactory implements ExceptionListener {
 
         // get the CF reference freshly [again] from JNDI
         context = new InitialContext(jndiProperties);
-        conFactory = (ConnectionFactory) context.lookup(connFactoryJNDIName);
+        conFactory = JMSUtils.lookup(context, ConnectionFactory.class, connFactoryJNDIName);
         log.info("Connected to the JMS connection factory : " + connFactoryJNDIName);
 
         try {
@@ -311,7 +311,7 @@ public class JMSConnectionFactory implements ExceptionListener {
             Destination destination = null;
 
             try {
-                destination = (Destination) context.lookup(destinationJNDIname);
+                destination = JMSUtils.lookup(context, Destination.class, destinationJNDIname);
 
             } catch (NameNotFoundException e) {
                 log.warn("Cannot find destination : " + destinationJNDIname + ". Creating a Queue");
@@ -406,18 +406,18 @@ public class JMSConnectionFactory implements ExceptionListener {
         Destination destination = null;
 
         try {
-            destination = (Destination) context.lookup(destinationJndi);
+            destination = JMSUtils.lookup(context, Destination.class, destinationJndi);
         } catch (NamingException e) {
 
             // if we are using ActiveMQ, check for dynamic Queues and Topics
             String provider = jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY);
             if (provider.indexOf("activemq") != -1) {
                 try {
-                    destination = (Destination) context.lookup(
+                    destination = JMSUtils.lookup(context, Destination.class,
                         JMSConstants.ACTIVEMQ_DYNAMIC_QUEUE + destinationJndi);
                 } catch (NamingException ne) {
                     try {
-                        destination = (Destination) context.lookup(
+                        destination = JMSUtils.lookup(context, Destination.class,
                             JMSConstants.ACTIVEMQ_DYNAMIC_TOPIC + destinationJndi);
                     } catch (NamingException e1) {
                         log.warn("Error looking up destination for JNDI name : " + destinationJndi);
@@ -540,7 +540,7 @@ public class JMSConnectionFactory implements ExceptionListener {
 
     public Destination getDestination(String destinationJNDIName) {
         try {
-            return (Destination) context.lookup(destinationJNDIName);
+            return JMSUtils.lookup(context, Destination.class, destinationJNDIName);
         } catch (NamingException ignore) {}
         return null;
     }

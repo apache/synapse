@@ -36,13 +36,13 @@ import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
 @DisplayName("EchoXML")
-public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C extends RequestResponseChannel<? super E>> extends TransportTestCase<E,C,XMLRequestResponseMessageSender<? super C>> {
+public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C extends RequestResponseChannel<? super E>> extends TransportTestCase<E,C,XMLRequestResponseMessageSender<? super E,? super C>> {
     private final EndpointFactory<? super E,? super C> endpointFactory;
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
     // TODO: realign order of arguments with XMLAsyncMessageTestCase constructor
-    public XMLRequestResponseMessageTestCase(E env, C channel, XMLRequestResponseMessageSender<? super C> sender, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
+    public XMLRequestResponseMessageTestCase(E env, C channel, XMLRequestResponseMessageSender<? super E,? super C> sender, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
         super(env, channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.xmlMessageType = xmlMessageType;

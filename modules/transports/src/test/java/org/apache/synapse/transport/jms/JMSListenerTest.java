@@ -45,7 +45,7 @@ public class JMSListenerTest extends TestCase {
         AxisServer<JMSTestEnvironment> server = new AxisServer<JMSTestEnvironment>(env);
         JMSBytesMessageSender bytesMessageSender = new JMSBytesMessageSender();
         JMSTextMessageSender textMessageSender = new JMSTextMessageSender();
-        List<AsyncMessageSender<? super JMSAsyncChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super JMSAsyncChannel,XMLMessage>>();
+        List<AsyncMessageSender<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage>>();
         senders.add(adapt(bytesMessageSender, MessageConverter.XML_TO_BYTE));
         senders.add(adapt(textMessageSender, MessageConverter.XML_TO_STRING));
         senders.add(new AxisAsyncMessageSender());
@@ -56,7 +56,7 @@ public class JMSListenerTest extends TestCase {
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
             JMSAsyncChannel channel = new JMSAsyncChannel(destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {
-                for (AsyncMessageSender<? super JMSAsyncChannel,XMLMessage> sender : senders) {
+                for (AsyncMessageSender<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage> sender : senders) {
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {
                         suite.addSOAPTests(env, channel, sender, server, contentTypeMode);
                         suite.addPOXTests(env, channel, sender, server, contentTypeMode);

@@ -30,7 +30,7 @@ import org.apache.synapse.transport.testkit.server.Server;
 
 import junit.framework.TestCase;
 
-public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,S extends MessageSender<? super C>> extends TestCase {
+public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,S extends MessageSender<? super E,? super C>> extends TestCase {
     protected final E env;
     protected final C channel;
     protected final S sender;
@@ -73,8 +73,8 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
         return sender;
     }
 
-    @NameComponent("setup")
-    public E getSetup() {
+    @NameComponent("env")
+    public E getEnvironment() {
         return env;
     }
     
@@ -92,7 +92,7 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
         if (server != null && manageServer) {
             server.start(env, channel);
         }
-        sender.setUp(channel);
+        sender.setUp(env, channel);
     }
 
     @Override

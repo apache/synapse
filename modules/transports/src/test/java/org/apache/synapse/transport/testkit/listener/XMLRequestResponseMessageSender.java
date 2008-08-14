@@ -20,8 +20,9 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
-public interface XMLRequestResponseMessageSender<C extends RequestResponseChannel<?>> extends MessageSender<C> {
+public interface XMLRequestResponseMessageSender<E extends TestEnvironment,C extends RequestResponseChannel<?>> extends MessageSender<E,C> {
     OMElement sendMessage(C channel, String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
 }

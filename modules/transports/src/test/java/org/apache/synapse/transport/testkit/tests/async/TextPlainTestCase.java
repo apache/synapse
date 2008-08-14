@@ -34,7 +34,7 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 public class TextPlainTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,StringMessage,StringMessage> {
     private final MessageTestData data;
     
-    public TextPlainTestCase(E env, C channel, AsyncMessageSender<? super C,StringMessage> sender, AsyncEndpointFactory<? super E,? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+    public TextPlainTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,StringMessage> sender, AsyncEndpointFactory<? super E,? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
         super(env, channel, sender, endpointFactory, contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset());
         this.data = data;
     }

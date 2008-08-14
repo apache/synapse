@@ -41,10 +41,10 @@ public class HttpCoreNIOListenerTest extends TestCase {
         TransportTestSuite<TestEnvironment> suite = new TransportTestSuite<TestEnvironment>();
         HttpChannel channel = new HttpChannel();
         JavaNetSender javaNetSender = new JavaNetSender();
-        List<AsyncMessageSender<? super HttpChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super HttpChannel,XMLMessage>>();
+        List<AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage>>();
         senders.add(adapt(javaNetSender, MessageConverter.XML_TO_BYTE));
         senders.add(new AxisAsyncMessageSender());
-        for (AsyncMessageSender<? super HttpChannel,XMLMessage> sender : senders) {
+        for (AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage> sender : senders) {
             suite.addSOAPTests(null, channel, sender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT);
             suite.addPOXTests(null, channel, sender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT);
         }

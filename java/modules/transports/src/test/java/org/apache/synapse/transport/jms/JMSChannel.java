@@ -20,14 +20,6 @@
 package org.apache.synapse.transport.jms;
 
 import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.QueueConnection;
-import javax.jms.QueueSession;
-import javax.jms.Session;
-import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.xml.namespace.QName;
 
@@ -128,23 +120,5 @@ public abstract class JMSChannel extends AbstractChannel<JMSTestEnvironment> {
         service.addParameter(JMSConstants.CONFAC_PARAM, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM_TYPE, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM, destinationName);
-    }
-
-    public Session createSession() throws JMSException {
-        if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
-            TopicConnection connection = env.getTopicConnectionFactory().createTopicConnection();
-            return connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-        } else {
-            QueueConnection connection = env.getQueueConnectionFactory().createQueueConnection();
-            return connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-        }
-    }
-
-    public void send(Session session, Message message) throws JMSException {
-        if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
-            ((TopicSession)session).createPublisher((Topic)destination).send(message);
-        } else {
-            ((QueueSession)session).createProducer(destination).send(message);
-        }
     }
 }

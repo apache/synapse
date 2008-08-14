@@ -31,7 +31,7 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("REST")
 public class RESTTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,RESTMessage,MessageData> {
-    public RESTTestCase(E env, C channel, AsyncMessageSender<? super C,RESTMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+    public RESTTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,RESTMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
         super(env, channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
     }
     

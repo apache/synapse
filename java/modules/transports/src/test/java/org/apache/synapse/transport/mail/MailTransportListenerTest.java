@@ -43,7 +43,7 @@ public class MailTransportListenerTest extends TestCase {
         senders.add(new MimeSender());
         senders.add(new MultipartSender());
         for (MailSender sender : senders) {
-            AsyncMessageSender<MailChannel,XMLMessage> xmlSender = adapt(sender, MessageConverter.XML_TO_BYTE);
+            AsyncMessageSender<TestEnvironment,MailChannel,XMLMessage> xmlSender = adapt(sender, MessageConverter.XML_TO_BYTE);
             // TODO: SOAP 1.2 tests don't work yet for mail transport
             suite.addSOAP11Test(null, channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, TransportTestSuite.ASCII_TEST_DATA);
             suite.addSOAP11Test(null, channel, xmlSender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT, TransportTestSuite.UTF8_TEST_DATA);

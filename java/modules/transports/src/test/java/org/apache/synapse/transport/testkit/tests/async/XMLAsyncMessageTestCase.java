@@ -42,7 +42,7 @@ public class XMLAsyncMessageTestCase<E extends TestEnvironment,C extends AsyncCh
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
-    public XMLAsyncMessageTestCase(E env, C channel, AsyncMessageSender<? super C,XMLMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, XMLMessageType xmlMessageType, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+    public XMLAsyncMessageTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,XMLMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, XMLMessageType xmlMessageType, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
         super(env, channel, sender, endpointFactory, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"", data.getCharset());
         this.xmlMessageType = xmlMessageType;
         this.data = data;

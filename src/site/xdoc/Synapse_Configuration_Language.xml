@@ -728,7 +728,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       Synapse server instances. The Synapse server name is picked up from the
       system property 'SynapseServerName', failing which the hostname of the
       machine would be used or default to 'localhost'. You can give a name to a
-      Synapse server instance as ./synapse.sh -DSynapseServerName=&lt;ServerName&gt;
+      Synapse server instance as ./synapse.sh -serverName=&lt;ServerName&gt;
       or by editing the wrapper.conf where Synapse is started as a service.
     </p>
     <p>

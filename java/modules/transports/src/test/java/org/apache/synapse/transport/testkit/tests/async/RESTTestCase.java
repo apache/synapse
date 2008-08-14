@@ -19,6 +19,12 @@
 
 package org.apache.synapse.transport.testkit.tests.async;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
@@ -26,22 +32,32 @@ import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageData;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
+import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("REST")
 public class RESTTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,RESTMessage,MessageData> {
-    public RESTTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,RESTMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+    private final RESTMessage message;
+    
+    public RESTTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,RESTMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, RESTMessage message) {
         super(env, channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
+        this.message = message;
     }
     
     @Override
     protected RESTMessage prepareMessage() throws Exception {
-        return new RESTMessage();
+        return message;
     }
 
     @Override
     protected void checkMessageData(RESTMessage message, MessageData messageData) throws Exception {
-        // TODO
+        OMElement content = messageData.getEnvelope().getBody().getFirstElement();
+        Set<Parameter> expected = new HashSet<Parameter>(Arrays.asList(message.getParameters()));
+        for (Iterator<?> it = content.getChildElements(); it.hasNext(); ) {
+            OMElement child = (OMElement)it.next();
+            assertTrue(expected.remove(new Parameter(child.getLocalName(), child.getText())));
+        }
+        assertTrue(expected.isEmpty());
     }
 }

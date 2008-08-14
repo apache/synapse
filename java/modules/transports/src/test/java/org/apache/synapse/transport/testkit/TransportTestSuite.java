@@ -35,6 +35,7 @@ import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.StringMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
+import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
@@ -57,6 +58,16 @@ public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
         LATIN1_TEST_DATA,
     };
     
+    private static final RESTMessage restTestMessage1 = new RESTMessage(new Parameter[] {
+        new Parameter("param1", "value1"),
+        new Parameter("param2", "value2"),
+    });
+    
+    private static final RESTMessage restTestMessage2 = new RESTMessage(new Parameter[] {
+            new Parameter("param", "value1"),
+            new Parameter("param", "value2"),
+        });
+        
     private final boolean reuseServer;
     
     public TransportTestSuite(boolean reuseServer) {
@@ -127,7 +138,9 @@ public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
     }
 
     public <C extends AsyncChannel<? super E>> void addRESTTests(E env, C channel, AsyncMessageSender<? super E,? super C,RESTMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
-        addTest(new RESTTestCase<E,C>(env, channel, sender, endpointFactory));
+        addTest(new RESTTestCase<E,C>(env, channel, sender, endpointFactory, restTestMessage1));
+        // TODO: regression test for SYNAPSE-431
+//        addTest(new RESTTestCase<E,C>(env, channel, sender, endpointFactory, restTestMessage2));
     }
 
 /*

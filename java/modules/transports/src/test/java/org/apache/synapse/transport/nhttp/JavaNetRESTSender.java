@@ -36,7 +36,16 @@ import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatc
 @DisplayName("java.net")
 public class JavaNetRESTSender extends AbstractMessageSender<TestEnvironment,AsyncChannel<?>> implements AsyncMessageSender<TestEnvironment,AsyncChannel<?>,RESTMessage> {
     public void sendMessage(AsyncChannel<?> channel, SenderOptions options, RESTMessage message) throws Exception {
-        URLConnection connection = new URL(options.getEndpointReference() + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
+        StringBuilder url = new StringBuilder();
+        url.append(options.getEndpointReference());
+        url.append('/');
+        url.append(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+        String queryString = message.getQueryString();
+        if (queryString.length() > 0) {
+            url.append('?');
+            url.append(queryString);
+        }
+        URLConnection connection = new URL(url.toString()).openConnection();
         connection.setDoInput(true);
         InputStream in = connection.getInputStream();
         IOUtils.copy(in, System.out);

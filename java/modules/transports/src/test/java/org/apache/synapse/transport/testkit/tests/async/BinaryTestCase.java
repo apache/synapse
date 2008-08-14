@@ -35,7 +35,7 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 public class BinaryTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,ByteArrayMessage,ByteArrayMessage> {
     private static final Random random = new Random();
     
-    public BinaryTestCase(E env, C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
+    public BinaryTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
         super(env, channel, sender, endpointFactory, contentTypeMode, "application/octet-stream", null);
     }
     

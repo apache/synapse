@@ -24,11 +24,11 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
-public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> extends TransportTestCase<E,C,AsyncMessageSender<? super C,M>> {
+public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> extends TransportTestCase<E,C,AsyncMessageSender<? super E,? super C,M>> {
     private final String charset;
     private final AsyncEndpointFactory<? super E,? super C,N> endpointFactory;
     
-    public AsyncMessageTestCase(E env, C channel, AsyncMessageSender<? super C,M> sender, AsyncEndpointFactory<? super E,? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
+    public AsyncMessageTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,M> sender, AsyncEndpointFactory<? super E,? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
         super(env, channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.charset = charset;

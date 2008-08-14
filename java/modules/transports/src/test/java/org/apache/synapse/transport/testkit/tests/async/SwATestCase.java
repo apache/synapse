@@ -55,7 +55,7 @@ public class SwATestCase<E extends TestEnvironment,C extends AsyncChannel<? supe
     private byte[] attachmentContent;
     private String contentID;
     
-    public SwATestCase(E env, C channel, AsyncMessageSender<? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+    public SwATestCase(E env, C channel, AsyncMessageSender<? super E,? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
         super(env, channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
     }
     

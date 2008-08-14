@@ -36,9 +36,10 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
-public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<C> {
+public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<TestEnvironment,C> {
     private static final Log log = LogFactory.getLog(AxisMessageSender.class);
     
     private C channel;
@@ -46,8 +47,8 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
     private ConfigurationContext cfgCtx;
     
     @Override
-    public void setUp(C channel) throws Exception {
-        super.setUp(channel);
+    public void setUp(TestEnvironment env, C channel) throws Exception {
+        super.setUp(env, channel);
         this.channel = channel;
         
         cfgCtx =

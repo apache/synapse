@@ -27,8 +27,8 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactoryAdapter;
 
 public class AdapterUtils {
-    public static <C extends AsyncChannel<?>,M,N> AsyncMessageSender<C,M> adapt(AsyncMessageSender<C,N> parent, MessageConverter<M,N> converter) {
-        return new AsyncMessageSenderAdapter<C,M,N>(parent, converter);
+    public static <E extends TestEnvironment,C extends AsyncChannel<?>,M,N> AsyncMessageSender<E,C,M> adapt(AsyncMessageSender<E,C,N> parent, MessageConverter<M,N> converter) {
+        return new AsyncMessageSenderAdapter<E,C,M,N>(parent, converter);
     }
 
     public static <E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> AsyncEndpointFactory<E,C,M> adapt(AsyncEndpointFactory<E,C,N> targetFactory, MessageConverter<N,M> converter) {

@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-public interface AsyncMessageSender<C extends AsyncChannel<?>,M> extends MessageSender<C> {
+import org.apache.synapse.transport.testkit.TestEnvironment;
+
+public interface AsyncMessageSender<E extends TestEnvironment,C extends AsyncChannel<?>,M> extends MessageSender<E,C> {
     void sendMessage(C channel, SenderOptions options, M message) throws Exception;
 }

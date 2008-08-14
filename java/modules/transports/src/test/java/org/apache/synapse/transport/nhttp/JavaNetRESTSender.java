@@ -24,6 +24,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
@@ -33,7 +34,7 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 
 @DisplayName("java.net")
-public class JavaNetRESTSender extends AbstractMessageSender<AsyncChannel<?>> implements AsyncMessageSender<AsyncChannel<?>,RESTMessage> {
+public class JavaNetRESTSender extends AbstractMessageSender<TestEnvironment,AsyncChannel<?>> implements AsyncMessageSender<TestEnvironment,AsyncChannel<?>,RESTMessage> {
     public void sendMessage(AsyncChannel<?> channel, SenderOptions options, RESTMessage message) throws Exception {
         URLConnection connection = new URL(options.getEndpointReference() + "/" + DefaultOperationDispatcher.DEFAULT_OPERATION_NAME).openConnection();
         connection.setDoInput(true);

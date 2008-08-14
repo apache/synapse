@@ -20,26 +20,23 @@
 package org.apache.synapse.transport.jms;
 
 import javax.jms.BytesMessage;
-import javax.jms.Session;
 
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.SenderOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("BytesMessage")
-public class JMSBytesMessageSender extends AbstractMessageSender<JMSAsyncChannel> implements AsyncMessageSender<JMSAsyncChannel,ByteArrayMessage> {
+public class JMSBytesMessageSender extends AbstractJMSSender implements AsyncMessageSender<JMSTestEnvironment,JMSAsyncChannel,ByteArrayMessage> {
     public void sendMessage(JMSAsyncChannel channel,
                             SenderOptions options,
                             ByteArrayMessage message) throws Exception {
-        Session session = channel.createSession();
         BytesMessage jmsMessage = session.createBytesMessage();
         if (message.getContentType() != null) {
             jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
         }
         jmsMessage.writeBytes(message.getContent());
-        channel.send(session, jmsMessage);
+        producer.send(jmsMessage);
     }
 }

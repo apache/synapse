@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.Properties;
 
 public class AMQPConsumer {
-    private MessageProducer replyProducer;
     private Connection connection;
     private MessageConsumer messageConsumer;
     private Session session;
@@ -45,7 +44,6 @@ public class AMQPConsumer {
     private String inQty;
     private String inClOrderID;
     private int execID = 1;
-    private String fileName;
 
     private static final String CLASS = "AMQPConsumer";
     private static final String PROPERTY_FILE = "../../repository/conf/sample/resources/fix/direct.properties";
@@ -62,8 +60,6 @@ public class AMQPConsumer {
 
     /**
      * Main method to execute the consumer sample.
-     *
-     * @param args
      */
     public static void main(String[] args) {
         AMQPConsumer syncConsumer = new AMQPConsumer();
@@ -75,7 +71,7 @@ public class AMQPConsumer {
      */
     private void runTest() {
         try {
-            fileName = getProperty(PROP_FILE_NAME, PROPERTY_FILE);
+            String fileName = getProperty(PROP_FILE_NAME, PROPERTY_FILE);
             // Load JNDI properties from the configuration file
             Properties properties = new Properties();
             InputStream inStream = new FileInputStream(new File(fileName).getAbsolutePath());
@@ -164,7 +160,7 @@ public class AMQPConsumer {
 
     /**
      * @param payload XML message content came inside the JMS message
-     * @throws XMLStreamException
+     * @throws XMLStreamException on error
      */
     private void parseOrder(String payload) throws XMLStreamException {
         InputStream is = new ByteArrayInputStream(payload.getBytes());
@@ -177,14 +173,14 @@ public class AMQPConsumer {
         SOAPBody soapBody = envelope.getBody();
         OMElement messageNode = soapBody.getFirstChildWithName(new QName(
                 FIX_MSG));
-        Iterator<OMElement> messageElements = messageNode
-                .getChildElements();
+        Iterator<?> messageElements = (Iterator<?>) messageNode
+                 .getChildElements();
         while (messageElements.hasNext()) {
-            OMElement node = messageElements.next();
+            OMElement node = (OMElement) messageElements.next();
             if (node.getQName().getLocalPart().equals(FIX_MSG_BODY)) {
-                Iterator<OMElement> bodyElements = node.getChildElements();
+                Iterator<?> bodyElements =(Iterator<?>) node.getChildElements();
                 while (bodyElements.hasNext()) {
-                    OMElement bodyNode = bodyElements.next();
+                   OMElement bodyNode = (OMElement) bodyElements.next();
                    String tag = bodyNode
                             .getAttributeValue(new QName(FIX_MSG_ID));
                     String value = bodyNode.getText();
@@ -203,7 +199,7 @@ public class AMQPConsumer {
     /**
      *
      * @param message incoming message
-     * @throws JMSException
+     * @throws JMSException on error
      */
     private void sendExecution(Message message) throws JMSException {
         String repValue = "<m0:message xmlns:m0=\"http://services.samples/xsd/\" inSeession=\"FIX.4.0:EXEC-->SYNAPSE\" count=\"2\">\n"
@@ -245,7 +241,7 @@ public class AMQPConsumer {
         execID++;
         TextMessage repMessage = session.createTextMessage(repValue);
         repMessage.setJMSCorrelationID(message.getJMSMessageID());
-        replyProducer = session.createProducer(message.getJMSReplyTo());
+        MessageProducer replyProducer = session.createProducer(message.getJMSReplyTo());
         replyProducer.send(repMessage);
         System.out.println("Execution sent: " + repMessage.getText());
     }

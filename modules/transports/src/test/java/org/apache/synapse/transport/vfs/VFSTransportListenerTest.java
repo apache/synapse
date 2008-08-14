@@ -45,7 +45,7 @@ import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
  * TransportListenerTestTemplate implementation for the VFS transport.
  */
 public class VFSTransportListenerTest extends TestCase {
-    private static class MessageSenderImpl extends AbstractMessageSender<VFSFileChannel> implements AsyncMessageSender<VFSFileChannel,ByteArrayMessage> {
+    private static class MessageSenderImpl extends AbstractMessageSender<VFSTestEnvironment,VFSFileChannel> implements AsyncMessageSender<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage> {
         public void sendMessage(VFSFileChannel channel, SenderOptions options, ByteArrayMessage message) throws Exception {
             OutputStream out = new FileOutputStream(channel.getRequestFile());
             out.write(message.getContent());
@@ -60,10 +60,10 @@ public class VFSTransportListenerTest extends TestCase {
         AxisServer<VFSTestEnvironment> server = new AxisServer<VFSTestEnvironment>(env);
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
         MessageSenderImpl vfsSender = new MessageSenderImpl();
-        List<AsyncMessageSender<? super VFSFileChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super VFSFileChannel,XMLMessage>>();
+        List<AsyncMessageSender<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage>>();
         senders.add(adapt(vfsSender, MessageConverter.XML_TO_BYTE));
         senders.add(new AxisAsyncMessageSender());
-        for (AsyncMessageSender<? super VFSFileChannel,XMLMessage> sender : senders) {
+        for (AsyncMessageSender<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage> sender : senders) {
             suite.addSOAPTests(env, channel, sender, server, ContentTypeMode.SERVICE);
             suite.addPOXTests(env, channel, sender, server, ContentTypeMode.SERVICE);
             // Since VFS has no Content-Type header, SwA is not supported.

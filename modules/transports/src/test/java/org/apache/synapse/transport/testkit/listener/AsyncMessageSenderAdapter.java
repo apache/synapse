@@ -20,18 +20,19 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.synapse.transport.testkit.Adapter;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 
-public class AsyncMessageSenderAdapter<C extends AsyncChannel<?>,M,N> implements AsyncMessageSender<C,M>, Adapter {
-    private final AsyncMessageSender<C,N> target;
+public class AsyncMessageSenderAdapter<E extends TestEnvironment,C extends AsyncChannel<?>,M,N> implements AsyncMessageSender<E,C,M>, Adapter {
+    private final AsyncMessageSender<E,C,N> target;
     private final MessageConverter<M,N> converter;
 
-    public AsyncMessageSenderAdapter(AsyncMessageSender<C,N> target, MessageConverter<M,N> converter) {
+    public AsyncMessageSenderAdapter(AsyncMessageSender<E,C,N> target, MessageConverter<M,N> converter) {
         this.target = target;
         this.converter = converter;
     }
     
-    public AsyncMessageSender<C,N> getTarget() {
+    public AsyncMessageSender<E,C,N> getTarget() {
         return target;
     }
 
@@ -39,8 +40,8 @@ public class AsyncMessageSenderAdapter<C extends AsyncChannel<?>,M,N> implements
         target.sendMessage(channel, options, converter.convert(options, message));
     }
 
-    public void setUp(C channel) throws Exception {
-        target.setUp(channel);
+    public void setUp(E env,C channel) throws Exception {
+        target.setUp(env, channel);
     }
 
     public void tearDown() throws Exception {

@@ -19,8 +19,10 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-public abstract class AbstractMessageSender<C extends Channel<?>> implements MessageSender<C> {
-    public void setUp(C channel) throws Exception {
+import org.apache.synapse.transport.testkit.TestEnvironment;
+
+public abstract class AbstractMessageSender<E extends TestEnvironment,C extends Channel<?>> implements MessageSender<E,C> {
+    public void setUp(E env, C channel) throws Exception {
     }
     
     public void tearDown() throws Exception {

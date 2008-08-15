@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This is the class invoked by the command line scripts synapse.sh and synapse-daemon.sh to
@@ -80,6 +81,11 @@ public class SynapseServer {
         
         serverManager.start();
         addShutdownHook();
+        
+        // Put the main thread into wait state. This makes sure that the Synapse server
+        // doesn't stop immediately if ServerManager#start doesn't create any non daemon
+        // threads (see also SYNAPSE-425).
+        new CountDownLatch(1).await();
     }
 
     private static void addShutdownHook() {

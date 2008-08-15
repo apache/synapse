@@ -17,17 +17,23 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.mail;
+package org.apache.synapse.transport.testkit.filter;
 
-import javax.activation.DataHandler;
-import javax.mail.internet.MimeMessage;
+import java.util.Map;
 
-import org.apache.synapse.transport.testkit.name.DisplayName;
+public class OrExpression implements FilterExpression {
+    private final FilterExpression[] operands;
 
-@DisplayName("mime")
-public class MimeClient extends MailClient {
-    @Override
-    protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
-        msg.setDataHandler(dh);
+    public OrExpression(FilterExpression[] operands) {
+        this.operands = operands;
+    }
+
+    public boolean matches(Map<String,String> map) {
+        for (FilterExpression operand : operands) {
+            if (!operand.matches(map)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

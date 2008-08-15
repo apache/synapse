@@ -19,16 +19,17 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
+import java.util.Map;
+
+import junit.framework.TestCase;
+
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.NameBuilder;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.name.NameUtils;
 import org.apache.synapse.transport.testkit.server.Server;
-
-import junit.framework.TestCase;
 
 public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,L extends TestClient<? super E,? super C>> extends TestCase {
     protected final E env;
@@ -37,6 +38,8 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
     private final Server<? super E> server;
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
+    
+    private Map<String,String> nameComponents;
     
     private boolean manageServer = true;
 
@@ -49,15 +52,28 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
         this.contentType = contentType;
     }
 
+    public Map<String,String> getNameComponents() {
+        if (nameComponents == null) {
+            nameComponents = NameUtils.getNameComponents("test", this);
+            nameComponents.put("contentTypeMode", contentTypeMode.toString().toLowerCase());
+        }
+        return nameComponents;
+    }
+    
     @Override
     public String getName() {
         String testName = super.getName();
         if (testName == null) {
-            NameBuilder nameBuilder = new NameBuilder();
-            nameBuilder.addComponent("test", NameUtils.getName(this));
-            NameUtils.getNameComponents(nameBuilder, this);
-            nameBuilder.addComponent("contentTypeMode", contentTypeMode.toString().toLowerCase());
-            testName = nameBuilder.toString();
+            StringBuilder buffer = new StringBuilder();
+            for (Map.Entry<String,String> entry : getNameComponents().entrySet()) {
+                if (buffer.length() > 0) {
+                    buffer.append(',');
+                }
+                buffer.append(entry.getKey());
+                buffer.append('=');
+                buffer.append(entry.getValue());
+            }
+            testName = buffer.toString();
             setName(testName);
         }
         return testName;

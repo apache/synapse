@@ -17,24 +17,18 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.filter;
 
-public class NameBuilder {
-    private final StringBuilder buffer = new StringBuilder();
+import java.util.Map;
+
+public class NotExpression implements FilterExpression {
+    private final FilterExpression operand;
     
-    public void addComponent(String key, String value) {
-        if (value != null) {
-            if (buffer.length() > 0) {
-                buffer.append(',');
-            }
-            buffer.append(key);
-            buffer.append('=');
-            buffer.append(value);
-        }
+    public NotExpression(FilterExpression operand) {
+        this.operand = operand;
     }
 
-    @Override
-    public String toString() {
-        return buffer.toString();
+    public boolean matches(Map<String,String> map) {
+        return !operand.matches(map);
     }
 }

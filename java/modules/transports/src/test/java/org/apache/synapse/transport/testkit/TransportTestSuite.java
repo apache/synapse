@@ -19,12 +19,20 @@
 
 package org.apache.synapse.transport.testkit;
 
+import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.XMLRequestResponseTestClient;
+import org.apache.synapse.transport.testkit.filter.FilterExpression;
+import org.apache.synapse.transport.testkit.filter.FilterExpressionParser;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
@@ -38,6 +46,7 @@ import org.apache.synapse.transport.testkit.message.XMLMessageType;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
+import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
 import org.apache.synapse.transport.testkit.tests.async.RESTTestCase;
 import org.apache.synapse.transport.testkit.tests.async.SwATestCase;
@@ -68,6 +77,7 @@ public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
             new Parameter("param", "value2"),
         });
         
+    private final List<FilterExpression> excludes = new LinkedList<FilterExpression>();
     private final boolean reuseServer;
     
     public TransportTestSuite(boolean reuseServer) {
@@ -76,6 +86,10 @@ public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
     
     public TransportTestSuite() {
         this(true);
+    }
+
+    public void addExclude(String filter) throws ParseException {
+        excludes.add(FilterExpressionParser.parse(filter));
     }
 
     public <C extends AsyncChannel<? super E>> void addSOAP11Test(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
@@ -141,6 +155,20 @@ public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
         addTest(new RESTTestCase<E,C>(env, channel, client, endpointFactory, restTestMessage1));
         // TODO: regression test for SYNAPSE-431
 //        addTest(new RESTTestCase<E,C>(env, channel, client, endpointFactory, restTestMessage2));
+    }
+
+    @Override
+    public void addTest(Test test) {
+        if (test instanceof TransportTestCase) {
+            TransportTestCase<?,?,?> ttest = (TransportTestCase<?,?,?>)test;
+            Map<String,String> map = ttest.getNameComponents();
+            for (FilterExpression exclude : excludes) {
+                if (exclude.matches(map)) {
+                    return;
+                }
+            }
+        }
+        super.addTest(test);
     }
 
 /*

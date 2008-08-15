@@ -20,9 +20,10 @@
 package org.apache.synapse.transport.testkit.name;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.synapse.transport.testkit.Adapter;
-import org.apache.synapse.transport.testkit.listener.NameBuilder;
 
 public class NameUtils {
     public static String getName(Object object) {
@@ -36,7 +37,28 @@ public class NameUtils {
         }
     }
     
-    public static void getNameComponents(NameBuilder nameBuilder, Object object) {
+    public static Map<String,String> getNameComponents(String rootKey, Object object) {
+        Map<String,String> result = new LinkedHashMap<String,String>();
+        collectNameComponents(result, rootKey, object);
+        return result;
+    }
+    
+    private static void collectNameComponents(Map<String,String> map, String key, Object component) {
+        while (component instanceof Adapter) {
+            component = ((Adapter)component).getTarget();
+        }
+        if (component instanceof String) {
+            map.put(key, (String)component);
+        } else {
+            DisplayName displayName = component.getClass().getAnnotation(DisplayName.class);
+            if (displayName != null) {
+                map.put(key, displayName.value());
+            }
+            collectNameComponents(map, component);
+        }
+    }
+    
+    private static void collectNameComponents(Map<String,String> map, Object object) {
         Class<?> clazz = object.getClass();
         for (Method method : clazz.getMethods()) {
             NameComponent ann = method.getAnnotation(NameComponent.class);
@@ -49,18 +71,7 @@ public class NameUtils {
                     throw new Error("Error invoking " + method, ex);
                 }
                 if (component != null) {
-                    while (component instanceof Adapter) {
-                        component = ((Adapter)component).getTarget();
-                    }
-                    if (component instanceof String) {
-                        nameBuilder.addComponent(ann.value(), (String)component);
-                    } else {
-                        DisplayName displayName = component.getClass().getAnnotation(DisplayName.class);
-                        if (displayName != null) {
-                            nameBuilder.addComponent(ann.value(), displayName.value());
-                        }
-                        getNameComponents(nameBuilder, component);
-                    }
+                    collectNameComponents(map, ann.value(), component);
                 }
             }
         }

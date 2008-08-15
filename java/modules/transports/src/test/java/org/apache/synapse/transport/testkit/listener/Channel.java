@@ -23,21 +23,9 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 
 public interface Channel<E extends TestEnvironment> {
-    TransportOutDescription createTransportOutDescription() throws Exception;
-    
-    /**
-     * Create a TransportInDescription for the transport under test.
-     * 
-     * @return the transport description
-     * @throws Exception
-     */
-    TransportInDescription createTransportInDescription() throws Exception;
-    
     /**
      * Set up the service so that it can receive messages through the transport under test.
      * Implementations will typically call {@link AxisService#addParameter(Parameter)} to

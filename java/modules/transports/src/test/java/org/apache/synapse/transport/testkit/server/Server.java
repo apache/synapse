@@ -22,13 +22,7 @@ package org.apache.synapse.transport.testkit.server;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.Channel;
 
-public abstract class Server<T extends TestEnvironment> {
-    private final T setup;
-    
-    public Server(T setup) {
-        this.setup = setup;
-    }
-
+public interface Server<T extends TestEnvironment> {
 //    public void addErrorListener(TransportErrorListener listener) {
 //        if (listener instanceof TransportErrorSource) {
 //            ((TransportErrorSource)listener).addErrorListener(listener);
@@ -41,10 +35,6 @@ public abstract class Server<T extends TestEnvironment> {
 //        }
 //    }
 
-    public T getSetup() {
-        return setup;
-    }
-
-    public abstract void start(T env, Channel<?> channel) throws Exception;
-    public abstract void stop() throws Exception;
+    void start(T env, Channel<?> channel) throws Exception;
+    void stop() throws Exception;
 }

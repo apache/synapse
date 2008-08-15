@@ -30,6 +30,8 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
@@ -56,13 +58,16 @@ public class VFSTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         // TODO: the VFS listener doesn't like reuseServer == true...
         TransportTestSuite<VFSTestEnvironment> suite = new TransportTestSuite<VFSTestEnvironment>(false);
+        TransportDescriptionFactory tdf =
+            new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
+                    VFSTransportSender.class);
         VFSTestEnvironment env = new VFSTestEnvironment();
-        AxisServer<VFSTestEnvironment> server = new AxisServer<VFSTestEnvironment>(env);
+        AxisServer<VFSTestEnvironment> server = new AxisServer<VFSTestEnvironment>(tdf);
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
         MessageSenderImpl vfsSender = new MessageSenderImpl();
         List<AsyncMessageSender<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage>>();
         senders.add(adapt(vfsSender, MessageConverter.XML_TO_BYTE));
-        senders.add(new AxisAsyncMessageSender());
+        senders.add(new AxisAsyncMessageSender(tdf));
         for (AsyncMessageSender<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage> sender : senders) {
             suite.addSOAPTests(env, channel, sender, server, ContentTypeMode.SERVICE);
             suite.addPOXTests(env, channel, sender, server, ContentTypeMode.SERVICE);

@@ -21,6 +21,7 @@ package org.apache.synapse.transport.jms;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.name.NameComponent;
@@ -29,7 +30,8 @@ import org.apache.synapse.transport.testkit.name.NameComponent;
 public class JMSAxisAsyncMessageSender extends AxisAsyncMessageSender {
     private final String jmsMessageType;
     
-    public JMSAxisAsyncMessageSender(String jmsMessageType) {
+    public JMSAxisAsyncMessageSender(TransportDescriptionFactory tdf, String jmsMessageType) {
+        super(tdf);
         this.jmsMessageType = jmsMessageType;
     }
 

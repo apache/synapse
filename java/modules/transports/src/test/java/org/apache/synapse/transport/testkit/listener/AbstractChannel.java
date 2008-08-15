@@ -22,14 +22,9 @@ package org.apache.synapse.transport.testkit.listener;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 
 public abstract class AbstractChannel<E extends TestEnvironment> implements Channel<E> {
-    public TransportOutDescription createTransportOutDescription() throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
     public void setupService(AxisService service) throws Exception {
     }
     

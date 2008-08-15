@@ -39,6 +39,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.util.jaxp.AXIOMResultBuilderFactory;
 import org.apache.synapse.util.jaxp.AXIOMSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMSourceBuilderFactory;
@@ -56,7 +57,8 @@ public class XSLTMediatorTest extends TestCase {
     
     private static final Class[] resultBuilderFactories = {
         DOOMResultBuilderFactory.class,
-        StreamResultBuilderFactory.class };
+        StreamResultBuilderFactory.class,
+        AXIOMResultBuilderFactory.class };
 
     private static final String SOURCE =
         "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
@@ -78,7 +80,8 @@ public class XSLTMediatorTest extends TestCase {
     }
     
     private static Set<String> testsToExclude = new HashSet<String>(
-            Arrays.asList("testSaxonDOOMSourceDOOMResult", "testSaxonDOOMSourceStreamResult"));
+            Arrays.asList("testSaxonDOOMSourceDOOMResult", "testSaxonDOOMSourceStreamResult",
+                    "testSaxonDOOMSourceAXIOMResult"));
     
     private static void addGenericTests(TestSuite suite, final String processorName,
             final Class<? extends TransformerFactory> transformerFactoryClass) {

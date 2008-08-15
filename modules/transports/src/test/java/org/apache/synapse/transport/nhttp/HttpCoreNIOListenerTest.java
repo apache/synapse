@@ -35,8 +35,8 @@ import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
@@ -66,19 +66,19 @@ public class HttpCoreNIOListenerTest extends TestCase {
         
         AxisServer<TestEnvironment> axisServer = new AxisServer<TestEnvironment>(tdf);
         HttpChannel channel = new HttpChannel();
-        JavaNetSender javaNetSender = new JavaNetSender();
-        List<AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage>>();
-        senders.add(adapt(javaNetSender, MessageConverter.XML_TO_BYTE));
-        senders.add(new AxisAsyncMessageSender(tdf));
-        for (AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage> sender : senders) {
-            suite.addSOAPTests(null, channel, sender, axisServer, ContentTypeMode.TRANSPORT);
-            suite.addPOXTests(null, channel, sender, axisServer, ContentTypeMode.TRANSPORT);
+        JavaNetClient javaNetClient = new JavaNetClient();
+        List<AsyncTestClient<TestEnvironment,? super HttpChannel,XMLMessage>> clients = new LinkedList<AsyncTestClient<TestEnvironment,? super HttpChannel,XMLMessage>>();
+        clients.add(adapt(javaNetClient, MessageConverter.XML_TO_BYTE));
+        clients.add(new AxisAsyncTestClient(tdf));
+        for (AsyncTestClient<TestEnvironment,? super HttpChannel,XMLMessage> client : clients) {
+            suite.addSOAPTests(null, channel, client, axisServer, ContentTypeMode.TRANSPORT);
+            suite.addPOXTests(null, channel, client, axisServer, ContentTypeMode.TRANSPORT);
         }
 //        suite.addPOXTests(channel, new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
-        suite.addSwATests(null, channel, javaNetSender, axisServer);
-        suite.addTextPlainTests(null, channel, adapt(javaNetSender, MessageConverter.STRING_TO_BYTE), adapt(axisServer, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
-        suite.addBinaryTest(null, channel, javaNetSender, adapt(axisServer, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
-        suite.addRESTTests(null, channel, new JavaNetRESTSender(), axisServer);
+        suite.addSwATests(null, channel, javaNetClient, axisServer);
+        suite.addTextPlainTests(null, channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(axisServer, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
+        suite.addBinaryTest(null, channel, javaNetClient, adapt(axisServer, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
+        suite.addRESTTests(null, channel, new JavaNetRESTClient(), axisServer);
         return suite;
     }
 }

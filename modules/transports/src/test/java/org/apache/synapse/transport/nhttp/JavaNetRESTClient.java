@@ -25,17 +25,17 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
+import org.apache.synapse.transport.testkit.client.AbstractTestClient;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.SenderOptions;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 
 @DisplayName("java.net")
-public class JavaNetRESTSender extends AbstractMessageSender<TestEnvironment,AsyncChannel<?>> implements AsyncMessageSender<TestEnvironment,AsyncChannel<?>,RESTMessage> {
-    public void sendMessage(AsyncChannel<?> channel, SenderOptions options, RESTMessage message) throws Exception {
+public class JavaNetRESTClient extends AbstractTestClient<TestEnvironment,AsyncChannel<?>> implements AsyncTestClient<TestEnvironment,AsyncChannel<?>,RESTMessage> {
+    public void sendMessage(AsyncChannel<?> channel, ClientOptions options, RESTMessage message) throws Exception {
         StringBuilder url = new StringBuilder();
         url.append(options.getEndpointReference());
         url.append('/');

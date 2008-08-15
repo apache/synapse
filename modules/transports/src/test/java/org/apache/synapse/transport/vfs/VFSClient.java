@@ -17,23 +17,20 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.mail;
+package org.apache.synapse.transport.vfs;
 
-import javax.activation.DataHandler;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
-public class MultipartSender extends MailSender {
-    @Override
-    protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
-        MimeMultipart multipart = new MimeMultipart();
-        MimeBodyPart part1 = new MimeBodyPart();
-        part1.setContent("This is an automated message.", "text/plain");
-        multipart.addBodyPart(part1);
-        MimeBodyPart part2 = new MimeBodyPart();
-        part2.setDataHandler(dh);
-        multipart.addBodyPart(part2);
-        msg.setContent(multipart);
+import org.apache.synapse.transport.testkit.client.AbstractTestClient;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+
+public class VFSClient extends AbstractTestClient<VFSTestEnvironment,VFSFileChannel> implements AsyncTestClient<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage> {
+    public void sendMessage(VFSFileChannel channel, ClientOptions options, ByteArrayMessage message) throws Exception {
+        OutputStream out = new FileOutputStream(channel.getRequestFile());
+        out.write(message.getContent());
+        out.close();
     }
 }

@@ -17,14 +17,14 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.mail;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
+import javax.activation.DataHandler;
+import javax.mail.internet.MimeMessage;
 
-public abstract class AbstractMessageSender<E extends TestEnvironment,C extends Channel<?>> implements MessageSender<E,C> {
-    public void setUp(E env, C channel) throws Exception {
-    }
-    
-    public void tearDown() throws Exception {
+public class MimeClient extends MailClient {
+    @Override
+    protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
+        msg.setDataHandler(dh);
     }
 }

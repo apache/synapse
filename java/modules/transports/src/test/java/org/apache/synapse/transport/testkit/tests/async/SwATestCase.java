@@ -39,8 +39,8 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
@@ -55,8 +55,8 @@ public class SwATestCase<E extends TestEnvironment,C extends AsyncChannel<? supe
     private byte[] attachmentContent;
     private String contentID;
     
-    public SwATestCase(E env, C channel, AsyncMessageSender<? super E,? super C,ByteArrayMessage> sender, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
-        super(env, channel, sender, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
+    public SwATestCase(E env, C channel, AsyncTestClient<? super E,? super C,ByteArrayMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+        super(env, channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
     }
     
     @Override

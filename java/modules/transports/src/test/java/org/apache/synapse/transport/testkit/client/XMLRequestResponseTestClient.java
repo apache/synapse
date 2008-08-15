@@ -17,12 +17,13 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.client;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
-public interface XMLRequestResponseMessageSender<E extends TestEnvironment,C extends RequestResponseChannel<?>> extends MessageSender<E,C> {
+public interface XMLRequestResponseTestClient<E extends TestEnvironment,C extends RequestResponseChannel<?>> extends TestClient<E,C> {
     OMElement sendMessage(C channel, String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
 }

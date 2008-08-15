@@ -17,26 +17,27 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.client;
 
 import org.apache.synapse.transport.testkit.Adapter;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 
-public class AsyncMessageSenderAdapter<E extends TestEnvironment,C extends AsyncChannel<?>,M,N> implements AsyncMessageSender<E,C,M>, Adapter {
-    private final AsyncMessageSender<E,C,N> target;
+public class AsyncTestClientAdapter<E extends TestEnvironment,C extends AsyncChannel<?>,M,N> implements AsyncTestClient<E,C,M>, Adapter {
+    private final AsyncTestClient<E,C,N> target;
     private final MessageConverter<M,N> converter;
 
-    public AsyncMessageSenderAdapter(AsyncMessageSender<E,C,N> target, MessageConverter<M,N> converter) {
+    public AsyncTestClientAdapter(AsyncTestClient<E,C,N> target, MessageConverter<M,N> converter) {
         this.target = target;
         this.converter = converter;
     }
     
-    public AsyncMessageSender<E,C,N> getTarget() {
+    public AsyncTestClient<E,C,N> getTarget() {
         return target;
     }
 
-    public void sendMessage(C channel, SenderOptions options, M message) throws Exception {
+    public void sendMessage(C channel, ClientOptions options, M message) throws Exception {
         target.sendMessage(channel, options, converter.convert(options, message));
     }
 

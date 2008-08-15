@@ -17,13 +17,13 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.client;
 
-public class SenderOptions {
+public class ClientOptions {
     private final String endpointReference;
     private final String charset;
 
-    public SenderOptions(String endpointReference, String charset) {
+    public ClientOptions(String endpointReference, String charset) {
         this.endpointReference = endpointReference;
         this.charset = charset;
     }

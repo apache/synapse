@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.client.axis2;
 
 import java.io.File;
 
@@ -38,10 +38,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.client.AbstractTestClient;
+import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
-public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<TestEnvironment,C> {
-    private static final Log log = LogFactory.getLog(AxisMessageSender.class);
+public class AxisTestClient<C extends Channel<?>> extends AbstractTestClient<TestEnvironment,C> {
+    private static final Log log = LogFactory.getLog(AxisTestClient.class);
     
     private final TransportDescriptionFactory tdf;
     
@@ -49,7 +51,7 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
-    public AxisMessageSender(TransportDescriptionFactory tdf) {
+    public AxisTestClient(TransportDescriptionFactory tdf) {
         this.tdf = tdf;
     }
 

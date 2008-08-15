@@ -17,10 +17,11 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.client;
 
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
-public interface AsyncMessageSender<E extends TestEnvironment,C extends AsyncChannel<?>,M> extends MessageSender<E,C> {
-    void sendMessage(C channel, SenderOptions options, M message) throws Exception;
+public interface AsyncTestClient<E extends TestEnvironment,C extends AsyncChannel<?>,M> extends TestClient<E,C> {
+    void sendMessage(C channel, ClientOptions options, M message) throws Exception;
 }

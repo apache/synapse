@@ -19,22 +19,24 @@
 
 package org.apache.synapse.transport.jms;
 
-import javax.jms.TextMessage;
+import javax.jms.BytesMessage;
 
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.SenderOptions;
-import org.apache.synapse.transport.testkit.message.StringMessage;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
-@DisplayName("TextMessage")
-public class JMSTextMessageSender extends AbstractJMSSender implements AsyncMessageSender<JMSTestEnvironment,JMSAsyncChannel,StringMessage> {
-    public void sendMessage(JMSAsyncChannel channel, SenderOptions options, StringMessage message) throws Exception {
-        TextMessage jmsMessage = session.createTextMessage();
+@DisplayName("BytesMessage")
+public class JMSBytesMessageClient extends JMSClient implements AsyncTestClient<JMSTestEnvironment,JMSAsyncChannel,ByteArrayMessage> {
+    public void sendMessage(JMSAsyncChannel channel,
+                            ClientOptions options,
+                            ByteArrayMessage message) throws Exception {
+        BytesMessage jmsMessage = session.createBytesMessage();
         if (message.getContentType() != null) {
             jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
         }
-        jmsMessage.setText(message.getContent());
+        jmsMessage.writeBytes(message.getContent());
         producer.send(jmsMessage);
     }
 }

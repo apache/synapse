@@ -20,16 +20,18 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
-public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> extends TransportTestCase<E,C,AsyncMessageSender<? super E,? super C,M>> {
+public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> extends TransportTestCase<E,C,AsyncTestClient<? super E,? super C,M>> {
     private final String charset;
     private final AsyncEndpointFactory<? super E,? super C,N> endpointFactory;
     
-    public AsyncMessageTestCase(E env, C channel, AsyncMessageSender<? super E,? super C,M> sender, AsyncEndpointFactory<? super E,? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
-        super(env, channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
+    public AsyncMessageTestCase(E env, C channel, AsyncTestClient<? super E,? super C,M> client, AsyncEndpointFactory<? super E,? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
+        super(env, channel, client, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.charset = charset;
     }
@@ -43,9 +45,9 @@ public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends A
         // Run the test.
         N messageData;
         try {
-            SenderOptions options = new SenderOptions(endpoint.getEPR(), charset);
+            ClientOptions options = new ClientOptions(endpoint.getEPR(), charset);
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
-            sender.sendMessage(channel, options, message);
+            client.sendMessage(channel, options, message);
             messageData = endpoint.waitForMessage(8000);
             if (messageData == null) {
                 fail("Failed to get message");

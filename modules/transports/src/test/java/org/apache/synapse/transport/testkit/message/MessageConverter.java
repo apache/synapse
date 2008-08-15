@@ -35,13 +35,13 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 
 public interface MessageConverter<T,U> {
     MessageConverter<MessageData,ByteArrayMessage> AXIS_TO_BYTE =
         new MessageConverter<MessageData,ByteArrayMessage>() {
 
-        public ByteArrayMessage convert(SenderOptions options, MessageData message) throws Exception {
+        public ByteArrayMessage convert(ClientOptions options, MessageData message) throws Exception {
             SOAPEnvelope envelope = message.getEnvelope();
             OMElement wrapper = envelope.getBody().getFirstElement();
             Assert.assertEquals(BaseConstants.DEFAULT_BINARY_WRAPPER, wrapper.getQName());
@@ -56,7 +56,7 @@ public interface MessageConverter<T,U> {
     MessageConverter<MessageData,StringMessage> AXIS_TO_STRING =
         new MessageConverter<MessageData,StringMessage>() {
 
-        public StringMessage convert(SenderOptions options, MessageData message) throws Exception {
+        public StringMessage convert(ClientOptions options, MessageData message) throws Exception {
             SOAPEnvelope envelope = message.getEnvelope();
             OMElement wrapper = envelope.getBody().getFirstElement();
             Assert.assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, wrapper.getQName());
@@ -67,7 +67,7 @@ public interface MessageConverter<T,U> {
     MessageConverter<XMLMessage,ByteArrayMessage> XML_TO_BYTE =
         new MessageConverter<XMLMessage,ByteArrayMessage>() {
 
-        public ByteArrayMessage convert(SenderOptions options, XMLMessage message) throws Exception {
+        public ByteArrayMessage convert(ClientOptions options, XMLMessage message) throws Exception {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             OMOutputFormat outputFormat = new OMOutputFormat();
             outputFormat.setCharSetEncoding(options.getCharset());
@@ -80,7 +80,7 @@ public interface MessageConverter<T,U> {
     MessageConverter<XMLMessage,StringMessage> XML_TO_STRING =
         new MessageConverter<XMLMessage,StringMessage>() {
 
-        public StringMessage convert(SenderOptions options, XMLMessage message) throws Exception {
+        public StringMessage convert(ClientOptions options, XMLMessage message) throws Exception {
             OMOutputFormat format = new OMOutputFormat();
             format.setIgnoreXMLDeclaration(true);
             StringWriter sw = new StringWriter();
@@ -92,7 +92,7 @@ public interface MessageConverter<T,U> {
     MessageConverter<ByteArrayMessage,XMLMessage> BINARY_WRAPPER =
         new MessageConverter<ByteArrayMessage,XMLMessage>() {
 
-        public XMLMessage convert(SenderOptions options, ByteArrayMessage message) throws Exception {
+        public XMLMessage convert(ClientOptions options, ByteArrayMessage message) throws Exception {
             OMFactory omFactory = XMLMessageType.SOAP11.getOMFactory();
             OMElement wrapper = omFactory.createOMElement(BaseConstants.DEFAULT_BINARY_WRAPPER);
             DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(message.getContent()));
@@ -104,7 +104,7 @@ public interface MessageConverter<T,U> {
     MessageConverter<StringMessage,XMLMessage> TEXT_WRAPPER =
         new MessageConverter<StringMessage,XMLMessage>() {
 
-        public XMLMessage convert(SenderOptions options, StringMessage message) throws Exception {
+        public XMLMessage convert(ClientOptions options, StringMessage message) throws Exception {
             OMFactory omFactory = XMLMessageType.SOAP11.getOMFactory();
             OMElement wrapper = omFactory.createOMElement(BaseConstants.DEFAULT_TEXT_WRAPPER);
             wrapper.addChild(omFactory.createOMText(message.getContent()));
@@ -115,7 +115,7 @@ public interface MessageConverter<T,U> {
     MessageConverter<StringMessage,ByteArrayMessage> STRING_TO_BYTE =
         new MessageConverter<StringMessage,ByteArrayMessage>() {
 
-        public ByteArrayMessage convert(SenderOptions options, StringMessage message) throws Exception {
+        public ByteArrayMessage convert(ClientOptions options, StringMessage message) throws Exception {
             return new ByteArrayMessage(message.getContentType(), message.getContent().getBytes(options.getCharset()));
         }
     };
@@ -123,12 +123,12 @@ public interface MessageConverter<T,U> {
     MessageConverter<ByteArrayMessage,StringMessage> BYTE_TO_STRING =
         new MessageConverter<ByteArrayMessage,StringMessage>() {
 
-        public StringMessage convert(SenderOptions options, ByteArrayMessage message) throws Exception {
+        public StringMessage convert(ClientOptions options, ByteArrayMessage message) throws Exception {
             ContentType contentType = new ContentType(message.getContentType());
             String charset = contentType.getParameter("charset");
             return new StringMessage(message.getContentType(), new String(message.getContent(), charset));
         }
     };
     
-    U convert(SenderOptions options, T message) throws Exception;
+    U convert(ClientOptions options, T message) throws Exception;
 }

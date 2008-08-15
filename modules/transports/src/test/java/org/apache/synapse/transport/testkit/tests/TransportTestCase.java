@@ -20,9 +20,9 @@
 package org.apache.synapse.transport.testkit.tests;
 
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.listener.MessageSender;
 import org.apache.synapse.transport.testkit.listener.NameBuilder;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.name.NameUtils;
@@ -30,20 +30,20 @@ import org.apache.synapse.transport.testkit.server.Server;
 
 import junit.framework.TestCase;
 
-public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,S extends MessageSender<? super E,? super C>> extends TestCase {
+public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,L extends TestClient<? super E,? super C>> extends TestCase {
     protected final E env;
     protected final C channel;
-    protected final S sender;
+    protected final L client;
     private final Server<? super E> server;
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
     
     private boolean manageServer = true;
 
-    public TransportTestCase(E env, C channel, S sender, Server<? super E> server, ContentTypeMode contentTypeMode, String contentType) {
+    public TransportTestCase(E env, C channel, L client, Server<? super E> server, ContentTypeMode contentTypeMode, String contentType) {
         this.env = env;
         this.channel = channel;
-        this.sender = sender;
+        this.client = client;
         this.server = server;
         this.contentTypeMode = contentTypeMode;
         this.contentType = contentType;
@@ -68,9 +68,9 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
         return channel;
     }
 
-    @NameComponent("sender")
-    public S getSender() {
-        return sender;
+    @NameComponent("client")
+    public L getClient() {
+        return client;
     }
 
     @NameComponent("env")
@@ -92,12 +92,12 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
         if (server != null && manageServer) {
             server.start(env, channel);
         }
-        sender.setUp(env, channel);
+        client.setUp(env, channel);
     }
 
     @Override
     protected void tearDown() throws Exception {
-        sender.tearDown();
+        client.tearDown();
         if (server != null && manageServer) {
             server.stop();
         }

@@ -31,13 +31,13 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.SenderOptions;
+import org.apache.synapse.transport.testkit.client.AbstractTestClient;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
-public abstract class MailSender extends AbstractMessageSender<TestEnvironment,MailChannel> implements AsyncMessageSender<TestEnvironment,MailChannel,ByteArrayMessage> {
-    public void sendMessage(MailChannel channel, SenderOptions options, ByteArrayMessage message) throws Exception {
+public abstract class MailClient extends AbstractTestClient<TestEnvironment,MailChannel> implements AsyncTestClient<TestEnvironment,MailChannel,ByteArrayMessage> {
+    public void sendMessage(MailChannel channel, ClientOptions options, ByteArrayMessage message) throws Exception {
         Properties props = new Properties();
         props.put("mail.smtp.class", TestTransport.class.getName());
         Session session = Session.getInstance(props);

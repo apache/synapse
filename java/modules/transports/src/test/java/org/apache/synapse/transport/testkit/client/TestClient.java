@@ -17,12 +17,12 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.client;
 
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.listener.Channel;
 
-// TODO: rename Sender to TestClient to avoid name collisions with transport implementation classes
-public interface MessageSender<E extends TestEnvironment,C extends Channel<?>> {
+public interface TestClient<E extends TestEnvironment,C extends Channel<?>> {
     void setUp(E env, C channel) throws Exception;
     void tearDown() throws Exception;
 }

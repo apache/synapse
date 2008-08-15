@@ -19,16 +19,16 @@
 
 package org.apache.synapse.transport.testkit;
 
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.AsyncTestClientAdapter;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageSenderAdapter;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactoryAdapter;
 
 public class AdapterUtils {
-    public static <E extends TestEnvironment,C extends AsyncChannel<?>,M,N> AsyncMessageSender<E,C,M> adapt(AsyncMessageSender<E,C,N> parent, MessageConverter<M,N> converter) {
-        return new AsyncMessageSenderAdapter<E,C,M,N>(parent, converter);
+    public static <E extends TestEnvironment,C extends AsyncChannel<?>,M,N> AsyncTestClient<E,C,M> adapt(AsyncTestClient<E,C,N> parent, MessageConverter<M,N> converter) {
+        return new AsyncTestClientAdapter<E,C,M,N>(parent, converter);
     }
 
     public static <E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> AsyncEndpointFactory<E,C,M> adapt(AsyncEndpointFactory<E,C,N> targetFactory, MessageConverter<N,M> converter) {

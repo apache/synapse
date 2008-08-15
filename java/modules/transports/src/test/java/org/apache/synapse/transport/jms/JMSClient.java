@@ -25,9 +25,9 @@ import javax.jms.Destination;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.apache.synapse.transport.testkit.listener.AbstractMessageSender;
+import org.apache.synapse.transport.testkit.client.AbstractTestClient;
 
-public class AbstractJMSSender extends AbstractMessageSender<JMSTestEnvironment,JMSAsyncChannel> {
+public class JMSClient extends AbstractTestClient<JMSTestEnvironment,JMSAsyncChannel> {
     protected Connection connection;
     protected Session session;
     protected MessageProducer producer;

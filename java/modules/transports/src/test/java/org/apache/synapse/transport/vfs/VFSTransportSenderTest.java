@@ -29,7 +29,7 @@ import junit.framework.TestSuite;
 import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
-import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
+import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
@@ -62,10 +62,10 @@ public class VFSTransportSenderTest extends TestCase {
         };
         
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
-        AxisAsyncMessageSender sender = new AxisAsyncMessageSender(tdf);
+        AxisAsyncTestClient client = new AxisAsyncTestClient(tdf);
         
-        suite.addBinaryTest(env, channel, adapt(sender, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);
-        suite.addTextPlainTests(env, channel, adapt(sender, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE);
+        suite.addBinaryTest(env, channel, adapt(client, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(env, channel, adapt(client, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE);
         
         return suite;
     }

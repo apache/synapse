@@ -24,10 +24,10 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.client.XMLRequestResponseTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-import org.apache.synapse.transport.testkit.listener.XMLRequestResponseMessageSender;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.name.NameComponent;
@@ -36,14 +36,14 @@ import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
 @DisplayName("EchoXML")
-public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C extends RequestResponseChannel<? super E>> extends TransportTestCase<E,C,XMLRequestResponseMessageSender<? super E,? super C>> {
+public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C extends RequestResponseChannel<? super E>> extends TransportTestCase<E,C,XMLRequestResponseTestClient<? super E,? super C>> {
     private final EndpointFactory<? super E,? super C> endpointFactory;
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
     // TODO: realign order of arguments with XMLAsyncMessageTestCase constructor
-    public XMLRequestResponseMessageTestCase(E env, C channel, XMLRequestResponseMessageSender<? super E,? super C> sender, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
-        super(env, channel, sender, endpointFactory.getServer(), contentTypeMode, contentType);
+    public XMLRequestResponseMessageTestCase(E env, C channel, XMLRequestResponseTestClient<? super E,? super C> client, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
+        super(env, channel, client, endpointFactory.getServer(), contentTypeMode, contentType);
         this.endpointFactory = endpointFactory;
         this.xmlMessageType = xmlMessageType;
         this.data = data;
@@ -66,7 +66,7 @@ public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C exten
             OMFactory factory = xmlMessageType.getOMFactory();
             OMElement orgElement = factory.createOMElement(new QName("root"));
             orgElement.setText(data.getText());
-            OMElement element = sender.sendMessage(channel, endpoint.getEPR(), contentType, data.getCharset(), xmlMessageType, orgElement);
+            OMElement element = client.sendMessage(channel, endpoint.getEPR(), contentType, data.getCharset(), xmlMessageType, orgElement);
             assertEquals(orgElement.getQName(), element.getQName());
             assertEquals(orgElement.getText(), element.getText());
         } finally {

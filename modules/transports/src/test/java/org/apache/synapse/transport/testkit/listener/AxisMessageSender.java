@@ -37,15 +37,22 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
 public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSender<TestEnvironment,C> {
     private static final Log log = LogFactory.getLog(AxisMessageSender.class);
     
+    private final TransportDescriptionFactory tdf;
+    
     private C channel;
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
+    public AxisMessageSender(TransportDescriptionFactory tdf) {
+        this.tdf = tdf;
+    }
+
     @Override
     public void setUp(TestEnvironment env, C channel) throws Exception {
         super.setUp(env, channel);
@@ -56,7 +63,7 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
                     new File("target/test_rep").getAbsolutePath());
         AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
 
-        trpOutDesc = channel.createTransportOutDescription();
+        trpOutDesc = tdf.createTransportOutDescription();
         axisCfg.addTransportOut(trpOutDesc);
         trpOutDesc.getSender().init(cfgCtx, trpOutDesc);
     }
@@ -87,6 +94,6 @@ public class AxisMessageSender<C extends Channel<?>> extends AbstractMessageSend
         return mepClient;
     }
     
-    protected void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
+    protected void setupRequestMessageContext(@SuppressWarnings("unused") MessageContext msgContext) throws AxisFault {
     }
 }

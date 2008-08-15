@@ -22,8 +22,6 @@ package org.apache.synapse.transport.vfs;
 import java.io.File;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
@@ -38,21 +36,6 @@ public class VFSFileChannel extends AbstractChannel<VFSTestEnvironment> implemen
         return requestFile;
     }
 
-    public TransportInDescription createTransportInDescription() {
-        TransportInDescription trpInDesc =
-            new TransportInDescription(VFSTransportListener.TRANSPORT_NAME);
-        trpInDesc.setReceiver(new VFSTransportListener());
-        return trpInDesc;
-    }
-    
-    @Override
-    public TransportOutDescription createTransportOutDescription() throws Exception {
-        TransportOutDescription trpOutDesc =
-            new TransportOutDescription(VFSTransportSender.TRANSPORT_NAME);
-        trpOutDesc.setSender(new VFSTransportSender());
-        return trpOutDesc;
-    }
-    
     @Override
     public void setupService(AxisService service) throws Exception {
         service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());

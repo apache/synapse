@@ -20,25 +20,12 @@
 package org.apache.synapse.transport.jms;
 
 import javax.jms.Destination;
-import javax.naming.Context;
-import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.ParameterInclude;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.NameComponent;
-import org.mockejb.jndi.MockContextFactory;
 
 public abstract class JMSChannel extends AbstractChannel<JMSTestEnvironment> {
-    private static final OMFactory factory = OMAbstractFactory.getOMFactory();
-    
     private final String destinationType;
     protected JMSTestEnvironment env;
     private String destinationName;
@@ -74,45 +61,6 @@ public abstract class JMSChannel extends AbstractChannel<JMSTestEnvironment> {
 
     public Destination getDestination() {
         return destination;
-    }
-
-    private OMElement createParameterElement(String name, String value) {
-        OMElement element = factory.createOMElement(new QName("parameter"));
-        element.addAttribute("name", name, null);
-        if (value != null) {
-            element.setText(value);
-        }
-        return element;
-    }
-    
-    private void setupConnectionFactoryConfig(ParameterInclude trpDesc, String name, String connFactName, String type) throws AxisFault {
-        OMElement element = createParameterElement(JMSConstants.DEFAULT_CONFAC_NAME, null);
-        element.addChild(createParameterElement(Context.INITIAL_CONTEXT_FACTORY,
-                MockContextFactory.class.getName()));
-        element.addChild(createParameterElement(JMSConstants.CONFAC_JNDI_NAME_PARAM,
-                connFactName));
-        element.addChild(createParameterElement(JMSConstants.CONFAC_TYPE, type));
-        trpDesc.addParameter(new Parameter(name, element));
-    }
-    
-    private void setupTransport(ParameterInclude trpDesc) throws AxisFault {
-        setupConnectionFactoryConfig(trpDesc, "queue", JMSTestEnvironment.QUEUE_CONNECTION_FACTORY, "queue");
-        setupConnectionFactoryConfig(trpDesc, "topic", JMSTestEnvironment.TOPIC_CONNECTION_FACTORY, "topic");
-    }
-    
-    public TransportInDescription createTransportInDescription() throws Exception {
-        TransportInDescription trpInDesc = new TransportInDescription(JMSListener.TRANSPORT_NAME);
-        setupTransport(trpInDesc);
-        trpInDesc.setReceiver(new JMSListener());
-        return trpInDesc;
-    }
-    
-    @Override
-    public TransportOutDescription createTransportOutDescription() throws Exception {
-        TransportOutDescription trpOutDesc = new TransportOutDescription(JMSSender.TRANSPORT_NAME);
-//        setupTransport(trpOutDesc);
-        trpOutDesc.setSender(new JMSSender());
-        return trpOutDesc;
     }
 
     @Override

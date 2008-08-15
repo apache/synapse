@@ -25,11 +25,16 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("axis")
 public class AxisRequestResponseMessageSender extends AxisMessageSender<RequestResponseChannel<?>> implements XMLRequestResponseMessageSender<TestEnvironment,RequestResponseChannel<?>> {
+    public AxisRequestResponseMessageSender(TransportDescriptionFactory tdf) {
+        super(tdf);
+    }
+
     public OMElement sendMessage(RequestResponseChannel<?> channel,
             String endpointReference, String contentType, String charset,
             XMLMessageType xmlMessageType, OMElement payload) throws Exception {

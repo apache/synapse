@@ -17,13 +17,19 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.nhttp;
+package org.apache.synapse.transport.testkit;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.AbstractChannel;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 
-// TODO: if this class remains empty, we should eliminate it
-public class HttpChannel extends AbstractChannel<TestEnvironment> implements AsyncChannel<TestEnvironment>, RequestResponseChannel<TestEnvironment> {
+public interface TransportDescriptionFactory {
+    TransportOutDescription createTransportOutDescription() throws Exception;
+    
+    /**
+     * Create a TransportInDescription for the transport under test.
+     * 
+     * @return the transport description
+     * @throws Exception
+     */
+    TransportInDescription createTransportInDescription() throws Exception;
 }

@@ -23,8 +23,6 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 
 public abstract class TestEnvironment {
-    public static final TestEnvironment DEFAULT = new TestEnvironment() {};
-    
     /**
      * Carry out initialization before server startup. This method is called
      * immediately before the test server is started and can be used by subclasses

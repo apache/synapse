@@ -26,6 +26,8 @@ import java.io.File;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
@@ -40,6 +42,9 @@ public class VFSTransportSenderTest extends TestCase {
         TransportTestSuite<VFSTestEnvironment> suite = new TransportTestSuite<VFSTestEnvironment>();
         
         VFSTestEnvironment env = new VFSTestEnvironment();
+        TransportDescriptionFactory tdf =
+            new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
+                    VFSTransportSender.class);
         
         AsyncEndpointFactory<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage> endpointFactory =
             new AsyncEndpointFactory<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage>() {
@@ -57,7 +62,7 @@ public class VFSTransportSenderTest extends TestCase {
         };
         
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
-        AxisAsyncMessageSender sender = new AxisAsyncMessageSender();
+        AxisAsyncMessageSender sender = new AxisAsyncMessageSender(tdf);
         
         suite.addBinaryTest(env, channel, adapt(sender, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);
         suite.addTextPlainTests(env, channel, adapt(sender, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE);

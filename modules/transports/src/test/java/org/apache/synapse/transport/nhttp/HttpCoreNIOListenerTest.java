@@ -27,7 +27,13 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.transport.http.CommonsHTTPTransportSender;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
@@ -39,20 +45,40 @@ import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() {
         TransportTestSuite<TestEnvironment> suite = new TransportTestSuite<TestEnvironment>();
+        
+        TransportDescriptionFactory tdfNIO =
+            new SimpleTransportDescriptionFactory("http", HttpCoreNIOListener.class, 
+                                                  HttpCoreNIOSender.class);
+        TransportDescriptionFactory tdfSimple =
+            new SimpleTransportDescriptionFactory("http", SimpleHTTPServer.class, 
+                                                  CommonsHTTPTransportSender.class) {
+
+            @Override
+            public TransportInDescription createTransportInDescription() throws Exception {
+                TransportInDescription desc = super.createTransportInDescription();
+                desc.addParameter(new Parameter(SimpleHTTPServer.PARAM_PORT, "8888"));
+                return desc;
+            }
+        };
+        
+        // Change to tdfSimple if you want to check the behavior of Axis' blocking HTTP transport 
+        TransportDescriptionFactory tdf = tdfNIO;
+        
+        AxisServer<TestEnvironment> axisServer = new AxisServer<TestEnvironment>(tdf);
         HttpChannel channel = new HttpChannel();
         JavaNetSender javaNetSender = new JavaNetSender();
         List<AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage>>();
         senders.add(adapt(javaNetSender, MessageConverter.XML_TO_BYTE));
-        senders.add(new AxisAsyncMessageSender());
+        senders.add(new AxisAsyncMessageSender(tdf));
         for (AsyncMessageSender<TestEnvironment,? super HttpChannel,XMLMessage> sender : senders) {
-            suite.addSOAPTests(null, channel, sender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT);
-            suite.addPOXTests(null, channel, sender, AxisServer.DEFAULT, ContentTypeMode.TRANSPORT);
+            suite.addSOAPTests(null, channel, sender, axisServer, ContentTypeMode.TRANSPORT);
+            suite.addPOXTests(null, channel, sender, axisServer, ContentTypeMode.TRANSPORT);
         }
 //        suite.addPOXTests(channel, new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
-        suite.addSwATests(null, channel, javaNetSender, AxisServer.DEFAULT);
-        suite.addTextPlainTests(null, channel, adapt(javaNetSender, MessageConverter.STRING_TO_BYTE), adapt(AxisServer.DEFAULT, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
-        suite.addBinaryTest(null, channel, javaNetSender, adapt(AxisServer.DEFAULT, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
-        suite.addRESTTests(null, channel, new JavaNetRESTSender(), AxisServer.DEFAULT);
+        suite.addSwATests(null, channel, javaNetSender, axisServer);
+        suite.addTextPlainTests(null, channel, adapt(javaNetSender, MessageConverter.STRING_TO_BYTE), adapt(axisServer, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
+        suite.addBinaryTest(null, channel, javaNetSender, adapt(axisServer, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
+        suite.addRESTTests(null, channel, new JavaNetRESTSender(), axisServer);
         return suite;
     }
 }

@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageSender;
 import org.apache.synapse.transport.testkit.listener.AxisAsyncMessageSender;
@@ -42,17 +43,18 @@ public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
         TransportTestSuite<JMSTestEnvironment> suite = new TransportTestSuite<JMSTestEnvironment>();
         JMSTestEnvironment env = new QpidTestEnvironment();
-        AxisServer<JMSTestEnvironment> server = new AxisServer<JMSTestEnvironment>(env);
+        TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory();
+        AxisServer<JMSTestEnvironment> server = new AxisServer<JMSTestEnvironment>(tdf);
         JMSBytesMessageSender bytesMessageSender = new JMSBytesMessageSender();
         JMSTextMessageSender textMessageSender = new JMSTextMessageSender();
         List<AsyncMessageSender<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage>> senders = new LinkedList<AsyncMessageSender<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage>>();
         senders.add(adapt(bytesMessageSender, MessageConverter.XML_TO_BYTE));
         senders.add(adapt(textMessageSender, MessageConverter.XML_TO_STRING));
-        senders.add(new AxisAsyncMessageSender());
-        senders.add(new JMSAxisAsyncMessageSender(JMSConstants.JMS_BYTE_MESSAGE));
-        senders.add(new JMSAxisAsyncMessageSender(JMSConstants.JMS_TEXT_MESSAGE));
-        suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), server, ContentTypeMode.TRANSPORT);
-        suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT);
+        senders.add(new AxisAsyncMessageSender(tdf));
+        senders.add(new JMSAxisAsyncMessageSender(tdf, JMSConstants.JMS_BYTE_MESSAGE));
+        senders.add(new JMSAxisAsyncMessageSender(tdf, JMSConstants.JMS_TEXT_MESSAGE));
+        suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(tdf), server, ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseMessageSender(tdf), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT);
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
             JMSAsyncChannel channel = new JMSAsyncChannel(destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {

@@ -20,7 +20,6 @@
 package org.apache.synapse.transport.mail;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
@@ -34,13 +33,6 @@ public class MailChannel extends AbstractChannel<TestEnvironment> implements Asy
 
     public String getAddress() {
         return address;
-    }
-
-    public TransportInDescription createTransportInDescription() {
-        TransportInDescription trpInDesc
-            = new TransportInDescription(MailConstants.TRANSPORT_NAME);
-        trpInDesc.setReceiver(new MailTransportListener());
-        return trpInDesc;
     }
 
     @Override

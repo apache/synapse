@@ -35,6 +35,7 @@ import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
@@ -45,20 +46,19 @@ import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class AxisServer<E extends TestEnvironment> extends Server<E> implements AsyncEndpointFactory<E,AsyncChannel<? super E>,MessageData>, EndpointFactory<E,RequestResponseChannel<? super E>> {
-    public static final AxisServer<TestEnvironment> DEFAULT = new AxisServer<TestEnvironment>(TestEnvironment.DEFAULT);
-    
+public class AxisServer<E extends TestEnvironment> implements Server<E>, AsyncEndpointFactory<E,AsyncChannel<? super E>,MessageData>, EndpointFactory<E,RequestResponseChannel<? super E>> {
     private static Server<?> activeServer;
+    
+    private final TransportDescriptionFactory tdf;
     
     private Channel<?> channel;
     private TransportListener listener;
     UtilsTransportServer server;
     
-    public AxisServer(E setup) {
-        super(setup);
+    public AxisServer(TransportDescriptionFactory tdf) {
+        this.tdf = tdf;
     }
 
-    @Override
     public void start(E env, Channel<?> channel) throws Exception {
         server = new UtilsTransportServer();
         this.channel = channel;
@@ -70,12 +70,12 @@ public class AxisServer<E extends TestEnvironment> extends Server<E> implements 
         
         TransportOutDescription trpOutDesc;
         if (channel instanceof RequestResponseChannel) {
-            trpOutDesc = ((RequestResponseChannel<?>)channel).createTransportOutDescription();
+            trpOutDesc = tdf.createTransportOutDescription();
         } else {
             trpOutDesc = null;
         }
         
-        TransportInDescription trpInDesc = channel.createTransportInDescription();
+        TransportInDescription trpInDesc = tdf.createTransportInDescription();
         listener = trpInDesc.getReceiver();
         server.addTransport(trpInDesc, trpOutDesc);
         
@@ -97,7 +97,6 @@ public class AxisServer<E extends TestEnvironment> extends Server<E> implements 
         server.start();
     }
     
-    @Override
     public void stop() throws Exception {
         server.stop();
         Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug

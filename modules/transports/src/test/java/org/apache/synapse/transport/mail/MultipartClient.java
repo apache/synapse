@@ -24,6 +24,9 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.synapse.transport.testkit.name.DisplayName;
+
+@DisplayName("multipart")
 public class MultipartClient extends MailClient {
     @Override
     protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {

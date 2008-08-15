@@ -17,17 +17,10 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.mail;
+package org.apache.synapse.transport.testkit.filter;
 
-import javax.activation.DataHandler;
-import javax.mail.internet.MimeMessage;
+import java.util.Map;
 
-import org.apache.synapse.transport.testkit.name.DisplayName;
-
-@DisplayName("mime")
-public class MimeClient extends MailClient {
-    @Override
-    protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
-        msg.setDataHandler(dh);
-    }
+public interface FilterExpression {
+    boolean matches(Map<String,String> map);
 }

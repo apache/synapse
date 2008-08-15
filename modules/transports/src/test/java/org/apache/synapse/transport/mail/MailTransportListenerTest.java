@@ -27,6 +27,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.synapse.transport.testkit.AdapterUtils;
 import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
@@ -38,8 +39,18 @@ import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class MailTransportListenerTest extends TestCase {
-    public static TestSuite suite() {
+    public static TestSuite suite() throws Exception {
         TransportTestSuite<TestEnvironment> suite = new TransportTestSuite<TestEnvironment>();
+        
+        // TODO: these test don't work; need more analysis why this is so
+        suite.addExclude("(&(messageType=SOAP12)(data=Latin1))");
+        suite.addExclude("(&(messageType=POX)(data=Latin1))");
+        suite.addExclude("(&(client=multipart)(data=Latin1))");
+        suite.addExclude("(&(client=multipart)(messageType=POX))");
+        suite.addExclude("(test=AsyncSwA)");
+        suite.addExclude("(test=AsyncBinary)");
+        suite.addExclude("(&(test=AsyncTextPlain)(!(data=ASCII)))");
+        
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory(MailConstants.TRANSPORT_NAME,
                     MailTransportListener.class, MailTransportSender.class);
@@ -50,21 +61,11 @@ public class MailTransportListenerTest extends TestCase {
         clients.add(new MultipartClient());
         for (MailClient client : clients) {
             AsyncTestClient<TestEnvironment,MailChannel,XMLMessage> xmlClient = adapt(client, MessageConverter.XML_TO_BYTE);
-            // TODO: SOAP 1.2 tests don't work yet for mail transport
-            suite.addSOAP11Test(null, channel, xmlClient, axisServer, ContentTypeMode.TRANSPORT, TransportTestSuite.ASCII_TEST_DATA);
-            suite.addSOAP11Test(null, channel, xmlClient, axisServer, ContentTypeMode.TRANSPORT, TransportTestSuite.UTF8_TEST_DATA);
-            // TODO: this test fails when using multipart
-            if (client instanceof MimeClient) {
-                suite.addSOAP11Test(null, channel, xmlClient, axisServer, ContentTypeMode.TRANSPORT, TransportTestSuite.LATIN1_TEST_DATA);
-            }
-            // addSOAPTests(strategy, suite);
-            // TODO: POX tests don't work yet for mail transport
-            // addPOXTests(strategy, suite);
-            // Temporarily skip this test until we know why it fails.
-            // addSwATests(strategy, suite);
-            // Temporarily skip the following tests until SYNAPSE-359 is solved
-            // addTextPlainTests(strategy, suite);
-            // addBinaryTest(strategy, suite);
+            suite.addSOAPTests(null, channel, xmlClient, axisServer, ContentTypeMode.TRANSPORT);
+            suite.addPOXTests(null, channel, xmlClient, axisServer, ContentTypeMode.TRANSPORT);
+            suite.addSwATests(null, channel, client, axisServer);
+            suite.addTextPlainTests(null, channel, AdapterUtils.adapt(client, MessageConverter.STRING_TO_BYTE), AdapterUtils.adapt(axisServer, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
+            suite.addBinaryTest(null, channel, client, AdapterUtils.adapt(axisServer, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
         }
         return suite;
     }

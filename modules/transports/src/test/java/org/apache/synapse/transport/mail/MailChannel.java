@@ -19,16 +19,22 @@
 
 package org.apache.synapse.transport.mail;
 
+import java.util.Map;
+
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
-public class MailChannel extends AbstractChannel<TestEnvironment> implements AsyncChannel<TestEnvironment> {
-    private final String address;
+public class MailChannel extends AbstractChannel<MailTestEnvironment> implements AsyncChannel<MailTestEnvironment> {
+    private String address;
+    private String protocol;
+    private Map<String,String> inProperties;
     
-    public MailChannel(String address) {
-        this.address = address;
+    @Override
+    public void setUp(MailTestEnvironment env) throws Exception {
+        protocol = env.getProtocol();
+        inProperties = env.getInProperties();
+        address = env.getAddress();
     }
 
     public String getAddress() {
@@ -37,11 +43,12 @@ public class MailChannel extends AbstractChannel<TestEnvironment> implements Asy
 
     @Override
     public void setupService(AxisService service) throws Exception {
-        service.addParameter("transport.mail.Protocol", "test-store");
+        service.addParameter("transport.mail.Protocol", protocol);
         service.addParameter("transport.mail.Address", address);
         service.addParameter("transport.PollInterval", "1");
-        // TODO: logically, this should be mail.test-store.user and mail.test-store.password
-        service.addParameter("mail.pop3.user", address);
-        service.addParameter("mail.pop3.password", "dummy");
+        
+        for (Map.Entry<String,String> prop : inProperties.entrySet()) {
+            service.addParameter(prop.getKey(), prop.getValue());
+        }
     }
 }

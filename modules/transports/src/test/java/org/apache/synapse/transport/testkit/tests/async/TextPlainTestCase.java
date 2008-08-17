@@ -51,6 +51,9 @@ public class TextPlainTestCase<E extends TestEnvironment,C extends AsyncChannel<
 
     @Override
     protected void checkMessageData(StringMessage message, StringMessage messageData) throws Exception {
-        assertEquals(message.getContent(), messageData.getContent());
+        // Some transport protocols add a newline at the end of the payload. Therefore trim the
+        // strings before comparison.
+        // TODO: investigate this a bit further
+        assertEquals(message.getContent().trim(), messageData.getContent().trim());
     }
 }

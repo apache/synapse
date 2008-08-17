@@ -40,8 +40,8 @@ public abstract class JMSTestEnvironment extends TestEnvironment {
     private QueueConnectionFactory queueConnectionFactory;
     private TopicConnectionFactory topicConnectionFactory;
     
-    @Override
-    public void setUp() throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp() throws Exception {
         MockContextFactory.setAsInitial();
         context = new InitialContext();
         queueConnectionFactory = createQueueConnectionFactory();

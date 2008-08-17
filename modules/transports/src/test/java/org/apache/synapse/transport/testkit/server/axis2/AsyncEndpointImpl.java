@@ -28,7 +28,7 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 public class AsyncEndpointImpl extends EndpointImpl implements AsyncEndpoint<MessageData> {
     private final MockMessageReceiver messageReceiver;
     
-    public AsyncEndpointImpl(AxisServer<?> server, AxisService service, MockMessageReceiver messageReceiver) {
+    public AsyncEndpointImpl(AxisServer server, AxisService service, MockMessageReceiver messageReceiver) {
         super(server, service);
         this.messageReceiver = messageReceiver;
     }

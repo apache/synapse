@@ -40,11 +40,15 @@ import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() {
-        TransportTestSuite<TestEnvironment> suite = new TransportTestSuite<TestEnvironment>();
+        // TODO: temporary hack, remove later
+        TestEnvironment env = new TestEnvironment() {};
+        
+        TransportTestSuite suite = new TransportTestSuite();
         
         TransportDescriptionFactory tdfNIO =
             new SimpleTransportDescriptionFactory("http", HttpCoreNIOListener.class, 
@@ -64,21 +68,22 @@ public class HttpCoreNIOListenerTest extends TestCase {
         // Change to tdfSimple if you want to check the behavior of Axis' blocking HTTP transport 
         TransportDescriptionFactory tdf = tdfNIO;
         
-        AxisServer<TestEnvironment> axisServer = new AxisServer<TestEnvironment>(tdf);
+        AxisServer axisServer = new AxisServer(tdf);
+        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory(axisServer);
         HttpChannel channel = new HttpChannel();
         JavaNetClient javaNetClient = new JavaNetClient();
-        List<AsyncTestClient<TestEnvironment,? super HttpChannel,XMLMessage>> clients = new LinkedList<AsyncTestClient<TestEnvironment,? super HttpChannel,XMLMessage>>();
+        List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(javaNetClient, MessageConverter.XML_TO_BYTE));
         clients.add(new AxisAsyncTestClient(tdf));
-        for (AsyncTestClient<TestEnvironment,? super HttpChannel,XMLMessage> client : clients) {
-            suite.addSOAPTests(null, channel, client, axisServer, ContentTypeMode.TRANSPORT);
-            suite.addPOXTests(null, channel, client, axisServer, ContentTypeMode.TRANSPORT);
+        for (AsyncTestClient<XMLMessage> client : clients) {
+            suite.addSOAPTests(env, channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT);
+            suite.addPOXTests(env, channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT);
         }
 //        suite.addPOXTests(channel, new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
-        suite.addSwATests(null, channel, javaNetClient, axisServer);
-        suite.addTextPlainTests(null, channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(axisServer, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
-        suite.addBinaryTest(null, channel, javaNetClient, adapt(axisServer, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
-        suite.addRESTTests(null, channel, new JavaNetRESTClient(), axisServer);
+        suite.addSwATests(env, channel, javaNetClient, asyncEndpointFactory);
+        suite.addTextPlainTests(env, channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
+        suite.addBinaryTest(env, channel, javaNetClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
+        suite.addRESTTests(env, channel, new JavaNetRESTClient(), asyncEndpointFactory);
         return suite;
     }
 }

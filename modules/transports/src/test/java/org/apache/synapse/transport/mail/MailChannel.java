@@ -25,13 +25,13 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
-public class MailChannel extends AbstractChannel<MailTestEnvironment> implements AsyncChannel<MailTestEnvironment> {
+public class MailChannel extends AbstractChannel implements AsyncChannel {
     private String address;
     private String protocol;
     private Map<String,String> inProperties;
     
-    @Override
-    public void setUp(MailTestEnvironment env) throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp(MailTestEnvironment env) throws Exception {
         protocol = env.getProtocol();
         inProperties = env.getInProperties();
         address = env.getAddress();

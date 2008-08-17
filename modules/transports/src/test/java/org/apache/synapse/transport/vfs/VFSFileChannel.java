@@ -25,7 +25,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
-public class VFSFileChannel extends AbstractChannel<VFSTestEnvironment> implements AsyncChannel<VFSTestEnvironment> {
+public class VFSFileChannel extends AbstractChannel implements AsyncChannel {
     private final File requestFile;
     
     public VFSFileChannel(File requestFile) {
@@ -43,8 +43,8 @@ public class VFSFileChannel extends AbstractChannel<VFSTestEnvironment> implemen
         service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");
     }
 
-    @Override
-    public void setUp(VFSTestEnvironment env) throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp() throws Exception {
         requestFile.getParentFile().mkdirs();
         requestFile.delete();
     }

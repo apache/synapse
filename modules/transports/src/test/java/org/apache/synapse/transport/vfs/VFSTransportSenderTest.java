@@ -39,22 +39,28 @@ import org.apache.synapse.transport.testkit.server.Server;
 
 public class VFSTransportSenderTest extends TestCase {
     public static TestSuite suite() {
-        TransportTestSuite<VFSTestEnvironment> suite = new TransportTestSuite<VFSTestEnvironment>();
+        TransportTestSuite suite = new TransportTestSuite();
         
         VFSTestEnvironment env = new VFSTestEnvironment();
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);
         
-        AsyncEndpointFactory<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage> endpointFactory =
-            new AsyncEndpointFactory<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage>() {
+        AsyncEndpointFactory<ByteArrayMessage> endpointFactory =
+            new AsyncEndpointFactory<ByteArrayMessage>() {
 
-            public Server<VFSTestEnvironment> getServer() {
+            private VFSFileChannel channel;
+            
+            public Server getServer() {
                 return null;
             }
             
-            public AsyncEndpoint<ByteArrayMessage> createAsyncEndpoint(
-                    VFSTestEnvironment env, VFSFileChannel channel, String contentType)
+            @SuppressWarnings("unused")
+            private void setUp(VFSFileChannel channel) {
+                this.channel = channel;
+            }
+            
+            public AsyncEndpoint<ByteArrayMessage> createAsyncEndpoint(String contentType)
                     throws Exception {
                 
                 return new VFSMockAsyncEndpoint(channel, contentType);

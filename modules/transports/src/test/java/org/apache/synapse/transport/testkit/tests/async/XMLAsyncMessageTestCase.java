@@ -38,11 +38,11 @@ import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("AsyncXML")
-public class XMLAsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,XMLMessage,MessageData> {
+public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,MessageData> {
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
-    public XMLAsyncMessageTestCase(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, XMLMessageType xmlMessageType, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
+    public XMLAsyncMessageTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, XMLMessageType xmlMessageType, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data) {
         super(env, channel, client, endpointFactory, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"", data.getCharset());
         this.xmlMessageType = xmlMessageType;
         this.data = data;

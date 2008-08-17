@@ -33,15 +33,13 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("qpid")
 public class QpidTestEnvironment extends JMSTestEnvironment {
-    @Override
-    public void setUp() throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp() throws Exception {
         TransportConnection.createVMBroker(1);
-        super.setUp();
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         TransportConnection.killVMBroker(1);
     }
 

@@ -54,7 +54,7 @@ import org.apache.synapse.transport.testkit.tests.async.TextPlainTestCase;
 import org.apache.synapse.transport.testkit.tests.async.XMLAsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.tests.echo.XMLRequestResponseMessageTestCase;
 
-public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
+public class TransportTestSuite extends TestSuite {
     public static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
     
     public static final MessageTestData ASCII_TEST_DATA = new MessageTestData("ASCII", "test string", "us-ascii");
@@ -92,75 +92,70 @@ public class TransportTestSuite<E extends TestEnvironment> extends TestSuite {
         excludes.add(FilterExpressionParser.parse(filter));
     }
 
-    public <C extends AsyncChannel<? super E>> void addSOAP11Test(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLAsyncMessageTestCase<E,C>(env, channel, client, endpointFactory, XMLMessageType.SOAP11, contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
+    public void addSOAP11Test(TestEnvironment env, AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase(env, channel, client, endpointFactory, XMLMessageType.SOAP11, contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
     }
     
-    public <C extends AsyncChannel<? super E>> void addSOAP12Test(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLAsyncMessageTestCase<E,C>(env, channel, client, endpointFactory, XMLMessageType.SOAP12, contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
+    public void addSOAP12Test(TestEnvironment env, AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase(env, channel, client, endpointFactory, XMLMessageType.SOAP12, contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
     }
     
-    public <C extends AsyncChannel<? super E>> void addSOAPTests(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
+    public void addSOAPTests(TestEnvironment env, AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addTest(new XMLAsyncMessageTestCase<E,C>(env, channel, client, endpointFactory, XMLMessageType.SOAP11, contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data));
-            addTest(new XMLAsyncMessageTestCase<E,C>(env, channel, client, endpointFactory, XMLMessageType.SOAP12, contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data));
-//            addSOAP11Test(channel, client, endpointFactory, contentTypeMode, data);
-//            addSOAP12Test(channel, client, endpointFactory, contentTypeMode, data);
+            addSOAP11Test(env, channel, client, endpointFactory, contentTypeMode, data);
+            addSOAP12Test(env, channel, client, endpointFactory, contentTypeMode, data);
         }
     }
     
-    public <C extends AsyncChannel<? super E>> void addPOXTest(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLAsyncMessageTestCase<E,C>(env, channel, client, endpointFactory, XMLMessageType.POX, contentTypeMode, "application/xml", data));
+    public void addPOXTest(TestEnvironment env, AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLAsyncMessageTestCase(env, channel, client, endpointFactory, XMLMessageType.POX, contentTypeMode, "application/xml", data));
     }
     
-    public <C extends AsyncChannel<? super E>> void addPOXTests(E env, C channel, AsyncTestClient<? super E,? super C,XMLMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
+    public void addPOXTests(TestEnvironment env, AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-            addTest(new XMLAsyncMessageTestCase<E,C>(env, channel, client, endpointFactory, XMLMessageType.POX, contentTypeMode, "application/xml", data));
-//            addPOXTest(channel, client, endpointFactory, contentTypeMode, data);
+            addPOXTest(env, channel, client, endpointFactory, contentTypeMode, data);
         }
     }
     
-    public <C extends RequestResponseChannel<? super E>> void addPOXTest(E env, C channel, XMLRequestResponseTestClient<? super E,? super C> client, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new XMLRequestResponseMessageTestCase<E,C>(env, channel, client, endpointFactory, contentTypeMode, "application/xml", XMLMessageType.POX, data));
+    public void addPOXTest(TestEnvironment env, RequestResponseChannel channel, XMLRequestResponseTestClient client, EndpointFactory endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new XMLRequestResponseMessageTestCase(env, channel, client, endpointFactory, contentTypeMode, "application/xml", XMLMessageType.POX, data));
     }
     
-    public <C extends RequestResponseChannel<? super E>> void addPOXTests(E env, C channel, XMLRequestResponseTestClient<? super E,? super C> client, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode) {
+    public void addPOXTests(TestEnvironment env, RequestResponseChannel channel, XMLRequestResponseTestClient client, EndpointFactory endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-//            addPOXTest(channel, client, endpointFactory, contentTypeMode, data);
-            addTest(new XMLRequestResponseMessageTestCase<E,C>(env, channel, client, endpointFactory, contentTypeMode, "application/xml", XMLMessageType.POX, data));
+            addPOXTest(env, channel, client, endpointFactory, contentTypeMode, data);
         }
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public <C extends AsyncChannel<? super E>> void addSwATests(E env, C channel, AsyncTestClient<? super E,? super C,ByteArrayMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
-        addTest(new SwATestCase<E,C>(env, channel, client, endpointFactory));
+    public void addSwATests(TestEnvironment env, AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<MessageData> endpointFactory) {
+        addTest(new SwATestCase(env, channel, client, endpointFactory));
     }
     
-    public <C extends AsyncChannel<? super E>> void addTextPlainTest(E env, C channel, AsyncTestClient<? super E,? super C,StringMessage> client, AsyncEndpointFactory<? super E,? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
-        addTest(new TextPlainTestCase<E,C>(env, channel, client, endpointFactory, contentTypeMode, data));
+    public void addTextPlainTest(TestEnvironment env, AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+        addTest(new TextPlainTestCase(env, channel, client, endpointFactory, contentTypeMode, data));
     }
     
-    public <C extends AsyncChannel<? super E>> void addTextPlainTests(E env, C channel, AsyncTestClient<? super E,? super C,StringMessage> client, AsyncEndpointFactory<? super E,? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode) {
+    public void addTextPlainTests(TestEnvironment env, AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode) {
         for (MessageTestData data : messageTestData) {
-//            addTextPlainTest(channel, client, endpointFactory, contentTypeMode, data);
-            addTest(new TextPlainTestCase<E,C>(env, channel, client, endpointFactory, contentTypeMode, data));
+            addTextPlainTest(env, channel, client, endpointFactory, contentTypeMode, data);
         }
     }
     
-    public <C extends AsyncChannel<? super E>> void addBinaryTest(E env, C channel, AsyncTestClient<? super E,? super C,ByteArrayMessage> client, AsyncEndpointFactory<? super E,? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
-        addTest(new BinaryTestCase<E,C>(env, channel, client, endpointFactory, contentTypeMode));
+    public void addBinaryTest(TestEnvironment env, AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
+        addTest(new BinaryTestCase(env, channel, client, endpointFactory, contentTypeMode));
     }
 
-    public <C extends AsyncChannel<? super E>> void addRESTTests(E env, C channel, AsyncTestClient<? super E,? super C,RESTMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
-        addTest(new RESTTestCase<E,C>(env, channel, client, endpointFactory, restTestMessage1));
+    public void addRESTTests(TestEnvironment env, AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpointFactory<MessageData> endpointFactory) {
+        addTest(new RESTTestCase(env, channel, client, endpointFactory, restTestMessage1));
         // TODO: regression test for SYNAPSE-431
-//        addTest(new RESTTestCase<E,C>(env, channel, client, endpointFactory, restTestMessage2));
+//        addTest(new RESTTestCase(env, channel, client, endpointFactory, restTestMessage2));
     }
 
     @Override
     public void addTest(Test test) {
         if (test instanceof TransportTestCase) {
-            TransportTestCase<?,?,?> ttest = (TransportTestCase<?,?,?>)test;
+            TransportTestCase ttest = (TransportTestCase)test;
             Map<String,String> map = ttest.getNameComponents();
             for (FilterExpression exclude : excludes) {
                 if (exclude.matches(map)) {

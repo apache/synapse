@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.mail;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -30,16 +31,22 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.client.AbstractTestClient;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
-public abstract class MailClient extends AbstractTestClient<TestEnvironment,MailChannel> implements AsyncTestClient<TestEnvironment,MailChannel,ByteArrayMessage> {
+public abstract class MailClient extends AbstractTestClient<MailTestEnvironment,MailChannel> implements AsyncTestClient<MailTestEnvironment,MailChannel,ByteArrayMessage> {
+    private Map<String,String> outProperties;
+    
+    @Override
+    public void setUp(MailTestEnvironment env, MailChannel channel) throws Exception {
+        outProperties = env.getOutProperties();
+    }
+
     public void sendMessage(MailChannel channel, ClientOptions options, ByteArrayMessage message) throws Exception {
         Properties props = new Properties();
-        props.put("mail.smtp.class", TestTransport.class.getName());
+        props.putAll(outProperties);
         Session session = Session.getInstance(props);
         MimeMessage msg = new MimeMessage(session);
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getAddress()));

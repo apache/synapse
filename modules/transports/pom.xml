@@ -196,6 +196,13 @@
             <scope>test</scope>
         </dependency>
         
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Workaround for SYNAPSE-400 -->
         <dependency>
             <groupId>org.apache.woden</groupId>

@@ -36,17 +36,26 @@ import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
 @DisplayName("EchoXML")
-public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C extends RequestResponseChannel<? super E>> extends TransportTestCase<E,C,XMLRequestResponseTestClient<? super E,? super C>> {
-    private final EndpointFactory<? super E,? super C> endpointFactory;
+public class XMLRequestResponseMessageTestCase extends TransportTestCase {
+    private final XMLRequestResponseTestClient client;
+    private final EndpointFactory endpointFactory;
     private final XMLMessageType xmlMessageType;
     private final MessageTestData data;
     
     // TODO: realign order of arguments with XMLAsyncMessageTestCase constructor
-    public XMLRequestResponseMessageTestCase(E env, C channel, XMLRequestResponseTestClient<? super E,? super C> client, EndpointFactory<? super E,? super C> endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
-        super(env, channel, client, endpointFactory.getServer(), contentTypeMode, contentType);
+    public XMLRequestResponseMessageTestCase(TestEnvironment env, RequestResponseChannel channel, XMLRequestResponseTestClient client, EndpointFactory endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessageType xmlMessageType, MessageTestData data) {
+        super(env, channel, endpointFactory.getServer(), contentTypeMode, contentType);
+        this.client = client;
         this.endpointFactory = endpointFactory;
         this.xmlMessageType = xmlMessageType;
         this.data = data;
+        addResource(client);
+        addResource(endpointFactory);
+    }
+
+    @NameComponent("client")
+    public XMLRequestResponseTestClient getClient() {
+        return client;
     }
 
     @NameComponent("messageType")
@@ -61,12 +70,12 @@ public class XMLRequestResponseMessageTestCase<E extends TestEnvironment,C exten
 
     @Override
     protected void runTest() throws Throwable {
-        Endpoint endpoint = endpointFactory.createEchoEndpoint(env, channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
+        Endpoint endpoint = endpointFactory.createEchoEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         try {
             OMFactory factory = xmlMessageType.getOMFactory();
             OMElement orgElement = factory.createOMElement(new QName("root"));
             orgElement.setText(data.getText());
-            OMElement element = client.sendMessage(channel, endpoint.getEPR(), contentType, data.getCharset(), xmlMessageType, orgElement);
+            OMElement element = client.sendMessage(endpoint.getEPR(), contentType, data.getCharset(), xmlMessageType, orgElement);
             assertEquals(orgElement.getQName(), element.getQName());
             assertEquals(orgElement.getText(), element.getText());
         } finally {

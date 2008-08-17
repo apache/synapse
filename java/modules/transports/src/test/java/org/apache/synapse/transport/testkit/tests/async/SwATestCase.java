@@ -49,13 +49,13 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("AsyncSwA")
-public class SwATestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,ByteArrayMessage,MessageData> {
+public class SwATestCase extends AsyncMessageTestCase<ByteArrayMessage,MessageData> {
     private static final Random random = new Random();
     
     private byte[] attachmentContent;
     private String contentID;
     
-    public SwATestCase(E env, C channel, AsyncTestClient<? super E,? super C,ByteArrayMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory) {
+    public SwATestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<MessageData> endpointFactory) {
         super(env, channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
     }
     

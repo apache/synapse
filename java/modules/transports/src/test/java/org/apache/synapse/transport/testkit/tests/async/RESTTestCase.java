@@ -37,10 +37,10 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("REST")
-public class RESTTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,RESTMessage,MessageData> {
+public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,MessageData> {
     private final RESTMessage message;
     
-    public RESTTestCase(E env, C channel, AsyncTestClient<? super E,? super C,RESTMessage> client, AsyncEndpointFactory<? super E,? super C,MessageData> endpointFactory, RESTMessage message) {
+    public RESTTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, RESTMessage message) {
         super(env, channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
         this.message = message;
     }

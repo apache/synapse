@@ -19,11 +19,10 @@
 
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 
 // TODO: if this class remains empty, we should eliminate it
-public class HttpChannel extends AbstractChannel<TestEnvironment> implements AsyncChannel<TestEnvironment>, RequestResponseChannel<TestEnvironment> {
+public class HttpChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
 }

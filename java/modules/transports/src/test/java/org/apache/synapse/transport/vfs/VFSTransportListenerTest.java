@@ -36,6 +36,7 @@ import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 /**
@@ -44,24 +45,25 @@ import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 public class VFSTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         // TODO: the VFS listener doesn't like reuseServer == true...
-        TransportTestSuite<VFSTestEnvironment> suite = new TransportTestSuite<VFSTestEnvironment>(false);
+        TransportTestSuite suite = new TransportTestSuite(false);
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);
         VFSTestEnvironment env = new VFSTestEnvironment();
-        AxisServer<VFSTestEnvironment> server = new AxisServer<VFSTestEnvironment>(tdf);
+        AxisServer server = new AxisServer(tdf);
+        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory(server);
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
         VFSClient vfsClient = new VFSClient();
-        List<AsyncTestClient<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage>> clients = new LinkedList<AsyncTestClient<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage>>();
+        List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(vfsClient, MessageConverter.XML_TO_BYTE));
         clients.add(new AxisAsyncTestClient(tdf));
-        for (AsyncTestClient<? super VFSTestEnvironment,? super VFSFileChannel,XMLMessage> client : clients) {
-            suite.addSOAPTests(env, channel, client, server, ContentTypeMode.SERVICE);
-            suite.addPOXTests(env, channel, client, server, ContentTypeMode.SERVICE);
+        for (AsyncTestClient<XMLMessage> client : clients) {
+            suite.addSOAPTests(env, channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE);
+            suite.addPOXTests(env, channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE);
             // Since VFS has no Content-Type header, SwA is not supported.
         }
-        suite.addTextPlainTests(env, channel, adapt(vfsClient, MessageConverter.STRING_TO_BYTE), adapt(server, MessageConverter.AXIS_TO_STRING), ContentTypeMode.SERVICE);
-        suite.addBinaryTest(env, channel, vfsClient, adapt(server, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(env, channel, adapt(vfsClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.SERVICE);
+        suite.addBinaryTest(env, channel, vfsClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.SERVICE);
         return suite;
     }
 }

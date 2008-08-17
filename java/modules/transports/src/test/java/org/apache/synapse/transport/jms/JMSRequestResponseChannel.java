@@ -27,7 +27,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 
-public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel<JMSTestEnvironment> {
+public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel {
     private final String replyDestinationType;
     private String replyDestinationName;
     private Destination replyDestination;
@@ -37,17 +37,15 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
         this.replyDestinationType = replyDestinationType;
     }
     
-    @Override
-    public void setUp(JMSTestEnvironment env) throws Exception {
-        super.setUp(env);
+    @SuppressWarnings("unused")
+    private void setUp(JMSTestEnvironment env) throws Exception {
         replyDestinationName = "response" + replyDestinationType;
         replyDestination = env.createDestination(replyDestinationType, replyDestinationName);
         env.getContext().bind(replyDestinationName, replyDestination);
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         env.getContext().unbind(replyDestinationName);
         replyDestinationName = null;
         replyDestination = null;

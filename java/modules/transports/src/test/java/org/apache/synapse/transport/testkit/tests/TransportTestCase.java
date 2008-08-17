@@ -19,23 +19,24 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.name.NameUtils;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public abstract class TransportTestCase<E extends TestEnvironment,C extends Channel<? super E>,L extends TestClient<? super E,? super C>> extends TestCase {
-    protected final E env;
-    protected final C channel;
-    protected final L client;
-    private final Server<? super E> server;
+public abstract class TransportTestCase extends TestCase {
+    private final List<TestResource> resources = new LinkedList<TestResource>();
+    private final TestEnvironment env;
+    private final Channel channel;
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
     
@@ -43,15 +44,24 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
     
     private boolean manageServer = true;
 
-    public TransportTestCase(E env, C channel, L client, Server<? super E> server, ContentTypeMode contentTypeMode, String contentType) {
+    public TransportTestCase(TestEnvironment env, Channel channel, Server server, ContentTypeMode contentTypeMode, String contentType) {
         this.env = env;
         this.channel = channel;
-        this.client = client;
-        this.server = server;
         this.contentTypeMode = contentTypeMode;
         this.contentType = contentType;
+        if (env != null) {
+            addResource(env);
+        }
+        addResource(channel);
+        if (server != null) {
+            addResource(server);
+        }
     }
 
+    protected void addResource(Object resource) {
+        resources.add(new TestResource(resources, resource));
+    }
+    
     public Map<String,String> getNameComponents() {
         if (nameComponents == null) {
             nameComponents = NameUtils.getNameComponents("test", this);
@@ -79,21 +89,16 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
         return testName;
     }
 
-    @NameComponent("channel")
-    public C getChannel() {
-        return channel;
-    }
-
-    @NameComponent("client")
-    public L getClient() {
-        return client;
-    }
-
     @NameComponent("env")
-    public E getEnvironment() {
+    public TestEnvironment getEnvironment() {
         return env;
     }
     
+    @NameComponent("channel")
+    public Channel getChannel() {
+        return channel;
+    }
+
 //    public void setServer(ListenerTestServer server){
 //        this.server = server;
 //        manageServer = false;
@@ -101,25 +106,15 @@ public abstract class TransportTestCase<E extends TestEnvironment,C extends Chan
     
     @Override
     protected void setUp() throws Exception {
-        if (env != null) {
-            env.setUp();
+        for (TestResource resource : resources) {
+            resource.setUp();
         }
-        channel.setUp(env);
-        if (server != null && manageServer) {
-            server.start(env, channel);
-        }
-        client.setUp(env, channel);
     }
 
     @Override
     protected void tearDown() throws Exception {
-        client.tearDown();
-        if (server != null && manageServer) {
-            server.stop();
-        }
-        channel.tearDown();
-        if (env != null) {
-            env.tearDown();
+        for (ListIterator<TestResource> it = resources.listIterator(resources.size()); it.hasPrevious(); ) {
+            it.previous().tearDown();
         }
     }
 }

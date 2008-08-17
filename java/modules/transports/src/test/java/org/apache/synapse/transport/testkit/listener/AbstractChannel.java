@@ -22,9 +22,8 @@ package org.apache.synapse.transport.testkit.listener;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 
-public abstract class AbstractChannel<E extends TestEnvironment> implements Channel<E> {
+public abstract class AbstractChannel implements Channel {
     public void setupService(AxisService service) throws Exception {
     }
     
@@ -33,11 +32,5 @@ public abstract class AbstractChannel<E extends TestEnvironment> implements Chan
 
     public EndpointReference createEndpointReference(String address) {
         return new EndpointReference(address);
-    }
-
-    public void setUp(E env) throws Exception {
-    }
-
-    public void tearDown() throws Exception {
     }
 }

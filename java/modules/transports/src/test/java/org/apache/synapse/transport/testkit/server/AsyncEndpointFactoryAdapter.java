@@ -20,29 +20,27 @@
 package org.apache.synapse.transport.testkit.server;
 
 import org.apache.synapse.transport.testkit.Adapter;
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 
-public class AsyncEndpointFactoryAdapter<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> implements AsyncEndpointFactory<E,C,M>, Adapter {
-    private final AsyncEndpointFactory<E,C,N> targetFactory;
+public class AsyncEndpointFactoryAdapter<M,N> implements AsyncEndpointFactory<M>, Adapter {
+    private final AsyncEndpointFactory<N> targetFactory;
     private final MessageConverter<N,M> converter;
     
-    public AsyncEndpointFactoryAdapter(AsyncEndpointFactory<E,C,N> targetFactory, MessageConverter<N,M> converter) {
+    public AsyncEndpointFactoryAdapter(AsyncEndpointFactory<N> targetFactory, MessageConverter<N,M> converter) {
         this.targetFactory = targetFactory;
         this.converter = converter;
     }
     
-    public AsyncEndpointFactory<E,C,N> getTarget() {
+    public AsyncEndpointFactory<N> getTarget() {
         return targetFactory;
     }
 
-    public Server<? super E> getServer() {
+    public Server getServer() {
         return targetFactory.getServer();
     }
 
-    public AsyncEndpoint<M> createAsyncEndpoint(E env, C channel, String contentType) throws Exception {
-        final AsyncEndpoint<N> targetEndpoint = targetFactory.createAsyncEndpoint(env, channel, contentType);
+    public AsyncEndpoint<M> createAsyncEndpoint(String contentType) throws Exception {
+        final AsyncEndpoint<N> targetEndpoint = targetFactory.createAsyncEndpoint(contentType);
         final MessageConverter<N,M> converter = this.converter;
         return new AsyncEndpoint<M>() {
             public String getEPR() throws Exception {

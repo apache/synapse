@@ -23,10 +23,10 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 
 public class EndpointImpl implements Endpoint {
-    private final AxisServer<?> server;
+    private final AxisServer server;
     private final AxisService service;
     
-    public EndpointImpl(AxisServer<?> server, AxisService service) {
+    public EndpointImpl(AxisServer server, AxisService service) {
         this.server = server;
         this.service = service;
     }

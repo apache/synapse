@@ -36,14 +36,23 @@ import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class MockEchoEndpointFactory implements EndpointFactory<JMSTestEnvironment,JMSRequestResponseChannel> {
+public class MockEchoEndpointFactory implements EndpointFactory {
     static Log log = LogFactory.getLog(MockEchoEndpointFactory.class);
     
-    public Server<JMSTestEnvironment> getServer() {
+    private JMSTestEnvironment env;
+    JMSRequestResponseChannel channel;
+    
+    @SuppressWarnings("unused")
+    private void setUp(JMSTestEnvironment env, JMSRequestResponseChannel channel) {
+        this.env = env;
+        this.channel = channel;
+    }
+    
+    public Server getServer() {
         return null;
     }
 
-    public Endpoint createEchoEndpoint(JMSTestEnvironment env, final JMSRequestResponseChannel channel, String contentType) throws Exception {
+    public Endpoint createEchoEndpoint(String contentType) throws Exception {
         Destination destination = channel.getDestination();
         Destination replyDestination = channel.getReplyDestination();
         final Connection connection = env.getConnectionFactory(destination).createConnection();

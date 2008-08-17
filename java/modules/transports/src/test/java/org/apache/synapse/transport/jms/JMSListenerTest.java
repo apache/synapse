@@ -37,48 +37,52 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
-        TransportTestSuite<JMSTestEnvironment> suite = new TransportTestSuite<JMSTestEnvironment>();
+        TransportTestSuite suite = new TransportTestSuite();
         JMSTestEnvironment env = new QpidTestEnvironment();
         TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory();
-        AxisServer<JMSTestEnvironment> server = new AxisServer<JMSTestEnvironment>(tdf);
+        AxisServer server = new AxisServer(tdf);
+        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory(server);
+        AxisEchoEndpointFactory echoEndpointFactory = new AxisEchoEndpointFactory(server);
         JMSBytesMessageClient bytesMessageClient = new JMSBytesMessageClient();
         JMSTextMessageClient textMessageClient = new JMSTextMessageClient();
-        List<AsyncTestClient<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage>> clients = new LinkedList<AsyncTestClient<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage>>();
+        List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(bytesMessageClient, MessageConverter.XML_TO_BYTE));
         clients.add(adapt(textMessageClient, MessageConverter.XML_TO_STRING));
         clients.add(new AxisAsyncTestClient(tdf));
         clients.add(new JMSAxisAsyncClient(tdf, JMSConstants.JMS_BYTE_MESSAGE));
         clients.add(new JMSAxisAsyncClient(tdf, JMSConstants.JMS_TEXT_MESSAGE));
-        suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseTestClient(tdf), server, ContentTypeMode.TRANSPORT);
+        suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseTestClient(tdf), echoEndpointFactory, ContentTypeMode.TRANSPORT);
         suite.addPOXTests(env, new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), new AxisRequestResponseTestClient(tdf), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT);
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
             JMSAsyncChannel channel = new JMSAsyncChannel(destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {
-                for (AsyncTestClient<? super JMSTestEnvironment,? super JMSAsyncChannel,XMLMessage> client : clients) {
+                for (AsyncTestClient<XMLMessage> client : clients) {
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                        suite.addSOAPTests(env, channel, client, server, contentTypeMode);
-                        suite.addPOXTests(env, channel, client, server, contentTypeMode);
+                        suite.addSOAPTests(env, channel, client, asyncEndpointFactory, contentTypeMode);
+                        suite.addPOXTests(env, channel, client, asyncEndpointFactory, contentTypeMode);
                     } else {
                         // If no content type header is used, SwA can't be used and the JMS transport
                         // always uses the default charset encoding
-                        suite.addSOAP11Test(env, channel, client, server, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
+                        suite.addSOAP11Test(env, channel, client, asyncEndpointFactory, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
                                 MessageContext.DEFAULT_CHAR_SET_ENCODING));
-                        suite.addSOAP12Test(env, channel, client, server, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
+                        suite.addSOAP12Test(env, channel, client, asyncEndpointFactory, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
                                 MessageContext.DEFAULT_CHAR_SET_ENCODING));
-                        suite.addPOXTest(env, channel, client, server, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
+                        suite.addPOXTest(env, channel, client, asyncEndpointFactory, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
                                 MessageContext.DEFAULT_CHAR_SET_ENCODING));
                     }
                 }
                 if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                    suite.addSwATests(env, channel, bytesMessageClient, server);
+                    suite.addSwATests(env, channel, bytesMessageClient, asyncEndpointFactory);
                 }
                 // TODO: these tests are temporarily disabled because of SYNAPSE-304
                 // addTextPlainTests(strategy, suite);
-                suite.addBinaryTest(env, channel, bytesMessageClient, adapt(server, MessageConverter.AXIS_TO_BYTE), contentTypeMode);
+                suite.addBinaryTest(env, channel, bytesMessageClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), contentTypeMode);
             }
         }
         return suite;

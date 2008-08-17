@@ -39,15 +39,15 @@ public class MailTestEnvironment extends TestEnvironment {
     
     private GreenMail greenMail;
     
-    @Override
-    public void setUp() throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp() throws Exception {
         greenMail = new GreenMail(new ServerSetup[] { SMTP, POP3 });
         greenMail.setUser(ADDRESS, PASSWORD);
         greenMail.start();
     }
 
-    @Override
-    public void tearDown() throws Exception {
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         greenMail.stop();
         greenMail = null;
     }

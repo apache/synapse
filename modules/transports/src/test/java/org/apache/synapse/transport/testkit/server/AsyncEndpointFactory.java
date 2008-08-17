@@ -19,10 +19,7 @@
 
 package org.apache.synapse.transport.testkit.server;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-
-public interface AsyncEndpointFactory<E extends TestEnvironment,C extends AsyncChannel<?>,M> {
-    Server<? super E> getServer();
-    AsyncEndpoint<M> createAsyncEndpoint(E env, C channel, String contentType) throws Exception;
+public interface AsyncEndpointFactory<M> {
+    Server getServer();
+    AsyncEndpoint<M> createAsyncEndpoint(String contentType) throws Exception;
 }

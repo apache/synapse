@@ -19,17 +19,24 @@
 
 package org.apache.synapse.transport.vfs;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-import org.apache.synapse.transport.testkit.client.AbstractTestClient;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
-public class VFSClient extends AbstractTestClient<VFSTestEnvironment,VFSFileChannel> implements AsyncTestClient<VFSTestEnvironment,VFSFileChannel,ByteArrayMessage> {
-    public void sendMessage(VFSFileChannel channel, ClientOptions options, ByteArrayMessage message) throws Exception {
-        OutputStream out = new FileOutputStream(channel.getRequestFile());
+public class VFSClient implements AsyncTestClient<ByteArrayMessage> {
+    private File requestFile;
+    
+    @SuppressWarnings("unused")
+    private void setUp(VFSFileChannel channel) {
+        requestFile = channel.getRequestFile();
+    }
+    
+    public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
+        OutputStream out = new FileOutputStream(requestFile);
         out.write(message.getContent());
         out.close();
     }

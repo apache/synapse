@@ -31,20 +31,21 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.synapse.transport.testkit.client.AbstractTestClient;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
-public abstract class MailClient extends AbstractTestClient<MailTestEnvironment,MailChannel> implements AsyncTestClient<MailTestEnvironment,MailChannel,ByteArrayMessage> {
+public abstract class MailClient implements AsyncTestClient<ByteArrayMessage> {
     private Map<String,String> outProperties;
+    private MailChannel channel;
     
-    @Override
-    public void setUp(MailTestEnvironment env, MailChannel channel) throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp(MailTestEnvironment env, MailChannel channel) throws Exception {
         outProperties = env.getOutProperties();
+        this.channel = channel;
     }
 
-    public void sendMessage(MailChannel channel, ClientOptions options, ByteArrayMessage message) throws Exception {
+    public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
         Properties props = new Properties();
         props.putAll(outProperties);
         Session session = Session.getInstance(props);

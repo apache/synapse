@@ -20,21 +20,19 @@
 package org.apache.synapse.transport.testkit.client.axis2;
 
 import org.apache.axis2.client.ServiceClient;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("axis")
-public class AxisAsyncTestClient extends AxisTestClient<AsyncChannel<?>> implements AsyncTestClient<TestEnvironment,AsyncChannel<?>,XMLMessage> {
+public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<XMLMessage> {
     public AxisAsyncTestClient(TransportDescriptionFactory tdf) {
         super(tdf);
     }
 
-    public void sendMessage(AsyncChannel<?> channel, ClientOptions options, XMLMessage message) throws Exception {
+    public void sendMessage(ClientOptions options, XMLMessage message) throws Exception {
         createClient(options.getEndpointReference(), ServiceClient.ANON_OUT_ONLY_OP, message.getXmlMessageType(), message.getPayload(), options.getCharset()).execute(false);
     }
 }

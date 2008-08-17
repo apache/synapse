@@ -36,18 +36,17 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.client.AbstractTestClient;
+import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
-public class AxisTestClient<C extends Channel<?>> extends AbstractTestClient<TestEnvironment,C> {
+public class AxisTestClient implements TestClient {
     private static final Log log = LogFactory.getLog(AxisTestClient.class);
     
     private final TransportDescriptionFactory tdf;
     
-    private C channel;
+    private Channel channel;
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
@@ -55,9 +54,8 @@ public class AxisTestClient<C extends Channel<?>> extends AbstractTestClient<Tes
         this.tdf = tdf;
     }
 
-    @Override
-    public void setUp(TestEnvironment env, C channel) throws Exception {
-        super.setUp(env, channel);
+    @SuppressWarnings("unused")
+    private void setUp(Channel channel) throws Exception {
         this.channel = channel;
         
         cfgCtx =
@@ -70,9 +68,8 @@ public class AxisTestClient<C extends Channel<?>> extends AbstractTestClient<Tes
         trpOutDesc.getSender().init(cfgCtx, trpOutDesc);
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         trpOutDesc.getSender().stop();
     }
     

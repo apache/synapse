@@ -28,8 +28,8 @@ import org.apache.synapse.transport.testkit.message.StringMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("TextMessage")
-public class JMSTextMessageClient extends JMSClient implements AsyncTestClient<JMSTestEnvironment,JMSAsyncChannel,StringMessage> {
-    public void sendMessage(JMSAsyncChannel channel, ClientOptions options, StringMessage message) throws Exception {
+public class JMSTextMessageClient extends JMSClient implements AsyncTestClient<StringMessage> {
+    public void sendMessage(ClientOptions options, StringMessage message) throws Exception {
         TextMessage jmsMessage = session.createTextMessage();
         if (message.getContentType() != null) {
             jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());

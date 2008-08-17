@@ -25,16 +25,13 @@ import javax.jms.Destination;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.apache.synapse.transport.testkit.client.AbstractTestClient;
-
-public class JMSClient extends AbstractTestClient<JMSTestEnvironment,JMSAsyncChannel> {
+public class JMSClient {
     protected Connection connection;
     protected Session session;
     protected MessageProducer producer;
     
-    @Override
-    public void setUp(JMSTestEnvironment env, JMSAsyncChannel channel) throws Exception {
-        super.setUp(env, channel);
+    @SuppressWarnings("unused")
+    private void setUp(JMSTestEnvironment env, JMSAsyncChannel channel) throws Exception {
         Destination destination = channel.getDestination();
         ConnectionFactory connectionFactory = env.getConnectionFactory(destination);
         connection = connectionFactory.createConnection();
@@ -42,11 +39,10 @@ public class JMSClient extends AbstractTestClient<JMSTestEnvironment,JMSAsyncCha
         producer = session.createProducer(destination);
     }
 
-    @Override
-    public void tearDown() throws Exception {
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         producer.close();
         session.close();
         connection.close();
-        super.tearDown();
     }
 }

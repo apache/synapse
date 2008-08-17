@@ -20,10 +20,8 @@
 package org.apache.synapse.transport.testkit.client;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 
-public interface XMLRequestResponseTestClient<E extends TestEnvironment,C extends RequestResponseChannel<?>> extends TestClient<E,C> {
-    OMElement sendMessage(C channel, String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
+public interface XMLRequestResponseTestClient extends TestClient {
+    OMElement sendMessage(String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
 }

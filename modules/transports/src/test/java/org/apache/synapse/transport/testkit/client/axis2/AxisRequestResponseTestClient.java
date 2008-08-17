@@ -24,21 +24,18 @@ import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.client.XMLRequestResponseTestClient;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.XMLMessageType;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("axis")
-public class AxisRequestResponseTestClient extends AxisTestClient<RequestResponseChannel<?>> implements XMLRequestResponseTestClient<TestEnvironment,RequestResponseChannel<?>> {
+public class AxisRequestResponseTestClient extends AxisTestClient implements XMLRequestResponseTestClient {
     public AxisRequestResponseTestClient(TransportDescriptionFactory tdf) {
         super(tdf);
     }
 
-    public OMElement sendMessage(RequestResponseChannel<?> channel,
-            String endpointReference, String contentType, String charset,
+    public OMElement sendMessage(String endpointReference, String contentType, String charset,
             XMLMessageType xmlMessageType, OMElement payload) throws Exception {
         
         OperationClient mepClient = createClient(endpointReference, ServiceClient.ANON_OUT_IN_OP, xmlMessageType, payload, charset);

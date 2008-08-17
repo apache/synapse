@@ -19,10 +19,5 @@
 
 package org.apache.synapse.transport.testkit.client;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.Channel;
-
-public interface TestClient<E extends TestEnvironment,C extends Channel<?>> {
-    void setUp(E env, C channel) throws Exception;
-    void tearDown() throws Exception;
+public interface TestClient {
 }

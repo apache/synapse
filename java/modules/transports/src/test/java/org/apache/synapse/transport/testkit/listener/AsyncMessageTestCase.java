@@ -22,23 +22,33 @@ package org.apache.synapse.transport.testkit.listener;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
-public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>,M,N> extends TransportTestCase<E,C,AsyncTestClient<? super E,? super C,M>> {
+public abstract class AsyncMessageTestCase<M,N> extends TransportTestCase {
+    private final AsyncTestClient<M> client;
     private final String charset;
-    private final AsyncEndpointFactory<? super E,? super C,N> endpointFactory;
+    private final AsyncEndpointFactory<N> endpointFactory;
     
-    public AsyncMessageTestCase(E env, C channel, AsyncTestClient<? super E,? super C,M> client, AsyncEndpointFactory<? super E,? super C,N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
-        super(env, channel, client, endpointFactory.getServer(), contentTypeMode, contentType);
+    public AsyncMessageTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpointFactory<N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
+        super(env, channel, endpointFactory.getServer(), contentTypeMode, contentType);
+        this.client = client;
         this.endpointFactory = endpointFactory;
         this.charset = charset;
+        addResource(client);
+        addResource(endpointFactory);
+    }
+
+    @NameComponent("client")
+    public AsyncTestClient<M> getClient() {
+        return client;
     }
 
     @Override
     protected void runTest() throws Throwable {
-        AsyncEndpoint<N> endpoint = endpointFactory.createAsyncEndpoint(env, channel, contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
+        AsyncEndpoint<N> endpoint = endpointFactory.createAsyncEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
         
         M message = prepareMessage();
         
@@ -47,7 +57,7 @@ public abstract class AsyncMessageTestCase<E extends TestEnvironment,C extends A
         try {
             ClientOptions options = new ClientOptions(endpoint.getEPR(), charset);
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
-            client.sendMessage(channel, options, message);
+            client.sendMessage(options, message);
             messageData = endpoint.waitForMessage(8000);
             if (messageData == null) {
                 fail("Failed to get message");

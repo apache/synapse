@@ -19,9 +19,6 @@
 
 package org.apache.synapse.transport.testkit.client;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-
-public interface AsyncTestClient<E extends TestEnvironment,C extends AsyncChannel<?>,M> extends TestClient<E,C> {
-    void sendMessage(C channel, ClientOptions options, M message) throws Exception;
+public interface AsyncTestClient<M> extends TestClient {
+    void sendMessage(ClientOptions options, M message) throws Exception;
 }

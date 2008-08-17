@@ -36,11 +36,10 @@ public class MockJMSTestEnvironment extends JMSTestEnvironment {
     private DestinationManager destinationManager;
     private ConfigurationManager configurationManager;
     
-    @Override
-    public void setUp() throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp() throws Exception {
         destinationManager = new DestinationManager();
         configurationManager = new ConfigurationManager();
-        super.setUp();
     }
 
     @Override

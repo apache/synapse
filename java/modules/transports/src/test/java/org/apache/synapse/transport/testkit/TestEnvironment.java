@@ -24,19 +24,6 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 
 public abstract class TestEnvironment {
     /**
-     * Carry out initialization before server startup. This method is called
-     * immediately before the test server is started and can be used by subclasses
-     * to set up the test environment.
-     * 
-     * @throws Exception
-     */
-    public void setUp() throws Exception {
-    }
-    
-    public void tearDown() throws Exception {
-    }
-    
-    /**
      * Set up the expected content type on the given service. This method should only be
      * implemented for transports that support {@link ContentTypeMode#SERVICE}.
      * The default implementation throws an {@link UnsupportedOperationException}.

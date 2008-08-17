@@ -19,10 +19,7 @@
 
 package org.apache.synapse.transport.testkit.server;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-
-public interface EndpointFactory<E extends TestEnvironment,C extends RequestResponseChannel<?>> {
-    Server<? super E> getServer();
-    Endpoint createEchoEndpoint(E env, C channel, String contentType) throws Exception;
+public interface EndpointFactory {
+    Server getServer();
+    Endpoint createEchoEndpoint(String contentType) throws Exception;
 }

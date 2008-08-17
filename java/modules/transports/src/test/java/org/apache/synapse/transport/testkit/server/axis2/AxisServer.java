@@ -20,38 +20,24 @@
 package org.apache.synapse.transport.testkit.server.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.InOnlyAxisOperation;
-import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.DispatchPhase;
-import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-import org.apache.synapse.transport.testkit.message.MessageData;
-import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.server.Endpoint;
-import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.server.Server;
 
-public class AxisServer<E extends TestEnvironment> implements Server<E>, AsyncEndpointFactory<E,AsyncChannel<? super E>,MessageData>, EndpointFactory<E,RequestResponseChannel<? super E>> {
-    private static Server<?> activeServer;
+public class AxisServer implements Server {
+    private static AxisServer activeServer;
     
     private final TransportDescriptionFactory tdf;
     
-    private Channel<?> channel;
     private TransportListener listener;
     UtilsTransportServer server;
     
@@ -59,9 +45,9 @@ public class AxisServer<E extends TestEnvironment> implements Server<E>, AsyncEn
         this.tdf = tdf;
     }
 
-    public void start(E env, Channel<?> channel) throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp(Channel channel) throws Exception {
         server = new UtilsTransportServer();
-        this.channel = channel;
         
         if (activeServer != null) {
             throw new IllegalStateException();
@@ -97,7 +83,8 @@ public class AxisServer<E extends TestEnvironment> implements Server<E>, AsyncEn
         server.start();
     }
     
-    public void stop() throws Exception {
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         server.stop();
         Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
         server = null;
@@ -113,50 +100,5 @@ public class AxisServer<E extends TestEnvironment> implements Server<E>, AsyncEn
             listener.getEPRsForService(service.getName(), "localhost");
         return endpointReferences != null && endpointReferences.length > 0
                             ? endpointReferences[0].getAddress() : null;
-    }
-    
-    public Server<E> getServer() {
-        return this;
-    }
-
-    public AsyncEndpoint<MessageData> createAsyncEndpoint(E env, AsyncChannel<? super E> channel, String contentType) throws Exception {
-        // Set up a test service with a default operation backed by a mock message
-        // receiver. The service is configured using the parameters specified by the
-        // implementation.
-        AxisService service = new AxisService("TestService");
-        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
-        MockMessageReceiver messageReceiver = new MockMessageReceiver();
-        operation.setMessageReceiver(messageReceiver);
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentType != null) {
-            env.setupContentType(service, contentType);
-        }
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
-//        server.addErrorListener(messageReceiver);
-        return new AsyncEndpointImpl(this, service, messageReceiver);
-    }
-    
-    public Endpoint createEchoEndpoint(E env, RequestResponseChannel<? super E> channel, String contentType) throws Exception {
-        AxisService service = new AxisService("EchoService");
-        AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
-        operation.setMessageReceiver(new AbstractInOutMessageReceiver() {
-            @Override
-            public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
-                System.out.println(inMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
-                System.out.println(inMessage.getEnvelope());
-                outMessage.setEnvelope(inMessage.getEnvelope());
-            }
-        });
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentType != null) {
-            env.setupContentType(service, contentType);
-        }
-        
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
-        return new EndpointImpl(this, service);
     }
 }

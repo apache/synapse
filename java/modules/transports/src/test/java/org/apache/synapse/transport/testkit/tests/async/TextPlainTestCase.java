@@ -31,10 +31,10 @@ import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("AsyncTextPlain")
-public class TextPlainTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,StringMessage,StringMessage> {
+public class TextPlainTestCase extends AsyncMessageTestCase<StringMessage,StringMessage> {
     private final MessageTestData data;
     
-    public TextPlainTestCase(E env, C channel, AsyncTestClient<? super E,? super C,StringMessage> client, AsyncEndpointFactory<? super E,? super C,StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
+    public TextPlainTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
         super(env, channel, client, endpointFactory, contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset());
         this.data = data;
     }

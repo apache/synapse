@@ -19,10 +19,7 @@
 
 package org.apache.synapse.transport.testkit.server;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
-import org.apache.synapse.transport.testkit.listener.Channel;
-
-public interface Server<T extends TestEnvironment> {
+public interface Server {
 //    public void addErrorListener(TransportErrorListener listener) {
 //        if (listener instanceof TransportErrorSource) {
 //            ((TransportErrorSource)listener).addErrorListener(listener);
@@ -34,7 +31,4 @@ public interface Server<T extends TestEnvironment> {
 //            ((TransportErrorSource)listener).removeErrorListener(listener);
 //        }
 //    }
-
-    void start(T env, Channel<?> channel) throws Exception;
-    void stop() throws Exception;
 }

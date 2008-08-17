@@ -28,9 +28,8 @@ import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("BytesMessage")
-public class JMSBytesMessageClient extends JMSClient implements AsyncTestClient<JMSTestEnvironment,JMSAsyncChannel,ByteArrayMessage> {
-    public void sendMessage(JMSAsyncChannel channel,
-                            ClientOptions options,
+public class JMSBytesMessageClient extends JMSClient implements AsyncTestClient<ByteArrayMessage> {
+    public void sendMessage(ClientOptions options,
                             ByteArrayMessage message) throws Exception {
         BytesMessage jmsMessage = session.createBytesMessage();
         if (message.getContentType() != null) {

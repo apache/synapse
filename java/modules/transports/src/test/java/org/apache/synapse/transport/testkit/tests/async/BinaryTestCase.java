@@ -32,10 +32,10 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("AsyncBinary")
-public class BinaryTestCase<E extends TestEnvironment,C extends AsyncChannel<? super E>> extends AsyncMessageTestCase<E,C,ByteArrayMessage,ByteArrayMessage> {
+public class BinaryTestCase extends AsyncMessageTestCase<ByteArrayMessage,ByteArrayMessage> {
     private static final Random random = new Random();
     
-    public BinaryTestCase(E env, C channel, AsyncTestClient<? super E,? super C,ByteArrayMessage> client, AsyncEndpointFactory<? super E,? super C,ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
+    public BinaryTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
         super(env, channel, client, endpointFactory, contentTypeMode, "application/octet-stream", null);
     }
     

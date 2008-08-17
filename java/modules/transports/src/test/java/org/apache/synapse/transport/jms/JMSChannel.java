@@ -25,7 +25,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 
-public abstract class JMSChannel extends AbstractChannel<JMSTestEnvironment> {
+public abstract class JMSChannel extends AbstractChannel {
     private final String destinationType;
     protected JMSTestEnvironment env;
     private String destinationName;
@@ -35,16 +35,16 @@ public abstract class JMSChannel extends AbstractChannel<JMSTestEnvironment> {
         this.destinationType = destinationType;
     }
     
-    @Override
-    public void setUp(JMSTestEnvironment env) throws Exception {
+    @SuppressWarnings("unused")
+    private void setUp(JMSTestEnvironment env) throws Exception {
         this.env = env;
         destinationName = "request" + destinationType;
         destination = env.createDestination(destinationType, destinationName);
         env.getContext().bind(destinationName, destination);
     }
 
-    @Override
-    public void tearDown() throws Exception {
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
         env.getContext().unbind(destinationName);
         destinationName = null;
         destination = null;

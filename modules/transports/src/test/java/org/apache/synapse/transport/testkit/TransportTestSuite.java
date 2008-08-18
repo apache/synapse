@@ -20,11 +20,13 @@
 package org.apache.synapse.transport.testkit;
 
 import java.text.ParseException;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import org.apache.axiom.soap.SOAP11Constants;
@@ -45,6 +47,7 @@ import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
+import org.apache.synapse.transport.testkit.tests.TestResourceSet;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
 import org.apache.synapse.transport.testkit.tests.async.RESTTestCase;
@@ -77,10 +80,10 @@ public class TransportTestSuite extends TestSuite {
         });
         
     private final List<FilterExpression> excludes = new LinkedList<FilterExpression>();
-    private final boolean reuseServer;
+    private final boolean reuseResources;
     
-    public TransportTestSuite(boolean reuseServer) {
-        this.reuseServer = reuseServer;
+    public TransportTestSuite(boolean reuseResources) {
+        this.reuseResources = reuseResources;
     }
     
     public TransportTestSuite() {
@@ -161,63 +164,45 @@ public class TransportTestSuite extends TestSuite {
                     return;
                 }
             }
+            ttest.setManaged(reuseResources);
+            ttest.getResourceSet().resolve();
         }
         super.addTest(test);
     }
 
-/*
     @Override
     public void run(TestResult result) {
-        if (!reuseServer) {
+        if (!reuseResources) {
             super.run(result);
         } else {
-            LinkedList<Test> tests = new LinkedList<Test>();
+            TestResourceSet resourceSet = null;
             for (Enumeration<?> e = tests(); e.hasMoreElements(); ) {
-                tests.add((Test)e.nextElement());
-            }
-            while (!tests.isEmpty()) {
-                if (result.shouldStop()) {
-                    return;
+                Test test = (Test)e.nextElement();
+                if (test instanceof TransportTestCase) {
+                    TransportTestCase ttest = (TransportTestCase)test;
+                    TestResourceSet newResourceSet = ttest.getResourceSet();
+                    try {
+                        if (resourceSet == null) {
+                            newResourceSet.setUp();
+                        } else {
+                            newResourceSet.setUp(resourceSet);
+                        }
+                    } catch (Throwable t) {
+                        result.addError(this, t);
+                        return;
+                    }
+                    resourceSet = newResourceSet;
                 }
-                Test test = tests.removeFirst();
-                if (test instanceof AsyncMessageTestCase) {
-                    AsyncMessageTestCase<?,?> listenerTest = (AsyncMessageTestCase<?,?>)test;
-                    Channel<?> channel = listenerTest.getChannel();
-                    ListenerTestServer server;
-                    try {
-                        server = new ListenerTestServer();
-                        server.start(channel);
-                    } catch (Throwable t) {
-                        result.addError(this, t);
-                        return;
-                    }
-                    listenerTest.setServer(server);
-                    runTest(test, result);
-                    for (Iterator<Test> it = tests.iterator(); it.hasNext(); ) {
-                        if (result.shouldStop()) {
-                            return;
-                        }
-                        test = it.next();
-                        if (test instanceof AsyncMessageTestCase) {
-                            listenerTest = (AsyncMessageTestCase<?,?>)test;
-                            if (listenerTest.getChannel() == channel) {
-                                it.remove();
-                                listenerTest.setServer(server);
-                                runTest(test, result);
-                            }
-                        }
-                    }
-                    try {
-                        server.stop();
-                    } catch (Throwable t) {
-                        result.addError(this, t);
-                        return;
-                    }
-                } else {
-                    runTest(test, result);
+                runTest(test, result);
+            }
+            if (resourceSet != null) {
+                try {
+                    resourceSet.tearDown();
+                } catch (Throwable t) {
+                    result.addError(this, t);
+                    return;
                 }
             }
         }
     }
-*/
 }

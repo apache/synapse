@@ -19,9 +19,6 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -30,27 +27,22 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.name.NameUtils;
 
 public abstract class TransportTestCase extends TestCase {
-    private final List<TestResource> resources = new LinkedList<TestResource>();
+    private final TestResourceSet resourceSet = new TestResourceSet();
     protected final ContentTypeMode contentTypeMode;
     protected final String contentType;
     
     private Map<String,String> nameComponents;
     
-    private boolean manageServer = true;
+    private boolean managed;
 
     public TransportTestCase(ContentTypeMode contentTypeMode, String contentType, Object... resources) {
         this.contentTypeMode = contentTypeMode;
         this.contentType = contentType;
-        for (Object resource : resources) {
-            addResource(resource);
-        }
+        resourceSet.addResources(resources);
     }
 
     protected void addResource(Object resource) {
-        // TODO: we should not allow null resources
-        if (resource != null) {
-            resources.add(new TestResource(resource));
-        }
+        resourceSet.addResource(resource);
     }
     
     public Map<String,String> getNameComponents() {
@@ -80,25 +72,26 @@ public abstract class TransportTestCase extends TestCase {
         return testName;
     }
 
-//    public void setServer(ListenerTestServer server){
-//        this.server = server;
-//        manageServer = false;
-//    }
+    public void setManaged(boolean managed) {
+        this.managed = managed;
+    }
     
+    public TestResourceSet getResourceSet() {
+        return resourceSet;
+    }
+
     @Override
     protected void setUp() throws Exception {
-        for (TestResource resource : resources) {
-            resource.resolve(resources);
-        }
-        for (TestResource resource : resources) {
-            resource.setUp();
+        if (!managed) {
+            resourceSet.resolve();
+            resourceSet.setUp();
         }
     }
 
     @Override
     protected void tearDown() throws Exception {
-        for (ListIterator<TestResource> it = resources.listIterator(resources.size()); it.hasPrevious(); ) {
-            it.previous().tearDown();
+        if (!managed) {
+            resourceSet.tearDown();
         }
     }
 }

@@ -19,16 +19,18 @@
 
 package org.apache.synapse.transport.testkit.message;
 
+import javax.mail.internet.ContentType;
+
 public class ByteArrayMessage {
-    private final String contentType;
+    private final ContentType contentType;
     private final byte[] content;
 
-    public ByteArrayMessage(String contentType, byte[] content) {
+    public ByteArrayMessage(ContentType contentType, byte[] content) {
         this.contentType = contentType;
         this.content = content;
     }
 
-    public String getContentType() {
+    public ContentType getContentType() {
         return contentType;
     }
 

@@ -49,6 +49,8 @@ public class NameUtils {
         }
         if (component instanceof String) {
             map.put(key, (String)component);
+        } else if (component instanceof Enum) {
+            map.put(key, String.valueOf(component));
         } else {
             DisplayName displayName = component.getClass().getAnnotation(DisplayName.class);
             if (displayName != null) {

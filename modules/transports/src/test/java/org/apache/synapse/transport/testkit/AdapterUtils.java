@@ -21,13 +21,19 @@ package org.apache.synapse.transport.testkit;
 
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.AsyncTestClientAdapter;
+import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
+import org.apache.synapse.transport.testkit.client.RequestResponseTestClientAdapter;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactoryAdapter;
 
 public class AdapterUtils {
-    public static <M,N> AsyncTestClient<M> adapt(AsyncTestClient<N> parent, MessageConverter<M,N> converter) {
-        return new AsyncTestClientAdapter<M,N>(parent, converter);
+    public static <M,N> AsyncTestClient<M> adapt(AsyncTestClient<N> target, MessageConverter<M,N> converter) {
+        return new AsyncTestClientAdapter<M,N>(target, converter);
+    }
+
+    public static <M,N,O,P> RequestResponseTestClient<M,O> adapt(RequestResponseTestClient<N,P> target, MessageConverter<M,N> requestConverter, MessageConverter<P,O> responseConverter) {
+        return new RequestResponseTestClientAdapter<M,N,O,P>(target, requestConverter, responseConverter);
     }
 
     public static <M,N> AsyncEndpointFactory<M> adapt(AsyncEndpointFactory<N> targetFactory, MessageConverter<N,M> converter) {

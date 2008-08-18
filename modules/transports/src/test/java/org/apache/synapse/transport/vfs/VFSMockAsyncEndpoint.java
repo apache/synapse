@@ -22,6 +22,8 @@ package org.apache.synapse.transport.vfs;
 import java.io.File;
 import java.io.InputStream;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
@@ -30,9 +32,9 @@ import de.schlichtherle.io.FileInputStream;
 
 public class VFSMockAsyncEndpoint implements AsyncEndpoint<ByteArrayMessage> {
     private final VFSFileChannel channel;
-    private final String contentType;
+    private final ContentType contentType;
     
-    public VFSMockAsyncEndpoint(VFSFileChannel channel, String contentType) {
+    public VFSMockAsyncEndpoint(VFSFileChannel channel, ContentType contentType) {
         this.channel = channel;
         this.contentType = contentType;
     }

@@ -19,29 +19,24 @@
 
 package org.apache.synapse.transport.testkit.client.axis2;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.client.XMLRequestResponseTestClient;
-import org.apache.synapse.transport.testkit.message.XMLMessageType;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("axis")
-public class AxisRequestResponseTestClient extends AxisTestClient implements XMLRequestResponseTestClient {
+public class AxisRequestResponseTestClient extends AxisTestClient implements RequestResponseTestClient<AxisMessage,AxisMessage> {
     public AxisRequestResponseTestClient(TransportDescriptionFactory tdf) {
         super(tdf);
     }
 
-    public OMElement sendMessage(String endpointReference, String contentType, String charset,
-            XMLMessageType xmlMessageType, OMElement payload) throws Exception {
-        
-        OperationClient mepClient = createClient(endpointReference, ServiceClient.ANON_OUT_IN_OP, xmlMessageType, payload, charset);
+    public AxisMessage sendMessage(ClientOptions options, AxisMessage message) throws Exception {
+        OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);
         mepClient.execute(true);
-        
-        MessageContext response = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-        return response.getEnvelope().getBody().getFirstElement();
+        return new AxisMessage(mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
     }
 }

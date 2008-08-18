@@ -23,34 +23,25 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.axiom.attachments.Attachments;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
-//import org.apache.synapse.transport.base.event.TransportError;
-//import org.apache.synapse.transport.base.event.TransportErrorListener;
-import org.apache.synapse.transport.testkit.message.MessageData;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
 
 /**
  * A mock message receiver that puts the message data in a queue.
  */
 public class MockMessageReceiver implements MessageReceiver /*, TransportErrorListener*/ {
     private interface Event {
-        MessageData process() throws Throwable;
+        AxisMessage process() throws Throwable;
     }
     
     private final BlockingQueue<Event> queue = new LinkedBlockingQueue<Event>();
     
     public void receive(MessageContext messageCtx) throws AxisFault {
-        SOAPEnvelope envelope = messageCtx.getEnvelope();
-        envelope.build();
-        Attachments attachments = messageCtx.getAttachmentMap();
-        // Make sure that all attachments are read
-        attachments.getAllContentIDs();
-        final MessageData messageData = new MessageData(envelope, attachments);
+        final AxisMessage messageData = new AxisMessage(messageCtx);
         queue.add(new Event() {
-            public MessageData process() throws Throwable {
+            public AxisMessage process() throws Throwable {
                 return messageData;
             }
         });
@@ -64,7 +55,7 @@ public class MockMessageReceiver implements MessageReceiver /*, TransportErrorLi
 //        });
 //    }
     
-    public MessageData waitForMessage(long timeout, TimeUnit unit) throws Throwable {
+    public AxisMessage waitForMessage(long timeout, TimeUnit unit) throws Throwable {
         Event event = queue.poll(timeout, unit);
         return event == null ? null : event.process();
     }

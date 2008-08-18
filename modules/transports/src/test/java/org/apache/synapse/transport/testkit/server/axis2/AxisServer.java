@@ -36,17 +36,11 @@ import org.apache.synapse.transport.testkit.server.Server;
 public class AxisServer implements Server {
     private static AxisServer activeServer;
     
-    private final TransportDescriptionFactory tdf;
-    
     private TransportListener listener;
-    UtilsTransportServer server;
+    private UtilsTransportServer server;
     
-    public AxisServer(TransportDescriptionFactory tdf) {
-        this.tdf = tdf;
-    }
-
     @SuppressWarnings("unused")
-    private void setUp(Channel channel) throws Exception {
+    private void setUp(Channel channel, TransportDescriptionFactory tdf) throws Exception {
         server = new UtilsTransportServer();
         
         if (activeServer != null) {
@@ -95,7 +89,7 @@ public class AxisServer implements Server {
         return server.getAxisConfiguration();
     }
 
-    String getEPR(AxisService service) throws AxisFault {
+    public String getEPR(AxisService service) throws AxisFault {
         EndpointReference[] endpointReferences =
             listener.getEPRsForService(service.getName(), "localhost");
         return endpointReferences != null && endpointReferences.length > 0

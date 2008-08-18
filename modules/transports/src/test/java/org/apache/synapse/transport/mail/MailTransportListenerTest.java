@@ -36,6 +36,7 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class MailTransportListenerTest extends TestCase {
@@ -45,30 +46,28 @@ public class MailTransportListenerTest extends TestCase {
         // TODO: these test don't work; need more analysis why this is so
         suite.addExclude("(&(messageType=SOAP12)(data=Latin1))");
         suite.addExclude("(&(messageType=POX)(data=Latin1))");
-        suite.addExclude("(&(client=multipart)(data=Latin1))");
-        suite.addExclude("(&(client=multipart)(messageType=POX))");
+        suite.addExclude("(&(layout=multipart)(data=Latin1))");
+        suite.addExclude("(&(layout=multipart)(messageType=POX))");
         suite.addExclude("(test=AsyncSwA)");
         suite.addExclude("(test=AsyncBinary)");
         suite.addExclude("(&(test=AsyncTextPlain)(!(data=ASCII)))");
         
         MailTestEnvironment env = new MailTestEnvironment();
         
-        TransportDescriptionFactory tdf =
-            new SimpleTransportDescriptionFactory(MailConstants.TRANSPORT_NAME,
-                    MailTransportListener.class, MailTransportSender.class);
-        AxisServer axisServer = new AxisServer(tdf);
-        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory(axisServer);
+        AxisServer axisServer = new AxisServer();
+        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
         MailChannel channel = new MailChannel();
-        List<MailClient> clients = new LinkedList<MailClient>();
-        clients.add(new MimeClient());
-        clients.add(new MultipartClient());
-        for (MailClient client : clients) {
+        suite.addPOXTests(channel, adapt(new MailRequestResponseClient(new FlatLayout()), MessageConverter.XML_TO_BYTE, MessageConverter.BYTE_TO_XML), new AxisEchoEndpointFactory(), ContentTypeMode.TRANSPORT, env, axisServer);
+        List<MailAsyncClient> clients = new LinkedList<MailAsyncClient>();
+        clients.add(new MailAsyncClient(new FlatLayout()));
+        clients.add(new MailAsyncClient(new MultipartLayout()));
+        for (MailAsyncClient client : clients) {
             AsyncTestClient<XMLMessage> xmlClient = adapt(client, MessageConverter.XML_TO_BYTE);
-            suite.addSOAPTests(env, channel, xmlClient, asyncEndpointFactory, ContentTypeMode.TRANSPORT);
-            suite.addPOXTests(env, channel, xmlClient, asyncEndpointFactory, ContentTypeMode.TRANSPORT);
-            suite.addSwATests(env, channel, client, asyncEndpointFactory);
-            suite.addTextPlainTests(env, channel, AdapterUtils.adapt(client, MessageConverter.STRING_TO_BYTE), AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT);
-            suite.addBinaryTest(env, channel, client, AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT);
+            suite.addSOAPTests(channel, xmlClient, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer);
+            suite.addPOXTests(channel, xmlClient, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer);
+            suite.addSwATests(channel, client, asyncEndpointFactory, env, axisServer);
+            suite.addTextPlainTests(channel, adapt(client, MessageConverter.STRING_TO_BYTE), AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer);
+            suite.addBinaryTest(channel, client, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer);
         }
         return suite;
     }

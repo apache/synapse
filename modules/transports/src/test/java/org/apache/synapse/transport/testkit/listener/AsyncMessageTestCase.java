@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.name.NameComponent;
@@ -32,11 +31,13 @@ public abstract class AsyncMessageTestCase<M,N> extends TransportTestCase {
     private final String charset;
     private final AsyncEndpointFactory<N> endpointFactory;
     
-    public AsyncMessageTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpointFactory<N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset) {
-        super(env, channel, endpointFactory.getServer(), contentTypeMode, contentType);
+    // TODO: maybe we don't need an explicit AsyncChannel
+    public AsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpointFactory<N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset, Object... resources) {
+        super(contentTypeMode, contentType, resources);
         this.client = client;
         this.endpointFactory = endpointFactory;
         this.charset = charset;
+        addResource(channel);
         addResource(client);
         addResource(endpointFactory);
     }

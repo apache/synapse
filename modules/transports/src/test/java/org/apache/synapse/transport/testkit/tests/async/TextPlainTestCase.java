@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.testkit.tests.async;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
@@ -34,8 +33,8 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 public class TextPlainTestCase extends AsyncMessageTestCase<StringMessage,StringMessage> {
     private final MessageTestData data;
     
-    public TextPlainTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data) {
-        super(env, channel, client, endpointFactory, contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset());
+    public TextPlainTestCase(AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
+        super(channel, client, endpointFactory, contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset(), resources);
         this.data = data;
     }
     

@@ -21,10 +21,14 @@ package org.apache.synapse.transport.testkit.tests;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.synapse.transport.testkit.Adapter;
+
+import com.sun.org.omg.CORBA.Initializer;
 
 public class TestResource {
     private static class Initializer {
@@ -58,22 +62,21 @@ public class TestResource {
     }
     
     private final Object instance;
+    private final Object target;
+    private final Set<TestResource> directDependencies = new HashSet<TestResource>();
     private final LinkedList<Initializer> initializers = new LinkedList<Initializer>();
     private final List<Finalizer> finalizers = new LinkedList<Finalizer>();
-    private boolean resolved;
     
     public TestResource(Object instance) {
         this.instance = instance;
-    }
-    
-    public void resolve(List<TestResource> resources) {
-        if (resolved) {
-            return;
-        }
         Object target = instance;
         while (target instanceof Adapter) {
             target = ((Adapter)target).getTarget();
         }
+        this.target = target;
+    }
+    
+    public void resolve(List<TestResource> resources) {
         for (Class<?> clazz = target.getClass(); !clazz.equals(Object.class);
                 clazz = clazz.getSuperclass()) {
             for (Method method : clazz.getDeclaredMethods()) {
@@ -102,6 +105,7 @@ public class TestResource {
                         if (res == null) {
                             throw new Error(target.getClass().getName() + " depends on " + parameterClass.getName() + ", but none found");
                         }
+                        directDependencies.add(res);
                         args[i] = res.getInstance();
                     }
                     method.setAccessible(true);
@@ -112,7 +116,6 @@ public class TestResource {
                 }
             }
         }
-        resolved = true;
     }
 
     public Object getInstance() {
@@ -129,5 +132,32 @@ public class TestResource {
         for (Finalizer finalizer : finalizers) {
             finalizer.execute();
         }
+    }
+    
+    public Object[] getAllDependencies() {
+        Set<Object> set = new HashSet<Object>();
+        collectDependencies(set);
+        return set.toArray();
+    }
+    
+    private void collectDependencies(Set<Object> set) {
+        for (TestResource dependency : directDependencies) {
+            set.add(dependency.getInstance());
+            dependency.collectDependencies(set);
+        }
+    }
+
+    @Override
+    public String toString() {
+        String result = getShortName(instance.getClass());
+        if (target != instance) {
+            result += "(" + getShortName(target.getClass()) + ")";
+        }
+        return result;
+    }
+    
+    private static String getShortName(Class<?> clazz) {
+        String name = clazz.getName();
+        return name.substring(name.lastIndexOf('.')+1);
     }
 }

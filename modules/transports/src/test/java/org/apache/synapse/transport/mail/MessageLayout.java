@@ -22,12 +22,6 @@ package org.apache.synapse.transport.mail;
 import javax.activation.DataHandler;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.synapse.transport.testkit.name.DisplayName;
-
-@DisplayName("mime")
-public class MimeClient extends MailClient {
-    @Override
-    protected void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
-        msg.setDataHandler(dh);
-    }
+public interface MessageLayout {
+    void setupMessage(MimeMessage msg, DataHandler dh) throws Exception;
 }

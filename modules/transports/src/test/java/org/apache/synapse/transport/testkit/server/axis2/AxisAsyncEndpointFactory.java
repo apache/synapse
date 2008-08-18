@@ -25,30 +25,23 @@ import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.message.MessageData;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-public class AxisAsyncEndpointFactory implements AsyncEndpointFactory<MessageData> {
-    private final AxisServer server;
+public class AxisAsyncEndpointFactory implements AsyncEndpointFactory<AxisMessage> {
     private TestEnvironment env;
+    private AxisServer server;
     private AsyncChannel channel;
     
-    public AxisAsyncEndpointFactory(AxisServer server) {
-        this.server = server;
-    }
-
-    public AxisServer getServer() {
-        return server;
-    }
-
     @SuppressWarnings("unused")
-    private void setUp(TestEnvironment env, AsyncChannel channel) {
+    private void setUp(TestEnvironment env, AxisServer server, AsyncChannel channel) {
         this.env = env;
+        this.server = server;
         this.channel = channel;
     }
     
-    public AsyncEndpoint<MessageData> createAsyncEndpoint(String contentType) throws Exception {
+    public AsyncEndpoint<AxisMessage> createAsyncEndpoint(String contentType) throws Exception {
         // Set up a test service with a default operation backed by a mock message
         // receiver. The service is configured using the parameters specified by the
         // implementation.

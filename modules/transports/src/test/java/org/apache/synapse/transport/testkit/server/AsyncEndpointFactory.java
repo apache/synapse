@@ -20,6 +20,5 @@
 package org.apache.synapse.transport.testkit.server;
 
 public interface AsyncEndpointFactory<M> {
-    Server getServer();
     AsyncEndpoint<M> createAsyncEndpoint(String contentType) throws Exception;
 }

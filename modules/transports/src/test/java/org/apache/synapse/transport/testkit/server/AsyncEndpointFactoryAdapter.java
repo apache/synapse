@@ -35,10 +35,6 @@ public class AsyncEndpointFactoryAdapter<M,N> implements AsyncEndpointFactory<M>
         return targetFactory;
     }
 
-    public Server getServer() {
-        return targetFactory.getServer();
-    }
-
     public AsyncEndpoint<M> createAsyncEndpoint(String contentType) throws Exception {
         final AsyncEndpoint<N> targetEndpoint = targetFactory.createAsyncEndpoint(contentType);
         final MessageConverter<N,M> converter = this.converter;

@@ -17,8 +17,25 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.server;
+package org.apache.synapse.transport.mail;
 
-public interface EndpointFactory {
-    Endpoint createEchoEndpoint(String contentType) throws Exception;
+import javax.activation.DataHandler;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.apache.synapse.transport.testkit.name.DisplayName;
+
+@DisplayName("multipart")
+public class MultipartLayout implements MessageLayout {
+    public void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
+        MimeMultipart multipart = new MimeMultipart();
+        MimeBodyPart part1 = new MimeBodyPart();
+        part1.setContent("This is an automated message.", "text/plain");
+        multipart.addBodyPart(part1);
+        MimeBodyPart part2 = new MimeBodyPart();
+        part2.setDataHandler(dh);
+        multipart.addBodyPart(part2);
+        msg.setContent(multipart);
+    }
 }

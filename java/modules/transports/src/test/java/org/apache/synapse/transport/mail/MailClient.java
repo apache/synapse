@@ -20,7 +20,6 @@
 package org.apache.synapse.transport.mail;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -31,32 +30,43 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 
-public abstract class MailClient implements AsyncTestClient<ByteArrayMessage> {
-    private Map<String,String> outProperties;
+public abstract class MailClient {
+    private final MessageLayout layout;
     private MailChannel channel;
+    private Session session;
     
+    public MailClient(MessageLayout layout) {
+        this.layout = layout;
+    }
+
+    @NameComponent("layout")
+    public MessageLayout getLayout() {
+        return layout;
+    }
+
     @SuppressWarnings("unused")
     private void setUp(MailTestEnvironment env, MailChannel channel) throws Exception {
-        outProperties = env.getOutProperties();
+        Properties props = new Properties();
+        props.putAll(env.getOutProperties());
+        session = Session.getInstance(props);
         this.channel = channel;
     }
 
-    public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
-        Properties props = new Properties();
-        props.putAll(outProperties);
-        Session session = Session.getInstance(props);
+    protected String sendMessage(ByteArrayMessage message) throws Exception {
+        String msgId = UUIDGenerator.getUUID();
         MimeMessage msg = new MimeMessage(session);
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getAddress()));
-        msg.setFrom(new InternetAddress("test-sender@localhost"));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getRecipient().getEmail()));
+        msg.setFrom(new InternetAddress(channel.getSender().getEmail()));
         msg.setSentDate(new Date());
-        DataHandler dh = new DataHandler(new ByteArrayDataSource(message.getContent(), message.getContentType()));
-        setupMessage(msg, dh);
+        msg.setHeader(MailConstants.MAIL_HEADER_MESSAGE_ID, msgId);
+        msg.setHeader(MailConstants.MAIL_HEADER_X_MESSAGE_ID, msgId);
+        DataHandler dh = new DataHandler(new ByteArrayDataSource(message.getContent(), message.getContentType().toString()));
+        layout.setupMessage(msg, dh);
         Transport.send(msg);
+        return msgId;
     }
-    
-    protected abstract void setupMessage(MimeMessage msg, DataHandler dh) throws Exception;
 }

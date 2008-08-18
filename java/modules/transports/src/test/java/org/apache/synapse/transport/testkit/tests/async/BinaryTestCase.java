@@ -22,7 +22,8 @@ package org.apache.synapse.transport.testkit.tests.async;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.apache.synapse.transport.testkit.TestEnvironment;
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
@@ -35,15 +36,15 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 public class BinaryTestCase extends AsyncMessageTestCase<ByteArrayMessage,ByteArrayMessage> {
     private static final Random random = new Random();
     
-    public BinaryTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode) {
-        super(env, channel, client, endpointFactory, contentTypeMode, "application/octet-stream", null);
+    public BinaryTestCase(AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
+        super(channel, client, endpointFactory, contentTypeMode, "application/octet-stream", null, resources);
     }
     
     @Override
     protected ByteArrayMessage prepareMessage() throws Exception {
         byte[] content = new byte[8192];
         random.nextBytes(content);
-        return new ByteArrayMessage("application/octet-stream", content);
+        return new ByteArrayMessage(new ContentType("application", "octet-stream", null), content);
     }
 
     @Override

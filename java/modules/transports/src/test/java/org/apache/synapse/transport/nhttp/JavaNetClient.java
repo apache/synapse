@@ -36,7 +36,7 @@ public class JavaNetClient implements AsyncTestClient<ByteArrayMessage> {
         URLConnection connection = new URL(options.getEndpointReference()).openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);
-        connection.setRequestProperty("Content-Type", message.getContentType());
+        connection.setRequestProperty("Content-Type", message.getContentType().toString());
         OutputStream out = connection.getOutputStream();
         out.write(message.getContent());
         out.close();

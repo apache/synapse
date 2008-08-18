@@ -20,34 +20,54 @@
 package org.apache.synapse.transport.mail;
 
 import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Session;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 
-public class MailChannel extends AbstractChannel implements AsyncChannel {
-    private String address;
+import com.icegreen.greenmail.user.GreenMailUser;
+
+public class MailChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
+    private GreenMailUser sender;
+    private GreenMailUser recipient;
     private String protocol;
-    private Map<String,String> inProperties;
+    private Map<String,String> senderInProperties;
+    private Map<String,String> recipientInProperties;
     
     @SuppressWarnings("unused")
     private void setUp(MailTestEnvironment env) throws Exception {
         protocol = env.getProtocol();
-        inProperties = env.getInProperties();
-        address = env.getAddress();
+        sender = env.getUser(0);
+        senderInProperties = env.getInProperties(0);
+        recipient = env.getUser(1);
+        recipientInProperties = env.getInProperties(1);
     }
 
-    public String getAddress() {
-        return address;
+    public GreenMailUser getSender() {
+        return sender;
+    }
+
+    public GreenMailUser getRecipient() {
+        return recipient;
+    }
+    
+    public Session getReplySession() {
+        Properties props = new Properties();
+        props.putAll(senderInProperties);
+        return Session.getInstance(props);
     }
 
     @Override
     public void setupService(AxisService service) throws Exception {
         service.addParameter("transport.mail.Protocol", protocol);
-        service.addParameter("transport.mail.Address", address);
+        service.addParameter("transport.mail.Address", recipient.getEmail());
         service.addParameter("transport.PollInterval", "1");
         
-        for (Map.Entry<String,String> prop : inProperties.entrySet()) {
+        for (Map.Entry<String,String> prop : recipientInProperties.entrySet()) {
             service.addParameter(prop.getKey(), prop.getValue());
         }
     }

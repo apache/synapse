@@ -23,6 +23,8 @@ import static org.apache.synapse.transport.testkit.AdapterUtils.adapt;
 
 import java.io.File;
 
+import javax.mail.internet.ContentType;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -35,7 +37,6 @@ import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.server.Server;
 
 public class VFSTransportSenderTest extends TestCase {
     public static TestSuite suite() {
@@ -51,10 +52,6 @@ public class VFSTransportSenderTest extends TestCase {
 
             private VFSFileChannel channel;
             
-            public Server getServer() {
-                return null;
-            }
-            
             @SuppressWarnings("unused")
             private void setUp(VFSFileChannel channel) {
                 this.channel = channel;
@@ -63,15 +60,15 @@ public class VFSTransportSenderTest extends TestCase {
             public AsyncEndpoint<ByteArrayMessage> createAsyncEndpoint(String contentType)
                     throws Exception {
                 
-                return new VFSMockAsyncEndpoint(channel, contentType);
+                return new VFSMockAsyncEndpoint(channel, new ContentType(contentType));
             }
         };
         
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
         AxisAsyncTestClient client = new AxisAsyncTestClient(tdf);
         
-        suite.addBinaryTest(env, channel, adapt(client, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE);
-        suite.addTextPlainTests(env, channel, adapt(client, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE);
+        suite.addBinaryTest(channel, adapt(client, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE, env);
+        suite.addTextPlainTests(channel, adapt(client, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE, env);
         
         return suite;
     }

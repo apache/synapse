@@ -22,15 +22,17 @@ package org.apache.synapse.transport.mail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 
+import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
-public class MailTestEnvironment extends TestEnvironment {
-    private static final String ADDRESS = "test-account";
-    private static final String PASSWORD = "password";
-    
+public class MailTestEnvironment extends TestEnvironment implements TransportDescriptionFactory {
     private static final ServerSetup SMTP =
                 new ServerSetup(7025, "127.0.0.1", ServerSetup.PROTOCOL_SMTP);
     
@@ -38,11 +40,15 @@ public class MailTestEnvironment extends TestEnvironment {
                 new ServerSetup(7110, "127.0.0.1", ServerSetup.PROTOCOL_POP3);
     
     private GreenMail greenMail;
+    private GreenMailUser[] users;
     
     @SuppressWarnings("unused")
     private void setUp() throws Exception {
         greenMail = new GreenMail(new ServerSetup[] { SMTP, POP3 });
-        greenMail.setUser(ADDRESS, PASSWORD);
+        users = new GreenMailUser[10];
+        for (int i=0; i<10; i++) {
+            users[i] = greenMail.setUser("test" + i, "password");
+        }
         greenMail.start();
     }
 
@@ -50,22 +56,23 @@ public class MailTestEnvironment extends TestEnvironment {
     private void tearDown() throws Exception {
         greenMail.stop();
         greenMail = null;
+        users = null;
     }
     
     public String getProtocol() {
         return "pop3";
     }
     
-    public String getAddress() {
-        return ADDRESS;
+    public GreenMailUser getUser(int i) {
+        return users[i];
     }
     
-    public Map<String,String> getInProperties() {
+    public Map<String,String> getInProperties(int i) {
         Map<String,String> props = new HashMap<String,String>();
         props.put("mail.pop3.host", "localhost");
         props.put("mail.pop3.port", String.valueOf(POP3.getPort()));
-        props.put("mail.pop3.user", ADDRESS);
-        props.put("mail.pop3.password", PASSWORD);
+        props.put("mail.pop3.user", users[i].getLogin());
+        props.put("mail.pop3.password", users[i].getPassword());
         return props;
     }
     
@@ -74,5 +81,20 @@ public class MailTestEnvironment extends TestEnvironment {
         props.put("mail.smtp.host", "localhost");
         props.put("mail.smtp.port", String.valueOf(SMTP.getPort()));
         return props;
+    }
+
+    public TransportInDescription createTransportInDescription() throws Exception {
+        TransportInDescription trpInDesc = new TransportInDescription(MailConstants.TRANSPORT_NAME);
+        trpInDesc.setReceiver(new MailTransportListener());
+        return trpInDesc;
+    }
+
+    public TransportOutDescription createTransportOutDescription() throws Exception {
+        TransportOutDescription trpOutDesc = new TransportOutDescription(MailConstants.TRANSPORT_NAME);
+        trpOutDesc.setSender(new MailTransportSender());
+        for (Map.Entry<String,String> prop : getOutProperties().entrySet()) {
+            trpOutDesc.addParameter(new Parameter(prop.getKey(), prop.getValue()));
+        }
+        return trpOutDesc;
     }
 }

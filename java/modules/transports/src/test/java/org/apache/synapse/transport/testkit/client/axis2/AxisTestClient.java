@@ -23,7 +23,6 @@ import java.io.File;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.client.OperationClient;
@@ -37,9 +36,10 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.message.XMLMessageType;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
 
 public class AxisTestClient implements TestClient {
     private static final Log log = LogFactory.getLog(AxisTestClient.class);
@@ -73,20 +73,24 @@ public class AxisTestClient implements TestClient {
         trpOutDesc.getSender().stop();
     }
     
-    protected OperationClient createClient(String endpointReference, QName operationQName, XMLMessageType xmlMessageType, OMElement payload, String charset) throws AxisFault {
+    protected OperationClient createClient(ClientOptions options, AxisMessage message, QName operationQName) throws AxisFault {
+        String endpointReference = options.getEndpointReference();
         log.info("Sending to " + endpointReference);
         
-        Options options = new Options();
-        options.setTo(channel.createEndpointReference(endpointReference));
+        Options axisOptions = new Options();
+        axisOptions.setTo(channel.createEndpointReference(endpointReference));
 
         ServiceClient serviceClient = new ServiceClient(cfgCtx, null);
-        serviceClient.setOptions(options);
+        serviceClient.setOptions(axisOptions);
         
         OperationClient mepClient = serviceClient.createClient(operationQName);
-        MessageContext mc = xmlMessageType.createMessageContext(payload);
+        MessageContext mc = new MessageContext();
+        mc.setProperty(Constants.Configuration.MESSAGE_TYPE, message.getMessageType());
+        mc.setEnvelope(message.getEnvelope());
+        mc.setAttachmentMap(message.getAttachments());
         channel.setupRequestMessageContext(mc);
         setupRequestMessageContext(mc);
-        mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charset);
+        mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, options.getCharset());
         mc.setServiceContext(serviceClient.getServiceContext());
         mepClient.addMessageContext(mc);
         

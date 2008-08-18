@@ -22,10 +22,10 @@ package org.apache.synapse.transport.testkit.server.axis2;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.message.MessageData;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
-public class AsyncEndpointImpl extends EndpointImpl implements AsyncEndpoint<MessageData> {
+public class AsyncEndpointImpl extends EndpointImpl implements AsyncEndpoint<AxisMessage> {
     private final MockMessageReceiver messageReceiver;
     
     public AsyncEndpointImpl(AxisServer server, AxisService service, MockMessageReceiver messageReceiver) {
@@ -33,7 +33,7 @@ public class AsyncEndpointImpl extends EndpointImpl implements AsyncEndpoint<Mes
         this.messageReceiver = messageReceiver;
     }
 
-    public MessageData waitForMessage(int timeout) throws Throwable {
+    public AxisMessage waitForMessage(int timeout) throws Throwable {
         return messageReceiver.waitForMessage(timeout, TimeUnit.MILLISECONDS);
     }
 }

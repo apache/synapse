@@ -50,20 +50,20 @@ public class VFSTransportListenerTest extends TestCase {
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);
         VFSTestEnvironment env = new VFSTestEnvironment();
-        AxisServer server = new AxisServer(tdf);
-        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory(server);
+        AxisServer server = new AxisServer();
+        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
         VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
         VFSClient vfsClient = new VFSClient();
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(vfsClient, MessageConverter.XML_TO_BYTE));
-        clients.add(new AxisAsyncTestClient(tdf));
+        clients.add(adapt(new AxisAsyncTestClient(tdf), MessageConverter.XML_TO_AXIS));
         for (AsyncTestClient<XMLMessage> client : clients) {
-            suite.addSOAPTests(env, channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE);
-            suite.addPOXTests(env, channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE);
+            suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE, env, server, tdf);
+            suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE, env, server, tdf);
             // Since VFS has no Content-Type header, SwA is not supported.
         }
-        suite.addTextPlainTests(env, channel, adapt(vfsClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.SERVICE);
-        suite.addBinaryTest(env, channel, vfsClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.SERVICE);
+        suite.addTextPlainTests(channel, adapt(vfsClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.SERVICE, env, server, tdf);
+        suite.addBinaryTest(channel, vfsClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.SERVICE, env, server, tdf);
         return suite;
     }
 }

@@ -19,29 +19,65 @@
 
 package org.apache.synapse.transport.testkit.message;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 
 public class XMLMessage {
+    public enum Type {
+        SOAP11(SOAP11Constants.SOAP_11_CONTENT_TYPE),
+        SOAP12(SOAP12Constants.SOAP_12_CONTENT_TYPE),
+        POX("application/xml");
+        
+        private final String contentType;
+        
+        private Type(String contentType) {
+            this.contentType = contentType;
+        }
+        
+        public String getContentType() {
+            return contentType;
+        }
+    }
+    
     private final String contentType;
-    private final XMLMessageType xmlMessageType;
+    private final Type type;
     private final OMElement payload;
     
-    public XMLMessage(String contentType, OMElement payload,
-            XMLMessageType xmlMessageType) {
+    public XMLMessage(String contentType, OMElement payload, Type type) {
         this.contentType = contentType;
         this.payload = payload;
-        this.xmlMessageType = xmlMessageType;
+        this.type = type;
     }
 
     public String getContentType() {
         return contentType;
     }
 
-    public XMLMessageType getXmlMessageType() {
-        return xmlMessageType;
+    public Type getType() {
+        return type;
     }
 
     public OMElement getPayload() {
         return payload;
+    }
+    
+    public OMElement getMessageElement() {
+        if (type == Type.POX) {
+            return payload;
+        } else {
+            SOAPFactory factory;
+            if (type == Type.SOAP12) {
+                factory = OMAbstractFactory.getSOAP12Factory();
+            } else {
+                factory = OMAbstractFactory.getSOAP11Factory();
+            }
+            SOAPEnvelope envelope = factory.getDefaultEnvelope();
+            envelope.getBody().addChild(payload);
+            return envelope;
+        }
     }
 }

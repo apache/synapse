@@ -21,6 +21,8 @@ package org.apache.synapse.transport.testkit.message;
 
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.Constants;
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.transport.testkit.server.axis2.MockMessageReceiver;
 
 /**
@@ -28,20 +30,45 @@ import org.apache.synapse.transport.testkit.server.axis2.MockMessageReceiver;
  * This class is used by {@link MockMessageReceiver} because it is not safe to
  * keep a reference to the {@link org.apache.axis2.context.MessageContext} object.
  */
-public class MessageData {
-    private final SOAPEnvelope envelope;
-    private final Attachments attachments;
+public class AxisMessage {
+    private String messageType;
+    private SOAPEnvelope envelope;
+    private Attachments attachments;
     
-    public MessageData(SOAPEnvelope envelope, Attachments attachments) {
-        this.envelope = envelope;
-        this.attachments = attachments;
+    public AxisMessage() {
+    }
+    
+    public AxisMessage(MessageContext msgContext) {
+        envelope = msgContext.getEnvelope();
+        envelope.build();
+        attachments = msgContext.getAttachmentMap();
+        // Make sure that all attachments are read
+        attachments.getAllContentIDs();
+        setAttachments(attachments);
+        messageType = (String)msgContext.getProperty(Constants.Configuration.MESSAGE_TYPE);
+    }
+    
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     public SOAPEnvelope getEnvelope() {
         return envelope;
     }
 
+    public void setEnvelope(SOAPEnvelope envelope) {
+        this.envelope = envelope;
+    }
+
     public Attachments getAttachments() {
         return attachments;
+    }
+    
+    public void setAttachments(Attachments attachments) {
+        this.attachments = attachments;
     }
 }

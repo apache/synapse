@@ -60,9 +60,16 @@ public class TestResource {
     private final Object instance;
     private final LinkedList<Initializer> initializers = new LinkedList<Initializer>();
     private final List<Finalizer> finalizers = new LinkedList<Finalizer>();
+    private boolean resolved;
     
-    public TestResource(List<TestResource> resources, Object instance) {
+    public TestResource(Object instance) {
         this.instance = instance;
+    }
+    
+    public void resolve(List<TestResource> resources) {
+        if (resolved) {
+            return;
+        }
         Object target = instance;
         while (target instanceof Adapter) {
             target = ((Adapter)target).getTarget();
@@ -82,12 +89,14 @@ public class TestResource {
                         Class<?> parameterClass = (Class<?>)parameterType;
                         TestResource res = null;
                         for (TestResource resource : resources) {
-                            Object obj = resource.getInstance();
-                            if (parameterClass.isInstance(obj)) {
-                                if (res != null) {
-                                    throw new Error();
+                            if (resource != this) {
+                                Object obj = resource.getInstance();
+                                if (parameterClass.isInstance(obj)) {
+                                    if (res != null) {
+                                        throw new Error();
+                                    }
+                                    res = resource;
                                 }
-                                res = resource;
                             }
                         }
                         if (res == null) {
@@ -103,6 +112,7 @@ public class TestResource {
                 }
             }
         }
+        resolved = true;
     }
 
     public Object getInstance() {

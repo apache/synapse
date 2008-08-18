@@ -33,21 +33,14 @@ import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 
 public class AxisEchoEndpointFactory implements EndpointFactory {
-    private final AxisServer server;
     private TestEnvironment env;
+    private AxisServer server;
     private RequestResponseChannel channel;
     
-    public AxisEchoEndpointFactory(AxisServer server) {
-        this.server = server;
-    }
-
-    public AxisServer getServer() {
-        return server;
-    }
-    
     @SuppressWarnings("unused")
-    private void setUp(TestEnvironment env, RequestResponseChannel channel) {
+    private void setUp(TestEnvironment env, AxisServer server, RequestResponseChannel channel) {
         this.env = env;
+        this.server = server;
         this.channel = channel;
     }
 

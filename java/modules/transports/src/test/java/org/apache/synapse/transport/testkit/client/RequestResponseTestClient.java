@@ -19,9 +19,6 @@
 
 package org.apache.synapse.transport.testkit.client;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.synapse.transport.testkit.message.XMLMessageType;
-
-public interface XMLRequestResponseTestClient extends TestClient {
-    OMElement sendMessage(String endpointReference, String contentType, String charset, XMLMessageType xmlMessageType, OMElement payload) throws Exception;
+public interface RequestResponseTestClient<M,N> extends TestClient {
+    N sendMessage(ClientOptions options, M message) throws Exception;
 }

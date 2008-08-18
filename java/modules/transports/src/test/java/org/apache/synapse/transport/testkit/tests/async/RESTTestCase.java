@@ -25,23 +25,22 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.message.MessageData;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.name.DisplayName;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 @DisplayName("REST")
-public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,MessageData> {
+public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,AxisMessage> {
     private final RESTMessage message;
     
-    public RESTTestCase(TestEnvironment env, AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpointFactory<MessageData> endpointFactory, RESTMessage message) {
-        super(env, channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null);
+    public RESTTestCase(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, RESTMessage message, Object... resources) {
+        super(channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null, resources);
         this.message = message;
     }
     
@@ -51,7 +50,7 @@ public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,MessageData> 
     }
 
     @Override
-    protected void checkMessageData(RESTMessage message, MessageData messageData) throws Exception {
+    protected void checkMessageData(RESTMessage message, AxisMessage messageData) throws Exception {
         OMElement content = messageData.getEnvelope().getBody().getFirstElement();
         Set<Parameter> expected = new HashSet<Parameter>(Arrays.asList(message.getParameters()));
         for (Iterator<?> it = content.getChildElements(); it.hasNext(); ) {

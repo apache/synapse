@@ -33,7 +33,7 @@ public class JMSBytesMessageClient extends JMSClient implements AsyncTestClient<
                             ByteArrayMessage message) throws Exception {
         BytesMessage jmsMessage = session.createBytesMessage();
         if (message.getContentType() != null) {
-            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
+            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType().toString());
         }
         jmsMessage.writeBytes(message.getContent());
         producer.send(jmsMessage);

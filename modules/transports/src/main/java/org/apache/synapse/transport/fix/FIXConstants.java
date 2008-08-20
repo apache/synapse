@@ -33,6 +33,8 @@ public class FIXConstants {
     public static final String FIX_BODY = "body";
     public static final String FIX_TRAILER = "trailer";
     public static final String FIX_FIELD_ID = "id";
+    public static final String FIX_GROUPS = "groups";
+    public static final String FIX_GROUP = "group";
     public static final String FIX_MESSAGE_SERVICE = "service";
     public static final String FIX_MESSAGE_APPLICATION = "fixApplication";
     public static final String FIX_BINARY_FIELD = "rawdata";

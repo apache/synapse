@@ -38,6 +38,7 @@ import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.*;
@@ -114,28 +115,8 @@ public class FIXUtils {
             }
         }
         //process FIX body
-        iter = message.iterator();
-        if (iter != null) {
-            while (iter.hasNext()) {
-                Field<?> field = iter.next();
-                OMElement msgField = soapFactory.createOMElement(FIXConstants.FIX_FIELD, null);
-                msgField.addAttribute(soapFactory.
-                        createOMAttribute(FIXConstants.FIX_FIELD_ID, null, String.valueOf(field.getTag())));
-                Object value = field.getObject();
-                if (value instanceof byte[]) {
-                    DataSource dataSource = new ByteArrayDataSource((byte[]) value);
-                    DataHandler dataHandler = new DataHandler(dataSource);
-                    String contentID = msgCtx.addAttachment(dataHandler);
-                    OMElement binaryData = soapFactory.createOMElement(FIXConstants.FIX_BINARY_FIELD, null);
-                    String binaryCID = "cid:" + contentID;
-                    binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
-                    msgField.addChild(binaryData);
-                } else {
-                    soapFactory.createOMText(msgField, value.toString(), OMElement.CDATA_SECTION_NODE);
-                }
-                body.addChild(msgField);
-            }
-        }
+        convertFIXBodyToXML(message, body, soapFactory, msgCtx);
+
         //process FIX trailer
         iter = message.getTrailer().iterator();
         if (iter != null) {
@@ -167,6 +148,149 @@ public class FIXUtils {
         SOAPEnvelope envelope = soapFactory.getDefaultEnvelope();
         envelope.getBody().addChild(msg);
         msgCtx.setEnvelope(envelope);
+    }
+    
+
+    /**
+     * Constructs the XML infoset for the FIX message body
+     *
+     * @param message the FIX message
+     * @param body the body element of the XML infoset
+     * @param soapFactory the SOAP factory to create XML elements
+     * @param msgCtx the Axis2 Message context
+     * @throws AxisFault on error
+     */
+    private void convertFIXBodyToXML(FieldMap message, OMElement body, SOAPFactory soapFactory,
+                                        MessageContext msgCtx) throws AxisFault{
+
+        if (log.isDebugEnabled()) {
+            log.debug("Generating FIX message body (Message ID: " + msgCtx.getMessageID() + ")");
+        }
+
+        Iterator<Field<?>> iter = message.iterator();
+        if (iter != null) {
+             while (iter.hasNext()) {
+                 Field<?> field = iter.next();
+                 OMElement msgField = soapFactory.createOMElement(FIXConstants.FIX_FIELD, null);
+                 msgField.addAttribute(soapFactory.
+                         createOMAttribute(FIXConstants.FIX_FIELD_ID, null, String.valueOf(field.getTag())));
+                 Object value = field.getObject();
+
+                 if (value instanceof byte[]) {
+                     DataSource dataSource = new ByteArrayDataSource((byte[]) value);
+                     DataHandler dataHandler = new DataHandler(dataSource);
+                     String contentID = msgCtx.addAttachment(dataHandler);
+                     OMElement binaryData = soapFactory.createOMElement(FIXConstants.FIX_BINARY_FIELD, null);
+                     String binaryCID = "cid:" + contentID;
+                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
+                     msgField.addChild(binaryData);
+                 } else {
+                     soapFactory.createOMText(msgField, value.toString(), OMElement.CDATA_SECTION_NODE);
+                 }
+
+                 body.addChild(msgField);
+             }
+        }
+        
+        //process FIX repeating groups
+        Iterator<Integer> groupKeyItr = message.groupKeyIterator();
+        if (groupKeyItr != null){
+            while (groupKeyItr.hasNext()) {
+                try {
+                    int groupKey =  groupKeyItr.next();
+                    OMElement groupsField = soapFactory.createOMElement(FIXConstants.FIX_GROUPS, null);
+                    groupsField.addAttribute(FIXConstants.FIX_FIELD_ID,String.valueOf(groupKey),null);
+                    // TODO: Folowing section uses reflections to access the FieldMap.getGroups(Field) method.
+                    // Once QFJ accept the QFJ-330 patch can remove the folowing section.
+                    Class fieldMap;
+                    // Package access method getGroups(int) is a method of FieldMap the parent class of Group , Message and <FIXV>Message
+                    if (message.getClass().getName().equals("quickfix.Group")){    // Not added to constants subject to remove with QFJ-330
+                        fieldMap = message.getClass().getSuperclass();
+                    } else if (message.getClass().getName().equals("quickfix.Message")){ // Not added to constants subject to remove with QFJ-330
+                        fieldMap = message.getClass().getSuperclass();
+                    } else {
+                        fieldMap = message.getClass().getSuperclass().getSuperclass().getSuperclass();
+                    }
+
+                    Class[] types = new Class[] { int.class };
+                    Method getGroups = fieldMap.getDeclaredMethod("getGroups", types); // Not added to constants subject to remove with QFJ-330
+                    getGroups.setAccessible(true);
+                    List<Group> groupList = (List<Group>) getGroups.invoke(message, groupKey);
+                    Iterator<Group> groupIterator = groupList.iterator();
+                    while(groupIterator.hasNext()){
+                        Group msgGroup = groupIterator.next();
+                        OMElement groupField = soapFactory.createOMElement(FIXConstants.FIX_GROUP, null);
+                        convertFIXBodyToXML(msgGroup, groupField, soapFactory, msgCtx);    // rec. call the method to process the repeating groups
+                        groupsField.addChild(groupField);
+                    }
+                    body.addChild(groupsField);
+
+                } catch (Exception e) {
+                    throw new AxisFault("Exception occured in FIX message processing : " + e.toString());
+                }
+            }
+        }
+    }
+
+
+    private void generateFIXBody(OMElement node, FieldMap message, MessageContext msgCtx, boolean withNs,
+                                 String nsURI, String nsPrefix) throws IOException {
+
+        Iterator<OMElement> bodyElements = node.getChildElements();
+        while (bodyElements.hasNext()) {
+            OMElement bodyNode = bodyElements.next();
+            String nodeLocalName = bodyNode.getLocalName();
+
+            //handle repeating groups
+            if (nodeLocalName.equals(FIXConstants.FIX_GROUPS)){
+                int groupsKey = Integer.parseInt(bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID)));
+                Group group;
+                Iterator<OMElement> groupElements = bodyNode.getChildElements();
+                while (groupElements.hasNext()){
+                    OMElement groupNode = groupElements.next();
+                    OMElement delimNode = groupNode.getFirstElement();
+                    int delimKey = Integer.parseInt(delimNode. getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID)));
+                    group = new Group(groupsKey,delimKey);
+                    generateFIXBody(groupNode, group, msgCtx, withNs, nsURI, nsPrefix);
+                    message.addGroup(group);
+                }
+
+            } else {
+                String tag;
+                if (withNs) {
+                    tag = bodyNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
+                } else {
+                    tag = bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
+                }
+
+                 String value = null;
+                 OMElement child = bodyNode.getFirstElement();
+                 if (child != null) {
+                     String href;
+                     if (withNs) {
+                         href = bodyNode.getFirstElement().
+                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix)) ;
+                     } else {
+                         href = bodyNode.getFirstElement().
+                                    getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
+                     }
+
+                     if (href != null) {
+                         DataHandler binaryDataHandler = msgCtx.getAttachment(href.substring(4));
+                         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                         binaryDataHandler.writeTo(outputStream);
+                         value = new String(outputStream.toByteArray());
+                     }
+                }
+                else {
+                     value = bodyNode.getText();
+                }
+
+                if (value != null) {
+                    message.setString(Integer.parseInt(tag), value);
+                }
+            }
+         }
     }
 
 
@@ -251,43 +375,8 @@ public class FIXUtils {
 
             } else if (node.getQName().getLocalPart().equals(FIXConstants.FIX_BODY)) {
                 //create FIX body
-                Iterator<OMElement> bodyElements = node.getChildElements();
-                while (bodyElements.hasNext()) {
-                    OMElement bodyNode = bodyElements.next();
-                    String tag;
-                    if (withNs) {
-                        tag = bodyNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID,
-                                nsPrefix));
-                    } else {
-                        tag = bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
-                    }
-
-                    String value = null;
-
-                    OMElement child = bodyNode.getFirstElement();
-                    if (child != null) {
-                        String href;
-                        if (withNs) {
-                            href = bodyNode.getFirstElement().
-                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix)) ;
-                        } else {
-                            href = bodyNode.getFirstElement().
-                                    getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
-                        }
-                        if (href != null) {
-                            DataHandler binaryDataHandler = msgCtx.getAttachment(href.substring(4));
-                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                            binaryDataHandler.writeTo(outputStream);
-                            value = new String(outputStream.toByteArray());
-                        }
-                    } else {
-                        value = bodyNode.getText();
-                    }
-
-                    if (value != null) {
-                        message.setString(Integer.parseInt(tag), value);
-                    }
-                }
+                generateFIXBody(node, message, msgCtx, withNs, nsURI, nsPrefix);
+                
             } else if (node.getQName().getLocalPart().equals(FIXConstants.FIX_TRAILER)) {
                 //create FIX trailer
                 Iterator<OMElement> trailerElements = node.getChildElements();

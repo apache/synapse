@@ -31,10 +31,6 @@ public class EndpointImpl implements Endpoint {
         this.service = service;
     }
 
-    public String getEPR() throws Exception {
-        return server.getEPR(service);
-    }
-
     public void remove() throws Exception {
         server.getAxisConfiguration().removeService(service.getName());
     }

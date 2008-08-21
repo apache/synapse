@@ -22,7 +22,6 @@ package org.apache.synapse.transport.testkit.client.axis2;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
@@ -30,10 +29,6 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("axis")
 public class AxisRequestResponseTestClient extends AxisTestClient implements RequestResponseTestClient<AxisMessage,AxisMessage> {
-    public AxisRequestResponseTestClient(TransportDescriptionFactory tdf) {
-        super(tdf);
-    }
-
     public AxisMessage sendMessage(ClientOptions options, AxisMessage message) throws Exception {
         OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);
         mepClient.execute(true);

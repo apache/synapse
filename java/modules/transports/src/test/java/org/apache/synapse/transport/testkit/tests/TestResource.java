@@ -28,8 +28,6 @@ import java.util.Set;
 
 import org.apache.synapse.transport.testkit.Adapter;
 
-import com.sun.org.omg.CORBA.Initializer;
-
 public class TestResource {
     private static class Initializer {
         private final Method method;
@@ -96,7 +94,7 @@ public class TestResource {
                                 Object obj = resource.getInstance();
                                 if (parameterClass.isInstance(obj)) {
                                     if (res != null) {
-                                        throw new Error();
+                                        throw new Error(target.getClass().getName() + " depends on " + parameterClass.getName() + ", but multiple candidates found");
                                     }
                                     res = resource;
                                 }

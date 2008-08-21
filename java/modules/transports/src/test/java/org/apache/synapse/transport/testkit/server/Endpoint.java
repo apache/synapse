@@ -20,6 +20,5 @@
 package org.apache.synapse.transport.testkit.server;
 
 public interface Endpoint {
-    String getEPR() throws Exception;
     void remove() throws Exception;
 }

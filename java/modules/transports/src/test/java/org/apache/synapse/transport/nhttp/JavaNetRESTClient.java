@@ -32,9 +32,16 @@ import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatc
 
 @DisplayName("java.net")
 public class JavaNetRESTClient implements AsyncTestClient<RESTMessage> {
+    private HttpChannel channel;
+    
+    @SuppressWarnings("unused")
+    private void setUp(HttpChannel channel) {
+        this.channel = channel;
+    }
+    
     public void sendMessage(ClientOptions options, RESTMessage message) throws Exception {
         StringBuilder url = new StringBuilder();
-        url.append(options.getEndpointReference());
+        url.append(channel.getEndpointReference().getAddress());
         url.append('/');
         url.append(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
         String queryString = message.getQueryString();

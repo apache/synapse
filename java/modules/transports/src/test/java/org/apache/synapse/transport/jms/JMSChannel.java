@@ -19,8 +19,16 @@
 
 package org.apache.synapse.transport.jms;
 
-import javax.jms.Destination;
+import java.util.Enumeration;
 
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.QueueBrowser;
+import javax.jms.Session;
+
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.NameComponent;
@@ -61,6 +69,26 @@ public abstract class JMSChannel extends AbstractChannel {
 
     public Destination getDestination() {
         return destination;
+    }
+
+    public int getMessageCount() throws JMSException {
+        Connection connection = env.getConnectionFactory(destination).createConnection();
+        try {
+            connection.start();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            QueueBrowser browser = session.createBrowser((Queue)destination);
+            int count = 0;
+            for (Enumeration<?> e = browser.getEnumeration(); e.hasMoreElements(); e.nextElement()) {
+                count++;
+            }
+            return count;
+        } finally {
+            connection.close();
+        }
+    }
+
+    public EndpointReference getEndpointReference() throws Exception {
+        return new EndpointReference("jms:/" + destinationName + "?transport.jms.DestinationType=" + destinationType + "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory&transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory");
     }
 
     @Override

@@ -59,8 +59,8 @@ public abstract class MailClient {
     protected String sendMessage(ByteArrayMessage message) throws Exception {
         String msgId = UUIDGenerator.getUUID();
         MimeMessage msg = new MimeMessage(session);
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getRecipient().getEmail()));
-        msg.setFrom(new InternetAddress(channel.getSender().getEmail()));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getRecipient().getAddress()));
+        msg.setFrom(new InternetAddress(channel.getSender().getAddress()));
         msg.setSentDate(new Date());
         msg.setHeader(MailConstants.MAIL_HEADER_MESSAGE_ID, msgId);
         msg.setHeader(MailConstants.MAIL_HEADER_X_MESSAGE_ID, msgId);

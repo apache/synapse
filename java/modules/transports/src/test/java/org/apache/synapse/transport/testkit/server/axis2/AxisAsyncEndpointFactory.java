@@ -22,40 +22,26 @@ package org.apache.synapse.transport.testkit.server.axis2;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOnlyAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
 public class AxisAsyncEndpointFactory implements AsyncEndpointFactory<AxisMessage> {
-    private TestEnvironment env;
     private AxisServer server;
     private AsyncChannel channel;
     
     @SuppressWarnings("unused")
-    private void setUp(TestEnvironment env, AxisServer server, AsyncChannel channel) {
-        this.env = env;
+    private void setUp(AxisServer server, AsyncChannel channel) {
         this.server = server;
         this.channel = channel;
     }
     
     public AsyncEndpoint<AxisMessage> createAsyncEndpoint(String contentType) throws Exception {
-        // Set up a test service with a default operation backed by a mock message
-        // receiver. The service is configured using the parameters specified by the
-        // implementation.
-        AxisService service = new AxisService("TestService");
         AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
         MockMessageReceiver messageReceiver = new MockMessageReceiver();
         operation.setMessageReceiver(messageReceiver);
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentType != null) {
-            env.setupContentType(service, contentType);
-        }
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
+        AxisService service = server.deployService(channel, operation, contentType);
 //        server.addErrorListener(messageReceiver);
         return new AsyncEndpointImpl(server, service, messageReceiver);
     }

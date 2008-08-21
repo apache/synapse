@@ -21,19 +21,25 @@ package org.apache.synapse.transport.vfs;
 
 import java.io.File;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 
 public class VFSFileChannel extends AbstractChannel implements AsyncChannel {
-    private final File requestFile;
+    private final String path;
+    private File requestFile;
     
-    public VFSFileChannel(File requestFile) {
-        this.requestFile = requestFile;
+    public VFSFileChannel(String path) {
+        this.path = path;
     }
 
     public File getRequestFile() {
         return requestFile;
+    }
+
+    public EndpointReference getEndpointReference() throws Exception {
+        return new EndpointReference("vfs:" + requestFile.getAbsoluteFile().toURL());
     }
 
     @Override
@@ -44,7 +50,8 @@ public class VFSFileChannel extends AbstractChannel implements AsyncChannel {
     }
 
     @SuppressWarnings("unused")
-    private void setUp() throws Exception {
+    private void setUp(VFSTestEnvironment env) throws Exception {
+        requestFile = new File(env.getRootDir(), path);
         requestFile.getParentFile().mkdirs();
         requestFile.delete();
     }

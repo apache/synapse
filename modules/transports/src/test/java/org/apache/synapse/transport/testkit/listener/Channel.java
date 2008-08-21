@@ -25,6 +25,8 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 
 public interface Channel {
+    String CONTEXT_PATH = "/services";
+    
     /**
      * Set up the service so that it can receive messages through the transport under test.
      * Implementations will typically call {@link AxisService#addParameter(Parameter)} to
@@ -38,5 +40,5 @@ public interface Channel {
     
     void setupRequestMessageContext(MessageContext msgContext);
     
-    EndpointReference createEndpointReference(String address);
+    EndpointReference getEndpointReference() throws Exception;
 }

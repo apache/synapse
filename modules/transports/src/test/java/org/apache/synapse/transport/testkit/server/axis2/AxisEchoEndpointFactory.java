@@ -20,49 +20,34 @@
 package org.apache.synapse.transport.testkit.server.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 
 public class AxisEchoEndpointFactory implements EndpointFactory {
-    private TestEnvironment env;
     private AxisServer server;
     private RequestResponseChannel channel;
     
     @SuppressWarnings("unused")
-    private void setUp(TestEnvironment env, AxisServer server, RequestResponseChannel channel) {
-        this.env = env;
+    private void setUp(AxisServer server, RequestResponseChannel channel) {
         this.server = server;
         this.channel = channel;
     }
 
     public Endpoint createEchoEndpoint(String contentType) throws Exception {
-        AxisService service = new AxisService("EchoService");
         AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
         operation.setMessageReceiver(new AbstractInOutMessageReceiver() {
             @Override
             public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
-                System.out.println(inMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
-                System.out.println(inMessage.getEnvelope());
                 outMessage.setEnvelope(inMessage.getEnvelope());
             }
         });
-        service.addOperation(operation);
-        channel.setupService(service);
-        if (contentType != null) {
-            env.setupContentType(service, contentType);
-        }
-        
-        AxisConfiguration axisConfiguration = server.getAxisConfiguration();
-        axisConfiguration.addService(service);
+        AxisService service = server.deployService(channel, operation, contentType);
         return new EndpointImpl(server, service);
     }
 }

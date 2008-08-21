@@ -39,10 +39,6 @@ public class VFSMockAsyncEndpoint implements AsyncEndpoint<ByteArrayMessage> {
         this.contentType = contentType;
     }
     
-    public String getEPR() throws Exception {
-        return "vfs:file:" + channel.getRequestFile().getAbsolutePath();
-    }
-
     public ByteArrayMessage waitForMessage(int timeout) throws Throwable {
         long time = System.currentTimeMillis();
         File file = channel.getRequestFile();

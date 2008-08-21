@@ -54,11 +54,11 @@ public class JMSListenerTest extends TestCase {
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(bytesMessageClient, MessageConverter.XML_TO_BYTE));
         clients.add(adapt(textMessageClient, MessageConverter.XML_TO_STRING));
-        clients.add(adapt(new AxisAsyncTestClient(tdf), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new JMSAxisAsyncClient(tdf, JMSConstants.JMS_BYTE_MESSAGE), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new JMSAxisAsyncClient(tdf, JMSConstants.JMS_TEXT_MESSAGE), MessageConverter.XML_TO_AXIS));
-        suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(tdf), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, server, tdf);
-        suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(tdf), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT, env);
+        clients.add(adapt(new AxisAsyncTestClient(), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new JMSAxisAsyncClient(JMSConstants.JMS_BYTE_MESSAGE), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new JMSAxisAsyncClient(JMSConstants.JMS_TEXT_MESSAGE), MessageConverter.XML_TO_AXIS));
+        suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, server, tdf);
+        suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT, env, tdf);
         for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
             JMSAsyncChannel channel = new JMSAsyncChannel(destinationType);
             for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {

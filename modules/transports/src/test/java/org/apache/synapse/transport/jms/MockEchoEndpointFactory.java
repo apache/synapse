@@ -34,7 +34,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
-import org.apache.synapse.transport.testkit.server.Server;
 
 public class MockEchoEndpointFactory implements EndpointFactory {
     static Log log = LogFactory.getLog(MockEchoEndpointFactory.class);
@@ -48,10 +47,6 @@ public class MockEchoEndpointFactory implements EndpointFactory {
         this.channel = channel;
     }
     
-    public Server getServer() {
-        return null;
-    }
-
     public Endpoint createEchoEndpoint(String contentType) throws Exception {
         Destination destination = channel.getDestination();
         Destination replyDestination = channel.getReplyDestination();
@@ -88,10 +83,6 @@ public class MockEchoEndpointFactory implements EndpointFactory {
         });
         
         return new Endpoint() {
-            public String getEPR() throws Exception {
-                return "jms:/" + channel.getDestinationName() + "?transport.jms.DestinationType=" + channel.getDestinationType() + "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory&transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory";
-            }
-
             public void remove() throws Exception {
                 connection.close();
                 replyConnection.close();

@@ -19,10 +19,22 @@
 
 package org.apache.synapse.transport.nhttp;
 
+import java.util.UUID;
+
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 
-// TODO: if this class remains empty, we should eliminate it
 public class HttpChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
+    private String serviceName;
+    
+    @SuppressWarnings("unused")
+    private void setUp() {
+        serviceName = "TestService-" + UUID.randomUUID();
+    }
+
+    public EndpointReference getEndpointReference() throws Exception {
+        return new EndpointReference("http://localhost:8280" + CONTEXT_PATH + "/" + serviceName);
+    }
 }

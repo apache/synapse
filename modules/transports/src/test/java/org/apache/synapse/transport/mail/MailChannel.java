@@ -24,34 +24,39 @@ import java.util.Properties;
 
 import javax.mail.Session;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 
-import com.icegreen.greenmail.user.GreenMailUser;
-
 public class MailChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
-    private GreenMailUser sender;
-    private GreenMailUser recipient;
-    private String protocol;
+    private MailTestEnvironment env;
+    private MailTestEnvironment.Account sender;
+    private MailTestEnvironment.Account recipient;
     private Map<String,String> senderInProperties;
     private Map<String,String> recipientInProperties;
     
     @SuppressWarnings("unused")
     private void setUp(MailTestEnvironment env) throws Exception {
-        protocol = env.getProtocol();
-        sender = env.getUser(0);
-        senderInProperties = env.getInProperties(0);
-        recipient = env.getUser(1);
-        recipientInProperties = env.getInProperties(1);
+        this.env = env;
+        sender = env.allocateAccount();
+        senderInProperties = env.getInProperties(sender);
+        recipient = env.allocateAccount();
+        recipientInProperties = env.getInProperties(recipient);
+    }
+    
+    @SuppressWarnings("unused")
+    private void tearDown() {
+        env.freeAccount(sender);
+        env.freeAccount(recipient);
     }
 
-    public GreenMailUser getSender() {
+    public MailTestEnvironment.Account getSender() {
         return sender;
     }
 
-    public GreenMailUser getRecipient() {
+    public MailTestEnvironment.Account getRecipient() {
         return recipient;
     }
     
@@ -61,10 +66,14 @@ public class MailChannel extends AbstractChannel implements AsyncChannel, Reques
         return Session.getInstance(props);
     }
 
+    public EndpointReference getEndpointReference() throws Exception {
+        return new EndpointReference("mailto:" + recipient.getAddress());
+    }
+
     @Override
     public void setupService(AxisService service) throws Exception {
-        service.addParameter("transport.mail.Protocol", protocol);
-        service.addParameter("transport.mail.Address", recipient.getEmail());
+        service.addParameter("transport.mail.Protocol", env.getProtocol());
+        service.addParameter("transport.mail.Address", recipient.getAddress());
         service.addParameter("transport.PollInterval", "1");
         
         for (Map.Entry<String,String> prop : recipientInProperties.entrySet()) {

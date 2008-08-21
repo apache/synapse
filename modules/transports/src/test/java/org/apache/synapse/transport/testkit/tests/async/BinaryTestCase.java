@@ -26,7 +26,6 @@ import javax.mail.internet.ContentType;
 
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.AsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.DisplayName;

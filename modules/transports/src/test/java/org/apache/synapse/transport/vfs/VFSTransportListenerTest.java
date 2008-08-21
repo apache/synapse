@@ -49,14 +49,14 @@ public class VFSTransportListenerTest extends TestCase {
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);
-        VFSTestEnvironment env = new VFSTestEnvironment();
+        VFSTestEnvironment env = new VFSTestEnvironment(new File("target/vfs3"));
         AxisServer server = new AxisServer();
         AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
-        VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
+        VFSFileChannel channel = new VFSFileChannel("req/in");
         VFSClient vfsClient = new VFSClient();
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(vfsClient, MessageConverter.XML_TO_BYTE));
-        clients.add(adapt(new AxisAsyncTestClient(tdf), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(), MessageConverter.XML_TO_AXIS));
         for (AsyncTestClient<XMLMessage> client : clients) {
             suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE, env, server, tdf);
             suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.SERVICE, env, server, tdf);

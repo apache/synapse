@@ -74,7 +74,7 @@ public class HttpCoreNIOListenerTest extends TestCase {
         JavaNetClient javaNetClient = new JavaNetClient();
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(javaNetClient, MessageConverter.XML_TO_BYTE));
-        clients.add(adapt(new AxisAsyncTestClient(tdf), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(), MessageConverter.XML_TO_AXIS));
         for (AsyncTestClient<XMLMessage> client : clients) {
             suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
             suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);

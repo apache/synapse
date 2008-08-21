@@ -19,18 +19,27 @@
 
 package org.apache.synapse.transport.testkit.server.axis2;
 
+import java.net.URI;
+import java.util.Iterator;
+import java.util.UUID;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.DispatchPhase;
+import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.engine.Phase;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
+import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.listener.Channel;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.Server;
 
 public class AxisServer implements Server {
@@ -38,9 +47,12 @@ public class AxisServer implements Server {
     
     private TransportListener listener;
     private UtilsTransportServer server;
+    private TestEnvironment env;
     
     @SuppressWarnings("unused")
-    private void setUp(Channel channel, TransportDescriptionFactory tdf) throws Exception {
+    private void setUp(TestEnvironment env, TransportDescriptionFactory tdf) throws Exception {
+        this.env = env;
+        
         server = new UtilsTransportServer();
         
         if (activeServer != null) {
@@ -48,45 +60,72 @@ public class AxisServer implements Server {
         }
         activeServer = this;
         
-        TransportOutDescription trpOutDesc;
-        if (channel instanceof RequestResponseChannel) {
-            trpOutDesc = tdf.createTransportOutDescription();
-        } else {
-            trpOutDesc = null;
-        }
-        
+        TransportOutDescription trpOutDesc = tdf.createTransportOutDescription();
         TransportInDescription trpInDesc = tdf.createTransportInDescription();
         listener = trpInDesc.getReceiver();
         server.addTransport(trpInDesc, trpOutDesc);
+        
+        ConfigurationContext cfgCtx = server.getConfigurationContext();
+        
+        cfgCtx.setContextRoot("/");
+        cfgCtx.setServicePath("services");
         
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();
         
         // Add a DefaultOperationDispatcher to the InFlow phase. This is necessary because
         // we want to receive all messages through the same operation.
-        DispatchPhase dispatchPhase = null;
-        for (Object phase : axisConfiguration.getInFlowPhases()) {
-            if (phase instanceof DispatchPhase) {
-                dispatchPhase = (DispatchPhase)phase;
-                break;
-            }
-        }
-        DefaultOperationDispatcher dispatcher = new DefaultOperationDispatcher();
-        dispatcher.initDispatcher();
-        dispatchPhase.addHandler(dispatcher);
+        DefaultOperationDispatcher operationDispatcher = new DefaultOperationDispatcher();
+        operationDispatcher.initDispatcher();
+        getInFlowPhase(axisConfiguration, "Dispatch").addHandler(operationDispatcher);
         
         server.start();
+    }
+    
+    private static Phase getInFlowPhase(AxisConfiguration axisConfiguration, String name) {
+        for (Iterator<?> it = axisConfiguration.getInFlowPhases().iterator(); it.hasNext(); ) {
+            Phase phase = (Phase)it.next();
+            if (phase.getName().equals(name)) {
+                return phase;
+            }
+        }
+        return null;
     }
     
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
         server.stop();
-        Thread.sleep(100); // TODO: this is required for the NIO transport; check whether this is a bug
+        listener = null;
         server = null;
+        env = null;
         activeServer = null;
     }
     
     public AxisConfiguration getAxisConfiguration() {
         return server.getAxisConfiguration();
+    }
+
+    public AxisService deployService(Channel channel, AxisOperation operation, String contentType) throws Exception {
+        String path = new URI(channel.getEndpointReference().getAddress()).getPath();
+        String serviceName;
+        if (path != null && path.startsWith(Channel.CONTEXT_PATH + "/")) {
+            serviceName = path.substring(Channel.CONTEXT_PATH.length()+1);
+        } else {
+            serviceName = "TestService-" + UUID.randomUUID();
+        }
+        AxisService service = new AxisService(serviceName);
+        service.addOperation(operation);
+        channel.setupService(service);
+        if (contentType != null) {
+            env.setupContentType(service, contentType);
+        }
+        server.getAxisConfiguration().addService(service);
+        return service;
+    }
+    
+    public Endpoint createAsyncEndpoint(Channel channel, MessageReceiver messageReceiver, String contentType) throws Exception {
+        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+        operation.setMessageReceiver(messageReceiver);
+        return new EndpointImpl(this, deployService(channel, operation, contentType));
     }
 
     public String getEPR(AxisService service) throws AxisFault {

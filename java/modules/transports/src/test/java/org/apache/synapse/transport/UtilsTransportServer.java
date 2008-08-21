@@ -97,6 +97,10 @@ public class UtilsTransportServer {
         cfgCtx.getAxisConfiguration().engageModule("addressing");
     }
 
+    public ConfigurationContext getConfigurationContext() {
+        return cfgCtx;
+    }
+
     public AxisConfiguration getAxisConfiguration() {
         return cfgCtx.getAxisConfiguration();
     }

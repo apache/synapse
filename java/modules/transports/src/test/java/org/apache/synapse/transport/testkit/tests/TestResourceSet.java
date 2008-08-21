@@ -27,19 +27,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class TestResourceSet {
+    private enum Status { UNRESOLVED, RESOLVED, SETUP, RECYCLED };
+    
     private static Log log = LogFactory.getLog(TestResourceSet.class);
     
+    private final TestResourceSet parent;
     private final List<TestResource> resources = new LinkedList<TestResource>();
-    private boolean resolved;
+    private Status status = Status.UNRESOLVED;
     
+    public TestResourceSet(TestResourceSet parent) {
+        this.parent = parent;
+    }
+    
+    public TestResourceSet() {
+        this(null);
+    }
+
     public void addResource(Object resource) {
-        if (resolved) {
+        if (status != Status.UNRESOLVED) {
             throw new IllegalStateException();
         }
-        // TODO: we should not allow null resources
-        if (resource != null) {
-            resources.add(new TestResource(resource));
-        }
+        resources.add(new TestResource(resource));
     }
     
     public void addResources(Object... resources) {
@@ -49,17 +57,26 @@ public class TestResourceSet {
     }
     
     public void resolve() {
-        if (resolved) {
-            return;
+        if (status == Status.UNRESOLVED) {
+            List<TestResource> availableResources = new LinkedList<TestResource>();
+            if (parent != null) {
+                availableResources.addAll(parent.resources);
+            }
+            availableResources.addAll(resources);
+            for (TestResource resource : resources) {
+                resource.resolve(availableResources);
+            }
+            status = Status.RESOLVED;
         }
-        for (TestResource resource : resources) {
-            resource.resolve(resources);
-        }
-        resolved = true;
     }
     
     public void setUp() throws Exception {
+        resolve();
+        if (status != Status.RESOLVED) {
+            throw new IllegalStateException();
+        }
         setUp(resources);
+        status = Status.SETUP;
     }
     
     private static void setUp(List<TestResource> resources) throws Exception {
@@ -81,6 +98,13 @@ public class TestResourceSet {
     }
     
     public void setUp(TestResourceSet old) throws Exception {
+        resolve();
+        if (status != Status.RESOLVED) {
+            throw new IllegalStateException();
+        }
+        if (old.status != Status.SETUP) {
+            throw new IllegalStateException();
+        }
         List<TestResource> oldResourcesToTearDown = new LinkedList<TestResource>();
         List<TestResource> resourcesToSetUp = new LinkedList<TestResource>(resources);
         List<TestResource> resourcesToKeep = new LinkedList<TestResource>();
@@ -108,9 +132,14 @@ public class TestResourceSet {
         tearDown(oldResourcesToTearDown);
         log.debug("Keeping: " + resourcesToKeep);
         setUp(resourcesToSetUp);
+        status = Status.SETUP;
+        old.status = Status.RECYCLED;
     }
     
     public void tearDown() throws Exception {
+        if (status != Status.SETUP) {
+            throw new IllegalStateException();
+        }
         tearDown(resources);
     }
     

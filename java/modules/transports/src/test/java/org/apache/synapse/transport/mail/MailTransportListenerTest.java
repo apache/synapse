@@ -28,8 +28,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.synapse.transport.testkit.AdapterUtils;
-import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
@@ -41,7 +39,7 @@ import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 
 public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() throws Exception {
-        TransportTestSuite suite = new TransportTestSuite();
+        TransportTestSuite suite = new TransportTestSuite(false);
         
         // TODO: these test don't work; need more analysis why this is so
         suite.addExclude("(&(messageType=SOAP12)(data=Latin1))");
@@ -52,7 +50,7 @@ public class MailTransportListenerTest extends TestCase {
         suite.addExclude("(test=AsyncBinary)");
         suite.addExclude("(&(test=AsyncTextPlain)(!(data=ASCII)))");
         
-        MailTestEnvironment env = new MailTestEnvironment();
+        MailTestEnvironment env = new GreenMailTestEnvironment();
         
         AxisServer axisServer = new AxisServer();
         AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
@@ -69,6 +67,7 @@ public class MailTransportListenerTest extends TestCase {
             suite.addTextPlainTests(channel, adapt(client, MessageConverter.STRING_TO_BYTE), AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer);
             suite.addBinaryTest(channel, client, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer);
         }
+//        suite.addTest(new MinConcurrencyTest(axisServer, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, env));
         return suite;
     }
 }

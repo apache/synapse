@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.mail;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.axis2.description.Parameter;
@@ -28,60 +27,40 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 
-import com.icegreen.greenmail.user.GreenMailUser;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
-
-public class MailTestEnvironment extends TestEnvironment implements TransportDescriptionFactory {
-    private static final ServerSetup SMTP =
-                new ServerSetup(7025, "127.0.0.1", ServerSetup.PROTOCOL_SMTP);
-    
-    private static final ServerSetup POP3 =
-                new ServerSetup(7110, "127.0.0.1", ServerSetup.PROTOCOL_POP3);
-    
-    private GreenMail greenMail;
-    private GreenMailUser[] users;
-    
-    @SuppressWarnings("unused")
-    private void setUp() throws Exception {
-        greenMail = new GreenMail(new ServerSetup[] { SMTP, POP3 });
-        users = new GreenMailUser[10];
-        for (int i=0; i<10; i++) {
-            users[i] = greenMail.setUser("test" + i, "password");
+public abstract class MailTestEnvironment extends TestEnvironment implements TransportDescriptionFactory {
+    public static class Account {
+        private final String address;
+        private final String login;
+        private final String password;
+        
+        public Account(String address, String login, String password) {
+            this.address = address;
+            this.login = login;
+            this.password = password;
         }
-        greenMail.start();
-    }
 
-    @SuppressWarnings("unused")
-    private void tearDown() throws Exception {
-        greenMail.stop();
-        greenMail = null;
-        users = null;
-    }
+        public String getAddress() {
+            return address;
+        }
+
+        public String getLogin() {
+            return login;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+    };
     
-    public String getProtocol() {
-        return "pop3";
-    }
+    public abstract String getProtocol();
     
-    public GreenMailUser getUser(int i) {
-        return users[i];
-    }
+    public abstract Account allocateAccount();
     
-    public Map<String,String> getInProperties(int i) {
-        Map<String,String> props = new HashMap<String,String>();
-        props.put("mail.pop3.host", "localhost");
-        props.put("mail.pop3.port", String.valueOf(POP3.getPort()));
-        props.put("mail.pop3.user", users[i].getLogin());
-        props.put("mail.pop3.password", users[i].getPassword());
-        return props;
-    }
+    public abstract void freeAccount(Account account);
     
-    public Map<String,String> getOutProperties() {
-        Map<String,String> props = new HashMap<String,String>();
-        props.put("mail.smtp.host", "localhost");
-        props.put("mail.smtp.port", String.valueOf(SMTP.getPort()));
-        return props;
-    }
+    public abstract Map<String,String> getInProperties(Account account);
+    
+    public abstract Map<String,String> getOutProperties();
 
     public TransportInDescription createTransportInDescription() throws Exception {
         TransportInDescription trpInDesc = new TransportInDescription(MailConstants.TRANSPORT_NAME);

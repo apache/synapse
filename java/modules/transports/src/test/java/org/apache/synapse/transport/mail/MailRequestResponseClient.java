@@ -36,8 +36,6 @@ import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
-import com.icegreen.greenmail.user.GreenMailUser;
-
 public class MailRequestResponseClient extends MailClient implements RequestResponseTestClient<ByteArrayMessage,ByteArrayMessage> {
     private static final Log log = LogFactory.getLog(MailRequestResponseClient.class);
     
@@ -52,7 +50,7 @@ public class MailRequestResponseClient extends MailClient implements RequestResp
         Session session = channel.getReplySession();
         session.setDebug(log.isTraceEnabled());
         store = session.getStore(env.getProtocol());
-        GreenMailUser sender = channel.getSender();
+        MailTestEnvironment.Account sender = channel.getSender();
         store.connect(sender.getLogin(), sender.getPassword());
     }
     

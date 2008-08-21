@@ -32,8 +32,15 @@ import org.apache.synapse.transport.testkit.name.DisplayName;
 
 @DisplayName("java.net")
 public class JavaNetClient implements AsyncTestClient<ByteArrayMessage> {
+    private HttpChannel channel;
+    
+    @SuppressWarnings("unused")
+    private void setUp(HttpChannel channel) {
+        this.channel = channel;
+    }
+    
     public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
-        URLConnection connection = new URL(options.getEndpointReference()).openConnection();
+        URLConnection connection = new URL(channel.getEndpointReference().getAddress()).openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);
         connection.setRequestProperty("Content-Type", message.getContentType().toString());

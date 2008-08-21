@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 
@@ -28,9 +27,5 @@ public abstract class AbstractChannel implements Channel {
     }
     
     public void setupRequestMessageContext(MessageContext msgContext) {
-    }
-
-    public EndpointReference createEndpointReference(String address) {
-        return new EndpointReference(address);
     }
 }

@@ -65,7 +65,8 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     }
 
     @Override
-    public EndpointReference createEndpointReference(String address) {
+    public EndpointReference getEndpointReference() throws Exception {
+        String address = super.getEndpointReference().getAddress();
         return new EndpointReference(address + "&" + JMSConstants.REPLY_PARAM_TYPE + "=" + replyDestinationType + "&" + JMSConstants.REPLY_PARAM + "=" + replyDestinationName);
     }
 

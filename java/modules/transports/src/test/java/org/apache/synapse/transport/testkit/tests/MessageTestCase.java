@@ -17,16 +17,23 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.client;
+package org.apache.synapse.transport.testkit.tests;
 
-public class ClientOptions {
-    private final String charset;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.name.NameComponent;
 
-    public ClientOptions(String charset) {
-        this.charset = charset;
+public class MessageTestCase extends TransportTestCase {
+    protected final ContentTypeMode contentTypeMode;
+    protected final String contentType;
+
+    public MessageTestCase(ContentTypeMode contentTypeMode, String contentType, Object... resources) {
+        super(resources);
+        this.contentTypeMode = contentTypeMode;
+        this.contentType = contentType;
     }
 
-    public String getCharset() {
-        return charset;
+    @NameComponent("contentTypeMode")
+    public ContentTypeMode getContentTypeMode() {
+        return contentTypeMode;
     }
 }

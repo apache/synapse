@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -44,18 +45,12 @@ import org.apache.synapse.transport.testkit.message.AxisMessage;
 public class AxisTestClient implements TestClient {
     private static final Log log = LogFactory.getLog(AxisTestClient.class);
     
-    private final TransportDescriptionFactory tdf;
-    
     private Channel channel;
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
-    public AxisTestClient(TransportDescriptionFactory tdf) {
-        this.tdf = tdf;
-    }
-
     @SuppressWarnings("unused")
-    private void setUp(Channel channel) throws Exception {
+    private void setUp(TransportDescriptionFactory tdf, Channel channel) throws Exception {
         this.channel = channel;
         
         cfgCtx =
@@ -73,12 +68,12 @@ public class AxisTestClient implements TestClient {
         trpOutDesc.getSender().stop();
     }
     
-    protected OperationClient createClient(ClientOptions options, AxisMessage message, QName operationQName) throws AxisFault {
-        String endpointReference = options.getEndpointReference();
-        log.info("Sending to " + endpointReference);
+    protected OperationClient createClient(ClientOptions options, AxisMessage message, QName operationQName) throws Exception {
+        EndpointReference epr = channel.getEndpointReference();
+        log.info("Sending to " + epr.getAddress());
         
         Options axisOptions = new Options();
-        axisOptions.setTo(channel.createEndpointReference(endpointReference));
+        axisOptions.setTo(epr);
 
         ServiceClient serviceClient = new ServiceClient(cfgCtx, null);
         serviceClient.setOptions(axisOptions);

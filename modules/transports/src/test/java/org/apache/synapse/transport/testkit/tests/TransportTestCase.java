@@ -23,21 +23,16 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.name.NameUtils;
 
 public abstract class TransportTestCase extends TestCase {
     private final TestResourceSet resourceSet = new TestResourceSet();
-    protected final ContentTypeMode contentTypeMode;
-    protected final String contentType;
     
     private Map<String,String> nameComponents;
     
     private boolean managed;
 
-    public TransportTestCase(ContentTypeMode contentTypeMode, String contentType, Object... resources) {
-        this.contentTypeMode = contentTypeMode;
-        this.contentType = contentType;
+    public TransportTestCase(Object... resources) {
         resourceSet.addResources(resources);
     }
 
@@ -48,7 +43,6 @@ public abstract class TransportTestCase extends TestCase {
     public Map<String,String> getNameComponents() {
         if (nameComponents == null) {
             nameComponents = NameUtils.getNameComponents("test", this);
-            nameComponents.put("contentTypeMode", contentTypeMode.toString().toLowerCase());
         }
         return nameComponents;
     }
@@ -83,7 +77,6 @@ public abstract class TransportTestCase extends TestCase {
     @Override
     protected void setUp() throws Exception {
         if (!managed) {
-            resourceSet.resolve();
             resourceSet.setUp();
         }
     }

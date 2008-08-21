@@ -39,10 +39,6 @@ public class AsyncEndpointFactoryAdapter<M,N> implements AsyncEndpointFactory<M>
         final AsyncEndpoint<N> targetEndpoint = targetFactory.createAsyncEndpoint(contentType);
         final MessageConverter<N,M> converter = this.converter;
         return new AsyncEndpoint<M>() {
-            public String getEPR() throws Exception {
-                return targetEndpoint.getEPR();
-            }
-
             public M waitForMessage(int timeout) throws Throwable {
                 N message = targetEndpoint.waitForMessage(timeout);
                 return message == null ? null : converter.convert(null, message);

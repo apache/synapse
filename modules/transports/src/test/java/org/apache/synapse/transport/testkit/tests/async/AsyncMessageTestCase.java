@@ -17,16 +17,18 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.tests.async;
 
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.tests.TransportTestCase;
+import org.apache.synapse.transport.testkit.tests.MessageTestCase;
 
-public abstract class AsyncMessageTestCase<M,N> extends TransportTestCase {
+public abstract class AsyncMessageTestCase<M,N> extends MessageTestCase {
     private final AsyncTestClient<M> client;
     private final String charset;
     private final AsyncEndpointFactory<N> endpointFactory;
@@ -56,7 +58,7 @@ public abstract class AsyncMessageTestCase<M,N> extends TransportTestCase {
         // Run the test.
         N messageData;
         try {
-            ClientOptions options = new ClientOptions(endpoint.getEPR(), charset);
+            ClientOptions options = new ClientOptions(charset);
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
             client.sendMessage(options, message);
             messageData = endpoint.waitForMessage(8000);

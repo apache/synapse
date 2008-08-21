@@ -42,7 +42,7 @@ public class VFSTransportSenderTest extends TestCase {
     public static TestSuite suite() {
         TransportTestSuite suite = new TransportTestSuite(false);
         
-        VFSTestEnvironment env = new VFSTestEnvironment();
+        VFSTestEnvironment env = new VFSTestEnvironment(new File("target/vfs4"));
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);
@@ -64,11 +64,11 @@ public class VFSTransportSenderTest extends TestCase {
             }
         };
         
-        VFSFileChannel channel = new VFSFileChannel(new File("target/vfs3/req/in").getAbsoluteFile());
-        AxisAsyncTestClient client = new AxisAsyncTestClient(tdf);
+        VFSFileChannel channel = new VFSFileChannel("req/in");
+        AxisAsyncTestClient client = new AxisAsyncTestClient();
         
-        suite.addBinaryTest(channel, adapt(client, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE, env);
-        suite.addTextPlainTests(channel, adapt(client, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE, env);
+        suite.addBinaryTest(channel, adapt(client, MessageConverter.BINARY_WRAPPER), endpointFactory, ContentTypeMode.SERVICE, env, tdf);
+        suite.addTextPlainTests(channel, adapt(client, MessageConverter.TEXT_WRAPPER), adapt(endpointFactory, MessageConverter.BYTE_TO_STRING), ContentTypeMode.SERVICE, env, tdf);
         
         return suite;
     }

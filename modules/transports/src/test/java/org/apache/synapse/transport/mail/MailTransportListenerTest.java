@@ -37,6 +37,7 @@ import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() throws Exception {
@@ -50,6 +51,8 @@ public class MailTransportListenerTest extends TestCase {
         suite.addExclude("(test=AsyncSwA)");
         suite.addExclude("(test=AsyncBinary)");
         suite.addExclude("(&(test=AsyncTextPlain)(!(data=ASCII)))");
+        // SYNAPSE-434
+        suite.addExclude("(test=MinConcurrency)");
         
         MailTestEnvironment env = new GreenMailTestEnvironment();
         
@@ -73,7 +76,7 @@ public class MailTransportListenerTest extends TestCase {
         suite.addPOXTests(channel, adapt(axisClient, MessageConverter.XML_TO_AXIS), asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer);
         suite.addTextPlainTests(channel, adapt(axisClient, MessageConverter.TEXT_WRAPPER), AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer);
         suite.addBinaryTest(channel, adapt(axisClient, MessageConverter.BINARY_WRAPPER), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer);
-//        suite.addTest(new MinConcurrencyTest(axisServer, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, env));
+        suite.addTest(new MinConcurrencyTest(axisServer, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, true, env));
         return suite;
     }
 }

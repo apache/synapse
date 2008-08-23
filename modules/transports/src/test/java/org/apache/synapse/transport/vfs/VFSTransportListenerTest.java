@@ -64,6 +64,7 @@ public class VFSTransportListenerTest extends TestCase {
         }
         suite.addTextPlainTests(channel, adapt(vfsClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.SERVICE, env, server, tdf);
         suite.addBinaryTest(channel, vfsClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.SERVICE, env, server, tdf);
+//        suite.addTest(new MinConcurrencyTest(server, new AsyncChannel[] { new VFSFileChannel("req/in1"), new VFSFileChannel("req/in2") }, 1, true, env, tdf));
         return suite;
     }
 }

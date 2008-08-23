@@ -37,11 +37,13 @@ import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() {
@@ -84,6 +86,7 @@ public class HttpCoreNIOListenerTest extends TestCase {
         suite.addTextPlainTests(channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer, tdf);
         suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer, tdf);
         suite.addRESTTests(channel, new JavaNetRESTClient(), asyncEndpointFactory, env, axisServer, tdf);
+        suite.addTest(new MinConcurrencyTest(axisServer, new AsyncChannel[] { new HttpChannel(), new HttpChannel() }, 2, false, env, tdf));
         return suite;
     }
 }

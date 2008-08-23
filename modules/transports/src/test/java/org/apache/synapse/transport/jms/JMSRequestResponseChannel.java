@@ -32,14 +32,18 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     private String replyDestinationName;
     private Destination replyDestination;
     
-    public JMSRequestResponseChannel(String destinationType, String replyDestinationType) {
-        super(destinationType);
+    public JMSRequestResponseChannel(String name, String destinationType, String replyDestinationType) {
+        super(name, destinationType);
         this.replyDestinationType = replyDestinationType;
+    }
+    
+    public JMSRequestResponseChannel(String destinationType, String replyDestinationType) {
+        this(null, destinationType, replyDestinationType);
     }
     
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env) throws Exception {
-        replyDestinationName = "response" + replyDestinationType;
+        replyDestinationName = buildDestinationName("response", replyDestinationType);
         replyDestination = env.createDestination(replyDestinationType, replyDestinationName);
         env.getContext().bind(replyDestinationName, replyDestination);
     }

@@ -24,7 +24,6 @@ import org.apache.synapse.transport.base.AbstractPollingTransportListener;
 import org.apache.synapse.transport.base.ManagementSupport;
 import org.apache.synapse.transport.base.ParamUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.description.*;
@@ -98,7 +97,7 @@ import java.text.SimpleDateFormat;
  * ftp://ftpuser:password@asankha/somefile.csv?passive=true
  * ftp://vfs:apache@vfs.netfirms.com/somepath/somefile.xml?passive=true
  */
-public class VFSTransportListener extends AbstractPollingTransportListener 
+public class VFSTransportListener extends AbstractPollingTransportListener<PollTableEntry> 
     implements ManagementSupport {
 
     public static final String TRANSPORT_NAME = "vfs";
@@ -106,10 +105,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener
     public static final String DELETE = "DELETE";
     public static final String MOVE = "MOVE";
 
-    /** Keep the list of directories/files and poll durations */
-    private final List<PollTableEntry> pollTable = new ArrayList<PollTableEntry>();
-    /** Keep the list of removed pollTable entries */
-    private final List<PollTableEntry> removeTable = new ArrayList<PollTableEntry>();
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
 
@@ -119,6 +114,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener
      * @param trpInDesc the VFS transport in description from the axis2.xml
      * @throws AxisFault on error
      */
+    @Override
     public void init(ConfigurationContext cfgCtx, TransportInDescription trpInDesc)
         throws AxisFault {
         super.init(cfgCtx, trpInDesc);
@@ -132,21 +128,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener
         }
     }
 
-    /**
-     * On a poller tick, iterate over the list of directories/files and check if
-     * it is time to scan the contents for new files
-     */
-    public void onPoll() {
-        if (!removeTable.isEmpty()) {
-            pollTable.removeAll(removeTable);
-        }
-        
-        for (PollTableEntry entry : pollTable) {
-            long startTime = System.currentTimeMillis();
-            if (startTime > entry.getNextPollTime()) {
-                scanFileOrDirectory(entry, entry.getFileURI());
-            }
-        }
+    @Override
+    protected void poll(PollTableEntry entry) {
+        scanFileOrDirectory(entry, entry.getFileURI());
     }
 
     /**
@@ -483,56 +467,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener
         }
     }
 
-    /**
-     * method to log a failure to the log file and to update the last poll status and time
-     * @param msg text for the log message
-     * @param e optiona exception encountered or null
-     * @param entry the PollTableEntry
-     */
-    private void processFailure(String msg, Exception e, PollTableEntry entry) {
-        if (e == null) {
-            log.error(msg);
-        } else {
-            log.error(msg, e);
-        }
-        long now = System.currentTimeMillis();
-        entry.setLastPollState(PollTableEntry.FAILED);
-        entry.setLastPollTime(now);
-        entry.setNextPollTime(now + entry.getPollInterval());
-    }
-
-    /**
-     * Get the EPR for the given service over the VFS transport
-     * vfs:uri (@see http://jakarta.apache.org/commons/vfs/filesystems.html for the URI formats)
-     * @param serviceName service name
-     * @param ip          ignored
-     * @return the EPR for the service
-     * @throws AxisFault not used
-     */
-    public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
-        for (PollTableEntry entry : pollTable) {
-            if (entry.getServiceName().equals(serviceName)
-                    || serviceName.startsWith(entry.getServiceName() + ".")) {
-                return new EndpointReference[]{new EndpointReference("vfs:" + entry.getFileURI())};
-            }
-        }
-        return null;
-    }
-
-    protected void startListeningForService(AxisService service) {
-
-        Parameter param = service.getParameter(BaseConstants.TRANSPORT_POLL_INTERVAL);
-        long pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
-        if (param != null && param.getValue() instanceof String) {
-            try {
-                pollInterval = Integer.parseInt(param.getValue().toString());
-            } catch (NumberFormatException e) {
-                log.error("Invalid poll interval : " + param.getValue() + " for service : " +
-                    service.getName() + " default to : "
-                        + (BaseConstants.DEFAULT_POLL_INTERVAL/1000) + "sec", e);
-                disableTransportForService(service);
-            }
-        }
+    @Override
+    protected PollTableEntry createPollTableEntry(AxisService service) {
 
         PollTableEntry entry = new PollTableEntry();
         try {
@@ -582,26 +518,13 @@ public class VFSTransportListener extends AbstractPollingTransportListener
             if(strReconnectTimeout != null)
               entry.setReconnectTimeout(Integer.parseInt(strReconnectTimeout) * 1000);
             
-            entry.setServiceName(service.getName());
-            schedulePoll(service, pollInterval);            
-            pollTable.add(entry);
-
+            return entry;
+            
         } catch (AxisFault axisFault) {
             String msg = "Error configuring the File/VFS transport for Service : " +
                 service.getName() + " :: " + axisFault.getMessage();
             log.warn(msg);
-            disableTransportForService(service);
-        }
-    }
-
-    protected void stopListeningForService(AxisService service) {
-        Iterator iter = pollTable.iterator();
-        while (iter.hasNext()) {
-            PollTableEntry entry = (PollTableEntry) iter.next();
-            if (service.getName().equals(entry.getServiceName())) {
-                cancelPoll(service);
-                removeTable.add(entry);
-            }
+            return null;
         }
     }
 }

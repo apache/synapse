@@ -34,19 +34,38 @@ import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.Key;
 
 public abstract class JMSChannel extends AbstractChannel {
+    private final String name;
     private final String destinationType;
     protected JMSTestEnvironment env;
     private String destinationName;
     private Destination destination;
     
-    public JMSChannel(String destinationType) {
+    public JMSChannel(String name, String destinationType) {
+        this.name = name;
         this.destinationType = destinationType;
+    }
+    
+    public JMSChannel(String destinationType) {
+        this(null, destinationType);
+    }
+    
+    protected String buildDestinationName(String direction, String destinationType) {
+        StringBuilder destinationName = new StringBuilder();
+        if (name != null) {
+            destinationName.append(name);
+            destinationName.append(Character.toUpperCase(direction.charAt(0)));
+            destinationName.append(direction.substring(1));
+        } else {
+            destinationName.append(direction);
+        }
+        destinationName.append(destinationType == JMSConstants.DESTINATION_TYPE_QUEUE ? 'Q' : 'T');
+        return destinationName.toString();
     }
     
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env) throws Exception {
         this.env = env;
-        destinationName = "request" + destinationType;
+        destinationName = buildDestinationName("request", destinationType);
         destination = env.createDestination(destinationType, destinationName);
         env.getContext().bind(destinationName, destination);
     }

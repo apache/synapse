@@ -50,6 +50,8 @@ public class JMSMessageReceiver implements MessageListener {
     private ConfigurationContext cfgCtx = null;
     /** A reference to the JMS Connection Factory to which this applies */
     private JMSConnectionFactory jmsConnectionFactory = null;
+    /** The name of the service this message receiver is bound to. */
+    final String serviceName;
     /** Metrics collector */
     private MetricsCollector metrics = null;
 
@@ -60,13 +62,15 @@ public class JMSMessageReceiver implements MessageListener {
      * @param jmsConFac the JMS connection factory we are associated with
      * @param workerPool the worker thread pool to be used
      * @param cfgCtx the axis ConfigurationContext
+     * @param serviceName the name of the Axis service
      */
     JMSMessageReceiver(JMSListener jmsListener, JMSConnectionFactory jmsConFac,
-                       WorkerPool workerPool, ConfigurationContext cfgCtx) {
+                       WorkerPool workerPool, ConfigurationContext cfgCtx, String serviceName) {
         this.jmsListener = jmsListener;
         this.jmsConnectionFactory = jmsConFac;
         this.workerPool = workerPool;
         this.cfgCtx = cfgCtx;
+        this.serviceName = serviceName;
         this.metrics = jmsListener.getMetricsCollector();
     }
 
@@ -156,16 +160,6 @@ public class JMSMessageReceiver implements MessageListener {
             } catch (JMSException ignore) {}
 
             try {
-                Destination dest = message.getJMSDestination();
-                String destinationName = null;
-                if (dest instanceof Queue) {
-                    destinationName = ((Queue) dest).getQueueName();
-                } else if (dest instanceof Topic) {
-                    destinationName = ((Topic) dest).getTopicName();
-                }
-
-                String serviceName =
-                    jmsConnectionFactory.getServiceNameForDestination(dest, destinationName);
                 String soapAction = JMSUtils.getInstace().
                     getProperty(message, BaseConstants.SOAPACTION);
                 AxisService service = null;

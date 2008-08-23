@@ -556,7 +556,7 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
             Parameter conFacParams = (Parameter) conFacIter.next();
 
             JMSConnectionFactory jmsConFactory =
-                new JMSConnectionFactory(conFacParams.getName(), cfgCtx);
+                new JMSConnectionFactory(conFacParams.getName(), null, null, cfgCtx);
             JMSUtils.setConnectionFactoryParameters(conFacParams, jmsConFactory);
 
             try {

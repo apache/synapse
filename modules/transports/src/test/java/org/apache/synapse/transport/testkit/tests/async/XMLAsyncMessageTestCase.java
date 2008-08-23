@@ -31,11 +31,12 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
-import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.Key;
+import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.name.Named;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-@DisplayName("AsyncXML")
+@Name("AsyncXML")
 public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,AxisMessage> {
     private final XMLMessage.Type xmlMessageType;
     private final MessageTestData data;
@@ -46,12 +47,12 @@ public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,Axi
         this.data = data;
     }
     
-    @NameComponent("messageType")
+    @Key("messageType")
     public XMLMessage.Type getXmlMessageType() {
         return xmlMessageType;
     }
 
-    @NameComponent("data")
+    @Named
     public MessageTestData getData() {
         return data;
     }

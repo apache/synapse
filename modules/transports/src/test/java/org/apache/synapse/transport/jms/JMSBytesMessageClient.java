@@ -25,9 +25,9 @@ import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
-@DisplayName("BytesMessage")
+@Name("BytesMessage")
 public class JMSBytesMessageClient extends JMSClient implements AsyncTestClient<ByteArrayMessage> {
     public void sendMessage(ClientOptions options,
                             ByteArrayMessage message) throws Exception {

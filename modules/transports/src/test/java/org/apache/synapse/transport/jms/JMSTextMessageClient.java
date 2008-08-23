@@ -25,9 +25,9 @@ import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.StringMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
-@DisplayName("TextMessage")
+@Name("TextMessage")
 public class JMSTextMessageClient extends JMSClient implements AsyncTestClient<StringMessage> {
     public void sendMessage(ClientOptions options, StringMessage message) throws Exception {
         TextMessage jmsMessage = session.createTextMessage();

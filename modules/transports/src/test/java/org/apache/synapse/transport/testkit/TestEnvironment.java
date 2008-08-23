@@ -21,7 +21,9 @@ package org.apache.synapse.transport.testkit;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
+import org.apache.synapse.transport.testkit.name.Key;
 
+@Key("env")
 public abstract class TestEnvironment {
     /**
      * Set up the expected content type on the given service. This method should only be

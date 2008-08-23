@@ -19,12 +19,14 @@
 
 package org.apache.synapse.transport.mail;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Session;
 
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
@@ -79,5 +81,12 @@ public class MailChannel extends AbstractChannel implements AsyncChannel, Reques
         for (Map.Entry<String,String> prop : recipientInProperties.entrySet()) {
             service.addParameter(prop.getKey(), prop.getValue());
         }
+    }
+
+    @Override
+    public void setupRequestMessageContext(MessageContext msgContext) {
+        Map<String,String> trpHeaders = new HashMap<String,String>();
+        trpHeaders.put(MailConstants.MAIL_HEADER_FROM, sender.getAddress());
+        msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, trpHeaders);
     }
 }

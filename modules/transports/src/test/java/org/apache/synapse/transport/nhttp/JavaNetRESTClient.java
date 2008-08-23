@@ -27,10 +27,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 
-@DisplayName("java.net")
+@Name("java.net")
 public class JavaNetRESTClient implements AsyncTestClient<RESTMessage> {
     private HttpChannel channel;
     

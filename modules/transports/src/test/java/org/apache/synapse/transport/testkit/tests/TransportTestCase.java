@@ -19,12 +19,15 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.name.NameUtils;
 
+@Key("test")
 public abstract class TransportTestCase extends TestCase {
     private final TestResourceSet resourceSet = new TestResourceSet();
     
@@ -42,7 +45,11 @@ public abstract class TransportTestCase extends TestCase {
     
     public Map<String,String> getNameComponents() {
         if (nameComponents == null) {
-            nameComponents = NameUtils.getNameComponents("test", this);
+            nameComponents = new LinkedHashMap<String,String>();
+            NameUtils.getNameComponents(nameComponents, this);
+            for (Object resource : resourceSet.getResources()) {
+                NameUtils.getNameComponents(nameComponents, resource);
+            }
         }
         return nameComponents;
     }

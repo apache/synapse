@@ -56,6 +56,15 @@ public class TestResourceSet {
         }
     }
     
+    public Object[] getResources() {
+        Object[] result = new Object[resources.size()];
+        int i = 0;
+        for (TestResource resource : resources) {
+            result[i++] = resource.getInstance();
+        }
+        return result;
+    }
+    
     public void resolve() {
         if (status == Status.UNRESOLVED) {
             List<TestResource> availableResources = new LinkedList<TestResource>();
@@ -90,7 +99,7 @@ public class TestResourceSet {
     
     private TestResource lookup(Object instance) {
         for (TestResource resource : resources) {
-            if (resource.getInstance() == instance) {
+            if (resource.getTarget() == instance) {
                 return resource;
             }
         }
@@ -110,13 +119,13 @@ public class TestResourceSet {
         List<TestResource> resourcesToKeep = new LinkedList<TestResource>();
         for (TestResource oldResource : old.resources) {
             boolean keep;
-            TestResource resource = lookup(oldResource.getInstance());
+            TestResource resource = lookup(oldResource.getTarget());
             if (resource == null) {
                 keep = false;
             } else {
                 keep = true;
-                for (Object instance : oldResource.getAllDependencies()) {
-                    if (lookup(instance) == null) {
+                for (TestResource dependency : oldResource.getAllDependencies()) {
+                    if (lookup(dependency.getTarget()) == null) {
                         keep = false;
                         break;
                     }

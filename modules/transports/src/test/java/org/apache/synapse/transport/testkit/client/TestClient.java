@@ -19,5 +19,8 @@
 
 package org.apache.synapse.transport.testkit.client;
 
+import org.apache.synapse.transport.testkit.name.Key;
+
+@Key("client")
 public interface TestClient {
 }

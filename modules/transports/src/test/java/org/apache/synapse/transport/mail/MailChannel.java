@@ -76,7 +76,7 @@ public class MailChannel extends AbstractChannel implements AsyncChannel, Reques
     public void setupService(AxisService service) throws Exception {
         service.addParameter("transport.mail.Protocol", env.getProtocol());
         service.addParameter("transport.mail.Address", recipient.getAddress());
-        service.addParameter("transport.PollInterval", "1");
+        service.addParameter("transport.PollInterval", "50ms");
         
         for (Map.Entry<String,String> prop : recipientInProperties.entrySet()) {
             service.addParameter(prop.getKey(), prop.getValue());

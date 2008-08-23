@@ -66,11 +66,9 @@ public abstract class AbstractPollingTransportListener<T extends AbstractPollTab
     /**
      * Schedule a repeated poll at the specified interval for the given service
      * @param service the service to be polled
-     * @param pollInterval the interval between successive polls in seconds
+     * @param pollInterval the interval between successive polls in milliseconds
      */
     public void schedulePoll(AxisService service, long pollInterval) {
-        pollInterval *= 1000; // convert to millisecs
-        
         TimerTask task = (TimerTask) serviceToTimerTaskMap.get(service);
 
         // if a timer task exists, cancel it first and create a new one
@@ -164,8 +162,16 @@ public abstract class AbstractPollingTransportListener<T extends AbstractPollTab
         Parameter param = service.getParameter(BaseConstants.TRANSPORT_POLL_INTERVAL);
         long pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
         if (param != null && param.getValue() instanceof String) {
+            String s = (String)param.getValue();
+            int multiplier;
+            if (s.endsWith("ms")) {
+                s = s.substring(0, s.length()-2);
+                multiplier = 1;
+            } else {
+                multiplier = 1000;
+            }
             try {
-                pollInterval = Integer.parseInt(param.getValue().toString());
+                pollInterval = Integer.parseInt(s) * multiplier;
             } catch (NumberFormatException e) {
                 log.error("Invalid poll interval : " + param.getValue() + " for service : " +
                     service.getName() + " default to : "

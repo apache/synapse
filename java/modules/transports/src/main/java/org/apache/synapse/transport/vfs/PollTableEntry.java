@@ -18,27 +18,21 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.synapse.transport.base.AbstractPollTableEntry;
 
 /**
  * Holds information about an entry in the VFS transport poll table used by the
  * VFS Transport Listener
  */
-public class PollTableEntry {
-
-    // status of last scan
-    public static final int SUCCSESSFUL = 0;
-    public static final int WITH_ERRORS = 1;
-    public static final int FAILED      = 2;
-    public static final int NONE        = 3;
+public class PollTableEntry extends AbstractPollTableEntry {
 
     // operation after scan
     public static final int DELETE = 0;
     public static final int MOVE   = 1;
 
-    /** Axis2 service name */
-    private String serviceName;
     /** File or Directory to scan */
     private String fileURI;
     /** file name pattern for a directory or compressed file entry */
@@ -46,14 +40,6 @@ public class PollTableEntry {
     /** Content-Type to use for the message */
     private String contentType;
 
-    /** last poll performed at */
-    private long lastPollTime;
-    /** duration in ms between successive polls */
-    private long pollInterval;
-    /** next poll time */
-    private long nextPollTime;
-    /** state of the last poll */
-    private int lastPollState;
     /** action to take after a successful poll */
     private int actionAfterProcess = DELETE;
     /** action to take after a poll with errors */
@@ -73,12 +59,9 @@ public class PollTableEntry {
     private int maxRetryCount;
     private long reconnectTimeout;
 
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    @Override
+    public EndpointReference getEndpointReference() {
+        return new EndpointReference("vfs:" + fileURI);
     }
 
     public String getFileURI() {
@@ -107,38 +90,6 @@ public class PollTableEntry {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
-    }
-
-    public long getLastPollTime() {
-        return lastPollTime;
-    }
-
-    public void setLastPollTime(long lastPollTime) {
-        this.lastPollTime = lastPollTime;
-    }
-
-    public long getPollInterval() {
-        return pollInterval;
-    }
-
-    public void setPollInterval(long pollInterval) {
-        this.pollInterval = pollInterval;
-    }
-
-    public long getNextPollTime() {
-        return nextPollTime;
-    }
-
-    public void setNextPollTime(long nextPollTime) {
-        this.nextPollTime = nextPollTime;
-    }
-
-    public int getLastPollState() {
-        return lastPollState;
-    }
-
-    public void setLastPollState(int lastPollState) {
-        this.lastPollState = lastPollState;
     }
 
     public int getActionAfterProcess() {

@@ -19,31 +19,28 @@
 
 package org.apache.synapse.transport.mail;
 
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.AddressException;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
+
+import javax.mail.Session;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.synapse.transport.base.AbstractPollTableEntry;
 
 /**
  * Holds information about an entry in the VFS transport poll table used by the
  * VFS Transport Listener
  */
-public class PollTableEntry {
-
-    // status of last mail check
-    public static final int SUCCSESSFUL = 0;
-    public static final int FAILED      = 2;
-    public static final int NONE        = 3;
+public class PollTableEntry extends AbstractPollTableEntry {
 
     // operation after mail check
     public static final int DELETE = 0;
     public static final int MOVE   = 1;
 
-    /** Axis2 service name */
-    private String serviceName;
     /** The email address mapped to the service */
     private InternetAddress emailAddress = null;
 
@@ -66,18 +63,9 @@ public class PollTableEntry {
     private InternetAddress replyAddress = null;
 
     /** list of mail headers to be preserved into the Axis2 message as transport headers */
-    private List preserveHeaders = null;
+    private List<String> preserveHeaders = null;
     /** list of mail headers to be removed from the Axis2 message transport headers */
-    private List removeHeaders = null;
-
-    /** last poll performed at */
-    private long lastPollTime;
-    /** duration in ms between successive polls */
-    private long pollInterval;
-    /** next poll time */
-    private long nextPollTime;
-    /** state of the last poll */
-    private int lastPollState;
+    private List<String> removeHeaders = null;
 
     /** action to take after a successful poll */
     private int actionAfterProcess = DELETE;
@@ -92,6 +80,10 @@ public class PollTableEntry {
     private int maxRetryCount;
     private long reconnectTimeout;
 
+    @Override
+    public EndpointReference getEndpointReference() {
+        return new EndpointReference(MailConstants.TRANSPORT_PREFIX + emailAddress);
+    }
 
     public InternetAddress getEmailAddress() {
         return emailAddress;
@@ -99,14 +91,6 @@ public class PollTableEntry {
 
     public void setEmailAddress(String emailAddress) throws AddressException {        
         this.emailAddress = new InternetAddress(emailAddress);
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
     }
 
     public String getUserName() {
@@ -139,38 +123,6 @@ public class PollTableEntry {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
-    }
-
-    public long getLastPollTime() {
-        return lastPollTime;
-    }
-
-    public void setLastPollTime(long lastPollTime) {
-        this.lastPollTime = lastPollTime;
-    }
-
-    public long getPollInterval() {
-        return pollInterval;
-    }
-
-    public void setPollInterval(long pollInterval) {
-        this.pollInterval = pollInterval;
-    }
-
-    public long getNextPollTime() {
-        return nextPollTime;
-    }
-
-    public void setNextPollTime(long nextPollTime) {
-        this.nextPollTime = nextPollTime;
-    }
-
-    public int getLastPollState() {
-        return lastPollState;
-    }
-
-    public void setLastPollState(int lastPollState) {
-        this.lastPollState = lastPollState;
     }
 
     public int getActionAfterProcess() {
@@ -270,7 +222,7 @@ public class PollTableEntry {
     public void addPreserveHeaders(String headerList) {
         if (headerList == null) return;
         StringTokenizer st = new StringTokenizer(headerList, " ,");
-        preserveHeaders = new ArrayList();
+        preserveHeaders = new ArrayList<String>();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (token.length() != 0) {
@@ -282,7 +234,7 @@ public class PollTableEntry {
     public void addRemoveHeaders(String headerList) {
         if (headerList == null) return;
         StringTokenizer st = new StringTokenizer(headerList, " ,");
-        removeHeaders = new ArrayList();
+        removeHeaders = new ArrayList<String>();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (token.length() != 0) {

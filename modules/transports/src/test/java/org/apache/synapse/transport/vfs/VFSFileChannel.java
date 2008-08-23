@@ -45,7 +45,7 @@ public class VFSFileChannel extends AbstractChannel implements AsyncChannel {
     @Override
     public void setupService(AxisService service) throws Exception {
         service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());
-        service.addParameter("transport.PollInterval", "1");
+        service.addParameter("transport.PollInterval", "50ms");
         service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");
     }
 

@@ -82,7 +82,7 @@ public class BaseConstants {
      */
     public static final String TRANSPORT_POLL_INTERVAL = "transport.PollInterval";
     /**
-     * the default poll interval
+     * The default poll interval in milliseconds.
      */
     public static final int DEFAULT_POLL_INTERVAL = 5 * 60 * 1000; // 5 mins by default
 }

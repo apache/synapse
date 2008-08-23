@@ -33,6 +33,7 @@ import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.client.axis2.AxisRequestResponseTestClient;
+import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
@@ -40,6 +41,7 @@ import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpointFactory;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
@@ -85,6 +87,10 @@ public class JMSListenerTest extends TestCase {
                 suite.addBinaryTest(channel, bytesMessageClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), contentTypeMode, env, server, tdf);
             }
         }
+        suite.addTest(new MinConcurrencyTest(server, new AsyncChannel[] {
+                new JMSAsyncChannel("endpoint1", JMSConstants.DESTINATION_TYPE_QUEUE),
+                new JMSAsyncChannel("endpoint2", JMSConstants.DESTINATION_TYPE_QUEUE) },
+                2, false, env, tdf));
         return suite;
     }
 }

@@ -18,26 +18,23 @@
 */
 package org.apache.synapse.transport.base;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.AxisFault;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TimerTask;
 import java.util.Timer;
 import java.util.Map;
 import java.util.HashMap;
 
-public abstract class AbstractPollingTransportListener extends AbstractTransportListener {
+public abstract class AbstractPollingTransportListener<T extends AbstractPollTableEntry>
+        extends AbstractTransportListener {
 
-    /** the parameter in the services.xml that specifies the poll interval for a service */
-    public static final String TRANSPORT_POLL_INTERVAL = "transport.PollInterval";
-    /** the default poll interval */
-    public static final int DEFAULT_POLL_INTERVAL = 5 * 60; // 5 mins by default
-
-    /** default interval in ms before polls */
-    protected int pollInterval = DEFAULT_POLL_INTERVAL;
     /** The main timer. */
     protected Timer timer;
     /** is a poll already executing? */
@@ -46,6 +43,10 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
     protected final Object pollLock = new Object();
     /** a map that keeps track of services to the timer tasks created for them */
     protected Map serviceToTimerTaskMap = new HashMap();
+    /** Keep the list of endpoints and poll durations */
+    private final List<T> pollTable = new ArrayList<T>();
+    /** Keep the list of removed pollTable entries */
+    private final List<T> removeTable = new ArrayList<T>();
 
     @Override
     public void init(ConfigurationContext cfgCtx,
@@ -124,38 +125,92 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
         }
     }
 
-    public void onPoll() {}
-
-    protected void startListeningForService(AxisService service) {
-
-        if (service.getName().startsWith("__")) {
-            return;
+    public void onPoll() {
+        if (!removeTable.isEmpty()) {
+            pollTable.removeAll(removeTable);
         }
 
-        Parameter param = service.getParameter(TRANSPORT_POLL_INTERVAL);
-        long pollInterval = DEFAULT_POLL_INTERVAL;
+        for (T entry : pollTable) {
+            long startTime = System.currentTimeMillis();
+            if (startTime > entry.getNextPollTime()) {
+                poll(entry);
+            }
+        }
+    }
+    
+    protected abstract void poll(T entry);
+
+    /**
+     * method to log a failure to the log file and to update the last poll status and time
+     * @param msg text for the log message
+     * @param e optional exception encountered or null
+     * @param entry the PollTableEntry
+     */
+    protected void processFailure(String msg, Exception e, T entry) {
+        if (e == null) {
+            log.error(msg);
+        } else {
+            log.error(msg, e);
+        }
+        long now = System.currentTimeMillis();
+        entry.setLastPollState(AbstractPollTableEntry.FAILED);
+        entry.setLastPollTime(now);
+        entry.setNextPollTime(now + entry.getPollInterval());
+    }
+
+    @Override
+    protected void startListeningForService(AxisService service) {
+
+        Parameter param = service.getParameter(BaseConstants.TRANSPORT_POLL_INTERVAL);
+        long pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
         if (param != null && param.getValue() instanceof String) {
             try {
                 pollInterval = Integer.parseInt(param.getValue().toString());
             } catch (NumberFormatException e) {
                 log.error("Invalid poll interval : " + param.getValue() + " for service : " +
-                    service.getName() + " Using defaults", e);
-                disableTransportForService(service);
+                    service.getName() + " default to : "
+                        + (BaseConstants.DEFAULT_POLL_INTERVAL / 1000) + "sec", e);
             }
         }
-        schedulePoll(service, pollInterval);
+        
+        T entry = createPollTableEntry(service);
+        if (entry == null) {
+            disableTransportForService(service);
+        } else {
+            entry.setServiceName(service.getName());
+            schedulePoll(service, pollInterval);
+            pollTable.add(entry);
+        }
+    }
+    
+    protected abstract T createPollTableEntry(AxisService service);
+
+    /**
+     * Get the EPR for the given service
+     * 
+     * @param serviceName service name
+     * @param ip          ignored
+     * @return the EPR for the service
+     * @throws AxisFault not used
+     */
+    public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
+        for (T entry : pollTable) {
+            if (entry.getServiceName().equals(serviceName) ||
+                    serviceName.startsWith(entry.getServiceName() + ".")) {
+                return new EndpointReference[]{ entry.getEndpointReference() };
+            }
+        }
+        return null;
     }
 
+    @Override
     protected void stopListeningForService(AxisService service) {
-        cancelPoll(service);
-    }
-
-    public int getPollInterval() {
-        return pollInterval;
-    }
-
-    public void setPollInterval(int pollInterval) {
-        this.pollInterval = pollInterval;
+        for (T entry : pollTable) {
+            if (service.getName().equals(entry.getServiceName())) {
+                cancelPoll(service);
+                removeTable.add(entry);
+            }
+        }
     }
 
     // -- jmx/management methods--

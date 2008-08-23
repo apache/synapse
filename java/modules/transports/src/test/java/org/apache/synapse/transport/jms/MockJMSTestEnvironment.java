@@ -24,14 +24,14 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.Topic;
 import javax.jms.TopicConnectionFactory;
 
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
 import com.mockrunner.jms.ConfigurationManager;
 import com.mockrunner.jms.DestinationManager;
 import com.mockrunner.mock.jms.MockQueueConnectionFactory;
 import com.mockrunner.mock.jms.MockTopicConnectionFactory;
 
-@DisplayName("mockrunner")
+@Name("mockrunner")
 public class MockJMSTestEnvironment extends JMSTestEnvironment {
     private DestinationManager destinationManager;
     private ConfigurationManager configurationManager;

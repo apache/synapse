@@ -22,9 +22,9 @@ package org.apache.synapse.transport.mail;
 import javax.activation.DataHandler;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
-@DisplayName("flat")
+@Name("flat")
 public class FlatLayout implements MessageLayout {
     public void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
         msg.setDataHandler(dh);

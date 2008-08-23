@@ -25,9 +25,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
 
-@DisplayName("axis")
 public class AxisRequestResponseTestClient extends AxisTestClient implements RequestResponseTestClient<AxisMessage,AxisMessage> {
     public AxisMessage sendMessage(ClientOptions options, AxisMessage message) throws Exception {
         OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);

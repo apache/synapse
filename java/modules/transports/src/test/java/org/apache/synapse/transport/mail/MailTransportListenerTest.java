@@ -30,6 +30,7 @@ import junit.framework.TestSuite;
 import org.apache.synapse.transport.testkit.AdapterUtils;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.MessageConverter;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
@@ -67,6 +68,11 @@ public class MailTransportListenerTest extends TestCase {
             suite.addTextPlainTests(channel, adapt(client, MessageConverter.STRING_TO_BYTE), AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer);
             suite.addBinaryTest(channel, client, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer);
         }
+        AxisAsyncTestClient axisClient = new AxisAsyncTestClient();
+        suite.addSOAPTests(channel, adapt(axisClient, MessageConverter.XML_TO_AXIS), asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer);
+        suite.addPOXTests(channel, adapt(axisClient, MessageConverter.XML_TO_AXIS), asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer);
+        suite.addTextPlainTests(channel, adapt(axisClient, MessageConverter.TEXT_WRAPPER), AdapterUtils.adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer);
+        suite.addBinaryTest(channel, adapt(axisClient, MessageConverter.BINARY_WRAPPER), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer);
 //        suite.addTest(new MinConcurrencyTest(axisServer, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, env));
         return suite;
     }

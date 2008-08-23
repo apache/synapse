@@ -31,10 +31,10 @@ import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-@DisplayName("REST")
+@Name("REST")
 public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,AxisMessage> {
     private final RESTMessage message;
     

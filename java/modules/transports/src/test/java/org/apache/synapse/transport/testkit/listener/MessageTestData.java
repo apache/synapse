@@ -19,7 +19,7 @@
 
 package org.apache.synapse.transport.testkit.listener;
 
-import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.Key;
 
 public class MessageTestData {
     private final String name;
@@ -32,7 +32,7 @@ public class MessageTestData {
         this.charset = charset;
     }
     
-    @NameComponent("data")
+    @Key("data")
     public String getName() {
         return name;
     }

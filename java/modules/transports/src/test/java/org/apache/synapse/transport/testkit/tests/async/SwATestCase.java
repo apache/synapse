@@ -44,10 +44,10 @@ import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-@DisplayName("AsyncSwA")
+@Name("AsyncSwA")
 public class SwATestCase extends AsyncMessageTestCase<ByteArrayMessage,AxisMessage> {
     private static final Random random = new Random();
     

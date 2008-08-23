@@ -28,10 +28,10 @@ import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-@DisplayName("AsyncBinary")
+@Name("AsyncBinary")
 public class BinaryTestCase extends AsyncMessageTestCase<ByteArrayMessage,ByteArrayMessage> {
     private static final Random random = new Random();
     

@@ -28,9 +28,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
-@DisplayName("java.net")
+@Name("java.net")
 public class JavaNetClient implements AsyncTestClient<ByteArrayMessage> {
     private HttpChannel channel;
     

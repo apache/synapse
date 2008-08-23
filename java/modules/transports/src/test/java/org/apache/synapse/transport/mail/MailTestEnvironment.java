@@ -54,7 +54,7 @@ public abstract class MailTestEnvironment extends TestEnvironment implements Tra
     
     public abstract String getProtocol();
     
-    public abstract Account allocateAccount();
+    public abstract Account allocateAccount() throws Exception;
     
     public abstract void freeAccount(Account account);
     

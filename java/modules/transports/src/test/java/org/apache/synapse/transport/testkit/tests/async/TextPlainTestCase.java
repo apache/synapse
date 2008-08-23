@@ -24,11 +24,11 @@ import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.message.StringMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
-import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.name.Named;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 
-@DisplayName("AsyncTextPlain")
+@Name("AsyncTextPlain")
 public class TextPlainTestCase extends AsyncMessageTestCase<StringMessage,StringMessage> {
     private final MessageTestData data;
     
@@ -37,7 +37,7 @@ public class TextPlainTestCase extends AsyncMessageTestCase<StringMessage,String
         this.data = data;
     }
     
-    @NameComponent("data")
+    @Named
     public MessageTestData getData() {
         return data;
     }

@@ -31,10 +31,13 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
-import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.name.Named;
 
-public abstract class MailClient {
+@Name("javamail")
+public abstract class MailClient implements TestClient {
     private final MessageLayout layout;
     private MailChannel channel;
     private Session session;
@@ -43,7 +46,7 @@ public abstract class MailClient {
         this.layout = layout;
     }
 
-    @NameComponent("layout")
+    @Named
     public MessageLayout getLayout() {
         return layout;
     }

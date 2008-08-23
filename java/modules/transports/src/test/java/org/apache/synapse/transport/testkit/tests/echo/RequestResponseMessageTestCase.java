@@ -23,7 +23,6 @@ import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.EndpointFactory;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;
@@ -44,11 +43,6 @@ public abstract class RequestResponseMessageTestCase<M,N> extends MessageTestCas
         addResource(endpointFactory);
     }
     
-    @NameComponent("client")
-    public RequestResponseTestClient<M,N> getClient() {
-        return client;
-    }
-
     @Override
     protected void runTest() throws Throwable {
         Endpoint endpoint = endpointFactory.createEchoEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);

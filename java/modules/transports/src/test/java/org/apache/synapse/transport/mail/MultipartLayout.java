@@ -24,9 +24,9 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
-@DisplayName("multipart")
+@Name("multipart")
 public class MultipartLayout implements MessageLayout {
     public void setupMessage(MimeMessage msg, DataHandler dh) throws Exception {
         MimeMultipart multipart = new MimeMultipart();

@@ -23,9 +23,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
-import org.apache.synapse.transport.testkit.name.DisplayName;
 
-@DisplayName("axis")
 public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<AxisMessage> {
     public void sendMessage(ClientOptions options, AxisMessage message) throws Exception {
         createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(false);

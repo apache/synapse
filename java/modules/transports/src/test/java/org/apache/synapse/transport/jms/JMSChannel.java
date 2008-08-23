@@ -31,7 +31,7 @@ import javax.jms.Session;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
-import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.Key;
 
 public abstract class JMSChannel extends AbstractChannel {
     private final String destinationType;
@@ -58,7 +58,7 @@ public abstract class JMSChannel extends AbstractChannel {
         destination = null;
     }
 
-    @NameComponent("destType")
+    @Key("destType")
     public String getDestinationType() {
         return destinationType;
     }

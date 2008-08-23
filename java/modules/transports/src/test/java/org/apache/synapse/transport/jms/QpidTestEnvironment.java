@@ -29,9 +29,9 @@ import org.apache.qpid.client.AMQQueue;
 import org.apache.qpid.client.AMQTopic;
 import org.apache.qpid.client.transport.TransportConnection;
 import org.apache.qpid.framing.AMQShortString;
-import org.apache.synapse.transport.testkit.name.DisplayName;
+import org.apache.synapse.transport.testkit.name.Name;
 
-@DisplayName("qpid")
+@Name("qpid")
 public class QpidTestEnvironment extends JMSTestEnvironment {
     @SuppressWarnings("unused")
     private void setUp() throws Exception {

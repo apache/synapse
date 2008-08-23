@@ -24,10 +24,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.Flags;
+
+import org.apache.synapse.transport.testkit.name.Name;
+
+import com.icegreen.greenmail.store.FolderListener;
+import com.icegreen.greenmail.store.MailFolder;
+import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
+@Name("greenmail")
 public class GreenMailTestEnvironment extends MailTestEnvironment {
     private static final ServerSetup SMTP =
             new ServerSetup(7025, "127.0.0.1", ServerSetup.PROTOCOL_SMTP);
@@ -35,6 +43,8 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     private static final ServerSetup POP3 =
             new ServerSetup(7110, "127.0.0.1", ServerSetup.PROTOCOL_POP3);
 
+    private static boolean debug = false;
+    
     private GreenMail greenMail;
     private int accountNumber;
     private List<Account> unallocatedAccounts;
@@ -50,17 +60,36 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     private void tearDown() throws Exception {
         greenMail.stop();
         greenMail = null;
+        accountNumber = 1;
         unallocatedAccounts = null;
     }
     
+    @Override
     public String getProtocol() {
         return "pop3";
     }
     
     @Override
-    public Account allocateAccount() {
+    public Account allocateAccount() throws Exception {
         if (unallocatedAccounts.isEmpty()) {
             GreenMailUser user = greenMail.setUser("test" + accountNumber++, "password");
+            if (debug) {
+                final MailFolder inbox = greenMail.getManagers().getImapHostManager().getInbox(user);
+                inbox.addListener(new FolderListener() {
+                    public void added(int msn) {
+                        StoredMessage storedMessage = (StoredMessage)inbox.getMessages().get(msn-1);
+                        try {
+                            storedMessage.getMimeMessage().writeTo(System.out);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+    
+                    public void expunged(int msn) {}
+                    public void flagsUpdated(int msn, Flags flags, Long uid) {}
+                    public void mailboxDeleted() {}
+                });
+            }
             return new Account(user.getEmail(), user.getLogin(), user.getPassword());
         } else {
             return unallocatedAccounts.remove(0);
@@ -72,6 +101,7 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
         unallocatedAccounts.add(account);
     }
 
+    @Override
     public Map<String,String> getInProperties(Account account) {
         Map<String,String> props = new HashMap<String,String>();
         props.put("mail.pop3.host", "localhost");
@@ -81,6 +111,7 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
         return props;
     }
     
+    @Override
     public Map<String,String> getOutProperties() {
         Map<String,String> props = new HashMap<String,String>();
         props.put("mail.smtp.host", "localhost");

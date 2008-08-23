@@ -20,7 +20,7 @@
 package org.apache.synapse.transport.testkit.tests;
 
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.name.NameComponent;
+import org.apache.synapse.transport.testkit.name.Key;
 
 public class MessageTestCase extends TransportTestCase {
     protected final ContentTypeMode contentTypeMode;
@@ -32,7 +32,7 @@ public class MessageTestCase extends TransportTestCase {
         this.contentType = contentType;
     }
 
-    @NameComponent("contentTypeMode")
+    @Key("contentTypeMode")
     public ContentTypeMode getContentTypeMode() {
         return contentTypeMode;
     }

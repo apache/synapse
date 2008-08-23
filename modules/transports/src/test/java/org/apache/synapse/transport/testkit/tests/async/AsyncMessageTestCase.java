@@ -23,7 +23,6 @@ import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.name.NameComponent;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;
@@ -42,11 +41,6 @@ public abstract class AsyncMessageTestCase<M,N> extends MessageTestCase {
         addResource(channel);
         addResource(client);
         addResource(endpointFactory);
-    }
-
-    @NameComponent("client")
-    public AsyncTestClient<M> getClient() {
-        return client;
     }
 
     @Override

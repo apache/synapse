@@ -17,14 +17,17 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.mail;
+package org.apache.synapse.transport.testkit.name;
 
-import javax.activation.DataHandler;
-import javax.mail.internet.MimeMessage;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.apache.synapse.transport.testkit.name.Key;
-
-@Key("layout")
-public interface MessageLayout {
-    void setupMessage(MimeMessage msg, DataHandler dh) throws Exception;
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface Name {
+    String value();
 }

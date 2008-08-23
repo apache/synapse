@@ -22,6 +22,7 @@ package org.apache.synapse.transport.testkit.tests;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -120,6 +121,10 @@ public class TestResource {
         return instance;
     }
     
+    public Object getTarget() {
+        return target;
+    }
+
     public void setUp() throws Exception {
         for (Initializer initializer : initializers) {
             initializer.execute();
@@ -132,15 +137,15 @@ public class TestResource {
         }
     }
     
-    public Object[] getAllDependencies() {
-        Set<Object> set = new HashSet<Object>();
+    public Set<TestResource> getAllDependencies() {
+        Set<TestResource> set = new LinkedHashSet<TestResource>();
         collectDependencies(set);
-        return set.toArray();
+        return set;
     }
     
-    private void collectDependencies(Set<Object> set) {
+    private void collectDependencies(Set<TestResource> set) {
         for (TestResource dependency : directDependencies) {
-            set.add(dependency.getInstance());
+            set.add(dependency);
             dependency.collectDependencies(set);
         }
     }

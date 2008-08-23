@@ -81,6 +81,7 @@ public class TransportTestSuite extends TestSuite {
         
     private final List<FilterExpression> excludes = new LinkedList<FilterExpression>();
     private final boolean reuseResources;
+    private boolean invertExcludes;
     
     public TransportTestSuite(boolean reuseResources) {
         this.reuseResources = reuseResources;
@@ -92,6 +93,10 @@ public class TransportTestSuite extends TestSuite {
 
     public void addExclude(String filter) throws ParseException {
         excludes.add(FilterExpressionParser.parse(filter));
+    }
+
+    public void setInvertExcludes(boolean invertExcludes) {
+        this.invertExcludes = invertExcludes;
     }
 
     public void addSOAP11Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
@@ -159,10 +164,15 @@ public class TransportTestSuite extends TestSuite {
         if (test instanceof TransportTestCase) {
             TransportTestCase ttest = (TransportTestCase)test;
             Map<String,String> map = ttest.getNameComponents();
+            boolean excluded = false;
             for (FilterExpression exclude : excludes) {
                 if (exclude.matches(map)) {
-                    return;
+                    excluded = true;
+                    break;
                 }
+            }
+            if (excluded != invertExcludes) {
+                return;
             }
             ttest.setManaged(reuseResources);
             ttest.getResourceSet().resolve();

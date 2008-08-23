@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.testkit.name;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,54 +27,67 @@ import java.util.Map;
 import org.apache.synapse.transport.testkit.Adapter;
 
 public class NameUtils {
-    public static String getName(Object object) {
-        Class<?> clazz = object.getClass();
-        DisplayName displayName = clazz.getAnnotation(DisplayName.class);
-        if (displayName != null) {
-            return displayName.value();
-        } else {
-            String className = clazz.getName();
-            return className.substring(className.lastIndexOf('.') + 1);
-        }
-    }
-    
-    public static Map<String,String> getNameComponents(String rootKey, Object object) {
+    public static Map<String,String> getNameComponents(Object object) {
         Map<String,String> result = new LinkedHashMap<String,String>();
-        collectNameComponents(result, rootKey, object);
+        getNameComponents(result, object);
         return result;
     }
     
-    private static void collectNameComponents(Map<String,String> map, String key, Object component) {
-        while (component instanceof Adapter) {
-            component = ((Adapter)component).getTarget();
+    private static <A extends Annotation> A getAnnotationInherited(Class<?> type, Class<A> annotationClass) {
+        A ann = type.getAnnotation(annotationClass);
+        if (ann != null) {
+            return ann;
         }
-        if (component instanceof String) {
-            map.put(key, (String)component);
-        } else if (component instanceof Enum) {
-            map.put(key, String.valueOf(component));
-        } else {
-            DisplayName displayName = component.getClass().getAnnotation(DisplayName.class);
-            if (displayName != null) {
-                map.put(key, displayName.value());
+        Class<?> superClass = type.getSuperclass();
+        if (superClass != null) {
+            ann = getAnnotationInherited(superClass, annotationClass);
+            if (ann != null) {
+                return ann;
             }
-            collectNameComponents(map, component);
         }
+        for (Class<?> iface : type.getInterfaces()) {
+            ann = getAnnotationInherited(iface, annotationClass);
+            if (ann != null) {
+                return ann;
+            }
+        }
+        return null;
     }
     
-    private static void collectNameComponents(Map<String,String> map, Object object) {
+    public static void getNameComponents(Map<String,String> map, Object object) {
+        while (object instanceof Adapter) {
+            object = ((Adapter)object).getTarget();
+        }
         Class<?> clazz = object.getClass();
+        {
+            Key key = getAnnotationInherited(clazz, Key.class);
+            if (key != null) {
+                Name name = clazz.getAnnotation(Name.class);
+                if (name == null) {
+                    String className = clazz.getName();
+                    map.put(key.value(), className.substring(className.lastIndexOf('.') + 1));
+                } else {
+                    map.put(key.value(), name.value());
+                }
+            }
+        }
         for (Method method : clazz.getMethods()) {
-            NameComponent ann = method.getAnnotation(NameComponent.class);
-            if (ann != null) {
-                Object component;
+            Key key = method.getAnnotation(Key.class);
+            Named named = method.getAnnotation(Named.class);
+            if (key != null || named != null) {
+                Object relatedObject;
                 try {
                     method.setAccessible(true);
-                    component = method.invoke(object);
+                    relatedObject = method.invoke(object);
                 } catch (Throwable ex) {
                     throw new Error("Error invoking " + method, ex);
                 }
-                if (component != null) {
-                    collectNameComponents(map, ann.value(), component);
+                if (relatedObject != null) {
+                    if (key != null) {
+                        map.put(key.value(), relatedObject.toString());
+                    } else {
+                        getNameComponents(map, relatedObject);
+                    }
                 }
             }
         }

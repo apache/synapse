@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.transport.base.BaseUtils;
+import org.apache.synapse.transport.base.threads.WorkerPool;
 
 import javax.jms.*;
 import javax.naming.Context;
@@ -77,14 +78,16 @@ public class JMSConnectionFactory implements ExceptionListener {
 
     /** The name used for the connection factory definition within Axis2 */
     private String name = null;
+    /** The JMS transport listener instance. */
+    private final JMSListener jmsListener;
+    /** The worker pool to use. */
+    private final WorkerPool workerPool;
     /** The JNDI name of the actual connection factory */
     private String connFactoryJNDIName = null;
     /** Map of destination JNDI names to service names */
     private Map<String,String> serviceJNDINameMapping = null;
     /** Map of destination JNDI names to destination types*/
     private Map<String,String> destinationTypeMapping = null;
-    /** Map of JMS destination names to service names */
-    private Map<String,String> serviceDestinationNameMapping = null;
     /** JMS Sessions currently active. One session for each Destination / Service */
     private Map<String,Session> jmsSessions = null;
     /** Properties of the connection factory to acquire the initial context */
@@ -97,8 +100,6 @@ public class JMSConnectionFactory implements ExceptionListener {
     private String connectionFactoryType = null;
     /** The JMS Connection opened */
     private Connection connection = null;
-    /** The JMS Message receiver for this connection factory */
-    private JMSMessageReceiver jmsMessageReceiver = null;
     /** The axis2 configuration context */
     private ConfigurationContext cfgCtx = null;
     /** if connection dropped, reconnect timeout in milliseconds; default 30 seconds */
@@ -110,14 +111,19 @@ public class JMSConnectionFactory implements ExceptionListener {
      *
      * @param name the connection factory name specified in the axis2.xml for the
      * TransportListener or the TransportSender using this
+     * @param jmsListener the JMS transport listener, or null if the connection factory
+     *                    is not linked to a transport listener
+     * @param workerPool the worker pool to be used to process incoming messages; may be null
      * @param cfgCtx the axis2 configuration context
      */
-    public JMSConnectionFactory(String name, ConfigurationContext cfgCtx) {
+    public JMSConnectionFactory(String name, JMSListener jmsListener, WorkerPool workerPool,
+                                ConfigurationContext cfgCtx) {
         this.name = name;
+        this.jmsListener = jmsListener;
+        this.workerPool = workerPool;
         this.cfgCtx = cfgCtx;
         serviceJNDINameMapping = new HashMap<String,String>();
         destinationTypeMapping = new HashMap<String,String>();
-        serviceDestinationNameMapping = new HashMap<String,String>();
         jndiProperties = new Hashtable<String,String>();
         jmsSessions = new HashMap<String,Session>();
     }
@@ -155,7 +161,6 @@ public class JMSConnectionFactory implements ExceptionListener {
 
         serviceJNDINameMapping.put(destinationJNDIName, serviceName);
         destinationTypeMapping.put(destinationJNDIName, destinationType);
-        serviceDestinationNameMapping.put(destinationName, serviceName);
 
         log.info("Mapped JNDI name : " + destinationJNDIName + " and JMS Destination name : " +
             destinationName + " against service : " + serviceName);
@@ -167,15 +172,8 @@ public class JMSConnectionFactory implements ExceptionListener {
      * @param jndiDestinationName the JNDI name of the JMS destination to be removed
      */
     public void removeDestination(String jndiDestinationName) {
-
-        // find and save provider specific Destination name before we delete
-        String providerSpecificDestination = getPhysicalDestinationName(jndiDestinationName);
         stoplisteningOnDestination(jndiDestinationName);
-
         serviceJNDINameMapping.remove(jndiDestinationName);
-        if (providerSpecificDestination != null) {
-            serviceDestinationNameMapping.remove(providerSpecificDestination);
-        }
     }
 
     /**
@@ -250,9 +248,11 @@ public class JMSConnectionFactory implements ExceptionListener {
             handleException("Error connecting to Connection Factory : " + connFactoryJNDIName, e);
         }
 
-        for (String destJNDIName : serviceJNDINameMapping.keySet()) {
+        for (Map.Entry<String,String> entry : serviceJNDINameMapping.entrySet()) {
+            String destJNDIName = entry.getKey();
+            String serviceName = entry.getValue();
             String destinationType = destinationTypeMapping.get(destJNDIName);
-            startListeningOnDestination(destJNDIName, destinationType);
+            startListeningOnDestination(destJNDIName, destinationType, serviceName);
         }
 
         connection.start(); // indicate readiness to start receiving messages
@@ -296,7 +296,9 @@ public class JMSConnectionFactory implements ExceptionListener {
      *
      * @param destinationJNDIname the JMS destination to listen on
      */
-    public void startListeningOnDestination(String destinationJNDIname, String destinationType) {
+    public void startListeningOnDestination(String destinationJNDIname,
+                                            String destinationType,
+                                            String serviceName) {
 
         Session session = jmsSessions.get(destinationJNDIname);
         // if we already had a session open, close it first
@@ -319,7 +321,8 @@ public class JMSConnectionFactory implements ExceptionListener {
             }
 
             MessageConsumer consumer = JMSUtils.createConsumer(session, destination);
-            consumer.setMessageListener(jmsMessageReceiver);
+            consumer.setMessageListener(new JMSMessageReceiver(jmsListener, this, workerPool,
+                    cfgCtx, serviceName));
             jmsSessions.put(destinationJNDIname, session);
 
         // catches NameNotFound and JMSExceptions and marks service as faulty    
@@ -491,38 +494,6 @@ public class JMSConnectionFactory implements ExceptionListener {
     }
 
     // -------------------- getters and setters and trivial methods --------------------
-    /**
-     * Return the service name using the JMS destination given by the JNDI name
-     *
-     * @param jmsDestinationName the JMS destination name
-     * @return the name of the service using the destination
-     */
-    public String getServiceNameForDestinationName(String jmsDestinationName) {
-        return serviceDestinationNameMapping.get(jmsDestinationName);
-    }
-
-    /**
-     * Return the service name using the JMS destination and its JNDI name
-     *
-     * @param dest the JMS Destination Queue or Topic
-     * @param jmsDestinationName the JMS destination name
-     * @return the name of the service using the destination
-     */
-    public String getServiceNameForDestination(Destination dest, String jmsDestinationName) {
-        String serviceName = serviceDestinationNameMapping.get(jmsDestinationName);
-
-        // hack to get around the crazy Active MQ dynamic queue and topic issues
-        if (serviceName == null) {
-            String provider = getJndiProperties().get(Context.INITIAL_CONTEXT_FACTORY);
-            if (provider.indexOf("activemq") != -1) {
-                serviceName = getServiceNameForJNDIName(
-                    (dest instanceof Queue ?
-                        JMSConstants.ACTIVEMQ_DYNAMIC_QUEUE :
-                        JMSConstants.ACTIVEMQ_DYNAMIC_TOPIC) + jmsDestinationName);
-            }
-        }
-        return serviceName;
-    }
 
     /**
      * Return the service name using the JMS destination given by the JNDI name
@@ -565,16 +536,8 @@ public class JMSConnectionFactory implements ExceptionListener {
         return jndiProperties;
     }
 
-    public JMSMessageReceiver getJmsMessageReceiver() {
-        return jmsMessageReceiver;
-    }
-    
     public Context getContext() {
         return context;
-    }
-
-    public void setJmsMessageReceiver(JMSMessageReceiver jmsMessageReceiver) {
-        this.jmsMessageReceiver = jmsMessageReceiver;
     }
 
     private void handleException(String msg, Exception e) throws AxisJMSException {

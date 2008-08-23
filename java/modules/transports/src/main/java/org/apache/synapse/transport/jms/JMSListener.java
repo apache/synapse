@@ -94,9 +94,6 @@ public class JMSListener extends AbstractTransportListener implements Management
     public void start() throws AxisFault {
 
         for (JMSConnectionFactory conFac : connectionFactories.values()) {
-            conFac.setJmsMessageReceiver(
-                new JMSMessageReceiver(this, conFac, workerPool, cfgCtx));
-
             try {
                 conFac.connectAndListen();
             } catch (JMSException e) {
@@ -167,7 +164,7 @@ public class JMSListener extends AbstractTransportListener implements Management
         log.info("Starting to listen on destination : " + destinationName + " of type "
                 + destinationType + " for service " + service.getName());
         cf.addDestination(destinationName, destinationType, service.getName());
-        cf.startListeningOnDestination(destinationName, destinationType);
+        cf.startListeningOnDestination(destinationName, destinationType, service.getName());
     }
 
     /**
@@ -229,7 +226,7 @@ public class JMSListener extends AbstractTransportListener implements Management
             Parameter conFacParams = (Parameter) conFacIter.next();
 
             JMSConnectionFactory jmsConFactory =
-                new JMSConnectionFactory(conFacParams.getName(), cfgCtx);
+                new JMSConnectionFactory(conFacParams.getName(), this, workerPool, cfgCtx);
             JMSUtils.setConnectionFactoryParameters(conFacParams, jmsConFactory);
 
             connectionFactories.put(jmsConFactory.getName(), jmsConFactory);

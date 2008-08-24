@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -32,7 +34,8 @@ public class TestResourceSet {
     private static Log log = LogFactory.getLog(TestResourceSet.class);
     
     private final TestResourceSet parent;
-    private final List<TestResource> resources = new LinkedList<TestResource>();
+    private final List<TestResource> unresolvedResources = new LinkedList<TestResource>();
+    private final List<TestResource> resolvedResources = new LinkedList<TestResource>();
     private Status status = Status.UNRESOLVED;
     
     public TestResourceSet(TestResourceSet parent) {
@@ -47,7 +50,7 @@ public class TestResourceSet {
         if (status != Status.UNRESOLVED) {
             throw new IllegalStateException();
         }
-        resources.add(new TestResource(resource));
+        unresolvedResources.add(new TestResource(resource));
     }
     
     public void addResources(Object... resources) {
@@ -57,9 +60,12 @@ public class TestResourceSet {
     }
     
     public Object[] getResources() {
-        Object[] result = new Object[resources.size()];
+        if (status == Status.UNRESOLVED) {
+            throw new IllegalStateException();
+        }
+        Object[] result = new Object[resolvedResources.size()];
         int i = 0;
-        for (TestResource resource : resources) {
+        for (TestResource resource : resolvedResources) {
             result[i++] = resource.getInstance();
         }
         return result;
@@ -67,16 +73,54 @@ public class TestResourceSet {
     
     public void resolve() {
         if (status == Status.UNRESOLVED) {
-            List<TestResource> availableResources = new LinkedList<TestResource>();
-            if (parent != null) {
-                availableResources.addAll(parent.resources);
-            }
-            availableResources.addAll(resources);
-            for (TestResource resource : resources) {
-                resource.resolve(availableResources);
+            while (!unresolvedResources.isEmpty()) {
+                resolveResource(unresolvedResources.get(0));
             }
             status = Status.RESOLVED;
         }
+    }
+    
+    private void resolveResource(TestResource resource) {
+        unresolvedResources.remove(resource);
+        resource.resolve(this);
+        resolvedResources.add(resource);
+    }
+    
+    TestResource[] findResources(Class<?> clazz, boolean allowAutoCreate) {
+        List<TestResource> result = new LinkedList<TestResource>();
+        if (parent != null) {
+            result.addAll(Arrays.asList(parent.findResources(clazz, false)));
+        }
+        for (TestResource resource : resolvedResources) {
+            if (clazz.isInstance(resource.getInstance())) {
+                result.add(resource);
+            }
+        }
+        List<TestResource> unresolvedMatchingResources = new LinkedList<TestResource>();
+        for (TestResource resource : unresolvedResources) {
+            if (clazz.isInstance(resource.getInstance())) {
+                unresolvedMatchingResources.add(resource);
+            }
+        }
+        for (TestResource resource : unresolvedMatchingResources) {
+            resolveResource(resource);
+            result.add(resource);
+        }
+        if (allowAutoCreate && result.isEmpty()) {
+            TestResource resource;
+            try {
+                Field field = clazz.getField("INSTANCE");
+                resource = new TestResource(field.get(null));
+            } catch (Throwable ex) {
+                resource = null;
+            }
+            if (resource != null) {
+                unresolvedResources.add(resource);
+                resolveResource(resource);
+                result.add(resource);
+            }
+        }
+        return result.toArray(new TestResource[result.size()]);
     }
     
     public void setUp() throws Exception {
@@ -84,7 +128,7 @@ public class TestResourceSet {
         if (status != Status.RESOLVED) {
             throw new IllegalStateException();
         }
-        setUp(resources);
+        setUp(resolvedResources);
         status = Status.SETUP;
     }
     
@@ -98,7 +142,7 @@ public class TestResourceSet {
     }
     
     private TestResource lookup(Object instance) {
-        for (TestResource resource : resources) {
+        for (TestResource resource : resolvedResources) {
             if (resource.getTarget() == instance) {
                 return resource;
             }
@@ -115,9 +159,9 @@ public class TestResourceSet {
             throw new IllegalStateException();
         }
         List<TestResource> oldResourcesToTearDown = new LinkedList<TestResource>();
-        List<TestResource> resourcesToSetUp = new LinkedList<TestResource>(resources);
+        List<TestResource> resourcesToSetUp = new LinkedList<TestResource>(resolvedResources);
         List<TestResource> resourcesToKeep = new LinkedList<TestResource>();
-        for (TestResource oldResource : old.resources) {
+        for (TestResource oldResource : old.resolvedResources) {
             boolean keep;
             TestResource resource = lookup(oldResource.getTarget());
             if (resource == null) {
@@ -149,7 +193,7 @@ public class TestResourceSet {
         if (status != Status.SETUP) {
             throw new IllegalStateException();
         }
-        tearDown(resources);
+        tearDown(resolvedResources);
     }
     
     private static void tearDown(List<TestResource> resources) throws Exception {
@@ -163,6 +207,6 @@ public class TestResourceSet {
 
     @Override
     public String toString() {
-        return resources.toString();
+        return resolvedResources.toString();
     }
 }

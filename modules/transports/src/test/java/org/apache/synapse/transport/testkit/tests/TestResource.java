@@ -75,7 +75,7 @@ public class TestResource {
         this.target = target;
     }
     
-    public void resolve(List<TestResource> resources) {
+    public void resolve(TestResourceSet resourceSet) {
         for (Class<?> clazz = target.getClass(); !clazz.equals(Object.class);
                 clazz = clazz.getSuperclass()) {
             for (Method method : clazz.getDeclaredMethods()) {
@@ -89,23 +89,18 @@ public class TestResource {
                             throw new Error("Generic parameters not supported in " + method);
                         }
                         Class<?> parameterClass = (Class<?>)parameterType;
-                        TestResource res = null;
-                        for (TestResource resource : resources) {
-                            if (resource != this) {
-                                Object obj = resource.getInstance();
-                                if (parameterClass.isInstance(obj)) {
-                                    if (res != null) {
-                                        throw new Error(target.getClass().getName() + " depends on " + parameterClass.getName() + ", but multiple candidates found");
-                                    }
-                                    res = resource;
-                                }
-                            }
+                        TestResource[] resources = resourceSet.findResources(parameterClass, true);
+                        if (resources.length == 0) {
+                            throw new Error(target.getClass().getName() + " depends on " +
+                                    parameterClass.getName() + ", but none found");
+                        } else if (resources.length > 1) {
+                            throw new Error(target.getClass().getName() + " depends on " +
+                                    parameterClass.getName() + ", but multiple candidates found");
+                            
                         }
-                        if (res == null) {
-                            throw new Error(target.getClass().getName() + " depends on " + parameterClass.getName() + ", but none found");
-                        }
-                        directDependencies.add(res);
-                        args[i] = res.getInstance();
+                        TestResource resource = resources[0];
+                        directDependencies.add(resource);
+                        args[i] = resource.getInstance();
                     }
                     method.setAccessible(true);
                     initializers.addFirst(new Initializer(method, target, args));

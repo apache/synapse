@@ -19,8 +19,6 @@
 
 package org.apache.synapse.transport.testkit.client.axis2;
 
-import java.io.File;
-
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
@@ -28,14 +26,9 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
@@ -49,9 +42,8 @@ public class AxisTestClient implements TestClient {
     
     private final AxisTestClientSetup setup;
     
+    private AxisTestClientContext context;
     private Channel channel;
-    private TransportOutDescription trpOutDesc;
-    private ConfigurationContext cfgCtx;
     
     public AxisTestClient(AxisTestClientSetup setup) {
         this.setup = setup;
@@ -67,24 +59,11 @@ public class AxisTestClient implements TestClient {
     }
 
     @SuppressWarnings("unused")
-    private void setUp(TransportDescriptionFactory tdf, Channel channel) throws Exception {
+    private void setUp(AxisTestClientContext context, Channel channel) throws Exception {
+        this.context = context;
         this.channel = channel;
-        
-        cfgCtx =
-            ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                    new File("target/test_rep").getAbsolutePath());
-        AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
-
-        trpOutDesc = tdf.createTransportOutDescription();
-        axisCfg.addTransportOut(trpOutDesc);
-        trpOutDesc.getSender().init(cfgCtx, trpOutDesc);
     }
 
-    @SuppressWarnings("unused")
-    private void tearDown() throws Exception {
-        trpOutDesc.getSender().stop();
-    }
-    
     protected OperationClient createClient(ClientOptions options, AxisMessage message, QName operationQName) throws Exception {
         EndpointReference epr = channel.getEndpointReference();
         log.info("Sending to " + epr.getAddress());
@@ -92,7 +71,7 @@ public class AxisTestClient implements TestClient {
         Options axisOptions = new Options();
         axisOptions.setTo(epr);
 
-        ServiceClient serviceClient = new ServiceClient(cfgCtx, null);
+        ServiceClient serviceClient = new ServiceClient(context.getConfigurationContext(), null);
         serviceClient.setOptions(axisOptions);
         
         OperationClient mepClient = serviceClient.createClient(operationQName);

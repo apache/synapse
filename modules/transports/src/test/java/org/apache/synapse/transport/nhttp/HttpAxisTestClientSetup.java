@@ -17,23 +17,26 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.client.axis2;
+package org.apache.synapse.transport.nhttp;
 
-import org.apache.axis2.client.ServiceClient;
-import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.message.AxisMessage;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientSetup;
+import org.apache.synapse.transport.testkit.name.Key;
 
-public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<AxisMessage> {
-    public AxisAsyncTestClient(AxisTestClientSetup setup) {
-        super(setup);
+public class HttpAxisTestClientSetup implements AxisTestClientSetup {
+    private final boolean forceHTTP10;
+    
+    public HttpAxisTestClientSetup(boolean forceHTTP10) {
+        this.forceHTTP10 = forceHTTP10;
     }
 
-    public AxisAsyncTestClient() {
-        super();
+    @Key("forceHTTP10")
+    public boolean isForceHTTP10() {
+        return forceHTTP10;
     }
 
-    public void sendMessage(ClientOptions options, AxisMessage message) throws Exception {
-        createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(false);
+    public void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
+        msgContext.setProperty(NhttpConstants.FORCE_HTTP_1_0, forceHTTP10);
     }
 }

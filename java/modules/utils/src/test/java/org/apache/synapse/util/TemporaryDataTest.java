@@ -48,6 +48,7 @@ public class TemporaryDataTest extends TestCase {
                 offset += c;
             }
             out.close();
+            assertEquals(size, tmp.getLength());
             // Reread the test data, again in chunks with random size
             InputStream in = tmp.getInputStream();
             offset = 0;

@@ -21,13 +21,13 @@ package org.apache.synapse.transport.jms;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
+import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientSetup;
 import org.apache.synapse.transport.testkit.name.Key;
 
-public class JMSAxisAsyncClient extends AxisAsyncTestClient {
+public class JMSAxisTestClientSetup implements AxisTestClientSetup {
     private final String jmsMessageType;
     
-    public JMSAxisAsyncClient(String jmsMessageType) {
+    public JMSAxisTestClientSetup(String jmsMessageType) {
         this.jmsMessageType = jmsMessageType;
     }
 
@@ -36,9 +36,7 @@ public class JMSAxisAsyncClient extends AxisAsyncTestClient {
         return jmsMessageType;
     }
 
-    @Override
-    protected void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
-        super.setupRequestMessageContext(msgContext);
+    public void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
         msgContext.setProperty(JMSConstants.JMS_MESSAGE_TYPE, jmsMessageType);
     }
 }

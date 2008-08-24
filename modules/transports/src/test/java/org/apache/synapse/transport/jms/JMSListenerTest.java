@@ -56,8 +56,8 @@ public class JMSListenerTest extends TestCase {
         clients.add(adapt(bytesMessageClient, MessageConverter.XML_TO_BYTE));
         clients.add(adapt(textMessageClient, MessageConverter.XML_TO_STRING));
         clients.add(adapt(new AxisAsyncTestClient(), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new JMSAxisAsyncClient(JMSConstants.JMS_BYTE_MESSAGE), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new JMSAxisAsyncClient(JMSConstants.JMS_TEXT_MESSAGE), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new JMSAxisTestClientSetup(JMSConstants.JMS_BYTE_MESSAGE)), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new JMSAxisTestClientSetup(JMSConstants.JMS_TEXT_MESSAGE)), MessageConverter.XML_TO_AXIS));
         for (JMSTestEnvironment env : new JMSTestEnvironment[] { new QpidTestEnvironment(), new ActiveMQTestEnvironment() }) {
             suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, server, tdf);
             suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT, env, tdf);

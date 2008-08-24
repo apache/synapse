@@ -43,22 +43,19 @@ import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.server.Server;
 
 public class AxisServer implements Server {
-    private static AxisServer activeServer;
+    public static final AxisServer INSTANCE = new AxisServer();
     
     private TransportListener listener;
     private UtilsTransportServer server;
     private TestEnvironment env;
+    
+    private AxisServer() {}
     
     @SuppressWarnings("unused")
     private void setUp(TestEnvironment env, TransportDescriptionFactory tdf) throws Exception {
         this.env = env;
         
         server = new UtilsTransportServer();
-        
-        if (activeServer != null) {
-            throw new IllegalStateException();
-        }
-        activeServer = this;
         
         TransportOutDescription trpOutDesc = tdf.createTransportOutDescription();
         TransportInDescription trpInDesc = tdf.createTransportInDescription();
@@ -97,7 +94,6 @@ public class AxisServer implements Server {
         listener = null;
         server = null;
         env = null;
-        activeServer = null;
     }
     
     public AxisConfiguration getAxisConfiguration() {

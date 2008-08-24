@@ -47,6 +47,7 @@ public abstract class TransportTestCase extends TestCase {
         if (nameComponents == null) {
             nameComponents = new LinkedHashMap<String,String>();
             NameUtils.getNameComponents(nameComponents, this);
+            resourceSet.resolve();
             for (Object resource : resourceSet.getResources()) {
                 NameUtils.getNameComponents(nameComponents, resource);
             }

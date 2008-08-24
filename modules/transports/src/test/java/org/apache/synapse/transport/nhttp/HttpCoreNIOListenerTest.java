@@ -70,7 +70,6 @@ public class HttpCoreNIOListenerTest extends TestCase {
         // Change to tdfSimple if you want to check the behavior of Axis' blocking HTTP transport 
         TransportDescriptionFactory tdf = tdfNIO;
         
-        AxisServer axisServer = new AxisServer();
         AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
 //        AxisEchoEndpointFactory echoEndpointFactory = new AxisEchoEndpointFactory();
         HttpChannel channel = new HttpChannel();
@@ -80,15 +79,15 @@ public class HttpCoreNIOListenerTest extends TestCase {
         clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(false)), MessageConverter.XML_TO_AXIS));
         clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(true)), MessageConverter.XML_TO_AXIS));
         for (AsyncTestClient<XMLMessage> client : clients) {
-            suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
-            suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
+            suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, tdf);
+            suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, tdf);
         }
 //        suite.addPOXTests(channel, adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
-        suite.addSwATests(channel, javaNetClient, asyncEndpointFactory, env, axisServer, tdf);
-        suite.addTextPlainTests(channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer, tdf);
-        suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer, tdf);
-        suite.addRESTTests(channel, new JavaNetRESTClient(), asyncEndpointFactory, env, axisServer, tdf);
-        suite.addTest(new MinConcurrencyTest(axisServer, new AsyncChannel[] { new HttpChannel(), new HttpChannel() }, 2, false, env, tdf));
+        suite.addSwATests(channel, javaNetClient, asyncEndpointFactory, env, tdf);
+        suite.addTextPlainTests(channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, tdf);
+        suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, tdf);
+        suite.addRESTTests(channel, new JavaNetRESTClient(), asyncEndpointFactory, env, tdf);
+        suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new AsyncChannel[] { new HttpChannel(), new HttpChannel() }, 2, false, env, tdf));
         return suite;
     }
 }

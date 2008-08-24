@@ -177,6 +177,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-utils</artifactId>
+        </dependency>
+        
+        <dependency>
             <groupId>org.apache.directory.shared</groupId>
             <artifactId>shared-ldap</artifactId>
             <version>0.9.11</version>

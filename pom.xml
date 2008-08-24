@@ -203,6 +203,11 @@
             <!-- Synapse -->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1128,6 +1133,7 @@
     </repositories>
 
     <modules>
+        <module>modules/utils</module>
         <module>modules/transports</module>
         <module>modules/mar</module>
         <module>modules/core</module>

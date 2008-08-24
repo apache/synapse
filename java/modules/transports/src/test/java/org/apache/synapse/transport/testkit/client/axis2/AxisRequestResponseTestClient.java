@@ -27,6 +27,14 @@ import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 
 public class AxisRequestResponseTestClient extends AxisTestClient implements RequestResponseTestClient<AxisMessage,AxisMessage> {
+    public AxisRequestResponseTestClient(AxisTestClientSetup setup) {
+        super(setup);
+    }
+
+    public AxisRequestResponseTestClient() {
+        super();
+    }
+
     public AxisMessage sendMessage(ClientOptions options, AxisMessage message) throws Exception {
         OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);
         mepClient.execute(true);

@@ -312,6 +312,39 @@ public class TemporaryData {
         }
     }
     
+    /**
+     * Write the data to a given output stream.
+     * 
+     * @param out The output stream to write the data to. This method will
+     *            not close the stream.
+     * @throws IOException
+     */
+    public void writeTo(OutputStream out) throws IOException {
+        if (temporaryFile != null) {
+            FileInputStream in = new FileInputStream(temporaryFile);
+            try {
+                IOUtils.copy(in, out);
+            } finally {
+                in.close();
+            }
+        } else {
+            for (int i=0; i<chunkIndex; i++) {
+                out.write(chunks[i]);
+            }
+            if (chunkOffset > 0) {
+                out.write(chunks[chunkIndex], 0, chunkOffset);
+            }
+        }
+    }
+    
+    public long getLength() {
+        if (temporaryFile != null) {
+            return temporaryFile.length();
+        } else {
+            return chunkIndex*chunkSize + chunkOffset;
+        }
+    }
+    
     public void release() {
         if (temporaryFile != null) {
             if (log.isDebugEnabled()) {

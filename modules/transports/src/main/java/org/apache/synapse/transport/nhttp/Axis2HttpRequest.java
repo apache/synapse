@@ -39,8 +39,8 @@ import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
+import org.apache.synapse.util.TemporaryData;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.ClosedChannelException;
@@ -138,12 +138,16 @@ public class Axis2HttpRequest {
                         "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
                 }
                 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                messageFormatter.writeTo(msgContext, format, baos, true);
+                TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
+                OutputStream out = serialized.getOutputStream();
+                try {
+                    messageFormatter.writeTo(msgContext, format, out, true);
+                } finally {
+                    out.close();
+                }
                 BasicHttpEntity entity = new BasicHttpEntity();
-                byte[] bytes = baos.toByteArray();
-                msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, bytes);
-                entity.setContentLength(bytes.length);
+                msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, serialized);
+                entity.setContentLength(serialized.getLength());
                 ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
 
             }
@@ -235,7 +239,13 @@ public class Axis2HttpRequest {
             OutputStream out = new ContentOutputStream(outputBuffer);
             try {
                 if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
-                    out.write((byte[])msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES));
+                    TemporaryData serialized =
+                            (TemporaryData)msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
+                    try {
+                        serialized.writeTo(out);
+                    } finally {
+                        serialized.release();
+                    }
                 } else {
                     messageFormatter.writeTo(msgContext, format, out, false);
                 }        

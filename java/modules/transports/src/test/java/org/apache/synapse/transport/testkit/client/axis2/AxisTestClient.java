@@ -23,7 +23,6 @@ import java.io.File;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
@@ -42,15 +41,31 @@ import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.name.Named;
 
 @Name("axis")
 public class AxisTestClient implements TestClient {
     private static final Log log = LogFactory.getLog(AxisTestClient.class);
     
+    private final AxisTestClientSetup setup;
+    
     private Channel channel;
     private TransportOutDescription trpOutDesc;
     private ConfigurationContext cfgCtx;
     
+    public AxisTestClient(AxisTestClientSetup setup) {
+        this.setup = setup;
+    }
+    
+    public AxisTestClient() {
+        this(null);
+    }
+
+    @Named
+    public AxisTestClientSetup getSetup() {
+        return setup;
+    }
+
     @SuppressWarnings("unused")
     private void setUp(TransportDescriptionFactory tdf, Channel channel) throws Exception {
         this.channel = channel;
@@ -86,14 +101,13 @@ public class AxisTestClient implements TestClient {
         mc.setEnvelope(message.getEnvelope());
         mc.setAttachmentMap(message.getAttachments());
         channel.setupRequestMessageContext(mc);
-        setupRequestMessageContext(mc);
+        if (setup != null) {
+            setup.setupRequestMessageContext(mc);
+        }
         mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, options.getCharset());
         mc.setServiceContext(serviceClient.getServiceContext());
         mepClient.addMessageContext(mc);
         
         return mepClient;
-    }
-    
-    protected void setupRequestMessageContext(@SuppressWarnings("unused") MessageContext msgContext) throws AxisFault {
     }
 }

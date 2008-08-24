@@ -19,21 +19,9 @@
 
 package org.apache.synapse.transport.testkit.client.axis2;
 
-import org.apache.axis2.client.ServiceClient;
-import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.message.AxisMessage;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
 
-public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<AxisMessage> {
-    public AxisAsyncTestClient(AxisTestClientSetup setup) {
-        super(setup);
-    }
-
-    public AxisAsyncTestClient() {
-        super();
-    }
-
-    public void sendMessage(ClientOptions options, AxisMessage message) throws Exception {
-        createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(false);
-    }
+public interface AxisTestClientSetup {
+    void setupRequestMessageContext(MessageContext msgContext) throws AxisFault;
 }

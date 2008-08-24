@@ -72,16 +72,18 @@ public class HttpCoreNIOListenerTest extends TestCase {
         
         AxisServer axisServer = new AxisServer();
         AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
+//        AxisEchoEndpointFactory echoEndpointFactory = new AxisEchoEndpointFactory();
         HttpChannel channel = new HttpChannel();
         JavaNetClient javaNetClient = new JavaNetClient();
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
         clients.add(adapt(javaNetClient, MessageConverter.XML_TO_BYTE));
-        clients.add(adapt(new AxisAsyncTestClient(), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(false)), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(true)), MessageConverter.XML_TO_AXIS));
         for (AsyncTestClient<XMLMessage> client : clients) {
             suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
             suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
         }
-//        suite.addPOXTests(channel, new AxisRequestResponseMessageSender(), ContentTypeMode.TRANSPORT);
+//        suite.addPOXTests(channel, adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
         suite.addSwATests(channel, javaNetClient, asyncEndpointFactory, env, axisServer, tdf);
         suite.addTextPlainTests(channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, axisServer, tdf);
         suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, axisServer, tdf);

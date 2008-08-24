@@ -40,6 +40,7 @@ public class ActiveMQTestEnvironment extends JMSTestEnvironment {
     private void setUp() throws Exception {
         broker = new BrokerService();
         broker.setBrokerName(BROKER_NAME);
+        broker.setDataDirectory("target/activemq-data");
         broker.start();
     }
 

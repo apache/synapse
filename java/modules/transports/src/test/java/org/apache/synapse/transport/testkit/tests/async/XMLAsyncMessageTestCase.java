@@ -36,11 +36,11 @@ import org.apache.synapse.transport.testkit.name.Named;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncXML")
-public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,AxisMessage> {
+public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,XMLMessage> {
     private final XMLMessage.Type xmlMessageType;
     private final MessageTestData data;
     
-    public XMLAsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, XMLMessage.Type xmlMessageType, MessageTestData data, Object... resources) {
+    public XMLAsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, XMLMessage.Type xmlMessageType, MessageTestData data, Object... resources) {
         super(channel, client, endpoint, xmlMessageType.getContentType(), data.getCharset(), resources);
         this.xmlMessageType = xmlMessageType;
         this.data = data;
@@ -65,9 +65,8 @@ public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,Axi
     }
 
     @Override
-    protected void checkMessageData(XMLMessage message, AxisMessage messageData) throws Exception {
-        SOAPEnvelope envelope = messageData.getEnvelope();
-        OMElement element = envelope.getBody().getFirstElement();
+    protected void checkMessageData(XMLMessage message, XMLMessage messageData) throws Exception {
+        OMElement element = messageData.getPayload();
         OMElement orgElement = message.getPayload();
         assertEquals(orgElement.getQName(), element.getQName());
         assertEquals(data.getText(), element.getText());

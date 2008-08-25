@@ -58,8 +58,8 @@ public class VFSTransportListenerTest extends TestCase {
         clients.add(adapt(new AxisAsyncTestClient(), MessageEncoder.XML_TO_AXIS));
         ContentTypeServiceConfigurator cfgtr = new ContentTypeServiceConfigurator("transport.vfs.ContentType");
         for (AsyncTestClient<XMLMessage> client : clients) {
-            suite.addSOAPTests(channel, client, asyncEndpoint, env, tdf, cfgtr);
-            suite.addPOXTests(channel, client, asyncEndpoint, env, tdf, cfgtr);
+            suite.addSOAPTests(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env, tdf, cfgtr);
+            suite.addPOXTests(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env, tdf, cfgtr);
             // Since VFS has no Content-Type header, SwA is not supported.
         }
         suite.addTextPlainTests(channel, adapt(vfsClient, MessageEncoder.STRING_TO_BYTE), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), env, tdf, cfgtr);

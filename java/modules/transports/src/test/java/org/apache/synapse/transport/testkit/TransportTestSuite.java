@@ -93,26 +93,26 @@ public class TransportTestSuite extends TestSuite {
         this.invertExcludes = invertExcludes;
     }
 
-    public void addSOAP11Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, MessageTestData data, Object... resources) {
+    public void addSOAP11Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, MessageTestData data, Object... resources) {
         addTest(new XMLAsyncMessageTestCase(channel, client, endpoint, XMLMessage.Type.SOAP11, data, resources));
     }
     
-    public void addSOAP12Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, MessageTestData data, Object... resources) {
+    public void addSOAP12Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, MessageTestData data, Object... resources) {
         addTest(new XMLAsyncMessageTestCase(channel, client, endpoint, XMLMessage.Type.SOAP12, data, resources));
     }
     
-    public void addSOAPTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
+    public void addSOAPTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, Object... resources) {
         for (MessageTestData data : messageTestData) {
             addSOAP11Test(channel, client, endpoint, data, resources);
             addSOAP12Test(channel, client, endpoint, data, resources);
         }
     }
     
-    public void addPOXTest(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, MessageTestData data, Object... resources) {
+    public void addPOXTest(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, MessageTestData data, Object... resources) {
         addTest(new XMLAsyncMessageTestCase(channel, client, endpoint, XMLMessage.Type.POX, data, resources));
     }
     
-    public void addPOXTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
+    public void addPOXTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, Object... resources) {
         for (MessageTestData data : messageTestData) {
             addPOXTest(channel, client, endpoint, data, resources);
         }

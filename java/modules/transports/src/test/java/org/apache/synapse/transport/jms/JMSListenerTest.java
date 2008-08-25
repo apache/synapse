@@ -67,16 +67,16 @@ public class JMSListenerTest extends TestCase {
                     JMSAsyncChannel channel = new JMSAsyncChannel(destinationType, contentTypeMode);
                     for (AsyncTestClient<XMLMessage> client : clients) {
                         if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                            suite.addSOAPTests(channel, client, asyncEndpoint, env, tdf);
-                            suite.addPOXTests(channel, client, asyncEndpoint, env, tdf);
+                            suite.addSOAPTests(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env, tdf);
+                            suite.addPOXTests(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env, tdf);
                         } else {
                             // If no content type header is used, SwA can't be used and the JMS transport
                             // always uses the default charset encoding
-                            suite.addSOAP11Test(channel, client, asyncEndpoint, new MessageTestData(null, TransportTestSuite.testString,
+                            suite.addSOAP11Test(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), new MessageTestData(null, TransportTestSuite.testString,
                                     MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf, cfgtr);
-                            suite.addSOAP12Test(channel, client, asyncEndpoint, new MessageTestData(null, TransportTestSuite.testString,
+                            suite.addSOAP12Test(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), new MessageTestData(null, TransportTestSuite.testString,
                                     MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf, cfgtr);
-                            suite.addPOXTest(channel, client, asyncEndpoint, new MessageTestData(null, TransportTestSuite.testString,
+                            suite.addPOXTest(channel, client, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), new MessageTestData(null, TransportTestSuite.testString,
                                     MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf, cfgtr);
                         }
                     }

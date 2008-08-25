@@ -19,26 +19,33 @@
 
 package org.apache.synapse.transport.nhttp;
 
-import java.util.UUID;
+import org.apache.synapse.transport.testkit.listener.Channel;
+import org.mortbay.http.HttpContext;
+import org.mortbay.http.SocketListener;
+import org.mortbay.jetty.Server;
 
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.testkit.listener.AbstractChannel;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-
-public class HttpChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
-    private String serviceName;
+public class JettyServer {
+    private Server server;
+    private HttpContext context;
     
     @SuppressWarnings("unused")
-    private void setUp() {
-        serviceName = "TestService-" + UUID.randomUUID();
+    private void setUp() throws Exception {
+        server = new Server();
+        SocketListener listener = new SocketListener();
+        listener.setPort(8280);
+        server.addListener(listener);
+        context = new HttpContext(server, Channel.CONTEXT_PATH + "/*");
+        server.start();
+    }
+    
+    public HttpContext getContext() {
+        return context;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public EndpointReference getEndpointReference() throws Exception {
-        return new EndpointReference("http://localhost:8280" + CONTEXT_PATH + "/" + serviceName);
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
+        server.stop();
+        server = null;
+        context = null;
     }
 }

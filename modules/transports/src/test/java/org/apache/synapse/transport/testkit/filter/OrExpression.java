@@ -30,7 +30,7 @@ public class OrExpression implements FilterExpression {
 
     public boolean matches(Map<String,String> map) {
         for (FilterExpression operand : operands) {
-            if (!operand.matches(map)) {
+            if (operand.matches(map)) {
                 return true;
             }
         }

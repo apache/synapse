@@ -224,6 +224,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>5.1.10</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Workaround for SYNAPSE-400 -->
         <dependency>
             <groupId>org.apache.woden</groupId>

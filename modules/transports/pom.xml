@@ -112,7 +112,6 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            !org.apache.commons.io.*,
                             !org.apache.synapse.*,
                             javax.xml.namespace; version=0.0.0,
                             javax.activation,
@@ -129,7 +128,10 @@
                             org.apache.commons.io.*; version=0.0.0,
                             org.apache.commons.logging,
                             org.apache.commons.vfs.*,
-                            org.apache.http.*,
+                            org.apache.http.params,
+                            org.apache.http.protocol,
+                            org.apache.http.nio.reactor,
+                            org.apache.http.nio,
                             org.apache.ws.commons.schema,
                             *;resolution:=optional,
                         </Import-Package>

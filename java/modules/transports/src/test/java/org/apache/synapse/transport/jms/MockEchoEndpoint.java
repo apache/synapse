@@ -32,27 +32,23 @@ import javax.jms.TextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.Endpoint;
-import org.apache.synapse.transport.testkit.server.EndpointFactory;
 
-public class MockEchoEndpointFactory implements EndpointFactory {
-    static Log log = LogFactory.getLog(MockEchoEndpointFactory.class);
+@Name("mock")
+public class MockEchoEndpoint implements Endpoint {
+    static Log log = LogFactory.getLog(MockEchoEndpoint.class);
     
-    private JMSTestEnvironment env;
-    JMSRequestResponseChannel channel;
+    private Connection connection;
+    private Connection replyConnection;
     
     @SuppressWarnings("unused")
-    private void setUp(JMSTestEnvironment env, JMSRequestResponseChannel channel) {
-        this.env = env;
-        this.channel = channel;
-    }
-    
-    public Endpoint createEchoEndpoint(String contentType) throws Exception {
+    private void setUp(JMSTestEnvironment env, JMSRequestResponseChannel channel) throws Exception {
         Destination destination = channel.getDestination();
         Destination replyDestination = channel.getReplyDestination();
-        final Connection connection = env.getConnectionFactory(destination).createConnection();
+        connection = env.getConnectionFactory(destination).createConnection();
         connection.start();
-        final Connection replyConnection = env.getConnectionFactory(replyDestination).createConnection();
+        replyConnection = env.getConnectionFactory(replyDestination).createConnection();
         final Session replySession = replyConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         final MessageProducer producer = replySession.createProducer(replyDestination);
         MessageConsumer consumer = connection.createSession(false, Session.AUTO_ACKNOWLEDGE).createConsumer(destination);
@@ -81,12 +77,13 @@ public class MockEchoEndpointFactory implements EndpointFactory {
                 }
             }
         });
-        
-        return new Endpoint() {
-            public void remove() throws Exception {
-                connection.close();
-                replyConnection.close();
-            }
-        };
+    }
+    
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
+        connection.close();
+        replyConnection.close();
+        connection = null;
+        replyConnection = null;
     }
 }

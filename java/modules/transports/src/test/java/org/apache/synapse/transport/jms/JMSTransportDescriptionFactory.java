@@ -36,6 +36,12 @@ import org.mockejb.jndi.MockContextFactory;
 public class JMSTransportDescriptionFactory implements TransportDescriptionFactory {
     private static final OMFactory factory = OMAbstractFactory.getOMFactory();
     
+    @SuppressWarnings("unused")
+    // We implicitly depend on the environment; make this explicit
+    private void setUp(JMSTestEnvironment env) {
+        
+    }
+    
     private OMElement createParameterElement(String name, String value) {
         OMElement element = factory.createOMElement(new QName("parameter"));
         element.addAttribute("name", name, null);

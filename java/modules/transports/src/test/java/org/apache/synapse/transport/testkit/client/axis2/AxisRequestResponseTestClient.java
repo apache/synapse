@@ -19,12 +19,15 @@
 
 package org.apache.synapse.transport.testkit.client.axis2;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
 
 public class AxisRequestResponseTestClient extends AxisTestClient implements RequestResponseTestClient<AxisMessage,AxisMessage> {
     public AxisRequestResponseTestClient(AxisTestClientSetup setup) {
@@ -35,9 +38,9 @@ public class AxisRequestResponseTestClient extends AxisTestClient implements Req
         super();
     }
 
-    public AxisMessage sendMessage(ClientOptions options, AxisMessage message) throws Exception {
+    public IncomingMessage<AxisMessage> sendMessage(ClientOptions options, ContentType contentType, AxisMessage message) throws Exception {
         OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);
         mepClient.execute(true);
-        return new AxisMessage(mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
+        return new IncomingMessage<AxisMessage>(null, new AxisMessage(mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE)));
     }
 }

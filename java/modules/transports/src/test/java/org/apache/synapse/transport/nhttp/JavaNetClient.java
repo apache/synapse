@@ -24,14 +24,15 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 
 @Name("java.net")
-public class JavaNetClient implements AsyncTestClient<ByteArrayMessage> {
+public class JavaNetClient implements AsyncTestClient<byte[]> {
     private HttpChannel channel;
     
     @SuppressWarnings("unused")
@@ -39,13 +40,17 @@ public class JavaNetClient implements AsyncTestClient<ByteArrayMessage> {
         this.channel = channel;
     }
     
-    public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return contentType;
+    }
+
+    public void sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
         URLConnection connection = new URL(channel.getEndpointReference().getAddress()).openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);
-        connection.setRequestProperty("Content-Type", message.getContentType().toString());
+        connection.setRequestProperty("Content-Type", contentType.toString());
         OutputStream out = connection.getOutputStream();
-        out.write(message.getContent());
+        out.write(message);
         out.close();
         InputStream in = connection.getInputStream();
         IOUtils.copy(in, System.out);

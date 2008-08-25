@@ -17,8 +17,24 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.server;
+package org.apache.synapse.transport.testkit.message;
 
-public interface EndpointFactory {
-    Endpoint createEchoEndpoint(String contentType) throws Exception;
+import javax.mail.internet.ContentType;
+
+public class IncomingMessage<M> {
+    private final ContentType contentType;
+    private final M data;
+    
+    public IncomingMessage(ContentType contentType, M data) {
+        this.contentType = contentType;
+        this.data = data;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public M getData() {
+        return data;
+    }
 }

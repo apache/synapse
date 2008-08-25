@@ -19,21 +19,16 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.name.Key;
+import javax.mail.internet.ContentType;
+
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 
 public class MessageTestCase extends TransportTestCase {
-    protected final ContentTypeMode contentTypeMode;
-    protected final String contentType;
+    protected final ClientOptions options;
 
-    public MessageTestCase(ContentTypeMode contentTypeMode, String contentType, Object... resources) {
+    public MessageTestCase(ContentType contentType, String charset, Object... resources) {
         super(resources);
-        this.contentTypeMode = contentTypeMode;
-        this.contentType = contentType;
-    }
-
-    @Key("contentTypeMode")
-    public ContentTypeMode getContentTypeMode() {
-        return contentTypeMode;
+        options = new ClientOptions(contentType, charset);
+        addResource(options);
     }
 }

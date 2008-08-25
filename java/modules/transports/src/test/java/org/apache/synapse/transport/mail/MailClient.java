@@ -26,13 +26,14 @@ import javax.activation.DataHandler;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.name.Named;
 
@@ -59,7 +60,11 @@ public abstract class MailClient implements TestClient {
         this.channel = channel;
     }
 
-    protected String sendMessage(ByteArrayMessage message) throws Exception {
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return contentType;
+    }
+
+    protected String sendMessage(ContentType contentType, byte[] message) throws Exception {
         String msgId = UUIDGenerator.getUUID();
         MimeMessage msg = new MimeMessage(session);
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(channel.getRecipient().getAddress()));
@@ -67,7 +72,7 @@ public abstract class MailClient implements TestClient {
         msg.setSentDate(new Date());
         msg.setHeader(MailConstants.MAIL_HEADER_MESSAGE_ID, msgId);
         msg.setHeader(MailConstants.MAIL_HEADER_X_MESSAGE_ID, msgId);
-        DataHandler dh = new DataHandler(new ByteArrayDataSource(message.getContent(), message.getContentType().toString()));
+        DataHandler dh = new DataHandler(new ByteArrayDataSource(message, contentType.toString()));
         layout.setupMessage(msg, dh);
         Transport.send(msg);
         return msgId;

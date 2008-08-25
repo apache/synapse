@@ -45,7 +45,7 @@ public class FilterExpressionParser {
         if (node instanceof AndNode) {
             return new AndExpression(buildExpressions(((AndNode)node).getChildren()));
         } else if (node instanceof OrNode) {
-            return new OrExpression(buildExpressions(((AndNode)node).getChildren()));
+            return new OrExpression(buildExpressions(((OrNode)node).getChildren()));
         } else if (node instanceof NotNode) {
             return new NotExpression(buildExpression(((NotNode)node).getFirstChild()));
         } else if (node instanceof EqualityNode) {

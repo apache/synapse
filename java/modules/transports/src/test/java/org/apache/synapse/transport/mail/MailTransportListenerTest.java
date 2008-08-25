@@ -64,15 +64,15 @@ public class MailTransportListenerTest extends TestCase {
         clients.add(new MailAsyncClient(new MultipartLayout()));
         for (MailAsyncClient client : clients) {
             AsyncTestClient<XMLMessage> xmlClient = adapt(client, MessageEncoder.XML_TO_BYTE);
-            suite.addSOAPTests(channel, xmlClient, asyncEndpoint, env);
-            suite.addPOXTests(channel, xmlClient, asyncEndpoint, env);
+            suite.addSOAPTests(channel, xmlClient, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env);
+            suite.addPOXTests(channel, xmlClient, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env);
             suite.addSwATests(channel, client, asyncEndpoint, env);
             suite.addTextPlainTests(channel, adapt(client, MessageEncoder.STRING_TO_BYTE), AdapterUtils.adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), env);
             suite.addBinaryTest(channel, client, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env);
         }
         AxisAsyncTestClient axisClient = new AxisAsyncTestClient();
-        suite.addSOAPTests(channel, adapt(axisClient, MessageEncoder.XML_TO_AXIS), asyncEndpoint, env);
-        suite.addPOXTests(channel, adapt(axisClient, MessageEncoder.XML_TO_AXIS), asyncEndpoint, env);
+        suite.addSOAPTests(channel, adapt(axisClient, MessageEncoder.XML_TO_AXIS), adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env);
+        suite.addPOXTests(channel, adapt(axisClient, MessageEncoder.XML_TO_AXIS), adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env);
         suite.addTextPlainTests(channel, adapt(axisClient, MessageEncoder.TEXT_WRAPPER), AdapterUtils.adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), env);
         suite.addBinaryTest(channel, adapt(axisClient, MessageEncoder.BINARY_WRAPPER), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env);
         suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, true, env));

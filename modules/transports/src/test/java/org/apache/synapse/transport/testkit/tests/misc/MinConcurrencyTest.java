@@ -22,20 +22,25 @@ package org.apache.synapse.transport.testkit.tests.misc;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.server.Endpoint;
+import org.apache.synapse.transport.testkit.server.axis2.AxisEndpoint;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 import org.apache.synapse.transport.testkit.tests.TestResourceSet;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
@@ -52,7 +57,6 @@ import org.apache.synapse.transport.testkit.tests.TransportTestCase;
  */
 @Name("MinConcurrency")
 public class MinConcurrencyTest extends TransportTestCase {
-    private final AxisServer server;
     private final AsyncChannel[] channels;
     private final int messages;
     private final boolean preloadMessages;
@@ -60,7 +64,6 @@ public class MinConcurrencyTest extends TransportTestCase {
     public MinConcurrencyTest(AxisServer server, AsyncChannel[] channels, int messages,
             boolean preloadMessages, Object... resources) {
         super(resources);
-        this.server = server;
         addResource(server);
         this.channels = channels;
         this.messages = messages;
@@ -75,7 +78,7 @@ public class MinConcurrencyTest extends TransportTestCase {
         final CountDownLatch shutdownLatch = new CountDownLatch(1);
         final CountDownLatch concurrencyReachedLatch = new CountDownLatch(expectedConcurrency);
         
-        MessageReceiver messageReceiver = new MessageReceiver() {
+        final MessageReceiver messageReceiver = new MessageReceiver() {
             public void receive(MessageContext msgContext) throws AxisFault {
                 concurrencyReachedLatch.countDown();
                 try {
@@ -85,32 +88,44 @@ public class MinConcurrencyTest extends TransportTestCase {
             }
         };
         
-        TestResourceSet[] resourceSets = new TestResourceSet[endpointCount];
-        Endpoint[] endpoints = new Endpoint[endpointCount];
+        TestResourceSet[] clientResourceSets = new TestResourceSet[endpointCount];
+        TestResourceSet[] endpointResourceSets = new TestResourceSet[endpointCount];
         try {
             for (int i=0; i<endpointCount; i++) {
-                TestResourceSet resources = new TestResourceSet(getResourceSet());
+                TestResourceSet clientResourceSet = new TestResourceSet(getResourceSet());
                 AsyncChannel channel = channels[i];
-                resources.addResource(channel);
+                clientResourceSet.addResource(channel);
                 AxisAsyncTestClient client = new AxisAsyncTestClient();
-                resources.addResource(client);
-                resources.setUp();
-                resourceSets[i] = resources;
+                clientResourceSet.addResource(client);
+                clientResourceSet.setUp();
+                clientResourceSets[i] = clientResourceSet;
+                
+                TestResourceSet endpointResourceSet = new TestResourceSet(clientResourceSet);
+                endpointResourceSet.addResource(new AxisEndpoint() {
+                    @Override
+                    protected AxisOperation createOperation() {
+                        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+                        operation.setMessageReceiver(messageReceiver);
+                        return operation;
+                    }
+                });
+                
                 if (!preloadMessages) {
-                    // TODO: we need to support transports that use static Content-Type
-                    endpoints[i] = server.createAsyncEndpoint(channel, messageReceiver, null);
+                    endpointResourceSet.setUp();
+                    endpointResourceSets[i] = endpointResourceSet;
                 }
                 for (int j=0; j<messages; j++) {
-                    ClientOptions options = new ClientOptions("UTF-8");
+                    ClientOptions options = new ClientOptions(new ContentType(SOAP11Constants.SOAP_11_CONTENT_TYPE), "UTF-8");
                     AxisMessage message = new AxisMessage();
                     message.setMessageType(SOAP11Constants.SOAP_11_CONTENT_TYPE);
                     SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
                     SOAPEnvelope envelope = factory.getDefaultEnvelope();
                     message.setEnvelope(envelope);
-                    client.sendMessage(options, message);
+                    client.sendMessage(options, new ContentType(message.getMessageType()), message);
                 }
                 if (preloadMessages) {
-                    endpoints[i] = server.createAsyncEndpoint(channel, messageReceiver, null);
+                    endpointResourceSet.setUp();
+                    endpointResourceSets[i] = endpointResourceSet;
                 }
             }
         
@@ -122,11 +137,11 @@ public class MinConcurrencyTest extends TransportTestCase {
         } finally {
             shutdownLatch.countDown();
             for (int i=0; i<endpointCount; i++) {
-                if (endpoints[i] != null) {
-                    endpoints[i].remove();
+                if (endpointResourceSets[i] != null) {
+                    endpointResourceSets[i].tearDown();
                 }
-                if (resourceSets[i] != null) {
-                    resourceSets[i].tearDown();
+                if (clientResourceSets[i] != null) {
+                    clientResourceSets[i].tearDown();
                 }
             }
         }

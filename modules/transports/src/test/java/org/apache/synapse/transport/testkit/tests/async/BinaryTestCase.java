@@ -26,28 +26,26 @@ import javax.mail.internet.ContentType;
 
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncBinary")
-public class BinaryTestCase extends AsyncMessageTestCase<ByteArrayMessage,ByteArrayMessage> {
+public class BinaryTestCase extends AsyncMessageTestCase<byte[],byte[]> {
     private static final Random random = new Random();
     
-    public BinaryTestCase(AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
-        super(channel, client, endpointFactory, contentTypeMode, "application/octet-stream", null, resources);
+    public BinaryTestCase(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<byte[]> endpoint, Object... resources) {
+        super(channel, client, endpoint, new ContentType("application", "octet-stream", null), null, resources);
     }
     
     @Override
-    protected ByteArrayMessage prepareMessage() throws Exception {
+    protected byte[] prepareMessage() throws Exception {
         byte[] content = new byte[8192];
         random.nextBytes(content);
-        return new ByteArrayMessage(new ContentType("application", "octet-stream", null), content);
+        return content;
     }
 
     @Override
-    protected void checkMessageData(ByteArrayMessage message, ByteArrayMessage messageData) throws Exception {
-        assertTrue(Arrays.equals(message.getContent(), messageData.getContent()));
+    protected void checkMessageData(byte[] message, byte[] messageData) throws Exception {
+        assertTrue(Arrays.equals(message, messageData));
     }
 }

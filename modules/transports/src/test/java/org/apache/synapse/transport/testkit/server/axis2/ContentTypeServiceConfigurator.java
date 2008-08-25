@@ -17,24 +17,28 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.jms;
+package org.apache.synapse.transport.testkit.server.axis2;
 
-import javax.jms.BytesMessage;
 import javax.mail.internet.ContentType;
 
-import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.client.TestClient;
 
-@Name("BytesMessage")
-public class JMSBytesMessageClient extends JMSClient implements AsyncTestClient<byte[]> {
-    public void sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
-        BytesMessage jmsMessage = session.createBytesMessage();
-        if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, contentType.toString());
-        }
-        jmsMessage.writeBytes(message);
-        producer.send(jmsMessage);
+public class ContentTypeServiceConfigurator implements AxisServiceConfigurator {
+    private final String parameterName;
+    private ContentType contentType;
+    
+    public ContentTypeServiceConfigurator(String parameterName) {
+        this.parameterName = parameterName;
+    }
+
+    @SuppressWarnings("unused")
+    private void setUp(TestClient client, ClientOptions options) {
+        contentType = client.getContentType(options, options.getBaseContentType());
+    }
+
+    public void setupService(AxisService service) throws Exception {
+        service.addParameter(parameterName, contentType.toString());
     }
 }

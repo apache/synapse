@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.server;
 
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
+
 public interface AsyncEndpoint<M> extends Endpoint {
-    M waitForMessage(int timeout) throws Throwable;
+    IncomingMessage<M> waitForMessage(int timeout) throws Throwable;
 }

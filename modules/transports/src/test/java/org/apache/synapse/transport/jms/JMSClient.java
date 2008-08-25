@@ -24,11 +24,16 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.mail.internet.ContentType;
 
-public class JMSClient {
+import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.client.TestClient;
+
+public class JMSClient implements TestClient {
     protected Connection connection;
     protected Session session;
     protected MessageProducer producer;
+    protected ContentTypeMode contentTypeMode;
     
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env, JMSAsyncChannel channel) throws Exception {
@@ -37,6 +42,7 @@ public class JMSClient {
         connection = connectionFactory.createConnection();
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         producer = session.createProducer(destination);
+        contentTypeMode = channel.getContentTypeMode();
     }
 
     @SuppressWarnings("unused")
@@ -44,5 +50,9 @@ public class JMSClient {
         producer.close();
         session.close();
         connection.close();
+    }
+    
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return contentType;
     }
 }

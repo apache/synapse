@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.server;
 
+import org.apache.synapse.transport.testkit.name.Key;
+
+@Key("endpoint")
 public interface Endpoint {
-    void remove() throws Exception;
 }

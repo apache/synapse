@@ -32,13 +32,13 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     private String replyDestinationName;
     private Destination replyDestination;
     
-    public JMSRequestResponseChannel(String name, String destinationType, String replyDestinationType) {
-        super(name, destinationType);
+    public JMSRequestResponseChannel(String name, String destinationType, String replyDestinationType, ContentTypeMode contentTypeMode) {
+        super(name, destinationType, contentTypeMode);
         this.replyDestinationType = replyDestinationType;
     }
     
-    public JMSRequestResponseChannel(String destinationType, String replyDestinationType) {
-        this(null, destinationType, replyDestinationType);
+    public JMSRequestResponseChannel(String destinationType, String replyDestinationType, ContentTypeMode contentTypeMode) {
+        this(null, destinationType, replyDestinationType, contentTypeMode);
     }
     
     @SuppressWarnings("unused")

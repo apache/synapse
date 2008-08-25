@@ -34,9 +34,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
 
-public class MailRequestResponseClient extends MailClient implements RequestResponseTestClient<ByteArrayMessage,ByteArrayMessage> {
+public class MailRequestResponseClient extends MailClient implements RequestResponseTestClient<byte[],byte[]> {
     private static final Log log = LogFactory.getLog(MailRequestResponseClient.class);
     
     private Store store;
@@ -60,12 +60,12 @@ public class MailRequestResponseClient extends MailClient implements RequestResp
         store = null;
     }
     
-    public ByteArrayMessage sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
-        String msgId = sendMessage(message);
+    public IncomingMessage<byte[]> sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
+        String msgId = sendMessage(contentType, message);
         Message reply = waitForReply(msgId);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         reply.getDataHandler().writeTo(baos);
-        return new ByteArrayMessage(new ContentType(reply.getContentType()), baos.toByteArray());
+        return new IncomingMessage<byte[]>(new ContentType(reply.getContentType()), baos.toByteArray());
     }
     
     private Message waitForReply(String msgId) throws Exception {

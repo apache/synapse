@@ -29,29 +29,23 @@ import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.filter.FilterExpression;
 import org.apache.synapse.transport.testkit.filter.FilterExpressionParser;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
-import org.apache.synapse.transport.testkit.message.StringMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.server.EndpointFactory;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.tests.TestResourceSet;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
 import org.apache.synapse.transport.testkit.tests.async.RESTTestCase;
-import org.apache.synapse.transport.testkit.tests.async.SwATestCase;
 import org.apache.synapse.transport.testkit.tests.async.TextPlainTestCase;
 import org.apache.synapse.transport.testkit.tests.async.XMLAsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.tests.echo.XMLRequestResponseMessageTestCase;
@@ -99,64 +93,64 @@ public class TransportTestSuite extends TestSuite {
         this.invertExcludes = invertExcludes;
     }
 
-    public void addSOAP11Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
-        addTest(new XMLAsyncMessageTestCase(channel, client, endpointFactory, XMLMessage.Type.SOAP11, contentTypeMode, SOAP11Constants.SOAP_11_CONTENT_TYPE, data, resources));
+    public void addSOAP11Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, MessageTestData data, Object... resources) {
+        addTest(new XMLAsyncMessageTestCase(channel, client, endpoint, XMLMessage.Type.SOAP11, data, resources));
     }
     
-    public void addSOAP12Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
-        addTest(new XMLAsyncMessageTestCase(channel, client, endpointFactory, XMLMessage.Type.SOAP12, contentTypeMode, SOAP12Constants.SOAP_12_CONTENT_TYPE, data, resources));
+    public void addSOAP12Test(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, MessageTestData data, Object... resources) {
+        addTest(new XMLAsyncMessageTestCase(channel, client, endpoint, XMLMessage.Type.SOAP12, data, resources));
     }
     
-    public void addSOAPTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
+    public void addSOAPTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
         for (MessageTestData data : messageTestData) {
-            addSOAP11Test(channel, client, endpointFactory, contentTypeMode, data, resources);
-            addSOAP12Test(channel, client, endpointFactory, contentTypeMode, data, resources);
+            addSOAP11Test(channel, client, endpoint, data, resources);
+            addSOAP12Test(channel, client, endpoint, data, resources);
         }
     }
     
-    public void addPOXTest(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
-        addTest(new XMLAsyncMessageTestCase(channel, client, endpointFactory, XMLMessage.Type.POX, contentTypeMode, "application/xml", data, resources));
+    public void addPOXTest(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, MessageTestData data, Object... resources) {
+        addTest(new XMLAsyncMessageTestCase(channel, client, endpoint, XMLMessage.Type.POX, data, resources));
     }
     
-    public void addPOXTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
+    public void addPOXTests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
         for (MessageTestData data : messageTestData) {
-            addPOXTest(channel, client, endpointFactory, contentTypeMode, data, resources);
+            addPOXTest(channel, client, endpoint, data, resources);
         }
     }
     
-    public void addPOXTest(RequestResponseChannel channel, RequestResponseTestClient<XMLMessage,XMLMessage> client, EndpointFactory endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
-        addTest(new XMLRequestResponseMessageTestCase(channel, client, endpointFactory, contentTypeMode, "application/xml", XMLMessage.Type.POX, data, resources));
+    public void addPOXTest(RequestResponseChannel channel, RequestResponseTestClient<XMLMessage,XMLMessage> client, Endpoint endpoint, MessageTestData data, Object... resources) {
+        addTest(new XMLRequestResponseMessageTestCase(channel, client, endpoint, XMLMessage.Type.POX, data, resources));
     }
     
-    public void addPOXTests(RequestResponseChannel channel, RequestResponseTestClient<XMLMessage,XMLMessage> client, EndpointFactory endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
+    public void addPOXTests(RequestResponseChannel channel, RequestResponseTestClient<XMLMessage,XMLMessage> client, Endpoint endpoint, Object... resources) {
         for (MessageTestData data : messageTestData) {
-            addPOXTest(channel, client, endpointFactory, contentTypeMode, data, resources);
+            addPOXTest(channel, client, endpoint, data, resources);
         }
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public void addSwATests(AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, Object... resources) {
-        addTest(new SwATestCase(channel, client, endpointFactory, resources));
+    public void addSwATests(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
+//        addTest(new SwATestCase(channel, client, endpoint, resources));
     }
     
-    public void addTextPlainTest(AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
-        addTest(new TextPlainTestCase(channel, client, endpointFactory, contentTypeMode, data, resources));
+    public void addTextPlainTest(AsyncChannel channel, AsyncTestClient<String> client, AsyncEndpoint<String> endpoint, MessageTestData data, Object... resources) {
+        addTest(new TextPlainTestCase(channel, client, endpoint, data, resources));
     }
     
-    public void addTextPlainTests(AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
+    public void addTextPlainTests(AsyncChannel channel, AsyncTestClient<String> client, AsyncEndpoint<String> endpoint, Object... resources) {
         for (MessageTestData data : messageTestData) {
-            addTextPlainTest(channel, client, endpointFactory, contentTypeMode, data, resources);
+            addTextPlainTest(channel, client, endpoint, data, resources);
         }
     }
     
-    public void addBinaryTest(AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<ByteArrayMessage> endpointFactory, ContentTypeMode contentTypeMode, Object... resources) {
-        addTest(new BinaryTestCase(channel, client, endpointFactory, contentTypeMode, resources));
+    public void addBinaryTest(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<byte[]> endpoint, Object... resources) {
+        addTest(new BinaryTestCase(channel, client, endpoint, resources));
     }
 
-    public void addRESTTests(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, Object... resources) {
-        addTest(new RESTTestCase(channel, client, endpointFactory, restTestMessage1, resources));
+    public void addRESTTests(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
+        addTest(new RESTTestCase(channel, client, endpoint, restTestMessage1, resources));
         // TODO: regression test for SYNAPSE-431
-//        addTest(new RESTTestCase(env, channel, client, endpointFactory, restTestMessage2));
+//        addTest(new RESTTestCase(env, channel, client, endpoint, restTestMessage2));
     }
 
     @Override

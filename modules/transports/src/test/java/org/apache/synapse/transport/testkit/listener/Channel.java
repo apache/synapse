@@ -21,22 +21,9 @@ package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
 
 public interface Channel {
     String CONTEXT_PATH = "/services";
-    
-    /**
-     * Set up the service so that it can receive messages through the transport under test.
-     * Implementations will typically call {@link AxisService#addParameter(Parameter)} to
-     * setup the service parameters required by the transport.
-     * The default implementation does nothing.
-     * 
-     * @param service
-     * @throws Exception
-     */
-    void setupService(AxisService service) throws Exception;
     
     void setupRequestMessageContext(MessageContext msgContext);
     

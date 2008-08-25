@@ -31,8 +31,9 @@ import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 
-public class MailChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
+public class MailChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel, AxisServiceConfigurator {
     private MailTestEnvironment env;
     private MailTestEnvironment.Account sender;
     private MailTestEnvironment.Account recipient;
@@ -72,7 +73,6 @@ public class MailChannel extends AbstractChannel implements AsyncChannel, Reques
         return new EndpointReference("mailto:" + recipient.getAddress());
     }
 
-    @Override
     public void setupService(AxisService service) throws Exception {
         service.addParameter("transport.mail.Protocol", env.getProtocol());
         service.addParameter("transport.mail.Address", recipient.getAddress());

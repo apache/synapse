@@ -20,21 +20,21 @@
 package org.apache.synapse.transport.jms;
 
 import javax.jms.TextMessage;
+import javax.mail.internet.ContentType;
 
 import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.message.StringMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 
 @Name("TextMessage")
-public class JMSTextMessageClient extends JMSClient implements AsyncTestClient<StringMessage> {
-    public void sendMessage(ClientOptions options, StringMessage message) throws Exception {
+public class JMSTextMessageClient extends JMSClient implements AsyncTestClient<String> {
+    public void sendMessage(ClientOptions options, ContentType contentType, String message) throws Exception {
         TextMessage jmsMessage = session.createTextMessage();
-        if (message.getContentType() != null) {
-            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, message.getContentType());
+        if (contentTypeMode == ContentTypeMode.TRANSPORT) {
+            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, contentType.toString());
         }
-        jmsMessage.setText(message.getContent());
+        jmsMessage.setText(message);
         producer.send(jmsMessage);
     }
 }

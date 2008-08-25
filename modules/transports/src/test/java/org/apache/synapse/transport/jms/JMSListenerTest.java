@@ -34,61 +34,65 @@ import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.client.axis2.AxisRequestResponseTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
-import org.apache.synapse.transport.testkit.message.MessageConverter;
+import org.apache.synapse.transport.testkit.message.MessageDecoder;
+import org.apache.synapse.transport.testkit.message.MessageEncoder;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
-import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpointFactory;
+import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpoint;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.server.axis2.ContentTypeServiceConfigurator;
 import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
         TransportTestSuite suite = new TransportTestSuite();
         TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory();
-        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
-        AxisEchoEndpointFactory echoEndpointFactory = new AxisEchoEndpointFactory();
+        AxisAsyncEndpoint asyncEndpoint = new AxisAsyncEndpoint();
+        AxisEchoEndpoint echoEndpoint = new AxisEchoEndpoint();
         JMSBytesMessageClient bytesMessageClient = new JMSBytesMessageClient();
         JMSTextMessageClient textMessageClient = new JMSTextMessageClient();
+        ContentTypeServiceConfigurator cfgtr = new ContentTypeServiceConfigurator("transport.jms.ContentType");
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
-        clients.add(adapt(bytesMessageClient, MessageConverter.XML_TO_BYTE));
-        clients.add(adapt(textMessageClient, MessageConverter.XML_TO_STRING));
-        clients.add(adapt(new AxisAsyncTestClient(), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new AxisAsyncTestClient(new JMSAxisTestClientSetup(JMSConstants.JMS_BYTE_MESSAGE)), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new AxisAsyncTestClient(new JMSAxisTestClientSetup(JMSConstants.JMS_TEXT_MESSAGE)), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(bytesMessageClient, MessageEncoder.XML_TO_BYTE));
+        clients.add(adapt(textMessageClient, MessageEncoder.XML_TO_STRING));
+        clients.add(adapt(new AxisAsyncTestClient(), MessageEncoder.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new JMSAxisTestClientSetup(JMSConstants.JMS_BYTE_MESSAGE)), MessageEncoder.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new JMSAxisTestClientSetup(JMSConstants.JMS_TEXT_MESSAGE)), MessageEncoder.XML_TO_AXIS));
         for (JMSTestEnvironment env : new JMSTestEnvironment[] { new QpidTestEnvironment(), new ActiveMQTestEnvironment() }) {
-            suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, tdf);
-            suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE), adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), new MockEchoEndpointFactory(), ContentTypeMode.TRANSPORT, env, tdf);
+            suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT), adapt(new AxisRequestResponseTestClient(), MessageEncoder.XML_TO_AXIS, MessageDecoder.AXIS_TO_XML), echoEndpoint, env, tdf);
+            suite.addPOXTests(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT), adapt(new AxisRequestResponseTestClient(), MessageEncoder.XML_TO_AXIS, MessageDecoder.AXIS_TO_XML), new MockEchoEndpoint(), env, tdf);
             for (String destinationType : new String[] { JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_TOPIC }) {
-                JMSAsyncChannel channel = new JMSAsyncChannel(destinationType);
                 for (ContentTypeMode contentTypeMode : ContentTypeMode.values()) {
+                    JMSAsyncChannel channel = new JMSAsyncChannel(destinationType, contentTypeMode);
                     for (AsyncTestClient<XMLMessage> client : clients) {
                         if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                            suite.addSOAPTests(channel, client, asyncEndpointFactory, contentTypeMode, env, tdf);
-                            suite.addPOXTests(channel, client, asyncEndpointFactory, contentTypeMode, env, tdf);
+                            suite.addSOAPTests(channel, client, asyncEndpoint, env, tdf);
+                            suite.addPOXTests(channel, client, asyncEndpoint, env, tdf);
                         } else {
                             // If no content type header is used, SwA can't be used and the JMS transport
                             // always uses the default charset encoding
-                            suite.addSOAP11Test(channel, client, asyncEndpointFactory, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
-                                    MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf);
-                            suite.addSOAP12Test(channel, client, asyncEndpointFactory, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
-                                    MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf);
-                            suite.addPOXTest(channel, client, asyncEndpointFactory, contentTypeMode, new MessageTestData(null, TransportTestSuite.testString,
-                                    MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf);
+                            suite.addSOAP11Test(channel, client, asyncEndpoint, new MessageTestData(null, TransportTestSuite.testString,
+                                    MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf, cfgtr);
+                            suite.addSOAP12Test(channel, client, asyncEndpoint, new MessageTestData(null, TransportTestSuite.testString,
+                                    MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf, cfgtr);
+                            suite.addPOXTest(channel, client, asyncEndpoint, new MessageTestData(null, TransportTestSuite.testString,
+                                    MessageContext.DEFAULT_CHAR_SET_ENCODING), env, tdf, cfgtr);
                         }
                     }
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                        suite.addSwATests(channel, bytesMessageClient, asyncEndpointFactory, env, tdf);
+                        suite.addSwATests(channel, bytesMessageClient, asyncEndpoint, env, tdf);
+                        suite.addBinaryTest(channel, bytesMessageClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env, tdf);
+                    } else {
+                        suite.addBinaryTest(channel, bytesMessageClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env, tdf, cfgtr);
                     }
                     // TODO: these tests are temporarily disabled because of SYNAPSE-304
                     // addTextPlainTests(strategy, suite);
-                    suite.addBinaryTest(channel, bytesMessageClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), contentTypeMode, env, tdf);
                 }
             }
             suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new AsyncChannel[] {
-                    new JMSAsyncChannel("endpoint1", JMSConstants.DESTINATION_TYPE_QUEUE),
-                    new JMSAsyncChannel("endpoint2", JMSConstants.DESTINATION_TYPE_QUEUE) },
+                    new JMSAsyncChannel("endpoint1", JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT),
+                    new JMSAsyncChannel("endpoint2", JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT) },
                     2, false, env, tdf));
         }
         return suite;

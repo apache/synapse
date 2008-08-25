@@ -28,11 +28,11 @@ import javax.jms.TopicConnectionFactory;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.TestEnvironment;
+import org.apache.synapse.transport.testkit.name.Key;
 import org.mockejb.jndi.MockContextFactory;
 
-public abstract class JMSTestEnvironment extends TestEnvironment {
+@Key("broker")
+public abstract class JMSTestEnvironment {
     public static final String QUEUE_CONNECTION_FACTORY = "QueueConnectionFactory";
     public static final String TOPIC_CONNECTION_FACTORY = "TopicConnectionFactory";
     
@@ -53,13 +53,6 @@ public abstract class JMSTestEnvironment extends TestEnvironment {
     protected abstract QueueConnectionFactory createQueueConnectionFactory() throws Exception;
     protected abstract TopicConnectionFactory createTopicConnectionFactory() throws Exception;
     
-    @Override
-    public void setupContentType(AxisService service, String contentType) throws Exception {
-        service.addParameter("transport.jms.contentType", contentType);
-        // TODO: use this once the changes for SYNAPSE-304 is implemented:
-//            service.addParameter(JMSConstants.CONTENT_TYPE_PARAM, contentType);
-    }
-
     public Context getContext() {
         return context;
     }

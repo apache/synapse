@@ -27,19 +27,18 @@ import java.util.Set;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("REST")
 public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,AxisMessage> {
     private final RESTMessage message;
     
-    public RESTTestCase(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, RESTMessage message, Object... resources) {
-        super(channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null, resources);
+    public RESTTestCase(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpoint<AxisMessage> endpoint, RESTMessage message, Object... resources) {
+        super(channel, client, endpoint, null, null, resources);
         this.message = message;
     }
     

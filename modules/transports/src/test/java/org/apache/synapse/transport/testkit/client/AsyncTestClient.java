@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.client;
 
+import javax.mail.internet.ContentType;
+
 public interface AsyncTestClient<M> extends TestClient {
-    void sendMessage(ClientOptions options, M message) throws Exception;
+    void sendMessage(ClientOptions options, ContentType contentType, M message) throws Exception;
 }

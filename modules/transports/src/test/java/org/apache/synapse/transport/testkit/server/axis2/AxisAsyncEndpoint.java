@@ -25,24 +25,37 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
-/**
- * A mock message receiver that puts the message data in a queue.
- */
-public class MockMessageReceiver implements MessageReceiver /*, TransportErrorListener*/ {
+public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<AxisMessage>, MessageReceiver /*, TransportErrorListener*/ {
     private interface Event {
-        AxisMessage process() throws Throwable;
+        IncomingMessage<AxisMessage> process() throws Throwable;
     }
     
-    private final BlockingQueue<Event> queue = new LinkedBlockingQueue<Event>();
+    private BlockingQueue<Event> queue;
     
+    @SuppressWarnings("unused")
+    private void setUp() {
+        queue = new LinkedBlockingQueue<Event>();
+    }
+    
+    @Override
+    protected AxisOperation createOperation() {
+        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+        operation.setMessageReceiver(this);
+        return operation;
+    }
+
     public void receive(MessageContext messageCtx) throws AxisFault {
         final AxisMessage messageData = new AxisMessage(messageCtx);
         queue.add(new Event() {
-            public AxisMessage process() throws Throwable {
-                return messageData;
+            public IncomingMessage<AxisMessage> process() throws Throwable {
+                return new IncomingMessage<AxisMessage>(null, messageData);
             }
         });
     }
@@ -55,8 +68,13 @@ public class MockMessageReceiver implements MessageReceiver /*, TransportErrorLi
 //        });
 //    }
     
-    public AxisMessage waitForMessage(long timeout, TimeUnit unit) throws Throwable {
-        Event event = queue.poll(timeout, unit);
+    public IncomingMessage<AxisMessage> waitForMessage(int timeout) throws Throwable {
+        Event event = queue.poll(timeout, TimeUnit.MILLISECONDS);
         return event == null ? null : event.process();
+    }
+    
+    @SuppressWarnings("unused")
+    private void tearDown() {
+        queue = null;
     }
 }

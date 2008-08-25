@@ -19,16 +19,17 @@
 
 package org.apache.synapse.transport.mail;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 
-public class MailAsyncClient extends MailClient implements AsyncTestClient<ByteArrayMessage> {
+public class MailAsyncClient extends MailClient implements AsyncTestClient<byte[]> {
     public MailAsyncClient(MessageLayout layout) {
         super(layout);
     }
     
-    public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
-        sendMessage(message);
+    public void sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
+        sendMessage(contentType, message);
     }
 }

@@ -24,10 +24,11 @@ import java.util.Map;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.name.Key;
 
-public abstract class MailTestEnvironment extends TestEnvironment implements TransportDescriptionFactory {
+@Key("server")
+public abstract class MailTestEnvironment implements TransportDescriptionFactory {
     public static class Account {
         private final String address;
         private final String login;

@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.testkit.tests;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashSet;
@@ -89,18 +90,30 @@ public class TestResource {
                             throw new Error("Generic parameters not supported in " + method);
                         }
                         Class<?> parameterClass = (Class<?>)parameterType;
-                        TestResource[] resources = resourceSet.findResources(parameterClass, true);
-                        if (resources.length == 0) {
-                            throw new Error(target.getClass().getName() + " depends on " +
-                                    parameterClass.getName() + ", but none found");
-                        } else if (resources.length > 1) {
-                            throw new Error(target.getClass().getName() + " depends on " +
-                                    parameterClass.getName() + ", but multiple candidates found");
-                            
+                        if (parameterClass.isArray()) {
+                            Class<?> componentType = parameterClass.getComponentType();
+                            TestResource[] resources = resourceSet.findResources(componentType, true);
+                            Object[] arg = (Object[])Array.newInstance(componentType, resources.length);
+                            for (int j=0; j<resources.length; j++) {
+                                TestResource resource = resources[j];
+                                directDependencies.add(resource);
+                                arg[j] = resource.getInstance();
+                            }
+                            args[i] = arg;
+                        } else {
+                            TestResource[] resources = resourceSet.findResources(parameterClass, true);
+                            if (resources.length == 0) {
+                                throw new Error(target.getClass().getName() + " depends on " +
+                                        parameterClass.getName() + ", but none found");
+                            } else if (resources.length > 1) {
+                                throw new Error(target.getClass().getName() + " depends on " +
+                                        parameterClass.getName() + ", but multiple candidates found");
+                                
+                            }
+                            TestResource resource = resources[0];
+                            directDependencies.add(resource);
+                            args[i] = resource.getInstance();
                         }
-                        TestResource resource = resources[0];
-                        directDependencies.add(resource);
-                        args[i] = resource.getInstance();
                     }
                     method.setAccessible(true);
                     initializers.addFirst(new Initializer(method, target, args));
@@ -118,6 +131,10 @@ public class TestResource {
     
     public Object getTarget() {
         return target;
+    }
+
+    public boolean hasLifecycle() {
+        return !(initializers.isEmpty() && finalizers.isEmpty());
     }
 
     public void setUp() throws Exception {
@@ -147,15 +164,12 @@ public class TestResource {
 
     @Override
     public String toString() {
-        String result = getShortName(instance.getClass());
-        if (target != instance) {
-            result += "(" + getShortName(target.getClass()) + ")";
+        Class<?> clazz = target.getClass();
+        String simpleName = clazz.getSimpleName();
+        if (simpleName.length() > 0) {
+            return simpleName;
+        } else {
+            return "<anonymous " + clazz.getSuperclass().getSimpleName() + ">";
         }
-        return result;
-    }
-    
-    private static String getShortName(Class<?> clazz) {
-        String name = clazz.getName();
-        return name.substring(name.lastIndexOf('.')+1);
     }
 }

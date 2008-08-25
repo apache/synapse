@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
@@ -39,7 +41,11 @@ public class JavaNetRESTClient implements AsyncTestClient<RESTMessage> {
         this.channel = channel;
     }
     
-    public void sendMessage(ClientOptions options, RESTMessage message) throws Exception {
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return contentType;
+    }
+
+    public void sendMessage(ClientOptions options, ContentType contentType, RESTMessage message) throws Exception {
         StringBuilder url = new StringBuilder();
         url.append(channel.getEndpointReference().getAddress());
         url.append('/');

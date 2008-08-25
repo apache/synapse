@@ -32,24 +32,20 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.http.CommonsHTTPTransportSender;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.TestEnvironment;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
-import org.apache.synapse.transport.testkit.message.MessageConverter;
+import org.apache.synapse.transport.testkit.message.MessageDecoder;
+import org.apache.synapse.transport.testkit.message.MessageEncoder;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
-import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
 import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() {
-        // TODO: temporary hack, remove later
-        TestEnvironment env = new TestEnvironment() {};
-        
         TransportTestSuite suite = new TransportTestSuite();
         
         TransportDescriptionFactory tdfNIO =
@@ -70,24 +66,24 @@ public class HttpCoreNIOListenerTest extends TestCase {
         // Change to tdfSimple if you want to check the behavior of Axis' blocking HTTP transport 
         TransportDescriptionFactory tdf = tdfNIO;
         
-        AxisAsyncEndpointFactory asyncEndpointFactory = new AxisAsyncEndpointFactory();
+        AxisAsyncEndpoint asyncEndpoint = new AxisAsyncEndpoint();
 //        AxisEchoEndpointFactory echoEndpointFactory = new AxisEchoEndpointFactory();
         HttpChannel channel = new HttpChannel();
         JavaNetClient javaNetClient = new JavaNetClient();
         List<AsyncTestClient<XMLMessage>> clients = new LinkedList<AsyncTestClient<XMLMessage>>();
-        clients.add(adapt(javaNetClient, MessageConverter.XML_TO_BYTE));
-        clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(false)), MessageConverter.XML_TO_AXIS));
-        clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(true)), MessageConverter.XML_TO_AXIS));
+        clients.add(adapt(javaNetClient, MessageEncoder.XML_TO_BYTE));
+        clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(false)), MessageEncoder.XML_TO_AXIS));
+        clients.add(adapt(new AxisAsyncTestClient(new HttpAxisTestClientSetup(true)), MessageEncoder.XML_TO_AXIS));
         for (AsyncTestClient<XMLMessage> client : clients) {
-            suite.addSOAPTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, tdf);
-            suite.addPOXTests(channel, client, asyncEndpointFactory, ContentTypeMode.TRANSPORT, env, tdf);
+            suite.addSOAPTests(channel, client, asyncEndpoint, tdf);
+            suite.addPOXTests(channel, client, asyncEndpoint, tdf);
         }
-//        suite.addPOXTests(channel, adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, ContentTypeMode.TRANSPORT, env, axisServer, tdf);
-        suite.addSwATests(channel, javaNetClient, asyncEndpointFactory, env, tdf);
-        suite.addTextPlainTests(channel, adapt(javaNetClient, MessageConverter.STRING_TO_BYTE), adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_STRING), ContentTypeMode.TRANSPORT, env, tdf);
-        suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpointFactory, MessageConverter.AXIS_TO_BYTE), ContentTypeMode.TRANSPORT, env, tdf);
-        suite.addRESTTests(channel, new JavaNetRESTClient(), asyncEndpointFactory, env, tdf);
-        suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new AsyncChannel[] { new HttpChannel(), new HttpChannel() }, 2, false, env, tdf));
+//        suite.addPOXTests(channel, adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, env, axisServer, tdf);
+        suite.addSwATests(channel, javaNetClient, asyncEndpoint, tdf);
+        suite.addTextPlainTests(channel, adapt(javaNetClient, MessageEncoder.STRING_TO_BYTE), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), tdf);
+        suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), tdf);
+        suite.addRESTTests(channel, new JavaNetRESTClient(), asyncEndpoint, tdf);
+        suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new AsyncChannel[] { new HttpChannel(), new HttpChannel() }, 2, false, tdf));
         return suite;
     }
 }

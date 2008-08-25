@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.jms;
 
 /**
  * Enumeration specifying how a transport listener determines the content type

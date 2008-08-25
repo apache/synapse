@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.testkit.tests;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -132,7 +133,18 @@ public class TestResourceSet {
         status = Status.SETUP;
     }
     
+    private static List<TestResource> filterOnHasLifecycle(List<TestResource> resources) {
+        List<TestResource> result = new ArrayList<TestResource>(resources.size());
+        for (TestResource resource : resources) {
+            if (resource.hasLifecycle()) {
+                result.add(resource);
+            }
+        }
+        return result;
+    }
+    
     private static void setUp(List<TestResource> resources) throws Exception {
+        resources = filterOnHasLifecycle(resources);
         if (!resources.isEmpty()) {
             log.info("Setting up: " + resources);
             for (TestResource resource : resources) {
@@ -197,6 +209,7 @@ public class TestResourceSet {
     }
     
     private static void tearDown(List<TestResource> resources) throws Exception {
+        resources = filterOnHasLifecycle(resources);
         if (!resources.isEmpty()) {
             log.info("Tearing down: " + resources);
             for (ListIterator<TestResource> it = resources.listIterator(resources.size()); it.hasPrevious(); ) {

@@ -19,23 +19,29 @@
 
 package org.apache.synapse.transport.testkit.client;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.Adapter;
-import org.apache.synapse.transport.testkit.message.MessageConverter;
+import org.apache.synapse.transport.testkit.message.MessageEncoder;
 
 public class AsyncTestClientAdapter<M,N> implements AsyncTestClient<M>, Adapter {
     private final AsyncTestClient<N> target;
-    private final MessageConverter<M,N> converter;
+    private final MessageEncoder<M,N> encoder;
 
-    public AsyncTestClientAdapter(AsyncTestClient<N> target, MessageConverter<M,N> converter) {
+    public AsyncTestClientAdapter(AsyncTestClient<N> target, MessageEncoder<M,N> encoder) {
         this.target = target;
-        this.converter = converter;
+        this.encoder = encoder;
     }
     
     public AsyncTestClient<N> getTarget() {
         return target;
     }
 
-    public void sendMessage(ClientOptions options, M message) throws Exception {
-        target.sendMessage(options, converter.convert(options, message));
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return target.getContentType(options, encoder.getContentType(options, contentType));
+    }
+
+    public void sendMessage(ClientOptions options, ContentType contentType, M message) throws Exception {
+        target.sendMessage(options, encoder.getContentType(options, contentType), encoder.encode(options, message));
     }
 }

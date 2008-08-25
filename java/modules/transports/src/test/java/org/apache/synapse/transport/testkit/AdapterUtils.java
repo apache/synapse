@@ -23,20 +23,21 @@ import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.AsyncTestClientAdapter;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClientAdapter;
-import org.apache.synapse.transport.testkit.message.MessageConverter;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactoryAdapter;
+import org.apache.synapse.transport.testkit.message.MessageDecoder;
+import org.apache.synapse.transport.testkit.message.MessageEncoder;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.AsyncEndpointAdapter;
 
 public class AdapterUtils {
-    public static <M,N> AsyncTestClient<M> adapt(AsyncTestClient<N> target, MessageConverter<M,N> converter) {
-        return new AsyncTestClientAdapter<M,N>(target, converter);
+    public static <M,N> AsyncTestClient<M> adapt(AsyncTestClient<N> target, MessageEncoder<M,N> encoder) {
+        return new AsyncTestClientAdapter<M,N>(target, encoder);
     }
 
-    public static <M,N,O,P> RequestResponseTestClient<M,O> adapt(RequestResponseTestClient<N,P> target, MessageConverter<M,N> requestConverter, MessageConverter<P,O> responseConverter) {
-        return new RequestResponseTestClientAdapter<M,N,O,P>(target, requestConverter, responseConverter);
+    public static <M,N,O,P> RequestResponseTestClient<M,O> adapt(RequestResponseTestClient<N,P> target, MessageEncoder<M,N> encoder, MessageDecoder<P,O> decoder) {
+        return new RequestResponseTestClientAdapter<M,N,O,P>(target, encoder, decoder);
     }
 
-    public static <M,N> AsyncEndpointFactory<M> adapt(AsyncEndpointFactory<N> targetFactory, MessageConverter<N,M> converter) {
-        return new AsyncEndpointFactoryAdapter<M,N>(targetFactory, converter);
+    public static <M,N> AsyncEndpoint<M> adapt(AsyncEndpoint<N> target, MessageDecoder<N,M> decoder) {
+        return new AsyncEndpointAdapter<M,N>(target, decoder);
     }
 }

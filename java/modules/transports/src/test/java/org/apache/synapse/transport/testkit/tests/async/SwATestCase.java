@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 import javax.activation.DataHandler;
-import javax.mail.internet.ContentType;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.attachments.Attachments;
@@ -35,27 +34,24 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.impl.MIMEOutputUtils;
 import org.apache.axiom.om.util.UUIDGenerator;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
 import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncSwA")
-public class SwATestCase extends AsyncMessageTestCase<ByteArrayMessage,AxisMessage> {
+public class SwATestCase extends AsyncMessageTestCase<byte[],AxisMessage> {
     private static final Random random = new Random();
     
     private byte[] attachmentContent;
     private String contentID;
     
-    public SwATestCase(AsyncChannel channel, AsyncTestClient<ByteArrayMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, Object... resources) {
-        super(channel, client, endpointFactory, ContentTypeMode.TRANSPORT, null, null, resources);
+    public SwATestCase(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
+        super(channel, client, endpoint, null, null, resources);
     }
     
     @Override
@@ -67,7 +63,7 @@ public class SwATestCase extends AsyncMessageTestCase<ByteArrayMessage,AxisMessa
     }
 
     @Override
-    protected ByteArrayMessage prepareMessage() throws Exception {
+    protected byte[] prepareMessage() throws Exception {
         SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
         SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
         SOAPBody orgBody = factory.createSOAPBody();
@@ -83,11 +79,12 @@ public class SwATestCase extends AsyncMessageTestCase<ByteArrayMessage,AxisMessa
         orgAttachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, orgAttachments, outputFormat);
-        return new ByteArrayMessage(new ContentType(outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE)), baos.toByteArray());
+//        return new ByteArrayMessage(new ContentType(outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE)), baos.toByteArray());
+        return baos.toByteArray();
     }
 
     @Override
-    protected void checkMessageData(ByteArrayMessage message, AxisMessage messageData) throws Exception {
+    protected void checkMessageData(byte[] message, AxisMessage messageData) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Attachments attachments = messageData.getAttachments();
         DataHandler dataHandler = attachments.getDataHandler(contentID);

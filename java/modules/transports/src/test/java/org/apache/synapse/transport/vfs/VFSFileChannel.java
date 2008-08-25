@@ -21,12 +21,14 @@ package org.apache.synapse.transport.vfs;
 
 import java.io.File;
 
+
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 
-public class VFSFileChannel extends AbstractChannel implements AsyncChannel {
+public class VFSFileChannel extends AbstractChannel implements AsyncChannel, AxisServiceConfigurator {
     private final String path;
     private File requestFile;
     
@@ -42,7 +44,6 @@ public class VFSFileChannel extends AbstractChannel implements AsyncChannel {
         return new EndpointReference("vfs:" + requestFile.getAbsoluteFile().toURL());
     }
 
-    @Override
     public void setupService(AxisService service) throws Exception {
         service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());
         service.addParameter("transport.PollInterval", "50ms");

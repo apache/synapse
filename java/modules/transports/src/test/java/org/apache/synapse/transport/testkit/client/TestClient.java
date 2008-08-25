@@ -19,8 +19,11 @@
 
 package org.apache.synapse.transport.testkit.client;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.name.Key;
 
 @Key("client")
 public interface TestClient {
+    ContentType getContentType(ClientOptions options, ContentType contentType);
 }

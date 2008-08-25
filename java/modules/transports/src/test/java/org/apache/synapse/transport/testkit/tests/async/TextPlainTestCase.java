@@ -19,21 +19,21 @@
 
 package org.apache.synapse.transport.testkit.tests.async;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
-import org.apache.synapse.transport.testkit.message.StringMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.name.Named;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncTextPlain")
-public class TextPlainTestCase extends AsyncMessageTestCase<StringMessage,StringMessage> {
+public class TextPlainTestCase extends AsyncMessageTestCase<String,String> {
     private final MessageTestData data;
     
-    public TextPlainTestCase(AsyncChannel channel, AsyncTestClient<StringMessage> client, AsyncEndpointFactory<StringMessage> endpointFactory, ContentTypeMode contentTypeMode, MessageTestData data, Object... resources) {
-        super(channel, client, endpointFactory, contentTypeMode, "text/plain; charset=\"" + data.getCharset() + "\"", data.getCharset(), resources);
+    public TextPlainTestCase(AsyncChannel channel, AsyncTestClient<String> client, AsyncEndpoint<String> endpoint, MessageTestData data, Object... resources) {
+        super(channel, client, endpoint, new ContentType("text", "plain", null), data.getCharset(), resources);
         this.data = data;
     }
     
@@ -43,15 +43,15 @@ public class TextPlainTestCase extends AsyncMessageTestCase<StringMessage,String
     }
     
     @Override
-    protected StringMessage prepareMessage() throws Exception {
-        return new StringMessage(contentType, data.getText());
+    protected String prepareMessage() throws Exception {
+        return data.getText();
     }
 
     @Override
-    protected void checkMessageData(StringMessage message, StringMessage messageData) throws Exception {
+    protected void checkMessageData(String message, String messageData) throws Exception {
         // Some transport protocols add a newline at the end of the payload. Therefore trim the
         // strings before comparison.
         // TODO: investigate this a bit further
-        assertEquals(message.getContent().trim(), messageData.getContent().trim());
+        assertEquals(message.trim(), messageData.trim());
     }
 }

@@ -32,21 +32,24 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.Key;
+import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 
-public abstract class JMSChannel extends AbstractChannel {
+public abstract class JMSChannel extends AbstractChannel implements AxisServiceConfigurator {
     private final String name;
     private final String destinationType;
+    private final ContentTypeMode contentTypeMode;
     protected JMSTestEnvironment env;
     private String destinationName;
     private Destination destination;
     
-    public JMSChannel(String name, String destinationType) {
+    public JMSChannel(String name, String destinationType, ContentTypeMode contentTypeMode) {
         this.name = name;
         this.destinationType = destinationType;
+        this.contentTypeMode = contentTypeMode;
     }
     
-    public JMSChannel(String destinationType) {
-        this(null, destinationType);
+    public JMSChannel(String destinationType, ContentTypeMode contentTypeMode) {
+        this(null, destinationType, contentTypeMode);
     }
     
     protected String buildDestinationName(String direction, String destinationType) {
@@ -90,6 +93,11 @@ public abstract class JMSChannel extends AbstractChannel {
         return destination;
     }
 
+    @Key("contentTypeMode")
+    public ContentTypeMode getContentTypeMode() {
+        return contentTypeMode;
+    }
+
     public int getMessageCount() throws JMSException {
         Connection connection = env.getConnectionFactory(destination).createConnection();
         try {
@@ -110,7 +118,6 @@ public abstract class JMSChannel extends AbstractChannel {
         return new EndpointReference("jms:/" + destinationName + "?transport.jms.DestinationType=" + destinationType + "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory&transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory");
     }
 
-    @Override
     public void setupService(AxisService service) throws Exception {
         service.addParameter(JMSConstants.CONFAC_PARAM, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM_TYPE, destinationType);

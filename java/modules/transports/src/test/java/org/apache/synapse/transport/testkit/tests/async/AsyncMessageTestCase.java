@@ -19,49 +19,38 @@
 
 package org.apache.synapse.transport.testkit.tests.async;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;
 
 public abstract class AsyncMessageTestCase<M,N> extends MessageTestCase {
     private final AsyncTestClient<M> client;
-    private final String charset;
-    private final AsyncEndpointFactory<N> endpointFactory;
+    private final AsyncEndpoint<N> endpoint;
     
     // TODO: maybe we don't need an explicit AsyncChannel
-    public AsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpointFactory<N> endpointFactory, ContentTypeMode contentTypeMode, String contentType, String charset, Object... resources) {
-        super(contentTypeMode, contentType, resources);
+    public AsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpoint<N> endpoint, ContentType contentType, String charset, Object... resources) {
+        super(contentType, charset, resources);
         this.client = client;
-        this.endpointFactory = endpointFactory;
-        this.charset = charset;
+        this.endpoint = endpoint;
         addResource(channel);
         addResource(client);
-        addResource(endpointFactory);
+        addResource(endpoint);
     }
 
     @Override
     protected void runTest() throws Throwable {
-        AsyncEndpoint<N> endpoint = endpointFactory.createAsyncEndpoint(contentTypeMode == ContentTypeMode.SERVICE ? contentType : null);
-        
         M message = prepareMessage();
         
         // Run the test.
         N messageData;
-        try {
-            ClientOptions options = new ClientOptions(charset);
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
-            client.sendMessage(options, message);
-            messageData = endpoint.waitForMessage(8000);
-            if (messageData == null) {
-                fail("Failed to get message");
-            }
-        }
-        finally {
-            endpoint.remove();
+        client.sendMessage(options, options.getBaseContentType(), message);
+        messageData = endpoint.waitForMessage(8000).getData();
+        if (messageData == null) {
+            fail("Failed to get message");
         }
         
         checkMessageData(message, messageData);

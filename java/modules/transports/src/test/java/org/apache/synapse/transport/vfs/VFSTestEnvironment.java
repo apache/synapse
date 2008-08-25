@@ -21,10 +21,7 @@ package org.apache.synapse.transport.vfs;
 
 import java.io.File;
 
-import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.TestEnvironment;
-
-public class VFSTestEnvironment extends TestEnvironment {
+public class VFSTestEnvironment {
     private final File rootDir;
     
     public VFSTestEnvironment(File rootDir) {
@@ -38,10 +35,5 @@ public class VFSTestEnvironment extends TestEnvironment {
     
     public File getRootDir() {
         return rootDir;
-    }
-
-    @Override
-    public void setupContentType(AxisService service, String contentType) throws Exception {
-        service.addParameter("transport.vfs.ContentType", contentType);
     }
 }

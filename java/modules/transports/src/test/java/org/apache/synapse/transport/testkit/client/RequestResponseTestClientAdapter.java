@@ -19,27 +19,37 @@
 
 package org.apache.synapse.transport.testkit.client;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.Adapter;
-import org.apache.synapse.transport.testkit.message.MessageConverter;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
+import org.apache.synapse.transport.testkit.message.MessageDecoder;
+import org.apache.synapse.transport.testkit.message.MessageEncoder;
 
 public class RequestResponseTestClientAdapter<M,N,O,P> implements RequestResponseTestClient<M,O>, Adapter {
     private final RequestResponseTestClient<N,P> target;
-    private final MessageConverter<M,N> requestConverter;
-    private final MessageConverter<P,O> responseConverter;
+    private final MessageEncoder<M,N> encoder;
+    private final MessageDecoder<P,O> decoder;
 
     public RequestResponseTestClientAdapter(RequestResponseTestClient<N,P> target,
-                                            MessageConverter<M,N> requestConverter,
-                                            MessageConverter<P,O> responseConverter) {
+                                            MessageEncoder<M,N> encoder,
+                                            MessageDecoder<P,O> decoder) {
         this.target = target;
-        this.requestConverter = requestConverter;
-        this.responseConverter = responseConverter;
+        this.encoder = encoder;
+        this.decoder = decoder;
     }
     
     public RequestResponseTestClient<N,P> getTarget() {
         return target;
     }
 
-    public O sendMessage(ClientOptions options, M message) throws Exception {
-        return responseConverter.convert(options, target.sendMessage(options, requestConverter.convert(options, message)));
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return target.getContentType(options, encoder.getContentType(options, contentType));
+    }
+
+    public IncomingMessage<O> sendMessage(ClientOptions options, ContentType contentType, M message) throws Exception {
+        IncomingMessage<P> response = target.sendMessage(options, encoder.getContentType(options, contentType), encoder.encode(options, message));
+        ContentType responseContentType = response.getContentType();
+        return new IncomingMessage<O>(responseContentType, decoder.decode(responseContentType, response.getData()));
     }
 }

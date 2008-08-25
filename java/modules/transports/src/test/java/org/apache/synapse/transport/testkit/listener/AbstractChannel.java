@@ -20,12 +20,8 @@
 package org.apache.synapse.transport.testkit.listener;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisService;
 
 public abstract class AbstractChannel implements Channel {
-    public void setupService(AxisService service) throws Exception {
-    }
-    
     public void setupRequestMessageContext(MessageContext msgContext) {
     }
 }

@@ -23,11 +23,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import javax.mail.internet.ContentType;
+
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.name.Name;
 
-public class VFSClient implements AsyncTestClient<ByteArrayMessage> {
+@Name("java.io")
+public class VFSClient implements AsyncTestClient<byte[]> {
     private File requestFile;
     
     @SuppressWarnings("unused")
@@ -35,9 +38,13 @@ public class VFSClient implements AsyncTestClient<ByteArrayMessage> {
         requestFile = channel.getRequestFile();
     }
     
-    public void sendMessage(ClientOptions options, ByteArrayMessage message) throws Exception {
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        return contentType;
+    }
+
+    public void sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
         OutputStream out = new FileOutputStream(requestFile);
-        out.write(message.getContent());
+        out.write(message);
         out.close();
     }
 }

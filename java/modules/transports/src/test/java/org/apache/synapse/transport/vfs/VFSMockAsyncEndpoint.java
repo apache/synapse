@@ -25,28 +25,33 @@ import java.io.InputStream;
 import javax.mail.internet.ContentType;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.synapse.transport.testkit.message.ByteArrayMessage;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.client.TestClient;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
+import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 import de.schlichtherle.io.FileInputStream;
 
-public class VFSMockAsyncEndpoint implements AsyncEndpoint<ByteArrayMessage> {
-    private final VFSFileChannel channel;
-    private final ContentType contentType;
+@Name("mock")
+public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
+    private VFSFileChannel channel;
+    private ContentType contentType;
     
-    public VFSMockAsyncEndpoint(VFSFileChannel channel, ContentType contentType) {
+    @SuppressWarnings("unused")
+    private void setUp(VFSFileChannel channel, TestClient client, ClientOptions options) {
         this.channel = channel;
-        this.contentType = contentType;
+        contentType = client.getContentType(options, options.getBaseContentType());
     }
     
-    public ByteArrayMessage waitForMessage(int timeout) throws Throwable {
+    public IncomingMessage<byte[]> waitForMessage(int timeout) throws Throwable {
         long time = System.currentTimeMillis();
         File file = channel.getRequestFile();
         while (System.currentTimeMillis() < time + timeout) {
             if (file.exists()) {
                 InputStream in = new FileInputStream(file);
                 try {
-                    return new ByteArrayMessage(contentType, IOUtils.toByteArray(in));
+                    return new IncomingMessage<byte[]>(contentType, IOUtils.toByteArray(in));
                 } finally {
                     in.close();
                 }
@@ -54,9 +59,5 @@ public class VFSMockAsyncEndpoint implements AsyncEndpoint<ByteArrayMessage> {
             Thread.sleep(100);
         }
         return null;
-    }
-
-    public void remove() throws Exception {
-        // Nothing to do
     }
 }

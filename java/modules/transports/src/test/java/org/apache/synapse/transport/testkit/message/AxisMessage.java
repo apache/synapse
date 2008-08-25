@@ -23,7 +23,6 @@ import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.transport.testkit.server.axis2.MockMessageReceiver;
 
 /**
  * Class encapsulating a SOAP envelope and an attachment map.

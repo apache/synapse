@@ -22,24 +22,12 @@ package org.apache.synapse.transport.testkit.server.axis2;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-import org.apache.synapse.transport.testkit.server.Endpoint;
-import org.apache.synapse.transport.testkit.server.EndpointFactory;
 
-public class AxisEchoEndpointFactory implements EndpointFactory {
-    private AxisServer server;
-    private RequestResponseChannel channel;
-    
-    @SuppressWarnings("unused")
-    private void setUp(AxisServer server, RequestResponseChannel channel) {
-        this.server = server;
-        this.channel = channel;
-    }
-
-    public Endpoint createEchoEndpoint(String contentType) throws Exception {
+public class AxisEchoEndpoint extends AxisEndpoint {
+    @Override
+    protected AxisOperation createOperation() {
         AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
         operation.setMessageReceiver(new AbstractInOutMessageReceiver() {
             @Override
@@ -47,7 +35,6 @@ public class AxisEchoEndpointFactory implements EndpointFactory {
                 outMessage.setEnvelope(inMessage.getEnvelope());
             }
         });
-        AxisService service = server.deployService(channel, operation, contentType);
-        return new EndpointImpl(server, service);
+        return operation;
     }
 }

@@ -25,23 +25,21 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.name.Named;
-import org.apache.synapse.transport.testkit.server.EndpointFactory;
+import org.apache.synapse.transport.testkit.server.Endpoint;
 
 @Name("EchoXML")
 public class XMLRequestResponseMessageTestCase extends RequestResponseMessageTestCase<XMLMessage,XMLMessage> {
     private final XMLMessage.Type xmlMessageType;
     private final MessageTestData data;
     
-    // TODO: realign order of arguments with XMLAsyncMessageTestCase constructor
-    public XMLRequestResponseMessageTestCase(RequestResponseChannel channel, RequestResponseTestClient<XMLMessage,XMLMessage> client, EndpointFactory endpointFactory, ContentTypeMode contentTypeMode, String contentType, XMLMessage.Type xmlMessageType, MessageTestData data, Object... resources) {
-        super(channel, client, endpointFactory, contentTypeMode, contentType, data.getCharset(), resources);
+    public XMLRequestResponseMessageTestCase(RequestResponseChannel channel, RequestResponseTestClient<XMLMessage,XMLMessage> client, Endpoint endpoint, XMLMessage.Type xmlMessageType, MessageTestData data, Object... resources) {
+        super(channel, client, endpoint, xmlMessageType.getContentType(), data.getCharset(), resources);
         this.xmlMessageType = xmlMessageType;
         this.data = data;
     }
@@ -61,7 +59,7 @@ public class XMLRequestResponseMessageTestCase extends RequestResponseMessageTes
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement orgElement = factory.createOMElement(new QName("root"));
         orgElement.setText(data.getText());
-        return new XMLMessage(contentType, orgElement, xmlMessageType);
+        return new XMLMessage(orgElement, xmlMessageType);
     }
 
     @Override

@@ -27,22 +27,21 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.ContentTypeMode;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.name.Named;
-import org.apache.synapse.transport.testkit.server.AsyncEndpointFactory;
+import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncXML")
 public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,AxisMessage> {
     private final XMLMessage.Type xmlMessageType;
     private final MessageTestData data;
     
-    public XMLAsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpointFactory<AxisMessage> endpointFactory, XMLMessage.Type xmlMessageType, ContentTypeMode contentTypeMode, String baseContentType, MessageTestData data, Object... resources) {
-        super(channel, client, endpointFactory, contentTypeMode, baseContentType + "; charset=\"" + data.getCharset() + "\"", data.getCharset(), resources);
+    public XMLAsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<AxisMessage> endpoint, XMLMessage.Type xmlMessageType, MessageTestData data, Object... resources) {
+        super(channel, client, endpoint, xmlMessageType.getContentType(), data.getCharset(), resources);
         this.xmlMessageType = xmlMessageType;
         this.data = data;
     }
@@ -62,7 +61,7 @@ public class XMLAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,Axi
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement orgElement = factory.createOMElement(new QName("root"));
         orgElement.setText(data.getText());
-        return new XMLMessage(contentType, orgElement, xmlMessageType);
+        return new XMLMessage(orgElement, xmlMessageType);
     }
 
     @Override

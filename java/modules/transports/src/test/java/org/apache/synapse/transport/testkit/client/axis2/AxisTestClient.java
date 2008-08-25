@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.testkit.client.axis2;
 
+import javax.mail.internet.ContentType;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
@@ -35,6 +36,7 @@ import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.name.Named;
+import org.apache.synapse.transport.testkit.util.ContentTypeUtil;
 
 @Name("axis")
 public class AxisTestClient implements TestClient {
@@ -62,6 +64,16 @@ public class AxisTestClient implements TestClient {
     private void setUp(AxisTestClientContext context, Channel channel) throws Exception {
         this.context = context;
         this.channel = channel;
+    }
+
+    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+        // TODO: this may be incorrect in some cases
+        String charset = options.getCharset();
+        if (charset == null) {
+            return contentType;
+        } else {
+            return ContentTypeUtil.addCharset(contentType, options.getCharset());
+        }
     }
 
     protected OperationClient createClient(ClientOptions options, AxisMessage message, QName operationQName) throws Exception {

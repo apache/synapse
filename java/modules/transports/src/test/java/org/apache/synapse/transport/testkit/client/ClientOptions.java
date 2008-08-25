@@ -19,11 +19,19 @@
 
 package org.apache.synapse.transport.testkit.client;
 
+import javax.mail.internet.ContentType;
+
 public class ClientOptions {
+    private final ContentType baseContentType;
     private final String charset;
 
-    public ClientOptions(String charset) {
+    public ClientOptions(ContentType baseContentType, String charset) {
+        this.baseContentType = baseContentType;
         this.charset = charset;
+    }
+
+    public ContentType getBaseContentType() {
+        return baseContentType;
     }
 
     public String getCharset() {

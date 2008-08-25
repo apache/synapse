@@ -19,6 +19,9 @@
 
 package org.apache.synapse.transport.testkit.message;
 
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -38,23 +41,21 @@ public class XMLMessage {
             this.contentType = contentType;
         }
         
-        public String getContentType() {
-            return contentType;
+        public ContentType getContentType() {
+            try {
+                return new ContentType(contentType);
+            } catch (ParseException ex) {
+                throw new Error(ex);
+            }
         }
     }
     
-    private final String contentType;
     private final Type type;
     private final OMElement payload;
     
-    public XMLMessage(String contentType, OMElement payload, Type type) {
-        this.contentType = contentType;
+    public XMLMessage(OMElement payload, Type type) {
         this.payload = payload;
         this.type = type;
-    }
-
-    public String getContentType() {
-        return contentType;
     }
 
     public Type getType() {

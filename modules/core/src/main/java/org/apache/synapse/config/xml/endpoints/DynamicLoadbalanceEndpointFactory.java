@@ -115,7 +115,7 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                     // Set load balance algorithm
                     LoadbalanceAlgorithm algorithm =
                             LoadbalanceAlgorithmFactory.
-                                    createLoadbalanceAlgorithm(loadbalanceElement, null);
+                                    createLoadbalanceAlgorithm(loadbalanceElement);
                     lbMembershipHandler.init(properties, algorithm);
                     loadbalanceEndpoint.setLoadBalanceMembershipHandler(lbMembershipHandler);
                 } catch (Exception e) {

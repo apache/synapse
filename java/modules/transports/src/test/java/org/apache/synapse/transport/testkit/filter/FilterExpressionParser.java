@@ -28,6 +28,7 @@ import org.apache.directory.shared.ldap.filter.ExprNode;
 import org.apache.directory.shared.ldap.filter.FilterParser;
 import org.apache.directory.shared.ldap.filter.NotNode;
 import org.apache.directory.shared.ldap.filter.OrNode;
+import org.apache.directory.shared.ldap.filter.PresenceNode;
 
 public class FilterExpressionParser {
     private FilterExpressionParser() {}
@@ -51,8 +52,10 @@ public class FilterExpressionParser {
         } else if (node instanceof EqualityNode) {
             EqualityNode equalityNode = (EqualityNode)node;
             return new EqualityExpression(equalityNode.getAttribute(), equalityNode.getValue().toString());
+        } else if (node instanceof PresenceNode) {
+            return new PresenceExpression(((PresenceNode)node).getAttribute());
         } else {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Node type " + node.getClass().getSimpleName() + " not supported");
         }
     }
     

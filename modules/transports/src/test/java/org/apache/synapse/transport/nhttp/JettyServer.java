@@ -25,8 +25,12 @@ import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 
 public class JettyServer {
+    public static final JettyServer INSTANCE = new JettyServer();
+    
     private Server server;
     private HttpContext context;
+    
+    private JettyServer() {}
     
     @SuppressWarnings("unused")
     private void setUp() throws Exception {

@@ -48,7 +48,7 @@ public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() throws Exception {
         TransportTestSuite suite = new TransportTestSuite();
         
-        suite.addExclude("(!(|(client=axis)(endpoint=axis)))");
+        suite.addExclude("(&(client=*)(endpoint=*)(!(|(client=axis)(endpoint=axis))))");
         
         TransportDescriptionFactory tdfNIO =
             new SimpleTransportDescriptionFactory("http", HttpCoreNIOListener.class, 
@@ -69,7 +69,6 @@ public class HttpCoreNIOListenerTest extends TestCase {
         TransportDescriptionFactory tdf = tdfNIO;
         
         AxisAsyncEndpoint asyncEndpoint = new AxisAsyncEndpoint();
-        JettyServer jettyServer = new JettyServer();
         JettyAsyncEndpoint jettyAsyncEndpoint = new JettyAsyncEndpoint();
 //        AxisEchoEndpointFactory echoEndpointFactory = new AxisEchoEndpointFactory();
         HttpChannel channel = new HttpChannel();
@@ -81,8 +80,8 @@ public class HttpCoreNIOListenerTest extends TestCase {
         for (AsyncTestClient<XMLMessage> client : clients) {
             suite.addSOAPTests(channel, client, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_XML), tdf);
             suite.addPOXTests(channel, client, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_XML), tdf);
-            suite.addSOAPTests(channel, client, adapt(jettyAsyncEndpoint, MessageDecoder.BYTE_TO_XML), jettyServer, tdf);
-            suite.addPOXTests(channel, client, adapt(jettyAsyncEndpoint, MessageDecoder.BYTE_TO_XML), jettyServer, tdf);
+            suite.addSOAPTests(channel, client, adapt(jettyAsyncEndpoint, MessageDecoder.BYTE_TO_XML), tdf);
+            suite.addPOXTests(channel, client, adapt(jettyAsyncEndpoint, MessageDecoder.BYTE_TO_XML), tdf);
         }
 //        suite.addPOXTests(channel, adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, env, axisServer, tdf);
         suite.addSwATests(channel, javaNetClient, asyncEndpoint, tdf);

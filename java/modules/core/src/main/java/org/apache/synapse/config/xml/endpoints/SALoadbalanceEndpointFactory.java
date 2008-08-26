@@ -32,7 +32,7 @@ import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
 import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates {@link SALoadbalanceEndpoint} from an XML configuration.
@@ -98,7 +98,7 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
         if(loadbalanceElement != null) {
 
             // set endpoints
-            ArrayList<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
+            List<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
             loadbalanceEndpoint.setEndpoints(endpoints);
 
             // set load balance algorithm

@@ -24,7 +24,8 @@
         <in>
             <send>
                 <endpoint name="dynamicLB">
-                    <dynamicLoadbalance failover="true" policy="roundrobin">
+                    <dynamicLoadbalance failover="true"
+                                        algorithm="org.apache.synapse.endpoints.algorithms.RoundRobin">
                         <membershipHandler
                                 class="org.apache.synapse.core.axis2.Axis2LoadBalanceMembershipHandler">
                             <property name="applicationDomain" value="apache.axis2.app.domain"/>

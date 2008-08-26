@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,22 +38,22 @@ public class RoundRobin implements LoadbalanceAlgorithm {
     /**
      * Endpoints list for the round robin algorithm
      */
-    private ArrayList endpoints = null;
+    private List<Endpoint> endpoints = null;
 
     /**
      * List of application members in the loadb balance group
      */
     private List<Member> members;
 
-    public RoundRobin(ArrayList endpoints) {
-        this.endpoints = endpoints;
-    }
-
     public RoundRobin() {
     }
 
     public void setApplicationMembers(List<Member> members) {
         this.members = members;
+    }
+
+    public void setEndpoints(List<Endpoint> endpoints) {
+        this.endpoints = endpoints;
     }
 
     /**
@@ -78,7 +77,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         do {
             // two successive clients could get the same endpoint if not synchronized.
             synchronized (this) {
-                nextEndpoint = (Endpoint) endpoints.get(currentEPR);
+                nextEndpoint = endpoints.get(currentEPR);
 
                 if (currentEPR == endpoints.size() - 1) {
                     currentEPR = 0;

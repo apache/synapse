@@ -89,7 +89,7 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
                     log.error(msg);
                     throw new SynapseException(msg);
                 }
-                ArrayList<Endpoint> endpoints
+                List<Endpoint> endpoints
                         = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
                 loadbalanceEndpoint.setEndpoints(endpoints);
                 algorithm =

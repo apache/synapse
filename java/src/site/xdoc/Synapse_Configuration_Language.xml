@@ -633,7 +633,8 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </p>
     <pre xml:space="preserve">
     &lt;session type="http|simpleClientSession"/&gt;?
-    &lt;loadBalance [policy="roundRobin"] [failover="true|false"]&gt;
+    &lt;loadBalance [policy="roundRobin"] [algorithm="impl of org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm"]
+                    [failover="true|false"]&gt;
       &lt;endpoint .../&gt;+
       &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+  
     &lt;/loadBalance&gt;

@@ -57,12 +57,9 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
                 = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(loadbalanceElement);
 
-        LoadbalanceAlgorithm algorithm = loadbalanceEndpoint.getAlgorithm();
-        String algorithmName = "roundRobin";
-        if (algorithm instanceof RoundRobin) {
-             algorithmName = "roundRobin";
-        }
-        loadbalanceElement.addAttribute(XMLConfigConstants.ALGORITHM_NAME, algorithmName, null);
+        loadbalanceElement.addAttribute(XMLConfigConstants.LOADBALANCE_ALGORITHM,
+                                        loadbalanceEndpoint.getAlgorithm().getClass().getName(),
+                                        null);
 
         // set if failover is turned off in the endpoint
         if (!loadbalanceEndpoint.isFailover()) {

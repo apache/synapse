@@ -76,7 +76,8 @@ public class XMLConfigConstants {
 	public static final String STATISTICS_DISABLE = "disable";
 
 	public static final String SUSPEND_DURATION_ON_FAILURE = "suspendDurationOnFailure";
-	public static final String ALGORITHM_NAME = "policy";
+	public static final String LOADBALANCE_POLICY = "policy";
+	public static final String LOADBALANCE_ALGORITHM = "algorithm";
 
     public static final String ONREJECT = "onReject";
 	public static final String ONACCEPT = "onAccept";

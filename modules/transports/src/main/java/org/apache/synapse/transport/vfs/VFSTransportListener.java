@@ -435,6 +435,13 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     return;
                 }
                 msgContext.setEnvelope(envelope);
+                
+                handleIncomingMessage(
+                    msgContext,
+                    transportHeaders,
+                    null, //* SOAP Action - not applicable *//
+                    contentType
+                );
             }
             finally {
                 try {
@@ -443,13 +450,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     handleException("Error closing stream", ex);
                 }
             }
-
-            handleIncomingMessage(
-                msgContext,
-                transportHeaders,
-                null, //* SOAP Action - not applicable *//
-                contentType
-            );
 
             if (log.isDebugEnabled()) {
                 log.debug("Processed file : " + file + " of Content-type : " + contentType);

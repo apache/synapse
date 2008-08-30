@@ -38,6 +38,7 @@ import org.apache.synapse.transport.testkit.message.MessageEncoder;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.axis2.ContentTypeServiceConfigurator;
+import org.apache.synapse.transport.testkit.tests.async.LargeSOAPAsyncMessageTestCase;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.
@@ -64,6 +65,8 @@ public class VFSTransportListenerTest extends TestCase {
         }
         suite.addTextPlainTests(channel, adapt(vfsClient, MessageEncoder.STRING_TO_BYTE), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), env, tdf, cfgtr);
         suite.addBinaryTest(channel, vfsClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env, tdf, cfgtr);
+        // Regression test for SYNAPSE-423:
+        suite.addTest(new LargeSOAPAsyncMessageTestCase(channel, adapt(vfsClient, MessageEncoder.XML_TO_BYTE), adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env, tdf, cfgtr));
 //        suite.addTest(new MinConcurrencyTest(server, new AsyncChannel[] { new VFSFileChannel("req/in1"), new VFSFileChannel("req/in2") }, 1, true, env, tdf));
         return suite;
     }

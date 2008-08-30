@@ -825,6 +825,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 if (p.getTargetInLineOutSequence() != null) {
                     p.getTargetInLineOutSequence().init(se);
                 }
+                
+                if (p.getTargetInLineFaultSequence() != null) {
+                    p.getTargetInLineFaultSequence().init(se);
+                }
         }
 
         // initialize managed mediators

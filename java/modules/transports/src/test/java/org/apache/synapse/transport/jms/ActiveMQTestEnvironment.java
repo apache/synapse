@@ -28,6 +28,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.synapse.transport.testkit.name.Name;
 
 @Name("ActiveMQ")
@@ -41,6 +42,7 @@ public class ActiveMQTestEnvironment extends JMSTestEnvironment {
         broker = new BrokerService();
         broker.setBrokerName(BROKER_NAME);
         broker.setDataDirectory("target/activemq-data");
+        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
         broker.start();
     }
 

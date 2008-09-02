@@ -19,8 +19,6 @@
 
 package org.apache.synapse.transport.testkit.server.axis2;
 
-import java.util.Iterator;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -28,7 +26,6 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.Phase;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.transport.UtilsTransportServer;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
@@ -59,23 +56,7 @@ public class AxisServer implements Server {
         
         AxisConfiguration axisConfiguration = server.getAxisConfiguration();
         
-        // Add a DefaultOperationDispatcher to the InFlow phase. This is necessary because
-        // we want to receive all messages through the same operation.
-        DefaultOperationDispatcher operationDispatcher = new DefaultOperationDispatcher();
-        operationDispatcher.initDispatcher();
-        getInFlowPhase(axisConfiguration, "Dispatch").addHandler(operationDispatcher);
-        
         server.start();
-    }
-    
-    private static Phase getInFlowPhase(AxisConfiguration axisConfiguration, String name) {
-        for (Iterator<?> it = axisConfiguration.getInFlowPhases().iterator(); it.hasNext(); ) {
-            Phase phase = (Phase)it.next();
-            if (phase.getName().equals(name)) {
-                return phase;
-            }
-        }
-        return null;
     }
     
     @SuppressWarnings("unused")

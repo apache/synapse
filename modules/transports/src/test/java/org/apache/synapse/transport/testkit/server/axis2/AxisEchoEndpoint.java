@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.testkit.server.axis2;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -28,7 +30,7 @@ import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 public class AxisEchoEndpoint extends AxisEndpoint {
     @Override
     protected AxisOperation createOperation() {
-        AxisOperation operation = new InOutAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+        AxisOperation operation = new InOutAxisOperation(new QName("echo"));
         operation.setMessageReceiver(new AbstractInOutMessageReceiver() {
             @Override
             public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {

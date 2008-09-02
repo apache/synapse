@@ -23,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.internet.ContentType;
+import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -40,7 +41,6 @@ import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.axis2.AxisEndpoint;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
-import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 import org.apache.synapse.transport.testkit.tests.TestResourceSet;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
@@ -104,7 +104,7 @@ public class MinConcurrencyTest extends TransportTestCase {
                 endpointResourceSet.addResource(new AxisEndpoint() {
                     @Override
                     protected AxisOperation createOperation() {
-                        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+                        AxisOperation operation = new InOnlyAxisOperation(new QName("in"));
                         operation.setMessageReceiver(messageReceiver);
                         return operation;
                     }

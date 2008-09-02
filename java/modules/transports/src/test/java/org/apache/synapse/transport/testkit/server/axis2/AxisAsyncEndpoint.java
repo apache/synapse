@@ -23,6 +23,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -46,7 +48,7 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
     
     @Override
     protected AxisOperation createOperation() {
-        AxisOperation operation = new InOnlyAxisOperation(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+        AxisOperation operation = new InOnlyAxisOperation(new QName("in"));
         operation.setMessageReceiver(this);
         return operation;
     }

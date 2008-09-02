@@ -45,6 +45,8 @@ public abstract class AxisEndpoint implements Endpoint {
         }
         service = new AxisService(serviceName);
         service.addOperation(createOperation());
+        // We want to receive all messages through the same operation:
+        service.addParameter(AxisService.SUPPORT_SINGLE_OP, true);
         if (configurators != null) {
             for (AxisServiceConfigurator configurator : configurators) {
                 configurator.setupService(service);

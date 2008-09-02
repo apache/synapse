@@ -30,7 +30,6 @@ import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.server.axis2.DefaultOperationDispatcher;
 
 @Name("java.net")
 public class JavaNetRESTClient implements AsyncTestClient<RESTMessage> {
@@ -48,8 +47,7 @@ public class JavaNetRESTClient implements AsyncTestClient<RESTMessage> {
     public void sendMessage(ClientOptions options, ContentType contentType, RESTMessage message) throws Exception {
         StringBuilder url = new StringBuilder();
         url.append(channel.getEndpointReference().getAddress());
-        url.append('/');
-        url.append(DefaultOperationDispatcher.DEFAULT_OPERATION_NAME);
+        url.append("/default");
         String queryString = message.getQueryString();
         if (queryString.length() > 0) {
             url.append('?');

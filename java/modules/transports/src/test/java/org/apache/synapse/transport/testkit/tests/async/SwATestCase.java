@@ -20,7 +20,6 @@
 package org.apache.synapse.transport.testkit.tests.async;
 
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -31,27 +30,23 @@ import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.impl.MIMEOutputUtils;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.UUIDGenerator;
-import org.apache.axiom.soap.SOAPBody;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.message.AxisMessage;
+import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncSwA")
-public class SwATestCase extends AsyncMessageTestCase<byte[],AxisMessage> {
+public class SwATestCase extends AsyncMessageTestCase<XMLMessage,XMLMessage> {
     private static final Random random = new Random();
     
     private byte[] attachmentContent;
     private String contentID;
     
-    public SwATestCase(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
-        super(channel, client, endpoint, null, null, resources);
+    public SwATestCase(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, Object... resources) {
+        super(channel, client, endpoint, XMLMessage.Type.SWA.getContentType(), "UTF-8", resources);
     }
     
     @Override
@@ -63,28 +58,16 @@ public class SwATestCase extends AsyncMessageTestCase<byte[],AxisMessage> {
     }
 
     @Override
-    protected byte[] prepareMessage() throws Exception {
-        SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
-        SOAPEnvelope orgEnvelope = factory.createSOAPEnvelope();
-        SOAPBody orgBody = factory.createSOAPBody();
-        OMElement orgElement = factory.createOMElement(new QName("root"));
-        orgBody.addChild(orgElement);
-        orgEnvelope.addChild(orgBody);
-        OMOutputFormat outputFormat = new OMOutputFormat();
-        outputFormat.setCharSetEncoding("UTF-8");
-        outputFormat.setIgnoreXMLDeclaration(true);
-        StringWriter writer = new StringWriter();
-        orgEnvelope.serializeAndConsume(writer);
-        Attachments orgAttachments = new Attachments();
-        orgAttachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, orgAttachments, outputFormat);
-//        return new ByteArrayMessage(new ContentType(outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE)), baos.toByteArray());
-        return baos.toByteArray();
+    protected XMLMessage prepareMessage() throws Exception {
+        OMFactory factory = OMAbstractFactory.getOMFactory();
+        OMElement payload = factory.createOMElement(new QName("root"));
+        Attachments attachments = new Attachments();
+        attachments.addDataHandler(contentID, new DataHandler(new ByteArrayDataSource(attachmentContent, "application/octet-stream")));
+        return new XMLMessage(payload, XMLMessage.Type.SWA, attachments);
     }
 
     @Override
-    protected void checkMessageData(byte[] message, AxisMessage messageData) throws Exception {
+    protected void checkMessageData(XMLMessage message, XMLMessage messageData) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Attachments attachments = messageData.getAttachments();
         DataHandler dataHandler = attachments.getDataHandler(contentID);

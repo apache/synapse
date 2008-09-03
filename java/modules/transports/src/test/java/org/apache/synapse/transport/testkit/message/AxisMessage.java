@@ -37,13 +37,14 @@ public class AxisMessage {
     public AxisMessage() {
     }
     
-    public AxisMessage(MessageContext msgContext) {
+    public AxisMessage(MessageContext msgContext) throws Exception {
         envelope = msgContext.getEnvelope();
         envelope.build();
-        attachments = msgContext.getAttachmentMap();
-        // Make sure that all attachments are read
-        attachments.getAllContentIDs();
-        setAttachments(attachments);
+        if (msgContext.isDoingSwA()) {
+            // Make sure that all attachments are read
+            attachments = msgContext.getAttachmentMap();
+            attachments.getAllContentIDs();
+        }
         messageType = (String)msgContext.getProperty(Constants.Configuration.MESSAGE_TYPE);
     }
     

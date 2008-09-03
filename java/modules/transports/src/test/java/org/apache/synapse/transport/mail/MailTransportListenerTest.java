@@ -66,7 +66,7 @@ public class MailTransportListenerTest extends TestCase {
             AsyncTestClient<XMLMessage> xmlClient = adapt(client, MessageEncoder.XML_TO_BYTE);
             suite.addSOAPTests(channel, xmlClient, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env);
             suite.addPOXTests(channel, xmlClient, adapt(new AxisAsyncEndpoint(), MessageDecoder.AXIS_TO_XML), env);
-            suite.addSwATests(channel, client, asyncEndpoint, env);
+            suite.addSwATests(channel, xmlClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_XML), env);
             suite.addTextPlainTests(channel, adapt(client, MessageEncoder.STRING_TO_BYTE), AdapterUtils.adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), env);
             suite.addBinaryTest(channel, client, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env);
         }

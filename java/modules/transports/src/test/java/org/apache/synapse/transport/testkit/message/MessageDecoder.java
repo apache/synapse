@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import junit.framework.Assert;
 
+import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
@@ -68,19 +69,25 @@ public interface MessageDecoder<T,U> {
         new MessageDecoder<AxisMessage,XMLMessage>() {
 
         public XMLMessage decode(ContentType contentType, AxisMessage message) throws Exception {
-            XMLMessage.Type type = null;
-            for (XMLMessage.Type candidate : XMLMessage.Type.values()) {
-                if (candidate.getContentType().equals(message.getMessageType())) {
-                    type = candidate;
-                    break;
+            Attachments attachments = message.getAttachments();
+            XMLMessage.Type type;
+            if (attachments != null) {
+                type = XMLMessage.Type.SWA;
+            } else {
+                type = null;
+                for (XMLMessage.Type candidate : XMLMessage.Type.values()) {
+                    if (candidate.getContentType().equals(message.getMessageType())) {
+                        type = candidate;
+                        break;
+                    }
+                }
+                if (type == null) {
+                    // TODO: make this an error later
+                    type = XMLMessage.Type.POX;
+    //                throw new UnsupportedOperationException("Content type " + message.getMessageType() + " not supported");
                 }
             }
-            if (type == null) {
-                // TODO: make this an error later
-                type = XMLMessage.Type.POX;
-//                throw new UnsupportedOperationException("Content type " + message.getMessageType() + " not supported");
-            }
-            return new XMLMessage(message.getEnvelope().getBody().getFirstElement(), type);
+            return new XMLMessage(message.getEnvelope().getBody().getFirstElement(), type, attachments);
         }
     };
 

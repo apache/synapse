@@ -25,11 +25,12 @@ import java.io.StringWriter;
 import javax.activation.DataHandler;
 import javax.mail.internet.ContentType;
 
-
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.impl.MIMEOutputUtils;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.synapse.transport.base.BaseConstants;
@@ -64,8 +65,15 @@ public interface MessageEncoder<T,U> {
     MessageEncoder<XMLMessage,byte[]> XML_TO_BYTE =
         new MessageEncoder<XMLMessage,byte[]>() {
 
-        public ContentType getContentType(ClientOptions options, ContentType contentType) {
-            return ContentTypeUtil.addCharset(contentType, options.getCharset());
+        public ContentType getContentType(ClientOptions options, ContentType contentType) throws Exception {
+            if (contentType.getBaseType().equals(XMLMessage.Type.SWA.getContentType().getBaseType())) {
+                OMOutputFormat outputFormat = new OMOutputFormat();
+                outputFormat.setMimeBoundary(options.getMimeBoundary());
+                outputFormat.setRootContentId(options.getRootContentId());
+                return new ContentType(outputFormat.getContentTypeForSwA(SOAP12Constants.SOAP_12_CONTENT_TYPE));
+            } else {
+                return ContentTypeUtil.addCharset(contentType, options.getCharset());
+            }
         }
 
         public byte[] encode(ClientOptions options, XMLMessage message) throws Exception {
@@ -73,7 +81,15 @@ public interface MessageEncoder<T,U> {
             OMOutputFormat outputFormat = new OMOutputFormat();
             outputFormat.setCharSetEncoding(options.getCharset());
             outputFormat.setIgnoreXMLDeclaration(true);
-            message.getMessageElement().serializeAndConsume(baos, outputFormat);
+            if (message.getType() == XMLMessage.Type.SWA) {
+                outputFormat.setMimeBoundary(options.getMimeBoundary());
+                outputFormat.setRootContentId(options.getRootContentId());
+                StringWriter writer = new StringWriter();
+                message.getMessageElement().serializeAndConsume(writer);
+                MIMEOutputUtils.writeSOAPWithAttachmentsMessage(writer, baos, message.getAttachments(), outputFormat);
+            } else {
+                message.getMessageElement().serializeAndConsume(baos, outputFormat);
+            }
             return baos.toByteArray();
         }
     };
@@ -86,6 +102,9 @@ public interface MessageEncoder<T,U> {
         }
 
         public String encode(ClientOptions options, XMLMessage message) throws Exception {
+            if (message.getType() == XMLMessage.Type.SWA) {
+                throw new UnsupportedOperationException();
+            }
             OMOutputFormat format = new OMOutputFormat();
             format.setIgnoreXMLDeclaration(true);
             StringWriter sw = new StringWriter();
@@ -147,6 +166,6 @@ public interface MessageEncoder<T,U> {
         }
     };
     
-    ContentType getContentType(ClientOptions options, ContentType contentType);
+    ContentType getContentType(ClientOptions options, ContentType contentType) throws Exception;
     U encode(ClientOptions options, T message) throws Exception;
 }

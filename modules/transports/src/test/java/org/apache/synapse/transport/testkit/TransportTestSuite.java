@@ -46,6 +46,7 @@ import org.apache.synapse.transport.testkit.tests.TestResourceSet;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
 import org.apache.synapse.transport.testkit.tests.async.RESTTestCase;
+import org.apache.synapse.transport.testkit.tests.async.SwATestCase;
 import org.apache.synapse.transport.testkit.tests.async.TextPlainTestCase;
 import org.apache.synapse.transport.testkit.tests.async.XMLAsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.tests.echo.XMLRequestResponseMessageTestCase;
@@ -129,8 +130,8 @@ public class TransportTestSuite extends TestSuite {
     }
     
     // TODO: this test actually only makes sense if the transport supports a Content-Type header
-    public void addSwATests(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
-//        addTest(new SwATestCase(channel, client, endpoint, resources));
+    public void addSwATests(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, Object... resources) {
+        addTest(new SwATestCase(channel, client, endpoint, resources));
     }
     
     public void addTextPlainTest(AsyncChannel channel, AsyncTestClient<String> client, AsyncEndpoint<String> endpoint, MessageTestData data, Object... resources) {

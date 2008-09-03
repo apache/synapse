@@ -81,7 +81,7 @@ public class JMSListenerTest extends TestCase {
                         }
                     }
                     if (contentTypeMode == ContentTypeMode.TRANSPORT) {
-                        suite.addSwATests(channel, bytesMessageClient, asyncEndpoint, env, tdf);
+                        suite.addSwATests(channel, adapt(bytesMessageClient, MessageEncoder.XML_TO_BYTE), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_XML), env, tdf);
                         suite.addBinaryTest(channel, bytesMessageClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env, tdf);
                     } else {
                         suite.addBinaryTest(channel, bytesMessageClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), env, tdf, cfgtr);

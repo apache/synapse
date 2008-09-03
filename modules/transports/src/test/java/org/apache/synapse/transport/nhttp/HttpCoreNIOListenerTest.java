@@ -84,7 +84,7 @@ public class HttpCoreNIOListenerTest extends TestCase {
             suite.addPOXTests(channel, client, adapt(jettyAsyncEndpoint, MessageDecoder.BYTE_TO_XML), tdf);
         }
 //        suite.addPOXTests(channel, adapt(new AxisRequestResponseTestClient(), MessageConverter.XML_TO_AXIS, MessageConverter.AXIS_TO_XML), echoEndpointFactory, env, axisServer, tdf);
-        suite.addSwATests(channel, javaNetClient, asyncEndpoint, tdf);
+        suite.addSwATests(channel, adapt(javaNetClient, MessageEncoder.XML_TO_BYTE), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_XML), tdf);
         suite.addTextPlainTests(channel, adapt(javaNetClient, MessageEncoder.STRING_TO_BYTE), adapt(asyncEndpoint, MessageDecoder.AXIS_TO_STRING), tdf);
         suite.addBinaryTest(channel, javaNetClient, adapt(asyncEndpoint, MessageDecoder.AXIS_TO_BYTE), tdf);
         suite.addRESTTests(channel, new JavaNetRESTClient(), asyncEndpoint, tdf);

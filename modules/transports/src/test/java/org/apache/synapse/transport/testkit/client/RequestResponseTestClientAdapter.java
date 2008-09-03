@@ -43,7 +43,7 @@ public class RequestResponseTestClientAdapter<M,N,O,P> implements RequestRespons
         return target;
     }
 
-    public ContentType getContentType(ClientOptions options, ContentType contentType) {
+    public ContentType getContentType(ClientOptions options, ContentType contentType) throws Exception {
         return target.getContentType(options, encoder.getContentType(options, contentType));
     }
 

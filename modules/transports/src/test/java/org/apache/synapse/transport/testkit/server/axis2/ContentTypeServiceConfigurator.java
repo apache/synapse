@@ -34,7 +34,7 @@ public class ContentTypeServiceConfigurator implements AxisServiceConfigurator {
     }
 
     @SuppressWarnings("unused")
-    private void setUp(TestClient client, ClientOptions options) {
+    private void setUp(TestClient client, ClientOptions options) throws Exception {
         contentType = client.getContentType(options, options.getBaseContentType());
     }
 

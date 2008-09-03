@@ -25,5 +25,5 @@ import org.apache.synapse.transport.testkit.name.Key;
 
 @Key("client")
 public interface TestClient {
-    ContentType getContentType(ClientOptions options, ContentType contentType);
+    ContentType getContentType(ClientOptions options, ContentType contentType) throws Exception;
 }

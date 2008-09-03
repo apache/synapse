@@ -22,18 +22,21 @@ package org.apache.synapse.transport.testkit.message;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
 
+import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axis2.transport.http.HTTPConstants;
 
 public class XMLMessage {
     public enum Type {
         SOAP11(SOAP11Constants.SOAP_11_CONTENT_TYPE),
         SOAP12(SOAP12Constants.SOAP_12_CONTENT_TYPE),
-        POX("application/xml");
+        POX("application/xml"),
+        SWA(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED);
         
         private final String contentType;
         
@@ -52,12 +55,18 @@ public class XMLMessage {
     
     private final Type type;
     private final OMElement payload;
+    private final Attachments attachments;
     
-    public XMLMessage(OMElement payload, Type type) {
+    public XMLMessage(OMElement payload, Type type, Attachments attachments) {
         this.payload = payload;
         this.type = type;
+        this.attachments = attachments;
     }
 
+    public XMLMessage(OMElement payload, Type type) {
+        this(payload, type, null);
+    }
+    
     public Type getType() {
         return type;
     }
@@ -71,14 +80,18 @@ public class XMLMessage {
             return payload;
         } else {
             SOAPFactory factory;
-            if (type == Type.SOAP12) {
-                factory = OMAbstractFactory.getSOAP12Factory();
-            } else {
+            if (type == Type.SOAP11) {
                 factory = OMAbstractFactory.getSOAP11Factory();
+            } else {
+                factory = OMAbstractFactory.getSOAP12Factory();
             }
             SOAPEnvelope envelope = factory.getDefaultEnvelope();
             envelope.getBody().addChild(payload);
             return envelope;
         }
+    }
+
+    public Attachments getAttachments() {
+        return attachments;
     }
 }

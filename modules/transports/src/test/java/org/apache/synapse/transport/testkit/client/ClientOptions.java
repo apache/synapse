@@ -21,9 +21,13 @@ package org.apache.synapse.transport.testkit.client;
 
 import javax.mail.internet.ContentType;
 
+import org.apache.axiom.om.util.UUIDGenerator;
+
 public class ClientOptions {
     private final ContentType baseContentType;
     private final String charset;
+    private String mimeBoundary;
+    private String rootContentId;
 
     public ClientOptions(ContentType baseContentType, String charset) {
         this.baseContentType = baseContentType;
@@ -36,5 +40,25 @@ public class ClientOptions {
 
     public String getCharset() {
         return charset;
+    }
+    
+    public String getMimeBoundary() {
+        if (mimeBoundary == null) {
+            mimeBoundary =
+                    "MIMEBoundary"
+                            + UUIDGenerator.getUUID().replace(':', '_');
+
+        }
+        return mimeBoundary;
+    }
+
+    public String getRootContentId() {
+        if (rootContentId == null) {
+            rootContentId =
+                    "0."
+                            + UUIDGenerator.getUUID()
+                            + "@apache.org";
+        }
+        return rootContentId;
     }
 }

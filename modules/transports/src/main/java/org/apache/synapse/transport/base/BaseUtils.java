@@ -206,6 +206,7 @@ public abstract class BaseUtils {
                 if (contentType.indexOf(BaseConstants.MULTIPART_RELATED) > -1) {
                     builder = BuilderUtil.getAttachmentsBuilder(msgContext, in, contentType, true);
                     envelope = (SOAPEnvelope) builder.getDocumentElement();
+                    msgContext.setDoingSwA(true);
 
                 } else {
                     builder = BuilderUtil.getSOAPBuilder(in, charSetEnc);

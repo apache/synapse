@@ -54,7 +54,18 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
     }
 
     public void receive(MessageContext messageCtx) throws AxisFault {
-        final AxisMessage messageData = new AxisMessage(messageCtx);
+        final AxisMessage messageData;
+        try {
+            messageData = new AxisMessage(messageCtx);
+        }
+        catch (final Throwable ex) {
+            queue.add(new Event() {
+                public IncomingMessage<AxisMessage> process() throws Throwable {
+                    throw ex;
+                }
+            });
+            return;
+        }
         queue.add(new Event() {
             public IncomingMessage<AxisMessage> process() throws Throwable {
                 return new IncomingMessage<AxisMessage>(null, messageData);

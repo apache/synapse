@@ -39,7 +39,7 @@ public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
     private ContentType contentType;
     
     @SuppressWarnings("unused")
-    private void setUp(VFSFileChannel channel, TestClient client, ClientOptions options) {
+    private void setUp(VFSFileChannel channel, TestClient client, ClientOptions options) throws Exception {
         this.channel = channel;
         contentType = client.getContentType(options, options.getBaseContentType());
     }

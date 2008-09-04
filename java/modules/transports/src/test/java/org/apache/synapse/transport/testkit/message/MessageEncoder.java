@@ -49,7 +49,7 @@ public interface MessageEncoder<T,U> {
             XMLMessage.Type type = message.getType();
             AxisMessage result = new AxisMessage();
             SOAPFactory factory;
-            if (type == XMLMessage.Type.SOAP12) {
+            if (type == XMLMessage.Type.SOAP12 || type == XMLMessage.Type.SWA) {
                 factory = OMAbstractFactory.getSOAP12Factory();
             } else {
                 factory = OMAbstractFactory.getSOAP11Factory();
@@ -58,6 +58,9 @@ public interface MessageEncoder<T,U> {
             SOAPEnvelope envelope = factory.getDefaultEnvelope();
             envelope.getBody().addChild(message.getPayload());
             result.setEnvelope(envelope);
+            if (type == XMLMessage.Type.SWA) {
+                result.setAttachments(message.getAttachments());
+            }
             return result;
         }
     };

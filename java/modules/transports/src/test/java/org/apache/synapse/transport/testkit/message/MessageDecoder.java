@@ -96,8 +96,7 @@ public interface MessageDecoder<T,U> {
     
         public XMLMessage decode(ContentType contentType, byte[] message) throws Exception {
             String baseType = contentType.getBaseType();
-            String charset = contentType.getParameter("charset");
-            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new ByteArrayInputStream(message), charset);
+            ByteArrayInputStream in = new ByteArrayInputStream(message);
             XMLMessage.Type type = null;
             for (XMLMessage.Type candidate : XMLMessage.Type.values()) {
                 if (candidate.getContentType().getBaseType().equals(baseType)) {
@@ -108,13 +107,21 @@ public interface MessageDecoder<T,U> {
             if (type == null) {
                 throw new Exception("Unrecognized content type " + baseType);
             }
-            OMElement payload;
-            if (type == XMLMessage.Type.POX) {
-                payload = new StAXOMBuilder(reader).getDocumentElement();
+            if (type == XMLMessage.Type.SWA) {
+                Attachments attachments = new Attachments(in, contentType.toString());
+                XMLStreamReader reader = StAXUtils.createXMLStreamReader(attachments.getSOAPPartInputStream());
+                OMElement payload = new StAXSOAPModelBuilder(reader).getSOAPEnvelope().getBody().getFirstElement();
+                return new XMLMessage(payload, type, attachments);
             } else {
-                payload = new StAXSOAPModelBuilder(reader).getSOAPEnvelope().getBody().getFirstElement();
+                XMLStreamReader reader = StAXUtils.createXMLStreamReader(in, contentType.getParameter("charset"));
+                OMElement payload;
+                if (type == XMLMessage.Type.POX) {
+                    payload = new StAXOMBuilder(reader).getDocumentElement();
+                } else {
+                    payload = new StAXSOAPModelBuilder(reader).getSOAPEnvelope().getBody().getFirstElement();
+                }
+                return new XMLMessage(payload, type);
             }
-            return new XMLMessage(payload, type);
         }
     };
 

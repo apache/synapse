@@ -22,6 +22,7 @@ package org.apache.synapse.transport.testkit.client.axis2;
 import javax.mail.internet.ContentType;
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.attachments.Attachments;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
@@ -90,7 +91,12 @@ public class AxisTestClient implements TestClient {
         MessageContext mc = new MessageContext();
         mc.setProperty(Constants.Configuration.MESSAGE_TYPE, message.getMessageType());
         mc.setEnvelope(message.getEnvelope());
-        mc.setAttachmentMap(message.getAttachments());
+        Attachments attachments = message.getAttachments();
+        if (attachments != null) {
+            mc.setAttachmentMap(attachments);
+            mc.setDoingSwA(true);
+            mc.setProperty(Constants.Configuration.ENABLE_SWA, true);
+        }
         channel.setupRequestMessageContext(mc);
         if (setup != null) {
             setup.setupRequestMessageContext(mc);

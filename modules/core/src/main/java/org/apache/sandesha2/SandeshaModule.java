@@ -323,6 +323,17 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			
 			//shutting down the storage manager.
 			storageManager.shutdown();
+			
+			//ensure the storage managers are nullified
+			AxisConfiguration config = configurationContext.getAxisConfiguration();
+			Parameter param = config.getParameter(Sandesha2Constants.INMEMORY_STORAGE_MANAGER);
+			if(param!=null){
+				config.removeParameter(param);
+			}
+			param = config.getParameter(Sandesha2Constants.PERMANENT_STORAGE_MANAGER);
+			if(param!=null){
+				config.removeParameter(param);
+			}
 		}
 		
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::shutdown");

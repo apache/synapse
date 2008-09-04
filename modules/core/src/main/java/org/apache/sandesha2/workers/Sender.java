@@ -167,6 +167,15 @@ public class Sender extends SandeshaThread {
 					}
 				} else {
 					rms = storageManager.getRMSBeanMgr().retrieve(entry.rmsKey);
+					if(rms==null)
+					{
+						if (log.isDebugEnabled())
+							log.debug("RMS bean is null - checking using findUnique");
+					    RMSBean matcher = new RMSBean();
+						matcher.setInternalSequenceID(sequenceId);
+						matcher.setTerminated(false);
+						rms = storageManager.getRMSBeanMgr().findUnique(matcher);
+					}
 				}
 				if (rms != null && !rms.isTerminated() && !rms.isTimedOut()) {
 					sequenceId = rms.getSequenceID();

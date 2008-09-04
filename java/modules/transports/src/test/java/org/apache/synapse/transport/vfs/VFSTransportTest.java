@@ -19,8 +19,6 @@
 
 package org.apache.synapse.transport.vfs;
 
-import static org.apache.synapse.transport.testkit.AdapterUtils.adapt;
-
 import java.io.File;
 
 import junit.framework.TestCase;
@@ -29,28 +27,41 @@ import junit.framework.TestSuite;
 import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
+import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
-import org.apache.synapse.transport.testkit.message.MessageDecoder;
-import org.apache.synapse.transport.testkit.message.MessageEncoder;
-import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.axis2.ContentTypeServiceConfigurator;
 
-public class VFSTransportSenderTest extends TestCase {
-    public static TestSuite suite() {
-        TransportTestSuite suite = new TransportTestSuite(VFSTransportSenderTest.class, false);
+/**
+ * TransportListenerTestTemplate implementation for the VFS transport.
+ */
+public class VFSTransportTest extends TestCase {
+    public static TestSuite suite() throws Exception {
+        // TODO: the VFS listener doesn't like reuseResources == true...
+        TransportTestSuite suite = new TransportTestSuite(VFSTransportTest.class, false);
         
-        VFSTestEnvironment env = new VFSTestEnvironment(new File("target/vfs4"));
+        // Since VFS has no Content-Type header, SwA is not supported.
+        suite.addExclude("(test=AsyncSwA)");
+        
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);
         
-        AsyncEndpoint<byte[]> endpoint = new VFSMockAsyncEndpoint();
+        TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
         
-        VFSFileChannel channel = new VFSFileChannel("req/in");
-        AxisAsyncTestClient client = new AxisAsyncTestClient();
+        builder.addEnvironment(new VFSTestEnvironment(new File("target/vfs3")), tdf);
         
-        suite.addBinaryTest(channel, adapt(client, MessageEncoder.BINARY_WRAPPER), endpoint, env, tdf);
-        suite.addTextPlainTests(channel, adapt(client, MessageEncoder.TEXT_WRAPPER), adapt(endpoint, MessageDecoder.BYTE_TO_STRING), env, tdf);
+        builder.addAsyncChannel(new VFSFileChannel("req/in"));
         
+        builder.addAxisAsyncTestClient(new AxisAsyncTestClient());
+        builder.addByteArrayAsyncTestClient(new VFSClient());
+        
+        builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint(), new ContentTypeServiceConfigurator("transport.vfs.ContentType"));
+        builder.addByteArrayAsyncEndpoint(new VFSMockAsyncEndpoint());
+        
+        builder.build();
+        
+//        suite.addTest(new MinConcurrencyTest(server, new AsyncChannel[] { new VFSFileChannel("req/in1"), new VFSFileChannel("req/in2") }, 1, true, env, tdf));
         return suite;
     }
 }

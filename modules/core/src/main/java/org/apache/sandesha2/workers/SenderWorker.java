@@ -609,7 +609,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					// To catch the modification and pass it to engine or handler, resenvelope is created by responseMessageContext. 
 					if (resenvelope==null) {
 						//We try to build the response out of the transport stream.
-						resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
+						resenvelope = TransportUtils.createSOAPMessage(responseMessageContext, true);
 						responseMessageContext.setEnvelope(resenvelope);
 						syncResponseBuilt = true;
 					}
@@ -697,6 +697,13 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	        InvocationResponse response = null;
 	        
 			if (resenvelope!=null) {
+				//Drive the response msg through the engine
+				//disable addressing validation - this is an inbound response msg so we do not want addressing to validate replyTo
+				//etc in the same way as it would for inbound request messages
+				if (log.isDebugEnabled())
+					log.debug("SenderWorker::disable addressing inbound checks, driving response through axis engine " + responseMessageContext);
+				
+				responseMessageContext.setProperty(AddressingConstants.ADDR_VALIDATE_INVOCATION_PATTERN, Boolean.FALSE);
 				response = AxisEngine.receive(responseMessageContext);
 			}
 	        if(!InvocationResponse.SUSPEND.equals(response)) {

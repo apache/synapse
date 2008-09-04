@@ -46,7 +46,7 @@ import org.apache.synapse.transport.testkit.tests.async.LargeSOAPAsyncMessageTes
 public class VFSTransportListenerTest extends TestCase {
     public static TestSuite suite() {
         // TODO: the VFS listener doesn't like reuseServer == true...
-        TransportTestSuite suite = new TransportTestSuite(false);
+        TransportTestSuite suite = new TransportTestSuite(VFSTransportListenerTest.class, false);
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);

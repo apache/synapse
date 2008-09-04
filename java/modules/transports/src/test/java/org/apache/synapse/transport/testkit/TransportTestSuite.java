@@ -29,6 +29,7 @@ import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.filter.FilterExpression;
@@ -50,6 +51,7 @@ import org.apache.synapse.transport.testkit.tests.async.SwATestCase;
 import org.apache.synapse.transport.testkit.tests.async.TextPlainTestCase;
 import org.apache.synapse.transport.testkit.tests.async.XMLAsyncMessageTestCase;
 import org.apache.synapse.transport.testkit.tests.echo.XMLRequestResponseMessageTestCase;
+import org.apache.synapse.transport.testkit.util.LogManager;
 
 public class TransportTestSuite extends TestSuite {
     public static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
@@ -73,17 +75,24 @@ public class TransportTestSuite extends TestSuite {
             new Parameter("param", "value1"),
             new Parameter("param", "value2"),
         });
-        
+    
+    private final Class<?> testClass;
     private final List<FilterExpression> excludes = new LinkedList<FilterExpression>();
     private final boolean reuseResources;
     private boolean invertExcludes;
+    private int nextId = 1;
     
-    public TransportTestSuite(boolean reuseResources) {
+    public TransportTestSuite(Class<?> testClass, boolean reuseResources) {
+        this.testClass = testClass;
         this.reuseResources = reuseResources;
     }
     
-    public TransportTestSuite() {
-        this(true);
+    public TransportTestSuite(Class<?> testClass) {
+        this(testClass, true);
+    }
+
+    public Class<?> getTestClass() {
+        return testClass;
     }
 
     public void addExclude(String filter) throws ParseException {
@@ -170,6 +179,7 @@ public class TransportTestSuite extends TestSuite {
                 return;
             }
             ttest.setManaged(reuseResources);
+            ttest.setId(StringUtils.leftPad(String.valueOf(nextId++), 4, '0'));
             ttest.getResourceSet().resolve();
         }
         super.addTest(test);
@@ -177,37 +187,42 @@ public class TransportTestSuite extends TestSuite {
 
     @Override
     public void run(TestResult result) {
-        if (!reuseResources) {
-            super.run(result);
-        } else {
-            TestResourceSet resourceSet = null;
-            for (Enumeration<?> e = tests(); e.hasMoreElements(); ) {
-                Test test = (Test)e.nextElement();
-                if (test instanceof TransportTestCase) {
-                    TransportTestCase ttest = (TransportTestCase)test;
-                    TestResourceSet newResourceSet = ttest.getResourceSet();
-                    try {
-                        if (resourceSet == null) {
-                            newResourceSet.setUp();
-                        } else {
-                            newResourceSet.setUp(resourceSet);
+        LogManager.INSTANCE.setTestSuite(this);
+        try {
+            if (!reuseResources) {
+                super.run(result);
+            } else {
+                TestResourceSet resourceSet = null;
+                for (Enumeration<?> e = tests(); e.hasMoreElements(); ) {
+                    Test test = (Test)e.nextElement();
+                    if (test instanceof TransportTestCase) {
+                        TransportTestCase ttest = (TransportTestCase)test;
+                        TestResourceSet newResourceSet = ttest.getResourceSet();
+                        try {
+                            if (resourceSet == null) {
+                                newResourceSet.setUp();
+                            } else {
+                                newResourceSet.setUp(resourceSet);
+                            }
+                        } catch (Throwable t) {
+                            result.addError(this, t);
+                            return;
                         }
+                        resourceSet = newResourceSet;
+                    }
+                    runTest(test, result);
+                }
+                if (resourceSet != null) {
+                    try {
+                        resourceSet.tearDown();
                     } catch (Throwable t) {
                         result.addError(this, t);
                         return;
                     }
-                    resourceSet = newResourceSet;
-                }
-                runTest(test, result);
-            }
-            if (resourceSet != null) {
-                try {
-                    resourceSet.tearDown();
-                } catch (Throwable t) {
-                    result.addError(this, t);
-                    return;
                 }
             }
+        } finally {
+            LogManager.INSTANCE.setTestSuite(null);
         }
     }
 }

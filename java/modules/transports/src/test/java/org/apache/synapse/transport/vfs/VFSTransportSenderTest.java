@@ -36,7 +36,7 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 public class VFSTransportSenderTest extends TestCase {
     public static TestSuite suite() {
-        TransportTestSuite suite = new TransportTestSuite(false);
+        TransportTestSuite suite = new TransportTestSuite(VFSTransportSenderTest.class, false);
         
         VFSTestEnvironment env = new VFSTestEnvironment(new File("target/vfs4"));
         TransportDescriptionFactory tdf =

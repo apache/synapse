@@ -26,17 +26,20 @@ import junit.framework.TestCase;
 
 import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.name.NameUtils;
+import org.apache.synapse.transport.testkit.util.LogManager;
 
 @Key("test")
 public abstract class TransportTestCase extends TestCase {
     private final TestResourceSet resourceSet = new TestResourceSet();
     
+    private String id;
     private Map<String,String> nameComponents;
     
     private boolean managed;
 
     public TransportTestCase(Object... resources) {
         resourceSet.addResources(resources);
+        addResource(LogManager.INSTANCE);
     }
 
     protected void addResource(Object resource) {
@@ -55,13 +58,28 @@ public abstract class TransportTestCase extends TestCase {
         return nameComponents;
     }
     
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String getName() {
         String testName = super.getName();
         if (testName == null) {
             StringBuilder buffer = new StringBuilder();
+            if (id != null) {
+                buffer.append(id);
+                buffer.append(':');
+            }
+            boolean first = true;
             for (Map.Entry<String,String> entry : getNameComponents().entrySet()) {
-                if (buffer.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
                     buffer.append(',');
                 }
                 buffer.append(entry.getKey());
@@ -84,6 +102,7 @@ public abstract class TransportTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        LogManager.INSTANCE.setTestCase(this);
         if (!managed) {
             resourceSet.setUp();
         }
@@ -94,5 +113,6 @@ public abstract class TransportTestCase extends TestCase {
         if (!managed) {
             resourceSet.tearDown();
         }
+        LogManager.INSTANCE.setTestCase(null);
     }
 }

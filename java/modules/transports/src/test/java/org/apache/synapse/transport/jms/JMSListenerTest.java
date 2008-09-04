@@ -46,7 +46,7 @@ import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class JMSListenerTest extends TestCase {
     public static TestSuite suite() {
-        TransportTestSuite suite = new TransportTestSuite();
+        TransportTestSuite suite = new TransportTestSuite(JMSListenerTest.class);
         TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory();
         AxisAsyncEndpoint asyncEndpoint = new AxisAsyncEndpoint();
         AxisEchoEndpoint echoEndpoint = new AxisEchoEndpoint();

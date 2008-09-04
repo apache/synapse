@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.mail;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 import javax.mail.Flags;
 
 import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.util.LogManager;
 
 import com.icegreen.greenmail.store.FolderListener;
 import com.icegreen.greenmail.store.MailFolder;
@@ -43,14 +45,14 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     private static final ServerSetup POP3 =
             new ServerSetup(7110, "127.0.0.1", ServerSetup.PROTOCOL_POP3);
 
-    private static boolean debug = false;
-    
+    private LogManager logManager;
     private GreenMail greenMail;
     private int accountNumber;
     private List<Account> unallocatedAccounts;
 
     @SuppressWarnings("unused")
-    private void setUp() throws Exception {
+    private void setUp(LogManager logManager) throws Exception {
+        this.logManager = logManager;
         greenMail = new GreenMail(new ServerSetup[] { SMTP, POP3 });
         greenMail.start();
         unallocatedAccounts = new LinkedList<Account>();
@@ -62,6 +64,7 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
         greenMail = null;
         accountNumber = 1;
         unallocatedAccounts = null;
+        logManager = null;
     }
     
     @Override
@@ -73,23 +76,26 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     public Account allocateAccount() throws Exception {
         if (unallocatedAccounts.isEmpty()) {
             GreenMailUser user = greenMail.setUser("test" + accountNumber++, "password");
-            if (debug) {
-                final MailFolder inbox = greenMail.getManagers().getImapHostManager().getInbox(user);
-                inbox.addListener(new FolderListener() {
-                    public void added(int msn) {
-                        StoredMessage storedMessage = (StoredMessage)inbox.getMessages().get(msn-1);
+            final MailFolder inbox = greenMail.getManagers().getImapHostManager().getInbox(user);
+            inbox.addListener(new FolderListener() {
+                public void added(int msn) {
+                    StoredMessage storedMessage = (StoredMessage)inbox.getMessages().get(msn-1);
+                    try {
+                        OutputStream out = logManager.createLog("greenmail");
                         try {
-                            storedMessage.getMimeMessage().writeTo(System.out);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
+                            storedMessage.getMimeMessage().writeTo(out);
+                        } finally {
+                            out.close();
                         }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-    
-                    public void expunged(int msn) {}
-                    public void flagsUpdated(int msn, Flags flags, Long uid) {}
-                    public void mailboxDeleted() {}
-                });
-            }
+                }
+
+                public void expunged(int msn) {}
+                public void flagsUpdated(int msn, Flags flags, Long uid) {}
+                public void mailboxDeleted() {}
+            });
             return new Account(user.getEmail(), user.getLogin(), user.getPassword());
         } else {
             return unallocatedAccounts.remove(0);

@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.mail;
 
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Properties;
 
@@ -36,10 +37,12 @@ import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.name.Named;
+import org.apache.synapse.transport.testkit.util.LogManager;
 
 @Name("javamail")
 public abstract class MailClient implements TestClient {
     private final MessageLayout layout;
+    private LogManager logManager;
     private MailChannel channel;
     private Session session;
     
@@ -53,11 +56,19 @@ public abstract class MailClient implements TestClient {
     }
 
     @SuppressWarnings("unused")
-    private void setUp(MailTestEnvironment env, MailChannel channel) throws Exception {
+    private void setUp(LogManager logManager, MailTestEnvironment env, MailChannel channel) throws Exception {
+        this.logManager = logManager;
         Properties props = new Properties();
         props.putAll(env.getOutProperties());
         session = Session.getInstance(props);
         this.channel = channel;
+    }
+    
+    @SuppressWarnings("unused")
+    private void tearDown() {
+        logManager = null;
+        channel = null;
+        session = null;
     }
 
     public ContentType getContentType(ClientOptions options, ContentType contentType) {
@@ -74,6 +85,12 @@ public abstract class MailClient implements TestClient {
         msg.setHeader(MailConstants.MAIL_HEADER_X_MESSAGE_ID, msgId);
         DataHandler dh = new DataHandler(new ByteArrayDataSource(message, contentType.toString()));
         layout.setupMessage(msg, dh);
+        OutputStream out = logManager.createLog("javamail");
+        try {
+            msg.writeTo(out);
+        } finally {
+            out.close();
+        }
         Transport.send(msg);
         return msgId;
     }

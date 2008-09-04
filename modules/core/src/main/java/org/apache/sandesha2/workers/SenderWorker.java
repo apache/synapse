@@ -706,16 +706,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setProperty(AddressingConstants.ADDR_VALIDATE_INVOCATION_PATTERN, Boolean.FALSE);
 				response = AxisEngine.receive(responseMessageContext);
 			}
-	        if(!InvocationResponse.SUSPEND.equals(response)) {
-	            // Performance work - need to close the XMLStreamReader to prevent GC thrashing.
-	            SOAPEnvelope env = responseMessageContext.getEnvelope();
-	            if(env!=null){
-	              StAXBuilder sb = (StAXBuilder)responseMessageContext.getEnvelope().getBuilder();
-	              if(sb!=null){
-	                sb.close();
-	              }            
-	            }
-	        }
 
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noValidSyncResponse);

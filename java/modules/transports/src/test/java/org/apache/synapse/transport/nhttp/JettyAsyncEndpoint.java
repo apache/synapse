@@ -20,6 +20,10 @@
 package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.util.LogManager;
 import org.mortbay.http.HttpException;
 import org.mortbay.http.HttpHandler;
 import org.mortbay.http.HttpRequest;
@@ -40,12 +45,14 @@ import org.mortbay.http.handler.AbstractHttpHandler;
 @Name("jetty")
 @SuppressWarnings("serial")
 public class JettyAsyncEndpoint implements AsyncEndpoint<byte[]> {
+    private LogManager logManager;
     private JettyServer server;
     private HttpHandler handler;
     BlockingQueue<IncomingMessage<byte[]>> queue;
     
     @SuppressWarnings("unused")
-    private void setUp(JettyServer server, HttpChannel channel) throws Exception {
+    private void setUp(LogManager logManager, JettyServer server, HttpChannel channel) throws Exception {
+        this.logManager = logManager;
         this.server = server;
         final String path = "/" + channel.getServiceName();
         queue = new LinkedBlockingQueue<IncomingMessage<byte[]>>();
@@ -54,6 +61,8 @@ public class JettyAsyncEndpoint implements AsyncEndpoint<byte[]> {
                     HttpRequest request, HttpResponse response) throws HttpException,
                     IOException {
                 
+                byte[] data = IOUtils.toByteArray(request.getInputStream());
+                logRequest(request, data);
                 if (pathInContext.equals(path)) {
                     ContentType contentType;
                     try {
@@ -61,7 +70,6 @@ public class JettyAsyncEndpoint implements AsyncEndpoint<byte[]> {
                     } catch (ParseException ex) {
                         throw new HttpException(500, "Unparsable Content-Type");
                     }
-                    byte[] data = IOUtils.toByteArray(request.getInputStream());
                     queue.add(new IncomingMessage<byte[]>(contentType, data));
                     request.setHandled(true);
                 }
@@ -71,12 +79,29 @@ public class JettyAsyncEndpoint implements AsyncEndpoint<byte[]> {
         handler.start();
     }
     
+    void logRequest(HttpRequest request, byte[] data) throws IOException {
+        OutputStream out = logManager.createLog("jetty");
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(out), false);
+        for (Enumeration<?> e = request.getFieldNames(); e.hasMoreElements(); ) {
+            String name = (String)e.nextElement();
+            for (Enumeration<?> e2 = request.getFieldValues(name); e2.hasMoreElements(); ) {
+                pw.print(name);
+                pw.print(": ");
+                pw.println((String)e2.nextElement());
+            }
+        }
+        pw.println();
+        pw.flush();
+        out.write(data);
+    }
+    
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
         handler.stop();
         server.getContext().removeHandler(handler);
         server = null;
         queue = null;
+        logManager = null;
     }
     
     public IncomingMessage<byte[]> waitForMessage(int timeout) throws Throwable {

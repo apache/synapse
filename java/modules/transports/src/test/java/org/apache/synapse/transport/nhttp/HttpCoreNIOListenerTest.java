@@ -46,7 +46,7 @@ import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() throws Exception {
-        TransportTestSuite suite = new TransportTestSuite();
+        TransportTestSuite suite = new TransportTestSuite(HttpCoreNIOListenerTest.class);
         
         suite.addExclude("(&(client=*)(endpoint=*)(!(|(client=axis)(endpoint=axis))))");
         

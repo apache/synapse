@@ -40,6 +40,7 @@ public abstract class JMSChannel extends AbstractChannel implements AxisServiceC
     private final ContentTypeMode contentTypeMode;
     protected JMSTestEnvironment env;
     private String destinationName;
+    private String jndiName;
     private Destination destination;
     
     public JMSChannel(String name, String destinationType, ContentTypeMode contentTypeMode) {
@@ -65,18 +66,24 @@ public abstract class JMSChannel extends AbstractChannel implements AxisServiceC
         return destinationName.toString();
     }
     
+    protected String buildJndiName(String direction, String destinationType) {
+        return "jms/" + buildDestinationName(direction, destinationType);
+    }
+    
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env) throws Exception {
         this.env = env;
         destinationName = buildDestinationName("request", destinationType);
+        jndiName = buildJndiName("request", destinationType);
         destination = env.createDestination(destinationType, destinationName);
-        env.getContext().bind(destinationName, destination);
+        env.getContext().bind(jndiName, destination);
     }
 
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
-        env.getContext().unbind(destinationName);
+        env.getContext().unbind(jndiName);
         destinationName = null;
+        jndiName = null;
         destination = null;
     }
 
@@ -115,12 +122,12 @@ public abstract class JMSChannel extends AbstractChannel implements AxisServiceC
     }
 
     public EndpointReference getEndpointReference() throws Exception {
-        return new EndpointReference("jms:/" + destinationName + "?transport.jms.DestinationType=" + destinationType + "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory&transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory");
+        return new EndpointReference("jms:/" + jndiName + "?transport.jms.DestinationType=" + destinationType + "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory&transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory");
     }
 
     public void setupService(AxisService service) throws Exception {
         service.addParameter(JMSConstants.CONFAC_PARAM, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM_TYPE, destinationType);
-        service.addParameter(JMSConstants.DEST_PARAM, destinationName);
+        service.addParameter(JMSConstants.DEST_PARAM, jndiName);
     }
 }

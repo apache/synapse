@@ -30,6 +30,7 @@ import org.apache.synapse.transport.testkit.name.Key;
 public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel {
     private final String replyDestinationType;
     private String replyDestinationName;
+    private String replyJndiName;
     private Destination replyDestination;
     
     public JMSRequestResponseChannel(String name, String destinationType, String replyDestinationType, ContentTypeMode contentTypeMode) {
@@ -44,14 +45,16 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env) throws Exception {
         replyDestinationName = buildDestinationName("response", replyDestinationType);
+        replyJndiName = buildJndiName("response", replyDestinationType);
         replyDestination = env.createDestination(replyDestinationType, replyDestinationName);
-        env.getContext().bind(replyDestinationName, replyDestination);
+        env.getContext().bind(replyJndiName, replyDestination);
     }
 
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
-        env.getContext().unbind(replyDestinationName);
+        env.getContext().unbind(replyJndiName);
         replyDestinationName = null;
+        replyJndiName = null;
         replyDestination = null;
     }
 
@@ -59,7 +62,7 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     public void setupService(AxisService service) throws Exception {
         super.setupService(service);
         service.addParameter(JMSConstants.REPLY_PARAM_TYPE, replyDestinationType);
-        service.addParameter(JMSConstants.REPLY_PARAM, replyDestinationName);
+        service.addParameter(JMSConstants.REPLY_PARAM, replyJndiName);
     }
 
     @Override
@@ -71,7 +74,7 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     @Override
     public EndpointReference getEndpointReference() throws Exception {
         String address = super.getEndpointReference().getAddress();
-        return new EndpointReference(address + "&" + JMSConstants.REPLY_PARAM_TYPE + "=" + replyDestinationType + "&" + JMSConstants.REPLY_PARAM + "=" + replyDestinationName);
+        return new EndpointReference(address + "&" + JMSConstants.REPLY_PARAM_TYPE + "=" + replyDestinationType + "&" + JMSConstants.REPLY_PARAM + "=" + replyJndiName);
     }
 
     @Key("replyDestType")

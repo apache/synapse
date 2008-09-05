@@ -27,14 +27,6 @@ import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 
 public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<AxisMessage> {
-    public AxisAsyncTestClient(AxisTestClientSetup setup) {
-        super(setup);
-    }
-
-    public AxisAsyncTestClient() {
-        super();
-    }
-
     public void sendMessage(ClientOptions options, ContentType contentType, AxisMessage message) throws Exception {
         createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(false);
     }

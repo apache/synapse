@@ -30,11 +30,10 @@ import javax.jms.Session;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 
-public abstract class JMSChannel extends AbstractChannel implements AxisServiceConfigurator {
+public abstract class JMSChannel implements AxisServiceConfigurator {
     private final String name;
     private final String destinationType;
     private final ContentTypeMode contentTypeMode;

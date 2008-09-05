@@ -22,11 +22,10 @@ package org.apache.synapse.transport.nhttp;
 import java.util.UUID;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.testkit.listener.AbstractChannel;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 
-public class HttpChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel {
+public class HttpChannel implements AsyncChannel, RequestResponseChannel {
     private String serviceName;
     
     @SuppressWarnings("unused")

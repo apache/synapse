@@ -72,8 +72,8 @@ public class HttpCoreNIOListenerTest extends TestCase {
         builder.addAsyncChannel(channel);
         
         builder.addByteArrayAsyncTestClient(new JavaNetClient());
-        builder.addAxisAsyncTestClient(new AxisAsyncTestClient(new HttpAxisTestClientSetup(false)));
-        builder.addAxisAsyncTestClient(new AxisAsyncTestClient(new HttpAxisTestClientSetup(true)));
+        builder.addAxisAsyncTestClient(new AxisAsyncTestClient(), new HttpAxisTestClientSetup(false));
+        builder.addAxisAsyncTestClient(new AxisAsyncTestClient(), new HttpAxisTestClientSetup(true));
         builder.addRESTAsyncTestClient(new JavaNetRESTClient());
         
         builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint());

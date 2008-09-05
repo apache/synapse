@@ -36,35 +36,21 @@ import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.name.Named;
 import org.apache.synapse.transport.testkit.util.ContentTypeUtil;
 
 @Name("axis")
 public class AxisTestClient implements TestClient {
     private static final Log log = LogFactory.getLog(AxisTestClient.class);
     
-    private final AxisTestClientSetup setup;
-    
     private AxisTestClientContext context;
     private Channel channel;
+    private AxisTestClientSetup[] setups;
     
-    public AxisTestClient(AxisTestClientSetup setup) {
-        this.setup = setup;
-    }
-    
-    public AxisTestClient() {
-        this(null);
-    }
-
-    @Named
-    public AxisTestClientSetup getSetup() {
-        return setup;
-    }
-
     @SuppressWarnings("unused")
-    private void setUp(AxisTestClientContext context, Channel channel) throws Exception {
+    private void setUp(AxisTestClientContext context, Channel channel, AxisTestClientSetup[] setups) throws Exception {
         this.context = context;
         this.channel = channel;
+        this.setups = setups;
     }
 
     public ContentType getContentType(ClientOptions options, ContentType contentType) {
@@ -97,8 +83,7 @@ public class AxisTestClient implements TestClient {
             mc.setDoingSwA(true);
             mc.setProperty(Constants.Configuration.ENABLE_SWA, true);
         }
-        channel.setupRequestMessageContext(mc);
-        if (setup != null) {
+        for (AxisTestClientSetup setup : setups) {
             setup.setupRequestMessageContext(mc);
         }
         mc.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, options.getCharset());

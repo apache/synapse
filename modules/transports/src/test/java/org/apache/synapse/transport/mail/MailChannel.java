@@ -28,12 +28,12 @@ import javax.mail.Session;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.AbstractChannel;
+import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientSetup;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 
-public class MailChannel extends AbstractChannel implements AsyncChannel, RequestResponseChannel, AxisServiceConfigurator {
+public class MailChannel implements AsyncChannel, RequestResponseChannel, AxisTestClientSetup, AxisServiceConfigurator {
     private MailTestEnvironment env;
     private MailTestEnvironment.Account sender;
     private MailTestEnvironment.Account recipient;
@@ -83,7 +83,6 @@ public class MailChannel extends AbstractChannel implements AsyncChannel, Reques
         }
     }
 
-    @Override
     public void setupRequestMessageContext(MessageContext msgContext) {
         Map<String,String> trpHeaders = new HashMap<String,String>();
         trpHeaders.put(MailConstants.MAIL_HEADER_FROM, sender.getAddress());

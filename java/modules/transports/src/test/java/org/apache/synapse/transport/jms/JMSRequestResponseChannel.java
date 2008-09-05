@@ -24,10 +24,11 @@ import javax.jms.Destination;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
+import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientSetup;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.name.Key;
 
-public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel {
+public class JMSRequestResponseChannel extends JMSChannel implements RequestResponseChannel, AxisTestClientSetup {
     private final String replyDestinationType;
     private String replyDestinationName;
     private String replyJndiName;
@@ -65,9 +66,7 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
         service.addParameter(JMSConstants.REPLY_PARAM, replyJndiName);
     }
 
-    @Override
     public void setupRequestMessageContext(MessageContext msgContext) {
-        super.setupRequestMessageContext(msgContext);
 //        msgContext.setProperty(JMSConstants.JMS_REPLY_TO, replyDestinationName);
     }
 

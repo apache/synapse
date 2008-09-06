@@ -55,6 +55,9 @@ public class AxisTestClientContext {
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
         trpOutDesc.getSender().stop();
+        trpOutDesc = null;
+        cfgCtx.terminate();
+        cfgCtx = null;
     }
 
     public ConfigurationContext getConfigurationContext() {

@@ -50,6 +50,15 @@ public abstract class JMSTestEnvironment {
         context.bind(TOPIC_CONNECTION_FACTORY, topicConnectionFactory);
     }
     
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
+        context.unbind(QUEUE_CONNECTION_FACTORY);
+        context.unbind(TOPIC_CONNECTION_FACTORY);
+        context = null;
+        queueConnectionFactory = null;
+        topicConnectionFactory = null;
+    }
+    
     protected abstract QueueConnectionFactory createQueueConnectionFactory() throws Exception;
     protected abstract TopicConnectionFactory createTopicConnectionFactory() throws Exception;
     

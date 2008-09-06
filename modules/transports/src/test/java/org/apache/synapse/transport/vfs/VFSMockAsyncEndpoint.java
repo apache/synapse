@@ -19,19 +19,13 @@
 
 package org.apache.synapse.transport.vfs;
 
-import java.io.File;
-import java.io.InputStream;
-
 import javax.mail.internet.ContentType;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
-
-import de.schlichtherle.io.FileInputStream;
 
 @Name("mock")
 public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
@@ -45,19 +39,7 @@ public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
     }
     
     public IncomingMessage<byte[]> waitForMessage(int timeout) throws Throwable {
-        long time = System.currentTimeMillis();
-        File file = channel.getRequestFile();
-        while (System.currentTimeMillis() < time + timeout) {
-            if (file.exists()) {
-                InputStream in = new FileInputStream(file);
-                try {
-                    return new IncomingMessage<byte[]>(contentType, IOUtils.toByteArray(in));
-                } finally {
-                    in.close();
-                }
-            }
-            Thread.sleep(100);
-        }
-        return null;
+        byte[] data = VFSTestUtils.waitForFile(channel.getRequestFile(), timeout);
+        return data == null ? null : new IncomingMessage<byte[]>(contentType, data);
     }
 }

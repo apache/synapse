@@ -20,31 +20,24 @@
 package org.apache.synapse.transport.vfs;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 
 import javax.mail.internet.ContentType;
 
 import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.client.TestClient;
-import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
 
-@Name("java.io")
-public class VFSClient implements TestClient {
-    private File requestFile;
+public class VFSRequestResponseClient extends VFSClient implements RequestResponseTestClient<byte[],byte[]> {
+    private File replyFile;
     
     @SuppressWarnings("unused")
-    private void setUp(VFSFileChannel channel) {
-        requestFile = channel.getRequestFile();
+    private void setUp(VFSRequestResponseFileChannel channel) {
+        replyFile = channel.getReplyFile();
     }
     
-    public ContentType getContentType(ClientOptions options, ContentType contentType) {
-        return contentType;
-    }
-
-    protected void send(byte[] message) throws Exception {
-        OutputStream out = new FileOutputStream(requestFile);
-        out.write(message);
-        out.close();
+    public IncomingMessage<byte[]> sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
+        send(message);
+        byte[] reply = VFSTestUtils.waitForFile(replyFile, 5000);
+        return reply == null ? null : new IncomingMessage<byte[]>(contentType, reply);
     }
 }

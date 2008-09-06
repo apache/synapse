@@ -52,6 +52,13 @@ public class AxisTestClient implements TestClient {
         this.channel = channel;
         this.setups = setups;
     }
+    
+    @SuppressWarnings("unused")
+    private void tearDown() {
+        context = null;
+        channel = null;
+        setups = null;
+    }
 
     public ContentType getContentType(ClientOptions options, ContentType contentType) {
         // TODO: this may be incorrect in some cases

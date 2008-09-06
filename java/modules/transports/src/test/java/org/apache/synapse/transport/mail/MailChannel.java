@@ -53,6 +53,8 @@ public class MailChannel implements AsyncChannel, RequestResponseChannel, AxisTe
     private void tearDown() {
         env.freeAccount(sender);
         env.freeAccount(recipient);
+        sender = null;
+        recipient = null;
     }
 
     public MailTestEnvironment.Account getSender() {

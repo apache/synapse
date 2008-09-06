@@ -36,6 +36,7 @@ import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
+import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientContext;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
@@ -65,6 +66,7 @@ public class MinConcurrencyTest extends TransportTestCase {
             boolean preloadMessages, Object... resources) {
         super(resources);
         addResource(server);
+        addResource(AxisTestClientContext.INSTANCE);
         this.channels = channels;
         this.messages = messages;
         this.preloadMessages = preloadMessages;

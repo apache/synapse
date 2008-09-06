@@ -23,14 +23,16 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.synapse.transport.testkit.Adapter;
 
 public class TestResource {
+    private enum Status { UNRESOLVED, RESOLVED, SETUP, RECYCLED };
+    
     private static class Initializer {
         private final Method method;
         private final Object object;
@@ -66,6 +68,9 @@ public class TestResource {
     private final Set<TestResource> directDependencies = new HashSet<TestResource>();
     private final LinkedList<Initializer> initializers = new LinkedList<Initializer>();
     private final List<Finalizer> finalizers = new LinkedList<Finalizer>();
+    private Status status = Status.UNRESOLVED;
+    private boolean hasHashCode;
+    private int hashCode;
     
     public TestResource(Object instance) {
         this.instance = instance;
@@ -77,6 +82,9 @@ public class TestResource {
     }
     
     public void resolve(TestResourceSet resourceSet) {
+        if (status != Status.UNRESOLVED) {
+            return;
+        }
         for (Class<?> clazz = target.getClass(); !clazz.equals(Object.class);
                 clazz = clazz.getSuperclass()) {
             for (Method method : clazz.getDeclaredMethods()) {
@@ -123,6 +131,7 @@ public class TestResource {
                 }
             }
         }
+        status = Status.RESOLVED;
     }
 
     public Object getInstance() {
@@ -138,28 +147,55 @@ public class TestResource {
     }
 
     public void setUp() throws Exception {
+        if (status != Status.RESOLVED) {
+            throw new IllegalStateException();
+        }
         for (Initializer initializer : initializers) {
             initializer.execute();
         }
+        status = Status.SETUP;
+    }
+    
+    public void recycle(TestResource resource) {
+        if (status != Status.RESOLVED || resource.status != Status.SETUP || !equals(resource)) {
+            throw new IllegalStateException();
+        }
+        status = Status.SETUP;
+        resource.status = Status.RECYCLED;
     }
     
     public void tearDown() throws Exception {
+        if (status != Status.SETUP) {
+            throw new IllegalStateException();
+        }
         for (Finalizer finalizer : finalizers) {
             finalizer.execute();
         }
+        status = Status.RESOLVED;
     }
     
-    public Set<TestResource> getAllDependencies() {
-        Set<TestResource> set = new LinkedHashSet<TestResource>();
-        collectDependencies(set);
-        return set;
-    }
-    
-    private void collectDependencies(Set<TestResource> set) {
-        for (TestResource dependency : directDependencies) {
-            set.add(dependency);
-            dependency.collectDependencies(set);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TestResource) {
+            TestResource other = (TestResource)obj;
+            return target == other.target && directDependencies.equals(other.directDependencies);
+        } else {
+            return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode;
+        if (hasHashCode) {
+            hashCode = this.hashCode;
+        } else {
+            hashCode = new HashCodeBuilder().append(target).append(directDependencies).toHashCode();
+            if (status != Status.UNRESOLVED) {
+                this.hashCode = hashCode;
+            }
+        }
+        return hashCode;
     }
 
     @Override

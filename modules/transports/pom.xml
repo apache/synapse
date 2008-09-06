@@ -53,6 +53,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
+                    <argLine>-javaagent:target/lib/aspectjweaver-${aspectj.version}.jar -Xms64m -Xmx128m</argLine>
                     <systemProperties>
                         <property>
                             <name>log4j.configuration</name>
@@ -89,6 +90,12 @@
                                     <type>mar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/test_rep/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.aspectj</groupId>
+                                    <artifactId>aspectjweaver</artifactId>
+                                    <version>${aspectj.version}</version>
+                                    <outputDirectory>target/lib</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -154,6 +161,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>org.mockejb</groupId>
             <artifactId>mockejb</artifactId>
             <version>0.6-beta2</version>
@@ -205,7 +219,7 @@
     </dependencies>
 
     <properties>
-
+        <aspectj.version>1.6.1</aspectj.version>
     </properties>
 
 </project>

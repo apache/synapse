@@ -44,6 +44,8 @@ public class JMSTransportTest extends TestCase {
         suite.addExclude("(&(test=AsyncSwA)(client=TextMessage))");
         // SYNAPSE-304:
         suite.addExclude("(&(test=AsyncTextPlain)(client=BytesMessage))");
+        // SYNAPSE-436:
+        suite.addExclude("(&(test=EchoXML)(replyDestType=topic)(endpoint=axis))");
         
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
 
@@ -66,6 +68,7 @@ public class JMSTransportTest extends TestCase {
         builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint());
         
         builder.addRequestResponseChannel(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_QUEUE, JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT));
+        builder.addRequestResponseChannel(new JMSRequestResponseChannel(JMSConstants.DESTINATION_TYPE_TOPIC, JMSConstants.DESTINATION_TYPE_TOPIC, ContentTypeMode.TRANSPORT));
         
         AxisTestClientSetup timeoutSetup = new AxisTestClientSetup() {
             public void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {

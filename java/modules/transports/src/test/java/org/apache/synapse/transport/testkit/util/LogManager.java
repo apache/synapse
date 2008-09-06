@@ -58,7 +58,7 @@ public class LogManager {
         }
     }
     
-    public OutputStream createLog(String name) throws IOException {
+    public synchronized OutputStream createLog(String name) throws IOException {
         testCaseDir.mkdirs();
         return new FileOutputStream(new File(testCaseDir, StringUtils.leftPad(String.valueOf(sequence++), 2, '0') + "-" + name + ".log"));
     }

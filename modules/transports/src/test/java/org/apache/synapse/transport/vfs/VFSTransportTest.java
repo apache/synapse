@@ -30,6 +30,7 @@ import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
 import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
+import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpoint;
 import org.apache.synapse.transport.testkit.server.axis2.ContentTypeServiceConfigurator;
 
 /**
@@ -49,15 +50,23 @@ public class VFSTransportTest extends TestCase {
         
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
         
+        ContentTypeServiceConfigurator cfgtr = new ContentTypeServiceConfigurator("transport.vfs.ContentType");
+        
         builder.addEnvironment(new VFSTestEnvironment(new File("target/vfs3")), tdf);
         
-        builder.addAsyncChannel(new VFSFileChannel("req/in"));
+        builder.addAsyncChannel(new VFSAsyncFileChannel("req/in"));
         
         builder.addAxisAsyncTestClient(new AxisAsyncTestClient());
-        builder.addByteArrayAsyncTestClient(new VFSClient());
+        builder.addByteArrayAsyncTestClient(new VFSAsyncClient());
         
-        builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint(), new ContentTypeServiceConfigurator("transport.vfs.ContentType"));
+        builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint(), cfgtr);
         builder.addByteArrayAsyncEndpoint(new VFSMockAsyncEndpoint());
+        
+        builder.addRequestResponseChannel(new VFSRequestResponseFileChannel("req/in", "req/out"));
+        
+        builder.addByteArrayRequestResponseTestClient(new VFSRequestResponseClient());
+        
+        builder.addEchoEndpoint(new AxisEchoEndpoint(), cfgtr);
         
         builder.build();
         

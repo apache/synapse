@@ -23,10 +23,9 @@ import java.io.File;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 
-public class VFSFileChannel implements AsyncChannel, AxisServiceConfigurator {
+public class VFSFileChannel implements AxisServiceConfigurator {
     private final String path;
     private File requestFile;
     
@@ -47,11 +46,16 @@ public class VFSFileChannel implements AsyncChannel, AxisServiceConfigurator {
         service.addParameter("transport.PollInterval", "50ms");
         service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");
     }
-
+    
+    protected static File preparePath(VFSTestEnvironment env, String path) {
+        File file = new File(env.getRootDir(), path);
+        file.getParentFile().mkdirs();
+        file.delete();
+        return file;
+    }
+    
     @SuppressWarnings("unused")
     private void setUp(VFSTestEnvironment env) throws Exception {
-        requestFile = new File(env.getRootDir(), path);
-        requestFile.getParentFile().mkdirs();
-        requestFile.delete();
+        requestFile = preparePath(env, path);
     }
 }

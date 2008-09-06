@@ -22,6 +22,7 @@ package org.apache.synapse.transport.testkit.tests;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -153,15 +154,6 @@ public class TestResourceSet {
         }
     }
     
-    private TestResource lookup(Object instance) {
-        for (TestResource resource : resolvedResources) {
-            if (resource.getTarget() == instance) {
-                return resource;
-            }
-        }
-        return null;
-    }
-    
     public void setUp(TestResourceSet old) throws Exception {
         resolve();
         if (status != Status.RESOLVED) {
@@ -173,26 +165,17 @@ public class TestResourceSet {
         List<TestResource> oldResourcesToTearDown = new LinkedList<TestResource>();
         List<TestResource> resourcesToSetUp = new LinkedList<TestResource>(resolvedResources);
         List<TestResource> resourcesToKeep = new LinkedList<TestResource>();
-        for (TestResource oldResource : old.resolvedResources) {
-            boolean keep;
-            TestResource resource = lookup(oldResource.getTarget());
-            if (resource == null) {
-                keep = false;
-            } else {
-                keep = true;
-                for (TestResource dependency : oldResource.getAllDependencies()) {
-                    if (lookup(dependency.getTarget()) == null) {
-                        keep = false;
-                        break;
-                    }
+        outer: for (TestResource oldResource : filterOnHasLifecycle(old.resolvedResources)) {
+            for (Iterator<TestResource> it = resourcesToSetUp.iterator(); it.hasNext(); ) {
+                TestResource resource = it.next();
+                if (resource.equals(oldResource)) {
+                    it.remove();
+                    resource.recycle(oldResource);
+                    resourcesToKeep.add(oldResource);
+                    continue outer;
                 }
             }
-            if (keep) {
-                resourcesToSetUp.remove(resource);
-                resourcesToKeep.add(resource);
-            } else {
-                oldResourcesToTearDown.add(oldResource);
-            }
+            oldResourcesToTearDown.add(oldResource);
         }
         tearDown(oldResourcesToTearDown);
         log.debug("Keeping: " + resourcesToKeep);

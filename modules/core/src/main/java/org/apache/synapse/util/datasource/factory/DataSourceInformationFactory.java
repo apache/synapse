@@ -55,6 +55,9 @@ public class DataSourceInformationFactory {
     public static final String PROP_DEFAULTMAXIDLE = "defaultMaxIdle";
     public static final String PROP_DEFAULTMAXWAIT = "defaultMaxWait";
     public static final String PROP_DATA_SOURCE_NAME = "dataSourceName";
+    public static final String PROP_CPDS_CLASS_NAME = "className";
+    public static final String PROP_CPDS_FACTORY = "factory";
+    public static final String PROP_CPDS_NAME = "name";
 
     public final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
     public final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
@@ -134,6 +137,7 @@ public class DataSourceInformationFactory {
 
         String password = (String) MiscellaneousUtil.getProperty(
                 properties, prefix + PROP_PASSWORD, "synapse", String.class);
+
         information.setPassword(password);
 
         String dataSourceName = (String) MiscellaneousUtil.getProperty(
@@ -180,25 +184,65 @@ public class DataSourceInformationFactory {
 
         boolean defaultAutoCommit = (Boolean) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_DEFAULTAUTOCOMMIT, true, Boolean.class);
+
         boolean defaultReadOnly = (Boolean) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_DEFAULTREADONLY, false, Boolean.class);
+
         boolean testOnBorrow = (Boolean) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_TESTONBORROW, true, Boolean.class);
+
         boolean testOnReturn = (Boolean) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_TESTONRETURN, false, Boolean.class);
+
         long timeBetweenEvictionRunsMillis = (Long) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
                 GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, Long.class);
+
         int numTestsPerEvictionRun = (Integer) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_NUMTESTSPEREVICTIONRUN,
                 GenericObjectPool.DEFAULT_NUM_TESTS_PER_EVICTION_RUN, Integer.class);
+
         long minEvictableIdleTimeMillis = (Long) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_MINEVICTABLEIDLETIMEMILLIS,
                 GenericObjectPool.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS, Long.class);
+
         boolean testWhileIdle = (Boolean) MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_TESTWHILEIDLE, false, Boolean.class);
+
         String validationQuery = MiscellaneousUtil.getProperty(properties,
                 prefix + PROP_VALIDATIONQUERY, null);
+
+        int minIdle = (Integer) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_MINIDLE, GenericObjectPool.DEFAULT_MIN_IDLE, Integer.class);
+
+        int initialSize = (Integer) MiscellaneousUtil.getProperty(
+                properties, prefix + PROP_INITIALSIZE, 0, Integer.class);
+
+        int defaultTransactionIsolation = (Integer) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_DEFAULTTRANSACTIONISOLATION, -1, Integer.class);
+
+        String defaultCatalog = MiscellaneousUtil.getProperty(
+                properties, prefix + PROP_DEFAULTCATALOG, null);
+
+        boolean accessToUnderlyingConnectionAllowed =
+                (Boolean) MiscellaneousUtil.getProperty(properties,
+                        prefix + PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, false, Boolean.class);
+
+        boolean removeAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_REMOVEABANDONED, false, Boolean.class);
+
+        int removeAbandonedTimeout = (Integer) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_REMOVEABANDONEDTIMEOUT, 300, Integer.class);
+
+        boolean logAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_LOGABANDONED, false, Boolean.class);
+
+        boolean poolPreparedStatements = (Boolean) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_POOLPREPAREDSTATEMENTS, false, Boolean.class);
+
+        int maxOpenPreparedStatements = (Integer) MiscellaneousUtil.getProperty(properties,
+                prefix + PROP_MAXOPENPREPAREDSTATEMENTS,
+                GenericKeyedObjectPool.DEFAULT_MAX_TOTAL, Integer.class);
 
         information.setDefaultAutoCommit(defaultAutoCommit);
         information.setDefaultReadOnly(defaultReadOnly);
@@ -209,58 +253,18 @@ public class DataSourceInformationFactory {
         information.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
         information.setTestWhileIdle(testWhileIdle);
         information.setValidationQuery(validationQuery);
-
-        setBasicDataSourceParameters(information, properties, prefix);
+        information.setMaxIdle(minIdle);
+        information.setDefaultTransactionIsolation(defaultTransactionIsolation);
+        information.setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
+        information.setRemoveAbandoned(removeAbandoned);
+        information.setRemoveAbandonedTimeout(removeAbandonedTimeout);
+        information.setLogAbandoned(logAbandoned);
+        information.setPoolPreparedStatements(poolPreparedStatements);
+        information.setMaxOpenPreparedStatements(maxOpenPreparedStatements);
+        information.setInitialSize(initialSize);
+        information.setDefaultCatalog(defaultCatalog);
 
         return information;
-    }
-
-    /**
-     * /**
-     * Helper method to set all BasicDataSource specific parameter
-     *
-     * @param information The naming reference instance
-     * @param properties  The properties which contains required parameter value
-     * @param prefix      The key prefix for which is used to get data from given properties
-     */
-    public static void setBasicDataSourceParameters(DataSourceInformation information, Properties properties, String prefix) {
-
-        int minIdle = (Integer) MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_MINIDLE, GenericObjectPool.DEFAULT_MIN_IDLE, Integer.class);
-        int initialSize = (Integer) MiscellaneousUtil.getProperty(
-                properties, prefix + PROP_INITIALSIZE, 0, Integer.class);
-        String defaultTransactionIsolation = MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_DEFAULTTRANSACTIONISOLATION, null);
-        String defaultCatalog = MiscellaneousUtil.getProperty(
-                properties, prefix + PROP_DEFAULTCATALOG, null);
-        boolean accessToUnderlyingConnectionAllowed =
-                (Boolean) MiscellaneousUtil.getProperty(properties,
-                        prefix + PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, false, Boolean.class);
-        boolean removeAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_REMOVEABANDONED, false, Boolean.class);
-        int removeAbandonedTimeout = (Integer) MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_REMOVEABANDONEDTIMEOUT, 300, Integer.class);
-        boolean logAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_LOGABANDONED, false, Boolean.class);
-        boolean poolPreparedStatements = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_POOLPREPAREDSTATEMENTS, false, Boolean.class);
-        int maxOpenPreparedStatements = (Integer) MiscellaneousUtil.getProperty(properties,
-                prefix + PROP_MAXOPENPREPAREDSTATEMENTS,
-                GenericKeyedObjectPool.DEFAULT_MAX_TOTAL, Integer.class);
-
-        information.addParameter(PROP_MINIDLE, minIdle);
-        information.addParameter(PROP_DEFAULTTRANSACTIONISOLATION,
-                defaultTransactionIsolation);
-        information.addParameter(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
-                accessToUnderlyingConnectionAllowed);
-        information.addParameter(PROP_REMOVEABANDONED, removeAbandoned);
-        information.addParameter(PROP_REMOVEABANDONEDTIMEOUT, removeAbandonedTimeout);
-        information.addParameter(PROP_LOGABANDONED, logAbandoned);
-        information.addParameter(PROP_POOLPREPAREDSTATEMENTS, poolPreparedStatements);
-        information.addParameter(PROP_MAXOPENPREPAREDSTATEMENTS,
-                maxOpenPreparedStatements);
-        information.addParameter(PROP_INITIALSIZE, initialSize);
-        information.addParameter(PROP_DEFAULTCATALOG, defaultCatalog);
     }
 
     /**

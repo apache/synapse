@@ -30,7 +30,7 @@ import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncBinary")
-public class BinaryTestCase extends AsyncMessageTestCase<byte[],byte[]> {
+public class BinaryTestCase extends AsyncMessageTestCase<byte[]> {
     private static final Random random = new Random();
     
     public BinaryTestCase(AsyncChannel channel, AsyncTestClient<byte[]> client, AsyncEndpoint<byte[]> endpoint, Object... resources) {
@@ -45,7 +45,7 @@ public class BinaryTestCase extends AsyncMessageTestCase<byte[],byte[]> {
     }
 
     @Override
-    protected void checkMessageData(byte[] message, byte[] messageData) throws Exception {
-        assertTrue(Arrays.equals(message, messageData));
+    protected void checkMessageData(byte[] expected, byte[] actual) throws Exception {
+        assertTrue(Arrays.equals(expected, actual));
     }
 }

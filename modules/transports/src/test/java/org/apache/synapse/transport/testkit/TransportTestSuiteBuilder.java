@@ -84,9 +84,9 @@ public class TransportTestSuiteBuilder {
     private final ResourceList<AsyncTestClient<RESTMessage>> restAsyncClients = new ResourceList<AsyncTestClient<RESTMessage>>();
     private final ResourceList<AsyncTestClient<String>> stringAsyncClients = new ResourceList<AsyncTestClient<String>>();
     
-    private final ResourceList<AsyncEndpoint<AxisMessage>> axisAsyncEndpoints = new ResourceList<AsyncEndpoint<AxisMessage>>();
     private final ResourceList<AsyncEndpoint<byte[]>> byteAsyncEndpoints = new ResourceList<AsyncEndpoint<byte[]>>();
     private final ResourceList<AsyncEndpoint<XMLMessage>> xmlAsyncEndpoints = new ResourceList<AsyncEndpoint<XMLMessage>>();
+    private final ResourceList<AsyncEndpoint<RESTMessage>> restAsyncEndpoints = new ResourceList<AsyncEndpoint<RESTMessage>>();
     private final ResourceList<AsyncEndpoint<String>> stringAsyncEndpoints = new ResourceList<AsyncEndpoint<String>>();
     
     private final ResourceList<RequestResponseChannel> requestResponseChannels = new ResourceList<RequestResponseChannel>();
@@ -135,9 +135,9 @@ public class TransportTestSuiteBuilder {
     }
     
     public void addAxisAsyncEndpoint(AsyncEndpoint<AxisMessage> endpoint, Object... relatedResources) {
-        axisAsyncEndpoints.add(endpoint, relatedResources);
         byteAsyncEndpoints.add(adapt(endpoint, MessageDecoder.AXIS_TO_BYTE), relatedResources);
         xmlAsyncEndpoints.add(adapt(endpoint, MessageDecoder.AXIS_TO_XML), relatedResources);
+        restAsyncEndpoints.add(adapt(endpoint, MessageDecoder.AXIS_TO_REST), relatedResources);
         stringAsyncEndpoints.add(adapt(endpoint, MessageDecoder.AXIS_TO_STRING), relatedResources);
     }
     
@@ -145,6 +145,10 @@ public class TransportTestSuiteBuilder {
         byteAsyncEndpoints.add(endpoint, relatedResources);
         xmlAsyncEndpoints.add(adapt(endpoint, MessageDecoder.BYTE_TO_XML), relatedResources);
         stringAsyncEndpoints.add(adapt(endpoint, MessageDecoder.BYTE_TO_STRING), relatedResources);
+    }
+    
+    public void addRESTAsyncEndpoint(AsyncEndpoint<RESTMessage> endpoint, Object... relatedResources) {
+        restAsyncEndpoints.add(endpoint, relatedResources);
     }
     
     public void addRequestResponseChannel(RequestResponseChannel channel, Object... relatedResources) {
@@ -197,7 +201,7 @@ public class TransportTestSuiteBuilder {
                 }
             }
             for (ResourceRelation<AsyncTestClient<RESTMessage>> client : restAsyncClients) {
-                for (ResourceRelation<AsyncEndpoint<AxisMessage>> endpoint : axisAsyncEndpoints) {
+                for (ResourceRelation<AsyncEndpoint<RESTMessage>> endpoint : restAsyncEndpoints) {
                     Object[] resources = merge(env, channel, client, endpoint);
                     suite.addRESTTests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
                 }

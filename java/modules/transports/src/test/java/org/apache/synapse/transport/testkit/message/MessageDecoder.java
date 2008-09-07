@@ -21,6 +21,9 @@ package org.apache.synapse.transport.testkit.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.mail.internet.ContentType;
@@ -37,6 +40,7 @@ import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 
 public interface MessageDecoder<T,U> {
     MessageDecoder<AxisMessage,byte[]> AXIS_TO_BYTE =
@@ -88,6 +92,20 @@ public interface MessageDecoder<T,U> {
                 }
             }
             return new XMLMessage(message.getEnvelope().getBody().getFirstElement(), type, attachments);
+        }
+    };
+    
+    MessageDecoder<AxisMessage,RESTMessage> AXIS_TO_REST =
+        new MessageDecoder<AxisMessage,RESTMessage>() {
+
+        public RESTMessage decode(ContentType contentType, AxisMessage message) throws Exception {
+            List<Parameter> parameters = new LinkedList<Parameter>();
+            OMElement content = message.getEnvelope().getBody().getFirstElement();
+            for (Iterator<?> it = content.getChildElements(); it.hasNext(); ) {
+                OMElement child = (OMElement)it.next();
+                parameters.add(new Parameter(child.getLocalName(), child.getText()));
+            }
+            return new RESTMessage(parameters.toArray(new Parameter[parameters.size()]));
         }
     };
 

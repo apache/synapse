@@ -29,7 +29,7 @@ import org.apache.synapse.transport.testkit.name.Named;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncTextPlain")
-public class TextPlainTestCase extends AsyncMessageTestCase<String,String> {
+public class TextPlainTestCase extends AsyncMessageTestCase<String> {
     private final MessageTestData data;
     
     public TextPlainTestCase(AsyncChannel channel, AsyncTestClient<String> client, AsyncEndpoint<String> endpoint, MessageTestData data, Object... resources) {
@@ -48,10 +48,10 @@ public class TextPlainTestCase extends AsyncMessageTestCase<String,String> {
     }
 
     @Override
-    protected void checkMessageData(String message, String messageData) throws Exception {
+    protected void checkMessageData(String expected, String actual) throws Exception {
         // Some transport protocols add a newline at the end of the payload. Therefore trim the
         // strings before comparison.
         // TODO: investigate this a bit further
-        assertEquals(message.trim(), messageData.trim());
+        assertEquals(expected.trim(), actual.trim());
     }
 }

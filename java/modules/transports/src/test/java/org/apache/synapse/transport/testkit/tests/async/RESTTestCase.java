@@ -21,23 +21,20 @@ package org.apache.synapse.transport.testkit.tests.async;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("REST")
-public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,AxisMessage> {
+public class RESTTestCase extends AsyncMessageTestCase<RESTMessage> {
     private final RESTMessage message;
     
-    public RESTTestCase(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpoint<AxisMessage> endpoint, RESTMessage message, Object... resources) {
+    public RESTTestCase(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpoint<RESTMessage> endpoint, RESTMessage message, Object... resources) {
         super(channel, client, endpoint, null, null, resources);
         this.message = message;
     }
@@ -48,13 +45,11 @@ public class RESTTestCase extends AsyncMessageTestCase<RESTMessage,AxisMessage> 
     }
 
     @Override
-    protected void checkMessageData(RESTMessage message, AxisMessage messageData) throws Exception {
-        OMElement content = messageData.getEnvelope().getBody().getFirstElement();
-        Set<Parameter> expected = new HashSet<Parameter>(Arrays.asList(message.getParameters()));
-        for (Iterator<?> it = content.getChildElements(); it.hasNext(); ) {
-            OMElement child = (OMElement)it.next();
-            assertTrue(expected.remove(new Parameter(child.getLocalName(), child.getText())));
+    protected void checkMessageData(RESTMessage expected, RESTMessage actual) throws Exception {
+        Set<Parameter> expectedParameters = new HashSet<Parameter>(Arrays.asList(expected.getParameters()));
+        for (Parameter actualParameter : actual.getParameters()) {
+            assertTrue(expectedParameters.remove(actualParameter));
         }
-        assertTrue(expected.isEmpty());
+        assertTrue(expectedParameters.isEmpty());
     }
 }

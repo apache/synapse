@@ -34,7 +34,7 @@ import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncSOAPLarge")
 // TODO: maybe we should use XMLUnit to construct these kind of tests
-public class LargeSOAPAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage,XMLMessage> {
+public class LargeSOAPAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessage> {
     public LargeSOAPAsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<XMLMessage> client, AsyncEndpoint<XMLMessage> endpoint, Object... resources) {
         super(channel, client, endpoint, XMLMessage.Type.SOAP11.getContentType(), "UTF-8", resources);
     }
@@ -52,9 +52,9 @@ public class LargeSOAPAsyncMessageTestCase extends AsyncMessageTestCase<XMLMessa
     }
 
     @Override
-    protected void checkMessageData(XMLMessage message, XMLMessage messageData) throws Exception {
-        OMElement element = messageData.getPayload();
-        OMElement orgElement = message.getPayload();
+    protected void checkMessageData(XMLMessage expected, XMLMessage actual) throws Exception {
+        OMElement element = actual.getPayload();
+        OMElement orgElement = expected.getPayload();
         assertEquals(orgElement.getQName(), element.getQName());
         assertEquals(1000, countChildren(element));
     }

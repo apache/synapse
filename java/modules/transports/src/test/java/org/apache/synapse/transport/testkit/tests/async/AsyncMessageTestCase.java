@@ -26,12 +26,12 @@ import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;
 
-public abstract class AsyncMessageTestCase<M,N> extends MessageTestCase {
+public abstract class AsyncMessageTestCase<M> extends MessageTestCase {
     private final AsyncTestClient<M> client;
-    private final AsyncEndpoint<N> endpoint;
+    private final AsyncEndpoint<M> endpoint;
     
     // TODO: maybe we don't need an explicit AsyncChannel
-    public AsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpoint<N> endpoint, ContentType contentType, String charset, Object... resources) {
+    public AsyncMessageTestCase(AsyncChannel channel, AsyncTestClient<M> client, AsyncEndpoint<M> endpoint, ContentType contentType, String charset, Object... resources) {
         super(contentType, charset, resources);
         this.client = client;
         this.endpoint = endpoint;
@@ -42,20 +42,19 @@ public abstract class AsyncMessageTestCase<M,N> extends MessageTestCase {
 
     @Override
     protected void runTest() throws Throwable {
-        M message = prepareMessage();
+        M expected = prepareMessage();
         
         // Run the test.
-        N messageData;
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
-        client.sendMessage(options, options.getBaseContentType(), message);
-        messageData = endpoint.waitForMessage(8000).getData();
-        if (messageData == null) {
+        client.sendMessage(options, options.getBaseContentType(), expected);
+        M actual = endpoint.waitForMessage(8000).getData();
+        if (actual == null) {
             fail("Failed to get message");
         }
         
-        checkMessageData(message, messageData);
+        checkMessageData(expected, actual);
     }
     
     protected abstract M prepareMessage() throws Exception;
-    protected abstract void checkMessageData(M message, N messageData) throws Exception;
+    protected abstract void checkMessageData(M expected, M actual) throws Exception;
 }

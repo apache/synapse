@@ -39,7 +39,7 @@ import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 
 @Name("AsyncSwA")
-public class SwATestCase extends AsyncMessageTestCase<XMLMessage,XMLMessage> {
+public class SwATestCase extends AsyncMessageTestCase<XMLMessage> {
     private static final Random random = new Random();
     
     private byte[] attachmentContent;
@@ -67,9 +67,9 @@ public class SwATestCase extends AsyncMessageTestCase<XMLMessage,XMLMessage> {
     }
 
     @Override
-    protected void checkMessageData(XMLMessage message, XMLMessage messageData) throws Exception {
+    protected void checkMessageData(XMLMessage expected, XMLMessage actual) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Attachments attachments = messageData.getAttachments();
+        Attachments attachments = actual.getAttachments();
         DataHandler dataHandler = attachments.getDataHandler(contentID);
         assertNotNull(dataHandler);
         dataHandler.writeTo(baos);

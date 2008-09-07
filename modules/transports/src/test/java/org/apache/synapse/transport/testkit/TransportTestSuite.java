@@ -37,7 +37,6 @@ import org.apache.synapse.transport.testkit.filter.FilterExpressionParser;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.MessageTestData;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
-import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
@@ -157,7 +156,7 @@ public class TransportTestSuite extends TestSuite {
         addTest(new BinaryTestCase(channel, client, endpoint, resources));
     }
 
-    public void addRESTTests(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpoint<AxisMessage> endpoint, Object... resources) {
+    public void addRESTTests(AsyncChannel channel, AsyncTestClient<RESTMessage> client, AsyncEndpoint<RESTMessage> endpoint, Object... resources) {
         addTest(new RESTTestCase(channel, client, endpoint, restTestMessage1, resources));
         // TODO: regression test for SYNAPSE-431
 //        addTest(new RESTTestCase(env, channel, client, endpoint, restTestMessage2));

@@ -19,6 +19,8 @@
 package org.apache.synapse.util.datasource.factory;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS;
+import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -62,6 +64,8 @@ public class DataSourceFactory {
 
         String user = information.getUser();
         String password = information.getPassword();
+        int defaultTransactionIsolation = information.getDefaultTransactionIsolation();
+
 
         if (DataSourceInformation.BASIC_DATA_SOURCE.equals(dsType)) {
 
@@ -80,18 +84,97 @@ public class DataSourceFactory {
             basicDataSource.setMaxActive(information.getMaxActive());
             basicDataSource.setMaxIdle(information.getMaxIdle());
             basicDataSource.setMaxWait(information.getMaxWait());
+            basicDataSource.setMaxIdle(information.getMaxIdle());
             basicDataSource.setDefaultAutoCommit(information.isDefaultAutoCommit());
             basicDataSource.setDefaultReadOnly(information.isDefaultReadOnly());
             basicDataSource.setTestOnBorrow(information.isTestOnBorrow());
             basicDataSource.setTestOnReturn(information.isTestOnReturn());
             basicDataSource.setTestWhileIdle(information.isTestWhileIdle());
+            basicDataSource.setMinEvictableIdleTimeMillis(
+                    information.getMinEvictableIdleTimeMillis());
+            basicDataSource.setTimeBetweenEvictionRunsMillis(
+                    information.getTimeBetweenEvictionRunsMillis());
+            basicDataSource.setNumTestsPerEvictionRun(
+                    information.getNumTestsPerEvictionRun());
+            basicDataSource.setMaxOpenPreparedStatements(
+                    information.getMaxOpenPreparedStatements());
+            basicDataSource.setAccessToUnderlyingConnectionAllowed(
+                    information.isAccessToUnderlyingConnectionAllowed());
+            basicDataSource.setInitialSize(information.getInitialSize());
+            basicDataSource.setPoolPreparedStatements(information.isPoolPreparedStatements());
+
+
+            if (defaultTransactionIsolation != -1) {
+                basicDataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
+            }
+
+            String defaultCatalog = information.getDefaultCatalog();
+            if (defaultCatalog != null || !"".equals(defaultCatalog)) {
+                basicDataSource.setDefaultCatalog(defaultCatalog);
+            }
 
             String validationQuery = information.getValidationQuery();
 
             if (validationQuery != null && !"".equals(validationQuery)) {
                 basicDataSource.setValidationQuery(validationQuery);
             }
+
             return basicDataSource;
+
+        } else if (DataSourceInformation.PER_USER_POOL_DATA_SOURCE.equals(dsType)) {
+
+            DriverAdapterCPDS adapterCPDS = new DriverAdapterCPDS();
+
+            try {
+                adapterCPDS.setDriver(driver);
+            } catch (ClassNotFoundException e) {
+                handleException("Error setting driver : " + driver + " DriverAdapterCPDS");
+            }
+
+            adapterCPDS.setUrl(url);
+
+            if (user != null && !"".equals(user)) {
+                adapterCPDS.setUser(user);
+            }
+
+            if (password != null && !"".equals(password)) {
+                adapterCPDS.setPassword(password);
+            }
+
+            adapterCPDS.setPoolPreparedStatements(information.isPoolPreparedStatements());
+            adapterCPDS.setMaxIdle(information.getMaxIdle());
+
+
+            PerUserPoolDataSource perUserPoolDataSource = new PerUserPoolDataSource();
+            perUserPoolDataSource.setConnectionPoolDataSource(adapterCPDS);
+
+            perUserPoolDataSource.setDefaultMaxActive(information.getMaxActive());
+            perUserPoolDataSource.setDefaultMaxIdle(information.getMaxIdle());
+            perUserPoolDataSource.setDefaultMaxWait((int) information.getMaxWait());
+            perUserPoolDataSource.setDefaultAutoCommit(information.isDefaultAutoCommit());
+            perUserPoolDataSource.setDefaultReadOnly(information.isDefaultReadOnly());
+            perUserPoolDataSource.setTestOnBorrow(information.isTestOnBorrow());
+            perUserPoolDataSource.setTestOnReturn(information.isTestOnReturn());
+            perUserPoolDataSource.setTestWhileIdle(information.isTestWhileIdle());
+            perUserPoolDataSource.setMinEvictableIdleTimeMillis(
+                    (int) information.getMinEvictableIdleTimeMillis());
+            perUserPoolDataSource.setTimeBetweenEvictionRunsMillis(
+                    (int) information.getTimeBetweenEvictionRunsMillis());
+            perUserPoolDataSource.setNumTestsPerEvictionRun(
+                    information.getNumTestsPerEvictionRun());
+
+            if (defaultTransactionIsolation != -1) {
+                perUserPoolDataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
+            }
+
+
+            String validationQuery = information.getValidationQuery();
+
+            if (validationQuery != null && !"".equals(validationQuery)) {
+                perUserPoolDataSource.setValidationQuery(validationQuery);
+            }
+
+            return perUserPoolDataSource;
 
         } else {
             handleException("Unsupported DataSorce : " + dsType);

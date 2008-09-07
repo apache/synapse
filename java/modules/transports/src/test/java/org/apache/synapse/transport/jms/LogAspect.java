@@ -39,12 +39,14 @@ import org.aspectj.lang.annotation.Before;
 public class LogAspect {
     private static final Log log = LogFactory.getLog(LogAspect.class);
     
-    @Before("call(void javax.jms.MessageProducer.send(javax.jms.Message)) && args(message)")
+    @Before("(call(void javax.jms.MessageProducer.send(javax.jms.Message)) ||" +
+    		" call(void javax.jms.TopicPublisher.publish(javax.jms.Message))) && args(message)")
     public void beforeSend(Message message) {
         try {
             OutputStream out = LogManager.INSTANCE.createLog("jms");
             try {
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(out), false);
+                pw.println("Type: " + message.getClass().getName());
                 pw.println("JMS message ID: " + message.getJMSMessageID());
                 pw.println("JMS correlation ID: " + message.getJMSCorrelationID());
                 pw.println("JMS reply to: " + message.getJMSReplyTo());
@@ -62,6 +64,7 @@ public class LogAspect {
                     IOUtils.copy(new BytesMessageInputStream(bytesMessage), out);
                 } else if (message instanceof TextMessage) {
                     pw.print(((TextMessage)message).getText());
+                    pw.flush();
                 }
             } finally {
                 out.close();

@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
@@ -64,17 +65,6 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     private String contentType = null;
 
     /**
-     * Creates an instance using the given connection factory and destination
-     *
-     * @param connectionFactory the connection factory
-     * @param dest the destination
-     */
-    JMSOutTransportInfo(ConnectionFactory connectionFactory, Destination dest) {
-        this.connectionFactory = connectionFactory;
-        this.destination = dest;
-    }
-
-    /**
      * Creates an instance using the given JMS connection factory and destination
      *
      * @param jmsConnectionFactory the JMS connection factory
@@ -83,6 +73,8 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     JMSOutTransportInfo(JMSConnectionFactory jmsConnectionFactory, Destination dest) {
         this.jmsConnectionFactory = jmsConnectionFactory;
         this.destination = dest;
+        destinationType = dest instanceof Topic ? JMSConstants.DESTINATION_TYPE_TOPIC
+                                                : JMSConstants.DESTINATION_TYPE_QUEUE;
     }
 
     /**

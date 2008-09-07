@@ -35,7 +35,7 @@ import java.util.Properties;
  */
 public class DataSourceRegistrar {
 
-    public static final Log log = LogFactory.getLog(DataSourceRegistrar.class);
+    private static final Log log = LogFactory.getLog(DataSourceRegistrar.class);
 
     /**
      * The  static constants only for constructing key prefix for each property
@@ -86,6 +86,45 @@ public class DataSourceRegistrar {
         buffer.append(DOT_STRING);
         // The prefix for root level properties
         String rootPrefix = buffer.toString();
+
+        Properties jndiEvn = null;
+        //Registering data sources with the initial context
+        for (String dsName : dataSourcesNames) {
+
+            if (dsName == null) {
+                continue;
+            }
+
+            StringBuffer registryBuffer = new StringBuffer();
+            registryBuffer.append(rootPrefix);
+            registryBuffer.append(dsName);
+            registryBuffer.append(DOT_STRING);
+            registryBuffer.append(PROP_REGISTRY);
+            String registryKey = registryBuffer.toString();
+
+            String registry = MiscellaneousUtil.getProperty(dsProperties,
+                    registryKey, PROP_REGISTRY_MEMORY);
+
+
+            DataSourceInformation information =
+                    DataSourceInformationFactory.
+                            createDataSourceInformation(dsName, dsProperties);
+
+            DataSourceRegistry dataSourceRegistry;
+
+            if (PROP_REGISTRY_JNDI.equals(registry)) {
+                if (jndiEvn == null) {
+                    jndiEvn = createJNDIEnvironment(dsProperties, rootPrefix);
+                }
+                dataSourceRegistry = JNDIBasedDataSourceRegistry.getInstance(jndiEvn);
+            } else {
+                dataSourceRegistry = InMemoryDataSourceRegistry.getInstance();
+            }
+            dataSourceRegistry.register(information);
+        }
+    }
+
+    private static Properties createJNDIEnvironment(Properties dsProperties, String rootPrefix) {
 
         // setting naming provider
         Properties jndiEvn = new Properties();  //This is needed for PerUserPoolDatasource
@@ -149,39 +188,6 @@ public class DataSourceRegistrar {
 
         log.info("DataSources will be registered in the JNDI context with provider PROP_URL : " +
                 providerUrl);
-
-        //Registering data sources with the initial context
-        for (String dsName : dataSourcesNames) {
-
-            if (dsName == null) {
-                continue;
-            }
-
-            StringBuffer registryBuffer = new StringBuffer();
-            registryBuffer.append(SynapseConstants.SYNAPSE_DATASOURCES);
-            registryBuffer.append(DOT_STRING);
-            registryBuffer.append(dsName);
-            registryBuffer.append(DOT_STRING);
-            registryBuffer.append(PROP_REGISTRY);
-            String registryKey = registryBuffer.toString();
-
-            String registry = MiscellaneousUtil.getProperty(dsProperties,
-                    registryKey, PROP_REGISTRY_MEMORY);
-
-
-            DataSourceInformation information =
-                    DataSourceInformationFactory.
-                            createDataSourceInformation(dsName, dsProperties);
-
-            DataSourceRegistry dataSourceRegistry;
-
-            if (PROP_REGISTRY_JNDI.equals(registry)) {
-                dataSourceRegistry = JNDIBasedDataSourceRegistry.getInstance(jndiEvn);
-            } else {
-                dataSourceRegistry = InMemoryDataSourceRegistry.getInstance();
-            }
-            dataSourceRegistry.register(information);
-        }
-
+        return jndiEvn;
     }
 }

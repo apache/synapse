@@ -38,7 +38,8 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
 
     private static Log log = LogFactory.getLog(JNDIBasedDataSourceRegistry.class);
 
-    private static final JNDIBasedDataSourceRegistry ourInstance = new JNDIBasedDataSourceRegistry();
+    private static final JNDIBasedDataSourceRegistry ourInstance =
+            new JNDIBasedDataSourceRegistry();
     private static InitialContext initialContext;
     private static final Properties indiEnv = new Properties();
     private static boolean initialize = false;
@@ -136,13 +137,16 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
             // Construct DriverAdapterCPDS reference
             String className = (String) information.getParameter(
                     DataSourceInformationFactory.PROP_CPDSADAPTER +
-                            DataSourceInformationFactory.DOT_STRING + "className");
+                            DataSourceInformationFactory.DOT_STRING +
+                            DataSourceInformationFactory.PROP_CPDS_CLASS_NAME);
             String factory = (String) information.getParameter(
                     DataSourceInformationFactory.PROP_CPDSADAPTER +
-                            DataSourceInformationFactory.DOT_STRING + "factory");
+                            DataSourceInformationFactory.DOT_STRING +
+                            DataSourceInformationFactory.PROP_CPDS_FACTORY);
             String name = (String) information.getParameter(
                     DataSourceInformationFactory.PROP_CPDSADAPTER +
-                            DataSourceInformationFactory.DOT_STRING + "name");
+                            DataSourceInformationFactory.DOT_STRING +
+                            DataSourceInformationFactory.PROP_CPDS_NAME);
 
             Reference cpdsRef =
                     new Reference(className, factory, null);
@@ -257,69 +261,46 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
      */
     private static void setBasicDataSourceParameters(Reference ref, DataSourceInformation information) {
 
-        String defaultTransactionIsolation = (String) information.getParameter(
-                DataSourceInformationFactory.PROP_DEFAULTTRANSACTIONISOLATION);
-        String defaultCatalog = String.valueOf(
-                information.getParameter(DataSourceInformationFactory.PROP_DEFAULTCATALOG));
+        int defaultTransactionIsolation = information.getDefaultTransactionIsolation();
+        String defaultCatalog = information.getDefaultCatalog();
 
-        ref.add(
-                new StringRefAddr(DataSourceInformationFactory.PROP_MINIDLE,
-                        String.valueOf(information.getParameter(
-                                DataSourceInformationFactory.PROP_MINIDLE))));
 
-        if (defaultTransactionIsolation != null && !"".equals(defaultTransactionIsolation)) {
+        if (defaultTransactionIsolation != -1) {
             ref.add(
                     new StringRefAddr(
                             DataSourceInformationFactory.PROP_DEFAULTTRANSACTIONISOLATION,
-                            String.valueOf(
-                                    information.getParameter(
-                                            DataSourceInformationFactory.
-                                                    PROP_DEFAULTTRANSACTIONISOLATION))));
+                            String.valueOf(defaultTransactionIsolation)));
         }
 
         ref.add(
+                new StringRefAddr(DataSourceInformationFactory.PROP_MINIDLE,
+                        String.valueOf(information.getMaxIdle())));
+        ref.add(
                 new StringRefAddr(
                         DataSourceInformationFactory.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
-                        String.valueOf(
-                                information.getParameter(
-                                        DataSourceInformationFactory.
-                                                PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED))));
+                        String.valueOf(information.isAccessToUnderlyingConnectionAllowed())));
         ref.add(
                 new StringRefAddr(
                         DataSourceInformationFactory.PROP_REMOVEABANDONED,
-                        String.valueOf(
-                                information.getParameter(
-                                        DataSourceInformationFactory.PROP_REMOVEABANDONED))));
+                        String.valueOf(information.isRemoveAbandoned())));
         ref.add
                 (new StringRefAddr(DataSourceInformationFactory.PROP_REMOVEABANDONEDTIMEOUT,
-                        String.valueOf(
-                                information.getParameter
-                                        (DataSourceInformationFactory.
-                                                PROP_REMOVEABANDONEDTIMEOUT))));
+                        String.valueOf(information.getRemoveAbandonedTimeout())));
         ref.add
                 (new StringRefAddr(
                         DataSourceInformationFactory.PROP_LOGABANDONED,
-                        String.valueOf(
-                                information.getParameter(
-                                        DataSourceInformationFactory.PROP_LOGABANDONED))));
+                        String.valueOf(information.isLogAbandoned())));
         ref.add(
                 new StringRefAddr(
                         DataSourceInformationFactory.PROP_POOLPREPAREDSTATEMENTS,
-                        String.valueOf(
-                                information.getParameter(
-                                        DataSourceInformationFactory.
-                                                PROP_POOLPREPAREDSTATEMENTS))));
+                        String.valueOf(information.isPoolPreparedStatements())));
         ref.add(
                 new StringRefAddr(DataSourceInformationFactory.PROP_MAXOPENPREPAREDSTATEMENTS,
-                        String.valueOf(
-                                information.getParameter(
-                                        DataSourceInformationFactory.
-                                                PROP_MAXOPENPREPAREDSTATEMENTS))));
+                        String.valueOf(information.getMaxOpenPreparedStatements())));
         ref.add(
                 new StringRefAddr(
                         DataSourceInformationFactory.PROP_INITIALSIZE, String.valueOf(
-                        information.getParameter(
-                                DataSourceInformationFactory.PROP_INITIALSIZE))));
+                        information.getInitialSize())));
 
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
             ref.add(new StringRefAddr

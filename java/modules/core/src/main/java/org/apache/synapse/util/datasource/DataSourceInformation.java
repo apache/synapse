@@ -43,6 +43,16 @@ public class DataSourceInformation {
     private boolean defaultReadOnly = false;
     private boolean testOnBorrow = true;
     private boolean testOnReturn = false;
+    private int minIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
+    private int initialSize;
+    private int defaultTransactionIsolation = -1;
+    private String defaultCatalog;
+    private boolean accessToUnderlyingConnectionAllowed;
+    private boolean removeAbandoned;
+    private long removeAbandonedTimeout;
+    private boolean logAbandoned;
+    private boolean poolPreparedStatements;
+    private int maxOpenPreparedStatements;
 
     private long timeBetweenEvictionRunsMillis =
             GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
@@ -57,6 +67,80 @@ public class DataSourceInformation {
     private String validationQuery;
 
     private final Map<String, Object> parameters = new HashMap<String, Object>();
+
+
+    public int getMinIdle() {
+        return minIdle;
+    }
+
+    public void setMinIdle(int minIdle) {
+        this.minIdle = minIdle;
+    }
+
+
+    public int getDefaultTransactionIsolation() {
+        return defaultTransactionIsolation;
+    }
+
+    public void setDefaultTransactionIsolation(int defaultTransactionIsolation) {
+        this.defaultTransactionIsolation = defaultTransactionIsolation;
+    }
+
+    public String getDefaultCatalog() {
+        return defaultCatalog;
+    }
+
+    public void setDefaultCatalog(String defaultCatalog) {
+        this.defaultCatalog = defaultCatalog;
+    }
+
+    public boolean isAccessToUnderlyingConnectionAllowed() {
+        return accessToUnderlyingConnectionAllowed;
+    }
+
+    public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
+        this.accessToUnderlyingConnectionAllowed = accessToUnderlyingConnectionAllowed;
+    }
+
+    public boolean isRemoveAbandoned() {
+        return removeAbandoned;
+    }
+
+    public void setRemoveAbandoned(boolean removeAbandoned) {
+        this.removeAbandoned = removeAbandoned;
+    }
+
+    public long getRemoveAbandonedTimeout() {
+        return removeAbandonedTimeout;
+    }
+
+    public void setRemoveAbandonedTimeout(long removeAbandonedTimeout) {
+        this.removeAbandonedTimeout = removeAbandonedTimeout;
+    }
+
+    public boolean isLogAbandoned() {
+        return logAbandoned;
+    }
+
+    public void setLogAbandoned(boolean logAbandoned) {
+        this.logAbandoned = logAbandoned;
+    }
+
+    public boolean isPoolPreparedStatements() {
+        return poolPreparedStatements;
+    }
+
+    public void setPoolPreparedStatements(boolean poolPreparedStatements) {
+        this.poolPreparedStatements = poolPreparedStatements;
+    }
+
+    public int getMaxOpenPreparedStatements() {
+        return maxOpenPreparedStatements;
+    }
+
+    public void setMaxOpenPreparedStatements(int maxOpenPreparedStatements) {
+        this.maxOpenPreparedStatements = maxOpenPreparedStatements;
+    }
 
     public String getUser() {
         return user;
@@ -208,5 +292,13 @@ public class DataSourceInformation {
 
     public void setValidationQuery(String validationQuery) {
         this.validationQuery = validationQuery;
+    }
+
+    public int getInitialSize() {
+        return initialSize;
+    }
+
+    public void setInitialSize(int initialSize) {
+        this.initialSize = initialSize;
     }
 }

@@ -26,6 +26,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMBean;
@@ -92,7 +94,8 @@ public class InMemoryTransaction implements Transaction {
 	
 	public void enlist(RMBean bean) {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
-		if (bean != null) {
+		if(isActive()){
+		  if (bean != null) {
 			DummyTransaction tran = null;
 			synchronized (bean) {
 				tran = (DummyTransaction) bean.getTransaction();
@@ -122,7 +125,12 @@ public class InMemoryTransaction implements Transaction {
 
 			}
 		}
-		
+	} else {
+		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
+		IllegalStateException e = new IllegalStateException(message);
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("An attempt to enlist new work to an InMemoryTransaction that has previously been committed or rolled back.", e);
+		throw e;
+	}
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::enlist");
 	}
 	
@@ -165,6 +173,7 @@ public class InMemoryTransaction implements Transaction {
 		return thread;
 	}
 }
+
 
 
 

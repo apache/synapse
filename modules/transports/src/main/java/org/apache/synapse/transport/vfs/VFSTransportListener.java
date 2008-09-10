@@ -284,18 +284,13 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     }
                     break;
 
-                case PollTableEntry.WITH_ERRORS:
-                    if (entry.getActionAfterProcess() == PollTableEntry.MOVE) {
-                        moveToDirectory = entry.getMoveAfterErrors();
-                    }
-                    break;
-
                 case PollTableEntry.FAILED:
-                    if (entry.getActionAfterProcess() == PollTableEntry.MOVE) {
+                    if (entry.getActionAfterFailure() == PollTableEntry.MOVE) {
                         moveToDirectory = entry.getMoveAfterFailure();
                     }
                     break;
-                case PollTableEntry.NONE:
+                
+                default:
                     return;
             }
 

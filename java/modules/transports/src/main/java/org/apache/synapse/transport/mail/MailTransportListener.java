@@ -398,7 +398,7 @@ public class MailTransportListener extends AbstractPollingTransportListener<Poll
                     break;
 
                 case PollTableEntry.FAILED:
-                    if (entry.getActionAfterProcess() == PollTableEntry.MOVE) {
+                    if (entry.getActionAfterFailure() == PollTableEntry.MOVE) {
                         moveToFolder = entry.getMoveAfterFailure();
                     }
                     break;

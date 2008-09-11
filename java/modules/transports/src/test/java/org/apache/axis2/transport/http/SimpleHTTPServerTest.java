@@ -17,33 +17,35 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.nhttp;
+package org.apache.axis2.transport.http;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.http.HttpTransportTestSuiteBuilder;
 
-public class HttpCoreNIOListenerTest extends TestCase {
+public class SimpleHTTPServerTest extends TestCase {
     public static TestSuite suite() throws Exception {
-        TransportTestSuite suite = new TransportTestSuite(HttpCoreNIOListenerTest.class);
+        TransportTestSuite suite = new TransportTestSuite(SimpleHTTPServerTest.class);
         
-        // These tests don't work because of a problem similar to SYNAPSE-418
-        suite.addExclude("(test=EchoXML)");
+        TransportDescriptionFactory tdf =
+            new SimpleTransportDescriptionFactory("http", SimpleHTTPServer.class, 
+                                                  CommonsHTTPTransportSender.class) {
+
+            @Override
+            public TransportInDescription createTransportInDescription() throws Exception {
+                TransportInDescription desc = super.createTransportInDescription();
+                desc.addParameter(new Parameter(SimpleHTTPServer.PARAM_PORT, "8280"));
+                return desc;
+            }
+        };
         
-        TransportDescriptionFactory tdfNIO =
-            new SimpleTransportDescriptionFactory("http", HttpCoreNIOListener.class, 
-                                                  HttpCoreNIOSender.class);
-        
-        HttpTransportTestSuiteBuilder builder = new HttpTransportTestSuiteBuilder(suite, tdfNIO);
-        
-        builder.addAxisTestClientSetup(new HttpAxisTestClientSetup(false));
-        builder.addAxisTestClientSetup(new HttpAxisTestClientSetup(true));
-        
-        builder.build();
+        new HttpTransportTestSuiteBuilder(suite, tdf).build();
         
         return suite;
     }

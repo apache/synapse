@@ -87,4 +87,16 @@ public class ProxyServiceTest extends TestCase {
         // referring to locations such as "my-matches?xsd=xsd0.xsd".
         axisService.printWSDL(new ByteArrayOutputStream());
     }
+    
+    /**
+     * Test a proxy service with recursive imports and without a {@link ResourceMap}.
+     * Regression test for SYNAPSE-442.
+     */
+    public void testRecursiveImports2() throws Exception {
+        ProxyService testService = new ProxyService("mytest");
+        SynapseConfiguration synCfg = new SynapseConfiguration();
+        AxisConfiguration axisCfg = new AxisConfiguration();
+        testService.setWsdlURI(getClass().getResource("SimpleStockService.wsdl").toURI());
+        testService.buildAxisService(synCfg, axisCfg);
+    }
 }

@@ -48,7 +48,7 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
     
     @Override
     protected AxisOperation createOperation() {
-        AxisOperation operation = new InOnlyAxisOperation(new QName("in"));
+        AxisOperation operation = new InOnlyAxisOperation(new QName("default"));
         operation.setMessageReceiver(this);
         return operation;
     }

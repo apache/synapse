@@ -55,7 +55,7 @@ public class HttpCoreNIOListenerTest extends TestCase {
             @Override
             public TransportInDescription createTransportInDescription() throws Exception {
                 TransportInDescription desc = super.createTransportInDescription();
-                desc.addParameter(new Parameter(SimpleHTTPServer.PARAM_PORT, "8888"));
+                desc.addParameter(new Parameter(SimpleHTTPServer.PARAM_PORT, "8280"));
                 return desc;
             }
         };
@@ -77,13 +77,15 @@ public class HttpCoreNIOListenerTest extends TestCase {
         builder.addRESTAsyncTestClient(new JavaNetRESTClient());
         
         builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint());
-        builder.addByteArrayAsyncEndpoint(new JettyAsyncEndpoint());
+        builder.addByteArrayAsyncEndpoint(new JettyByteArrayAsyncEndpoint());
+        builder.addRESTAsyncEndpoint(new JettyRESTAsyncEndpoint());
         
         builder.addRequestResponseChannel(channel);
         
         builder.addAxisRequestResponseTestClient(new AxisRequestResponseTestClient());
         
         builder.addEchoEndpoint(new AxisEchoEndpoint());
+        builder.addEchoEndpoint(new JettyEchoEndpoint());
         
         builder.build();
         

@@ -73,9 +73,12 @@ public class CustomWSDLLocator implements WSDLLocator {
             result = resourceMap.resolve(synCfg, relativeLocation);
         }
         if (result == null) {
-            result = new InputSource(SynapseConfigUtils.resolveRelativeURI(parentLocation, relativeLocation));
+            String location = SynapseConfigUtils.resolveRelativeURI(parentLocation, relativeLocation);
+            result = new InputSource(location);
+            latestImportURI = location;
+        } else {
+            latestImportURI = relativeLocation;
         }
-        this.latestImportURI = relativeLocation;
         return result;
     }
 

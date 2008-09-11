@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.nhttp;
+package org.apache.synapse.transport.testkit.http;
 
 import java.util.UUID;
 

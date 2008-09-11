@@ -20,41 +20,29 @@
 package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
-import org.apache.synapse.transport.testkit.name.Name;
-import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
+import org.apache.synapse.transport.testkit.message.RESTMessage;
+import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.mortbay.http.HttpException;
 import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
 
-@Name("jetty")
-public abstract class JettyAsyncEndpoint<M> extends JettyEndpoint implements AsyncEndpoint<M> {
-    private BlockingQueue<IncomingMessage<M>> queue;
-    
-    @SuppressWarnings("unused")
-    private void setUp() throws Exception {
-        queue = new LinkedBlockingQueue<IncomingMessage<M>>();
-    }
-    
+public class JettyRESTAsyncEndpoint extends JettyAsyncEndpoint<RESTMessage> {
     @Override
-    protected void handle(String pathParams, HttpRequest request, HttpResponse response)
+    protected IncomingMessage<RESTMessage> handle(HttpRequest request)
             throws HttpException, IOException {
         
-        queue.add(handle(request));
-    }
-    
-    protected abstract IncomingMessage<M> handle(HttpRequest request) throws HttpException, IOException;
-    
-    @SuppressWarnings("unused")
-    private void tearDown() throws Exception {
-        queue = null;
-    }
-    
-    public IncomingMessage<M> waitForMessage(int timeout) throws Throwable {
-        return queue.poll(timeout, TimeUnit.MILLISECONDS);
+        List<Parameter> parameters = new LinkedList<Parameter>();
+        for (Map.Entry<String,List<String>> entry :
+                ((Map<String,List<String>>)request.getParameters()).entrySet()) {
+            for (String value : entry.getValue()) {
+                parameters.add(new Parameter(entry.getKey(), value));
+            }
+        }
+        return new IncomingMessage<RESTMessage>(null, new RESTMessage(parameters.toArray(
+                new Parameter[parameters.size()])));
     }
 }

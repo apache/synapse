@@ -55,7 +55,8 @@ public class MailTransportListenerTest extends TestCase {
         
         builder.addAsyncChannel(channel);
         
-        builder.addAxisAsyncTestClient(new AxisAsyncTestClient());
+        builder.addAxisAsyncTestClient(new AxisAsyncTestClient(), new MailAxisTestClientSetup(MailConstants.TRANSPORT_FORMAT_TEXT));
+        builder.addAxisAsyncTestClient(new AxisAsyncTestClient(), new MailAxisTestClientSetup(MailConstants.TRANSPORT_FORMAT_MP));
         builder.addByteArrayAsyncTestClient(new MailAsyncClient(new FlatLayout()));
         builder.addByteArrayAsyncTestClient(new MailAsyncClient(new MultipartLayout()));
         

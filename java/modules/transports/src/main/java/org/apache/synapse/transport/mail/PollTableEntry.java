@@ -40,6 +40,7 @@ public class PollTableEntry extends AbstractPollTableEntry {
     // operation after mail check
     public static final int DELETE = 0;
     public static final int MOVE   = 1;
+    public static final int LEAVE  = 2;
 
     /** The email address mapped to the service */
     private InternetAddress emailAddress = null;

@@ -174,7 +174,10 @@ public class MessageHelper {
         Attachments attachments = ori.getAttachmentMap();
         if (attachments != null && attachments.getAllContentIDs().length > 0) {
             String[] cIDs = attachments.getAllContentIDs();
-            String soapPart = attachments.getSOAPPartContentID();
+            String soapPart = null;
+            try {
+                soapPart = attachments.getSOAPPartContentID();
+            } catch (Exception ignore) {}
             for (String cID : cIDs) {
                 if (!cID.equals(soapPart)) {
                     newMC.addAttachment(cID, attachments.getDataHandler(cID));

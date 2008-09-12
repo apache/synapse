@@ -362,8 +362,8 @@ public class MailTransportSender extends AbstractTransportSender
             }
 
         } catch (MessagingException e) {
-            handleException("Error creating mail message or sending it to the configured server", e);
             metrics.incrementFaultsSending();
+            handleException("Error creating mail message or sending it to the configured server", e);
             
         }
     }

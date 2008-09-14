@@ -23,6 +23,7 @@ import javax.mail.internet.ContentType;
 
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+import org.apache.synapse.transport.testkit.message.IncomingMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;
 
@@ -47,12 +48,12 @@ public abstract class AsyncMessageTestCase<M> extends MessageTestCase {
         // Run the test.
 //                    contentTypeMode == ContentTypeMode.TRANSPORT ? contentType : null);
         client.sendMessage(options, options.getBaseContentType(), expected);
-        M actual = endpoint.waitForMessage(8000).getData();
+        IncomingMessage<M> actual = endpoint.waitForMessage(8000);
         if (actual == null) {
             fail("Failed to get message");
         }
         
-        checkMessageData(expected, actual);
+        checkMessageData(expected, actual.getData());
     }
     
     protected abstract M prepareMessage() throws Exception;

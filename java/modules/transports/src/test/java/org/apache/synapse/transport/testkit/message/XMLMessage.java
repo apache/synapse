@@ -94,4 +94,16 @@ public class XMLMessage {
     public Attachments getAttachments() {
         return attachments;
     }
+    
+    public static Type getTypeFromContentType(ContentType contentType) {
+        String baseType = contentType.getBaseType();
+        Type type = null;
+        for (Type candidate : Type.values()) {
+            if (candidate.getContentType().getBaseType().equals(baseType)) {
+                type = candidate;
+                break;
+            }
+        }
+        return type;
+    }
 }

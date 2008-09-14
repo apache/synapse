@@ -29,24 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.Timer;
-import java.util.Map;
-import java.util.HashMap;
 
 public abstract class AbstractPollingTransportListener<T extends AbstractPollTableEntry>
         extends AbstractTransportListener {
 
     /** The main timer. */
-    protected Timer timer;
-    /** is a poll already executing? */
-    protected boolean pollInProgress = false;
-    /** a lock to prevent concurrent execution of polling */
-    protected final Object pollLock = new Object();
-    /** a map that keeps track of services to the timer tasks created for them */
-    protected Map serviceToTimerTaskMap = new HashMap();
+    private Timer timer;
     /** Keep the list of endpoints and poll durations */
     private final List<T> pollTable = new ArrayList<T>();
-    /** Keep the list of removed pollTable entries */
-    private final List<T> removeTable = new ArrayList<T>();
 
     @Override
     public void init(ConfigurationContext cfgCtx,
@@ -64,78 +54,42 @@ public abstract class AbstractPollingTransportListener<T extends AbstractPollTab
     }
 
     /**
-     * Schedule a repeated poll at the specified interval for the given service
-     * @param service the service to be polled
+     * Schedule a repeated poll at the specified interval for a given service.
+     * The method will schedule a single-shot timer task with executes a work
+     * task on the worker pool. At the end of this work task, a new timer task
+     * is scheduled for the next poll (except if the polling for the service
+     * has been canceled). This effectively schedules the poll repeatedly
+     * with fixed delay.
+     * @param entry the poll table entry with the configuration for the service
      * @param pollInterval the interval between successive polls in milliseconds
      */
-    public void schedulePoll(AxisService service, long pollInterval) {
-        TimerTask task = (TimerTask) serviceToTimerTaskMap.get(service);
-
-        // if a timer task exists, cancel it first and create a new one
-        if (task != null) {
-            task.cancel();
-        }
-
-        task = new TimerTask() {
+    void schedulePoll(final T entry, final long pollInterval) {
+        TimerTask timerTask = new TimerTask() {
+            @Override
             public void run() {
-                if (pollInProgress) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Transport " + getTransportName() +
-                                " onPoll() trigger : already executing poll..");
-                    }
-                    return;
-                }
-
-                if (state == BaseConstants.PAUSED) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Transport " + getTransportName() +
-                                " onPoll() trigger : Transport is currently paused..");
-                    }
-                    return;
-                }
-
                 workerPool.execute(new Runnable() {
                     public void run() {
-                        synchronized (pollLock) {
-                            pollInProgress = true;
-                            try {
-                                onPoll();
-                            } finally {
-                                pollInProgress = false;
+                        if (state == BaseConstants.PAUSED) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Transport " + getTransportName() +
+                                        " poll trigger : Transport is currently paused..");
+                            }
+                        } else {
+                            poll(entry);
+                        }
+                        synchronized (entry) {
+                            if (!entry.canceled) {
+                                schedulePoll(entry, pollInterval);
                             }
                         }
                     }
                 });
             }
         };
-        serviceToTimerTaskMap.put(service, task);
-        timer.scheduleAtFixedRate(task, pollInterval, pollInterval);
+        entry.timerTask = timerTask;
+        timer.schedule(timerTask, pollInterval);
     }
 
-    /**
-     * Cancel any pending timer tasks for the given service
-     * @param service the service for which the timer task should be cancelled
-     */
-    public void cancelPoll(AxisService service) {
-        TimerTask task = (TimerTask) serviceToTimerTaskMap.get(service);
-        if (task != null) {
-            task.cancel();
-        }
-    }
-
-    public void onPoll() {
-        if (!removeTable.isEmpty()) {
-            pollTable.removeAll(removeTable);
-        }
-
-        for (T entry : pollTable) {
-            long startTime = System.currentTimeMillis();
-            if (startTime > entry.getNextPollTime()) {
-                poll(entry);
-            }
-        }
-    }
-    
     protected abstract void poll(T entry);
 
     /**
@@ -184,7 +138,7 @@ public abstract class AbstractPollingTransportListener<T extends AbstractPollTab
             disableTransportForService(service);
         } else {
             entry.setServiceName(service.getName());
-            schedulePoll(service, pollInterval);
+            schedulePoll(entry, pollInterval);
             pollTable.add(entry);
         }
     }
@@ -213,8 +167,11 @@ public abstract class AbstractPollingTransportListener<T extends AbstractPollTab
     protected void stopListeningForService(AxisService service) {
         for (T entry : pollTable) {
             if (service.getName().equals(entry.getServiceName())) {
-                cancelPoll(service);
-                removeTable.add(entry);
+                synchronized (entry) {
+                    entry.timerTask.cancel();
+                    entry.canceled = true;
+                }
+                break;
             }
         }
     }

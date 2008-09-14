@@ -19,6 +19,8 @@
 
 package org.apache.synapse.transport.base;
 
+import java.util.TimerTask;
+
 import org.apache.axis2.addressing.EndpointReference;
 
 public abstract class AbstractPollTableEntry {
@@ -38,6 +40,10 @@ public abstract class AbstractPollTableEntry {
     private long pollInterval;
     /** state of the last poll */
     private int lastPollState;
+    /** The timer task that will trigger the next poll */
+    TimerTask timerTask;
+    /** Flag indicating whether polling has been canceled. */
+    boolean canceled;
     
     public String getServiceName() {
         return serviceName;

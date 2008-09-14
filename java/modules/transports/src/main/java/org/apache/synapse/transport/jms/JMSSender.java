@@ -103,7 +103,6 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
         Connection connection = null;   // holds a one time connection if used
         JMSOutTransportInfo jmsOut = null;
         Session session = null;
-        Destination destination = null;
         Destination replyDestination = null;
 
         try {
@@ -165,7 +164,6 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                         handleException("Error creating a connection/session for : " + targetAddress, e);
                     }
                 }
-                destination = jmsOut.getDestination();
                 replyDestination = jmsOut.getReplyDestination();
 
             } else if (outTransportInfo != null && outTransportInfo instanceof JMSOutTransportInfo) {
@@ -175,8 +173,9 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
 
                 session = jmsConnectionFactory.getSessionForDestination(
                     jmsOut.getDestination().toString());
-                destination = jmsOut.getDestination();
             }
+            
+            Destination destination = jmsOut.getDestination();
 
             String replyDestName = (String) msgCtx.getProperty(JMSConstants.JMS_REPLY_TO);
             if (replyDestName != null) {

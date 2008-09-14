@@ -32,7 +32,7 @@ import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class MailTransportListenerTest extends TestCase {
     public static TestSuite suite() throws Exception {
-        TransportTestSuite suite = new TransportTestSuite(MailTransportListenerTest.class, false);
+        TransportTestSuite suite = new TransportTestSuite(MailTransportListenerTest.class);
         
         // TODO: these test don't work; need more analysis why this is so
         suite.addExclude("(&(messageType=SOAP12)(data=Latin1))");

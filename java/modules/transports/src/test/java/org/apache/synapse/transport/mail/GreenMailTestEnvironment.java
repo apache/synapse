@@ -29,6 +29,7 @@ import javax.mail.Flags;
 
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.util.LogManager;
+import org.apache.synapse.transport.testkit.util.ServerUtil;
 
 import com.icegreen.greenmail.store.FolderListener;
 import com.icegreen.greenmail.store.MailFolder;
@@ -56,6 +57,8 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
         greenMail = new GreenMail(new ServerSetup[] { SMTP, POP3 });
         greenMail.start();
         unallocatedAccounts = new LinkedList<Account>();
+        ServerUtil.waitForServer(SMTP.getPort());
+        ServerUtil.waitForServer(POP3.getPort());
     }
 
     @SuppressWarnings("unused")

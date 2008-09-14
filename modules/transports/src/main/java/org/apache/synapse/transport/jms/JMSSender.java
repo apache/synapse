@@ -258,9 +258,14 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
 
                 // if we are expecting a synchronous response back for the message sent out
                 if (waitForResponse) {
-                    try {
-                        connection.start();
-                    } catch (JMSException ignore) {}
+                    if (connection != null) {
+                        try {
+                            connection.start();
+                        } catch (JMSException ignore) {}
+                    } else {
+                        // If connection is null, we are using a cached session and the underlying
+                        // connection is already started. Thus, there is nothing to do here.
+                    }
                     try {
                         correlationId = message.getJMSMessageID();
                     } catch(JMSException ignore) {}

@@ -243,7 +243,7 @@ public class MailTransportSender extends AbstractTransportSender
         if (trpHeaders != null && trpHeaders.containsKey(MailConstants.MAIL_HEADER_CC)) {
             message.setRecipients(Message.RecipientType.CC,
                 InternetAddress.parse((String) trpHeaders.get(MailConstants.MAIL_HEADER_CC)));
-        } else if (outInfo.getTargetAddresses() != null) {
+        } else if (outInfo.getCcAddresses() != null) {
             message.setRecipients(Message.RecipientType.CC, outInfo.getCcAddresses());
         }
 

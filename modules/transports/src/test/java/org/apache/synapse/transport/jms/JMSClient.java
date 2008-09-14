@@ -22,21 +22,37 @@ package org.apache.synapse.transport.jms;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.mail.internet.ContentType;
 
+import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
+import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.synapse.transport.testkit.name.Named;
 
-public class JMSClient implements TestClient {
-    protected Connection connection;
-    protected Session session;
-    protected MessageProducer producer;
-    protected ContentTypeMode contentTypeMode;
+@Name("jms")
+public class JMSClient<T> implements TestClient {
+    protected final JMSMessageFactory<T> jmsMessageFactory;
     
+    private Connection connection;
+    private Session session;
+    private MessageProducer producer;
+    private ContentTypeMode contentTypeMode;
+    
+    public JMSClient(JMSMessageFactory<T> jmsMessageFactory) {
+        this.jmsMessageFactory = jmsMessageFactory;
+    }
+
+    @Named
+    public JMSMessageFactory<T> getJmsMessageFactory() {
+        return jmsMessageFactory;
+    }
+
     @SuppressWarnings("unused")
-    private void setUp(JMSTestEnvironment env, JMSAsyncChannel channel) throws Exception {
+    private void setUp(JMSTestEnvironment env, JMSChannel channel) throws Exception {
         Destination destination = channel.getDestination();
         ConnectionFactory connectionFactory = env.getConnectionFactory(destination);
         connection = connectionFactory.createConnection();
@@ -45,6 +61,15 @@ public class JMSClient implements TestClient {
         contentTypeMode = channel.getContentTypeMode();
     }
 
+    protected String doSendMessage(ClientOptions options, ContentType contentType, T message) throws Exception {
+        Message jmsMessage = jmsMessageFactory.createMessage(session, message);
+        if (contentTypeMode == ContentTypeMode.TRANSPORT) {
+            jmsMessage.setStringProperty(BaseConstants.CONTENT_TYPE, contentType.toString());
+        }
+        producer.send(jmsMessage);
+        return jmsMessage.getJMSMessageID();
+    }
+    
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
         producer.close();

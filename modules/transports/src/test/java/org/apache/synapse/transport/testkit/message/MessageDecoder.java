@@ -21,6 +21,7 @@ package org.apache.synapse.transport.testkit.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,18 +114,11 @@ public interface MessageDecoder<T,U> {
         new MessageDecoder<byte[],XMLMessage>() {
     
         public XMLMessage decode(ContentType contentType, byte[] message) throws Exception {
-            String baseType = contentType.getBaseType();
-            ByteArrayInputStream in = new ByteArrayInputStream(message);
-            XMLMessage.Type type = null;
-            for (XMLMessage.Type candidate : XMLMessage.Type.values()) {
-                if (candidate.getContentType().getBaseType().equals(baseType)) {
-                    type = candidate;
-                    break;
-                }
-            }
+            XMLMessage.Type type = XMLMessage.getTypeFromContentType(contentType);
             if (type == null) {
-                throw new Exception("Unrecognized content type " + baseType);
+                throw new Exception("Unrecognized content type " + contentType);
             }
+            ByteArrayInputStream in = new ByteArrayInputStream(message);
             if (type == XMLMessage.Type.SWA) {
                 Attachments attachments = new Attachments(in, contentType.toString());
                 XMLStreamReader reader = StAXUtils.createXMLStreamReader(attachments.getSOAPPartInputStream());
@@ -140,6 +134,25 @@ public interface MessageDecoder<T,U> {
                 }
                 return new XMLMessage(payload, type);
             }
+        }
+    };
+    
+    MessageDecoder<String,XMLMessage> STRING_TO_XML =
+        new MessageDecoder<String,XMLMessage>() {
+
+        public XMLMessage decode(ContentType contentType, String message) throws Exception {
+            XMLMessage.Type type = XMLMessage.getTypeFromContentType(contentType);
+            if (type == null) {
+                throw new Exception("Unrecognized content type " + contentType);
+            }
+            XMLStreamReader reader = StAXUtils.createXMLStreamReader(new StringReader(message));
+            OMElement payload;
+            if (type == XMLMessage.Type.POX) {
+                payload = new StAXOMBuilder(reader).getDocumentElement();
+            } else {
+                payload = new StAXSOAPModelBuilder(reader).getSOAPEnvelope().getBody().getFirstElement();
+            }
+            return new XMLMessage(payload, type);
         }
     };
 

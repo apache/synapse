@@ -163,6 +163,10 @@ public class TransportTestSuiteBuilder {
         xmlRequestResponseClients.add(adapt(client, MessageEncoder.XML_TO_BYTE, MessageDecoder.BYTE_TO_XML), relatedResources);
     }
     
+    public void addStringRequestResponseTestClient(RequestResponseTestClient<String,String> client, Object... relatedResources) {
+        xmlRequestResponseClients.add(adapt(client, MessageEncoder.XML_TO_STRING, MessageDecoder.STRING_TO_XML), relatedResources);
+    }
+    
     public void addEchoEndpoint(Endpoint endpoint, Object... relatedResources) {
         echoEndpoints.add(endpoint, relatedResources);
     }

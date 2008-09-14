@@ -204,22 +204,42 @@ public class MailTransportSender extends AbstractTransportSender
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
 
+        if (log.isDebugEnabled()) {
+            log.debug("Creating MIME message using message formatter " +
+                    messageFormatter.getClass().getSimpleName());
+        }
+
         WSMimeMessage message = new WSMimeMessage(session);
         Map trpHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (log.isDebugEnabled() && trpHeaders != null) {
+            log.debug("Using transport headers: " + trpHeaders);
+        }
 
         // set From address - first check if this is a reply, then use from address from the
         // transport out, else if any custom transport headers set on this message, or default
         // to the transport senders default From address        
         if (outInfo.getTargetAddresses() != null && outInfo.getFromAddress() != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Setting From header to " + outInfo.getFromAddress().getAddress() +
+                        " from OutTransportInfo");
+            }
             message.setFrom(outInfo.getFromAddress());
             message.setReplyTo((new Address []{outInfo.getFromAddress()}));
         } else if (trpHeaders != null && trpHeaders.containsKey(MailConstants.MAIL_HEADER_FROM)) {
-            message.setFrom(
-                new InternetAddress((String) trpHeaders.get(MailConstants.MAIL_HEADER_FROM)));
-            message.setReplyTo(InternetAddress.parse(
-                (String) trpHeaders.get(MailConstants.MAIL_HEADER_FROM)));
+            InternetAddress from =
+                new InternetAddress((String) trpHeaders.get(MailConstants.MAIL_HEADER_FROM));
+            if (log.isDebugEnabled()) {
+                log.debug("Setting From header to " + from.getAddress() +
+                        " from transport headers");
+            }
+            message.setFrom(from);
+            message.setReplyTo(new Address[] { from });
         } else {
             if (smtpFromAddress != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Setting From header to " + smtpFromAddress.getAddress() +
+                            " from transport configuration");
+                }
                 message.setFrom(smtpFromAddress);
                 message.setReplyTo(new Address[] {smtpFromAddress});
             } else {
@@ -230,9 +250,18 @@ public class MailTransportSender extends AbstractTransportSender
         // set To address/es to any custom transport header set on the message, else use the reply
         // address from the out transport information
         if (trpHeaders != null && trpHeaders.containsKey(MailConstants.MAIL_HEADER_TO)) {
-            message.setRecipients(Message.RecipientType.TO,
-                InternetAddress.parse((String) trpHeaders.get(MailConstants.MAIL_HEADER_TO)));
+            Address[] to =
+                InternetAddress.parse((String) trpHeaders.get(MailConstants.MAIL_HEADER_TO)); 
+            if (log.isDebugEnabled()) {
+                log.debug("Setting To header to " + InternetAddress.toString(to) +
+                        " from transport headers");
+            }
+            message.setRecipients(Message.RecipientType.TO, to);
         } else if (outInfo.getTargetAddresses() != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Setting To header to " + InternetAddress.toString(
+                        outInfo.getTargetAddresses()) + " from OutTransportInfo");
+            }
             message.setRecipients(Message.RecipientType.TO, outInfo.getTargetAddresses());
         } else {
             handleException("To address for outgoing message cannot be determined");
@@ -241,9 +270,18 @@ public class MailTransportSender extends AbstractTransportSender
         // set Cc address/es to any custom transport header set on the message, else use the
         // Cc list from original request message
         if (trpHeaders != null && trpHeaders.containsKey(MailConstants.MAIL_HEADER_CC)) {
-            message.setRecipients(Message.RecipientType.CC,
-                InternetAddress.parse((String) trpHeaders.get(MailConstants.MAIL_HEADER_CC)));
+            Address[] cc =
+                InternetAddress.parse((String) trpHeaders.get(MailConstants.MAIL_HEADER_CC)); 
+            if (log.isDebugEnabled()) {
+                log.debug("Setting Cc header to " + InternetAddress.toString(cc) +
+                        " from transport headers");
+            }
+            message.setRecipients(Message.RecipientType.CC, cc);
         } else if (outInfo.getCcAddresses() != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Setting Cc header to " + InternetAddress.toString(
+                        outInfo.getCcAddresses()) + " from OutTransportInfo");
+            }
             message.setRecipients(Message.RecipientType.CC, outInfo.getCcAddresses());
         }
 
@@ -252,6 +290,10 @@ public class MailTransportSender extends AbstractTransportSender
         InternetAddress[] trpBccArr = null;
         if (trpHeaders != null && trpHeaders.containsKey(MailConstants.MAIL_HEADER_BCC)) {
             trpBccArr = InternetAddress.parse((String) trpHeaders.get(MailConstants.MAIL_HEADER_BCC));
+            if (log.isDebugEnabled()) {
+                log.debug("Adding Bcc header values " + InternetAddress.toString(trpBccArr) +
+                        " from transport headers");
+            }
         }
 
         InternetAddress[] mergedBcc = new InternetAddress[
@@ -261,6 +303,10 @@ public class MailTransportSender extends AbstractTransportSender
             System.arraycopy(trpBccArr, 0, mergedBcc, 0, trpBccArr.length);
         }
         if (smtpBccAddresses != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding Bcc header values " + InternetAddress.toString(smtpBccAddresses) +
+                        " from transport configuration");
+            }
             System.arraycopy(smtpBccAddresses, 0, mergedBcc, mergedBcc.length, smtpBccAddresses.length);
         }
         if (mergedBcc != null) {
@@ -269,10 +315,21 @@ public class MailTransportSender extends AbstractTransportSender
 
         // set subject
         if (trpHeaders != null && trpHeaders.containsKey(MailConstants.MAIL_HEADER_SUBJECT)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Setting Subject header to '" + trpHeaders.get(
+                        MailConstants.MAIL_HEADER_SUBJECT) + "' from transport headers");
+            }
             message.setSubject((String) trpHeaders.get(MailConstants.MAIL_HEADER_SUBJECT));
         } else if (outInfo.getSubject() != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Setting Subject header to '" + outInfo.getSubject() +
+                        "' from transport headers");
+            }
             message.setSubject(outInfo.getSubject());
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Generating default Subject header from SOAP action");
+            }
             message.setSubject(BaseConstants.SOAPACTION + ": " + msgContext.getSoapAction());
         }
 
@@ -322,6 +379,10 @@ public class MailTransportSender extends AbstractTransportSender
             mFormat = defaultMailFormat;
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Using mail format '" + mFormat + "'");
+        }
+
         if (MailConstants.TRANSPORT_FORMAT_MP.equals(mFormat)) {
             mimeMultiPart = new MimeMultipart();
             MimeBodyPart mimeBodyPart1 = new MimeBodyPart();
@@ -342,6 +403,7 @@ public class MailTransportSender extends AbstractTransportSender
             } else {
                 message.setContent(mimeMultiPart);
             }
+            log.debug("Sending message");
             Transport.send(message);
 
             // update metrics

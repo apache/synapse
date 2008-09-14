@@ -37,6 +37,8 @@ public class JMSOutTransportInfo implements OutTransportInfo {
 
     private static final Log log = LogFactory.getLog(JMSOutTransportInfo.class);
 
+    /** The naming context */
+    private Context context;
     /**
      * this is a reference to the underlying JMS connection factory when sending messages
      * through connection factories not defined to the transport sender
@@ -100,6 +102,13 @@ public class JMSOutTransportInfo implements OutTransportInfo {
             if(replyDestinationName != null) {
                 setReplyDestinationName(replyDestinationName);
             }
+            try {
+                context = new InitialContext(properties);
+            } catch (NamingException e) {
+                handleException("Could not get an initial context using " + properties, e);
+            }
+            destination = getDestination(context, targetEPR);
+            replyDestination = getReplyDestination(context, targetEPR);
         }
     }
 
@@ -109,15 +118,7 @@ public class JMSOutTransportInfo implements OutTransportInfo {
      */
     public void loadConnectionFactoryFromProperies() {
         if (properties != null) {
-            Context context = null;
-            try {
-                context = new InitialContext(properties);
-            } catch (NamingException e) {
-                handleException("Could not get an initial context using " + properties, e);
-            }
             connectionFactory = getConnectionFactory(context, properties);
-            destination = getDestination(context, targetEPR);
-            replyDestination = getReplyDestination(context, targetEPR);
         }
     }
 

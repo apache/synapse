@@ -41,9 +41,9 @@ public class JMSTransportTest extends TestCase {
         TransportTestSuite suite = new TransportTestSuite(JMSTransportTest.class);
         
         // SwA doesn't make sense with text messages
-        suite.addExclude("(&(test=AsyncSwA)(client=TextMessage))");
+        suite.addExclude("(&(test=AsyncSwA)(client=jms)(jmsType=text))");
         // SYNAPSE-304:
-        suite.addExclude("(&(test=AsyncTextPlain)(client=BytesMessage))");
+        suite.addExclude("(&(test=AsyncTextPlain)(client=jms)(jmsType=bytes))");
         // SYNAPSE-436:
         suite.addExclude("(&(test=EchoXML)(replyDestType=topic)(endpoint=axis))");
         
@@ -62,8 +62,8 @@ public class JMSTransportTest extends TestCase {
         builder.addAxisAsyncTestClient(new AxisAsyncTestClient());
         builder.addAxisAsyncTestClient(new AxisAsyncTestClient(), new JMSAxisTestClientSetup(JMSConstants.JMS_BYTE_MESSAGE));
         builder.addAxisAsyncTestClient(new AxisAsyncTestClient(), new JMSAxisTestClientSetup(JMSConstants.JMS_TEXT_MESSAGE));
-        builder.addByteArrayAsyncTestClient(new JMSBytesMessageClient());
-        builder.addStringAsyncTestClient(new JMSTextMessageClient());
+        builder.addByteArrayAsyncTestClient(new JMSAsyncClient<byte[]>(JMSBytesMessageFactory.INSTANCE));
+        builder.addStringAsyncTestClient(new JMSAsyncClient<String>(JMSTextMessageFactory.INSTANCE));
         
         builder.addAxisAsyncEndpoint(new AxisAsyncEndpoint());
         
@@ -77,6 +77,7 @@ public class JMSTransportTest extends TestCase {
         };
         
         builder.addAxisRequestResponseTestClient(new AxisRequestResponseTestClient(), timeoutSetup);
+        builder.addStringRequestResponseTestClient(new JMSRequestResponseClient<String>(JMSTextMessageFactory.INSTANCE));
         
         builder.addEchoEndpoint(new MockEchoEndpoint());
         builder.addEchoEndpoint(new AxisEchoEndpoint());

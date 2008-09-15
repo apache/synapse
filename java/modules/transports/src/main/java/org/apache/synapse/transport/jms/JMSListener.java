@@ -27,10 +27,7 @@ import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.transport.base.BaseUtils;
 import org.apache.synapse.transport.base.ManagementSupport;
 
-import javax.jms.JMSException;
-import javax.naming.NamingException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -59,8 +56,7 @@ public class JMSListener extends AbstractTransportListener implements Management
 
     public static final String TRANSPORT_NAME = Constants.TRANSPORT_JMS;
 
-    /** A Map containing the JMS connection factories managed by this, keyed by name */
-    private Map<String,JMSConnectionFactory> connectionFactories = new HashMap<String,JMSConnectionFactory>();
+    private JMSConnectionFactoryManager connFacManager;
     /** A Map of service name to the JMS EPR addresses */
     private Map<String,String> serviceNameToEPRMap = new HashMap<String,String>();
 
@@ -74,11 +70,12 @@ public class JMSListener extends AbstractTransportListener implements Management
                      TransportInDescription trpInDesc) throws AxisFault {
         super.init(cfgCtx, trpInDesc);
 
+        connFacManager = new JMSConnectionFactoryManager(cfgCtx, this, workerPool);
         // read the connection factory definitions and create them
-        loadConnectionFactoryDefinitions(trpInDesc);
+        connFacManager.loadConnectionFactoryDefinitions(trpInDesc);
 
         // if no connection factories are defined, we cannot listen for any messages
-        if (connectionFactories.isEmpty()) {
+        if (connFacManager.getNames().length == 0) {
             log.warn("No JMS connection factories are defined. Cannot listen for JMS");
             return;
         }
@@ -92,17 +89,7 @@ public class JMSListener extends AbstractTransportListener implements Management
      * @throws AxisFault
      */
     public void start() throws AxisFault {
-
-        for (JMSConnectionFactory conFac : connectionFactories.values()) {
-            try {
-                conFac.connectAndListen();
-            } catch (JMSException e) {
-                handleException("Error starting connection factory : " + conFac.getName(), e);
-            } catch (NamingException e) {
-                handleException("Error starting connection factory : " + conFac.getName(), e);
-            }
-        }
-
+        connFacManager.start();
         super.start();
     }
 
@@ -111,9 +98,7 @@ public class JMSListener extends AbstractTransportListener implements Management
      */
     public void stop() throws AxisFault {
         super.stop();
-        for (JMSConnectionFactory conFac : connectionFactories.values()) {
-            conFac.stop();
-        }
+        connFacManager.stop();
     }
 
     /**
@@ -196,43 +181,12 @@ public class JMSListener extends AbstractTransportListener implements Management
 
         // validate connection factory name (specified or default)
         if (conFacParam != null) {
-            String conFac = (String) conFacParam.getValue();
-            if (connectionFactories.containsKey(conFac)) {
-                return connectionFactories.get(conFac);
-            } else {
-                return null;
-            }
-
-        } else if (connectionFactories.containsKey(JMSConstants.DEFAULT_CONFAC_NAME)) {
-            return connectionFactories.get(JMSConstants.DEFAULT_CONFAC_NAME);
-
+            return connFacManager.getJMSConnectionFactory((String)conFacParam.getValue());
         } else {
-            return null;
+            return connFacManager.getJMSConnectionFactory(JMSConstants.DEFAULT_CONFAC_NAME);
         }
     }
 
-    /**
-     * Create JMSConnectionFactory instances for the definitions in the transport listener,
-     * and add these into our collection of connectionFactories map keyed by name
-     *
-     * @param transprtIn the transport-in description for JMS
-     */
-    private void loadConnectionFactoryDefinitions(TransportInDescription transprtIn) {
-
-        // iterate through all defined connection factories
-        Iterator conFacIter = transprtIn.getParameters().iterator();
-
-        while (conFacIter.hasNext()) {
-            Parameter conFacParams = (Parameter) conFacIter.next();
-
-            JMSConnectionFactory jmsConFactory =
-                new JMSConnectionFactory(conFacParams.getName(), this, workerPool, cfgCtx);
-            JMSUtils.setConnectionFactoryParameters(conFacParams, jmsConFactory);
-
-            connectionFactories.put(jmsConFactory.getName(), jmsConFactory);
-        }
-    }
-    
     // -- jmx/management methods--
     /**
      * Pause the listener - Stop accepting/processing new messages, but continues processing existing
@@ -242,9 +196,7 @@ public class JMSListener extends AbstractTransportListener implements Management
     public void pause() throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         try {
-            for (JMSConnectionFactory conFac : connectionFactories.values()) {
-                conFac.pause();
-            }
+            connFacManager.pause();
             state = BaseConstants.PAUSED;
             log.info("Listener paused");
         } catch (AxisJMSException e) {
@@ -259,9 +211,7 @@ public class JMSListener extends AbstractTransportListener implements Management
     public void resume() throws AxisFault {
         if (state != BaseConstants.PAUSED) return;
         try {
-            for (JMSConnectionFactory conFac : connectionFactories.values()) {
-                conFac.resume();
-            }
+            connFacManager.resume();
             state = BaseConstants.STARTED;
             log.info("Listener resumed");
         } catch (AxisJMSException e) {

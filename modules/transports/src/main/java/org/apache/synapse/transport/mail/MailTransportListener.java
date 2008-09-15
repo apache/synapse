@@ -57,7 +57,6 @@ public class MailTransportListener extends AbstractPollingTransportListener<Poll
 
     public static final String DELETE = "DELETE";
     public static final String MOVE = "MOVE";
-    public static final String LEAVE = "LEAVE";
 
     /**
      * Initializes the Mail transport
@@ -197,7 +196,7 @@ public class MailTransportListener extends AbstractPollingTransportListener<Poll
             } catch (MessagingException me) {
                 processFailure("Error checking mail for account : " +
                     emailAddress + " :: " + me.getMessage(), me, entry);
-                
+
             } finally {
 
                 try {
@@ -395,16 +394,12 @@ public class MailTransportListener extends AbstractPollingTransportListener<Poll
                 case PollTableEntry.SUCCSESSFUL:
                     if (entry.getActionAfterProcess() == PollTableEntry.MOVE) {
                         moveToFolder = entry.getMoveAfterProcess();
-                    } else if (entry.getActionAfterProcess() == PollTableEntry.LEAVE) {
-                        return;
                     }
                     break;
 
                 case PollTableEntry.FAILED:
                     if (entry.getActionAfterFailure() == PollTableEntry.MOVE) {
                         moveToFolder = entry.getMoveAfterFailure();
-                    } else if (entry.getActionAfterFailure() == PollTableEntry.LEAVE) {
-                        return;
                     }
                     break;
                 case PollTableEntry.NONE:
@@ -474,13 +469,11 @@ public class MailTransportListener extends AbstractPollingTransportListener<Poll
             String option = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_ACTION_AFTER_PROCESS);
             entry.setActionAfterProcess(
-                MOVE.equals(option) ? PollTableEntry.MOVE :
-                LEAVE.equals(option) ? PollTableEntry.LEAVE : PollTableEntry.DELETE);
+                MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
             option = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_ACTION_AFTER_FAILURE);
             entry.setActionAfterFailure(
-                MOVE.equals(option) ? PollTableEntry.MOVE :
-                LEAVE.equals(option) ? PollTableEntry.LEAVE : PollTableEntry.DELETE);
+                MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
 
             String moveFolderAfterProcess = ParamUtils.getOptionalParam(
                 service, MailConstants.TRANSPORT_MAIL_MOVE_AFTER_PROCESS);

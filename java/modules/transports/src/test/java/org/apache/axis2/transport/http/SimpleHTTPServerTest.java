@@ -22,9 +22,6 @@ package org.apache.axis2.transport.http;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.synapse.transport.testkit.SimpleTransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.http.HttpTransportTestSuiteBuilder;
@@ -33,17 +30,7 @@ public class SimpleHTTPServerTest extends TestCase {
     public static TestSuite suite() throws Exception {
         TransportTestSuite suite = new TransportTestSuite(SimpleHTTPServerTest.class);
         
-        TransportDescriptionFactory tdf =
-            new SimpleTransportDescriptionFactory("http", SimpleHTTPServer.class, 
-                                                  CommonsHTTPTransportSender.class) {
-
-            @Override
-            public TransportInDescription createTransportInDescription() throws Exception {
-                TransportInDescription desc = super.createTransportInDescription();
-                desc.addParameter(new Parameter(SimpleHTTPServer.PARAM_PORT, "8280"));
-                return desc;
-            }
-        };
+        TransportDescriptionFactory tdf = new HttpTransportDescriptionFactory(8280);
         
         new HttpTransportTestSuiteBuilder(suite, tdf).build();
         

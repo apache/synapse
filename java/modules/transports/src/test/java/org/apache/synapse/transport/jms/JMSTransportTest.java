@@ -72,7 +72,7 @@ public class JMSTransportTest extends TestCase {
         
         AxisTestClientSetup timeoutSetup = new AxisTestClientSetup() {
             public void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
-                msgContext.setProperty(JMSConstants.JMS_WAIT_REPLY, "2000");
+                msgContext.setProperty(JMSConstants.JMS_WAIT_REPLY, "5000");
             }
         };
         

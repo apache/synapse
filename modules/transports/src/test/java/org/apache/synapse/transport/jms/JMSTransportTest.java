@@ -49,7 +49,7 @@ public class JMSTransportTest extends TestCase {
         
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
 
-        TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory();
+        TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory(false);
         JMSTestEnvironment[] environments = new JMSTestEnvironment[] { new QpidTestEnvironment(), new ActiveMQTestEnvironment() };
         
         for (JMSTestEnvironment env : environments) {

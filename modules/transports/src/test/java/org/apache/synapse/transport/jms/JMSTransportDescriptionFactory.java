@@ -31,17 +31,29 @@ import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.name.Key;
 import org.mockejb.jndi.MockContextFactory;
 
 public class JMSTransportDescriptionFactory implements TransportDescriptionFactory {
     private static final OMFactory factory = OMAbstractFactory.getOMFactory();
     
+    private final boolean cfOnSender;
+    
+    public JMSTransportDescriptionFactory(boolean cfOnSender) {
+        this.cfOnSender = cfOnSender;
+    }
+
     @SuppressWarnings("unused")
     // We implicitly depend on the environment; make this explicit
     private void setUp(JMSTestEnvironment env) {
         
     }
     
+    @Key("cfOnSender")
+    public boolean isCfOnSender() {
+        return cfOnSender;
+    }
+
     private OMElement createParameterElement(String name, String value) {
         OMElement element = factory.createOMElement(new QName("parameter"));
         element.addAttribute("name", name, null);
@@ -75,7 +87,9 @@ public class JMSTransportDescriptionFactory implements TransportDescriptionFacto
     
     public TransportOutDescription createTransportOutDescription() throws Exception {
         TransportOutDescription trpOutDesc = new TransportOutDescription(JMSSender.TRANSPORT_NAME);
-//        setupTransport(trpOutDesc);
+        if (cfOnSender) {
+            setupTransport(trpOutDesc);
+        }
         trpOutDesc.setSender(new JMSSender());
         return trpOutDesc;
     }

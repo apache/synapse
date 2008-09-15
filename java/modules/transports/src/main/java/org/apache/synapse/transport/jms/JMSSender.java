@@ -19,12 +19,10 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -36,7 +34,6 @@ import javax.jms.*;
 import javax.jms.Queue;
 import javax.activation.DataHandler;
 import javax.naming.Context;
-import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -48,9 +45,8 @@ import java.util.*;
 public class JMSSender extends AbstractTransportSender implements ManagementSupport {
 
     public static final String TRANSPORT_NAME = "jms";
-
-    /** A Map containing the JMS connection factories managed by this, keyed by name */
-    private Map<String,JMSConnectionFactory> connectionFactories = new HashMap<String,JMSConnectionFactory>();
+    
+    private JMSConnectionFactoryManager connFacManager;
 
     public JMSSender() {
         log = LogFactory.getLog(JMSSender.class);
@@ -66,8 +62,16 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
         super.init(cfgCtx, transportOut);
+        connFacManager = new JMSConnectionFactoryManager(cfgCtx);
         // read the connection factory definitions and create them
-        loadConnectionFactoryDefinitions(transportOut);
+        connFacManager.loadConnectionFactoryDefinitions(transportOut);
+        connFacManager.start();
+    }
+
+    @Override
+    public void stop() {
+        connFacManager.stop();
+        super.stop();
     }
 
     /**
@@ -78,19 +82,17 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
      * @return the corresponding JMS connection factory, if any
      */
     private JMSConnectionFactory getJMSConnectionFactory(JMSOutTransportInfo trpInfo) {
+        Map<String,String> props = trpInfo.getProperties();
         if(trpInfo.getProperties() != null) {
-            String jmsConnectionFactoryName = trpInfo.getProperties().get(JMSConstants.CONFAC_PARAM);
+            String jmsConnectionFactoryName = props.get(JMSConstants.CONFAC_PARAM);
             if(jmsConnectionFactoryName != null) {
-                return connectionFactories.get(jmsConnectionFactoryName);
+                return connFacManager.getJMSConnectionFactory(jmsConnectionFactoryName);
+            } else {
+                return connFacManager.getJMSConnectionFactory(props);
             }
+        } else {
+            return null;
         }
-
-        for (JMSConnectionFactory cf : connectionFactories.values()) {
-            if (cf.equals(trpInfo)) {
-                return cf;
-            }
-        }
-        return null;
     }
 
     /**
@@ -544,35 +546,4 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
     private String getProperty(MessageContext mc, String key) {
         return (String) mc.getProperty(key);
     }
-
-    /**
-     * Create JMSConnectionFactory instances for the definitions in the transport sender,
-     * and add these into our collection of connectionFactories map keyed by name
-     *
-     * @param transportOut the transport-in description for JMS
-     */
-    private void loadConnectionFactoryDefinitions(TransportOutDescription transportOut) {
-
-        // iterate through all defined connection factories
-        Iterator conFacIter = transportOut.getParameters().iterator();
-
-        while (conFacIter.hasNext()) {
-            Parameter conFacParams = (Parameter) conFacIter.next();
-
-            JMSConnectionFactory jmsConFactory =
-                new JMSConnectionFactory(conFacParams.getName(), null, null, cfgCtx);
-            JMSUtils.setConnectionFactoryParameters(conFacParams, jmsConFactory);
-
-            try {
-                jmsConFactory.connectAndListen();
-            } catch (NamingException e) {
-                log.warn("Error looking up JMS connection factory : " + jmsConFactory.getName(), e);
-            } catch (JMSException e) {
-                log.warn("Error connecting to JMS connection factory : " + jmsConFactory.getName(), e);
-            }
-
-            connectionFactories.put(jmsConFactory.getName(), jmsConFactory);
-        }
-    }
-
 }

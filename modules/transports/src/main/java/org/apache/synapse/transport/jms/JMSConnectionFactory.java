@@ -452,47 +452,6 @@ public class JMSConnectionFactory implements ExceptionListener {
         return new EndpointReference(sb.toString());
     }
 
-    /**
-     * Is this connection factory referring to the same underlying connection factory passed in
-     *
-     * @param o a JMSOutTransport object which specifies a connection factory
-     * @return true if this instance could be substituted for the out-transport
-     */
-    // TODO: this implementation violates the contract of Object#equals (however, JMSSender#getJMSConnectionFactory depends on this behavior)
-    public boolean equals(Object o) {
-        if (o instanceof JMSOutTransportInfo) {
-            JMSOutTransportInfo trpInfo = (JMSOutTransportInfo) o;
-
-            Map<String,String> trpProps = trpInfo.getProperties();
-            if (equals(trpProps.get(JMSConstants.CONFAC_JNDI_NAME_PARAM), jndiProperties.get(JMSConstants.CONFAC_JNDI_NAME_PARAM))
-                &&
-                equals(trpProps.get(Context.INITIAL_CONTEXT_FACTORY), jndiProperties.get(Context.INITIAL_CONTEXT_FACTORY))
-                &&
-                equals(trpProps.get(Context.PROVIDER_URL), jndiProperties.get(Context.PROVIDER_URL))
-                &&
-                equals(trpProps.get(Context.SECURITY_PRINCIPAL), jndiProperties.get(Context.SECURITY_PRINCIPAL))
-                &&
-                equals(trpProps.get(Context.SECURITY_CREDENTIALS), jndiProperties.get(Context.SECURITY_CREDENTIALS))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     *     Prevents NullPointerException when s1 is null.
-     *     If both values are null this returns true 
-     */
-    private boolean equals(Object s1, Object s2) {
-        if(s1 == s2) {
-            return true;
-        } else if(s1 != null && s1.equals(s2)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     // -------------------- getters and setters and trivial methods --------------------
 
     /**

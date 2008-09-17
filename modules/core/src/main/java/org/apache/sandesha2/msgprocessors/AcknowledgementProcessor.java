@@ -157,9 +157,9 @@ public class AcknowledgementProcessor {
 						
 						numberOfNewMessagesAcked++;
 						SenderBean retransmitterBean = retransmitterMgr.retrieve(outSequenceId, messageNo);						
-						if (retransmitterBean != null) {
-							// Check we haven't got an Ack for a message that hasn't been sent yet !
-							if (retransmitterBean.getSentCount() == 0) {
+						if (retransmitterBean != null && retransmitterBean.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+							// Check we haven't got an Ack for an application message that hasn't been sent yet !
+							if (retransmitterBean.getSentCount() == 0 ) {
 								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
 										storageManager, piggybackedAck, null); //do not want to send the fault to acksTo in this case
 								if (log.isDebugEnabled())

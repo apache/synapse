@@ -24,7 +24,6 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
@@ -42,6 +41,14 @@ public class JMSTransportTest extends TestCase {
         
         // SwA doesn't make sense with text messages
         suite.addExclude("(&(test=AsyncSwA)(client=jms)(jmsType=text))");
+        
+        // Don't execute all possible test combinations:
+        //  * Use a single setup to execute tests with all message types.
+        //  * Only use a small set of message types for the other setups.
+        suite.addExclude("(!(|(&(broker=qpid)(cfOnSender=false)(!(|(destType=topic)(replyDestType=topic))))" +
+        		             "(&(test=AsyncXML)(messageType=SOAP11)(data=ASCII))" +
+        		             "(&(test=EchoXML)(messageType=POX)(data=ASCII))))");
+        
         // SYNAPSE-304:
         suite.addExclude("(&(test=AsyncTextPlain)(client=jms)(jmsType=bytes))");
         // SYNAPSE-436:
@@ -49,11 +56,11 @@ public class JMSTransportTest extends TestCase {
         
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
 
-        TransportDescriptionFactory tdf = new JMSTransportDescriptionFactory(false);
         JMSTestEnvironment[] environments = new JMSTestEnvironment[] { new QpidTestEnvironment(), new ActiveMQTestEnvironment() };
-        
-        for (JMSTestEnvironment env : environments) {
-            builder.addEnvironment(env, tdf);
+        for (boolean cfOnSender : new boolean[] { false, true }) {
+            for (JMSTestEnvironment env : environments) {
+                builder.addEnvironment(env, new JMSTransportDescriptionFactory(cfOnSender));
+            }
         }
         
         builder.addAsyncChannel(new JMSAsyncChannel(JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT));
@@ -86,7 +93,7 @@ public class JMSTransportTest extends TestCase {
             suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new AsyncChannel[] {
                     new JMSAsyncChannel("endpoint1", JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT),
                     new JMSAsyncChannel("endpoint2", JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT) },
-                    2, false, env, tdf));
+                    2, false, env, new JMSTransportDescriptionFactory(false)));
         }
         
         

@@ -177,8 +177,8 @@ public class TransportTestSuite extends TestSuite {
             if (excluded != invertExcludes) {
                 return;
             }
-            ttest.setManaged(reuseResources);
-            ttest.setId(StringUtils.leftPad(String.valueOf(nextId++), 4, '0'));
+            ttest.init(StringUtils.leftPad(String.valueOf(nextId++), 4, '0'),
+                       reuseResources, testClass);
             ttest.getResourceSet().resolve();
         }
         super.addTest(test);

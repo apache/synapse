@@ -32,10 +32,11 @@ import org.apache.synapse.transport.testkit.util.LogManager;
 public abstract class TransportTestCase extends TestCase {
     private final TestResourceSet resourceSet = new TestResourceSet();
     
-    private String id;
     private Map<String,String> nameComponents;
     
+    private String id;
     private boolean managed;
+    private Class<?> testClass;
 
     public TransportTestCase(Object... resources) {
         resourceSet.addResources(resources);
@@ -58,12 +59,16 @@ public abstract class TransportTestCase extends TestCase {
         return nameComponents;
     }
     
-    public String getId() {
-        return id;
+    // TODO: TransportTestCase should be in the same package as TransportTestSuite and this
+    //       method should have package access
+    public void init(String id, boolean managed, Class<?> testClass) {
+        this.id = id;
+        this.managed = managed;
+        this.testClass = testClass;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -92,10 +97,6 @@ public abstract class TransportTestCase extends TestCase {
         return testName;
     }
 
-    public void setManaged(boolean managed) {
-        this.managed = managed;
-    }
-    
     public TestResourceSet getResourceSet() {
         return resourceSet;
     }
@@ -114,5 +115,10 @@ public abstract class TransportTestCase extends TestCase {
             resourceSet.tearDown();
         }
         LogManager.INSTANCE.setTestCase(null);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + "(" + testClass.getName() + ")";
     }
 }

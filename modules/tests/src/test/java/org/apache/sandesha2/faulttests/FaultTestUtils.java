@@ -27,7 +27,7 @@ public class FaultTestUtils {
 	 * Sets up a connection to an HTTP endpoint
 	 * @return
 	 */
-	public static HttpURLConnection getHttpURLConnection(String uri, String soapAction) throws Exception {
+	public static HttpURLConnection getHttpURLConnection(String uri, String soapAction, boolean soap12) throws Exception {
     // Open a connection to the endpoint
 		URL endPointURL = new URL(uri);
 		
@@ -36,12 +36,27 @@ public class FaultTestUtils {
 		connection.setDoInput(true);
 		connection.setRequestMethod("POST");
 		connection.addRequestProperty("SOAPAction", soapAction);
-		connection.setRequestProperty("Content-Type", "text/xml"); 
+		if(soap12){
+			connection.setRequestProperty("Content-Type", "application/soap+xml");
+		}
+		else{
+			connection.setRequestProperty("Content-Type", "text/xml"); 
+		}
 		 
 		connection.connect();
 
 		return connection;
 	}
+
+	/**
+	 * A Soap 11 connection
+	 * @throws Exception
+	 */
+	public static HttpURLConnection getHttpURLConnection(String uri, String soapAction) throws Exception {
+	    // Open a connection to the endpoint
+		return getHttpURLConnection(uri, soapAction, false);
+	}
+	
 	
 	/**
 	 * Reads a response from the HttpURLConnection instance

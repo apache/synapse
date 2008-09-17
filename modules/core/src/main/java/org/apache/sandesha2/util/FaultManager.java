@@ -228,14 +228,7 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForInvalidAcknowledgement");
 
-		// check lower<=upper
-		if (ackRMMessageContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, MessageType not an ACK");
-		}
-
-		boolean invalidAck = false;
-		
+		boolean invalidAck = false;		
 		List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
 		Iterator it = sequenceAckList.iterator();
 
@@ -256,7 +249,7 @@ public class FaultManager {
 		}		
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement");
+			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement: ack is valid");
 		return false;
 	}
 
@@ -460,7 +453,7 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceTerminated, " + sequenceID);
 
-		if (bean.isTerminated()) {
+		if (bean!=null && bean.isTerminated()) {
 			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 			FaultData data = new FaultData();
 			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
@@ -500,7 +493,7 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
-		if (rmdBean.isClosed()) {
+		if (rmdBean!=null && rmdBean.isClosed()) {
 			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 			FaultData data = new FaultData();
 			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());

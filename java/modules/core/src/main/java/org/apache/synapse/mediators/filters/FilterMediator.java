@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -43,6 +44,22 @@ public class FilterMediator extends AbstractListMediator implements
     private boolean thenElementPresent = false;
     private String thenKey = null;
     private String elseKey = null;
+
+    @Override
+    public void init(SynapseEnvironment se) {
+        super.init(se);
+        if (elseMediator != null) {
+            elseMediator.init(se);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (elseMediator != null) {
+            elseMediator.destroy();
+        }
+    }
 
     /**
      * Executes the list of sub/child mediators, if the filter condition is satisfied

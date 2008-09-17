@@ -19,14 +19,19 @@
 
 package org.apache.synapse.mediators;
 
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 
 import java.util.List;
 
 /**
- * The List mediator executes a given sequence/list of child mediators
+ * The List mediator executes a given sequence/list of child mediators.
+ * <p>
+ * This interface extends {@link ManagedLifecycle}. An implementations must
+ * propagate lifecycle events to all children implementing the ManagedLifecycle
+ * interface.
  */
-public interface ListMediator extends Mediator {
+public interface ListMediator extends Mediator, ManagedLifecycle {
 
     /**
      * Appends the specified mediator to the end of this mediator's (children) list

@@ -39,6 +39,12 @@ public class JMSTransportDescriptionFactory implements TransportDescriptionFacto
     
     private final boolean cfOnSender;
     
+    /**
+     * Constructor.
+     * @param cfOnSender Determine whether the connection factories (JMS providers)
+     *                   should also be configured on the sender. This switch allows
+     *                   us to build regression tests for SYNAPSE-448. 
+     */
     public JMSTransportDescriptionFactory(boolean cfOnSender) {
         this.cfOnSender = cfOnSender;
     }

@@ -27,7 +27,17 @@ import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 
 public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<AxisMessage> {
+    private final boolean block;
+    
+    public AxisAsyncTestClient(boolean block) {
+        this.block = block;
+    }
+
+    public AxisAsyncTestClient() {
+        this(true);
+    }
+
     public void sendMessage(ClientOptions options, ContentType contentType, AxisMessage message) throws Exception {
-        createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(false);
+        createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(block);
     }
 }

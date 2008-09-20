@@ -23,8 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 
-import java.util.Iterator;
-
 /**
  * Factory for {@link SwitchMediator} instances.
  * 
@@ -49,10 +47,8 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Invalid switch mediator. Source required");
         }
 
-        Iterator iter = mediator.getCases().iterator();
-        while (iter.hasNext()) {
+        for (SwitchCase aCase : mediator.getCases()) {
             OMElement caseElem = fac.createOMElement("case", synNS);
-            SwitchCase aCase = ((SwitchCase) iter.next());
             if (aCase.getRegex() != null) {
                 caseElem.addAttribute(fac.createOMAttribute(
                         "regex", nullNS, aCase.getRegex().pattern()));

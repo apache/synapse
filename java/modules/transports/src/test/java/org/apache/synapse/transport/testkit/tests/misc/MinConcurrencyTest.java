@@ -97,7 +97,7 @@ public class MinConcurrencyTest extends TransportTestCase {
                 TestResourceSet clientResourceSet = new TestResourceSet(getResourceSet());
                 AsyncChannel channel = channels[i];
                 clientResourceSet.addResource(channel);
-                AxisAsyncTestClient client = new AxisAsyncTestClient();
+                AxisAsyncTestClient client = new AxisAsyncTestClient(false);
                 clientResourceSet.addResource(client);
                 clientResourceSet.setUp();
                 clientResourceSets[i] = clientResourceSet;

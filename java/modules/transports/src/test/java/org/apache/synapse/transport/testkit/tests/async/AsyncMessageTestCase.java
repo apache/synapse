@@ -43,6 +43,7 @@ public abstract class AsyncMessageTestCase<M> extends MessageTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        endpoint.clear();
         M expected = prepareMessage();
         
         // Run the test.

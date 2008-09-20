@@ -38,6 +38,10 @@ public class AsyncEndpointAdapter<M,N> implements AsyncEndpoint<M>, Adapter {
         return target;
     }
 
+    public void clear() throws Exception {
+        target.clear();
+    }
+
     public IncomingMessage<M> waitForMessage(int timeout) throws Throwable {
         IncomingMessage<N> message = target.waitForMessage(timeout);
         if (message == null) {

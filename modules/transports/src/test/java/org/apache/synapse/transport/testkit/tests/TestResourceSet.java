@@ -22,7 +22,6 @@ package org.apache.synapse.transport.testkit.tests;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -31,14 +30,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class TestResourceSet {
-    private enum Status { UNRESOLVED, RESOLVED, SETUP, RECYCLED };
+    enum Status { UNRESOLVED, RESOLVED, SETUP, RECYCLED };
     
     private static Log log = LogFactory.getLog(TestResourceSet.class);
     
     private final TestResourceSet parent;
     private final List<TestResource> unresolvedResources = new LinkedList<TestResource>();
-    private final List<TestResource> resolvedResources = new LinkedList<TestResource>();
-    private Status status = Status.UNRESOLVED;
+    final List<TestResource> resolvedResources = new LinkedList<TestResource>();
+    Status status = Status.UNRESOLVED;
     
     public TestResourceSet(TestResourceSet parent) {
         this.parent = parent;
@@ -134,7 +133,7 @@ public class TestResourceSet {
         status = Status.SETUP;
     }
     
-    private static List<TestResource> filterOnHasLifecycle(List<TestResource> resources) {
+    static List<TestResource> filterOnHasLifecycle(List<TestResource> resources) {
         List<TestResource> result = new ArrayList<TestResource>(resources.size());
         for (TestResource resource : resources) {
             if (resource.hasLifecycle()) {
@@ -144,7 +143,7 @@ public class TestResourceSet {
         return result;
     }
     
-    private static void setUp(List<TestResource> resources) throws Exception {
+    static void setUp(List<TestResource> resources) throws Exception {
         resources = filterOnHasLifecycle(resources);
         if (!resources.isEmpty()) {
             log.info("Setting up: " + resources);
@@ -154,36 +153,6 @@ public class TestResourceSet {
         }
     }
     
-    public void setUp(TestResourceSet old) throws Exception {
-        resolve();
-        if (status != Status.RESOLVED) {
-            throw new IllegalStateException();
-        }
-        if (old.status != Status.SETUP) {
-            throw new IllegalStateException();
-        }
-        List<TestResource> oldResourcesToTearDown = new LinkedList<TestResource>();
-        List<TestResource> resourcesToSetUp = new LinkedList<TestResource>(resolvedResources);
-        List<TestResource> resourcesToKeep = new LinkedList<TestResource>();
-        outer: for (TestResource oldResource : filterOnHasLifecycle(old.resolvedResources)) {
-            for (Iterator<TestResource> it = resourcesToSetUp.iterator(); it.hasNext(); ) {
-                TestResource resource = it.next();
-                if (resource.equals(oldResource)) {
-                    it.remove();
-                    resource.recycle(oldResource);
-                    resourcesToKeep.add(oldResource);
-                    continue outer;
-                }
-            }
-            oldResourcesToTearDown.add(oldResource);
-        }
-        tearDown(oldResourcesToTearDown);
-        log.debug("Keeping: " + resourcesToKeep);
-        setUp(resourcesToSetUp);
-        status = Status.SETUP;
-        old.status = Status.RECYCLED;
-    }
-    
     public void tearDown() throws Exception {
         if (status != Status.SETUP) {
             throw new IllegalStateException();
@@ -191,7 +160,7 @@ public class TestResourceSet {
         tearDown(resolvedResources);
     }
     
-    private static void tearDown(List<TestResource> resources) throws Exception {
+    static void tearDown(List<TestResource> resources) throws Exception {
         resources = filterOnHasLifecycle(resources);
         if (!resources.isEmpty()) {
             log.info("Tearing down: " + resources);

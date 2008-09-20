@@ -81,6 +81,10 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
 //        });
 //    }
     
+    public void clear() throws Exception {
+        queue.clear();
+    }
+
     public IncomingMessage<AxisMessage> waitForMessage(int timeout) throws Throwable {
         Event event = queue.poll(timeout, TimeUnit.MILLISECONDS);
         return event == null ? null : event.process();

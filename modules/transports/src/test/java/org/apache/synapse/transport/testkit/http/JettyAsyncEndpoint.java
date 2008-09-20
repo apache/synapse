@@ -54,6 +54,10 @@ public abstract class JettyAsyncEndpoint<M> extends JettyEndpoint implements Asy
         queue = null;
     }
     
+    public void clear() throws Exception {
+        queue.clear();
+    }
+
     public IncomingMessage<M> waitForMessage(int timeout) throws Throwable {
         return queue.poll(timeout, TimeUnit.MILLISECONDS);
     }

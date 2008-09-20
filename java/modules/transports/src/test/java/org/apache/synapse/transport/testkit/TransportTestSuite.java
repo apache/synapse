@@ -43,6 +43,7 @@ import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.tests.TestResourceSet;
+import org.apache.synapse.transport.testkit.tests.TestResourceSetTransition;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
 import org.apache.synapse.transport.testkit.tests.async.RESTTestCase;
@@ -186,7 +187,8 @@ public class TransportTestSuite extends TestSuite {
 
     @Override
     public void run(TestResult result) {
-        LogManager.INSTANCE.setTestSuite(this);
+        LogManager logManager = LogManager.INSTANCE;
+        logManager.setTestSuite(this);
         try {
             if (!reuseResources) {
                 super.run(result);
@@ -199,9 +201,13 @@ public class TransportTestSuite extends TestSuite {
                         TestResourceSet newResourceSet = ttest.getResourceSet();
                         try {
                             if (resourceSet == null) {
+                                logManager.setTestCase(ttest);
                                 newResourceSet.setUp();
                             } else {
-                                newResourceSet.setUp(resourceSet);
+                                TestResourceSetTransition transition = new TestResourceSetTransition(resourceSet, newResourceSet);
+                                transition.tearDown();
+                                logManager.setTestCase(ttest);
+                                transition.setUp();
                             }
                         } catch (Throwable t) {
                             result.addError(this, t);
@@ -214,6 +220,7 @@ public class TransportTestSuite extends TestSuite {
                 if (resourceSet != null) {
                     try {
                         resourceSet.tearDown();
+                        logManager.setTestCase(null);
                     } catch (Throwable t) {
                         result.addError(this, t);
                         return;
@@ -221,7 +228,7 @@ public class TransportTestSuite extends TestSuite {
                 }
             }
         } finally {
-            LogManager.INSTANCE.setTestSuite(null);
+            logManager.setTestSuite(null);
         }
     }
 }

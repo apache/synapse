@@ -21,6 +21,7 @@ package org.apache.synapse.transport.vfs;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.mail.internet.ContentType;
@@ -43,8 +44,14 @@ public class VFSClient implements TestClient {
     }
 
     protected void send(byte[] message) throws Exception {
-        OutputStream out = new FileOutputStream(requestFile);
+        // Create the file atomically (using move/rename) to avoid problems with the
+        // listener starting to read the file too early.
+        File tmpFile = new File(requestFile.getParent(), "." + requestFile.getName() + ".tmp");
+        OutputStream out = new FileOutputStream(tmpFile);
         out.write(message);
         out.close();
+        if (!tmpFile.renameTo(requestFile)) {
+            throw new IOException("Unable to rename " + tmpFile + " to " + requestFile);
+        }
     }
 }

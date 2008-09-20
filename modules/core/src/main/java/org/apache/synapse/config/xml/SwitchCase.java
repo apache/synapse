@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +46,14 @@ public class SwitchCase {
      * The list mediator which is responsible on message mediation of the case
      */
     private AnonymousListMediator caseMediator;
+
+    public void init(SynapseEnvironment se) {
+        caseMediator.init(se);
+    }
+
+    public void destroy() {
+        caseMediator.destroy();
+    }
 
     /**
      * To delegate message mediation to list mediator

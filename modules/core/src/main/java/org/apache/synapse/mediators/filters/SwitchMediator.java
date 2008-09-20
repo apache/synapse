@@ -19,8 +19,10 @@
 
 package org.apache.synapse.mediators.filters;
 
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SwitchCase;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
@@ -33,7 +35,7 @@ import java.util.List;
  * the given list of cases. This is actually a list of sequences, and depending on the
  * selected case, the selected sequence gets executed.
  */
-public class SwitchMediator extends AbstractMediator {
+public class SwitchMediator extends AbstractMediator implements ManagedLifecycle {
 
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private SynapseXPath source = null;
@@ -41,6 +43,24 @@ public class SwitchMediator extends AbstractMediator {
     private List<SwitchCase> cases = new ArrayList<SwitchCase>();
     /** The default switch case, if any */
     private SwitchCase defaultCase = null;
+
+    public void init(SynapseEnvironment se) {
+        for (SwitchCase swCase : cases) {
+            swCase.init(se);
+        }
+        if (defaultCase != null) {
+            defaultCase.init(se);
+        }
+    }
+
+    public void destroy() {
+        for (SwitchCase swCase : cases) {
+            swCase.destroy();
+        }
+        if (defaultCase != null) {
+            defaultCase.destroy();
+        }
+    }
 
     /**
      * Iterate over switch cases and find match and execute selected sequence

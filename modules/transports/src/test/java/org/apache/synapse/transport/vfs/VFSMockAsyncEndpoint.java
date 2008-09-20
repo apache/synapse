@@ -38,6 +38,10 @@ public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
         contentType = client.getContentType(options, options.getBaseContentType());
     }
     
+    public void clear() throws Exception {
+        channel.getRequestFile().delete();
+    }
+
     public IncomingMessage<byte[]> waitForMessage(int timeout) throws Throwable {
         byte[] data = VFSTestUtils.waitForFile(channel.getRequestFile(), timeout);
         return data == null ? null : new IncomingMessage<byte[]>(contentType, data);

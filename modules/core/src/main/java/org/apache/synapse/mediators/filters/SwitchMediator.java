@@ -25,7 +25,6 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -39,7 +38,7 @@ public class SwitchMediator extends AbstractMediator {
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private SynapseXPath source = null;
     /** The list of switch cases    */
-    private List cases = new ArrayList();
+    private List<SwitchCase> cases = new ArrayList<SwitchCase>();
     /** The default switch case, if any */
     private SwitchCase defaultCase = null;
 
@@ -83,9 +82,7 @@ public class SwitchMediator extends AbstractMediator {
                 return defaultCase.mediate(synCtx);
 
             } else {
-                for (Iterator iter = cases.iterator(); iter.hasNext();) {
-                    SwitchCase swCase = (SwitchCase) iter.next();
-
+                for (SwitchCase swCase : cases) {
                     if (swCase != null) {
                         if (swCase.matches(sourceText)) {
                             if (traceOrDebugOn) {
@@ -134,7 +131,7 @@ public class SwitchMediator extends AbstractMediator {
      *
      * @return the cases list
      */
-    public List getCases() {
+    public List<SwitchCase> getCases() {
         return cases;
     }
 

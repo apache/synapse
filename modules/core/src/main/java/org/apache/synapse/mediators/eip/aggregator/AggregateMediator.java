@@ -23,8 +23,10 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.eip.EIPConstants;
@@ -46,7 +48,7 @@ import java.util.Map;
  * so that aggregations that never would complete could be timed out and cleared from memory and
  * any fault conditions handled
  */
-public class AggregateMediator extends AbstractMediator {
+public class AggregateMediator extends AbstractMediator implements ManagedLifecycle {
 
     private static final Log log = LogFactory.getLog(AggregateMediator.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
@@ -94,6 +96,18 @@ public class AggregateMediator extends AbstractMediator {
                 handleException("Unable to set the default " +
                     "aggregationExpression for the aggregation", e, null);
             }
+        }
+    }
+
+    public void init(SynapseEnvironment se) {
+        if (onCompleteSequence != null) {
+            onCompleteSequence.init(se);
+        }
+    }
+
+    public void destroy() {
+        if (onCompleteSequence != null) {
+            onCompleteSequence.destroy();
         }
     }
 

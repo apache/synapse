@@ -22,5 +22,10 @@ package org.apache.synapse.transport.testkit.server;
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
 
 public interface AsyncEndpoint<M> extends Endpoint {
+    /**
+     * Discard any pending messages.
+     */
+    void clear() throws Exception;
+    
     IncomingMessage<M> waitForMessage(int timeout) throws Throwable;
 }

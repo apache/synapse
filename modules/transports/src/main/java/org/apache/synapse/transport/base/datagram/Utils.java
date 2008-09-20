@@ -29,7 +29,7 @@ public class Utils {
             for (int i=0; i<16; i++) {
                 int index = start+i;
                 if (index < length) {
-                    String hex = Integer.toHexString(data[start+i]);
+                    String hex = Integer.toHexString(data[start+i] & 0xFF);
                     if (hex.length() < 2) {
                         buffer.append('0');
                     }

@@ -19,18 +19,28 @@
 
 package org.apache.synapse.transport.testkit.http;
 
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.util.tcpmon.Tunnel;
 
 public class HttpChannel implements AsyncChannel, RequestResponseChannel {
     private String serviceName;
+    private Tunnel tunnel;
     
     @SuppressWarnings("unused")
-    private void setUp() {
+    private void setUp() throws Exception {
         serviceName = "TestService-" + UUID.randomUUID();
+        tunnel = new Tunnel(new InetSocketAddress("127.0.0.1", 8280));
+        new Thread(tunnel).start();
+    }
+    
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
+        tunnel.stop();
     }
 
     public String getServiceName() {
@@ -38,6 +48,6 @@ public class HttpChannel implements AsyncChannel, RequestResponseChannel {
     }
 
     public EndpointReference getEndpointReference() throws Exception {
-        return new EndpointReference("http://localhost:8280" + CONTEXT_PATH + "/" + serviceName);
+        return new EndpointReference("http://localhost:" + tunnel.getPort() + CONTEXT_PATH + "/" + serviceName);
     }
 }

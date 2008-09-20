@@ -24,8 +24,10 @@ import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.saaj.util.SAAJUtil;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -55,7 +57,7 @@ import java.io.IOException;
  *
  * @see org.apache.synapse.Mediator
  */
-public class CacheMediator extends AbstractMediator {
+public class CacheMediator extends AbstractMediator implements ManagedLifecycle {
 
     private String id = null;
     private String scope = CachingConstants.SCOPE_PER_HOST;// global
@@ -71,6 +73,18 @@ public class CacheMediator extends AbstractMediator {
     private int maxMessageSize = 0;
     private String cacheManagerKey = CachingConstants.CACHE_MANAGER; // default per-host
     private static final String CACHE_MANAGER_PREFIX = "synapse.cache_manager_";
+
+    public void init(SynapseEnvironment se) {
+        if (onCacheHitSequence != null) {
+            onCacheHitSequence.init(se);
+        }
+    }
+
+    public void destroy() {
+        if (onCacheHitSequence != null) {
+            onCacheHitSequence.destroy();
+        }
+    }
 
     public boolean mediate(MessageContext synCtx) {
 

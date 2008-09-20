@@ -103,8 +103,8 @@ public abstract class TransportTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        LogManager.INSTANCE.setTestCase(this);
         if (!managed) {
+            LogManager.INSTANCE.setTestCase(this);
             resourceSet.setUp();
         }
     }
@@ -113,8 +113,8 @@ public abstract class TransportTestCase extends TestCase {
     protected void tearDown() throws Exception {
         if (!managed) {
             resourceSet.tearDown();
+            LogManager.INSTANCE.setTestCase(null);
         }
-        LogManager.INSTANCE.setTestCase(null);
     }
 
     @Override

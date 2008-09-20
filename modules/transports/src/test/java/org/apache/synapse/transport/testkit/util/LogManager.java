@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.log4j.TTCCLayout;
+import org.apache.log4j.WriterAppender;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
@@ -34,13 +37,23 @@ public class LogManager {
     private final File logDir;
     private File testSuiteDir;
     private File testCaseDir;
+    private WriterAppender appender;
     private int sequence;
     
     private LogManager() {
         logDir = new File("target" + File.separator + "testkit-logs");
     }
     
+    private void cleanUp() {
+        if (appender != null) {
+            Logger.getRootLogger().removeAppender(appender);
+            appender.close();
+            appender = null;
+        }
+    }
+    
     public void setTestSuite(TransportTestSuite suite) {
+        cleanUp();
         if (suite == null) {
             testSuiteDir = null;
         } else {
@@ -49,12 +62,15 @@ public class LogManager {
         testCaseDir = null;
     }
     
-    public void setTestCase(TransportTestCase testCase) {
+    public void setTestCase(TransportTestCase testCase) throws IOException {
+        cleanUp();
         if (testCase == null) {
             testCaseDir = null;
         } else {
             testCaseDir = new File(testSuiteDir, testCase.getId());
             sequence = 1;
+            appender = new WriterAppender(new TTCCLayout(), createLog("debug"));
+            Logger.getRootLogger().addAppender(appender);
         }
     }
     

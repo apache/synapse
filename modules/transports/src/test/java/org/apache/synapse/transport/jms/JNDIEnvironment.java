@@ -19,40 +19,30 @@
 
 package org.apache.synapse.transport.jms;
 
-import javax.jms.Queue;
-import javax.jms.Topic;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
-import org.apache.qpid.client.AMQConnectionFactory;
-import org.apache.qpid.client.AMQQueue;
-import org.apache.qpid.client.AMQTopic;
-import org.apache.qpid.client.transport.TransportConnection;
-import org.apache.qpid.framing.AMQShortString;
-import org.apache.synapse.transport.testkit.name.Name;
+import org.mockejb.jndi.MockContextFactory;
 
-@Name("qpid")
-public class QpidTestEnvironment extends JMSTestEnvironment {
+public class JNDIEnvironment {
+    public static final JNDIEnvironment INSTANCE = new JNDIEnvironment();
+    
+    private Context context;
+    
+    private JNDIEnvironment() {}
+    
     @SuppressWarnings("unused")
     private void setUp() throws Exception {
-        TransportConnection.createVMBroker(1);
+        MockContextFactory.setAsInitial();
+        context = new InitialContext();
+    }
+    
+    public Context getContext() {
+        return context;
     }
 
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
-        TransportConnection.killVMBroker(1);
-    }
-
-    @Override
-    protected AMQConnectionFactory createConnectionFactory() throws Exception {
-        return new AMQConnectionFactory("vm://:1", "guest", "guest", "fred", "test");
-    }
-
-    @Override
-    public Queue createQueue(String name) {
-        return new AMQQueue(name, name);
-    }
-
-    @Override
-    public Topic createTopic(String name) {
-        return new AMQTopic(new AMQShortString(name), name);
+        context = null;
     }
 }

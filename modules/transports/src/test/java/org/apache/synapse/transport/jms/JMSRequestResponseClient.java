@@ -43,7 +43,7 @@ public class JMSRequestResponseClient<T> extends JMSClient<T> implements Request
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env, JMSRequestResponseChannel channel) throws Exception {
         replyDestination = channel.getReplyDestination();
-        ConnectionFactory connectionFactory = env.getConnectionFactory(replyDestination);
+        ConnectionFactory connectionFactory = env.getConnectionFactory();
         replyConnection = connectionFactory.createConnection();
         replyConnection.start();
         replySession = replyConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);

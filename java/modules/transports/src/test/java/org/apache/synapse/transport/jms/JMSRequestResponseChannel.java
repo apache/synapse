@@ -48,12 +48,12 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
         replyDestinationName = buildDestinationName("response", replyDestinationType);
         replyJndiName = buildJndiName("response", replyDestinationType);
         replyDestination = env.createDestination(replyDestinationType, replyDestinationName);
-        env.getContext().bind(replyJndiName, replyDestination);
+        context.bind(replyJndiName, replyDestination);
     }
 
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
-        env.getContext().unbind(replyJndiName);
+        context.unbind(replyJndiName);
         replyDestinationName = null;
         replyJndiName = null;
         replyDestination = null;

@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
 
+import junit.framework.Assert;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -56,6 +58,7 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
     public void receive(MessageContext messageCtx) throws AxisFault {
         final AxisMessage messageData;
         try {
+            Assert.assertTrue(messageCtx.isServerSide());
             messageData = new AxisMessage(messageCtx);
         }
         catch (final Throwable ex) {

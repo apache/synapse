@@ -21,8 +21,11 @@ package org.apache.synapse.transport.testkit.client.axis2;
 
 import javax.mail.internet.ContentType;
 
+import junit.framework.Assert;
+
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
@@ -33,6 +36,8 @@ public class AxisRequestResponseTestClient extends AxisTestClient implements Req
     public IncomingMessage<AxisMessage> sendMessage(ClientOptions options, ContentType contentType, AxisMessage message) throws Exception {
         OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);
         mepClient.execute(true);
-        return new IncomingMessage<AxisMessage>(null, new AxisMessage(mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE)));
+        MessageContext responseMsgContext = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+        Assert.assertFalse(responseMsgContext.isServerSide());
+        return new IncomingMessage<AxisMessage>(null, new AxisMessage(responseMsgContext));
     }
 }

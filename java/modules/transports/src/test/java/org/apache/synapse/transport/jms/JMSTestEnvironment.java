@@ -22,50 +22,26 @@ package org.apache.synapse.transport.jms;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Queue;
-import javax.jms.QueueConnectionFactory;
 import javax.jms.Topic;
-import javax.jms.TopicConnectionFactory;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import org.apache.synapse.transport.testkit.name.Key;
-import org.mockejb.jndi.MockContextFactory;
 
 @Key("broker")
 public abstract class JMSTestEnvironment {
-    public static final String QUEUE_CONNECTION_FACTORY = "QueueConnectionFactory";
-    public static final String TOPIC_CONNECTION_FACTORY = "TopicConnectionFactory";
-    
-    private Context context;
-    private QueueConnectionFactory queueConnectionFactory;
-    private TopicConnectionFactory topicConnectionFactory;
+    private ConnectionFactory connectionFactory;
     
     @SuppressWarnings("unused")
     private void setUp() throws Exception {
-        MockContextFactory.setAsInitial();
-        context = new InitialContext();
-        queueConnectionFactory = createQueueConnectionFactory();
-        topicConnectionFactory = createTopicConnectionFactory();
-        context.bind(QUEUE_CONNECTION_FACTORY, queueConnectionFactory);
-        context.bind(TOPIC_CONNECTION_FACTORY, topicConnectionFactory);
+        connectionFactory = createConnectionFactory();
     }
     
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
-        context.unbind(QUEUE_CONNECTION_FACTORY);
-        context.unbind(TOPIC_CONNECTION_FACTORY);
-        context = null;
-        queueConnectionFactory = null;
-        topicConnectionFactory = null;
+        connectionFactory = null;
     }
     
-    protected abstract QueueConnectionFactory createQueueConnectionFactory() throws Exception;
-    protected abstract TopicConnectionFactory createTopicConnectionFactory() throws Exception;
+    protected abstract ConnectionFactory createConnectionFactory() throws Exception;
     
-    public Context getContext() {
-        return context;
-    }
-
     public Destination createDestination(String destinationType, String name) {
         if (destinationType.equals(JMSConstants.DESTINATION_TYPE_TOPIC)) {
             return createTopic(name);
@@ -77,19 +53,7 @@ public abstract class JMSTestEnvironment {
     public abstract Queue createQueue(String name);
     public abstract Topic createTopic(String name);
     
-    public QueueConnectionFactory getQueueConnectionFactory() {
-        return queueConnectionFactory;
-    }
-    
-    public TopicConnectionFactory getTopicConnectionFactory() {
-        return topicConnectionFactory;
-    }
-    
-    public ConnectionFactory getConnectionFactory(Destination destination) {
-        if (destination instanceof Queue) {
-            return queueConnectionFactory;
-        } else {
-            return topicConnectionFactory;
-        }
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
     }
 }

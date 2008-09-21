@@ -27,6 +27,7 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
+import javax.naming.Context;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
@@ -38,9 +39,12 @@ public abstract class JMSChannel implements AxisServiceConfigurator {
     private final String destinationType;
     private final ContentTypeMode contentTypeMode;
     protected JMSTestEnvironment env;
+    protected Context context;
     private String destinationName;
     private String jndiName;
     private Destination destination;
+    private String connectionFactoryName;
+    private String connectionFactoryJNDIName;
     
     public JMSChannel(String name, String destinationType, ContentTypeMode contentTypeMode) {
         this.name = name;
@@ -70,17 +74,20 @@ public abstract class JMSChannel implements AxisServiceConfigurator {
     }
     
     @SuppressWarnings("unused")
-    private void setUp(JMSTestEnvironment env) throws Exception {
+    private void setUp(JMSTestEnvironment env, JNDIEnvironment jndiEnvironment, JMSTransportDescriptionFactory tdf) throws Exception {
         this.env = env;
+        context = jndiEnvironment.getContext();
         destinationName = buildDestinationName("request", destinationType);
         jndiName = buildJndiName("request", destinationType);
         destination = env.createDestination(destinationType, destinationName);
-        env.getContext().bind(jndiName, destination);
+        context.bind(jndiName, destination);
+        connectionFactoryName = tdf.getConnectionFactoryName(destinationType);
+        connectionFactoryJNDIName = tdf.getConnectionFactoryJNDIName(destinationType);
     }
 
     @SuppressWarnings("unused")
     private void tearDown() throws Exception {
-        env.getContext().unbind(jndiName);
+        context.unbind(jndiName);
         destinationName = null;
         jndiName = null;
         destination = null;
@@ -105,7 +112,7 @@ public abstract class JMSChannel implements AxisServiceConfigurator {
     }
 
     public int getMessageCount() throws JMSException {
-        Connection connection = env.getConnectionFactory(destination).createConnection();
+        Connection connection = env.getConnectionFactory().createConnection();
         try {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -121,11 +128,14 @@ public abstract class JMSChannel implements AxisServiceConfigurator {
     }
 
     public EndpointReference getEndpointReference() throws Exception {
-        return new EndpointReference("jms:/" + jndiName + "?transport.jms.DestinationType=" + destinationType + "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory&transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory");
+        return new EndpointReference(
+                "jms:/" + jndiName + "?transport.jms.DestinationType=" + destinationType +
+                "&java.naming.factory.initial=org.mockejb.jndi.MockContextFactory" +
+                "&transport.jms.ConnectionFactoryJNDIName=" + connectionFactoryJNDIName);
     }
 
     public void setupService(AxisService service) throws Exception {
-        service.addParameter(JMSConstants.CONFAC_PARAM, destinationType);
+        service.addParameter(JMSConstants.CONFAC_PARAM, connectionFactoryName);
         service.addParameter(JMSConstants.DEST_PARAM_TYPE, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM, jndiName);
     }

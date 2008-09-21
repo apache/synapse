@@ -19,6 +19,7 @@
 
 package org.apache.synapse.transport.jms;
 
+import javax.jms.ConnectionFactory;
 import javax.naming.Context;
 import javax.xml.namespace.QName;
 
@@ -35,26 +36,58 @@ import org.apache.synapse.transport.testkit.name.Key;
 import org.mockejb.jndi.MockContextFactory;
 
 public class JMSTransportDescriptionFactory implements TransportDescriptionFactory {
+    public static final String CONNECTION_FACTORY = "ConnectionFactory";
+    public static final String QUEUE_CONNECTION_FACTORY = "QueueConnectionFactory";
+    public static final String TOPIC_CONNECTION_FACTORY = "TopicConnectionFactory";
+    
     private static final OMFactory factory = OMAbstractFactory.getOMFactory();
     
+    private final boolean singleCF;
     private final boolean cfOnSender;
+    private Context context;
     
     /**
      * Constructor.
+     * @param singleCF True if a single connection factory for all types of destinations
+     *                 (queues and topics) should be used. Otherwise, separate connection
+     *                 factories will be configured.
      * @param cfOnSender Determine whether the connection factories (JMS providers)
      *                   should also be configured on the sender. This switch allows
      *                   us to build regression tests for SYNAPSE-448. 
      */
-    public JMSTransportDescriptionFactory(boolean cfOnSender) {
+    public JMSTransportDescriptionFactory(boolean singleCF, boolean cfOnSender) {
+        this.singleCF = singleCF;
         this.cfOnSender = cfOnSender;
     }
 
     @SuppressWarnings("unused")
-    // We implicitly depend on the environment; make this explicit
-    private void setUp(JMSTestEnvironment env) {
-        
+    private void setUp(JMSTestEnvironment env, JNDIEnvironment jndiEnvironment) throws Exception {
+        context = jndiEnvironment.getContext();
+        ConnectionFactory connectionFactory = env.getConnectionFactory();
+        if (singleCF) {
+            context.bind(CONNECTION_FACTORY, connectionFactory);
+        } else {
+            context.bind(QUEUE_CONNECTION_FACTORY, connectionFactory);
+            context.bind(TOPIC_CONNECTION_FACTORY, connectionFactory);
+        }
     }
     
+    @SuppressWarnings("unused")
+    private void tearDown() throws Exception {
+        if (singleCF) {
+            context.unbind(CONNECTION_FACTORY);
+        } else {
+            context.unbind(QUEUE_CONNECTION_FACTORY);
+            context.unbind(TOPIC_CONNECTION_FACTORY);
+        }
+        context = null;
+    }
+    
+    @Key("singleCF")
+    public boolean isSingleCF() {
+        return singleCF;
+    }
+
     @Key("cfOnSender")
     public boolean isCfOnSender() {
         return cfOnSender;
@@ -75,13 +108,20 @@ public class JMSTransportDescriptionFactory implements TransportDescriptionFacto
                 MockContextFactory.class.getName()));
         element.addChild(createParameterElement(JMSConstants.CONFAC_JNDI_NAME_PARAM,
                 connFactName));
-        element.addChild(createParameterElement(JMSConstants.CONFAC_TYPE, type));
+        if (type != null) {
+            element.addChild(createParameterElement(JMSConstants.CONFAC_TYPE, type));
+        }
         trpDesc.addParameter(new Parameter(name, element));
     }
     
     private void setupTransport(ParameterInclude trpDesc) throws AxisFault {
-        setupConnectionFactoryConfig(trpDesc, "queue", JMSTestEnvironment.QUEUE_CONNECTION_FACTORY, "queue");
-        setupConnectionFactoryConfig(trpDesc, "topic", JMSTestEnvironment.TOPIC_CONNECTION_FACTORY, "topic");
+        if (singleCF) {
+            // TODO: setting the type to "queue" is nonsense, but required by the transport (see SYNAPSE-439)
+            setupConnectionFactoryConfig(trpDesc, "default", CONNECTION_FACTORY, "queue");
+        } else {
+            setupConnectionFactoryConfig(trpDesc, "queue", QUEUE_CONNECTION_FACTORY, "queue");
+            setupConnectionFactoryConfig(trpDesc, "topic", TOPIC_CONNECTION_FACTORY, "topic");
+        }
     }
     
     public TransportInDescription createTransportInDescription() throws Exception {
@@ -98,5 +138,18 @@ public class JMSTransportDescriptionFactory implements TransportDescriptionFacto
         }
         trpOutDesc.setSender(new JMSSender());
         return trpOutDesc;
+    }
+    
+    public String getConnectionFactoryName(String destinationType) {
+        return singleCF ? "default" : destinationType;
+    }
+    
+    public String getConnectionFactoryJNDIName(String destinationType) {
+        if (singleCF) {
+            return CONNECTION_FACTORY;
+        } else {
+            return destinationType.equals("queue") ? QUEUE_CONNECTION_FACTORY
+                                                   : TOPIC_CONNECTION_FACTORY;
+        }
     }
 }

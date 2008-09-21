@@ -45,7 +45,7 @@ public class JMSTransportTest extends TestCase {
         // Don't execute all possible test combinations:
         //  * Use a single setup to execute tests with all message types.
         //  * Only use a small set of message types for the other setups.
-        suite.addExclude("(!(|(&(broker=qpid)(cfOnSender=false)(!(|(destType=topic)(replyDestType=topic))))" +
+        suite.addExclude("(!(|(&(broker=qpid)(singleCF=false)(cfOnSender=false)(!(|(destType=topic)(replyDestType=topic))))" +
         		             "(&(test=AsyncXML)(messageType=SOAP11)(data=ASCII))" +
         		             "(&(test=EchoXML)(messageType=POX)(data=ASCII))))");
         
@@ -57,9 +57,11 @@ public class JMSTransportTest extends TestCase {
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
 
         JMSTestEnvironment[] environments = new JMSTestEnvironment[] { new QpidTestEnvironment(), new ActiveMQTestEnvironment() };
-        for (boolean cfOnSender : new boolean[] { false, true }) {
-            for (JMSTestEnvironment env : environments) {
-                builder.addEnvironment(env, new JMSTransportDescriptionFactory(cfOnSender));
+        for (boolean singleCF : new boolean[] { false, true }) {
+            for (boolean cfOnSender : new boolean[] { false, true }) {
+                for (JMSTestEnvironment env : environments) {
+                    builder.addEnvironment(env, new JMSTransportDescriptionFactory(singleCF, cfOnSender));
+                }
             }
         }
         
@@ -93,7 +95,7 @@ public class JMSTransportTest extends TestCase {
             suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new AsyncChannel[] {
                     new JMSAsyncChannel("endpoint1", JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT),
                     new JMSAsyncChannel("endpoint2", JMSConstants.DESTINATION_TYPE_QUEUE, ContentTypeMode.TRANSPORT) },
-                    2, false, env, new JMSTransportDescriptionFactory(false)));
+                    2, false, env, new JMSTransportDescriptionFactory(false, false)));
         }
         
         

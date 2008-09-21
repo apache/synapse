@@ -30,6 +30,8 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.ContentType;
 
+import junit.framework.Assert;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
@@ -63,6 +65,7 @@ public class MailRequestResponseClient extends MailClient implements RequestResp
     public IncomingMessage<byte[]> sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
         String msgId = sendMessage(contentType, message);
         Message reply = waitForReply(msgId);
+        Assert.assertNotNull("No response received", reply);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         reply.getDataHandler().writeTo(baos);
         return new IncomingMessage<byte[]>(new ContentType(reply.getContentType()), baos.toByteArray());

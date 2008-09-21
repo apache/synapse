@@ -99,7 +99,7 @@ public class XMLMessage {
         String baseType = contentType.getBaseType();
         Type type = null;
         for (Type candidate : Type.values()) {
-            if (candidate.getContentType().getBaseType().equals(baseType)) {
+            if (candidate.getContentType().getBaseType().equalsIgnoreCase(baseType)) {
                 type = candidate;
                 break;
             }

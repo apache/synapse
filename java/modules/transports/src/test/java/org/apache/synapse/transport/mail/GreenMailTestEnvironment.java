@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.mail.Flags;
 
+import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.util.LogManager;
 import org.apache.synapse.transport.testkit.util.ServerUtil;
@@ -45,20 +46,36 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     
     private static final ServerSetup POP3 =
             new ServerSetup(7110, "127.0.0.1", ServerSetup.PROTOCOL_POP3);
-
+    
+    private static final ServerSetup IMAP =
+            new ServerSetup(7143, "127.0.0.1", ServerSetup.PROTOCOL_IMAP);
+    
+    private final String protocol;
+    private final ServerSetup storeServerSetup;
     private LogManager logManager;
     private GreenMail greenMail;
     private int accountNumber;
     private List<Account> unallocatedAccounts;
 
+    public GreenMailTestEnvironment(String protocol) {
+        this.protocol = protocol;
+        if (protocol.equals("pop3")) {
+            storeServerSetup = POP3;
+        } else if (protocol.equals("imap")) {
+            storeServerSetup = IMAP;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     @SuppressWarnings("unused")
     private void setUp(LogManager logManager) throws Exception {
         this.logManager = logManager;
-        greenMail = new GreenMail(new ServerSetup[] { SMTP, POP3 });
+        greenMail = new GreenMail(new ServerSetup[] { SMTP, storeServerSetup });
         greenMail.start();
         unallocatedAccounts = new LinkedList<Account>();
         ServerUtil.waitForServer(SMTP.getPort());
-        ServerUtil.waitForServer(POP3.getPort());
+        ServerUtil.waitForServer(storeServerSetup.getPort());
     }
 
     @SuppressWarnings("unused")
@@ -71,14 +88,16 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     }
     
     @Override
+    @Key("protocol")
     public String getProtocol() {
-        return "pop3";
+        return protocol;
     }
     
     @Override
     public Account allocateAccount() throws Exception {
         if (unallocatedAccounts.isEmpty()) {
-            GreenMailUser user = greenMail.setUser("test" + accountNumber++, "password");
+            String login = "test" + accountNumber++;
+            GreenMailUser user = greenMail.setUser(login + "@localhost", login, "password");
             final MailFolder inbox = greenMail.getManagers().getImapHostManager().getInbox(user);
             inbox.addListener(new FolderListener() {
                 public void added(int msn) {
@@ -113,10 +132,10 @@ public class GreenMailTestEnvironment extends MailTestEnvironment {
     @Override
     public Map<String,String> getInProperties(Account account) {
         Map<String,String> props = new HashMap<String,String>();
-        props.put("mail.pop3.host", "localhost");
-        props.put("mail.pop3.port", String.valueOf(POP3.getPort()));
-        props.put("mail.pop3.user", account.getLogin());
-        props.put("mail.pop3.password", account.getPassword());
+        props.put("mail." + protocol + ".host", "localhost");
+        props.put("mail." + protocol + ".port", String.valueOf(storeServerSetup.getPort()));
+        props.put("mail." + protocol + ".user", account.getLogin());
+        props.put("mail." + protocol + ".password", account.getPassword());
         return props;
     }
     

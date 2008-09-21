@@ -20,9 +20,7 @@
 package org.apache.synapse.transport.jms;
 
 import javax.jms.Queue;
-import javax.jms.QueueConnectionFactory;
 import javax.jms.Topic;
-import javax.jms.TopicConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
@@ -53,16 +51,7 @@ public class ActiveMQTestEnvironment extends JMSTestEnvironment {
     }
 
     @Override
-    protected QueueConnectionFactory createQueueConnectionFactory() throws Exception {
-        return createConnectionFactory();
-    }
-
-    @Override
-    protected TopicConnectionFactory createTopicConnectionFactory() throws Exception {
-        return createConnectionFactory();
-    }
-    
-    private ActiveMQConnectionFactory createConnectionFactory() throws Exception {
+    protected ActiveMQConnectionFactory createConnectionFactory() throws Exception {
         return new ActiveMQConnectionFactory("vm://" + BROKER_NAME);
     }
 

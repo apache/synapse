@@ -46,9 +46,9 @@ public class MockEchoEndpoint implements Endpoint {
     private void setUp(JMSTestEnvironment env, JMSRequestResponseChannel channel) throws Exception {
         Destination destination = channel.getDestination();
         Destination replyDestination = channel.getReplyDestination();
-        connection = env.getConnectionFactory(destination).createConnection();
+        connection = env.getConnectionFactory().createConnection();
         connection.start();
-        replyConnection = env.getConnectionFactory(replyDestination).createConnection();
+        replyConnection = env.getConnectionFactory().createConnection();
         final Session replySession = replyConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         final MessageProducer producer = replySession.createProducer(replyDestination);
         MessageConsumer consumer = connection.createSession(false, Session.AUTO_ACKNOWLEDGE).createConsumer(destination);

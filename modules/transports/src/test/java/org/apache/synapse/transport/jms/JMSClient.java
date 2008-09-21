@@ -54,7 +54,7 @@ public class JMSClient<T> implements TestClient {
     @SuppressWarnings("unused")
     private void setUp(JMSTestEnvironment env, JMSChannel channel) throws Exception {
         Destination destination = channel.getDestination();
-        ConnectionFactory connectionFactory = env.getConnectionFactory(destination);
+        ConnectionFactory connectionFactory = env.getConnectionFactory();
         connection = connectionFactory.createConnection();
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         producer = session.createProducer(destination);

@@ -76,7 +76,7 @@ public class MailUtils extends BaseUtils {
                     Multipart mp = (Multipart) msg.getContent();
                     for (int i=0; i<mp.getCount(); i++) {
                         MimeBodyPart mbp = (MimeBodyPart) mp.getBodyPart(i);
-                        String contType = mbp.getContentType();
+                        String contType = mbp.getContentType().toLowerCase();
 
                         if (contType != null &&
                             (contType.indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) != -1 ||

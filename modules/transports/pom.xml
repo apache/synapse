@@ -62,7 +62,6 @@
                     </systemProperties>
                     <excludes>
                         <exclude>**/AbstractTransportTest.java</exclude>
-                        <exclude>**/MailEchoRawXMLTest.java</exclude>
                         <exclude>org/apache/synapse/transport/mail/Test*.java</exclude>
                         <exclude>org/apache/synapse/transport/testkit/**/*.java</exclude>
                     </excludes>

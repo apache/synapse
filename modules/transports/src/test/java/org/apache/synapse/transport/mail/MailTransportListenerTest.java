@@ -47,9 +47,8 @@ public class MailTransportListenerTest extends TestCase {
         
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
         
-        GreenMailTestEnvironment env = new GreenMailTestEnvironment();
-        
-        builder.addEnvironment(env);
+        builder.addEnvironment(new GreenMailTestEnvironment("pop3"));
+        builder.addEnvironment(new GreenMailTestEnvironment("imap"));
         
         MailChannel channel = new MailChannel();
         
@@ -71,7 +70,7 @@ public class MailTransportListenerTest extends TestCase {
         
         builder.build();
         
-        suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, true, env));
+        suite.addTest(new MinConcurrencyTest(AxisServer.INSTANCE, new MailChannel[] { new MailChannel(), new MailChannel() }, 2, true, new GreenMailTestEnvironment("pop3")));
         return suite;
     }
 }

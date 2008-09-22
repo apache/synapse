@@ -28,14 +28,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.TTCCLayout;
 import org.apache.log4j.WriterAppender;
-import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.tests.TransportTestCase;
 
 public class LogManager {
     public static final LogManager INSTANCE = new LogManager();
     
     private final File logDir;
-    private File testSuiteDir;
     private File testCaseDir;
     private WriterAppender appender;
     private int sequence;
@@ -44,29 +42,16 @@ public class LogManager {
         logDir = new File("target" + File.separator + "testkit-logs");
     }
     
-    private void cleanUp() {
+    public void setTestCase(TransportTestCase testCase) throws IOException {
         if (appender != null) {
             Logger.getRootLogger().removeAppender(appender);
             appender.close();
             appender = null;
         }
-    }
-    
-    public void setTestSuite(TransportTestSuite suite) {
-        cleanUp();
-        if (suite == null) {
-            testSuiteDir = null;
-        } else {
-            testSuiteDir = new File(logDir, suite.getTestClass().getName());
-        }
-        testCaseDir = null;
-    }
-    
-    public void setTestCase(TransportTestCase testCase) throws IOException {
-        cleanUp();
         if (testCase == null) {
             testCaseDir = null;
         } else {
+            File testSuiteDir = new File(logDir, testCase.getTestClass().getName());
             testCaseDir = new File(testSuiteDir, testCase.getId());
             sequence = 1;
             appender = new WriterAppender(new TTCCLayout(), createLog("debug"));

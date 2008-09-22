@@ -23,8 +23,8 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
+import org.apache.synapse.transport.testkit.channel.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.util.tcpmon.Tunnel;
 
 public class HttpChannel implements AsyncChannel, RequestResponseChannel {

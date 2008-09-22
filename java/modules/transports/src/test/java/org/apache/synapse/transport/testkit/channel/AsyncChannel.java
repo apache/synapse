@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.channel;
 
-public interface RequestResponseChannel extends Channel {
+public interface AsyncChannel extends Channel {
 }

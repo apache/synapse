@@ -25,10 +25,10 @@ import junit.framework.TestSuite;
 import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
-import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
-import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
-import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpoint;
-import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.axis2.client.AxisAsyncTestClient;
+import org.apache.synapse.transport.testkit.axis2.endpoint.AxisAsyncEndpoint;
+import org.apache.synapse.transport.testkit.axis2.endpoint.AxisEchoEndpoint;
+import org.apache.synapse.transport.testkit.axis2.endpoint.AxisServer;
 import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class MailTransportListenerTest extends TestCase {

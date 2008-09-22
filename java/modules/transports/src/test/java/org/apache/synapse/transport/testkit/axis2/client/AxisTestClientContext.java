@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.client.axis2;
+package org.apache.synapse.transport.testkit.axis2.client;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.format.BinaryFormatter;
 import org.apache.axis2.format.PlainTextFormatter;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
 
 public class AxisTestClientContext {
     public static final AxisTestClientContext INSTANCE = new AxisTestClientContext();

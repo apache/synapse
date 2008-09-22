@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.name.Name;

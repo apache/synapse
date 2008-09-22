@@ -22,8 +22,8 @@ package org.apache.axis2.transport.http;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
+import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.http.HttpTransportTestSuiteBuilder;
 
 public class SimpleHTTPServerTest extends TestCase {

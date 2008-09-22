@@ -17,12 +17,27 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit.axis2.client;
 
-import org.apache.axis2.addressing.EndpointReference;
+import javax.mail.internet.ContentType;
 
-public interface Channel {
-    String CONTEXT_PATH = "/services";
+import org.apache.axis2.client.ServiceClient;
+import org.apache.synapse.transport.testkit.client.AsyncTestClient;
+import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.synapse.transport.testkit.message.AxisMessage;
+
+public class AxisAsyncTestClient extends AxisTestClient implements AsyncTestClient<AxisMessage> {
+    private final boolean block;
     
-    EndpointReference getEndpointReference() throws Exception;
+    public AxisAsyncTestClient(boolean block) {
+        this.block = block;
+    }
+
+    public AxisAsyncTestClient() {
+        this(true);
+    }
+
+    public void sendMessage(ClientOptions options, ContentType contentType, AxisMessage message) throws Exception {
+        createClient(options, message, ServiceClient.ANON_OUT_ONLY_OP).execute(block);
+    }
 }

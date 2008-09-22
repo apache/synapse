@@ -27,7 +27,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.axis2.transport.mail.MailTransportListener;
 import org.apache.axis2.transport.mail.MailTransportSender;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.name.Key;
 
 @Key("server")

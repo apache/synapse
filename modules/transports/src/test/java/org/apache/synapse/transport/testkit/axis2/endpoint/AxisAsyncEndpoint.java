@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.server.axis2;
+package org.apache.synapse.transport.testkit.axis2.endpoint;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

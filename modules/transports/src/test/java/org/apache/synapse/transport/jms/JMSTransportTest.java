@@ -27,13 +27,13 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
-import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;
-import org.apache.synapse.transport.testkit.client.axis2.AxisRequestResponseTestClient;
-import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientSetup;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.server.axis2.AxisAsyncEndpoint;
-import org.apache.synapse.transport.testkit.server.axis2.AxisEchoEndpoint;
-import org.apache.synapse.transport.testkit.server.axis2.AxisServer;
+import org.apache.synapse.transport.testkit.axis2.client.AxisAsyncTestClient;
+import org.apache.synapse.transport.testkit.axis2.client.AxisRequestResponseTestClient;
+import org.apache.synapse.transport.testkit.axis2.client.AxisTestClientSetup;
+import org.apache.synapse.transport.testkit.axis2.endpoint.AxisAsyncEndpoint;
+import org.apache.synapse.transport.testkit.axis2.endpoint.AxisEchoEndpoint;
+import org.apache.synapse.transport.testkit.axis2.endpoint.AxisServer;
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
 import org.apache.synapse.transport.testkit.tests.misc.MinConcurrencyTest;
 
 public class JMSTransportTest extends TestCase {

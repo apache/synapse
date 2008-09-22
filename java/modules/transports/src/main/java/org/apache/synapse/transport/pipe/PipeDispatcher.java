@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import org.apache.synapse.transport.base.datagram.DatagramDispatcher;
-import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
+import org.apache.axis2.transport.base.datagram.DatagramDispatcher;
+import org.apache.axis2.transport.base.datagram.DatagramDispatcherCallback;
 
 /**
  * {@link DatagramDispatcher} implementation for the pipe transport.

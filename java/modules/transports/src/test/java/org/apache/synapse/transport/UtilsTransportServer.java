@@ -36,11 +36,11 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.format.BinaryBuilder;
+import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
 import org.apache.axis2.receivers.RawXMLINOutMessageReceiver;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.synapse.format.BinaryBuilder;
-import org.apache.synapse.format.PlainTextBuilder;
 
 /**
  * Base class for transport util servers used in unit testing

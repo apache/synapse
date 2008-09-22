@@ -33,7 +33,7 @@ import org.apache.axiom.om.impl.MIMEOutputUtils;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.util.ContentTypeUtil;
 

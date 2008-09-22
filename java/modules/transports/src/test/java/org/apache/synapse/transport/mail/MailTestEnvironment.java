@@ -24,6 +24,9 @@ import java.util.Map;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.transport.mail.MailConstants;
+import org.apache.axis2.transport.mail.MailTransportListener;
+import org.apache.axis2.transport.mail.MailTransportSender;
 import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.name.Key;
 

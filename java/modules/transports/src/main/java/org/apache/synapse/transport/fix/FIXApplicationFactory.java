@@ -21,7 +21,7 @@ package org.apache.synapse.transport.fix;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.base.threads.WorkerPool;
+import org.apache.axis2.transport.base.threads.WorkerPool;
 import quickfix.Application;
 
 public class FIXApplicationFactory {

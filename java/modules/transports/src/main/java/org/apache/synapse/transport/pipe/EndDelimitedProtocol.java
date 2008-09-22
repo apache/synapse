@@ -24,7 +24,7 @@ import java.util.Queue;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.ParameterInclude;
-import org.apache.synapse.transport.base.ParamUtils;
+import org.apache.axis2.transport.base.ParamUtils;
 
 /**
  * End delimited protocol implementation.

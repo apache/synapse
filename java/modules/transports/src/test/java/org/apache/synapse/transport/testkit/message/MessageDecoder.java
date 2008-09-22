@@ -40,7 +40,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 
 public interface MessageDecoder<T,U> {

@@ -31,9 +31,9 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.base.AbstractTransportSender;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.base.AbstractTransportSender;
-import org.apache.synapse.transport.base.BaseUtils;
 
 /**
  * Transport sender for the UDP protocol.

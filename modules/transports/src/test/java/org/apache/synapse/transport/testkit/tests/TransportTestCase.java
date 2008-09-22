@@ -68,7 +68,11 @@ public abstract class TransportTestCase extends TestCase {
     }
 
     public String getId() {
-        return id;
+        return id != null ? id : getName();
+    }
+
+    public Class<?> getTestClass() {
+        return testClass != null ? testClass : getClass();
     }
 
     @Override

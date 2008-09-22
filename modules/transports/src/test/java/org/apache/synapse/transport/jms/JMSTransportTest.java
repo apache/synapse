@@ -24,6 +24,7 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;

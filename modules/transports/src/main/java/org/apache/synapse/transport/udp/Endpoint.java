@@ -19,7 +19,7 @@
 package org.apache.synapse.transport.udp;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.base.datagram.DatagramEndpoint;
+import org.apache.axis2.transport.base.datagram.DatagramEndpoint;
 
 /**
  * UDP endpoint description.

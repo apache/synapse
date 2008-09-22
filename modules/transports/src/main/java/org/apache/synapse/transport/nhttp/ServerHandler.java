@@ -19,9 +19,9 @@
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.synapse.transport.base.MetricsCollector;
-import org.apache.synapse.transport.base.threads.WorkerPoolFactory;
-import org.apache.synapse.transport.base.threads.WorkerPool;
+import org.apache.axis2.transport.base.MetricsCollector;
+import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
+import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.synapse.transport.nhttp.util.SharedInputBuffer;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;

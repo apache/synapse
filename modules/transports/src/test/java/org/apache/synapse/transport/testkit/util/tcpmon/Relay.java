@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.axis2.transport.base.datagram.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.base.datagram.Utils;
 
 public class Relay implements Runnable {
     private static final Log log = LogFactory.getLog(Relay.class);

@@ -29,6 +29,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.axis2.transport.jms.BytesMessageInputStream;
+import org.apache.axis2.transport.jms.BytesMessageOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

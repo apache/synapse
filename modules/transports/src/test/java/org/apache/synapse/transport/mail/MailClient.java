@@ -32,6 +32,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.name.Name;

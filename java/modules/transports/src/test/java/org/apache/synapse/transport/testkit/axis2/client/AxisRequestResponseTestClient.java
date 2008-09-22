@@ -27,17 +27,28 @@ import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.synapse.transport.testkit.axis2.MessageContextValidator;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
 
 public class AxisRequestResponseTestClient extends AxisTestClient implements RequestResponseTestClient<AxisMessage,AxisMessage> {
+    private MessageContextValidator[] validators;
+    
+    @SuppressWarnings("unused")
+    private void setUp(MessageContextValidator[] validators) {
+        this.validators = validators;
+    }
+    
     public IncomingMessage<AxisMessage> sendMessage(ClientOptions options, ContentType contentType, AxisMessage message) throws Exception {
         OperationClient mepClient = createClient(options, message, ServiceClient.ANON_OUT_IN_OP);
         mepClient.execute(true);
         MessageContext responseMsgContext = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         Assert.assertFalse(responseMsgContext.isServerSide());
+        for (MessageContextValidator validator : validators) {
+            validator.validate(responseMsgContext, true);
+        }
         return new IncomingMessage<AxisMessage>(null, new AxisMessage(responseMsgContext));
     }
 }

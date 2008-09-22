@@ -32,6 +32,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.synapse.transport.testkit.axis2.MessageContextValidator;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
@@ -41,10 +42,12 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
         IncomingMessage<AxisMessage> process() throws Throwable;
     }
     
+    private MessageContextValidator[] validators;
     private BlockingQueue<Event> queue;
     
     @SuppressWarnings("unused")
-    private void setUp() {
+    private void setUp(MessageContextValidator[] validators) {
+        this.validators = validators;
         queue = new LinkedBlockingQueue<Event>();
     }
     
@@ -59,6 +62,9 @@ public class AxisAsyncEndpoint extends AxisEndpoint implements AsyncEndpoint<Axi
         final AxisMessage messageData;
         try {
             Assert.assertTrue(messageCtx.isServerSide());
+            for (MessageContextValidator validator : validators) {
+                validator.validate(messageCtx, false);
+            }
             messageData = new AxisMessage(messageCtx);
         }
         catch (final Throwable ex) {

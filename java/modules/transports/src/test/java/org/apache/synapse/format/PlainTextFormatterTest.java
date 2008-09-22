@@ -20,6 +20,8 @@ package org.apache.synapse.format;
 
 import java.io.ByteArrayOutputStream;
 
+import junit.framework.TestCase;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
@@ -27,9 +29,8 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.transport.base.BaseConstants;
-
-import junit.framework.TestCase;
+import org.apache.axis2.format.PlainTextFormatter;
+import org.apache.axis2.transport.base.BaseConstants;
 
 public class PlainTextFormatterTest extends TestCase {
 	private static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";

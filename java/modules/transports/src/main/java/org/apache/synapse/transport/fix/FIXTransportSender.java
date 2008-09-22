@@ -26,8 +26,8 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.OutTransportInfo;
+import org.apache.axis2.transport.base.AbstractTransportSender;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.base.AbstractTransportSender;
 import quickfix.*;
 import quickfix.field.*;
 

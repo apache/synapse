@@ -25,10 +25,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.synapse.transport.base.ManagementSupport;
-import org.apache.synapse.transport.base.ParamUtils;
-import org.apache.synapse.transport.base.datagram.AbstractDatagramTransportListener;
-import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
+import org.apache.axis2.transport.base.ManagementSupport;
+import org.apache.axis2.transport.base.ParamUtils;
+import org.apache.axis2.transport.base.datagram.AbstractDatagramTransportListener;
+import org.apache.axis2.transport.base.datagram.DatagramDispatcherCallback;
 
 /**
  * Transport listener for UNIX pipes.

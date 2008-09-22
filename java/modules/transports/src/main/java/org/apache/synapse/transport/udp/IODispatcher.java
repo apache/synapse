@@ -30,12 +30,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.axis2.transport.base.datagram.DatagramDispatcher;
+import org.apache.axis2.transport.base.datagram.DatagramDispatcherCallback;
+import org.apache.axis2.transport.base.datagram.ProcessPacketTask;
+import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.base.datagram.DatagramDispatcher;
-import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
-import org.apache.synapse.transport.base.datagram.ProcessPacketTask;
-import org.apache.synapse.transport.base.threads.WorkerPool;
 
 /**
  * I/O dispatcher for incoming UDP packets.

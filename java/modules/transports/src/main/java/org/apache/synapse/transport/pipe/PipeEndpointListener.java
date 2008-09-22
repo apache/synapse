@@ -27,9 +27,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.axis2.transport.base.datagram.DatagramDispatcherCallback;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.base.datagram.DatagramDispatcherCallback;
 
 /**
  * {@link Runnable} that reads messages from a given UNIX pipe.

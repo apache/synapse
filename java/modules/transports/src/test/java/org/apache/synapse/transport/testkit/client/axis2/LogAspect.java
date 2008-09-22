@@ -57,7 +57,7 @@ public class LogAspect {
     }
     
     @AfterReturning(
-        pointcut="call(javax.activation.DataSource org.apache.synapse.format.MessageFormatterEx.getDataSource(..))",
+        pointcut="call(javax.activation.DataSource org.apache.axis2.format.MessageFormatterEx.getDataSource(..))",
         returning="dataSource")
     public void afterGetDataSource(DataSource dataSource) {
         try {

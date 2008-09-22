@@ -28,6 +28,7 @@ import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import org.apache.axis2.transport.jms.BytesMessageInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

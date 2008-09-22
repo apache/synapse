@@ -21,7 +21,7 @@ package org.apache.synapse.transport.pipe;
 import java.io.File;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.base.datagram.DatagramEndpoint;
+import org.apache.axis2.transport.base.datagram.DatagramEndpoint;
 
 /**
  * Pipe endpoint description.

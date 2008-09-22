@@ -22,6 +22,7 @@ package org.apache.synapse.transport.mail;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.synapse.transport.testkit.TransportTestSuite;
 import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
 import org.apache.synapse.transport.testkit.client.axis2.AxisAsyncTestClient;

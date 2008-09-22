@@ -21,7 +21,7 @@ package org.apache.synapse.transport.vfs;
 import java.text.DateFormat;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.transport.base.AbstractPollTableEntry;
+import org.apache.axis2.transport.base.AbstractPollTableEntry;
 
 /**
  * Holds information about an entry in the VFS transport poll table used by the

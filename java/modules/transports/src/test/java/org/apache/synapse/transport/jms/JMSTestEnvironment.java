@@ -24,6 +24,7 @@ import javax.jms.Destination;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
+import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.synapse.transport.testkit.name.Key;
 
 @Key("broker")

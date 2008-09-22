@@ -21,8 +21,8 @@ package org.apache.synapse.transport.testkit.tests.async;
 
 import javax.mail.internet.ContentType;
 
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
 import org.apache.synapse.transport.testkit.message.IncomingMessage;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;

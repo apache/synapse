@@ -19,7 +19,7 @@
 
 package org.apache.synapse.transport.testkit.http;
 
-import org.apache.synapse.transport.testkit.listener.Channel;
+import org.apache.synapse.transport.testkit.channel.Channel;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;

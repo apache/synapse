@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.client.axis2;
+package org.apache.synapse.transport.testkit.axis2.client;
 
 import javax.mail.internet.ContentType;
 import javax.xml.namespace.QName;
@@ -31,9 +31,9 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.testkit.channel.Channel;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
-import org.apache.synapse.transport.testkit.listener.Channel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.util.ContentTypeUtil;

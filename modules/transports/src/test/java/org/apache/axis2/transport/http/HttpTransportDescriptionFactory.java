@@ -22,7 +22,7 @@ package org.apache.axis2.transport.http;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.util.LifecycleFixTransportListenerProxy;
 
 public class HttpTransportDescriptionFactory implements TransportDescriptionFactory {

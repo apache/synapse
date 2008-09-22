@@ -19,7 +19,7 @@
 
 package org.apache.synapse.transport.jms;
 
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
 
 public class JMSAsyncChannel extends JMSChannel implements AsyncChannel {
     public JMSAsyncChannel(String name, String destinationType, ContentTypeMode contentTypeMode) {

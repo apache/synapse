@@ -29,6 +29,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.ContentType;
+import javax.mail.internet.InternetAddress;
 
 import junit.framework.Assert;
 
@@ -42,6 +43,7 @@ import org.apache.synapse.transport.testkit.message.IncomingMessage;
 public class MailRequestResponseClient extends MailClient implements RequestResponseTestClient<byte[],byte[]> {
     private static final Log log = LogFactory.getLog(MailRequestResponseClient.class);
     
+    private MailChannel channel;
     private Store store;
     
     public MailRequestResponseClient(MessageLayout layout) {
@@ -50,6 +52,7 @@ public class MailRequestResponseClient extends MailClient implements RequestResp
     
     @SuppressWarnings("unused")
     private void setUp(MailTestEnvironment env, MailChannel channel) throws MessagingException {
+        this.channel = channel;
         Session session = channel.getReplySession();
         session.setDebug(log.isTraceEnabled());
         store = session.getStore(env.getProtocol());
@@ -67,6 +70,11 @@ public class MailRequestResponseClient extends MailClient implements RequestResp
         String msgId = sendMessage(contentType, message);
         Message reply = waitForReply(msgId);
         Assert.assertNotNull("No response received", reply);
+        Assert.assertEquals(channel.getSender().getAddress(),
+                            ((InternetAddress)reply.getRecipients(Message.RecipientType.TO)[0]).getAddress());
+        // TODO: enable this once the corresponding bug in the mail transport is corrected
+//        Assert.assertEquals(channel.getRecipient().getAddress(),
+//                            ((InternetAddress)reply.getFrom()[0]).getAddress());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         reply.getDataHandler().writeTo(baos);
         return new IncomingMessage<byte[]>(new ContentType(reply.getContentType()), baos.toByteArray());

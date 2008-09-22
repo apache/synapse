@@ -48,8 +48,8 @@ public class MailTransportListenerTest extends TestCase {
         
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
         
-        builder.addEnvironment(new GreenMailTestEnvironment("pop3"));
-        builder.addEnvironment(new GreenMailTestEnvironment("imap"));
+        builder.addEnvironment(new GreenMailTestEnvironment("pop3"), MailMessageContextValidator.INSTANCE);
+        builder.addEnvironment(new GreenMailTestEnvironment("imap"), MailMessageContextValidator.INSTANCE);
         
         MailChannel channel = new MailChannel();
         

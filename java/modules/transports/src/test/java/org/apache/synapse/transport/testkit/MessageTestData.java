@@ -17,7 +17,31 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.listener;
+package org.apache.synapse.transport.testkit;
 
-public interface AsyncChannel extends Channel {
+import org.apache.synapse.transport.testkit.name.Key;
+
+public class MessageTestData {
+    private final String name;
+    private final String text;
+    private final String charset;
+    
+    public MessageTestData(String name, String text, String charset) {
+        this.name = name;
+        this.text = text;
+        this.charset = charset;
+    }
+    
+    @Key("data")
+    public String getName() {
+        return name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
 }

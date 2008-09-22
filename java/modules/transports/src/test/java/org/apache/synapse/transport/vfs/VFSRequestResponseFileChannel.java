@@ -22,7 +22,7 @@ package org.apache.synapse.transport.vfs;
 import java.io.File;
 
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
+import org.apache.synapse.transport.testkit.channel.RequestResponseChannel;
 
 public class VFSRequestResponseFileChannel extends VFSFileChannel implements RequestResponseChannel {
     private final String replyPath;

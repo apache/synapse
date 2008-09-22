@@ -30,13 +30,12 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
+import org.apache.synapse.transport.testkit.channel.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
 import org.apache.synapse.transport.testkit.filter.FilterExpression;
 import org.apache.synapse.transport.testkit.filter.FilterExpressionParser;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.MessageTestData;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
 import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;

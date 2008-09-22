@@ -34,7 +34,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.axis2.transport.jms.JMSListener;
 import org.apache.axis2.transport.jms.JMSSender;
-import org.apache.synapse.transport.testkit.TransportDescriptionFactory;
+import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
 import org.apache.synapse.transport.testkit.name.Key;
 import org.mockejb.jndi.MockContextFactory;
 

@@ -29,10 +29,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.synapse.transport.testkit.channel.AsyncChannel;
+import org.apache.synapse.transport.testkit.channel.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.client.AsyncTestClient;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
-import org.apache.synapse.transport.testkit.listener.AsyncChannel;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.message.AxisMessage;
 import org.apache.synapse.transport.testkit.message.MessageDecoder;
 import org.apache.synapse.transport.testkit.message.MessageEncoder;

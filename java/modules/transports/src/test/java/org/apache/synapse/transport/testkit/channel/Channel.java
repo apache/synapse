@@ -17,11 +17,12 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.client.axis2;
+package org.apache.synapse.transport.testkit.channel;
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.addressing.EndpointReference;
 
-public interface AxisTestClientSetup {
-    void setupRequestMessageContext(MessageContext msgContext) throws AxisFault;
+public interface Channel {
+    String CONTEXT_PATH = "/services";
+    
+    EndpointReference getEndpointReference() throws Exception;
 }

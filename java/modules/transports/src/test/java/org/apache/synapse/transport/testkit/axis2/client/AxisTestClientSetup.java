@@ -17,21 +17,11 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.server.axis2;
+package org.apache.synapse.transport.testkit.axis2.client;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
 
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-
-public interface AxisServiceConfigurator {
-    /**
-     * Set up the service so that it can receive messages through the transport under test.
-     * Implementations will typically call {@link AxisService#addParameter(Parameter)} to
-     * setup the service parameters required by the transport.
-     * The default implementation does nothing.
-     * 
-     * @param service
-     * @throws Exception
-     */
-    void setupService(AxisService service) throws Exception;
+public interface AxisTestClientSetup {
+    void setupRequestMessageContext(MessageContext msgContext) throws AxisFault;
 }

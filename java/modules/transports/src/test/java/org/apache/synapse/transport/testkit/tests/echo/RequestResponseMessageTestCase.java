@@ -21,8 +21,8 @@ package org.apache.synapse.transport.testkit.tests.echo;
 
 import javax.mail.internet.ContentType;
 
+import org.apache.synapse.transport.testkit.channel.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
-import org.apache.synapse.transport.testkit.listener.RequestResponseChannel;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 import org.apache.synapse.transport.testkit.tests.MessageTestCase;
 

@@ -17,14 +17,14 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.server.axis2;
+package org.apache.synapse.transport.testkit.axis2.endpoint;
 
 import java.net.URI;
 import java.util.UUID;
 
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.listener.Channel;
+import org.apache.synapse.transport.testkit.channel.Channel;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.Endpoint;
 

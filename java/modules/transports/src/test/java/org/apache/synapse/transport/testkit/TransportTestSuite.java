@@ -188,47 +188,42 @@ public class TransportTestSuite extends TestSuite {
     @Override
     public void run(TestResult result) {
         LogManager logManager = LogManager.INSTANCE;
-        logManager.setTestSuite(this);
-        try {
-            if (!reuseResources) {
-                super.run(result);
-            } else {
-                TestResourceSet resourceSet = null;
-                for (Enumeration<?> e = tests(); e.hasMoreElements(); ) {
-                    Test test = (Test)e.nextElement();
-                    if (test instanceof TransportTestCase) {
-                        TransportTestCase ttest = (TransportTestCase)test;
-                        TestResourceSet newResourceSet = ttest.getResourceSet();
-                        try {
-                            if (resourceSet == null) {
-                                logManager.setTestCase(ttest);
-                                newResourceSet.setUp();
-                            } else {
-                                TestResourceSetTransition transition = new TestResourceSetTransition(resourceSet, newResourceSet);
-                                transition.tearDown();
-                                logManager.setTestCase(ttest);
-                                transition.setUp();
-                            }
-                        } catch (Throwable t) {
-                            result.addError(this, t);
-                            return;
-                        }
-                        resourceSet = newResourceSet;
-                    }
-                    runTest(test, result);
-                }
-                if (resourceSet != null) {
+        if (!reuseResources) {
+            super.run(result);
+        } else {
+            TestResourceSet resourceSet = null;
+            for (Enumeration<?> e = tests(); e.hasMoreElements(); ) {
+                Test test = (Test)e.nextElement();
+                if (test instanceof TransportTestCase) {
+                    TransportTestCase ttest = (TransportTestCase)test;
+                    TestResourceSet newResourceSet = ttest.getResourceSet();
                     try {
-                        resourceSet.tearDown();
-                        logManager.setTestCase(null);
+                        if (resourceSet == null) {
+                            logManager.setTestCase(ttest);
+                            newResourceSet.setUp();
+                        } else {
+                            TestResourceSetTransition transition = new TestResourceSetTransition(resourceSet, newResourceSet);
+                            transition.tearDown();
+                            logManager.setTestCase(ttest);
+                            transition.setUp();
+                        }
                     } catch (Throwable t) {
                         result.addError(this, t);
                         return;
                     }
+                    resourceSet = newResourceSet;
+                }
+                runTest(test, result);
+            }
+            if (resourceSet != null) {
+                try {
+                    resourceSet.tearDown();
+                    logManager.setTestCase(null);
+                } catch (Throwable t) {
+                    result.addError(this, t);
+                    return;
                 }
             }
-        } finally {
-            logManager.setTestSuite(null);
         }
     }
 }

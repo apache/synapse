@@ -31,6 +31,7 @@ import javax.naming.Context;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.synapse.transport.testkit.name.Key;
 import org.apache.synapse.transport.testkit.server.axis2.AxisServiceConfigurator;
 

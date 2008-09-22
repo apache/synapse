@@ -27,7 +27,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.mail.internet.ContentType;
 
-import org.apache.synapse.transport.base.BaseConstants;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 import org.apache.synapse.transport.testkit.name.Name;

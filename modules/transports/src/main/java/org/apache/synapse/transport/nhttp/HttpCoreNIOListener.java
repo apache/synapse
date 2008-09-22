@@ -28,6 +28,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.SessionContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.transport.TransportListener;
+import org.apache.axis2.transport.base.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
@@ -40,7 +41,6 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-import org.apache.synapse.transport.base.*;
 import org.apache.axiom.om.OMElement;
 
 import javax.net.ssl.SSLContext;

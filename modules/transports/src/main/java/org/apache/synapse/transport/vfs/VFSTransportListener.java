@@ -18,16 +18,16 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.base.AbstractPollingTransportListener;
-import org.apache.synapse.transport.base.ManagementSupport;
-import org.apache.synapse.transport.base.ParamUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.description.*;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.base.BaseConstants;
+import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.base.AbstractPollingTransportListener;
+import org.apache.axis2.transport.base.ManagementSupport;
+import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.vfs.*;

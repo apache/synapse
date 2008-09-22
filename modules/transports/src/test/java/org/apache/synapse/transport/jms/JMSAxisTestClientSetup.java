@@ -21,6 +21,7 @@ package org.apache.synapse.transport.jms;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.synapse.transport.testkit.client.axis2.AxisTestClientSetup;
 import org.apache.synapse.transport.testkit.name.Key;
 

@@ -18,9 +18,9 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import org.apache.synapse.transport.base.*;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.base.*;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.AxisFault;

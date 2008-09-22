@@ -32,6 +32,7 @@ import javax.mail.internet.ContentType;
 
 import junit.framework.Assert;
 
+import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.client.ClientOptions;

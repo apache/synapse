@@ -101,8 +101,8 @@
     </dependencies>
 	
     <properties>
-	     <rampart.version>SNAPSHOT</rampart.version>
-	     <wss4j.version>SNAPSHOT</wss4j.version>
+	     <rampart.version>1.4</rampart.version>
+	     <wss4j.version>1.5.4</wss4j.version>
     </properties>     
 	 
 </project>

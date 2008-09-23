@@ -232,7 +232,7 @@
 
 	<properties>
 		<test.property>2.8.1</test.property>
-		<rampart.version>SNAPSHOT</rampart.version>
+		<rampart.version>1.4</rampart.version>
     </properties>
 	 
 </project>

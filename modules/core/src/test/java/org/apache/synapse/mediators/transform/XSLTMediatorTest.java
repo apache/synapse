@@ -38,7 +38,6 @@ import org.apache.axiom.om.OMNode;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.TestMessageContextBuilder;
-import org.apache.synapse.transport.base.BaseConstants;
 import org.apache.synapse.util.jaxp.AXIOMResultBuilderFactory;
 import org.apache.synapse.util.jaxp.AXIOMSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
@@ -47,6 +46,7 @@ import org.apache.synapse.util.jaxp.SpringStaxSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.StreamResultBuilderFactory;
 import org.apache.synapse.util.jaxp.StreamSourceBuilderFactory;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.axis2.transport.base.BaseConstants;
 
 public class XSLTMediatorTest extends TestCase {
     private static final Class[] sourceBuilderFactories = {

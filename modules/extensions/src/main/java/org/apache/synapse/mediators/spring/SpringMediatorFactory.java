@@ -63,7 +63,7 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
 
              // after successfully creating the mediator
              // set its common attributes such as tracing etc
-            processTraceState(sm,elem);
+            processAuditStatus(sm,elem);
             sm.setBeanName(bean.getAttributeValue());
             sm.setConfigKey(key.getAttributeValue());
             return sm;

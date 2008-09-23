@@ -105,20 +105,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "optimize"));
         OMAttribute encoding
                 = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "encoding"));
-
-        OMAttribute statistics = elem.getAttribute(new QName(
-                XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
-        if (statistics != null && statistics.getAttributeValue() != null) {
-            String statisticsValue = statistics.getAttributeValue();
-            if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                definition.setStatisticsState(SynapseConstants.STATISTICS_ON);
-            } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                definition.setStatisticsState(SynapseConstants.STATISTICS_OFF);
-            }
-        } else {
-            definition.setStatisticsState(SynapseConstants.STATISTICS_UNSET);
-        }
-
+        
         OMAttribute trace = elem.getAttribute(new QName(
                 XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
         if (trace != null && trace.getAttributeValue() != null) {

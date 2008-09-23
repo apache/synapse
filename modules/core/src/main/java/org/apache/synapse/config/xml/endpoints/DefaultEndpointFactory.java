@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.statistics.AuditConfigurable;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
@@ -83,7 +84,7 @@ public class DefaultEndpointFactory extends EndpointFactory {
             EndpointDefinition endpoint = createEndpointDefinition(defaultElement);
             defaultEndpoint.setEndpoint(endpoint);
         }
-
+        processAuditStatus(defaultEndpoint, defaultElement);
         return defaultEndpoint;
     }
 
@@ -131,5 +132,21 @@ public class DefaultEndpointFactory extends EndpointFactory {
         extractCommonEndpointProperties(endpointDefinition, elem);
         extractSpecificEndpointProperties(endpointDefinition, elem);
         return endpointDefinition;
+    }
+    
+    protected void processAuditStatus(Endpoint endpoint ,OMElement epOmElement){
+        
+        OMAttribute statistics = epOmElement.getAttribute(
+                new QName(XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+        if (statistics != null) {
+            String statisticsValue = statistics.getAttributeValue();
+            if (statisticsValue != null) {
+                if (endpoint instanceof AuditConfigurable) {
+                    if (Boolean.parseBoolean(statisticsValue)) {
+                        ((AuditConfigurable) endpoint).enableStatistics();
+                    }
+                }
+            }
+        }
     }
 }

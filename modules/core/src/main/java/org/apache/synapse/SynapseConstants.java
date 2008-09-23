@@ -164,33 +164,7 @@ public final class SynapseConstants {
         /** The tracing state-unset */
         public static final int TRACING_UNSET=2;
 
-        /** The statistics state -off */
-        public static final int STATISTICS_OFF =0;
-        /** The statistics state-on */
-        public static final int STATISTICS_ON =1;
-        /** The statistics state-unset */
-        public static final int STATISTICS_UNSET=2;
-
-        /** key for lookup sequence statistics stack */
-        public static final String SEQUENCE_STATS ="synapse.sequence.stats";
-
-        /** key for lookup Proxy Service statistics stack */
-        public static final String PROXY_STATS ="synapse.proxy.stats";
-
-        /** key for lookup Proxy Service statistics stack */
-        public static final String SERVICE_STATS ="synapse.service.stats";
-
-        /** key for lookup Endpoint statistics stack */
-        public static final String ENDPOINT_STATS ="synapse.endpoint.stats";
-
-        /** Sequence statistics category*/
-        public static final int  SEQUENCE_STATISTICS = 0;
-
-        /** Proxy Service statistics category */
-        public static final int  PROXYSERVICE_STATISTICS = 1;
-
-        /** Endpoint statistics category*/
-        public static final int ENDPOINT_STATISTICS = 2;
+        public static final String STATISTICS_STACK ="synapse.stats";       
 
     //- handling of timed out events from the callbacks -
         /** The System property that states the duration at which the timeout handler runs */

@@ -23,9 +23,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 
 /**
  * This is the MessageReceiver set to act on behalf of Proxy services.
@@ -78,18 +77,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
         synCtx.setProperty(SynapseConstants.PROXY_SERVICE, name);
         synCtx.setTracingState(proxy.getTraceState());
 
-        try {
-            // Setting property to collect the proxy service statistics
-            boolean statsOn = (SynapseConstants.STATISTICS_ON == proxy.getStatisticsState());
-            if (statsOn) {
-                ProxyServiceStatisticsStack proxyServiceStatisticsStack
-                        = new ProxyServiceStatisticsStack();
-                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-                proxyServiceStatisticsStack.put(name, System.currentTimeMillis(),
-                        !synCtx.isResponse(), statsOn, isFault);
-                synCtx.setProperty(SynapseConstants.PROXY_STATS,
-                        proxyServiceStatisticsStack);
-            }
+        try {            
 
             Mediator mandatorySeq = synCtx.getConfiguration().getMandatorySequence();
             if (mandatorySeq != null) {

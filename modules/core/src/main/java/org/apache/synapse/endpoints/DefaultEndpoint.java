@@ -25,7 +25,9 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+import org.apache.synapse.statistics.AuditConfigurable;
+import org.apache.synapse.statistics.StatisticsReporter;
+
 
 import java.util.Stack;
 
@@ -35,7 +37,7 @@ import java.util.Stack;
  * retries if a failure occurred and informing the parent endpoint if a failure couldn't be
  * recovered.
  */
-public class DefaultEndpoint extends FaultHandler implements Endpoint {
+public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConfigurable{
 
     protected Log log;
     
@@ -58,6 +60,8 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
      * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects.
      */
     private Endpoint parentEndpoint = null;
+    
+    private boolean statisticsEnable = false;
 
     public DefaultEndpoint() {
         log = LogFactory.getLog(this.getClass());
@@ -129,24 +133,8 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
         }
 
         // Setting Required property to collect the End Point statistics
-        boolean statisticsEnable
-                = (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
-        if (statisticsEnable) {
-            EndPointStatisticsStack endPointStatisticsStack = null;
-            Object statisticsStackObj =
-                    synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
-            if (statisticsStackObj == null) {
-                endPointStatisticsStack = new EndPointStatisticsStack();
-                synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
-                        endPointStatisticsStack);
-            } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
-                endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
-            }
-            if (endPointStatisticsStack != null) {
-                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-                endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
-                        !synCtx.isResponse(), statisticsEnable, isFault);
-            }
+        if (isStatisticsEnable()) {
+            StatisticsReporter.collect(synCtx, this);
         }
 
         if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {
@@ -230,5 +218,27 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint {
         if (log.isDebugEnabled()) {
             log.debug(msg);
         }
+    }
+
+    public boolean isStatisticsEnable() {
+        return statisticsEnable;
+    }
+
+    public void disableStatistics() {
+
+        if (statisticsEnable) {
+            this.statisticsEnable = false;
+        }
+    }
+
+    public void enableStatistics() {
+
+        if (!statisticsEnable) {
+            statisticsEnable = true;
+        }
+    }
+
+    public String getAuditId() {
+        return getName();
     }
 }

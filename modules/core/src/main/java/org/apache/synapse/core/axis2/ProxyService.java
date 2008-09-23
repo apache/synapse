@@ -31,10 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.security.definition.KeyStoreInformation;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -191,11 +190,7 @@ public class ProxyService {
     private boolean running = false;
 
     public static final String ALL_TRANSPORTS = "all";
-
-    /**
-     * To decide to whether statistics should have collected or not
-     */
-    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
+   
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
@@ -818,25 +813,7 @@ public class ProxyService {
     public void setRunning(boolean running) {
         this.running = running;
     }
-
-    /**
-     * To check whether statistics should have collected or not
-     *
-     * @return Returns the int value that indicate statistics is enabled or not.
-     */
-    public int getStatisticsState() {
-        return statisticsState;
-    }
-
-    /**
-     * To set the statistics enable variable value
-     *
-     * @param statisticsState statistics state
-     */
-    public void setStatisticsState(int statisticsState) {
-        this.statisticsState = statisticsState;
-    }
-
+   
     /**
      * Returns the int value that indicate the tracing state
      *

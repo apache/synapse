@@ -82,19 +82,6 @@ public class ProxyServiceFactory {
             proxy = new ProxyService(name.getAttributeValue());
         }
 
-        OMAttribute statistics = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
-                XMLConfigConstants.STATISTICS_ATTRIB_NAME));
-        if (statistics != null) {
-            String statisticsValue = statistics.getAttributeValue();
-            if (statisticsValue != null) {
-                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    proxy.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    proxy.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
-                }
-            }
-        }
-
         OMAttribute trans = elem.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "transports"));
         if (trans != null) {

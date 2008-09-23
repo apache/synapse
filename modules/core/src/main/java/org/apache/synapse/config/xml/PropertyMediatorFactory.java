@@ -84,7 +84,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(propMediator, elem);
+        processAuditStatus(propMediator, elem);
         // The action attribute is optional, if provided and equals to 'remove' the
         // property mediator will act as a property remove mediator
         if (action != null && "remove".equals(action.getAttributeValue())) {

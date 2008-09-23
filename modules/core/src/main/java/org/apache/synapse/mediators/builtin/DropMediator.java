@@ -19,11 +19,7 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**
@@ -48,13 +44,7 @@ public class DropMediator extends AbstractMediator {
             if (traceOn && trace.isTraceEnabled()) {
                 trace.trace("Message : " + synCtx.getEnvelope());
             }
-        }
-
-        //If drop mediator is a child of a sequence
-        // and if this sequence is a IN or OUT sequence of a proxy service
-        StatisticsUtils.processProxyServiceStatistics(synCtx);
-        //If this a sequence is not  a IN or OUT sequence of a proxy service
-        StatisticsUtils.processAllSequenceStatistics(synCtx);
+        }      
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "End : Drop mediator");

@@ -191,7 +191,7 @@
         </parameter>
     </transportReceiver>-->
 
-    <transportReceiver name="mailto" class="org.apache.synapse.transport.mail.MailTransportListener">
+    <transportReceiver name="mailto" class="org.apache.axis2.transport.mail.MailTransportListener">
         <!-- configure any optional POP3/IMAP properties
         check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
     </transportReceiver>
@@ -228,7 +228,7 @@
     </transportSender>
 
     <transportSender name="jms"
-                     class="org.apache.synapse.transport.jms.JMSSender"/>
+                     class="org.apache.axis2.transport.jms.JMSSender"/>
 
     <!-- Uncomment and configure the SMTP server information
     check com.sun.mail.smtp package documentation for descriptions of properties

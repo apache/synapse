@@ -73,7 +73,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         AggregateMediator mediator = new AggregateMediator();
-        processTraceState(mediator, elem);
+        processAuditStatus(mediator, elem);
 
         OMElement corelateOn = elem.getFirstChildWithName(CORELATE_ON_Q);
         if (corelateOn != null) {

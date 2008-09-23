@@ -19,10 +19,11 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.*;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.*;
+import org.apache.synapse.statistics.StatisticsReporter;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
  * This implements the FaultHandler interface as a mediator fault handler. That is the fault handler is
@@ -71,6 +72,8 @@ public class MediatorFaultHandler extends FaultHandler {
             name = faultMediator.getClass().getName();
         }
 
+        StatisticsReporter.reportFault(synCtx); 
+        
         if (traceOrDebugOn) {
             traceOrDebugWarn(traceOn, "Executing fault handler mediator : " + name);
         }

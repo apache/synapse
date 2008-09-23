@@ -33,7 +33,6 @@ import org.apache.rampart.handler.WSSHandlerConstants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.POXUtils;
@@ -90,13 +89,7 @@ public class Axis2Sender {
         try {
             messageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check if addressing is already engaged for this message.
-            // if engaged we should use the addressing enabled Configuraion context.
-            if (smc.isResponse()) {
-                //Process statistics
-                StatisticsUtils.processEndPointStatistics(smc);
-                StatisticsUtils.processProxyServiceStatistics(smc);
-                StatisticsUtils.processAllSequenceStatistics(smc);
-            }
+            // if engaged we should use the addressing enabled Configuration context.            
 
             if (AddressingHelper.isReplyRedirected(messageContext) &&
                     !messageContext.getReplyTo().hasNoneAddress()) {

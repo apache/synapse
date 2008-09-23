@@ -71,7 +71,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         IterateMediator mediator = new IterateMediator();
-        processTraceState(mediator, elem);
+        processAuditStatus(mediator, elem);
 
         OMAttribute continueParent = elem.getAttribute(ATT_CONTPAR);
         if (continueParent != null) {

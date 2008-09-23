@@ -43,7 +43,7 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
         InMediator filter = new InMediator();
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(filter,elem);
+        processAuditStatus(filter,elem);
         addChildren(elem, filter);
         return filter;
     }

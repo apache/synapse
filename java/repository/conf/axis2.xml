@@ -206,7 +206,7 @@
 
     <transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
 
-    <transportReceiver name="mailto" class="org.apache.synapse.transport.mail.MailTransportListener">
+    <transportReceiver name="mailto" class="org.apache.axis2.transport.mail.MailTransportListener">
         <!-- configure any optional POP3/IMAP properties
         check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
     </transportReceiver>
@@ -244,7 +244,7 @@
             supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
     </transportSender>
     
-    <transportSender name="jms" class="org.apache.synapse.transport.jms.JMSSender">
+    <transportSender name="jms" class="org.apache.axis2.transport.jms.JMSSender">
         <!-- uncomment this and configure to use connection pools for sending messages
         <parameter name="myTopicConnectionFactory">
             <parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>

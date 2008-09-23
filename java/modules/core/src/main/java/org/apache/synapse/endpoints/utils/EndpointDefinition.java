@@ -123,12 +123,7 @@ public class EndpointDefinition {
      * suspended forever.
      */
     private long suspendOnFailDuration = -1;
-
-    /**
-     * To decide to whether statistics should have collected or not
-     */
-    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
-
+   
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
@@ -419,25 +414,7 @@ public class EndpointDefinition {
      */
     public void setSuspendOnFailDuration(long suspendOnFailDuration) {
         this.suspendOnFailDuration = suspendOnFailDuration;
-    }
-
-    /**
-     * To check whether statistics should have collected or not
-     *
-     * @return Returns the int value that indicate statistics is enabled or not.
-     */
-    public int getStatisticsState() {
-        return statisticsState;
-    }
-
-    /**
-     * To set the statistics enable variable value
-     *
-     * @param statisticsState Indicates whether statictics is enable or not
-     */
-    public void setStatisticsState(int statisticsState) {
-        this.statisticsState = statisticsState;
-    }
+    }   
 
     public int getTraceState() {
         return traceState;

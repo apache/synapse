@@ -29,7 +29,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 
 import java.util.Stack;
 
@@ -121,26 +120,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             }
 
             // Setting Required property to collect the End Point statistics
-            boolean statisticsEnable =
-                    (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
-
-            if (statisticsEnable) {
-                EndPointStatisticsStack endPointStatisticsStack = null;
-                Object statisticsStackObj =
-                        synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
-                if (statisticsStackObj == null) {
-                    endPointStatisticsStack = new EndPointStatisticsStack();
-                    synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
-                            endPointStatisticsStack);
-                } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
-                    endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
-                }
-                if (endPointStatisticsStack != null) {
-                    boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
-                            !synCtx.isResponse(), statisticsEnable, isFault);
-                }
-            }
+           
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Sending message to WSDL endpoint : " +
                         endPointName + " resolves to address = " + eprAddress);

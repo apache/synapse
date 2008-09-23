@@ -28,8 +28,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.statistics.StatisticsStack;
-import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 
 /**
  * This message receiver should be configured in the Axis2 configuration as the
@@ -74,13 +72,6 @@ public class SynapseMessageReceiver implements MessageReceiver {
         ((Axis2MessageContext) synCtx).setServiceLog(serviceLog);
 
         try {
-            // set the statistics collection stack for this message
-            StatisticsStack synapseServiceStack = new ProxyServiceStatisticsStack();
-            boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-            synapseServiceStack.put(SynapseConstants.SYNAPSE_SERVICE_NAME,
-                System.currentTimeMillis(), !synCtx.isResponse(), true, isFault);
-            synCtx.setProperty(SynapseConstants.SERVICE_STATS, synapseServiceStack);
-
             // set default fault handler
             synCtx.pushFaultHandler(new MediatorFaultHandler(
                         synCtx.getSequence(SynapseConstants.FAULT_SEQUENCE_KEY)));

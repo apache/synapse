@@ -21,8 +21,8 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import javax.xml.namespace.QName;
@@ -59,21 +59,8 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         if (e != null) {
             seqMediator.setErrorHandler(e.getAttributeValue());
         }
-        processTraceState(seqMediator, elem);
-        addChildren(elem, seqMediator);
-        OMAttribute statistics = elem.getAttribute(ATT_STATS);
-        if (statistics != null) {
-            String statisticsValue = statistics.getAttributeValue();
-            if (statisticsValue != null) {
-                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(
-                        org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(
-                        org.apache.synapse.SynapseConstants.STATISTICS_OFF);
-                }
-            }
-        }
+        processAuditStatus(seqMediator, elem);
+        addChildren(elem, seqMediator);         
         return seqMediator;
     }
     
@@ -88,7 +75,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             if (e != null) {
                 seqMediator.setErrorHandler(e.getAttributeValue());
             }
-            processTraceState(seqMediator, elem);
+            processAuditStatus(seqMediator, elem);
             addChildren(elem, seqMediator);
 
         } else {
@@ -108,21 +95,6 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 throw new SynapseException(msg);
             }
         }
-
-        OMAttribute statistics = elem.getAttribute(ATT_STATS);
-        if (statistics != null) {
-            String statisticsValue = statistics.getAttributeValue();
-            if (statisticsValue != null) {
-                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(
-                        org.apache.synapse.SynapseConstants.STATISTICS_ON);
-                } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsState(
-                        org.apache.synapse.SynapseConstants.STATISTICS_OFF);
-                }
-            }
-        }
-
         return seqMediator;
     }
 }

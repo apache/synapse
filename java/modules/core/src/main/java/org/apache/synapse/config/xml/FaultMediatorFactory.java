@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.transform.FaultMediator;
 import org.jaxen.JaxenException;
 
@@ -159,7 +158,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(faultMediator,elem);
+        processAuditStatus(faultMediator,elem);
 
         OMElement node = elem.getFirstChildWithName(NODE_Q);
         if (node != null && node.getText() != null) {

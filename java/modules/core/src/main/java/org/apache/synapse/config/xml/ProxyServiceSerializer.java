@@ -207,19 +207,7 @@ public class ProxyServiceSerializer {
         }
         if (service.isWsSecEnabled()) {
             proxy.addChild(fac.createOMElement("enableSec", synNS));
-        }
-
-        int isEnableStatistics = service.getStatisticsState();
-        String statisticsValue = null;
-        if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
-            statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
-        } else if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_OFF) {
-            statisticsValue = XMLConfigConstants.STATISTICS_DISABLE;
-        }
-        if (statisticsValue != null) {
-            proxy.addAttribute(fac.createOMAttribute(
-                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
-        }
+        }        
 
         int traceState = service.getTraceState();
         String traceValue = null;

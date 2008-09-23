@@ -43,6 +43,7 @@ public class MailTransportListenerTest extends TestCase {
         suite.addExclude("(test=AsyncSwA)");
         suite.addExclude("(test=AsyncBinary)");
         suite.addExclude("(&(test=AsyncTextPlain)(!(data=ASCII)))");
+        suite.addExclude("(&(test=EchoXML)(messageType=SOAP12))");
         // SYNAPSE-434
         suite.addExclude("(test=MinConcurrency)");
         

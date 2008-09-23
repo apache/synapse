@@ -38,11 +38,10 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.statistics.StatisticsReporter;
-import org.apache.synapse.statistics.AuditConfigurable;
+import org.apache.synapse.audit.statatistics.StatisticsReporter;
+import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.ResponseAcceptEncodingProcessor;
 

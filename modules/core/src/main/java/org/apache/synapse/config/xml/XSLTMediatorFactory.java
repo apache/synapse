@@ -82,7 +82,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(transformMediator, elem);
+        processAuditStatus(transformMediator, elem);
         // set the features 
         for (Map.Entry<String,String> entry : collectNameValuePairs(elem, FEATURE_Q).entrySet()) {
             String value = entry.getValue();

@@ -40,13 +40,13 @@ public class Statistics {
     /**
      * Update the statistics
      *
-     * @param inTime  - The processing start time
-     * @param outTime - The processing end time
-     * @param isFault - A boolean value that indicate whether falut has occured or not
+     *
+     * @param currentProcessingTime - The processing end time
+     * @param isFault - A boolean value that indicate whether fault has occurred or not
      */
-    public void update(long inTime, long outTime, boolean isFault) {
+    public void update(long currentProcessingTime, boolean isFault) {
 
-        if (outTime < 0 || inTime < 0) {
+        if (currentProcessingTime < 0) {
             return;
         }
 
@@ -55,17 +55,16 @@ public class Statistics {
             faultCount++;
         }
 
-        long responseTime = outTime - inTime;
-        if (maxProcessingTime < responseTime) {
-            maxProcessingTime = responseTime;
+        if (maxProcessingTime < currentProcessingTime) {
+            maxProcessingTime = currentProcessingTime;
         }
-        if (minProcessingTime > responseTime) {
-            minProcessingTime = responseTime;
+        if (minProcessingTime > currentProcessingTime) {
+            minProcessingTime = currentProcessingTime;
         }
         if (minProcessingTime == -1) {
-            minProcessingTime = responseTime;
+            minProcessingTime = currentProcessingTime;
         }
-        totalProcessingTime = totalProcessingTime + responseTime;
+        totalProcessingTime = totalProcessingTime + currentProcessingTime;
         avgProcessingTime = totalProcessingTime / count;
     }
 
@@ -77,7 +76,7 @@ public class Statistics {
     }
 
     /**
-     * @return Returns the Avarage processing time
+     * @return Returns the Average processing time
      */
     public double getAvgProcessingTime() {
         return avgProcessingTime;
@@ -102,5 +101,19 @@ public class Statistics {
      */
     public int getCount() {
         return count;
+    }
+
+    public String toString() {
+        return new StringBuffer().append(" Avg Processing Time : ").
+                append(avgProcessingTime)
+                .append(" Max Processing Time : ").
+                append(maxProcessingTime)
+                .append(" Min Processing Time : ").
+                append(minProcessingTime)
+                .append(" Total Request Count : ").
+                append(count)
+                .append(" Total Fault Response Count : ").
+                append(faultCount).
+                toString();
     }
 }

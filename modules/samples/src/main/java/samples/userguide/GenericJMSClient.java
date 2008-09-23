@@ -19,8 +19,9 @@
 
 package samples.userguide;
 
-import org.apache.synapse.transport.jms.JMSConstants;
-import org.apache.synapse.transport.jms.JMSUtils;
+
+import org.apache.axis2.transport.jms.JMSUtils;
+import org.apache.axis2.transport.jms.JMSConstants;
 
 import javax.jms.*;
 import javax.naming.InitialContext;

@@ -108,7 +108,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(validateMediator,elem);
+        processAuditStatus(validateMediator,elem);
         // set the features
         for (Map.Entry<String,String> entry : collectNameValuePairs(elem, FEATURE_Q).entrySet()) {
             String value = entry.getValue();

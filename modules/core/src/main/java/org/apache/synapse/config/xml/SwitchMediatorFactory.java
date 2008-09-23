@@ -73,7 +73,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(switchMediator, elem);
+        processAuditStatus(switchMediator, elem);
         Iterator iter = elem.getChildrenWithName(CASE_Q);
         while (iter.hasNext()) {
             OMElement caseElem = (OMElement) iter.next();

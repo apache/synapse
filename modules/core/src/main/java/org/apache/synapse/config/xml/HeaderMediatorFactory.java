@@ -80,7 +80,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(headerMediator,elem);
+        processAuditStatus(headerMediator,elem);
 
         // The action attribute is optional, if provided and equals to 'remove' the
         // header mediator will act as a header remove mediator

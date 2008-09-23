@@ -35,13 +35,16 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.util.ResponseAcceptEncodingProcessor;
+import org.apache.synapse.statistics.StatisticsReporter;
+import org.apache.synapse.statistics.AuditConfigurable;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.util.ResponseAcceptEncodingProcessor;
 
 import java.util.*;
 
@@ -154,9 +157,16 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private void handleMessage(MessageContext response,
         org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
 
+        Endpoint endpoint = (Endpoint) synapseOutMsgCtx.getProperty(
+                SynapseConstants.PROCESSED_ENDPOINT);
+        if (endpoint instanceof AuditConfigurable) {
+            StatisticsReporter.report(synapseOutMsgCtx, (AuditConfigurable) endpoint);
+        }
+        
         Object o = response.getProperty(NhttpConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
 
+            StatisticsReporter.reportFault(synapseOutMsgCtx);
             // there is a sending fault. propagate the fault to fault handlers.
 
             Stack faultStack = synapseOutMsgCtx.getFaultStack();

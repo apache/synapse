@@ -84,7 +84,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(xQueryMediator, elem);
+        processAuditStatus(xQueryMediator, elem);
         OMElement dataSource = elem.getFirstChildWithName(
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "dataSource"));
         if (dataSource != null) {

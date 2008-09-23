@@ -24,6 +24,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.statistics.AuditConfigurable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,15 +33,21 @@ import org.apache.commons.logging.LogFactory;
  * for all mediators who extend from this.
  * elements of a mediator class.
  */
-public abstract class AbstractMediator implements Mediator {
+public abstract class AbstractMediator implements Mediator , AuditConfigurable{
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
     protected Log log;
     /** The runtime trace log for mediators */
     protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
-    /** State of tracing for this mediator */
-     protected int traceState = SynapseConstants.TRACING_UNSET;
+    /**
+     * State of tracing for this mediator
+     */
+    protected int traceState = SynapseConstants.TRACING_UNSET;
+
+    private boolean statisticsEnable = false;
+
+    private String name;
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -229,5 +236,27 @@ public abstract class AbstractMediator implements Mediator {
             trace.error(msg, e);
         }
         throw new SynapseException(msg, e);
+    }
+
+    public boolean isStatisticsEnable() {
+        return statisticsEnable;
+    }
+
+    public void disableStatistics() {
+
+        if (statisticsEnable) {
+            this.statisticsEnable = false;
+        }
+    }
+
+    public void enableStatistics() {
+
+        if (!statisticsEnable) {
+            statisticsEnable = true;
+        }
+    }
+
+    public String getAuditId() {
+        return name;
     }
 }

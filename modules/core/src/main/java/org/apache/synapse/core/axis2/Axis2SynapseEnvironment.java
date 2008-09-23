@@ -36,9 +36,8 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.statistics.StatisticsCollector;
-import org.apache.synapse.statistics.StatisticsUtils;
-import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.TemporaryData;
+import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
 
 import java.util.concurrent.ExecutorService;
@@ -99,14 +98,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         if (log.isDebugEnabled()) {
             log.debug("Injecting MessageContext");
         }
-        synCtx.setEnvironment(this);
-        if (synCtx.isResponse()) {
-            //Process statistics related to a sequence which has send mediator as a child,end point
-            StatisticsUtils.processEndPointStatistics(synCtx);
-            StatisticsUtils.processProxyServiceStatistics(synCtx);
-            StatisticsUtils.processSequenceStatistics(synCtx);
-        }
-
+        synCtx.setEnvironment(this);         
         Mediator mandatorySeq = synCtx.getConfiguration().getMandatorySequence();
         // the mandatory sequence is optional and hence check for the existance before mediation
         if (mandatorySeq != null) {
@@ -185,14 +177,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 + (seq.getName() == null? "Anonymous" : seq.getName()) + " Sequence");
         }
         synCtx.setEnvironment(this);
-
-        if (synCtx.isResponse()) {
-            //Process statistics related to a sequence which has send mediator as a child,end point
-            StatisticsUtils.processEndPointStatistics(synCtx);
-            StatisticsUtils.processProxyServiceStatistics(synCtx);
-            StatisticsUtils.processSequenceStatistics(synCtx);
-        }
-
         executorService.execute(new MediatorWorker(seq, synCtx));
     }
 
@@ -208,11 +192,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         if (synCtx.isResponse()) {
 
             if (endpoint != null) {
-                // not sure whether we need to collect statistics here
-                StatisticsUtils.processEndPointStatistics(synCtx);
-                StatisticsUtils.processProxyServiceStatistics(synCtx);
-                StatisticsUtils.processAllSequenceStatistics(synCtx);
-
+               
                 Axis2Sender.sendOn(endpoint, synCtx);
 
             } else {

@@ -138,7 +138,7 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(sequenceMediator, elem);
+        processAuditStatus(sequenceMediator, elem);
 
         return sequenceMediator;
     }

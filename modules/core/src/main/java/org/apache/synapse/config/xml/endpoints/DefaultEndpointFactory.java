@@ -22,7 +22,7 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.statistics.AuditConfigurable;
+import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
@@ -142,7 +142,7 @@ public class DefaultEndpointFactory extends EndpointFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (endpoint instanceof AuditConfigurable) {
-                    if (Boolean.parseBoolean(statisticsValue)) {
+                    if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
                         ((AuditConfigurable) endpoint).enableStatistics();
                     }
                 }

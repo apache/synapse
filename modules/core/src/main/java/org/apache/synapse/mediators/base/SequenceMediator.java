@@ -24,7 +24,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.statistics.StatisticsReporter;
+import org.apache.synapse.audit.statatistics.StatisticsReporter;
 
 import java.util.Stack;
 
@@ -87,7 +87,7 @@ public class SequenceMediator extends AbstractListMediator {
             // mediation through this sequence
             Mediator errorHandlerMediator = null;
 
-            // Setting Required property to collect the sequence statistics
+            // Setting Required property to collect the sequence audit
 
             try {
 

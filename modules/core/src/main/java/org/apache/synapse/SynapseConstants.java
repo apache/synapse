@@ -152,7 +152,7 @@ public final class SynapseConstants {
     public static final String ISRESPONSE_PROPERTY = "synapse.isresponse";
 
 
-    //- tracing and statistics constants -
+    //- tracing and audit constants -
         /** Tracing logger name */
         public static final String TRACE_LOGGER ="TRACE_LOGGER";
         public static final String SERVICE_LOGGER_PREFIX ="SERVICE_LOGGER.";
@@ -164,7 +164,13 @@ public final class SynapseConstants {
         /** The tracing state-unset */
         public static final int TRACING_UNSET=2;
 
-        public static final String STATISTICS_STACK ="synapse.stats";       
+        public static final String STATISTICS_STACK ="synapse.statistics.stack";     
+        
+        public static final String SYNAPSE_STATISTICS_STATE = "synapse.statistics.state";
+    
+        public static final String SYNAPSE_AUDIT_CONFIGURATION = "synapse.audit.configuration";
+        
+        public static final String SYNAPSE_STATISTICS ="synapse.statistics";
 
     //- handling of timed out events from the callbacks -
         /** The System property that states the duration at which the timeout handler runs */

@@ -25,7 +25,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.StatisticsReporter;
+import org.apache.synapse.audit.statatistics.StatisticsReporter;
+import org.apache.synapse.audit.statatistics.StatisticsCollector;
 
 /**
  * This class represents an actual endpoint to send the message. It is responsible for sending the
@@ -150,7 +151,7 @@ public class AddressEndpoint extends DefaultEndpoint {
         }
 
         EndpointDefinition endpoint = getEndpoint();
-        // Setting Required property to collect the End Point statistics
+        // Setting Required property to collect the End Point audit
         if (isStatisticsEnable()) {
             StatisticsReporter.collect(synCtx, this);
         }
@@ -173,7 +174,7 @@ public class AddressEndpoint extends DefaultEndpoint {
         // register this as the immediate fault handler for this message.
         synCtx.pushFaultHandler(this);
 
-        // add this as the last endpoint to process this message. it is used by statistics code.
+        // add this as the last endpoint to process this message. it is used by audit code.
         synCtx.setProperty(SynapseConstants.PROCESSED_ENDPOINT, this);
 
         synCtx.getEnvironment().send(endpoint, synCtx);

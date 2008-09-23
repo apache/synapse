@@ -16,14 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.statistics;
+package org.apache.synapse.audit;
 
 /**
  * 
  */
 public interface AuditConfigurable {
     
-    public String getAuditId();   
+    public String getAuditId(); 
+    public void setAuditId(String id);   
     public boolean isStatisticsEnable();
     public void disableStatistics();
     public void enableStatistics();

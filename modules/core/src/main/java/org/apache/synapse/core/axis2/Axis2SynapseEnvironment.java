@@ -30,12 +30,13 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.audit.statatistics.StatisticsCollector;
+import org.apache.synapse.audit.AuditHelper;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
@@ -191,6 +192,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public void send(EndpointDefinition endpoint, MessageContext synCtx) {
         if (synCtx.isResponse()) {
 
+            AuditHelper.reportGlobalAudit(synCtx); 
+            
             if (endpoint != null) {
                
                 Axis2Sender.sendOn(endpoint, synCtx);

@@ -119,7 +119,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
                 }
             }
 
-            // Setting Required property to collect the End Point statistics
+            // Setting Required property to collect the End Point audit
            
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Sending message to WSDL endpoint : " +
@@ -137,7 +137,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
             // register this as the immediate fault handler for this message.
             synCtx.pushFaultHandler(this);
 
-            // add this as the last endpoint to process this message. it is used by statistics code.
+            // add this as the last endpoint to process this message. it is used by audit code.
             synCtx.setProperty(SynapseConstants.PROCESSED_ENDPOINT, this);
 
             synCtx.getEnvironment().send(endpoint, synCtx);

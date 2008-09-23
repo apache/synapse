@@ -38,9 +38,16 @@ import org.apache.synapse.transport.testkit.message.MessageDecoder;
 import org.apache.synapse.transport.testkit.message.MessageEncoder;
 import org.apache.synapse.transport.testkit.message.RESTMessage;
 import org.apache.synapse.transport.testkit.message.XMLMessage;
+import org.apache.synapse.transport.testkit.message.RESTMessage.Parameter;
 import org.apache.synapse.transport.testkit.server.AsyncEndpoint;
 import org.apache.synapse.transport.testkit.server.Endpoint;
+import org.apache.synapse.transport.testkit.tests.async.BinaryTestCase;
 import org.apache.synapse.transport.testkit.tests.async.LargeSOAPAsyncMessageTestCase;
+import org.apache.synapse.transport.testkit.tests.async.RESTTestCase;
+import org.apache.synapse.transport.testkit.tests.async.SwATestCase;
+import org.apache.synapse.transport.testkit.tests.async.TextPlainTestCase;
+import org.apache.synapse.transport.testkit.tests.async.XMLAsyncMessageTestCase;
+import org.apache.synapse.transport.testkit.tests.echo.XMLRequestResponseMessageTestCase;
 
 public class TransportTestSuiteBuilder {
     static class ResourceRelation<T> {
@@ -72,6 +79,28 @@ public class TransportTestSuiteBuilder {
             return list.iterator();
         }
     }
+    
+    public static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
+    
+    public static final MessageTestData ASCII_TEST_DATA = new MessageTestData("ASCII", "test string", "us-ascii");
+    public static final MessageTestData UTF8_TEST_DATA = new MessageTestData("UTF8", testString, "UTF-8");
+    public static final MessageTestData LATIN1_TEST_DATA = new MessageTestData("Latin1", testString, "ISO-8859-1");
+    
+    private static final MessageTestData[] messageTestData = new MessageTestData[] {
+        ASCII_TEST_DATA,
+        UTF8_TEST_DATA,
+        LATIN1_TEST_DATA,
+    };
+    
+    private static final RESTMessage restTestMessage1 = new RESTMessage(new Parameter[] {
+        new Parameter("param1", "value1"),
+        new Parameter("param2", "value2"),
+    });
+    
+    private static final RESTMessage restTestMessage2 = new RESTMessage(new Parameter[] {
+            new Parameter("param", "value1"),
+            new Parameter("param", "value2"),
+        });
     
     private final TransportTestSuite suite;
     
@@ -185,9 +214,14 @@ public class TransportTestSuiteBuilder {
             for (ResourceRelation<AsyncTestClient<XMLMessage>> client : xmlAsyncClients) {
                 for (ResourceRelation<AsyncEndpoint<XMLMessage>> endpoint : xmlAsyncEndpoints) {
                     Object[] resources = merge(env, channel, client, endpoint);
-                    suite.addSOAPTests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
-                    suite.addPOXTests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
-                    suite.addSwATests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
+                    for (MessageTestData data : messageTestData) {
+                        for (XMLMessage.Type type : XMLMessage.Type.values()) {
+                            if (type != XMLMessage.Type.SWA) {
+                                suite.addTest(new XMLAsyncMessageTestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), type, data, resources));
+                            }
+                        }
+                    }
+                    suite.addTest(new SwATestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources));
                     // Regression test for SYNAPSE-423:
                     suite.addTest(new LargeSOAPAsyncMessageTestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources));
                 }
@@ -195,19 +229,23 @@ public class TransportTestSuiteBuilder {
             for (ResourceRelation<AsyncTestClient<String>> client : stringAsyncClients) {
                 for (ResourceRelation<AsyncEndpoint<String>> endpoint : stringAsyncEndpoints) {
                     Object[] resources = merge(env, channel, client, endpoint);
-                    suite.addTextPlainTests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
+                    for (MessageTestData data : messageTestData) {
+                        suite.addTest(new TextPlainTestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), data, resources));
+                    }
                 }
             }
             for (ResourceRelation<AsyncTestClient<byte[]>> client : byteAsyncClients) {
                 for (ResourceRelation<AsyncEndpoint<byte[]>> endpoint : byteAsyncEndpoints) {
                     Object[] resources = merge(env, channel, client, endpoint);
-                    suite.addBinaryTest(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
+                    suite.addTest(new BinaryTestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources));
                 }
             }
             for (ResourceRelation<AsyncTestClient<RESTMessage>> client : restAsyncClients) {
                 for (ResourceRelation<AsyncEndpoint<RESTMessage>> endpoint : restAsyncEndpoints) {
                     Object[] resources = merge(env, channel, client, endpoint);
-                    suite.addRESTTests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
+                    suite.addTest(new RESTTestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), restTestMessage1, resources));
+                    // TODO: regression test for SYNAPSE-431
+//                    addTest(new RESTTestCase(env, channel, client, endpoint, restTestMessage2));
                 }
             }
         }
@@ -215,7 +253,13 @@ public class TransportTestSuiteBuilder {
             for (ResourceRelation<RequestResponseTestClient<XMLMessage,XMLMessage>> client : xmlRequestResponseClients) {
                 for (ResourceRelation<Endpoint> endpoint : echoEndpoints) {
                     Object[] resources = merge(env, channel, client, endpoint);
-                    suite.addPOXTests(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), resources);
+                    for (MessageTestData data : messageTestData) {
+                        for (XMLMessage.Type type : XMLMessage.Type.values()) {
+                            if (type != XMLMessage.Type.SWA) {
+                                suite.addTest(new XMLRequestResponseMessageTestCase(channel.getPrimaryResource(), client.getPrimaryResource(), endpoint.getPrimaryResource(), type, data, resources));
+                            }
+                        }
+                    }
                 }
             }
         }

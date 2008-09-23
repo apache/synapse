@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.statistics.AuditConfigurable;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
@@ -74,19 +75,11 @@ public abstract class EndpointSerializer {
      */
     protected void serializeCommonEndpointProperties(
             EndpointDefinition endpointDefinition, OMElement element) {
-
-        if (endpointDefinition.getStatisticsState() == SynapseConstants.STATISTICS_ON) {
-            element.addAttribute(fac.createOMAttribute(XMLConfigConstants.STATISTICS_ATTRIB_NAME,
-                    null, XMLConfigConstants.STATISTICS_ENABLE));
-        } else if (endpointDefinition.getStatisticsState() == SynapseConstants.STATISTICS_OFF) {
-            element.addAttribute(fac.createOMAttribute(XMLConfigConstants.STATISTICS_ATTRIB_NAME,
-                    null, XMLConfigConstants.STATISTICS_DISABLE));
-        }
-
+    
         if (endpointDefinition.getTraceState() == SynapseConstants.TRACING_ON) {
             element.addAttribute(fac.createOMAttribute(XMLConfigConstants.TRACE_ATTRIB_NAME,
                     null, XMLConfigConstants.TRACE_ENABLE));
-        } else if (endpointDefinition.getStatisticsState() == SynapseConstants.TRACING_OFF) {
+        } else if (endpointDefinition.getTraceState() == SynapseConstants.TRACING_OFF) {
             element.addAttribute(fac.createOMAttribute(XMLConfigConstants.TRACE_ATTRIB_NAME,
                     null, XMLConfigConstants.TRACE_DISABLE));
         }

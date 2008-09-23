@@ -64,7 +64,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         CloneMediator mediator = new CloneMediator();
-        processTraceState(mediator, elem);
+        processAuditStatus(mediator, elem);
         
         OMAttribute continueParent = elem.getAttribute(ATT_CONTPAR);
         if (continueParent != null) {

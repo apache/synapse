@@ -19,8 +19,8 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.SynapseConstants;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.synapse.SynapseConstants;
 
 import javax.xml.namespace.QName;
 

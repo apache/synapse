@@ -19,11 +19,8 @@
 
 package org.apache.synapse.mediators.base;
 
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.statistics.StatisticsStack;
-import org.apache.synapse.statistics.StatisticsUtils;
-import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
@@ -55,24 +52,7 @@ public class SynapseMediator extends AbstractListMediator {
             if (traceOn && trace.isTraceEnabled()) {
                 trace.trace("Message : " + synCtx.getEnvelope());
             }
-        }
-
-        // If the message flow path is OUT, then process the satatistics
-        if (synCtx.isResponse()) {
-            StatisticsUtils.processAllSequenceStatistics(synCtx);
-        }
-
-        //put the required property for the collecttng statistics for the message mediation
-        StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
-                SynapseConstants.SEQUENCE_STATS);
-        if (sequenceStack == null) {
-            sequenceStack = new SequenceStatisticsStack();
-            synCtx.setProperty(SynapseConstants.SEQUENCE_STATS,sequenceStack);
-        }
-        String seqName = "MainSequence";
-        boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-        sequenceStack.put(seqName,System.currentTimeMillis(),!synCtx.isResponse(),true,isFault);
-
+        }       
         boolean result = super.mediate(synCtx);
 
         if (traceOrDebugOn) {

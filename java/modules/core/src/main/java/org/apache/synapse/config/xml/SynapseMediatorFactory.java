@@ -48,7 +48,7 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(sm,elem);
+        processAuditStatus(sm,elem);
 
         addChildren(elem, sm);
         return sm;

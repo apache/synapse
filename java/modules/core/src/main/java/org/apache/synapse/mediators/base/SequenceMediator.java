@@ -20,14 +20,11 @@
 package org.apache.synapse.mediators.base;
 
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.statistics.StatisticsUtils;
-import org.apache.synapse.statistics.StatisticsStack;
-import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
+import org.apache.synapse.statistics.StatisticsReporter;
 
 import java.util.Stack;
 
@@ -53,10 +50,7 @@ public class SequenceMediator extends AbstractListMediator {
     /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
     private boolean initialized = false;
     /** the registry key to load this definition if dynamic */
-    private String registryKey = null;
-
-    /** To decide to whether statistics should have collected or not  */
-    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
+    private String registryKey = null;   
 
     /**
      * If this mediator refers to another named Sequence, execute that. Else
@@ -71,13 +65,16 @@ public class SequenceMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean statsOn = SynapseConstants.STATISTICS_ON == statisticsState;
         boolean traceOn = isTraceOn(synCtx);
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
 
+        if (isStatisticsEnable()) {
+            StatisticsReporter.collect(synCtx, this);
+        }
+
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Start : Sequence "
-                + (name == null ? (key == null ? "<anonymous" : "key=<" + key) : "<" + name) + ">");
+                    + (name == null ? (key == null ? "<anonymous" : "key=<" + key) : "<" + name) + ">");
 
             if (traceOn && trace.isTraceEnabled()) {
                 trace.trace("Message : " + synCtx.getEnvelope());
@@ -91,18 +88,7 @@ public class SequenceMediator extends AbstractListMediator {
             Mediator errorHandlerMediator = null;
 
             // Setting Required property to collect the sequence statistics
-            if (statsOn) {
-                StatisticsStack sequenceStack = (StatisticsStack)
-                    synCtx.getProperty(SynapseConstants.SEQUENCE_STATS);
-                if (sequenceStack == null) {
-                    sequenceStack = new SequenceStatisticsStack();
-                    synCtx.setProperty(SynapseConstants.SEQUENCE_STATS, sequenceStack);
-                }
-                String seqName = (name == null ? SynapseConstants.ANONYMOUS_SEQUENCE : name);
-                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-                sequenceStack.put(seqName, System.currentTimeMillis(),
-                        !synCtx.isResponse(), statsOn, isFault);
-            }
+
             try {
 
                 // push the errorHandler sequence into the current message as the fault handler
@@ -112,13 +98,13 @@ public class SequenceMediator extends AbstractListMediator {
                     if (errorHandlerMediator != null) {
                         if (traceOrDebugOn) {
                             traceOrDebug(traceOn, "Setting the onError handler : " +
-                                errorHandler + " for the sequence : " + name);
+                                    errorHandler + " for the sequence : " + name);
                         }
                         synCtx.pushFaultHandler(
                                 new MediatorFaultHandler(errorHandlerMediator));
                     } else {
                         auditWarn("onError handler : " + errorHandler + " for sequence : " +
-                            name + " cannot be found", synCtx);
+                                name + " cannot be found", synCtx);
                     }
                 }
 
@@ -132,8 +118,8 @@ public class SequenceMediator extends AbstractListMediator {
                         Object o = faultStack.peek();
 
                         if (o instanceof MediatorFaultHandler &&
-                            errorHandlerMediator.equals(
-                                ((MediatorFaultHandler) o).getFaultMediator())) {
+                                errorHandlerMediator.equals(
+                                        ((MediatorFaultHandler) o).getFaultMediator())) {
                             faultStack.pop();
                         }
                     }
@@ -145,19 +131,16 @@ public class SequenceMediator extends AbstractListMediator {
                     }
 
                     traceOrDebug(traceOn,
-                        "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
+                            "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }
 
                 return result;
 
             } finally {
 
-                //If this sequence is finished it's task normally
-                if (statsOn) {
-                    StatisticsUtils.processSequenceStatistics(synCtx);
+                if (isStatisticsEnable()) {
+                    StatisticsReporter.report(synCtx, this);
                 }
-                //If this sequence is a IN or OUT sequence of a proxy service
-                StatisticsUtils.processProxyServiceStatistics(synCtx);
             }
 
         } else {
@@ -249,25 +232,7 @@ public class SequenceMediator extends AbstractListMediator {
     public void setErrorHandler(String errorHandler) {
         this.errorHandler = errorHandler;
     }
-
-    /**
-     * To check whether statistics should have collected or not
-     *
-     * @return Returns the int value that indicate statistics is enabled or not.
-     */
-    public int getStatisticsState() {
-        return statisticsState;
-    }
-
-    /**
-     * To set the statistics enable variable value
-     *
-     * @param statisticsState  To indicate statistics collecting state
-     */
-    public void setStatisticsState(int statisticsState) {
-        this.statisticsState = statisticsState;
-    }
-
+   
     /**
      * Is this a dynamic sequence?
      * @return true if dynamic
@@ -298,5 +263,9 @@ public class SequenceMediator extends AbstractListMediator {
      */
     public void setRegistryKey(String registryKey) {
         this.registryKey = registryKey;
+    }
+
+    public String getAuditId() {
+        return getName();
     }
 }

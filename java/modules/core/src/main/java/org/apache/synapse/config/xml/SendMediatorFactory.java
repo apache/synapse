@@ -21,10 +21,9 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
-import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.builtin.SendMediator;
 
 import javax.xml.namespace.QName;
 
@@ -83,7 +82,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(sm,elem);
+        processAuditStatus(sm,elem);
 
         OMElement epElement = elem.getFirstChildWithName(ENDPOINT_Q);
         if (epElement != null) {

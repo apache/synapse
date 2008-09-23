@@ -19,18 +19,18 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.statistics.AuditConfigurable;
+
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.xml.namespace.QName;
 
 /**
  * Parent class for all the {@link MediatorFactory} implementations
@@ -71,7 +71,7 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * @param mediator of which trace state has to be set
      * @param mediatorOmElement from which the trace state is extracted
      */
-    protected void processTraceState(Mediator mediator, OMElement mediatorOmElement) {
+    protected void processAuditStatus(Mediator mediator, OMElement mediatorOmElement) {
 
         OMAttribute trace = mediatorOmElement.getAttribute(
             new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
@@ -83,6 +83,18 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
                     mediator.setTraceState(org.apache.synapse.SynapseConstants.TRACING_ON);
                 } else if (traceValue.equals(XMLConfigConstants.TRACE_DISABLE)) {
                     mediator.setTraceState(org.apache.synapse.SynapseConstants.TRACING_OFF);
+                }
+            }
+        }
+
+        OMAttribute statistics = mediatorOmElement.getAttribute(ATT_STATS);
+        if (statistics != null) {
+            String statisticsValue = statistics.getAttributeValue();
+            if (statisticsValue != null) {
+                if (mediator instanceof AuditConfigurable) {
+                    if (Boolean.parseBoolean(statisticsValue)) {
+                        ((AuditConfigurable) mediator).enableStatistics();
+                    }
                 }
             }
         }

@@ -26,13 +26,12 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.format.PlainTextBuilder;
+import org.apache.axis2.format.BinaryBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.format.BinaryBuilder;
-import org.apache.synapse.format.PlainTextBuilder;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.ClasspathURLStreamHandler;
 import org.apache.synapse.util.RMIRegistryController;
 

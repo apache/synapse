@@ -25,7 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+import org.apache.synapse.statistics.StatisticsReporter;
 
 /**
  * This class represents an actual endpoint to send the message. It is responsible for sending the
@@ -151,24 +151,8 @@ public class AddressEndpoint extends DefaultEndpoint {
 
         EndpointDefinition endpoint = getEndpoint();
         // Setting Required property to collect the End Point statistics
-        boolean statisticsEnable
-                = (SynapseConstants.STATISTICS_ON == endpoint.getStatisticsState());
-        if (statisticsEnable) {
-            EndPointStatisticsStack endPointStatisticsStack = null;
-            Object statisticsStackObj =
-                    synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS);
-            if (statisticsStackObj == null) {
-                endPointStatisticsStack = new EndPointStatisticsStack();
-                synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATS,
-                        endPointStatisticsStack);
-            } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
-                endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
-            }
-            if (endPointStatisticsStack != null) {
-                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-                endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
-                        !synCtx.isResponse(), statisticsEnable, isFault);
-            }
+        if (isStatisticsEnable()) {
+            StatisticsReporter.collect(synCtx, this);
         }
 
         if (endpoint.getAddress() != null) {

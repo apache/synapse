@@ -21,8 +21,6 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
@@ -57,7 +55,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        processTraceState(logMediator,elem);
+        processAuditStatus(logMediator,elem);
         
         // Set the high level set of properties to be logged (i.e. log level)
         OMAttribute level = elem.getAttribute(ATT_LEVEL);

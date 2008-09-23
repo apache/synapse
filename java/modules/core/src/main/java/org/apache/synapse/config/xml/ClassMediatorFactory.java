@@ -22,8 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.ClassMediator;
@@ -96,7 +94,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         classMediator.setMediator(m);
-        processTraceState(classMediator, elem);
+        processAuditStatus(classMediator, elem);
 
         return classMediator;
     }

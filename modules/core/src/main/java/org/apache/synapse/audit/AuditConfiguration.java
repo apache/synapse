@@ -16,51 +16,48 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.statistics;
+package org.apache.synapse.audit;
 
 /**
- * 
+ *
  */
-public class StatisticsLog {
-    
-    private String id ;
-    private long startTime =-1;
-    private long endTime = -1;
+public class AuditConfiguration implements AuditConfigurable {
 
-    public StatisticsLog(String id) {
-        this(id, System.currentTimeMillis());
+    private boolean statisticsEnable = false;
+    private String AuditId;
+
+    public AuditConfiguration(String auditId, boolean statisticsEnable) {
+        this.statisticsEnable = statisticsEnable;
+        AuditId = auditId;
     }
 
-    public StatisticsLog(String id, long startTime) {
-        this.id = id;
-        this.startTime = startTime;
+    public AuditConfiguration(String auditId) {
+        AuditId = auditId;
     }
 
-    public String getId() {
-        return id;
+    public boolean isStatisticsEnable() {
+        return statisticsEnable;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void disableStatistics() {
+
+        if (statisticsEnable) {
+            this.statisticsEnable = false;
+        }
     }
 
-    public long getStartTime() {
-        return startTime;
+    public void enableStatistics() {
+
+        if (!statisticsEnable) {
+            statisticsEnable = true;
+        }
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+    public String getAuditId() {
+        return AuditId;
     }
 
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-    
-    public long getProcessingTime(){
-        return this.endTime - this.startTime;
+    public void setAuditId(String auditId) {
+        AuditId = auditId;
     }
 }

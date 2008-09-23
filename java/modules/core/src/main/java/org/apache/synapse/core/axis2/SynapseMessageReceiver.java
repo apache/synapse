@@ -27,6 +27,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.audit.AuditHelper;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 
 /**
@@ -43,6 +44,8 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
 
+        AuditHelper.setGlobalAudit(synCtx);
+        
         boolean traceOn = synCtx.getMainSequence().getTraceState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
 

@@ -34,8 +34,10 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.audit.AuditConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -478,4 +480,12 @@ public class Axis2MessageContext implements MessageContext {
         return sb.toString();
     }
 
+    private void initAudit(MessageContext synCtx) {
+        
+        if (XMLConfigConstants.STATISTICS_ENABLE.equals(
+                synCtx.getConfiguration().getProperty(SynapseConstants.SYNAPSE_STATISTICS_STATE))) {
+            synCtx.setProperty(SynapseConstants.SYNAPSE_AUDIT_CONFIGURATION,
+                    new AuditConfiguration(SynapseConstants.SYNAPSE_STATISTICS, true));
+        }
+    }
 }

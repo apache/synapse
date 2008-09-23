@@ -16,11 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.statistics;
+package org.apache.synapse.audit.statatistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.audit.AuditConfigurable;
 
 import java.util.HashMap;
 import java.util.Map;

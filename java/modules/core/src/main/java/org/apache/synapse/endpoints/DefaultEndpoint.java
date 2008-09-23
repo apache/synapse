@@ -25,8 +25,9 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.statistics.AuditConfigurable;
-import org.apache.synapse.statistics.StatisticsReporter;
+import org.apache.synapse.audit.AuditConfigurable;
+import org.apache.synapse.audit.statatistics.StatisticsReporter;
+import org.apache.synapse.audit.AuditConfiguration;
 
 
 import java.util.Stack;
@@ -37,7 +38,7 @@ import java.util.Stack;
  * retries if a failure occurred and informing the parent endpoint if a failure couldn't be
  * recovered.
  */
-public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConfigurable{
+public class DefaultEndpoint extends FaultHandler implements Endpoint, AuditConfigurable{
 
     protected Log log;
     
@@ -60,8 +61,8 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConf
      * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects.
      */
     private Endpoint parentEndpoint = null;
-    
-    private boolean statisticsEnable = false;
+
+    private final AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.ANONYMOUS_ENDPOINT);
 
     public DefaultEndpoint() {
         log = LogFactory.getLog(this.getClass());
@@ -81,6 +82,7 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConf
 
     public void setName(String name) {
         this.name = name.trim();
+        this.auditConfigurable.setAuditId(this.name);
     }
 
     /**
@@ -132,7 +134,7 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConf
             endPointName = SynapseConstants.ANONYMOUS_ENDPOINT;
         }
 
-        // Setting Required property to collect the End Point statistics
+        // Setting Required property to collect the End Point audit
         if (isStatisticsEnable()) {
             StatisticsReporter.collect(synCtx, this);
         }
@@ -155,7 +157,7 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConf
         // register this as the immediate fault handler for this message.
         synCtx.pushFaultHandler(this);
 
-        // add this as the last endpoint to process this message. it is used by statistics code.
+        // add this as the last endpoint to process this message. it is used by audit code.
         synCtx.setProperty(SynapseConstants.PROCESSED_ENDPOINT, this);
 
         synCtx.getEnvironment().send(endpoint, synCtx);
@@ -221,24 +223,22 @@ public class DefaultEndpoint extends FaultHandler implements Endpoint ,AuditConf
     }
 
     public boolean isStatisticsEnable() {
-        return statisticsEnable;
+        return this.auditConfigurable.isStatisticsEnable();
     }
 
     public void disableStatistics() {
-
-        if (statisticsEnable) {
-            this.statisticsEnable = false;
-        }
+        this.auditConfigurable.disableStatistics();
     }
 
     public void enableStatistics() {
-
-        if (!statisticsEnable) {
-            statisticsEnable = true;
-        }
+        this.auditConfigurable.disableStatistics();
     }
 
     public String getAuditId() {
-        return getName();
+        return this.auditConfigurable.getAuditId();
+    }
+
+    public void setAuditId(String id) {
+        this.auditConfigurable.setAuditId(id);
     }
 }

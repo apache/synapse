@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.audit.AuditHelper;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 
@@ -70,6 +71,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
 
+        AuditHelper.setGlobalAudit(synCtx);
+        
         // get service log for this message and attach to the message context also set proxy name
         Log serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + name);
         ((Axis2MessageContext) synCtx).setServiceLog(serviceLog);

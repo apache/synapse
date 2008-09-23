@@ -24,13 +24,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.testkit.channel.Channel;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
@@ -40,24 +37,25 @@ import org.apache.synapse.transport.testkit.util.ContentTypeUtil;
 
 @Name("axis")
 public class AxisTestClient implements TestClient {
-    private static final Log log = LogFactory.getLog(AxisTestClient.class);
-    
-    private AxisTestClientContext context;
-    private Channel channel;
     private AxisTestClientSetup[] setups;
+    protected ServiceClient serviceClient;
+    protected Options axisOptions;
     
     @SuppressWarnings("unused")
     private void setUp(AxisTestClientContext context, Channel channel, AxisTestClientSetup[] setups) throws Exception {
-        this.context = context;
-        this.channel = channel;
         this.setups = setups;
+        serviceClient = new ServiceClient(context.getConfigurationContext(), null);
+        axisOptions = new Options();
+        axisOptions.setTo(channel.getEndpointReference());
+        serviceClient.setOptions(axisOptions);
     }
     
     @SuppressWarnings("unused")
-    private void tearDown() {
-        context = null;
-        channel = null;
+    private void tearDown() throws Exception {
+        serviceClient.cleanup();
         setups = null;
+        serviceClient = null;
+        axisOptions = null;
     }
 
     public ContentType getContentType(ClientOptions options, ContentType contentType) {
@@ -71,15 +69,6 @@ public class AxisTestClient implements TestClient {
     }
 
     protected OperationClient createClient(ClientOptions options, AxisMessage message, QName operationQName) throws Exception {
-        EndpointReference epr = channel.getEndpointReference();
-        log.info("Sending to " + epr.getAddress());
-        
-        Options axisOptions = new Options();
-        axisOptions.setTo(epr);
-
-        ServiceClient serviceClient = new ServiceClient(context.getConfigurationContext(), null);
-        serviceClient.setOptions(axisOptions);
-        
         OperationClient mepClient = serviceClient.createClient(operationQName);
         MessageContext mc = new MessageContext();
         mc.setProperty(Constants.Configuration.MESSAGE_TYPE, message.getMessageType());

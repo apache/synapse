@@ -23,7 +23,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.audit.statatistics.StatisticsCollector;
+import org.apache.synapse.audit.statistics.StatisticsCollector;
 import org.apache.synapse.util.TemporaryData;
 
 import java.util.concurrent.ExecutorService;

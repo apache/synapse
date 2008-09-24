@@ -30,7 +30,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.audit.statatistics.StatisticsCollector;
+import org.apache.synapse.audit.statistics.StatisticsCollector;
 import org.apache.synapse.audit.AuditHelper;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;

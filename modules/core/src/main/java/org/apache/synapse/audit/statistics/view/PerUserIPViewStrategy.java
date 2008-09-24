@@ -16,23 +16,23 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statatistics.view;
+package org.apache.synapse.audit.statistics.view;
 
-import org.apache.synapse.audit.statatistics.StatisticsRecord;
+import org.apache.synapse.audit.statistics.StatisticsRecord;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * PerUserViewStrategy - user domain name is used.
+ * PerUserViewStrategy , user IP is used
  */
-public class PerUserDomainViewStrategy extends PerUserViewStrategy {
+public class PerUserIPViewStrategy extends PerUserViewStrategy {
 
     public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords, int type) {
-        return determineView(statisticsRecords, type, DOMAIN);
+        return determineView(statisticsRecords, type, IP);
     }
 
     public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords, int type) {
-        return determineView(id, statisticsRecords, type, DOMAIN);
+        return determineView(id, statisticsRecords, type, IP);
     }
 }

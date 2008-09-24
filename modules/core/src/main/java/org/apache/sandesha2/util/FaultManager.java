@@ -587,7 +587,6 @@ public class FaultManager {
 	            if (referenceRMMsgContext.getMessageContext().isServerSide()) {
 	        		if (log.isDebugEnabled())
 	        			log.debug("Exit: FaultManager::getOrSendFault: " + fault);
-	        		System.out.println("throw fault2 " + fault);
 	                throw fault; 
 	            }
 			}
@@ -625,7 +624,6 @@ public class FaultManager {
 					//having a surrounded try block will make sure that the error is logged here 
 					//and that this does not disturb the processing of a carrier message.
 					try {
-						System.out.println("sendFault " + faultMessageContext.getEnvelope());
 						AxisEngine.sendFault(faultMessageContext);
 						
 						EndpointReference destination = faultMessageContext.getTo();
@@ -648,7 +646,6 @@ public class FaultManager {
 		else 
 		{
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
-			System.out.println("throwing exception " + message);
 			throw new SandeshaException (message);
 		}
 

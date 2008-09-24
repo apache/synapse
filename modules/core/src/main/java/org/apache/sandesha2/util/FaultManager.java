@@ -269,6 +269,8 @@ public class FaultManager {
 			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
 		else
 			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+		
+		System.out.println("makingInvalidAck piggy=" + piggybackedMessage + ": soap=" + SOAPVersion);
 
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMsgCtx.getRMNamespaceValue(), 
@@ -567,72 +569,88 @@ public class FaultManager {
 		
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
-                        reasonText.setLang(Sandesha2Constants.LANG_EN);
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) 
+		{
+            reasonText.setLang(Sandesha2Constants.LANG_EN);
 			reason.addSOAPText(reasonText);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
-			reason.setText(data.getReason());
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
-			// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
-			MessageContext faultMessageContext = 
-				MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
-			if(acksToEPR!=null){
-        		if (log.isDebugEnabled())
-        			log.debug("Debug: FaultManager::getOrSendFault: rewrriting fault destination EPR to " + acksToEPR);
-        		faultMessageContext.setTo(acksToEPR);
+			
+			AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+			fault.setFaultAction(SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
+			
+			//if this is throwable throwing it out, else we will log here.
+			
+			if (throwable)
+			{
+	            if (referenceRMMsgContext.getMessageContext().isServerSide()) {
+	        		if (log.isDebugEnabled())
+	        			log.debug("Exit: FaultManager::getOrSendFault: " + fault);
+	        		System.out.println("throw fault2 " + fault);
+	                throw fault; 
+	            }
 			}
-
-			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
+			else
+				log.error("Sandesha2 got a fault when processing the message " + referenceRMMsgContext.getMessageId(), fault);
+		} 
+		else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) 
+		{
 			
-			// Set the action // TODO SET THE ACTION BASED ON THE SPEC
-			faultMessageContext.setWSAAction(
-					SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
-			
-			if (log.isDebugEnabled())
-				log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
+				reason.setText(data.getReason());
+				referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+				referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+				referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
+				// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
+				MessageContext faultMessageContext = 
+					MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
+				if(acksToEPR!=null){
+	        		if (log.isDebugEnabled())
+	        			log.debug("Debug: FaultManager::getOrSendFault: rewrriting fault destination EPR to " + acksToEPR);
+	        		faultMessageContext.setTo(acksToEPR);
+				}
 
-				// Sending the message
-				//having a surrounded try block will make sure that the error is logged here 
-				//and that this does not disturb the processing of a carrier message.
-				try {
-					AxisEngine.sendFault(faultMessageContext);
-					
-					EndpointReference destination = faultMessageContext.getTo();
-					if(destination == null || destination.hasAnonymousAddress()) {
-						TransportUtils.setResponseWritten(referenceRMMsgContext.getMessageContext(), true);
-					}
-				} catch (Exception e) {
+				SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
+				
+				// Set the action // TODO SET THE ACTION BASED ON THE SPEC
+				faultMessageContext.setWSAAction(
+						SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
+				
+				if(throwable)
+				{
+					if (log.isDebugEnabled())
+						log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
+	
+					// Sending the message
+					//having a surrounded try block will make sure that the error is logged here 
+					//and that this does not disturb the processing of a carrier message.
+					try {
+						System.out.println("sendFault " + faultMessageContext.getEnvelope());
+						AxisEngine.sendFault(faultMessageContext);
+						
+						EndpointReference destination = faultMessageContext.getTo();
+						if(destination == null || destination.hasAnonymousAddress()) {
+							TransportUtils.setResponseWritten(referenceRMMsgContext.getMessageContext(), true);
+						}
+					} catch (Exception e) {
+						AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage(), e.getMessage());
+						log.error(message);
+					}	
+				}
+				else
+				{
 					AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage(), e.getMessage());
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage());
 					log.error(message);
 				}
-			
-			return;
-			
-		} else {
+		} 
+		else 
+		{
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
+			System.out.println("throwing exception " + message);
 			throw new SandeshaException (message);
 		}
-		
-		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
-		fault.setFaultAction(SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
-		
-		//if this is throwable throwing it out, else we will log here.
-		
-		if (throwable)
-            if (referenceRMMsgContext.getMessageContext().isServerSide()) {
-        		if (log.isDebugEnabled())
-        			log.debug("Exit: FaultManager::getOrSendFault: " + fault);
-                throw fault; 
-            }
-        
-		// TODO - Remove console written strings
-		log.error("Sandesha2 got a fault when processing the message " + referenceRMMsgContext.getMessageId(), fault);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::getOrSendFault");

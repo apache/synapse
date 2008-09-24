@@ -18,35 +18,61 @@
  */
 package org.apache.synapse.audit.statatistics;
 
+import org.apache.synapse.audit.statatistics.view.Statistics;
+import org.apache.synapse.audit.statatistics.view.StatisticsViewStrategy;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * To collect statistics
+ * Collects statistics and provides those collected data
  */
 
 public class StatisticsCollector {
 
     private final List<StatisticsRecord> statisticsCollection = new ArrayList<StatisticsRecord>();
 
-    public void collect(StatisticsRecord statisticsRegistry) {
-        this.statisticsCollection.add(statisticsRegistry);
+    /**
+     * Registering a statistics record
+     *
+     * @param statisticsRecord statistics record instance
+     */
+    public void collect(StatisticsRecord statisticsRecord) {
+        this.statisticsCollection.add(statisticsRecord);
     }
 
-    public Statistics getEndpointStatistics(String id) {
-        Statistics statistics = new Statistics();
-        for (StatisticsRecord statisticsRegistry : statisticsCollection) {
-            if (statisticsRegistry != null) {
-                StatisticsLog log = statisticsRegistry.getEndpointStatisticsRecord(id);
-                if (log != null) {
-                    statistics.update(log.getProcessingTime(), statisticsRegistry.isFaultResponse());
-                }
-            }
-        }
-        return statistics;
-    }
-
+    /**
+     * Check whether given statistics record has  already been registered
+     *
+     * @param statisticsRecord statisticsRecord statistics record instance
+     * @return True if there
+     */
     public boolean contains(StatisticsRecord statisticsRecord) {
         return statisticsCollection.contains(statisticsRecord);
     }
+
+    /**
+     * Returns a particular statistics view according to a given strategy for a given resource with particular type
+     *
+     * @param id       Resource id
+     * @param type     Type of the resource
+     * @param strategy Statistics viewing strategy
+     * @return Statistics view
+     */
+    public Map<String, Statistics> getStatistics(String id, int type, StatisticsViewStrategy strategy) {
+        return strategy.determineView(id, statisticsCollection, type);
+    }
+
+    /**
+     * Returns a particular statistics view according to a given strategy for a given resource type
+     *
+     * @param type     type Type of the resource
+     * @param strategy strategy Statistics viewing strategy
+     * @return Statistics view
+     */
+    public Map<String, Map<String, Statistics>> getStatistics(int type, StatisticsViewStrategy strategy) {
+        return strategy.determineView(statisticsCollection, type);
+    }
+
 }

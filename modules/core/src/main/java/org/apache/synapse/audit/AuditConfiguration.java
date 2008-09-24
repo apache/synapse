@@ -19,20 +19,23 @@
 package org.apache.synapse.audit;
 
 /**
- *
+ * Audit configuration
+ * Currently contains only statistics configuration related things
  */
 public class AuditConfiguration implements AuditConfigurable {
 
+    /* Whether statistics enable */
     private boolean statisticsEnable = false;
-    private String AuditId;
+    /* Identifier for a particular audit configuration */
+    private String auditId;
 
     public AuditConfiguration(String auditId, boolean statisticsEnable) {
         this.statisticsEnable = statisticsEnable;
-        AuditId = auditId;
+        this.auditId = auditId;
     }
 
     public AuditConfiguration(String auditId) {
-        AuditId = auditId;
+        this.auditId = auditId;
     }
 
     public boolean isStatisticsEnable() {
@@ -40,24 +43,22 @@ public class AuditConfiguration implements AuditConfigurable {
     }
 
     public void disableStatistics() {
-
         if (statisticsEnable) {
             this.statisticsEnable = false;
         }
     }
 
     public void enableStatistics() {
-
         if (!statisticsEnable) {
             statisticsEnable = true;
         }
     }
 
     public String getAuditId() {
-        return AuditId;
+        return auditId;
     }
 
     public void setAuditId(String auditId) {
-        AuditId = auditId;
+        this.auditId = auditId;
     }
 }

@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statatistics;
+package org.apache.synapse.audit.statatistics.view;
 
 /**
  * The statistics data structure
@@ -24,25 +24,46 @@ package org.apache.synapse.audit.statatistics;
 
 public class Statistics {
 
-    /**  Maximum processing time for a one way flow  */
+    public static final String ALL = "all";
+
+    /**
+     * Maximum processing time for a one way flow
+     */
     private long maxProcessingTime = 0;
-    /** Minimum processing time for a one way flow   */
+    /**
+     * Minimum processing time for a one way flow
+     */
     private long minProcessingTime = -1;
-    /** Average processing time for a one way flow */
+    /**
+     * Average processing time for a one way flow
+     */
     private double avgProcessingTime = 0;
-    /** Total processing time for a one way flow  */
+    /**
+     * Total processing time for a one way flow
+     */
     private double totalProcessingTime;
-    /** The number of access count for a one way flow  */
+    /**
+     * The number of access count for a one way flow
+     */
     private int count = 0;
-    /** The number of fault count for a one way flow  */
+    /**
+     * The number of fault count for a one way flow
+     */
     private int faultCount = 0;
+    /**
+     * Identifier for this statistics , whose statistics
+     */
+    private String id;
+
+    public Statistics(String id) {
+        this.id = id;
+    }
 
     /**
      * Update the statistics
      *
-     *
      * @param currentProcessingTime - The processing end time
-     * @param isFault - A boolean value that indicate whether fault has occurred or not
+     * @param isFault               - A Boolean value that indicate whether fault has occurred or not
      */
     public void update(long currentProcessingTime, boolean isFault) {
 
@@ -103,17 +124,21 @@ public class Statistics {
         return count;
     }
 
-    public String toString() {
-        return new StringBuffer().append(" Avg Processing Time : ").
-                append(avgProcessingTime)
-                .append(" Max Processing Time : ").
-                append(maxProcessingTime)
-                .append(" Min Processing Time : ").
-                append(minProcessingTime)
-                .append(" Total Request Count : ").
-                append(count)
-                .append(" Total Fault Response Count : ").
-                append(faultCount).
-                toString();
+    public String getId() {
+        return id;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String toString() {
+        return new StringBuffer().append("[Avg Processing Time : ").append(avgProcessingTime).append(" ]")
+                .append(" [Max Processing Time : ").append(maxProcessingTime).append(" ]")
+                .append(" [Min Processing Time : ").append(minProcessingTime).append(" ]")
+                .append(" [Total Request Count : ").append(count).append(" ]")
+                .append(" [Total Fault Response Count : ").append(faultCount).append(" ]")
+                .toString();
+    }
+
 }

@@ -18,23 +18,36 @@
  */
 package org.apache.synapse.audit.statatistics;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 /**
- * 
+ * Factory for creating a StatisticsRecord
  */
 public class StatisticsRecordFactory {
-    
+
+    private static final Log log = LogFactory.getLog(StatisticsRecordFactory.class);
+
+    /**
+     * Factory method to create a a StatisticsRecord
+     *
+     * @param synCtx Current Message through synapse
+     * @return StatisticsRecord instance
+     */
     public static StatisticsRecord getStatisticsRecord(MessageContext synCtx) {
-        
+
         String messageId = synCtx.getMessageID();
         org.apache.axis2.context.MessageContext axisMC = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         String remoteIP = (String) axisMC.getPropertyNonReplicable(
                 org.apache.axis2.context.MessageContext.REMOTE_ADDR);
         String domainName = (String) axisMC.getPropertyNonReplicable(NhttpConstants.REMOTE_HOST);
-        return new StatisticsRecord(messageId, remoteIP, domainName);
-
+        StatisticsRecord statisticsRecord = new StatisticsRecord(messageId, remoteIP, domainName);
+        if (log.isDebugEnabled()) {
+            log.debug("Created a StatisticsRecord with " + statisticsRecord.toString());
+        }
+        return statisticsRecord;
     }
 }

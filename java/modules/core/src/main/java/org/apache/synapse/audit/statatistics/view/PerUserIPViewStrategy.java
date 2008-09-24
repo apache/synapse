@@ -16,42 +16,23 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit;
+package org.apache.synapse.audit.statatistics.view;
+
+import org.apache.synapse.audit.statatistics.StatisticsRecord;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * Capability for configurable auditing
+ * PerUserViewStrategy , user IP is used
  */
-public interface AuditConfigurable {
+public class PerUserIPViewStrategy extends PerUserViewStrategy {
 
-    /**
-     * Returns audit id , identifier for a particular audit
-     * Example , component name , endpoint name
-     *
-     * @return audit id
-     */
-    public String getAuditId();
+    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords, int type) {
+        return determineView(statisticsRecords, type, IP);
+    }
 
-    /**
-     * Sets the identifier for a particular audit
-     *
-     * @param id audit id
-     */
-    public void setAuditId(String id);
-
-    /**
-     * Whether statistics has been enabled
-     *
-     * @return True if enable , o.w , false
-     */
-    public boolean isStatisticsEnable();
-
-    /**
-     * To disable statistics
-     */
-    public void disableStatistics();
-
-    /**
-     * To enable statistics
-     */
-    public void enableStatistics();
+    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords, int type) {
+        return determineView(id, statisticsRecords, type, IP);
+    }
 }

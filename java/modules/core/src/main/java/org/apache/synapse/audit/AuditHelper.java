@@ -18,32 +18,57 @@
  */
 package org.apache.synapse.audit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.audit.statatistics.StatisticsReporter;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 
 /**
- *
+ * Contains helper methods required for auditing.
+ * This class need to evolved as any audit related things are adding
  */
 public class AuditHelper {
 
+    private static final Log log = LogFactory.getLog(AuditHelper.class);
+
+    /**
+     * Sets the Global audit configuration if it has been forced by setting
+     *
+     * @param synCtx Current Message through synapse
+     */
     public static void setGlobalAudit(MessageContext synCtx) {
 
         if (XMLConfigConstants.STATISTICS_ENABLE.equals(
-                synCtx.getConfiguration().getProperty(SynapseConstants.SYNAPSE_STATISTICS_STATE))) {
-            AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.SYNAPSE_STATISTICS, true);
+                synCtx.getConfiguration().getProperty(SynapseConstants.SYNAPSE_AUDIT_STATE))) {
+            
+            AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.SYNAPSE_AUDIT, true);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Global Audit is enabled. System-wide auditing will be occurred.");
+            }
+
             StatisticsReporter.collect(synCtx, auditConfigurable);
             synCtx.setProperty(SynapseConstants.SYNAPSE_AUDIT_CONFIGURATION,
                     auditConfigurable);
         }
     }
 
+    /**
+     * Report Global audit for this message
+     *
+     * @param synCtx Current Message through synapse
+     */
     public static void reportGlobalAudit(MessageContext synCtx) {
-        
+
         AuditConfigurable auditConfigurable = (AuditConfigurable) synCtx.getProperty(
                 SynapseConstants.SYNAPSE_AUDIT_CONFIGURATION);
+        
         if (auditConfigurable != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("System-wide audit record is reported.");
+            }
             StatisticsReporter.report(synCtx, auditConfigurable);
         }
     }

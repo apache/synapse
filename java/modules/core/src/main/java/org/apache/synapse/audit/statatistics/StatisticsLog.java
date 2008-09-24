@@ -19,12 +19,18 @@
 package org.apache.synapse.audit.statatistics;
 
 /**
- * 
+ *
  */
 public class StatisticsLog {
-    
-    private String id ;
-    private long startTime =-1;
+
+    public static final int ENDPOINT_STATISTICS = 0;
+
+    public static final int PROXY_SERVICE_STATISTICS = 1;
+
+    public static final int MEDIATOR_STATISTICS = 2;
+
+    private String id;
+    private long startTime = -1;
     private long endTime = -1;
 
     public StatisticsLog(String id) {
@@ -59,8 +65,8 @@ public class StatisticsLog {
     public void setEndTime(long endTime) {
         this.endTime = endTime;
     }
-    
-    public long getProcessingTime(){
+
+    public long getProcessingTime() {
         return this.endTime - this.startTime;
     }
 }

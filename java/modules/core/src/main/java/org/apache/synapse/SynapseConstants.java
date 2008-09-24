@@ -166,11 +166,11 @@ public final class SynapseConstants {
 
         public static final String STATISTICS_STACK ="synapse.statistics.stack";     
         
-        public static final String SYNAPSE_STATISTICS_STATE = "synapse.statistics.state";
+        public static final String SYNAPSE_AUDIT_STATE = "synapse.audit.state";
     
         public static final String SYNAPSE_AUDIT_CONFIGURATION = "synapse.audit.configuration";
         
-        public static final String SYNAPSE_STATISTICS ="synapse.statistics";
+        public static final String SYNAPSE_AUDIT ="synapse.audit";
 
     //- handling of timed out events from the callbacks -
         /** The System property that states the duration at which the timeout handler runs */

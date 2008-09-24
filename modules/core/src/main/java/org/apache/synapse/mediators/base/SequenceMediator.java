@@ -24,7 +24,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.audit.statatistics.StatisticsReporter;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
 
 import java.util.Stack;
 

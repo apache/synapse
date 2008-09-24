@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.audit.statatistics.StatisticsReporter;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 
 /**

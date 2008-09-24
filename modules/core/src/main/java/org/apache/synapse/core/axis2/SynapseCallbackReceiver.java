@@ -38,7 +38,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.audit.statatistics.StatisticsReporter;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;

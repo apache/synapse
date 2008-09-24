@@ -16,10 +16,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statatistics;
+package org.apache.synapse.audit.statistics;
 
-import org.apache.synapse.audit.statatistics.view.Statistics;
-import org.apache.synapse.audit.statatistics.view.StatisticsViewStrategy;
+import org.apache.synapse.audit.statistics.view.Statistics;
+import org.apache.synapse.audit.statistics.view.StatisticsViewStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

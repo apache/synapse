@@ -16,9 +16,9 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statatistics.view;
+package org.apache.synapse.audit.statistics.view;
 
-import org.apache.synapse.audit.statatistics.StatisticsRecord;
+import org.apache.synapse.audit.statistics.StatisticsRecord;
 
 import java.util.List;
 import java.util.Map;

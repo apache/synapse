@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statatistics.view;
+package org.apache.synapse.audit.statistics.view;
 
 /**
  * The statistics data structure

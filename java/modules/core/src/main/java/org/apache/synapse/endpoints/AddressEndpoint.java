@@ -25,8 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.audit.statatistics.StatisticsReporter;
-import org.apache.synapse.audit.statatistics.StatisticsCollector;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
 
 /**
  * This class represents an actual endpoint to send the message. It is responsible for sending the

@@ -232,8 +232,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 }
 
                 cfgCtx.setProperty(cacheManagerKey, cacheManager);
-                Replicator.replicate(cfgCtx);
-
+                Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
             } else {
                 auditWarn("A response message without a valid mapping to the " +
                     "request hash found. Unable to store the response in cache", synCtx);
@@ -355,7 +354,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 }
 
                 cfgCtx.setProperty(cacheManagerKey, cacheManager);
-                Replicator.replicate(cfgCtx);
+                Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
             }
 
         } else {
@@ -396,7 +395,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         cacheManager.addResponseWithKey(requestHash, cachedObj, cfgCtx);
 
         cfgCtx.setProperty(cacheManagerKey, cacheManager);
-        Replicator.replicate(cfgCtx);
+        Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
     }
 
     public String getId() {

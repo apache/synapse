@@ -23,7 +23,7 @@ import java.io.File;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
-import org.apache.synapse.transport.testkit.axis2.endpoint.AxisServiceConfigurator;
+import org.apache.synapse.transport.testkit.axis2.AxisServiceConfigurator;
 
 public class VFSFileChannel implements AxisServiceConfigurator {
     private final String path;
@@ -41,7 +41,7 @@ public class VFSFileChannel implements AxisServiceConfigurator {
         return new EndpointReference("vfs:" + requestFile.getAbsoluteFile().toURL());
     }
 
-    public void setupService(AxisService service) throws Exception {
+    public void setupService(AxisService service, boolean isClientSide) throws Exception {
         service.addParameter("transport.vfs.FileURI", "vfs:" + requestFile.toURL());
         service.addParameter("transport.PollInterval", "50ms");
         service.addParameter("transport.vfs.ActionAfterProcess", "DELETE");

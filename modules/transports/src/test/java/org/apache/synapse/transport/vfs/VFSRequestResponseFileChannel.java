@@ -38,8 +38,8 @@ public class VFSRequestResponseFileChannel extends VFSFileChannel implements Req
     }
 
     @Override
-    public void setupService(AxisService service) throws Exception {
-        super.setupService(service);
+    public void setupService(AxisService service, boolean isClientSide) throws Exception {
+        super.setupService(service, isClientSide);
         service.addParameter("transport.vfs.ReplyFileURI", "vfs:" + replyFile.toURL());
     }
     

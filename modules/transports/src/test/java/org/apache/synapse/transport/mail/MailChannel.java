@@ -29,8 +29,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.transport.mail.MailConstants;
+import org.apache.synapse.transport.testkit.axis2.AxisServiceConfigurator;
 import org.apache.synapse.transport.testkit.axis2.client.AxisTestClientSetup;
-import org.apache.synapse.transport.testkit.axis2.endpoint.AxisServiceConfigurator;
 import org.apache.synapse.transport.testkit.channel.AsyncChannel;
 import org.apache.synapse.transport.testkit.channel.RequestResponseChannel;
 
@@ -38,16 +38,12 @@ public class MailChannel implements AsyncChannel, RequestResponseChannel, AxisTe
     private MailTestEnvironment env;
     private MailTestEnvironment.Account sender;
     private MailTestEnvironment.Account recipient;
-    private Map<String,String> senderInProperties;
-    private Map<String,String> recipientInProperties;
     
     @SuppressWarnings("unused")
     private void setUp(MailTestEnvironment env) throws Exception {
         this.env = env;
         sender = env.allocateAccount();
-        senderInProperties = env.getInProperties(sender);
         recipient = env.allocateAccount();
-        recipientInProperties = env.getInProperties(recipient);
     }
     
     @SuppressWarnings("unused")
@@ -68,7 +64,7 @@ public class MailChannel implements AsyncChannel, RequestResponseChannel, AxisTe
     
     public Session getReplySession() {
         Properties props = new Properties();
-        props.putAll(senderInProperties);
+        props.putAll(env.getInProperties(sender));
         return Session.getInstance(props);
     }
 
@@ -76,12 +72,13 @@ public class MailChannel implements AsyncChannel, RequestResponseChannel, AxisTe
         return new EndpointReference("mailto:" + recipient.getAddress());
     }
 
-    public void setupService(AxisService service) throws Exception {
+    public void setupService(AxisService service, boolean isClientSide) throws Exception {
+        MailTestEnvironment.Account account = isClientSide ? sender : recipient;
         service.addParameter("transport.mail.Protocol", env.getProtocol());
-        service.addParameter("transport.mail.Address", recipient.getAddress());
+        service.addParameter("transport.mail.Address", account.getAddress());
         service.addParameter("transport.PollInterval", "50ms");
         
-        for (Map.Entry<String,String> prop : recipientInProperties.entrySet()) {
+        for (Map.Entry<String,String> prop : env.getInProperties(account).entrySet()) {
             service.addParameter(prop.getKey(), prop.getValue());
         }
     }

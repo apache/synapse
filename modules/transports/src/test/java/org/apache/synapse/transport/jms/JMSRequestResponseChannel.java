@@ -61,8 +61,8 @@ public class JMSRequestResponseChannel extends JMSChannel implements RequestResp
     }
 
     @Override
-    public void setupService(AxisService service) throws Exception {
-        super.setupService(service);
+    public void setupService(AxisService service, boolean isClientSide) throws Exception {
+        super.setupService(service, isClientSide);
         service.addParameter(JMSConstants.REPLY_PARAM_TYPE, replyDestinationType);
         service.addParameter(JMSConstants.REPLY_PARAM, replyJndiName);
     }

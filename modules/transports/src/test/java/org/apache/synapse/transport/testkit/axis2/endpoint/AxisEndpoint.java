@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
+import org.apache.synapse.transport.testkit.axis2.AxisServiceConfigurator;
 import org.apache.synapse.transport.testkit.channel.Channel;
 import org.apache.synapse.transport.testkit.name.Name;
 import org.apache.synapse.transport.testkit.server.Endpoint;
@@ -49,7 +50,7 @@ public abstract class AxisEndpoint implements Endpoint {
         service.addParameter(AxisService.SUPPORT_SINGLE_OP, true);
         if (configurators != null) {
             for (AxisServiceConfigurator configurator : configurators) {
-                configurator.setupService(service);
+                configurator.setupService(service, false);
             }
         }
         server.getAxisConfiguration().addService(service);

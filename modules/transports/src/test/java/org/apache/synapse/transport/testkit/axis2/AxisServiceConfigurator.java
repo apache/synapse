@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.testkit.axis2.endpoint;
+package org.apache.synapse.transport.testkit.axis2;
 
 
 import org.apache.axis2.description.AxisService;
@@ -31,7 +31,8 @@ public interface AxisServiceConfigurator {
      * The default implementation does nothing.
      * 
      * @param service
+     * @param isClientSide TODO
      * @throws Exception
      */
-    void setupService(AxisService service) throws Exception;
+    void setupService(AxisService service, boolean isClientSide) throws Exception;
 }

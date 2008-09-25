@@ -22,6 +22,7 @@ package org.apache.synapse.transport.testkit.axis2.endpoint;
 import javax.mail.internet.ContentType;
 
 import org.apache.axis2.description.AxisService;
+import org.apache.synapse.transport.testkit.axis2.AxisServiceConfigurator;
 import org.apache.synapse.transport.testkit.client.ClientOptions;
 import org.apache.synapse.transport.testkit.client.TestClient;
 
@@ -38,7 +39,7 @@ public class ContentTypeServiceConfigurator implements AxisServiceConfigurator {
         contentType = client.getContentType(options, options.getBaseContentType());
     }
 
-    public void setupService(AxisService service) throws Exception {
+    public void setupService(AxisService service, boolean isClientSide) throws Exception {
         service.addParameter(parameterName, contentType.toString());
     }
 }

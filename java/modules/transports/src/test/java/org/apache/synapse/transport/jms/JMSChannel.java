@@ -32,7 +32,7 @@ import javax.naming.Context;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.transport.jms.JMSConstants;
-import org.apache.synapse.transport.testkit.axis2.endpoint.AxisServiceConfigurator;
+import org.apache.synapse.transport.testkit.axis2.AxisServiceConfigurator;
 import org.apache.synapse.transport.testkit.name.Key;
 
 public abstract class JMSChannel implements AxisServiceConfigurator {
@@ -135,7 +135,7 @@ public abstract class JMSChannel implements AxisServiceConfigurator {
                 "&transport.jms.ConnectionFactoryJNDIName=" + connectionFactoryJNDIName);
     }
 
-    public void setupService(AxisService service) throws Exception {
+    public void setupService(AxisService service, boolean isClientSide) throws Exception {
         service.addParameter(JMSConstants.CONFAC_PARAM, connectionFactoryName);
         service.addParameter(JMSConstants.DEST_PARAM_TYPE, destinationType);
         service.addParameter(JMSConstants.DEST_PARAM, jndiName);

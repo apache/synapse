@@ -123,7 +123,7 @@
     </dependencies>
 
     <properties>
-	<rampart.version>1.4</rampart.version>
+	<rampart.version>SNAPSHOT</rampart.version>
 	<wss4j.version>SNAPSHOT</wss4j.version>
 	<wsdl4j.version>1.6.2</wsdl4j.version>
     </properties>

@@ -26,9 +26,9 @@ import java.io.OutputStream;
 
 import javax.mail.internet.ContentType;
 
-import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.client.TestClient;
-import org.apache.synapse.transport.testkit.name.Name;
+import org.apache.axis2.transport.testkit.client.ClientOptions;
+import org.apache.axis2.transport.testkit.client.TestClient;
+import org.apache.axis2.transport.testkit.name.Name;
 
 @Name("java.io")
 public class VFSClient implements TestClient {

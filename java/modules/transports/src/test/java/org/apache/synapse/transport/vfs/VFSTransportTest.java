@@ -24,14 +24,14 @@ import java.io.File;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.synapse.transport.testkit.TransportTestSuite;
-import org.apache.synapse.transport.testkit.TransportTestSuiteBuilder;
-import org.apache.synapse.transport.testkit.axis2.SimpleTransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.axis2.client.AxisAsyncTestClient;
-import org.apache.synapse.transport.testkit.axis2.endpoint.AxisAsyncEndpoint;
-import org.apache.synapse.transport.testkit.axis2.endpoint.AxisEchoEndpoint;
-import org.apache.synapse.transport.testkit.axis2.endpoint.ContentTypeServiceConfigurator;
+import org.apache.axis2.transport.testkit.TransportTestSuite;
+import org.apache.axis2.transport.testkit.TransportTestSuiteBuilder;
+import org.apache.axis2.transport.testkit.axis2.SimpleTransportDescriptionFactory;
+import org.apache.axis2.transport.testkit.axis2.TransportDescriptionFactory;
+import org.apache.axis2.transport.testkit.axis2.client.AxisAsyncTestClient;
+import org.apache.axis2.transport.testkit.axis2.endpoint.AxisAsyncEndpoint;
+import org.apache.axis2.transport.testkit.axis2.endpoint.AxisEchoEndpoint;
+import org.apache.axis2.transport.testkit.axis2.endpoint.ContentTypeServiceConfigurator;
 
 /**
  * TransportListenerTestTemplate implementation for the VFS transport.

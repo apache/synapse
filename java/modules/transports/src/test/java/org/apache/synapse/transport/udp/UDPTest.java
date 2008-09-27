@@ -18,8 +18,6 @@
  */
 package org.apache.synapse.transport.udp;
 
-import java.io.File;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -31,6 +29,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.transport.CustomAxisConfigurator;
 import org.apache.axis2.transport.UtilsTransportServer;
 import org.apache.synapse.transport.AbstractTransportTest;
 
@@ -63,8 +62,7 @@ public class UDPTest extends AbstractTransportTest {
     
     public ConfigurationContext getClientCfgCtx() throws Exception {
         ConfigurationContext cfgCtx =
-            ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                    new File("target/test_rep").getAbsolutePath());
+            ConfigurationContextFactory.createConfigurationContext(new CustomAxisConfigurator());
         AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
         axisCfg.engageModule("addressing");
 

@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.synapse.transport.UtilsTransportServer;
+import org.apache.axis2.transport.UtilsTransportServer;
 
 public class UtilsUDPServer extends UtilsTransportServer {
     public UtilsUDPServer() throws Exception {

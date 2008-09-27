@@ -23,9 +23,9 @@ import java.io.File;
 
 import javax.mail.internet.ContentType;
 
-import org.apache.synapse.transport.testkit.client.ClientOptions;
-import org.apache.synapse.transport.testkit.client.RequestResponseTestClient;
-import org.apache.synapse.transport.testkit.message.IncomingMessage;
+import org.apache.axis2.transport.testkit.client.ClientOptions;
+import org.apache.axis2.transport.testkit.client.RequestResponseTestClient;
+import org.apache.axis2.transport.testkit.message.IncomingMessage;
 
 public class VFSRequestResponseClient extends VFSClient implements RequestResponseTestClient<byte[],byte[]> {
     private File replyFile;

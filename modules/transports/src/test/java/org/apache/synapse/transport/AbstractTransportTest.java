@@ -31,6 +31,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.transport.UtilsTransportServer;
 
 public abstract class AbstractTransportTest extends TestCase {
 

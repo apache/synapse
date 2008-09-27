@@ -18,13 +18,8 @@
   ~  under the License.
   -->
 <aspectj>
-    <aspects>
-        <aspect name="org.apache.synapse.transport.jms.LogAspect"/>
-        <aspect name="org.apache.synapse.transport.mail.LogAspect"/>
-        <aspect name="org.apache.synapse.transport.testkit.axis2.client.LogAspect"/>
-    </aspects>
     <weaver options="-showWeaveInfo">
         <include within="org.apache.synapse.transport..*"/>
-        <include within="org.apache.axis2.transport..*"/>
+        <include within="org.apache.axis2.transport.base..*"/>
     </weaver>
 </aspectj>

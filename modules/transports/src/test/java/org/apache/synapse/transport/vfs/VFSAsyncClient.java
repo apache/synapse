@@ -21,8 +21,8 @@ package org.apache.synapse.transport.vfs;
 
 import javax.mail.internet.ContentType;
 
-import org.apache.synapse.transport.testkit.client.AsyncTestClient;
-import org.apache.synapse.transport.testkit.client.ClientOptions;
+import org.apache.axis2.transport.testkit.client.AsyncTestClient;
+import org.apache.axis2.transport.testkit.client.ClientOptions;
 
 public class VFSAsyncClient extends VFSClient implements AsyncTestClient<byte[]> {
     public void sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {

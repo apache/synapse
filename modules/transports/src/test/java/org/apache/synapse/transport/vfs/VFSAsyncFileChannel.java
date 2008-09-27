@@ -19,7 +19,7 @@
 
 package org.apache.synapse.transport.vfs;
 
-import org.apache.synapse.transport.testkit.channel.AsyncChannel;
+import org.apache.axis2.transport.testkit.channel.AsyncChannel;
 
 public class VFSAsyncFileChannel extends VFSFileChannel implements AsyncChannel {
     public VFSAsyncFileChannel(String path) {

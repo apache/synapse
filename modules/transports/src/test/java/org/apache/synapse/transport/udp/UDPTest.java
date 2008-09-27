@@ -31,8 +31,8 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.transport.UtilsTransportServer;
 import org.apache.synapse.transport.AbstractTransportTest;
-import org.apache.synapse.transport.UtilsTransportServer;
 
 /**
  * Test case for {@link UDPListener} and {@link UDPSender}.

@@ -22,10 +22,10 @@ package org.apache.synapse.transport.nhttp;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.synapse.transport.testkit.TransportTestSuite;
-import org.apache.synapse.transport.testkit.axis2.SimpleTransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.axis2.TransportDescriptionFactory;
-import org.apache.synapse.transport.testkit.http.HttpTransportTestSuiteBuilder;
+import org.apache.axis2.transport.testkit.TransportTestSuite;
+import org.apache.axis2.transport.testkit.axis2.SimpleTransportDescriptionFactory;
+import org.apache.axis2.transport.testkit.axis2.TransportDescriptionFactory;
+import org.apache.axis2.transport.testkit.http.HttpTransportTestSuiteBuilder;
 
 public class HttpCoreNIOListenerTest extends TestCase {
     public static TestSuite suite() throws Exception {

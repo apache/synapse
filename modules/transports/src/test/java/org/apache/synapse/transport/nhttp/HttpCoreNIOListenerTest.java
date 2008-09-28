@@ -40,8 +40,8 @@ public class HttpCoreNIOListenerTest extends TestCase {
         
         HttpTransportTestSuiteBuilder builder = new HttpTransportTestSuiteBuilder(suite, tdfNIO);
         
-        builder.addAxisTestClientSetup(new HttpAxisTestClientSetup(false));
-        builder.addAxisTestClientSetup(new HttpAxisTestClientSetup(true));
+        builder.addAxisTestClientConfigurator(new HttpAxisTestClientConfigurator(false));
+        builder.addAxisTestClientConfigurator(new HttpAxisTestClientConfigurator(true));
         
         builder.build();
         

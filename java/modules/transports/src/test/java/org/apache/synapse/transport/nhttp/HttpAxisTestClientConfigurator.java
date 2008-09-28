@@ -21,13 +21,13 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.testkit.axis2.client.AxisTestClientSetup;
+import org.apache.axis2.transport.testkit.axis2.client.AxisTestClientConfigurator;
 import org.apache.axis2.transport.testkit.name.Key;
 
-public class HttpAxisTestClientSetup implements AxisTestClientSetup {
+public class HttpAxisTestClientConfigurator implements AxisTestClientConfigurator {
     private final boolean forceHTTP10;
     
-    public HttpAxisTestClientSetup(boolean forceHTTP10) {
+    public HttpAxisTestClientConfigurator(boolean forceHTTP10) {
         this.forceHTTP10 = forceHTTP10;
     }
 

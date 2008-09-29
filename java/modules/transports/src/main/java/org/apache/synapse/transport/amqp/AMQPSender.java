@@ -15,6 +15,10 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.base.AbstractTransportSender;
+import org.apache.axis2.transport.base.BaseConstants;
+import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.jms.JMSUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.qpidity.api.Message;
@@ -26,10 +30,6 @@ import org.apache.qpidity.transport.DeliveryProperties;
 import org.apache.qpidity.transport.MessageProperties;
 import org.apache.qpidity.transport.Option;
 import org.apache.qpidity.transport.ReplyTo;
-import org.apache.synapse.transport.base.AbstractTransportSender;
-import org.apache.synapse.transport.base.BaseConstants;
-import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.jms.JMSUtils;
 
 public class AMQPSender extends AbstractTransportSender {
 

@@ -17,12 +17,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterIncludeImpl;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.qpidity.api.Message;
-import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.jms.JMSConnectionFactory;
-import org.apache.synapse.transport.jms.JMSConstants;
 
 public class AMQPUtils extends BaseUtils
 {

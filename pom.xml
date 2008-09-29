@@ -1135,18 +1135,6 @@
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
-        <!-- this is for qpid -->
-        <repository>
-            <id>apache-incubating</id>
-            <name>Apache Maven 2 Incubating Repository</name>
-            <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-            <releases>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:60</updatePolicy>
-            </snapshots>
-        </repository>
     </repositories>
 
     <modules>
@@ -1229,7 +1217,7 @@
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>
         <servlet-api.version>2.3</servlet-api.version>
-        <qpid.version>1.0-incubating-M2.1</qpid.version>
+        <qpid.version>1.0-incubating-M3-615355</qpid.version>
 
     </properties>
 

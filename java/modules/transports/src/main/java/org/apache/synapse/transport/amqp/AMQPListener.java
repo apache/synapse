@@ -13,15 +13,10 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterIncludeImpl;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.transport.base.AbstractTransportListener;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.qpidity.nclient.Client;
-import org.apache.qpidity.nclient.Connection;
-import org.apache.synapse.transport.base.AbstractTransportListener;
-import org.apache.synapse.transport.base.BaseUtils;
-import org.apache.synapse.transport.jms.JMSConnectionFactory;
-import org.apache.synapse.transport.jms.JMSConstants;
-import org.apache.synapse.transport.jms.JMSUtils;
 
 public class AMQPListener extends AbstractTransportListener
 {

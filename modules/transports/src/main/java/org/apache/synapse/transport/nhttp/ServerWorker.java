@@ -38,6 +38,7 @@ import org.apache.http.*;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
+import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.ws.commons.schema.XmlSchema;
 
 import java.io.IOException;
@@ -163,7 +164,7 @@ public class ServerWorker implements Runnable {
             InetAddress remoteAddr = inetConn.getRemoteAddress();
             if (remoteAddr != null) {
                 msgContext.setProperty(MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
-                msgContext.setProperty(NhttpConstants.REMOTE_HOST, remoteAddr.getHostName());
+                msgContext.setProperty(NhttpConstants.REMOTE_HOST, NhttpUtil.getHostName(remoteAddr));
             }
         }
 

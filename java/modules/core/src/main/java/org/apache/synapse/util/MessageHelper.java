@@ -17,16 +17,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
+import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.eip.EIPConstants;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -79,6 +77,13 @@ public class MessageHelper {
             if (o instanceof String) {
                 newCtx.setProperty((String) o, synCtx.getProperty((String) o));
             }
+        }
+
+        Stack faultStack = synCtx.getFaultStack();
+        FaultHandler faultHandler = (FaultHandler) faultStack.pop();
+        while (faultHandler != null) {
+            newCtx.pushFaultHandler(faultHandler);
+            faultHandler = (FaultHandler) faultStack.pop();
         }
 
         return newCtx;

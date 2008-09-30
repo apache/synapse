@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.axiom.om.impl.builder.StAXBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -227,12 +226,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				// Piggyback ack messages based on the 'To' address of the message
 				AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager);
 			}
-			if (transaction != null && transaction.isActive()) 
-				transaction.commit();			
-			
-			transaction = storageManager.getTransaction();
-
-			
 			if (transaction != null && transaction.isActive()) 
 				transaction.commit();			
 			

@@ -51,6 +51,7 @@ import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.TerminateManager;
 
 /**
  * This is responsible for sending and re-sending messages of Sandesha2. This
@@ -574,6 +575,13 @@ public class Sender extends SandeshaThread {
 			finder.setTimeToSend(System.currentTimeMillis() - Sandesha2Constants.TRANSPORT_WAIT_TIME);
 
 			List beans = manager.getSenderBeanMgr().find(finder);
+			
+			//Commit this transaction
+			tran.commit();
+			
+			// Create a new transaction
+			tran = manager.getTransaction();
+
 			Iterator beanIter = beans.iterator();
 			while (beanIter.hasNext()) {
 				SenderBean bean = (SenderBean) beanIter.next();
@@ -605,9 +613,14 @@ public class Sender extends SandeshaThread {
 				int messageType = bean.getMessageType();
 				if(MessageTypes.TERMINATE_SEQ ==  messageType || MessageTypes.TERMINATE_SEQ_RESPONSE ==  messageType){
 					String id = bean.getSequenceID(); // get this again as it is an error case
-					if(log.isDebugEnabled()) log.debug("Sender::checkForOrphanMessages.  Orphaned message of type TERMINATE_SEQ or TERMINATE_SEQ_RESPONSE found.  Deleting this message with a sequence ID of : " + id);
-					manager.getSenderBeanMgr().delete(id);
 					
+					// Mark the sequence as terminated
+					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(manager, id);
+					TerminateManager.terminateSendingSide(rmsBean, storageManager, false);
+					
+					if(log.isDebugEnabled()) log.debug("Sender::checkForOrphanMessages.  Orphaned message of type TERMINATE_SEQ or TERMINATE_SEQ_RESPONSE found.  Deleting this message with a sequence ID of : " + id);
+					// Delete the terminate sender bean.
+					manager.getSenderBeanMgr().delete(bean.getMessageID());		
 					
 				} else {					
 					// Update the bean so that we won't emit another message for another TRANSPORT_WAIT_TIME

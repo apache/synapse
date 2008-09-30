@@ -278,29 +278,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.axis2</groupId>
-                <artifactId>axis2-java2wsdl</artifactId>
-                <version>${axis2.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xom</groupId>
-                        <artifactId>xom</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>dom4j</groupId>
-                        <artifactId>dom4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jdom</groupId>
-                        <artifactId>jdom</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-clustering</artifactId>
                 <version>${axis2.version}</version>
                 <exclusions>
@@ -489,10 +466,6 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-java2wsdl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>

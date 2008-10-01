@@ -79,7 +79,7 @@ public class MessageHelper {
             }
         }
         
-        // Make deep copy of fault stack so that parent will not lost it's fault stack
+        // Make deep copy of fault stack so that parent will not be lost it's fault stack
         Stack faultStack = synCtx.getFaultStack();
         if (!faultStack.isEmpty()) {
             

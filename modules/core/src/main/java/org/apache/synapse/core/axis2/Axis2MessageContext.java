@@ -198,7 +198,6 @@ public class Axis2MessageContext implements MessageContext {
         setAxis2MessageContext(axisMsgCtx);
         this.synCfg = synCfg;
         this.synEnv = synEnv;
-        this.pushFaultHandler(new MediatorFaultHandler(synCfg.getFaultSequence()));
     }
 
     public EndpointReference getFaultTo() {

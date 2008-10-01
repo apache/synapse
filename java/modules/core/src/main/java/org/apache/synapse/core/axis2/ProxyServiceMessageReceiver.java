@@ -116,8 +116,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     // fault sequence and the message mediation can still continue
                     traceOrDebug(traceOn, "Unable to find fault-sequence : " +
                         proxy.getTargetFaultSequence() + "; using default fault sequence");
-                    synCtx.pushFaultHandler(new MediatorFaultHandler(
-                        synCtx.getSequence(SynapseConstants.FAULT_SEQUENCE_KEY)));
+                    synCtx.pushFaultHandler(new MediatorFaultHandler(synCtx.getFaultSequence()));
                 }
 
             } else if (proxy.getTargetInLineFaultSequence() != null) {

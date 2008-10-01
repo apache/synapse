@@ -29,6 +29,7 @@ import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.audit.AuditHelper;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.Task;
 import org.apache.synapse.util.PayloadHelper;
@@ -142,10 +143,10 @@ public class MessageInjector implements Task, ManagedLifecycle {
 			return;
 
 		}
-        MessageContext mc = synapseEnvironment.createMessageContext();
 
+        MessageContext mc = synapseEnvironment.createMessageContext();
         AuditHelper.setGlobalAudit(mc);
-        
+        mc.pushFaultHandler(new MediatorFaultHandler(mc.getFaultSequence()));
         mc.setTo(new EndpointReference(to));
         if (format == null) {
             PayloadHelper.setXMLPayload(mc, message.cloneOMElement());

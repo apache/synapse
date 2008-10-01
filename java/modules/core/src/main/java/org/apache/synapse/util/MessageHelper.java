@@ -1,14 +1,17 @@
 package org.apache.synapse.util;
-
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.mediators.eip.EIPConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -17,12 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.mediators.eip.EIPConstants;
 
 import java.util.*;
 
@@ -31,7 +30,8 @@ import java.util.*;
  */
 public class MessageHelper {
 
-    private static final Log log = LogFactory.getLog(MessageHelper.class);
+
+    private static Log log = LogFactory.getLog(MessageHelper.class);
 
     /**
      * This method will simulate cloning the message context and creating an exact copy of the
@@ -60,7 +60,7 @@ public class MessageHelper {
         newCtx.setEnvironment(synCtx.getEnvironment());
         newCtx.setContextEntries(synCtx.getContextEntries());
 
-        // set the parent corelation details to the cloned MC -
+        // set the parent correlation details to the cloned MC -
         //                              for the use of aggregation like tasks
         newCtx.setProperty(EIPConstants.AGGREGATE_CORRELATION, synCtx.getMessageID());
 
@@ -73,19 +73,30 @@ public class MessageHelper {
 
         // copy all the synapse level properties to the newCtx
         for (Object o : synCtx.getPropertyKeySet()) {
-            // If there are non String keyed properties neglect them rathern than trow exception
+            // If there are non String keyed properties neglect them rather than trow exception
             if (o instanceof String) {
                 newCtx.setProperty((String) o, synCtx.getProperty((String) o));
             }
         }
-
+        
+        // Make deep copy of fault stack so that parent will not lost it's fault stack
         Stack faultStack = synCtx.getFaultStack();
-        FaultHandler faultHandler = (FaultHandler) faultStack.pop();
-        while (faultHandler != null) {
-            newCtx.pushFaultHandler(faultHandler);
-            faultHandler = (FaultHandler) faultStack.pop();
+        if (!faultStack.isEmpty()) {
+            
+            List<FaultHandler> newFaultStack = new ArrayList<FaultHandler>();
+            newFaultStack.addAll(faultStack);
+            
+            for (FaultHandler faultHandler : newFaultStack) {
+                if (faultHandler != null) {
+                    newCtx.pushFaultHandler(faultHandler);
+                }
+            }
         }
 
+        if (log.isDebugEnabled()) {
+            log.info("Parent's Fault Stack : " + faultStack + " : Child's Fault Stack :" + newCtx.getFaultStack());
+        }
+        
         return newCtx;
     }
 

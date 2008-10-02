@@ -411,6 +411,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             }
 
             // does the service specify a default reply file URI ?
+            // FIXME: we should look for the parameter in createPollTableEntry
+            //        and store the value in PollTableEntry as we do for the
+            //        other parameters
             Parameter param = service.getParameter(VFSConstants.REPLY_FILE_URI);
             if (param != null && param.getValue() != null) {
                 msgContext.setProperty(

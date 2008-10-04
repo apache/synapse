@@ -466,63 +466,59 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
     }
 
     @Override
-    protected PollTableEntry createPollTableEntry(AxisService service) {
-
-        PollTableEntry entry = new PollTableEntry();
-        try {
-            entry.setFileURI(
-                ParamUtils.getRequiredParam(service, VFSConstants.TRANSPORT_FILE_FILE_URI));
-            entry.setFileNamePattern(ParamUtils.getOptionalParam(service,
+    protected PollTableEntry createPollTableEntry(ParameterInclude params) throws AxisFault {
+        String fileURI = ParamUtils.getOptionalParam(params, VFSConstants.TRANSPORT_FILE_FILE_URI);
+        if (fileURI == null) {
+            return null;
+        } else {
+            PollTableEntry entry = new PollTableEntry();
+            entry.setFileURI(fileURI);
+            entry.setFileNamePattern(ParamUtils.getOptionalParam(params,
                     VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
-            entry.setContentType(ParamUtils.getRequiredParam(service,
+            entry.setContentType(ParamUtils.getRequiredParam(params,
                     VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
             String option = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
+                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
             entry.setActionAfterProcess(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
             option = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
+                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
             entry.setActionAfterErrors(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
             option = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
+                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
             entry.setActionAfterFailure(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
 
             String moveDirectoryAfterProcess = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
             entry.setMoveAfterProcess(moveDirectoryAfterProcess);
             String moveDirectoryAfterErrors = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
+                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
             entry.setMoveAfterErrors(moveDirectoryAfterErrors);
             String moveDirectoryAfterFailure = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
+                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
             entry.setMoveAfterFailure(moveDirectoryAfterFailure);
 
             String moveFileTimestampFormat = ParamUtils.getOptionalParam(
-                service, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
+                params, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
             if(moveFileTimestampFormat != null) {
                 DateFormat moveTimestampFormat = new SimpleDateFormat(moveFileTimestampFormat);
                 entry.setMoveTimestampFormat(moveTimestampFormat);
             }
 
             String strMaxRetryCount = ParamUtils.getOptionalParam(
-                service, VFSConstants.MAX_RETRY_COUNT);
+                params, VFSConstants.MAX_RETRY_COUNT);
             if(strMaxRetryCount != null)
               entry.setMaxRetryCount(Integer.parseInt(strMaxRetryCount));
 
             String strReconnectTimeout = ParamUtils.getOptionalParam(
-                service, VFSConstants.RECONNECT_TIMEOUT);            
+                params, VFSConstants.RECONNECT_TIMEOUT);            
             if(strReconnectTimeout != null)
               entry.setReconnectTimeout(Integer.parseInt(strReconnectTimeout) * 1000);
             
             return entry;
             
-        } catch (AxisFault axisFault) {
-            String msg = "Error configuring the File/VFS transport for Service : " +
-                service.getName() + " :: " + axisFault.getMessage();
-            log.warn(msg);
-            return null;
         }
     }
 }

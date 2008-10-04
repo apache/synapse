@@ -19,8 +19,9 @@
 
 package samples.userguide;
 
-import org.apache.synapse.transport.jms.JMSConstants;
-import org.apache.synapse.transport.jms.JMSUtils;
+
+import org.apache.axis2.transport.jms.JMSUtils;
+import org.apache.axis2.transport.jms.JMSConstants;
 
 import javax.jms.*;
 import javax.naming.InitialContext;
@@ -55,7 +56,7 @@ public class GenericJMSClient {
             app.sendBytesMessage(dest, getBytesFromFile(param));
         } else if ("pox".equalsIgnoreCase(type)) {
             app.sendTextMessage(dest, 
-                "<m:placeOrder xmlns:m=\"http://services.samples/xsd\">\n" +
+                "<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
                 "    <m:order>\n" +
                 "        <m:price>" + getRandom(100, 0.9, true) + "</m:price>\n" +
                 "        <m:quantity>" + (int) getRandom(10000, 1.0, true) + "</m:quantity>\n" +

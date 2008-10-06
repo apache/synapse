@@ -48,7 +48,7 @@ public class Replicator {
                     log.debug("Start replicating the property removal with key : " + key);
                 }
 
-                configCtx.removeProperty(key);
+                configCtx.removePropertyNonReplicable(key);
                 org.apache.axis2.clustering.context.Replicator.replicate(
                         configCtx, new String[]{key});
 
@@ -80,7 +80,7 @@ public class Replicator {
                             " value : " + value);
                 }
 
-                configCtx.setProperty(key, value);
+                configCtx.setNonReplicableProperty(key, value);
                 org.apache.axis2.clustering.context.Replicator.replicate(
                         configCtx, new String[]{key});
 

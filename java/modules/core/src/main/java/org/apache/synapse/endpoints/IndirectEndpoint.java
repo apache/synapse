@@ -19,70 +19,29 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.FaultHandler;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.config.SynapseConfiguration;
+
+import java.util.List;
 
 /**
- * This class represents the endpoints referred by keys. It does not store the actual referred
- * endpoint as a private variable as it could expire. Therefore, it only stores the key and gets the
- * actual endpoint from the synapse configuration.
- * <p/>
- * As this is also an instance of endpoint, this can be used any place, where a normal endpoint is
- * used.
+ * This class represents a real endpoint referred by a key. An Indirect endpoint does not really
+ * have a life, but merely acts as a virtual endpoint for the actual endpoint refferred.
  */
-public class IndirectEndpoint extends FaultHandler implements Endpoint {
+public class IndirectEndpoint extends AbstractEndpoint {
 
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-    private static final Log log = LogFactory.getLog(IndirectEndpoint.class);
-
-    private String name = null;
     private String key = null;
-    private Endpoint parentEndpoint = null;
+    private Endpoint realEndpoint = null;
 
-    public void send(MessageContext synMessageContext) {
-
-        // get the actual endpoint and send
-        Endpoint endpoint = synMessageContext.getEndpoint(key);
-        if (endpoint == null) {
-            handleException("Reference to non-existent endpoint for key : " + key);
-        }
-
-        assert endpoint != null;
-        if (endpoint.isActive(synMessageContext)) {
-             // register this as the immediate fault handler for this message.
-            synMessageContext.pushFaultHandler(this);
-            endpoint.send(synMessageContext);
-        } else {
-            // if this is a child of some other endpoint, inform parent about the failure.
-            // if not, inform to the next fault handler.
-            if (parentEndpoint != null) {
-                auditWarn("Endpoint : " + endpoint.getName() + " is currently inactive" +
-                        " - invoking parent endpoint", synMessageContext);
-                parentEndpoint.onChildEndpointFail(this, synMessageContext);
-
-            } else {
-                auditWarn("Endpoint : " + endpoint.getName() + " is currently inactive" +
-                        " - invoking fault handler / assuming failure", synMessageContext);
-
-                Object o = synMessageContext.getFaultStack().pop();
-                if (o != null) {
-                    ((FaultHandler) o).handleFault(synMessageContext);
-                }
-            }
-        }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name.trim();
+    /**
+     * Send by calling to the real endpoint
+     * @param synCtx the message to send
+     */
+    public void send(MessageContext synCtx) {
+        realEndpoint.send(synCtx);
     }
 
     public String getKey() {
@@ -93,100 +52,58 @@ public class IndirectEndpoint extends FaultHandler implements Endpoint {
         this.key = key;
     }
 
+    @Override
     /**
-     * IndirectEndpoints are active if its referref endpoint is active and vise versa. Therefore,
-     * this returns if its referred endpoint is active or not.
-     *
-     * @param synMessageContext MessageContext of the current message.
-     * @return true if the referred endpoint is active. false otherwise.
+     * Ready to send, if the real endpoint is ready
      */
-    public boolean isActive(MessageContext synMessageContext) {
-        Endpoint endpoint = synMessageContext.getEndpoint(key);
-        if (endpoint == null) {
-            handleException("Reference to non-existent endpoint for key : " + key);
-        }
-
-        assert endpoint != null;
-        return endpoint.isActive(synMessageContext);
+    public boolean readyToSend() {
+        return realEndpoint.readyToSend();
     }
 
+    @Override
+    public void setName(String endpointName) {
+        // do nothing, also prevent this endpoint from binding to JMX
+    }
+
+    @Override
+    public EndpointContext getContext() {
+        return realEndpoint.getContext();
+    }
+
+    @Override
+    public List<Endpoint> getChildren() {
+        return realEndpoint.getChildren();
+    }
+
+    @Override
     /**
-     * Activating or deactivating an IndirectEndpoint is the activating or deactivating its
-     * referref endpoint. Therefore, this sets the active state of its referred endpoint.
-     *
-     * @param active            true if active. false otherwise.
-     * @param synMessageContext MessageContext of the current message.
+     * Since an Indirect never sends messages for real, it has no moetrics.. but those of its
+     * actual endpoint
      */
-    public void setActive(boolean active, MessageContext synMessageContext) {
-        Endpoint endpoint = synMessageContext.getEndpoint(key);
-        if (endpoint == null) {
-            handleException("Reference to non-existent endpoint for key : " + key);
+    public EndpointView getMetricsMBean() {
+        return realEndpoint.getMetricsMBean();
+    }
+
+    @Override
+    /**
+     * Figure out the real endpoint we proxy for, and make sure its initialized
+     */
+    public synchronized void init(ConfigurationContext cc) {
+        Parameter param = cc.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
+        if (param != null && param.getValue() instanceof SynapseConfiguration) {
+            SynapseConfiguration synCfg = (SynapseConfiguration) param.getValue();
+            realEndpoint = synCfg.getEndpoint(key);
         }
-
-        assert endpoint != null;
-        endpoint.setActive(active, synMessageContext);
-    }
-
-    public void setParentEndpoint(Endpoint parentEndpoint) {
-        this.parentEndpoint = parentEndpoint;
-    }
-
-    public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-
-        // if this is a child of some other endpoint, inform parent about the failure.
-        // if not, inform to the next fault handler.
-        if (parentEndpoint != null) {
-            parentEndpoint.onChildEndpointFail(this, synMessageContext);
-        } else {
-            Object o = synMessageContext.getFaultStack().pop();
-            if (o != null) {
-                ((FaultHandler) o).handleFault(synMessageContext);
-            }
+        if (realEndpoint == null) {
+            handleException("Unable to load endpoint with key : " + key);
+        }
+        if (!realEndpoint.isInitialized()) {
+            realEndpoint.init(cc);
         }
     }
 
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    protected void auditWarn(String msg, MessageContext msgContext) {
-        log.warn(msg);
-        if (msgContext.getServiceLog() != null) {
-            msgContext.getServiceLog().warn(msg);
-        }
-        if (shouldTrace(msgContext)) {
-            trace.warn(msg);
-        }
-    }
-
-    public boolean shouldTrace(MessageContext synCtx) {
-        Endpoint endpoint = synCtx.getEndpoint(key);
-        EndpointDefinition endptDefn = null;
-        if (endpoint instanceof AddressEndpoint) {
-            AddressEndpoint addEndpt = (AddressEndpoint) endpoint;
-            endptDefn = addEndpt.getEndpoint();
-        } else if (endpoint instanceof WSDLEndpoint) {
-            WSDLEndpoint wsdlEndpt = (WSDLEndpoint) endpoint;
-            endptDefn = wsdlEndpt.getEndpoint();
-        }
-
-        return endptDefn != null && ((endptDefn.getTraceState() == SynapseConstants.TRACING_ON) ||
-                (endptDefn.getTraceState() == SynapseConstants.TRACING_UNSET &&
-                        synCtx.getTracingState() == SynapseConstants.TRACING_ON));
-    }
-
-    public void onFault(MessageContext synMessageContext) {
-        // At this point,child endpoint is in inactive state
-        // if this is a child of some other endpoint, inform parent about the failure.
-        // if not, inform to the next fault handler.
-        if (parentEndpoint != null) {
-            parentEndpoint.onChildEndpointFail(this, synMessageContext);
-        } else {
-            Object o = synMessageContext.getFaultStack().pop();
-            if (o != null) {
-                ((FaultHandler) o).handleFault(synMessageContext);
-            }
-        }
+    @Override
+    public String toString() {
+        return "[Indirect Endpoint [ " + key + "]]";
     }
 }

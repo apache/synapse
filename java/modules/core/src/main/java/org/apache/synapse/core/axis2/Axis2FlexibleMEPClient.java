@@ -40,7 +40,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.util.MessageHelper;
 
 import javax.xml.namespace.QName;
@@ -267,6 +267,11 @@ public class Axis2FlexibleMEPClient {
         mepClient.addMessageContext(axisOutMsgCtx);
         axisOutMsgCtx.setAxisMessage(
             axisAnonymousOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
+
+        // set the SEND_TIMEOUT for transport sender
+        if (endpoint != null && endpoint.getTimeoutDuration() > 0) {
+            axisOutMsgCtx.setProperty(SynapseConstants.SEND_TIMEOUT, endpoint.getTimeoutDuration());
+        }
 
         if (!outOnlyMessage) {
             // always set a callback as we decide if the send it blocking or non blocking within

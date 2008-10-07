@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.eip.splitter;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.MessageHelper;
@@ -31,6 +32,7 @@ import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,4 +177,21 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         }
     }
 
+    public void init(ConfigurationContext cc) {
+        
+        for (Target target : targets) {
+            
+            if (target != null) {
+                
+                Endpoint endpoint = target.getEndpoint();
+                if (endpoint != null) {
+                    endpoint.init(cc);
+                }
+                SequenceMediator seq = target.getSequence();
+                if (seq != null) {
+                    seq.init(cc);
+                }
+            }
+        }
+    }
 }

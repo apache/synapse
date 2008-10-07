@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.axis2.context.ConfigurationContext;
 import org.jaxen.JaxenException;
 
 import java.util.Collections;
@@ -162,6 +163,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                             }
 
                             aggregate = new Aggregate(
+                                    synCtx.getEnvironment(),
                                     correlateExpression.toString(),
                                     completionTimeoutMillis,
                                     minMessagesToComplete,
@@ -208,14 +210,19 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                                 }
                         
                                 aggregate = new Aggregate(
+                                        synCtx.getEnvironment(),
                                         correlation,
                                         completionTimeoutMillis,
                                         minMessagesToComplete,
                                         maxMessagesToComplete, this);
 
                                 if (completionTimeoutMillis > 0) {
-                                    synCtx.getConfiguration().getSynapseTimer().
-                                            schedule(aggregate, completionTimeoutMillis);
+                                    synchronized(aggregate) {
+                                        if (!aggregate.isCompleted()) {
+                                            synCtx.getConfiguration().getSynapseTimer().
+                                                schedule(aggregate, completionTimeoutMillis);
+                                        }
+                                    }
                                 }
                                 aggregate.getLock();
                                 activeAggregates.put(correlation, aggregate);
@@ -292,16 +299,31 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
      * itself
      * @param aggregate the timed out Aggregate that holds collected messages and properties
      */
-    public synchronized void completeAggregate(Aggregate aggregate) {
+    public void completeAggregate(Aggregate aggregate) {
+
+        boolean markedCompletedNow = false;
+        boolean wasComplete = aggregate.isCompleted();
+        if (wasComplete) {
+            return;
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("Aggregation completed or timed out");
         }
 
         // cancel the timer
-        aggregate.cancel();
-        aggregate.setCompleted(true);
+        synchronized(this) {
+            if (!aggregate.isCompleted()) {
+                aggregate.cancel();
+                aggregate.setCompleted(true);
+                markedCompletedNow = true;
+            }
+        }
 
+        if (!markedCompletedNow) {
+            return;
+        }
+        
         MessageContext newSynCtx = getAggregatedMessage(aggregate);
         if (newSynCtx == null) {
             log.warn("An aggregation of messages timed out with no aggregated messages", null);
@@ -429,5 +451,12 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
 
     public Map getActiveAggregates() {
         return activeAggregates;
+    }
+
+    public void init(ConfigurationContext cc) {
+        
+        if (onCompleteSequence != null) {
+            onCompleteSequence.init(cc);
+        }
     }
 }

@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 
@@ -83,7 +83,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
         if (addressElement != null) {
             EndpointDefinition endpoint = createEndpointDefinition(addressElement);
-            addressEndpoint.setEndpoint(endpoint);
+            addressEndpoint.setDefinition(endpoint);
         }
         processAuditStatus(addressEndpoint, epConfig);
         return addressEndpoint;

@@ -172,14 +172,19 @@ public class ClientWorker implements Runnable {
                         contentType);
             } catch (OMException e) {
                 // handle non SOAP and POX/REST payloads (probably text/html)
-                log.warn("Unexpected response received : " + e.getMessage());
+                String errorMessage = "Unexpected response received. HTTP response code : "
+                    + this.response.getStatusLine().getStatusCode() + " HTTP status : "
+                    + this.response.getStatusLine().getReasonPhrase() + " exception : "
+                    + e.getMessage();
+
+                log.warn(errorMessage, e);
                 SOAPFactory factory = new SOAP11Factory();
                 envelope = factory.getDefaultFaultEnvelope();
                 SOAPFaultDetail detail = factory.createSOAPFaultDetail();
-                detail.setText("Unexpected response received : " + e.getMessage());
+                detail.setText(errorMessage);
                 envelope.getBody().getFault().setDetail(detail);
                 SOAPFaultReason reason = factory.createSOAPFaultReason();
-                reason.setText(this.response.getStatusLine().getReasonPhrase());
+                reason.setText(errorMessage);
                 envelope.getBody().getFault().setReason(reason);
                 SOAPFaultCode code = factory.createSOAPFaultCode();
                 code.setText(Integer.toString(this.response.getStatusLine().getStatusCode()));

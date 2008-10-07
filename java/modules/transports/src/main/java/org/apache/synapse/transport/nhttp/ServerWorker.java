@@ -44,6 +44,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -218,7 +219,39 @@ public class ServerWorker implements Runnable {
                 }
 
                 response.setStatusCode(HttpStatus.SC_ACCEPTED);
-                serverHandler.commitResponse(conn, response);
+                if (metrics != null) {
+                    metrics.incrementMessagesSent();
+                }
+
+                try {
+                    serverHandler.commitResponse(conn, response);
+
+                } catch (HttpException e) {
+                    if (metrics != null) {
+                        metrics.incrementFaultsSending();
+                    }
+                    handleException("Unexpected HTTP protocol error : " + e.getMessage(), e);
+                } catch (ConnectionClosedException e) {
+                    if (metrics != null) {
+                        metrics.incrementFaultsSending();
+                    }
+                    log.warn("Connection closed by client (Connection closed)");
+                } catch (IllegalStateException e) {
+                    if (metrics != null) {
+                        metrics.incrementFaultsSending();
+                    }
+                    log.warn("Connection closed by client (Buffer closed)");
+                } catch (IOException e) {
+                    if (metrics != null) {
+                        metrics.incrementFaultsSending();
+                    }
+                    handleException("IO Error sending response message", e);
+                } catch (Exception e) {
+                    if (metrics != null) {
+                        metrics.incrementFaultsSending();
+                    }
+                    handleException("General Error sending response message", e);
+                }
 
                 try {
                     is.close();
@@ -311,27 +344,27 @@ public class ServerWorker implements Runnable {
         if (uri.equals("/favicon.ico")) {
             response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
             response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
-            serverHandler.commitResponse(conn,  response);
+            serverHandler.commitResponseHideExceptions(conn,  response);
 
         } else if (!uri.startsWith(servicePath)) {
             response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
             response.addHeader(LOCATION, servicePath + "/");
-            serverHandler.commitResponse(conn, response);
+            serverHandler.commitResponseHideExceptions(conn, response);
 
         } else if (serviceName != null && parameters.containsKey("wsdl")) {
             AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
                 getServices().get(serviceName);
             if (service != null) {
                 try {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    service.printWSDL(baos, getIpAddress());
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
-                    serverHandler.commitResponse(conn, response);
-                    service.printWSDL(os, getIpAddress());
+                    serverHandler.commitResponseHideExceptions(conn, response);
+                    os.write(baos.toByteArray());
 
-                } catch (AxisFault e) {
-                    handleException("Axis2 fault writing ?wsdl output", e);
-                    return;
-                } catch (SocketException e) {
-                    handleException("Error getting ip address for ?wsdl output", e);
+                } catch (Exception e) {
+                    handleBrowserException(
+                        "Error generating ?wsdl output for service : " + serviceName, e);
                     return;
                 }
             }
@@ -341,14 +374,15 @@ public class ServerWorker implements Runnable {
                 getServices().get(serviceName);
             if (service != null) {
                 try {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    service.printWSDL2(baos, getIpAddress());
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
-                    serverHandler.commitResponse(conn, response);
-                    service.printWSDL2(os, getIpAddress());
-                } catch (AxisFault e) {
-                    handleException("Axis2 fault writing ?wsdl2 output", e);
-                    return;
-                } catch (SocketException e) {
-                    handleException("Error getting ip address for ?wsdl2 output", e);
+                    serverHandler.commitResponseHideExceptions(conn, response);
+                    os.write(baos.toByteArray());
+
+                } catch (Exception e) {
+                    handleBrowserException(
+                        "Error generating ?wsdl2 output for service : " + serviceName, e);
                     return;
                 }
             }
@@ -359,12 +393,15 @@ public class ServerWorker implements Runnable {
                     .getServices().get(serviceName);
                 if (service != null) {
                     try {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        service.printSchema(baos);
                         response.addHeader(CONTENT_TYPE, TEXT_XML);
-                        serverHandler.commitResponse(conn, response);
-                        service.printSchema(os);
+                        serverHandler.commitResponseHideExceptions(conn, response);
+                        os.write(baos.toByteArray());
 
-                    } catch (AxisFault axisFault) {
-                        handleException("Error writing ?xsd output to client", axisFault);
+                    } catch (Exception e) {
+                        handleBrowserException(
+                            "Error generating ?xsd output for service : " + serviceName, e);
                         return;
                     }
                 }
@@ -390,9 +427,17 @@ public class ServerWorker implements Runnable {
                     }
                     //schema found - write it to the stream
                     if (schema != null) {
-                        response.addHeader(CONTENT_TYPE, TEXT_XML);
-                        serverHandler.commitResponse(conn, response);
-                        schema.write(os);
+                        try {
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            schema.write(baos);
+                            response.addHeader(CONTENT_TYPE, TEXT_XML);
+                            serverHandler.commitResponseHideExceptions(conn, response);
+                            os.write(baos.toByteArray());
+                        } catch (Exception e) {
+                            handleBrowserException(
+                                "Error generating named ?xsd output for service : " + serviceName, e);
+                            return;
+                        }
 
                     } else {
                         // no schema available by that name  - send 404
@@ -407,28 +452,31 @@ public class ServerWorker implements Runnable {
                     getServices().get(serviceName);
             if (service != null) {
                 try {
+                    byte[] bytes =
+                        HTTPTransportReceiver.printServiceHTML(serviceName, cfgCtx).getBytes();
                     response.addHeader(CONTENT_TYPE, TEXT_HTML);
-                    serverHandler.commitResponse(conn, response);
-                    os.write(HTTPTransportReceiver.printServiceHTML(
-                            serviceName, cfgCtx).getBytes());
+                    serverHandler.commitResponseHideExceptions(conn, response);
+                    os.write(bytes);
 
                 } catch (IOException e) {
-                    handleException("Error writing service HTML to client", e);
+                    handleBrowserException(
+                        "Error generating service details page for : " + serviceName, e);
                     return;
                 }
             } else {
-                handleException("Invalid service : " + serviceName, null);
+                handleBrowserException("Invalid service : " + serviceName, null);
                 return;
             }
         } else if (serviceName == null || serviceName.length() == 0) {
 
             try {
+                byte[] bytes = getServicesHTML().getBytes();
                 response.addHeader(CONTENT_TYPE, TEXT_HTML);
-                serverHandler.commitResponse(conn, response);
-                os.write(getServicesHTML().getBytes());
+                serverHandler.commitResponseHideExceptions(conn, response);
+                os.write(bytes);
 
             } catch (IOException e) {
-                handleException("Error writing ? output to client", e);
+                handleBrowserException("Error generating services list", e);
             }
 
         } else {
@@ -454,6 +502,31 @@ public class ServerWorker implements Runnable {
         } catch (IOException ignore) {}
     }
 
+    private void handleBrowserException(String msg, Exception e) {
+
+        if (e == null) {
+            log.error(msg);
+        } else {
+            log.error(msg, e);
+        }
+
+        if (!response.containsHeader(HTTP.TRANSFER_ENCODING)) {
+            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            response.setReasonPhrase(msg);
+            response.addHeader(CONTENT_TYPE, TEXT_HTML);
+            serverHandler.commitResponseHideExceptions(conn, response);
+            try {
+                os.write(msg.getBytes());
+                os.close();
+            } catch (IOException ignore) {}
+        }
+
+        if (conn != null) {
+            try {
+                conn.shutdown();
+            } catch (IOException ignore) {}
+        }
+    }
 
     private void handleException(String msg, Exception e) {
         
@@ -475,7 +548,7 @@ public class ServerWorker implements Runnable {
         } catch (Exception ex) {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             response.addHeader(CONTENT_TYPE, TEXT_XML);
-            serverHandler.commitResponse(conn, response);
+            serverHandler.commitResponseHideExceptions(conn, response);
 
             try {
                 os.write(msg.getBytes());

@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Creates {@link LoadbalanceEndpoint} using an XML configuration.
@@ -91,7 +92,7 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
                 }
                 List<Endpoint> endpoints
                         = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
-                loadbalanceEndpoint.setEndpoints(endpoints);
+                loadbalanceEndpoint.setChildren(endpoints);
                 algorithm =
                         LoadbalanceAlgorithmFactory.
                                 createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
@@ -105,12 +106,13 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
                     log.error(msg);
                     throw new SynapseException(msg);
                 }
-                List<Member> members = getMembers(loadbalanceElement);
-                loadbalanceEndpoint.setMembers(members);
-                algorithm =
-                        LoadbalanceAlgorithmFactory.
-                                createLoadbalanceAlgorithm2(loadbalanceElement, members);
-                loadbalanceEndpoint.startApplicationMembershipTimer();
+//                TODO FIX-RUWAN
+//                List<Member> members = getMembers(loadbalanceElement);
+//                loadbalanceEndpoint.setMembers(members);
+//                algorithm =
+//                        LoadbalanceAlgorithmFactory.
+//                                createLoadbalanceAlgorithm2(loadbalanceElement, members);
+//                loadbalanceEndpoint.startApplicationMembershipTimer();
             }
 
             // set load balance algorithm

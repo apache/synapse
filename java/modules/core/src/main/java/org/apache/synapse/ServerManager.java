@@ -34,6 +34,9 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.ClasspathURLStreamHandler;
 import org.apache.synapse.util.RMIRegistryController;
+import org.apache.synapse.util.datasource.InMemoryDataSourceRegistry;
+import org.apache.synapse.util.datasource.JNDIBasedDataSourceRegistry;
+import org.apache.synapse.endpoints.dispatch.SALSessions;
 
 import java.io.File;
 import java.net.*;
@@ -159,10 +162,12 @@ public class ServerManager {
                 }
             }
 
+            synConfig.init(configctx);
+
             log.info("Ready for processing");
 
         } catch (Throwable t) {
-            log.fatal("Synaps startup failed...", t);
+            log.fatal("Synapse startup failed...", t);
             throw new SynapseException("Synapse startup failed", t);
         }
     }
@@ -180,8 +185,7 @@ public class ServerManager {
      * stop all the listeners
      */
     public void stop() {
-        try {
-            RMIRegistryController.getInstance().removeLocalRegistry();
+        try {                 
 
             // stop all services
             if (configctx != null && configctx.getAxisConfiguration() != null) {
@@ -204,6 +208,17 @@ public class ServerManager {
                 listenerManager.stop();
                 listenerManager.destroy();
             }
+
+            // clear session information used for SA load balancing
+            try {
+                RMIRegistryController.getInstance().removeLocalRegistry();
+                SALSessions.getInstance().reset();
+                InMemoryDataSourceRegistry.getInstance().clear();
+                JNDIBasedDataSourceRegistry registry = JNDIBasedDataSourceRegistry.getInstance();
+                if (registry.isInitialized()) {
+                    registry.clear();
+                }
+            } catch (Throwable ignored) {}
             
             // we need to call this method to clean the temp files we created.
             if (configctx != null) {

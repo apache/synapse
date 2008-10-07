@@ -23,6 +23,7 @@ import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.synapse.transport.nhttp.util.SharedInputBuffer;
+import org.apache.synapse.transport.nhttp.util.SharedOutputBuffer;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -32,10 +33,12 @@ import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.util.ByteBufferAllocator;
+import org.apache.http.nio.util.HeapByteBufferAllocator;
+import org.apache.http.nio.util.ContentOutputBuffer;
+import org.apache.http.nio.util.ContentInputBuffer;
 import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.nio.entity.ContentOutputStream;
-import org.apache.http.nio.util.*;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.http.util.EncodingUtils;
@@ -110,6 +113,9 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpRequest request = conn.getHttpRequest();
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
+        // Mark request as not yet fully read, to detect timeouts from harmless keepalive deaths
+        conn.getContext().setAttribute(NhttpConstants.REQUEST_READ, Boolean.FALSE);
+
         try {
             ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
             ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
@@ -136,6 +142,9 @@ public class ServerHandler implements NHttpServiceHandler {
                     response, new ContentOutputStream(outputBuffer)));
 
         } catch (Exception e) {
+            if (metrics != null) {
+                metrics.incrementFaultsReceiving();
+            }
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
         }
@@ -161,10 +170,16 @@ public class ServerHandler implements NHttpServiceHandler {
                 if (metrics != null) {
                     metrics.incrementMessagesReceived();
                 }
+                // remove the request we have fully read, to detect harmless keepalive timeouts from
+                // real timeouts while reading requests
+                context.setAttribute(NhttpConstants.REQUEST_READ, Boolean.TRUE);
             }
 
         } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
+            if (metrics != null) {
+                metrics.incrementFaultsReceiving();
+            }
+            handleException("I/O Error at inputReady : " + e.getMessage(), e, conn);
         }
     }
 
@@ -186,9 +201,6 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
             if (encoder.isCompleted()) {
-                if (metrics != null) {
-                    metrics.incrementMessagesSent();
-                }
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
@@ -197,17 +209,21 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
         } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
+            if (metrics != null) {
+                metrics.incrementFaultsSending();
+            }
+            handleException("I/O Error at outputReady : " + e.getMessage(), e, conn);
         }
     }
 
     /**
      * Commit the response to the connection. Processes the response through the configured
-     * HttpProcessor and submits it to be sent out
+     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted
+     * for non critical (i.e. browser requests etc) requests, which are not core messages
      * @param conn the connection being processed
      * @param response the response to commit over the connection
      */
-    public void commitResponse(final NHttpServerConnection conn, final HttpResponse response) {
+    public void commitResponseHideExceptions(final NHttpServerConnection conn, final HttpResponse response) {
         try {
             httpProcessor.process(response, conn.getContext());
             conn.submitResponse(response);
@@ -218,24 +234,45 @@ public class ServerHandler implements NHttpServiceHandler {
         }
     }
 
+    /**
+     * Commit the response to the connection. Processes the response through the configured
+     * HttpProcessor and submits it to be sent out. Re-Throws exceptions, after closing connections
+     * @param conn the connection being processed
+     * @param response the response to commit over the connection
+     * @throws IOException
+     * @throws HttpException
+     */
+    public void commitResponse(final NHttpServerConnection conn,
+        final HttpResponse response) throws IOException, HttpException {
+        try {
+            httpProcessor.process(response, conn.getContext());
+            conn.submitResponse(response);
+        } catch (HttpException e) {
+            shutdownConnection(conn);
+            throw e;
+        } catch (IOException e) {
+            shutdownConnection(conn);
+            throw e;
+        }
+    }
 
     /**
      * Handle connection timeouts by shutting down the connections
      * @param conn the connection being processed
      */
     public void timeout(final NHttpServerConnection conn) {
-        HttpRequest req = (HttpRequest) conn.getContext().getAttribute(
-                ExecutionContext.HTTP_REQUEST);
-        if (req != null) {
+        HttpContext context = conn.getContext();
+        Boolean read = (Boolean) context.getAttribute(NhttpConstants.REQUEST_READ);
+
+        if (read != null && read) {
             if (log.isDebugEnabled()) {
-                log.debug("Connection Timeout for request to : " + req.getRequestLine().getUri() +
-                        " Probably the keepalive connection was closed");
+                log.debug("Keepalive connection was closed");
             }
         } else {
-            log.warn("Connection Timeout");
+            log.error("Connection Timeout - before message body was fully read : " + conn);
             if (metrics != null) {
                 metrics.incrementTimeoutsReceiving();
-            }            
+            }
         }
         shutdownConnection(conn);
     }
@@ -247,6 +284,11 @@ public class ServerHandler implements NHttpServiceHandler {
     }
 
     public void responseReady(NHttpServerConnection conn) {
+
+        metrics.notifyReceivedMessageSize(conn.getMetrics().getReceivedBytesCount());
+        metrics.notifySentMessageSize(conn.getMetrics().getSentBytesCount());
+        conn.getMetrics().reset();
+
         if (log.isTraceEnabled()) {
             log.trace("Ready to send response");
         }
@@ -255,6 +297,7 @@ public class ServerHandler implements NHttpServiceHandler {
     public void closed(final NHttpServerConnection conn) {
 
         HttpContext context = conn.getContext();
+        shutdownConnection(conn);
         context.removeAttribute(REQUEST_SINK_BUFFER);
         context.removeAttribute(RESPONSE_SOURCE_BUFFER);
 
@@ -269,9 +312,16 @@ public class ServerHandler implements NHttpServiceHandler {
      * @param e the exception encountered
      */
     public void exception(final NHttpServerConnection conn, final HttpException e) {
+        if (metrics != null) {
+            metrics.incrementFaultsReceiving();
+        }
+
         HttpContext context = conn.getContext();
         HttpRequest request = conn.getHttpRequest();
-        ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
+        ProtocolVersion ver = HttpVersion.HTTP_1_0;
+        if (request != null && request.getRequestLine() != null) {
+            ver = request.getRequestLine().getProtocolVersion();
+        }
         HttpResponse response = responseFactory.newHttpResponse(
             ver, HttpStatus.SC_BAD_REQUEST, context);
 
@@ -279,11 +329,9 @@ public class ServerHandler implements NHttpServiceHandler {
         ByteArrayEntity entity = new ByteArrayEntity(msg);
         entity.setContentType("text/plain; charset=US-ASCII");
         response.setEntity(entity);
-        commitResponse(conn, response);
-
-        if (metrics != null) {
-            metrics.incrementFaultsReceiving();
-        }        
+        try {
+            commitResponseHideExceptions(conn, response);
+        } catch (Exception ignore) {}        
     }
 
     /**
@@ -300,7 +348,7 @@ public class ServerHandler implements NHttpServiceHandler {
                         "was closed):" + e.getMessage());
             }
         } else {
-            log.error("I/O error: " + e.getMessage());
+            log.error("I/O error: " + e.getMessage(), e);
             if (metrics != null) {
                 metrics.incrementFaultsReceiving();
             }
@@ -321,7 +369,17 @@ public class ServerHandler implements NHttpServiceHandler {
      * Shutdown the connection ignoring any IO errors during the process
      * @param conn the connection to be shutdown
      */
-    private void shutdownConnection(final HttpConnection conn) {
+    private void shutdownConnection(final NHttpServerConnection conn) {
+        SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
+            conn.getContext().getAttribute(RESPONSE_SOURCE_BUFFER);
+        if (outputBuffer != null) {
+            outputBuffer.close();
+        }
+        SharedInputBuffer inputBuffer = (SharedInputBuffer)
+            conn.getContext().getAttribute(REQUEST_SINK_BUFFER);
+        if (inputBuffer != null) {
+            inputBuffer.close();
+        }
         try {
             conn.shutdown();
         } catch (IOException ignore) {}
@@ -346,5 +404,15 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public int getQueueSize() {
         return workerPool.getQueueSize();
+    }
+
+    public MetricsCollector getMetrics() {
+        return metrics;
+    }
+
+    public void stop() {
+        try {
+            workerPool.shutdown(1000);
+        } catch (InterruptedException ignore) {}
     }
 }

@@ -28,6 +28,7 @@ import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.audit.AuditConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axis2.context.ConfigurationContext;
 
 /**
  * This is the superclass of all mediators, and defines common logging, tracing other aspects
@@ -255,5 +256,14 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
 
     public void setAuditId(String id) {
         this.auditConfigurable.setAuditId(id);
+    }
+
+    /**
+     * Initialize  mediator with configuration context.
+     * By default nothing to initiate and let it to decide each mediator itself
+     *
+     * @param cc ConfigurationContext instance
+     */
+    public void init(ConfigurationContext cc) {
     }
 }

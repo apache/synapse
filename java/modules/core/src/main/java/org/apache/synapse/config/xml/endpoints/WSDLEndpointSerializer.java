@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
  * Serializes an {@link WSDLEndpoint} to an XML configuration.
@@ -73,7 +73,7 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         // currently, we have to get QOS information from the endpoint definition and set them as
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.
-        EndpointDefinition epDefinition = wsdlEndpoint.getEndpoint();
+        EndpointDefinition epDefinition = wsdlEndpoint.getDefinition();
         serializeCommonEndpointProperties(epDefinition, wsdlElement);
         serializeSpecificEndpointProperties(epDefinition, wsdlElement);
         endpointElement.addChild(wsdlElement);

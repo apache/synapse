@@ -20,6 +20,9 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
+import org.apache.axis2.context.ConfigurationContext;
+
+import java.util.List;
 
 /**
  * Endpoint defines the behavior common to all Synapse endpoints. Synapse endpoints should be able
@@ -74,25 +77,44 @@ public interface Endpoint {
     public void setName(String name);
 
     /**
-     * Returns if the endpoint is currently active or not. Messages should not be sent to inactive
-     * endpoints.
-     *
-     * @param synMessageContext MessageContext for the current message. This is required for
-     *                          IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
-     *                          Endpoint implementations may ignore this parameter.
-     * @return true if the endpoint is in active state. false otherwise.
+     * An event notification whenever endpoint invocation is successful
+     * Can be used to clear a timeout status etc
      */
-    public boolean isActive(MessageContext synMessageContext);
+    public void onSuccess();
 
     /**
-     * Sets the endpoint as active or inactive. If an endpoint is detected as failed, it should be
-     * set as inactive. But endpoints may be eventually set as active by the endpoint refresher to
-     * avoid ignoring endpoints forever.
-     *
-     * @param active            true if active. false otherwise.
-     * @param synMessageContext MessageContext for the current message. This is required for
-     *                          IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
-     *                          Endpoint implementations may ignore this parameter.
+     * Returns true to indicate that the endpoint is ready to service requests
+     * @return true if endpoint is ready to service requests
      */
-    public void setActive(boolean active, MessageContext synMessageContext);
+    public boolean readyToSend();
+
+    /**
+     * Initialize the endpoint, using this configuration context
+     * @param cc the axis2 configuration context
+     */
+    public void init(ConfigurationContext cc);
+
+    /**
+     * Has this Endpoint initialized?
+     * @return true if the endpoint is initialized
+     */
+    public boolean isInitialized();
+
+    /**
+     * Get the EndpointContext that has the run-time state of this endpoint
+     * @return the runtime context
+     */
+    public EndpointContext getContext();
+
+    /**
+     * Get the children of this endpoint
+     * @return the child endpoints
+     */
+    public List<Endpoint> getChildren();
+
+    /**
+     * Get a reference to the metrics MBean for this endpoint
+     * @return
+     */
+    public EndpointView getMetricsMBean();
 }

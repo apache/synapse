@@ -53,7 +53,7 @@ public class FailoverEndpointSerializer extends EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        for (Endpoint childEndpoint : failoverEndpoint.getEndpoints()) {
+        for (Endpoint childEndpoint : failoverEndpoint.getChildren()) {
             failoverElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
         }
 

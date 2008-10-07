@@ -42,11 +42,15 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
             new JNDIBasedDataSourceRegistry();
     private static InitialContext initialContext;
     private static final Properties indiEnv = new Properties();
-    private static boolean initialize = false;
+    private boolean initialized = false;
 
-    public static JNDIBasedDataSourceRegistry getInstance(Properties jndiEnv) {
+    public static JNDIBasedDataSourceRegistry getInstance() {
+        return ourInstance;
+    }
 
-        if (!initialize) {
+    public void init(Properties jndiEnv) {
+
+        if (!initialized) {
 
             if (jndiEnv == null) {
                 handleException("JNDI environment properties cannot be found");
@@ -57,19 +61,18 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
             try {
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Initilating a Naming conext with JNDI " +
+                    log.debug("Initiating a Naming context with JNDI " +
                             "environment properties :  " + jndiEnv);
                 }
 
                 initialContext = new InitialContext(jndiEnv);
-                initialize = true;
+                initialized = true;
 
             } catch (NamingException e) {
                 handleException("Error creating a InitialConext" +
                         " with JNDI env properties : " + jndiEnv);
             }
         }
-        return ourInstance;
     }
 
     private JNDIBasedDataSourceRegistry() {
@@ -81,6 +84,8 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
      * @see org.apache.synapse.util.datasource.DataSourceRegistry#register(DataSourceInformation)
      */
     public void register(DataSourceInformation information) {
+
+        validateInitialized();
 
         String dsType = information.getType();
         String driver = information.getDriver();
@@ -211,10 +216,18 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
      */
     public DataSource lookUp(String dsName) {
 
+        validateInitialized();
+
         if (log.isDebugEnabled()) {
             log.debug("Getting a DataSource with name : " + dsName + " from the JNDI tree.");
         }
         return DataSourceFinder.find(dsName, initialContext);
+    }
+
+    public void clear() {
+        initialized = false;
+        initialContext = null;
+        indiEnv.clear();
     }
 
     /**
@@ -355,5 +368,15 @@ public class JNDIBasedDataSourceRegistry implements DataSourceRegistry {
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    private void validateInitialized() {
+        if (!isInitialized()) {
+            handleException("Datasource registry has not been initialized yet");
+        }
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }

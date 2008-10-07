@@ -22,6 +22,8 @@ package org.apache.synapse.endpoints.dispatch;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 
+import java.util.List;
+
 /**
  * Defines the behavior of session dispatchers. There can be two dispatcher types. Server initiated
  * session dispatchers and client initiated session dispatchers. In the former one, server generates
@@ -37,30 +39,25 @@ public interface Dispatcher {
      * synapseMessageContext is not found it should return null.
      *
      * @param synCtx client -> esb message context.
-     * @param dispatcherContext context for dispatching
      * @return Endpoint Endpoint associated with this session.
      */
-    public Endpoint getEndpoint(MessageContext synCtx, DispatcherContext dispatcherContext);
+    public SessionInformation getSession(MessageContext synCtx);
 
     /**
      * Updates the session maps. This will be called in the first client -> synapse -> server flow
      * for client initiated sessions. For server initiated sessions, this will be called in the
      * first server -> synapse -> client flow.
      *
-     * @param synCtx   SynapseMessageContext
-     * @param dispatcherContext context for dispatching
-     * @param endpoint Selected endpoint for this session.
+     * @param synCtx SynapseMessageContext
      */
-    public void updateSession(MessageContext synCtx, DispatcherContext dispatcherContext,
-        Endpoint endpoint);
+    public void updateSession(MessageContext synCtx);
 
     /**
      * Removes the session belonging to the given message context.
      *
      * @param synCtx MessageContext containing an session ID.
-     * @param dispatcherContext context for dispatching
      */
-    public void unbind(MessageContext synCtx, DispatcherContext dispatcherContext);
+    public void unbind(MessageContext synCtx);
 
     /**
      * Determine whether the session supported by the implementing dispatcher is initiated by the
@@ -69,4 +66,18 @@ public interface Dispatcher {
      * @return true, if the session is initiated by the server. false, otherwise.
      */
     public boolean isServerInitiatedSession();
+
+    /**
+     * Returns the endpoint sequence associated with current session with out root
+     *
+     * @param sessionInformation Current Session information
+     * @return Endpoint sequence
+     */
+    public List<Endpoint> getEndpoints(SessionInformation sessionInformation);
+
+    /**
+     * Remove the session Id - To clear out session information from current message
+     * @param syCtx MessageContext containing an session ID
+     */
+    public void removeSessionID(MessageContext syCtx);
 }

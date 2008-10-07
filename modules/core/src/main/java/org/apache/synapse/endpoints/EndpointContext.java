@@ -18,204 +18,445 @@
 */
 package org.apache.synapse.endpoints;
 
+import org.apache.axis2.clustering.ClusteringFault;
+import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.Replicator;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.endpoints.EndpointDefinition;
+
+import java.util.Date;
 
 /**
- * Keeps the states of the endpoint.This hides where those states are kept .For a cluster
- * environment,all states are kept in the axis2 configuration context in order to replicate those
- * states so that other synapse instance in the same cluster can see those changes . This class can
- * be evolved to keep any run time states related to the endpoint .For a non-clustered environment,
- * all data are kept locally.
- * <p/>
- * This class provide the abstraction need to separate the dynamic data from the static data and
- * improve the  high cohesion and provides capability to replicate only required state at
- * a given time. This improves the performance when replicate data.
+ * This class is one of the key classes of the Endpoint management in Synapse. It maintains the
+ * runtime state of an endpoint for local and clustered endpoint configurations.
  */
 public class EndpointContext {
 
     private static final Log log = LogFactory.getLog(EndpointContext.class);
 
-    /* The  static constant only for construct key prefix for each property in endpoint context
-     * as it is need when those property state going to replicate in a cluster env. */
-    private static final String ACTIVE = "active";
-    private static final String RECOVER_ON = "recover_on";
-    private static final String UNDERSCORE_STRING = "_";
+    private static final String KEY_PREFIX = "synapse.endpoint.";
+    private static final String STATE = ".state";
+    private static final String NEXT_RETRY_TIME = ".next_retry_time";
+    private static final String REMAINING_RETRIES = ".remaining_retries";
+    private static final String LAST_SUSPEND_DURATION = ".last_suspend_duration";
 
-    /* Determines if this endpoint is active or not. This variable have to be loaded always from the
-     * memory as multiple threads could access it.*/
-    private boolean active = true;
+    // The different states an endpoint could exist at any point in time
+    /** And active endpoint known to be functioning properly */
+    public static final int ST_ACTIVE      = 1;
+    /** An endpoint which timed out - but now maybe ready to retry depending on the current time */
+    public static final int ST_TIMEOUT     = 2;
+    /** An endpoint put into the suspended state by the system. Will retry after an applicable delay */
+    public static final int ST_SUSPENDED   = 3;
+    /** An endpoint manually switched off into maintenence - it will never change state automatically */
+    public static final int ST_OFF = 4;
 
-    /* Time to recover a failed endpoint.*/
-    private long recoverOn = Long.MAX_VALUE;
+    /** The state of the endpoint at present */
+    private int  localState = ST_ACTIVE;
+    /** The time in ms, until the next retry - depending on a timeout or suspension */
+    private long localNextRetryTime = -1;
+    /** The number of attempts left for timeout failures, until they make the endpoint suspended */
+    private int  localRemainingRetries = -1;
+    /** The duration in ms for the last suspension */
+    private long localLastSuspendDuration = -1;
 
-    /* The axis configuration context-  this will hold the all callers states
-     * when doing throttling in a clustered environment. */
-    private ConfigurationContext configCtx;
+    /** Is the environment clustered ? */
+    private boolean isClustered = false;
+    /** Name of the endpoint - mainly for logging */
+    private String endpointName = SynapseConstants.ANONYMOUS_ENDPOINT;
+    /** The Axis2 configuration context - to replicate state in a cluster */
+    private ConfigurationContext cfgCtx = null;
+    /** The endpoint definition that holds static endpoint information */
+    private EndpointDefinition definition = null;
 
-    /* The key for 'active' attribute and this is used when this attribute value being replicated */
-    private String activePropertyKey;
-    /* The key for 'recoverOn' attribute and this is used when this attribute value being
-     * replicated */
-    private String recoverOnPropertyKey;
-
-    /* Is this env. support clustering*/
-    private boolean isClusteringEnable = false;
+    // for clustered mode operation, keys pre-computed and used for replication
+    private final String STATE_KEY;
+    private final String NEXT_RETRY_TIME_KEY;
+    private final String REMAINING_RETRIES_KEY;
+    private final String LAST_SUSPEND_DURATION_KEY;
 
     /**
-     * Checks if the endpoint is active (failed or not)
-     *
-     * @return Returns true if the endpoint is active , otherwise , false will be returned
+     * Create an EndpointContext to hold runtime state of an Endpoint
+     * @param endpointName the name of the endpoint (mainly for logging)
+     * @param endpointDefinition the definition of the endpoint (e.g. retry time, suspend duration..)
+     * @param clustered is the environment clustered?
+     * @param cfgCtx the Axis2 configurationContext for clustering
      */
-    public boolean isActive() {
+    public EndpointContext(String endpointName, EndpointDefinition endpointDefinition,
+        boolean clustered, ConfigurationContext cfgCtx) {
 
-        if (this.isClusteringEnable) {  // if this is a clustering env.
+        if (clustered) {
+            if (endpointName == null) {
+                handleException("For proper clustered mode operation, all endpoints should be uniquely named");
+            }
+            this.isClustered = true;
+            this.cfgCtx = cfgCtx;
+        }
 
-            if (this.activePropertyKey == null || "".equals(this.activePropertyKey)) {
-                handleException("Cannot find the required key to find the " +
-                        "shared state of 'active' attribute");
+        this.definition = endpointDefinition;
+        if (endpointName != null) {
+            this.endpointName = endpointName;
+        } else if (endpointDefinition != null) {
+            this.endpointName = endpointDefinition.toString();
+        }
+
+        STATE_KEY                 = KEY_PREFIX + endpointName + STATE;
+        NEXT_RETRY_TIME_KEY       = KEY_PREFIX + endpointName + NEXT_RETRY_TIME;
+        REMAINING_RETRIES_KEY     = KEY_PREFIX + endpointName + REMAINING_RETRIES;
+        LAST_SUSPEND_DURATION_KEY = KEY_PREFIX + endpointName + LAST_SUSPEND_DURATION;
+    }
+
+    /**
+     * Update the internal state of the endpoint
+     * @param state the new state of the endpoint
+     */
+    private void setState(int state) {
+
+        if (isClustered) {
+            setAndReplicateState(STATE_KEY, state);
+            switch (state) {
+                case ST_ACTIVE : {
+                    setAndReplicateState(REMAINING_RETRIES_KEY,
+                        definition.getRetriesOnTimeoutBeforeSuspend());
+                    setAndReplicateState(LAST_SUSPEND_DURATION_KEY, null);
+                    break;
+                }
+                case ST_TIMEOUT : {
+                    Integer retries = (Integer) cfgCtx.getPropertyNonReplicable(REMAINING_RETRIES_KEY);
+                    if (retries == null) {
+                        retries = definition.getRetriesOnTimeoutBeforeSuspend();
+                    }
+
+                    if (retries <= 0) {
+                        log.info("Endpoint : " + endpointName + " has been marked for SUSPENSION," +
+                                " but no further retries remain. Thus it will be SUSPENDED.");
+
+                        setState(ST_SUSPENDED);
+
+                    } else {
+                        setAndReplicateState(REMAINING_RETRIES_KEY, (retries-1));
+                        long nextRetry = System.currentTimeMillis() + definition.getRetryDurationOnTimeout();
+                        setAndReplicateState(NEXT_RETRY_TIME_KEY, nextRetry);
+
+                        if (log.isDebugEnabled()) {
+                            log.debug("Endpoint : " + endpointName + " is marked as TIMEOUT and " +
+                                "will be retried : " + (retries-1) + " more time/s after : " +
+                                new Date(nextRetry) + " until its marked SUSPENDED for failure");
+                        }
+                    }
+                    break;
+                }
+                case ST_SUSPENDED : {
+                    computeNextRetryTimeForSuspended();
+                    break;
+                }
+                case ST_OFF: {
+                    // mark as in maintenence, and reset all other information
+                    setAndReplicateState(REMAINING_RETRIES_KEY,
+                        definition == null ? -1 : definition.getRetriesOnTimeoutBeforeSuspend());
+                    setAndReplicateState(LAST_SUSPEND_DURATION_KEY, null);
+                    break;
+                }
             }
 
-            // gets the value from configuration context (The shared state across all instances )
-            Object value = this.configCtx.getPropertyNonReplicable(this.activePropertyKey);
-            if (value == null) {
+        } else {
+
+            localState = state;
+            switch (state) {
+                case ST_ACTIVE: {
+                    localRemainingRetries = definition.getRetriesOnTimeoutBeforeSuspend();
+                    localLastSuspendDuration = -1;
+                    break;
+                }
+                case ST_TIMEOUT : {
+                    int retries = localRemainingRetries;
+                    if (retries == -1) {
+                        retries = definition.getRetriesOnTimeoutBeforeSuspend();
+                    }
+
+                    if (retries <= 0) {
+                        log.info("Endpoint : " + endpointName + " has been marked for SUSPENSION, " +
+                                "but no further retries remain. Thus it will be SUSPENDED.");
+
+                        setState(ST_SUSPENDED);
+
+                    } else {
+                        localRemainingRetries = retries -1;
+                        localNextRetryTime =
+                            System.currentTimeMillis() + definition.getRetryDurationOnTimeout();
+
+                        if (log.isDebugEnabled()) {
+                            log.debug("Endpoint : " + endpointName + " is marked as TIMEOUT and " +
+                                "will be retried : " + localRemainingRetries + " more time/s after : " +
+                                new Date(localNextRetryTime) + " until its marked SUSPENDED for failure");
+                        }
+                    }
+                    break;
+                }
+                case ST_SUSPENDED : {
+                    computeNextRetryTimeForSuspended();
+                    break;
+                }
+                case ST_OFF: {
+                    // mark as in maintenence, and reset all other information
+                    localRemainingRetries = definition == null ?
+                        -1 : definition.getRetriesOnTimeoutBeforeSuspend();
+                    localLastSuspendDuration = -1;
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Endpoint has processed a message successfully
+     */
+    public void onSuccess() {
+        if (isClustered) {
+            Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
+            if (state != ST_ACTIVE && state != ST_OFF) {
+                setState(ST_ACTIVE);
+            }
+        } else {
+            if (localState != ST_ACTIVE && localState != ST_OFF) {
+                log.info("Endpoint : " + endpointName + " currently " + getStateAsString() +
+                    " will now be marked active since it processed its last message");
+                setState(ST_ACTIVE);
+            }
+        }
+    }
+
+    /**
+     *  Endpoint failed processing a message
+     */
+    public void onFault() {
+        log.warn("Endpoint : " + endpointName + " will be marked SUSPENDED as it failed");
+        setState(ST_SUSPENDED);
+    }
+
+    /**
+     *  Endpoint timeout processing a message
+     */
+    public void onTimeout() {
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint : " + endpointName + " will be marked for " +
+                    "SUSPENSION due to the occurrence of one of the configured errors");
+        }
+        setState(ST_TIMEOUT);
+    }
+
+    /**
+     * Compute the suspension duration according to the geometric series parameters defined
+     */
+    private void computeNextRetryTimeForSuspended() {
+        boolean notYetSuspended = true;
+        long lastSuspendDuration = definition.getInitialSuspendDuration();
+        if (isClustered) {
+            Long lastDuration = (Long) cfgCtx.getPropertyNonReplicable(LAST_SUSPEND_DURATION_KEY);
+            if (lastDuration != null) {
+                lastSuspendDuration = lastDuration;
+                notYetSuspended = false;
+            }
+        } else if (localLastSuspendDuration > 0) {
+            lastSuspendDuration = localLastSuspendDuration;
+            notYetSuspended = false;
+        }
+
+        long nextSuspendDuration = (notYetSuspended ?
+            definition.getInitialSuspendDuration() :
+            (long) (lastSuspendDuration * definition.getSuspendProgressionFactor()));
+
+        if (nextSuspendDuration > definition.getSuspendMaximumDuration()) {
+            nextSuspendDuration = definition.getSuspendMaximumDuration();
+        } else if (nextSuspendDuration < 0) {
+            nextSuspendDuration = SynapseConstants.DEFAULT_ENDPOINT_SUSPEND_TIME;
+        }
+
+        long nextRetryTime = System.currentTimeMillis() + nextSuspendDuration;
+
+        if (isClustered) {
+            setAndReplicateState(LAST_SUSPEND_DURATION_KEY, nextSuspendDuration);
+            setAndReplicateState(NEXT_RETRY_TIME_KEY, nextRetryTime);
+        } else {
+            localLastSuspendDuration = nextSuspendDuration;
+            localNextRetryTime = nextRetryTime;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Suspending endpoint : " + endpointName +
+                (notYetSuspended ? " -" :
+                    " - last suspend duration was : " + lastSuspendDuration + "ms and") +
+                " current suspend duration is : " + nextSuspendDuration + "ms - " +
+                "Next retry after : " + new Date(nextRetryTime));
+        }
+    }
+
+    /**
+     * Checks if the endpoint is in the state ST_ACTIVE. In a clustered environment, the non
+     * availability of a clustered STATE_KEY implies that this endpoint is active
+     *
+     * @return Returns true if the endpoint should be considered as active
+     */
+    public boolean readyToSend() {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Checking if endpoint : " + endpointName + " currently at state " +
+                getStateAsString() + " can be used now?");
+        }
+
+        if (isClustered) {
+            
+            // gets the value from configuration context (The shared state across all instances)
+            Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
+            Integer remainingRetries = (Integer) cfgCtx.getPropertyNonReplicable(REMAINING_RETRIES_KEY);
+            Long nextRetryTime = (Long) cfgCtx.getPropertyNonReplicable(NEXT_RETRY_TIME_KEY);
+
+            if (state == null) {
+                // state has not yet been replicated.. first replication occurs on first timeout or fault
+                return true;
+
+            } else {
+                if (state == ST_ACTIVE) {
+                    return true;
+
+                } else if (state == ST_OFF) {
+                    return false;
+
+                } else if (System.currentTimeMillis() > nextRetryTime) {
+                    // if we are not active, but reached the next retry time, return true but do not
+                    // make a state change. We will make the state change on a successful send
+                    // if we are in the ST_TIMEOUT state, reduce a remaining retry
+                    if (state == ST_TIMEOUT) {
+                        remainingRetries--;
+                        setAndReplicateState(REMAINING_RETRIES_KEY, remainingRetries);
+
+                        if (log.isDebugEnabled()) {
+                            log.debug("Endpoint : " + endpointName + " currently in timeout state" +
+                                " is ready to retry. Remaining retries before suspension : " + remainingRetries);
+                        }
+                        
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Endpoint : " + endpointName + " currently SUSPENDED," +
+                                " is ready to retry now");
+                        }
+                    }
+                    return true;
+                }
+            }
+
+        } else {
+
+            if (localState == ST_ACTIVE) {
+                return true;
+
+            } else if (localState == ST_OFF) {
+                return false;
+
+            } else if (System.currentTimeMillis() > localNextRetryTime) {
+
+                // if we are not active, but reached the next retry time, return true but do not
+                // make a state change. We will make the state change on a successful send
+                // if we are in the ST_TIMEOUT state, reduce a remaining retry
+                if (localState == ST_TIMEOUT) {
+                    localRemainingRetries--;
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Endpoint : " + endpointName + " currently in timeout state" +
+                            " is ready to retry. Remaining retries before suspension : " + localRemainingRetries);
+                    }
+
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Endpoint : " + endpointName + " currently SUSPENDED," +
+                            " is ready to retry now");
+                    }
+                }
                 return true;
             }
-            if (value instanceof Boolean) {
-                return ((Boolean) value).booleanValue();
-            } else if (value instanceof String) {
-                return Boolean.parseBoolean((String) value);
-            } else {
-                handleException("Unsupported object type for value" + value);
-            }
-
-        } else {
-            return active;
         }
 
-        throw new SynapseException("Invalid states in endpoint context");
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint : " + endpointName + " not ready and is currently : " +
+                getStateAsString() + " Next retry will be after : " + new Date(localNextRetryTime));
+        }
 
+        return false;
     }
 
     /**
-     * Sets if endpoint active or not.
-     *
-     * @param active True for make endpoint active , false for make it inactive
+     * Manually turn off this endpoint (e.g. for maintenence)
      */
-    public synchronized void setActive(boolean active) {
-
-        if (this.isClusteringEnable) {  // if this is a clustering env.
-            // replicates the state so that all instances across cluster can see this state
-            Replicator.setAndReplicateState(this.activePropertyKey, active, configCtx);
-        } else {
-            this.active = active;
-        }
-
+    public void switchOff() {
+        log.info("Manually switching off endpoint : " + endpointName);
+        setState(ST_OFF);
     }
 
     /**
-     * Time to recover a failed endpoint.
-     *
-     * @return Returns time to recover a failed endpoint.
+     * Activate this endpoint manually (i.e. from an automatic suspend or manual switch off)
      */
-    public long getRecoverOn() {
+    public void switchOn() {
+        log.info("Manually activating endpoint : " + endpointName);
+        setState(ST_ACTIVE);
+    }
 
-        if (this.isClusteringEnable) {    // if this is a clustering env.
+    public boolean isState(int s) {
+        if (isClustered) {
+            Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
+            // state has not yet been replicated.. first replication occurs on first timeout or fault
+            return state == null || state == s;
+        } else {
+            return localState == s;
+        }
+    }
 
-            if (this.recoverOnPropertyKey == null || "".equals(this.recoverOnPropertyKey)) {
-                handleException("Cannot find the required key to find the " +
-                        "shared state of 'recoveOn' attribute");
+
+    /**
+     * Private method to return the current state as a loggable string
+     * @return the current state as a string
+     */
+    private String getStateAsString() {
+        Integer state = localState;
+        if (isClustered) {
+            state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
+            if (state == null) {
+                return "ACTIVE";
             }
+        }
+        switch (state) {
+            case ST_ACTIVE : return "ACTIVE";
+            case ST_TIMEOUT : return "TIMEOUT";
+            case ST_SUSPENDED : return "SUSPENDED";
+            case ST_OFF: return "MAINTNENCE";
+            default: return "UNKNOWN";
+        }
+    }
 
-            // gets the value from configuration context (The shared state across all instances )
-            Object value = this.configCtx.getPropertyNonReplicable(this.recoverOnPropertyKey);
-            if (value == null) {
-                return Long.MAX_VALUE;
-            }
-            if (value instanceof Long) {
-                return ((Long) value).longValue();
-            } else if (value instanceof String) {
-                try {
-                    return Long.parseLong((String) value);
-                } catch (NumberFormatException e) {
-                    return Long.MAX_VALUE;
+    /**
+     * Helper method to replicates states of the property with given key
+     * replicates  the given state so that all instances across cluster can see this state
+     *
+     * @param key   The key of the property
+     * @param value The value of the property
+     */
+    private void setAndReplicateState(String key, Object value) {
+
+        if (cfgCtx != null && key != null && value != null) {
+
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Replicating property key : " + key + " as : " + value);
                 }
-            } else {
-                handleException("Unsupported object type for value" + value);
+                cfgCtx.setProperty(key, value);
+                Replicator.replicate(cfgCtx, new String[]{key});
+
+            } catch (ClusteringFault clusteringFault) {
+                handleException("Error replicating property : " + key + " as : " +
+                    value, clusteringFault);
             }
-
-        } else {
-            return recoverOn;
         }
-        throw new SynapseException("Invalid states in endpoint context");
-    }
-
-    /**
-     * Sets time to recover a failed endpoint.
-     *
-     * @param recoverOn The value for recover time
-     */
-    public void setRecoverOn(long recoverOn) {
-
-        if (this.isClusteringEnable) { // if this is a clustering env.
-            // replicates the state so that all instances across cluster can see this state
-            Replicator.setAndReplicateState(this.recoverOnPropertyKey, recoverOn, configCtx);
-        } else {
-            this.recoverOn = recoverOn;
-        }
-    }
-
-    /**
-     * Get the configuration context instance . This is only available for cluster env.
-     *
-     * @return Returns the ConfigurationContext instance
-     */
-    public ConfigurationContext getConfigurationContext() {
-        return configCtx;
-    }
-
-    /**
-     * Sets the  ConfigurationContext instance . This is only used for cluster env.
-     * By setting this , indicates that this is a cluster env.
-     *
-     * @param configCtx The ConfigurationContext instance
-     */
-    public void setConfigurationContext(ConfigurationContext configCtx) {
-
-        if (configCtx == null) {
-            handleException("The ConfigurationContext cannot be null" +
-                    " when system in a cluster environment");
-        }
-
-        this.configCtx = configCtx;
-        this.isClusteringEnable = true; // Now, the environment is considered as a cluster
-    }
-
-    /**
-     * Sets the identifier for this endpoint context , so that , this can be identified
-     * uniquely across the cluster. The id will be the name of the endpoint
-     *
-     * @param contextID The Id for this endpoint context
-     */
-    public void setContextID(String contextID) {
-
-        if (contextID == null || "".equals(contextID)) {
-            handleException("The Context ID cannot be null when system in a cluster environment");
-        }
-
-        //Making required key for each property in the endpoint context - Those will be used when
-        //replicating states
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(contextID);
-        buffer.append(UNDERSCORE_STRING);
-        String prefix = buffer.toString();
-
-        this.recoverOnPropertyKey = prefix + RECOVER_ON;
-        this.activePropertyKey = prefix + ACTIVE;
-
     }
 
     /**
@@ -226,5 +467,16 @@ public class EndpointContext {
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    /**
+     * Helper methods for handle errors.
+     *
+     * @param msg The error message
+     * @param e   The exception
+     */
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

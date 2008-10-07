@@ -71,26 +71,33 @@ public abstract class FaultHandler {
         boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
 
-        synCtx.setProperty(SynapseConstants.ERROR_CODE, "00000");
-        // use only the first line as the message for multiline exception messages (Axis2 has these)
-        synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
-
-        synCtx.setProperty(SynapseConstants.ERROR_DETAIL, getStackTrace(e));
-        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, e);
+        if (e != null && synCtx.getProperty(SynapseConstants.ERROR_CODE) == null) {
+            synCtx.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.DEFAULT_ERROR);
+            // use only the first line as the message for multiline exception messages (Axis2 has these)
+            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
+            synCtx.setProperty(SynapseConstants.ERROR_DETAIL, getStackTrace(e));
+            synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, e);
+        }
 
         if (traceOrDebugOn) {
-            traceOrDebugWarn(traceOn, "Fault handler - setting ERROR_MESSAGE : " +
+            traceOrDebugWarn(traceOn, "ERROR_CODE : " +
+                synCtx.getProperty(SynapseConstants.ERROR_CODE));
+            traceOrDebugWarn(traceOn, "ERROR_MESSAGE : " +
                 synCtx.getProperty(SynapseConstants.ERROR_MESSAGE));
-            traceOrDebugWarn(traceOn, "Fault handler - setting ERROR_DETAIL : " +
+            traceOrDebugWarn(traceOn, "ERROR_DETAIL : " +
                 synCtx.getProperty(SynapseConstants.ERROR_DETAIL));
-            traceOrDebugWarn(traceOn, "Fault handler - setting ERROR_EXCEPTION : " +
+            traceOrDebugWarn(traceOn, "ERROR_EXCEPTION : " +
                 synCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
         }
 
-        synCtx.getServiceLog().warn("Fault handler - setting ERROR_MESSAGE : " +
+        synCtx.getServiceLog().warn("ERROR_CODE : " +
+            synCtx.getProperty(SynapseConstants.ERROR_CODE) + " ERROR_MESSAGE : " + 
             synCtx.getProperty(SynapseConstants.ERROR_MESSAGE));
 
         try {
+            if (traceOrDebugOn) {
+                traceOrDebugWarn(traceOn, "FaultHandler : " + this);
+            }
             onFault(synCtx);
 
         } catch (SynapseException se) {

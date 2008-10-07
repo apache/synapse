@@ -25,6 +25,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.endpoints.dispatch.SALSessions;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -81,7 +82,10 @@ public class TimeoutHandler extends TimerTask {
         }
     }
 
-    private void processCallbacks() {
+    private void processCallbacks() {       
+        
+        //clear all the expired sessions
+        SALSessions.getInstance().clearSessions();
 
         // checks if callback store contains at least one entry before proceeding. otherwise getting
         // the time for doing nothing would be a inefficient task.
@@ -112,7 +116,7 @@ public class TimeoutHandler extends TimerTask {
 
                                 // add an error code to the message context, so that error sequences
                                 // can identify the cause of error
-                                msgContext.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.TIME_OUT);
+                                msgContext.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.HANDLER_TIME_OUT);
                                 msgContext.setProperty(SynapseConstants.ERROR_MESSAGE, "Send timeout");
 
                                 Stack faultStack = msgContext.getFaultStack();

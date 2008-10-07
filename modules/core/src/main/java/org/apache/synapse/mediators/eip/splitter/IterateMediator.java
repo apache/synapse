@@ -25,11 +25,14 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.mediators.eip.Target;
@@ -263,6 +266,20 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
     public void destroy() {
         if (target.getSequence() != null) {
             target.getSequence().destroy();
+        }
+    }
+
+    public void init(ConfigurationContext cc) {
+
+        if (target != null) {
+            Endpoint endpoint = target.getEndpoint();
+            if (endpoint != null) {
+                endpoint.init(cc);
+            }
+            SequenceMediator seq = target.getSequence();
+            if (seq != null) {
+                seq.init(cc);
+            }
         }
     }
 }

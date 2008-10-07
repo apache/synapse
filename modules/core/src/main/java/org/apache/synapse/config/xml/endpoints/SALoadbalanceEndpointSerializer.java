@@ -57,23 +57,26 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
         }
 
         Dispatcher dispatcher = loadbalanceEndpoint.getDispatcher();
+        if (dispatcher != null) {
 
-        if (dispatcher instanceof SoapSessionDispatcher) {
-            OMElement sessionElement
-                    = fac.createOMElement("session", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            sessionElement.addAttribute("type", "soap", null);
-            endpointElement.addChild(sessionElement);
+            OMElement sessionElement = fac.createOMElement("session", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            if (dispatcher instanceof SoapSessionDispatcher) {
+                sessionElement.addAttribute("type", "soap", null);
+            } else if (dispatcher instanceof HttpSessionDispatcher) {
+                sessionElement.addAttribute("type", "http", null);
+            } else if (dispatcher instanceof SimpleClientSessionDispatcher) {
+                sessionElement.addAttribute("type", "simpleClientSession", null);
+            } else {
+                handleException("invalid session dispatcher : " + dispatcher.getClass().getName());
+            }
 
-        } else if (dispatcher instanceof HttpSessionDispatcher) {
-            OMElement sessionElement
-                    = fac.createOMElement("session", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            sessionElement.addAttribute("type", "http", null);
-            endpointElement.addChild(sessionElement);
-
-        } else if (dispatcher instanceof SimpleClientSessionDispatcher) {
-            OMElement sessionElement
-                    = fac.createOMElement("session", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            sessionElement.addAttribute("type", "simpleClientSession", null);
+            long sessionTimeout = loadbalanceEndpoint.getSessionTimeout();
+            if (sessionTimeout != -1) {
+                OMElement sessionTimeoutElement = fac.createOMElement("sessionTimeout",
+                        SynapseConstants.SYNAPSE_OMNAMESPACE);
+                sessionTimeoutElement.setText(String.valueOf(sessionTimeout));
+                sessionElement.addChild(sessionTimeoutElement);
+            }
             endpointElement.addChild(sessionElement);
         }
 
@@ -88,7 +91,7 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
         }
         loadbalanceElement.addAttribute("algorithm", algorithmName, null);
 
-        for (Endpoint childEndpoint : loadbalanceEndpoint.getEndpoints()) {
+        for (Endpoint childEndpoint : loadbalanceEndpoint.getChildren()) {
             loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
         }
 

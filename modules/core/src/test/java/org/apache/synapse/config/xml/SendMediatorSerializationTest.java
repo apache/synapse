@@ -72,12 +72,12 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
         AddressEndpoint ep2 = (AddressEndpoint) send2.getEndpoint();
 
         assertEquals("Address URI is not serialized properly",
-                ep1.getEndpoint().getAddress(), ep2.getEndpoint().getAddress());
+                ep1.getDefinition().getAddress(), ep2.getDefinition().getAddress());
 
         assertEquals(
                 "Addressing information is not serialized properly",
-                ep1.getEndpoint().isAddressingOn(),
-                ep2.getEndpoint().isAddressingOn());
+                ep1.getDefinition().isAddressingOn(),
+                ep2.getDefinition().isAddressingOn());
     }
 
     public void testWSDLEndpointSerialization() {
@@ -113,8 +113,8 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         assertEquals(
                 "Addressing information is not serialized properly",
-                ep1.getEndpoint().isAddressingOn(),
-                ep2.getEndpoint().isAddressingOn());
+                ep1.getDefinition().isAddressingOn(),
+                ep2.getDefinition().isAddressingOn());
     }
 
     public void testSimpleLoadbalanceSendSerialization() {
@@ -151,7 +151,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 send2.getEndpoint() instanceof LoadbalanceEndpoint);
 
         LoadbalanceEndpoint endpoint = (LoadbalanceEndpoint) send2.getEndpoint();
-        List addresses = endpoint.getEndpoints();
+        List addresses = endpoint.getChildren();
         assertEquals("There should be 3 leaf level address endpoints", addresses.size(), 3);
 
         assertTrue("Leaf level endpoints should be address endpoints",
@@ -163,7 +163,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/services/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
+                "http://localhost:9001/services/Service1".equals(addressEndpoint.getDefinition().getAddress()));
     }
 
     public void testSimpleFailoverSendSerialization() {
@@ -200,7 +200,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 send2.getEndpoint() instanceof FailoverEndpoint);
 
         FailoverEndpoint endpoint = (FailoverEndpoint) send2.getEndpoint();
-        List addresses = endpoint.getEndpoints();
+        List addresses = endpoint.getChildren();
         assertEquals("There should be 3 leaf level address endpoints", addresses.size(), 3);
 
         assertTrue("Leaf level endpoints should be address endpoints",
@@ -212,7 +212,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/services/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
+                "http://localhost:9001/services/Service1".equals(addressEndpoint.getDefinition().getAddress()));
     }
 
     public void testNestedLoadbalanceFailoverSendSerialization() {
@@ -254,7 +254,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         LoadbalanceEndpoint loadbalanceEndpoint = (LoadbalanceEndpoint) send2.getEndpoint();
 
-        List children = loadbalanceEndpoint.getEndpoints();
+        List children = loadbalanceEndpoint.getChildren();
         assertEquals("Top level endpoint should have 2 child endpoints.", children.size(), 2);
 
         assertTrue("First child should be a address endpoint",
@@ -264,7 +264,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 children.get(1) instanceof FailoverEndpoint);
 
         FailoverEndpoint failoverEndpoint = (FailoverEndpoint) children.get(1);
-        List children2 = failoverEndpoint.getEndpoints();
+        List children2 = failoverEndpoint.getChildren();
 
         assertEquals("Fail over endpoint should have 2 children.", children2.size(), 2);
         assertTrue("Children of the fail over endpoint should be address endpoints.",

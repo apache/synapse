@@ -57,76 +57,6 @@ public class SendMediator extends AbstractMediator {
             synLog.traceTrace("Message : " + synCtx.getEnvelope());
         }
 
-        if (synCtx.isResponse()) {
-
-            Axis2MessageContext axis2MsgCtx = (Axis2MessageContext) synCtx;
-            OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
-
-            boolean isClusteringEnable = false;
-
-            // get Axis2 MessageContext and ConfigurationContext
-            org.apache.axis2.context.MessageContext axisMC =
-                    axis2MsgCtx.getAxis2MessageContext();
-            ConfigurationContext cc = axisMC.getConfigurationContext();
-
-            //The heck for clustering environment
-
-            ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
-            if (clusterManager != null &&
-                    clusterManager.getContextManager() != null) {
-                isClusteringEnable = true;
-            }
-
-            if (isClusteringEnable) {
-                // if this is a clustering env.
-                // Only keeps endpoint names , because , it is heavy task to
-                // replicate endpoint itself
-                Object epNames = opCtx.getPropertyNonReplicable(SALoadbalanceEndpoint.ENDPOINT_NAME_LIST);
-                if (epNames != null && epNames instanceof List) {
-
-                    List epNameList = (List) epNames;
-                    Object obj = epNameList.remove(0);
-                    if (obj != null && obj instanceof String) {
-                        Object rootEPObj = opCtx.getPropertyNonReplicable(
-                                SALoadbalanceEndpoint.ROOT_ENDPOINT);
-
-                        if (rootEPObj != null && rootEPObj instanceof Endpoint) {
-                            String name = ((Endpoint) rootEPObj).getName();
-
-                            if (name != null && name.equals(obj)) {
-                                Endpoint rootEP = ((Endpoint) rootEPObj);
-
-                                if (rootEP instanceof SALoadbalanceEndpoint) {
-                                    SALoadbalanceEndpoint salEP = (SALoadbalanceEndpoint) rootEP;
-                                    salEP.updateSession(synCtx, epNameList,
-                                            isClusteringEnable);
-                                }
-                            }
-                        }
-
-                    }
-                    opCtx.setProperty(SALoadbalanceEndpoint.ENDPOINT_NAME_LIST, epNames);
-                }
-
-            } else {
-                Object o = opCtx.getProperty(SALoadbalanceEndpoint.ENDPOINT_LIST);
-                if (o != null && o instanceof List) {
-                    // we are in the response of the first message of a server initiated session
-                    // so update all session maps
-                    List epList = (List) o;
-                    Object e = epList.remove(0);
-
-                    if (e != null) {
-                        if (e instanceof SALoadbalanceEndpoint) {
-                            SALoadbalanceEndpoint salEP = (SALoadbalanceEndpoint) e;
-                            salEP.updateSession(synCtx, epList, isClusteringEnable);
-                        }
-                    }
-                }
-            }
-
-        }
-
         // if no endpoints are defined, send where implicitly stated
         if (endpoint == null) {
 
@@ -161,5 +91,12 @@ public class SendMediator extends AbstractMediator {
 
     public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public void init(ConfigurationContext cc) {
+        
+        if (endpoint != null) {
+            endpoint.init(cc);
+        }
     }
 }

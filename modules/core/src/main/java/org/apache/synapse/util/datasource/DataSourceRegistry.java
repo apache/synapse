@@ -19,11 +19,26 @@
 package org.apache.synapse.util.datasource;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Keep all DataSources defined in the Synapse
  */
 public interface DataSourceRegistry {
+
+    /**
+     * Initialization with given properties
+     *
+     * @param properties configuration properties
+     */
+    public void init(Properties properties);
+
+    /**
+     * Explicitly check for init
+     *
+     * @return True , if has already initialized
+     */
+    public boolean isInitialized();
 
     /**
      * Register a DataSource based on given information
@@ -40,5 +55,10 @@ public interface DataSourceRegistry {
      * @return DataSource Instance
      */
     DataSource lookUp(String name);
+
+    /**
+     * Clear already registered datasources
+     */
+    public void clear();
 
 }

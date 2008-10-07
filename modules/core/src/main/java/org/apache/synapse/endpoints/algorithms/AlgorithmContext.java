@@ -18,73 +18,57 @@
 */
 package org.apache.synapse.endpoints.algorithms;
 
+import org.apache.axis2.clustering.ClusteringFault;
+import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.Replicator;
 
 /**
- * Keeps the states of the load balance algorithm.This hides where those states are kept.For a
- * cluster environment ,all states are kept in the axis2 configuration context in order to replicate
- * those states so that other synapse instance in the same cluster can see those changes .
- * This class can be evolved to keep any run time states related to the endpoint .
- * For a non-clustered environment , all data are kept locally.
- * <p/>
- * This class provide the abstraction need to separate the dynamic data from the static data
- * and improve the  high cohesion and provides capability to replicate only required state at
- * a given time. This improves the performance when replicate data.
+ * Keeps the runtime state of the algorithm
  */
 public class AlgorithmContext {
 
     private static final Log log = LogFactory.getLog(AlgorithmContext.class);
 
-    /* The  static constant only for construct key prefix for each property in a dispatcher context
-     * as it is need when those property state going to replicate in a cluster env. */
-    private static final String UNDERSCORE_STRING = "_";
-    private static final String CURRENT_EPR = "currentEPR";
+    private static final String KEY_PREFIX = "synapse.endpoint.lb.algorithm.";
+    private static final String CURRENT_EPR = ".current_epr";
 
-    /* The axis configuration context-  this will hold the all callers states
-     * when doing throttling in a clustered environment. */
-    private ConfigurationContext configCtx;
+    /* The axis2 configuration context - this hold state in a clustered environment. */
+    private ConfigurationContext cfgCtx;
 
-    /* Is this env. support clustering*/
-    private boolean isClusteringEnable = false;
+    /* Are we supporting clustering ? */
+    private Boolean isClusteringEnabled = null;
 
-    /* The key for 'currentEPR' attribute and this is used when this attribute value being
-     * replicated */
-    private String currentEPRPropertyKey;
+    /* The key for 'currentEPR' attribute when replicated in a clsuter */
+    private String CURRENT_EPR_PROP_KEY;
 
     /* The pointer to current epr - The position of the current EPR */
     private int currentEPR = 0;
 
+    public AlgorithmContext(boolean clusteringEnabled, ConfigurationContext cfgCtx, String endpointName) {
+        this.cfgCtx = cfgCtx;
+        if (clusteringEnabled) {
+            isClusteringEnabled = Boolean.TRUE;
+        }
+        CURRENT_EPR_PROP_KEY = KEY_PREFIX + endpointName + CURRENT_EPR;
+    }
+
     /**
-     * To get the  position of the current EPR
-     * If there is no value and if there will not appear any errors , then '0' will be returned.
+     * To get the position of the current EPR for use. Default to 0 - i.e. first endpoint
      *
      * @return The  position of the current EPR
      */
     public int getCurrentEndpointIndex() {
 
-        if (this.isClusteringEnable) {  // if this is a clustering env.
+        if (Boolean.TRUE.equals(isClusteringEnabled)) {
 
-            if (this.currentEPRPropertyKey == null || "".equals(this.currentEPRPropertyKey)) {
-                handleException("Cannot find the required key to find the " +
-                        "shared state of the 'currentEPR' attribute");
-            }
-
-            Object value = this.configCtx.getPropertyNonReplicable(this.currentEPRPropertyKey);
+            Object value = cfgCtx.getPropertyNonReplicable(this.CURRENT_EPR_PROP_KEY);
             if (value == null) {
                 return 0;
-            }
-            try {
-                if (value instanceof Integer) {
-                    return (Integer) value;
-                } else if (value instanceof String) {
-                    return Integer.parseInt((String) value);
-                }
-            } catch (NumberFormatException e) {
-                handleException("The invalid value for the 'currentEPR' attribute");
+            } else if (value instanceof Integer) {
+                return ((Integer) value);
             }
         } else {
             return currentEPR;
@@ -97,21 +81,18 @@ public class AlgorithmContext {
      *
      * @param currentEPR The current position
      */
-    public void setCurrentEndpointIndex(int currentEPR) {
+    public void setCurrentEPR(int currentEPR) {
 
-        if (isClusteringEnable) {  // if this is a clustering env.
+        if (Boolean.TRUE.equals(isClusteringEnabled)) {
 
-            if (currentEPRPropertyKey != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Setting the current EPR " + currentEPR
-                            + " with the key " + currentEPRPropertyKey);
-                }
-                // Sets the property and  replicates the current state  so that all instances
-                Replicator.setAndReplicateState(currentEPRPropertyKey, currentEPR, configCtx);
+            if (log.isDebugEnabled()) {
+                log.debug("Set EPR with key : " + CURRENT_EPR_PROP_KEY + " as : " + currentEPR);
             }
+            setAndReplicateState(CURRENT_EPR_PROP_KEY, currentEPR);
+
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("Setting the current EPR " + currentEPR);
+                log.debug("Setting the current EPR as : " + currentEPR);
             }
             this.currentEPR = currentEPR;
         }
@@ -123,55 +104,54 @@ public class AlgorithmContext {
      * @return Returns the ConfigurationContext instance
      */
     public ConfigurationContext getConfigurationContext() {
-        return configCtx;
+        return cfgCtx;
     }
-
-    /**
-     * Sets the  ConfigurationContext instance . This is only used for cluster env.
-     * By setting this , indicates that this is a cluster env.
-     *
-     * @param configCtx The ConfigurationContext instance
-     */
-    public void setConfigurationContext(ConfigurationContext configCtx) {
-
-        if (configCtx == null) {
-            handleException("The ConfigurationContext cannot be null when system " +
-                    "in a cluster environment");
-        }
-
-        this.configCtx = configCtx;
-        this.isClusteringEnable = true; // Now, the environment is considered as a cluster
-    }
-
-    /**
-     * Sets the identifier for this algorithm context , so that , this can be identified
-     * uniquely across the cluster. The id will be the name of the endpoint
-     *
-     * @param contextID The Id for this algorithm context
-     */
-    public void setContextID(String contextID) {
-
-        if (contextID == null || "".equals(contextID)) {
-            handleException("The Context ID cannot be null when system in a cluster environment");
-        }
-
-        //Making required key for each property in the algorithm context- Those will be used when
-        //replicating states
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(contextID);
-        buffer.append(UNDERSCORE_STRING);
-        buffer.append(CURRENT_EPR);
-        currentEPRPropertyKey = buffer.toString();
-    }
-
 
     /**
      * Helper methods for handle errors.
      *
      * @param msg The error message
      */
-    private void handleException(String msg) {
+    protected void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }
+
+    /**
+     * Helper methods for handle errors.
+     *
+     * @param msg The error message
+     * @param e   The exception
+     */
+    protected void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
+    /**
+     * Helper method to replicates states of the property with given key
+     * Sets property and  replicates the current state  so that all instances
+     * across cluster can see this state
+     *
+     * @param key   The key of the property
+     * @param value The value of the property
+     */
+    private void setAndReplicateState(String key, Object value) {
+
+        if (cfgCtx != null && key != null && value != null) {
+
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Replicating property key : " + key + " as : " + value);
+                }
+                cfgCtx.setProperty(key, value);
+                Replicator.replicate(cfgCtx, new String[]{key});
+
+            } catch (ClusteringFault clusteringFault) {
+                handleException("Error replicating property : " + key + " as : " +
+                    value, clusteringFault);
+            }
+        }
+    }
+
 }

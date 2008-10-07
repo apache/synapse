@@ -17,19 +17,24 @@
  *  under the License.
  */
 
-package org.apache.synapse.endpoints.utils;
+package org.apache.synapse.endpoints;
 
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.audit.AuditConfigurable;
+import org.apache.synapse.audit.AuditConfiguration;
+
+import java.util.List;
+import java.util.ArrayList;
 
 
 /**
- * Endpoint definition contains the information about an web services endpoint. It is used by leaf
- * level endpoints to keep these information (e.g. AddressEndpoint and WSDLEndpoint). An
- * EndpointDefinition object is used by only one endpoint and they cannot be looked up in the
- * registry.
+ * An Endpoint definition contains the information about an endpoint. It is used by leaf
+ * level endpoints to store this information (e.g. AddressEndpoint and WSDLEndpoint).
  */
-public class EndpointDefinition {
+public class EndpointDefinition implements AuditConfigurable {
 
+    /** Who is the leaf level Endpoint which uses me? */
+    private Endpoint leafEndpoint = null;
     /**
      * The simple address this endpoint resolves to - if explicitly specified
      */
@@ -98,15 +103,15 @@ public class EndpointDefinition {
      * Endpoint message format. pox/soap11/soap12
      */
     private String format = null;
-    
+
     /**
      * The charset encoding for messages sent to the endpoint.
      */
     private String charSetEncoding;
-    
+
     /**
-     * timeout duration for waiting for a response. if the user has set some timeout action and
-     * the timeout duration is not set, default is set to 0 seconds. note that if the user has
+     * timeout duration for waiting for a response in ms. if the user has set some timeout action
+     * and the timeout duration is not set, default is set to 0. note that if the user has
      * not set any timeout configuration, default timeout action is set to NONE, which won't do
      * anything for timeouts.
      */
@@ -117,13 +122,23 @@ public class EndpointDefinition {
      */
     private int timeoutAction = SynapseConstants.NONE;
 
-    /**
-     * Leaf level endpoints will be suspended for the specified time by this variable, after a
-     * failure. If this is not explicitly set, it is set to -1, which causes endpoints to
-     * suspended forever.
-     */
-    private long suspendOnFailDuration = -1;
-   
+    /** The initial suspend duration when an endpoint is marked inactive */
+    private long initialSuspendDuration = -1;
+    /** The suspend duration ratio for the next duration - this is the geometric series multipler */
+    private float suspendProgressionFactor = 1;
+    /** This is the maximum duration for which a node will be suspended */
+    private long suspendMaximumDuration = Long.MAX_VALUE;
+    /** A list of error codes, which directly puts an endpoint into suspend mode */
+    private final List<Integer> suspendErrorCodes = new ArrayList<Integer>();
+
+    /** No of retries to attempt on timeout, before an endpoint is makred inactive */
+    private int retriesOnTimeoutBeforeSuspend = 0;
+    /** The delay between retries for a timeout out endpoint */
+    private int retryDurationOnTimeout = 0;
+    /** A list of error codes which puts the endpoint into timeout mode */
+    private final List<Integer> timeoutErrorCodes = new ArrayList<Integer>();
+
+    private AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.ANONYMOUS_ENDPOINT);
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
@@ -357,7 +372,7 @@ public class EndpointDefinition {
 
     /**
      * Set the timeout duration.
-     * 
+     *
      * @param timeoutDuration a duration in milliseconds
      */
     public void setTimeoutDuration(long timeoutDuration) {
@@ -391,8 +406,8 @@ public class EndpointDefinition {
 
     /**
      * Set the charset encoding for messages sent to the endpoint.
-     * 
-     * @param charSetEncoding the charset encoding or <code>null</code> 
+     *
+     * @param charSetEncoding the charset encoding or <code>null</code>
      */
     public void setCharSetEncoding(String charSetEncoding) {
         this.charSetEncoding = charSetEncoding;
@@ -403,18 +418,18 @@ public class EndpointDefinition {
      *
      * @return suspendOnFailDuration
      */
-    public long getSuspendOnFailDuration() {
-        return suspendOnFailDuration;
+    public long getInitialSuspendDuration() {
+        return initialSuspendDuration;
     }
 
     /**
      * Set the suspend on fail duration.
      *
-     * @param suspendOnFailDuration a duration in milliseconds
+     * @param initialSuspendDuration a duration in milliseconds
      */
-    public void setSuspendOnFailDuration(long suspendOnFailDuration) {
-        this.suspendOnFailDuration = suspendOnFailDuration;
-    }   
+    public void setInitialSuspendDuration(long initialSuspendDuration) {
+        this.initialSuspendDuration = initialSuspendDuration;
+    }
 
     public int getTraceState() {
         return traceState;
@@ -422,5 +437,86 @@ public class EndpointDefinition {
 
     public void setTraceState(int traceState) {
         this.traceState = traceState;
+    }
+
+    public float getSuspendProgressionFactor() {
+        return suspendProgressionFactor;
+    }
+
+    public void setSuspendProgressionFactor(float suspendProgressionFactor) {
+        this.suspendProgressionFactor = suspendProgressionFactor;
+    }
+
+    public long getSuspendMaximumDuration() {
+        return suspendMaximumDuration;
+    }
+
+    public void setSuspendMaximumDuration(long suspendMaximumDuration) {
+        this.suspendMaximumDuration = suspendMaximumDuration;
+    }
+
+    public int getRetriesOnTimeoutBeforeSuspend() {
+        return retriesOnTimeoutBeforeSuspend;
+    }
+
+    public void setRetriesOnTimeoutBeforeSuspend(int retriesOnTimeoutBeforeSuspend) {
+        this.retriesOnTimeoutBeforeSuspend = retriesOnTimeoutBeforeSuspend;
+    }
+
+    public int getRetryDurationOnTimeout() {
+        return retryDurationOnTimeout;
+    }
+
+    public void setRetryDurationOnTimeout(int retryDurationOnTimeout) {
+        this.retryDurationOnTimeout = retryDurationOnTimeout;
+    }
+
+    public List<Integer> getSuspendErrorCodes() {
+        return suspendErrorCodes;
+    }
+
+    public List<Integer> getTimeoutErrorCodes() {
+        return timeoutErrorCodes;
+    }
+
+    public void addSuspendErrorCode(int code) {
+        suspendErrorCodes.add(code);
+    }
+
+    public void addTimeoutErrorCode(int code) {
+        timeoutErrorCodes.add(code);
+    }
+
+    public String toString() {
+        if (leafEndpoint != null) {
+            return leafEndpoint.toString();
+        } else if (address != null) {
+            return "Address [" + address + "]";
+        }
+        return "[unknown endpoint]";
+    }
+
+    public void setLeafEndpoint(Endpoint leafEndpoint) {
+        this.leafEndpoint = leafEndpoint;
+    }
+
+    public String getAuditId() {
+        return this.auditConfigurable.getAuditId();
+    }
+
+    public void setAuditId(String id) {
+        this.auditConfigurable.setAuditId(id);
+    }
+
+    public boolean isStatisticsEnable() {
+        return this.auditConfigurable.isStatisticsEnable();
+    }
+
+    public void disableStatistics() {
+        this.auditConfigurable.disableStatistics();
+    }
+
+    public void enableStatistics() {
+        this.auditConfigurable.enableStatistics();
     }
 }

@@ -42,6 +42,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -237,8 +238,10 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         // configure the IO reactor on the specified port
         HttpParams params = getServerParameters();
         try {
+            String prefix = (sslContext == null ? "http" : "https") + "-Listener I/O dispatcher";
             ioReactor = new DefaultListeningIOReactor(
-                NHttpConfiguration.getInstance().getServerIOWorkers(), params);
+                NHttpConfiguration.getInstance().getServerIOWorkers(),                
+                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
                 public boolean handle(IOException ioException) {
@@ -331,9 +334,10 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @throws AxisFault on error
      */
     public void stop() throws AxisFault {
-        if (state != BaseConstants.STARTED) return;
+        if (state == BaseConstants.STOPPED) return;
         try {
             ioReactor.shutdown();
+            handler.stop();
             state = BaseConstants.STOPPED;
             for (Object obj : cfgCtx.getAxisConfiguration().getServices().values()) {
                 removeServiceFfromURIMap((AxisService) obj);
@@ -574,6 +578,89 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     public long getBytesSent() {
         if (metrics != null) {
             return metrics.getBytesSent();
+        }
+        return -1;
+    }
+
+    public long getTimeoutsReceiving() {
+        if (metrics != null) {
+            return metrics.getTimeoutsReceiving();
+        }
+        return -1;
+    }
+
+    public long getTimeoutsSending() {
+        if (metrics != null) {
+            return metrics.getTimeoutsSending();
+        }
+        return -1;
+    }
+
+    public long getMinSizeReceived() {
+        if (metrics != null) {
+            return metrics.getMinSizeReceived();
+        }
+        return -1;
+    }
+
+    public long getMaxSizeReceived() {
+        if (metrics != null) {
+            return metrics.getMaxSizeReceived();
+        }
+        return -1;
+    }
+
+    public double getAvgSizeReceived() {
+        if (metrics != null) {
+            return metrics.getAvgSizeReceived();
+        }
+        return -1;
+    }
+
+    public long getMinSizeSent() {
+        if (metrics != null) {
+            return metrics.getMinSizeSent();
+        }
+        return -1;
+    }
+
+    public long getMaxSizeSent() {
+        if (metrics != null) {
+            return metrics.getMaxSizeSent();
+        }
+        return -1;
+    }
+
+    public double getAvgSizeSent() {
+        if (metrics != null) {
+            return metrics.getAvgSizeSent();
+        }
+        return -1;
+    }
+
+    public Map getResponseCodeTable() {
+        if (metrics != null) {
+            return metrics.getResponseCodeTable();
+        }
+        return null;
+    }
+
+    public void resetStatistics() {
+        if (metrics != null) {
+            metrics.reset();
+        }
+    }
+
+    public long getLastResetTime() {
+        if (metrics != null) {
+            return metrics.getLastResetTime();
+        }
+        return -1;
+    }
+
+    public long getMetricsWindow() {
+        if (metrics != null) {
+            return System.currentTimeMillis() - metrics.getLastResetTime();
         }
         return -1;
     }

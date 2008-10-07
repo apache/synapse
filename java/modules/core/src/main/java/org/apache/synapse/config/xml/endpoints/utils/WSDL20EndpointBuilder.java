@@ -19,19 +19,6 @@
 
 package org.apache.synapse.config.xml.endpoints.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.woden.WSDLException;
-import org.apache.woden.WSDLFactory;
-import org.apache.woden.WSDLReader;
-import org.apache.woden.types.NCName;
-import org.apache.woden.wsdl20.Description;
-import org.apache.woden.wsdl20.Endpoint;
-import org.apache.woden.wsdl20.Service;
-
-import javax.xml.namespace.QName;
 import java.net.URI;
 
 /**
@@ -42,7 +29,7 @@ import java.net.URI;
  * documents.
  */
 public class WSDL20EndpointBuilder {
-
+    /* COMMENT DUE TO BUILD FAILURE - TO BE FIXED LATER WHEN WSDL 2.0 SUPPORT IS OFFICIALLY IN
     private static Log log = LogFactory.getLog(WSDL20EndpointBuilder.class);
 
     public EndpointDefinition createEndpointDefinitionFromWSDL(String wsdlURI, String serviceName,
@@ -103,4 +90,5 @@ public class WSDL20EndpointBuilder {
         log.error(msg);
         throw new SynapseException(msg);
     }
+    */
 }

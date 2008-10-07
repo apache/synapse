@@ -61,6 +61,8 @@ public class Axis2HttpRequest {
     private EndpointReference epr = null;
     /** the HttpHost that contains the HTTP connection information */
     private HttpHost httpHost = null;
+    /** The [socket | connect] timeout */
+    private int timeout = -1;
     /** the message context being sent */
     private MessageContext msgContext = null;
     /** The Axis2 MessageFormatter that will ensure proper serialization as per Axis2 semantics */
@@ -70,7 +72,12 @@ public class Axis2HttpRequest {
     private ContentOutputBuffer outputBuffer = null;
     /** ready to begin streaming? */
     private boolean readyToStream = false;
-    /** for request complete checking */
+    /** The sending of this request has fully completed */
+    private boolean sendingCompleted = false;
+    /**
+     * for request complete checking - request complete means the request has been fully sent
+     * and the response it fully received
+     */
     private boolean completed = false;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
@@ -109,6 +116,14 @@ public class Axis2HttpRequest {
 
     public MessageContext getMsgContext() {
         return msgContext;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     /**
@@ -257,10 +272,18 @@ public class Axis2HttpRequest {
                             "SessionRequestCallback handles this exception");
                     }
                 } else {
-                    if (e instanceof AxisFault) {
-                        throw (AxisFault) e;
+                    Integer errorCode = msgContext == null ? null :
+                        (Integer) msgContext.getProperty(NhttpConstants.ERROR_CODE);
+                    if (errorCode == null || errorCode == NhttpConstants.SEND_ABORT) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Remote server aborted request being sent, and responded");
+                        }
                     } else {
-                        handleException("Error streaming message context", e);
+                        if (e instanceof AxisFault) {
+                            throw (AxisFault) e;
+                        } else {
+                            handleException("Error streaming message context", e);
+                        }
                     }
                 }
             }
@@ -271,6 +294,7 @@ public class Axis2HttpRequest {
                 } catch (IOException e) {
                     handleException("Error closing outgoing message stream", e);
                 }
+                setSendingCompleted(true);
             }
         }
     }
@@ -290,5 +314,13 @@ public class Axis2HttpRequest {
         synchronized(this) {
             this.notifyAll();
         }
+    }
+
+    public boolean isSendingCompleted() {
+        return sendingCompleted;
+    }
+
+    public void setSendingCompleted(boolean sendingCompleted) {
+        this.sendingCompleted = sendingCompleted;
     }
 }

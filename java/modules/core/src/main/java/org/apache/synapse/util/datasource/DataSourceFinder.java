@@ -54,8 +54,11 @@ public class DataSourceFinder {
             return result;
         }
 
-        registry = JNDIBasedDataSourceRegistry.getInstance(null);
-        return registry.lookUp(name);
+        registry = JNDIBasedDataSourceRegistry.getInstance();
+        if (registry.isInitialized()) {
+            return registry.lookUp(name);
+        }
+        return null;
     }
 
     /**

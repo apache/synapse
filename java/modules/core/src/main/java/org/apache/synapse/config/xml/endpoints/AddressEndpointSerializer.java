@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
  * Serializes {@link AddressEndpoint} to XML.
@@ -51,7 +51,7 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        EndpointDefinition epAddress = addressEndpoint.getEndpoint();
+        EndpointDefinition epAddress = addressEndpoint.getDefinition();
         OMElement addressElement = serializeEndpointDefinition(epAddress);
         endpointElement.addChild(addressElement);
 

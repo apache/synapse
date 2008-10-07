@@ -73,5 +73,5 @@ public interface ListMediator extends Mediator, ManagedLifecycle {
      * Return the list of mediators of this List mediator instance
      * @return the child/sub mediator list
      */
-    public List getList();
+    public List<Mediator> getList();
 }

@@ -86,8 +86,9 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
      * @param context The AlgorithmContext
      * @return The current member
      */
-    public Member getNextApplicationMember(AlgorithmContext context) {
-        algorithm.setApplicationMembers(lbEventHandler.getMembers());
-        return algorithm.getNextApplicationMember(context);
-    }
+//    TODO FIX-RUWAN
+//    public Member getNextApplicationMember(AlgorithmContext context) {
+//        algorithm.setApplicationMembers(lbEventHandler.getMembers());
+//        return algorithm.getNextApplicationMember(context);
+//    }
 }

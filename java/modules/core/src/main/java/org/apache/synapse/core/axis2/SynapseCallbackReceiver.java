@@ -19,9 +19,7 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFault;
-import org.apache.axiom.soap.SOAPFaultReason;
+import org.apache.axiom.om.OMException;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -42,6 +40,7 @@ import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.ResponseAcceptEncodingProcessor;
 
@@ -157,12 +156,12 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
 
         Endpoint endpoint = (Endpoint) synapseOutMsgCtx.getProperty(
-                SynapseConstants.PROCESSED_ENDPOINT);
+                SynapseConstants.LAST_ENDPOINT);
         if (endpoint instanceof AuditConfigurable) {
             StatisticsReporter.report(synapseOutMsgCtx, (AuditConfigurable) endpoint);
         }
         
-        Object o = response.getProperty(NhttpConstants.SENDING_FAULT);
+        Object o = response.getProperty(SynapseConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
 
             StatisticsReporter.reportFault(synapseOutMsgCtx);
@@ -170,33 +169,28 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
             if (faultStack != null && !faultStack.isEmpty()) {
-                SOAPEnvelope envelope = response.getEnvelope();
-                if (envelope != null) {
-                    SOAPFault fault = envelope.getBody().getFault();
-                    if (fault != null) {
-                        Exception e = fault.getException();
-                        if (e == null) {
-                            SOAPFaultReason reason = fault.getReason();
-                            if (reason != null) {
-                                e = new Exception(reason.getText());
-                            }
-                        }
-                        // set an error code to the message context, so that error sequences can
-                        // filter using that property to determine the cause of error
-                        synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_CODE,
-                            SynapseConstants.SENDING_FAULT);
-                        SOAPFaultReason faultReason = fault.getReason();
-                        if (faultReason != null) {
-                            synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
-                                    faultReason.getText());
-                        }
-                        if (fault.getException() != null) {
-                            synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_EXCEPTION,
-                                    fault.getException());
-                        }
-                        ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
-                    }
-                }
+
+                // if we have access to the full synapseOutMsgCtx.getEnvelope(), then let
+                // it flow with the error details. Else, replace its envelope with the
+                // fault envelope
+                try {
+                    synapseOutMsgCtx.getEnvelope().build();
+                } catch (OMException x) {
+                    synapseOutMsgCtx.setEnvelope(response.getEnvelope());
+                  }
+
+                Exception e = (Exception) response.getProperty(SynapseConstants.ERROR_EXCEPTION);
+
+                synapseOutMsgCtx.setProperty(SynapseConstants.SENDING_FAULT, Boolean.TRUE);
+                synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_CODE,
+                    response.getProperty(SynapseConstants.ERROR_CODE));
+                synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
+                    response.getProperty(SynapseConstants.ERROR_MESSAGE));
+                synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                    response.getProperty(SynapseConstants.ERROR_DETAIL));
+                synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, e);
+
+                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);
             }
 
         } else {
@@ -206,7 +200,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
             if (faultStack !=null && !faultStack.isEmpty()
                 && faultStack.peek() instanceof Endpoint) {
-                faultStack.pop();
+                Endpoint successfulEndpoint = (Endpoint) faultStack.pop();
+                successfulEndpoint.onSuccess();
             }
             if (log.isDebugEnabled()) {
                 log.debug("Synapse received an asynchronous response message");

@@ -75,9 +75,20 @@ public class XMLConfigConstants {
 	/** The statistics value 'disable' */
 	public static final String STATISTICS_DISABLE = "disable";
 
-	public static final String SUSPEND_DURATION_ON_FAILURE = "suspendDurationOnFailure";
+    public static final String SUSPEND_ON_FAILURE = "suspendOnFailure";
+    public static final String SUSPEND_INITIAL_DURATION = "initialDuration";
+    public static final String SUSPEND_PROGRESSION_FACTOR = "progressionFactor";
+    public static final String SUSPEND_MAXIMUM_DURATION = "maximumDuration";
+    public static final String ERROR_CODES = "errorCodes";
+    public static final String MARK_FOR_SUSPENSION = "markForSuspension";
+    public static final String RETRIES_BEFORE_SUSPENSION = "retriesBeforeSuspension";
+    public static final String RETRY_DELAY = "retryDelay";
+
 	public static final String LOADBALANCE_POLICY = "policy";
 	public static final String LOADBALANCE_ALGORITHM = "algorithm";
+
+    //TODO FIX-RUWAN
+    public static final String ALGORITHM_NAME = "policy";
 
     public static final String ONREJECT = "onReject";
 	public static final String ONACCEPT = "onAccept";

@@ -26,7 +26,7 @@ import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 
@@ -82,7 +82,7 @@ public class DefaultEndpointFactory extends EndpointFactory {
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "default"));
         if (defaultElement != null) {
             EndpointDefinition endpoint = createEndpointDefinition(defaultElement);
-            defaultEndpoint.setEndpoint(endpoint);
+            defaultEndpoint.setDefinition(endpoint);
         }
         processAuditStatus(defaultEndpoint, defaultElement);
         return defaultEndpoint;

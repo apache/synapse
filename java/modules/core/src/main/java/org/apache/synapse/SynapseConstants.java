@@ -128,6 +128,8 @@ public final class SynapseConstants {
         public static final String OUT_ONLY = "OUT_ONLY";
 
         //-- error handling --
+        /** An Axis2 message context property indicating a transport send failure */
+        public static final String SENDING_FAULT = "SENDING_FAULT";
         /** The message context property name which holds the error code for the last encountered exception */
         public static final String ERROR_CODE = "ERROR_CODE";
         /** The MC property name which holds the error message for the last encountered exception */
@@ -136,6 +138,8 @@ public final class SynapseConstants {
         public static final String ERROR_DETAIL = "ERROR_DETAIL";
         /** The message context property name which holds the exception (if any) for the last encountered exception */
         public static final String ERROR_EXCEPTION = "ERROR_EXCEPTION";
+        /** The default/generic error code */
+        public static final int DEFAULT_ERROR= 0;
 
         /** Mercury last message property name */
         public static final String MERCURY_LAST_MESSAGE = "MercuryLastMessage";
@@ -143,6 +147,9 @@ public final class SynapseConstants {
         public static final String MERCURY_SEQUENCE_KEY = "MercurySequenceKey";
         /** Mercury WS-RM specification version property name */
         public static final String MERCURY_SPEC_VERSION = "MercuryRMSpecVersion";
+
+    /** An Axis2 message context property that indicates the maximum time to spend on sending the message */
+    public static final String SEND_TIMEOUT = "SEND_TIMEOUT";
 
     //- Axis2 Message Context Properties used by Synapse -
     /** an axis2 message context property set to hold the relates to for POX responses */
@@ -184,6 +191,11 @@ public final class SynapseConstants {
         public static final long DEFAULT_TIMEOUT_HANDLER_INTERVAL = 15000;
 
         /**
+         * The default endpoint suspend duration on failure (i hour)
+         */
+        public static final long DEFAULT_ENDPOINT_SUSPEND_TIME = 60 * 60 * 1000;
+
+        /**
          * This is a system wide interval for handling otherwise non-expiring callbacks to
          * ensure system stability over a period of time 
          */
@@ -213,19 +225,41 @@ public final class SynapseConstants {
         /**
          * Error codes for message sending. We go with closest HTTP fault codes.
          */
-        public static final String TIME_OUT = "504";
-        public static final String SENDING_FAULT = "503";
+        public static final int HANDLER_TIME_OUT = 504;
 
     //- Endpoints processing constants -
     /** Property name to store the last endpoint through which the message has flowed */
-    public static final String PROCESSED_ENDPOINT = "processed_endpoint";
+    public static final String LAST_ENDPOINT = "last_endpoint";
     
     /** A name to use for anonymous endpoints */
     public static final String ANONYMOUS_ENDPOINT = "AnonymousEndpoint";
 
+    /* Constants related to the SAL endpoints */
+
+    public static final String PROP_SAL_ENDPOINT_FIRST_MESSAGE_IN_SESSION
+            = "synapse.sal.first_message_in_session";
+
+    public static final String PROP_SAL_ENDPOINT_ENDPOINT_LIST
+            = "synapse.sal.endpoint.list";
+    
+    public static final String PROP_SAL_CURRENT_SESSION_INFORMATION
+            = "synapse.sal.endpoint.current.sessioninformation";
+
+    public static final String PROP_SAL_ENDPOINT_CURRENT_ENDPOINT_LIST
+            = "synapse.sal.current.endpoint.list";
+
+    public static final String PROP_SAL_ENDPOINT_CURRENT_DISPATCHER
+            = "synape.sal.endpoints.dispatcher";   
+
+    public static final String PROP_SAL_ENDPOINT_DEFAULT_SESSION_TIMEOUT
+            = "synapse.sal.endpoints.sesssion.timeout.default";    
+
+    public static final long SAL_ENDPOINTS_DEFAULT_SESSION_TIMEOUT = 120000;
+    
+
     /** A name to use for anonymous sequences in the sequence stack */
     public static final String ANONYMOUS_SEQUENCE = "AnonymousSequence";
-    
+
     /** Message format values in EndpointDefinition. Used by address, wsdl endpoints */
     public static final String FORMAT_POX = "pox";
     public static final String FORMAT_GET = "get";
@@ -266,5 +300,31 @@ public final class SynapseConstants {
     public static final String TEMP_FILE_PREFIX = "synapse.tempfile.prefix";
     
     public static final String TEMP_FILE_SUFIX = "synapse.tempfile.sufix";
+
+    // Known transport error codes
+    public static final int RCV_IO_ERROR_SENDING     = 101000;
+    public static final int RCV_IO_ERROR_RECEIVING   = 101001;
+
+    public static final int SND_IO_ERROR_SENDING     = 101500;
+    public static final int SND_IO_ERROR_RECEIVING   = 101501;
+
+    public static final int NHTTP_CONNECTION_FAILED  = 101503;
+    public static final int NHTTP_CONNECTION_TIMEOUT = 101504;
+    public static final int NHTTP_CONNECTION_CLOSED  = 101505;
+    public static final int NHTTP_PROTOCOL_VIOLATION = 101506;
+    public static final int NHTTP_CONNECT_CANCEL     = 101507;
+    public static final int NHTTP_CONNECT_TIMEOUT    = 101508;
+
+    // Endpoint failures
+    public static final int ENDPOINT_LB_NONE_READY   = 303000;
+    public static final int ENDPOINT_FO_NONE_READY   = 303000;
+    // Failure on endpoint in the session 
+    public static final int ENDPOINT_SAL_NOT_READY = 309001;
+    public static final int ENDPOINT_SAL_INVALID_PATH = 309002;
+    public static final int ENDPOINT_SAL_FAILED_SESSION = 309003;
+
+    // endpoints, non fatal warnings etc
+    public static final int ENDPOINT_LB_FAIL_OVER    = 303100;
+    public static final int ENDPOINT_FO_FAIL_OVER    = 304100;
 
 }

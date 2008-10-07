@@ -72,12 +72,14 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 			traceOrDebug(traceOn, "invoking : " + mediator.getClass() + ".mediate()");
 		}
 
-        boolean result = false;
+        boolean result;
 
         try {
 			result = mediator.mediate(synCtx);
         } catch (Exception e) {
-            handleException(e.getMessage(), e, synCtx);
+            // throw Synapse Exception for any exception in class meditor
+            // so that the fault handler will be invoked
+            throw new SynapseException("Error occured in the mediation of the class mediator", e);
         }
 
         if (traceOrDebugOn) {

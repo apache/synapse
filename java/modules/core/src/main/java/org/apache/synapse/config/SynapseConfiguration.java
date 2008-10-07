@@ -20,16 +20,27 @@
 package org.apache.synapse.config;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.ListMediator;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.eip.splitter.CloneMediator;
+import org.apache.synapse.mediators.eip.splitter.IterateMediator;
+import org.apache.synapse.mediators.eip.Target;
+import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
+import org.apache.synapse.mediators.filters.SwitchMediator;
+import org.apache.synapse.mediators.builtin.SendMediator;
+import org.apache.synapse.mediators.builtin.CacheMediator;
 import org.apache.synapse.registry.Registry;
 
 import javax.xml.namespace.QName;
@@ -807,7 +818,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public void init(SynapseEnvironment se) {
         
         if (log.isDebugEnabled()) {
-            log.debug("Initializing the Synapse Configuration");
+            log.debug("Initializing the Synapse Configuration using the SynapseEnvironment");
         }
 
         // initialize registry
@@ -838,6 +849,53 @@ public class SynapseConfiguration implements ManagedLifecycle {
             }
         }
     }
+
+    public void init(ConfigurationContext cc) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing the Synapse Configuration using the ConfigurationContext");
+        }
+
+        // Initialize endpoints
+        for (Endpoint e : getDefinedEndpoints().values()) {
+            initEndpoint(e, cc);
+        }
+
+        for (SequenceMediator s : getDefinedSequences().values()) {
+            initEndpointsOfChildren(s, cc);
+        }
+
+        for (ProxyService p : getProxyServices()) {
+            if (p.getTargetInLineEndpoint() != null) {
+                initEndpoint(p.getTargetInLineEndpoint(), cc);
+            }
+
+            if (p.getTargetInLineInSequence() != null) {
+                initEndpointsOfChildren(p.getTargetInLineInSequence(), cc);
+            }
+
+            if (p.getTargetInLineOutSequence() != null) {
+                initEndpointsOfChildren(p.getTargetInLineOutSequence(), cc);
+            }
+
+            if (p.getTargetInLineFaultSequence() != null) {
+                initEndpointsOfChildren(p.getTargetInLineFaultSequence(), cc);
+            }
+        }
+    }
+
+    private void initEndpointsOfChildren(ListMediator s, ConfigurationContext cc) {
+        for (Mediator m : s.getList()) {
+            if (m instanceof AbstractMediator) {
+                ((AbstractMediator)m).init(cc);
+            } 
+        }
+    }
+    
+    private void initEndpoint(Endpoint e, ConfigurationContext cc) {
+        e.init(cc);
+    }
+
 
     private void handleException(String msg) {
 		log.error(msg);

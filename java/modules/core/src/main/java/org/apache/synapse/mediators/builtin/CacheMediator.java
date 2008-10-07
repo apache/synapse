@@ -481,4 +481,11 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
     public void setMaxMessageSize(int maxMessageSize) {
         this.maxMessageSize = maxMessageSize;
     }
+
+    public void init(ConfigurationContext cc) {
+        
+        if (onCacheHitSequence != null) {
+            onCacheHitSequence.init(cc);
+        }
+    }
 }

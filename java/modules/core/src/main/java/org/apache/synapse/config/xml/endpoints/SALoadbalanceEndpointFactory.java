@@ -64,6 +64,18 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
                 getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "session"));
         if (sessionElement != null) {
 
+            OMElement sessionTimeout = sessionElement.getFirstChildWithName(
+                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sessionTimeout"));
+
+            if (sessionTimeout != null) {
+                try {
+                    loadbalanceEndpoint.setSessionTimeout(Long.parseLong(
+                            sessionTimeout.getText().trim()));
+                } catch (NumberFormatException nfe) {
+                    handleException("Invalid session timeout value : " + sessionTimeout.getText());
+                }
+            }
+            
             String type = sessionElement.getAttributeValue(new QName("type"));
 
             if (type.equalsIgnoreCase("soap")) {
@@ -99,7 +111,7 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
 
             // set endpoints
             List<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
-            loadbalanceEndpoint.setEndpoints(endpoints);
+            loadbalanceEndpoint.setChildren(endpoints);
 
             // set load balance algorithm
             LoadbalanceAlgorithm algorithm = LoadbalanceAlgorithmFactory.

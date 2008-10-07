@@ -27,7 +27,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -36,12 +35,9 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.base.TransportMBeanSupport;
-import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
+import org.apache.http.*;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
@@ -55,6 +51,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 
 import javax.net.ssl.SSLContext;
@@ -108,8 +105,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         HttpParams params = getClientParameters();
         try {
+            String prefix = (sslContext == null ? "http" : "https") + "-Sender I/O dispatcher";
             ioReactor = new DefaultConnectingIOReactor(
-                NHttpConfiguration.getInstance().getClientIOWorkers(), params);
+                NHttpConfiguration.getInstance().getClientIOWorkers(),
+                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: IOReactor encountered a checked exception : " +
@@ -305,6 +304,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             HttpHost httpHost = new HttpHost(url.getHost(), port, url.getProtocol());
 
             Axis2HttpRequest axis2Req = new Axis2HttpRequest(epr, httpHost, msgContext);
+            Object timeout = msgContext.getProperty(NhttpConstants.SEND_TIMEOUT);
+            if (timeout != null && timeout instanceof Long) {
+                axis2Req.setTimeout( (int) ((Long) timeout).longValue());
+            }
 
             NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), port);
 
@@ -315,18 +318,28 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                     log.debug("A new connection established to : " + url.getHost() + ":" + port);
                 }
             } else {
-                ((ClientHandler) handler).submitRequest(conn, axis2Req);
+                handler.submitRequest(conn, axis2Req);
                 if (log.isDebugEnabled()) {
                     log.debug("An existing connection reused to : " + url.getHost() + ":" + port);
                 }
             }
 
-            axis2Req.streamMessageContents();
+            try {
+                axis2Req.streamMessageContents();
+                if (metrics != null) {
+                    if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                        metrics.incrementMessagesSent(msgContext);
+                    } else {
+                        metrics.incrementMessagesSent();
+                    }
+                }
+
+            } catch (AxisFault af) {
+                throw af;
+            }
 
         } catch (MalformedURLException e) {
             handleException("Malformed destination EPR : " + epr.getAddress(), e);
-        } catch (IOException e) {
-            handleException("IO Error while submiting request message for sending", e);
         }
     }
 
@@ -384,10 +397,13 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 }
             }
         }
-        worker.getServiceHandler().commitResponse(worker.getConn(), response);
 
-        OutputStream out = worker.getOutputStream();
+        MetricsCollector lstMetrics = worker.getServiceHandler().getMetrics();
         try {
+            worker.getServiceHandler().commitResponse(worker.getConn(), response);
+            lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());
+            OutputStream out = worker.getOutputStream();
+
             if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
                 // see comment above on the reasoning
                 out.write(new byte[0]);
@@ -395,13 +411,40 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 messageFormatter.writeTo(msgContext, format, out, false);
             }
             out.close();
+            if (lstMetrics != null) {
+                lstMetrics.incrementMessagesSent();
+            }
+
+        } catch (HttpException e) {
+            if (lstMetrics != null) {
+                lstMetrics.incrementFaultsSending();
+            }
+            handleException("Unexpected HTTP protocol error : " + e.getMessage(), e);
+        } catch (ConnectionClosedException e) {
+            if (lstMetrics != null) {
+                lstMetrics.incrementFaultsSending();
+            }
+            log.warn("Connection closed by client (Connection closed)");
+        } catch (IllegalStateException e) {
+            if (lstMetrics != null) {
+                lstMetrics.incrementFaultsSending();
+            }
+            log.warn("Connection closed by client (Buffer closed)");
         } catch (IOException e) {
+            if (lstMetrics != null) {
+                lstMetrics.incrementFaultsSending();
+            }
             handleException("IO Error sending response message", e);
+        } catch (Exception e) {
+            if (lstMetrics != null) {
+                lstMetrics.incrementFaultsSending();
+            }
+            handleException("General Error sending response message", e);
         }
 
         try {
             worker.getIs().close();
-        } catch (IOException ignore) {}        
+        } catch (IOException ignore) {}
     }
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {
@@ -437,9 +480,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     }
 
     public void stop() {
-        if (state != BaseConstants.STARTED) return;
+        if (state == BaseConstants.STOPPED) return;
         try {
             ioReactor.shutdown();
+            handler.stop();
             state = BaseConstants.STOPPED;
         } catch (IOException e) {
             log.warn("Error shutting down IOReactor", e);
@@ -461,62 +505,29 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
 
             public void failed(SessionRequest request) {
-                handleError(request, false);
+                handleError(request, NhttpConstants.CONNECTION_FAILED,
+                    "Connection refused or failed for : " + request.getRemoteAddress());
             }
 
             public void timeout(SessionRequest request) {
-                handleError(request, true);
+                handleError(request, NhttpConstants.CONNECT_TIMEOUT,
+                    "Timeout connecting to : " + request.getRemoteAddress());
                 request.cancel();
             }
 
-            public void cancelled(SessionRequest sessionRequest) {
-
+            public void cancelled(SessionRequest request) {
+                handleError(request, NhttpConstants.CONNECT_CANCEL,
+                    "Connection cancelled for : " + request.getRemoteAddress());
             }
 
-            private void handleError(SessionRequest request, boolean isTimeout) {
+            private void handleError(SessionRequest request, int errorCode, String errorMessage) {
                 if (request.getAttachment() != null &&
                     request.getAttachment() instanceof Axis2HttpRequest) {
 
                     Axis2HttpRequest axis2Request = (Axis2HttpRequest) request.getAttachment();
                     if (!axis2Request.isCompleted()) {
-
-                        axis2Request.setCompleted(true);
-                        MessageContext mc = axis2Request.getMsgContext();
-                        final MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
-
-                        if (mr != null) {
-                            try {
-                                // this fault is NOT caused by the endpoint while processing. so we have to
-                                // inform that this is a sending error (e.g. endpoint failure) and handle it
-                                // differently at the message receiver.
-
-                                AxisFault axisFault;
-                                if (isTimeout) {
-                                    // In case of a timeout there is no exception
-                                    axisFault = new AxisFault("The connection timed out");
-                                } else {
-                                    Exception exception = request.getException();
-                                    /** this is not a mistake I do NOT want getMessage()*/
-                                    axisFault = new AxisFault(exception.toString(), exception);
-                                }
-                                final MessageContext nioFaultMessageContext =
-                                    MessageContextBuilder.createFaultMessageContext(mc, axisFault);
-                                nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
-
-                                handler.execute(new Runnable() {
-                                    public void run() {
-                                        try {
-                                            mr.receive(nioFaultMessageContext);
-                                        } catch (AxisFault af) {
-                                            log.error("Error processing fault message context", af);
-                                        }
-                                    }
-                                });
-
-                            } catch (AxisFault af) {
-                                log.error("Unable to report back failure to the message receiver", af);
-                            }
-                        }
+                        handler.markRequestCompletedWithError(
+                            axis2Request, errorCode,  errorMessage,  null);
                     }
                 }
             }
@@ -613,6 +624,89 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     public long getBytesSent() {
         if (metrics != null) {
             return metrics.getBytesSent();
+        }
+        return -1;
+    }
+
+    public long getTimeoutsReceiving() {
+        if (metrics != null) {
+            return metrics.getTimeoutsReceiving();
+        }
+        return -1;
+    }
+
+    public long getTimeoutsSending() {
+        if (metrics != null) {
+            return metrics.getTimeoutsSending();
+        }
+        return -1;
+    }
+
+    public long getMinSizeReceived() {
+        if (metrics != null) {
+            return metrics.getMinSizeReceived();
+        }
+        return -1;
+    }
+
+    public long getMaxSizeReceived() {
+        if (metrics != null) {
+            return metrics.getMaxSizeReceived();
+        }
+        return -1;
+    }
+
+    public double getAvgSizeReceived() {
+        if (metrics != null) {
+            return metrics.getAvgSizeReceived();
+        }
+        return -1;
+    }
+
+    public long getMinSizeSent() {
+        if (metrics != null) {
+            return metrics.getMinSizeSent();
+        }
+        return -1;
+    }
+
+    public long getMaxSizeSent() {
+        if (metrics != null) {
+            return metrics.getMaxSizeSent();
+        }
+        return -1;
+    }
+
+    public double getAvgSizeSent() {
+        if (metrics != null) {
+            return metrics.getAvgSizeSent();
+        }
+        return -1;
+    }
+
+    public Map getResponseCodeTable() {
+        if (metrics != null) {
+            return metrics.getResponseCodeTable();
+        }
+        return null;
+    }
+
+    public void resetStatistics() {
+        if (metrics != null) {
+            metrics.reset();
+        }
+    }
+
+    public long getLastResetTime() {
+        if (metrics != null) {
+            return metrics.getLastResetTime();
+        }
+        return -1;
+    }
+
+    public long getMetricsWindow() {
+        if (metrics != null) {
+            return System.currentTimeMillis() - metrics.getLastResetTime();
         }
         return -1;
     }

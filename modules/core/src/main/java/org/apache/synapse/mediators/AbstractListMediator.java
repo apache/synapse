@@ -23,6 +23,7 @@ import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,5 +123,14 @@ public abstract class AbstractListMediator extends AbstractMediator
                 ((ManagedLifecycle) mediator).destroy();
             }
         } 
+    }
+
+    public void init(ConfigurationContext cc) {
+
+        for (Mediator m : mediators) {
+            if (m instanceof AbstractMediator) {
+                ((AbstractMediator) m).init(cc);
+            }
+        }
     }
 }

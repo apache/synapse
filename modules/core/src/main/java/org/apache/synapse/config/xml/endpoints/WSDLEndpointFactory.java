@@ -30,7 +30,7 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 import java.io.File;
@@ -165,7 +165,7 @@ public class WSDLEndpointFactory extends EndpointFactory {
                 // for now, QOS information has to be provided explicitly.
                 extractCommonEndpointProperties(endpoint, wsdlElement);
                 extractSpecificEndpointProperties(endpoint, wsdlElement);
-                wsdlEndpoint.setEndpoint(endpoint);
+                wsdlEndpoint.setDefinition(endpoint);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");
             }

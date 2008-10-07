@@ -172,6 +172,10 @@ public class Axis2MessageContext implements MessageContext {
     }
 
     public void setProperty(String key, Object value) {
+        if (value == null) {
+            return;
+        }
+        
         properties.put(key, value);
 
         // do not commit response by default in the server process

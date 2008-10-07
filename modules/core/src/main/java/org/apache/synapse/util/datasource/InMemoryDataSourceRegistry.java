@@ -29,6 +29,7 @@ import org.apache.synapse.util.datasource.factory.DataSourceFactory;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Keeps all DataSources in the memory
@@ -89,6 +90,21 @@ public class InMemoryDataSourceRegistry implements DataSourceRegistry {
             handleException("DataSorce name cannot be found.");
         }
         return dataSources.get(name);
+    }
+
+    public void init(Properties properties) {
+        // nothing
+    }
+
+    public boolean isInitialized() {
+        return true;
+    }
+
+    public void clear() {
+        if (!dataSources.isEmpty()) {
+            log.info("Clearing all in-memory datasources ");
+            dataSources.clear();
+        }
     }
 
     private static void handleException(String msg) {

@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.eip.aggregator;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +53,7 @@ public class Aggregate extends TimerTask {
     private List<MessageContext> messages = new ArrayList<MessageContext>();
     private boolean locked = false;
     private boolean completed = false;
+    private SynapseEnvironment synEnv = null;
 
     /**
      * Save aggregation properties and timeout
@@ -62,9 +64,10 @@ public class Aggregate extends TimerTask {
      * @param max the maximum number of messages to be aggregated
      * @param mediator
      */
-    public Aggregate(String corelation, long timeoutMillis, int min,
+    public Aggregate(SynapseEnvironment synEnv, String corelation, long timeoutMillis, int min,
         int max, AggregateMediator mediator) {
-        
+
+        this.synEnv = synEnv;
         this.correlation = corelation;
         if (timeoutMillis > 0) {
             expiryTimeMillis = System.currentTimeMillis() + timeoutMillis;
@@ -244,9 +247,20 @@ public class Aggregate extends TimerTask {
                     log.debug("Time : " + System.currentTimeMillis() + " and this aggregator " +
                             "expired at : " + expiryTimeMillis);
                 }
-                aggregateMediator.completeAggregate(this);
+                synEnv.getExecutorService().execute(new AggregateTimeout(this));
                 break;
             }
+        }
+    }
+
+    private class AggregateTimeout implements Runnable {
+        private Aggregate aggregate = null;
+        AggregateTimeout(Aggregate aggregate) {
+            this.aggregate = aggregate;
+        }
+
+        public void run() {
+            aggregateMediator.completeAggregate(aggregate);
         }
     }
 

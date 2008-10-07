@@ -58,7 +58,7 @@ public class FailoverEndpointFactory extends EndpointFactory {
                 failoverEndpoint.setName(name);
             }
             // set endpoints and return
-            failoverEndpoint.setEndpoints(getEndpoints(failoverElement, failoverEndpoint));
+            failoverEndpoint.setChildren(getEndpoints(failoverElement, failoverEndpoint));
             return failoverEndpoint;
         }
         return null;

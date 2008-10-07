@@ -113,10 +113,14 @@ public class DataSourceRegistrar {
             DataSourceRegistry dataSourceRegistry;
 
             if (PROP_REGISTRY_JNDI.equals(registry)) {
+
                 if (jndiEvn == null) {
                     jndiEvn = createJNDIEnvironment(dsProperties, rootPrefix);
                 }
-                dataSourceRegistry = JNDIBasedDataSourceRegistry.getInstance(jndiEvn);
+                dataSourceRegistry = JNDIBasedDataSourceRegistry.getInstance();
+                if (!dataSourceRegistry.isInitialized()) {
+                    dataSourceRegistry.init(jndiEvn);
+                }
             } else {
                 dataSourceRegistry = InMemoryDataSourceRegistry.getInstance();
             }

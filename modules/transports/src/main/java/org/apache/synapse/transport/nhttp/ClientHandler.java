@@ -20,6 +20,7 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
@@ -38,16 +39,21 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.nio.DefaultNHttpClientConnection;
 import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.util.ByteBufferAllocator;
+import org.apache.http.nio.util.HeapByteBufferAllocator;
+import org.apache.http.nio.util.ContentOutputBuffer;
+import org.apache.http.nio.util.ContentInputBuffer;
 import org.apache.http.nio.entity.ContentInputStream;
-import org.apache.http.nio.util.*;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.util.SharedInputBuffer;
+import org.apache.synapse.transport.nhttp.util.SharedOutputBuffer;
 
 import java.io.IOException;
 
@@ -123,35 +129,7 @@ public class ClientHandler implements NHttpClientHandler {
      * @param axis2Req the new request
      */
     public void submitRequest(final NHttpClientConnection conn, Axis2HttpRequest axis2Req) {
-
-        try {
-            HttpContext context = conn.getContext();
-            ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
-            axis2Req.setOutputBuffer(outputBuffer);
-            context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);            
-
-            context.setAttribute(AXIS2_HTTP_REQUEST, axis2Req);
-            context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
-            context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
-            context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
-
-            HttpRequest request = axis2Req.getRequest();
-            request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
-            this.httpProcessor.process(request, context);
-
-            conn.submitRequest(request);
-            context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
-
-            synchronized(axis2Req) {
-                axis2Req.setReadyToStream(true);
-                axis2Req.notifyAll();
-            }
-
-        } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
-        } catch (HttpException e) {
-            handleException("Unexpected HTTP protocol error: " + e.getMessage(), e, conn);
-        }
+        processConnection(conn, axis2Req);
     }
 
     /**
@@ -164,10 +142,21 @@ public class ClientHandler implements NHttpClientHandler {
         if (log.isDebugEnabled() ) {
             log.debug("ClientHandler connected : " + conn);
         }
+        processConnection(conn, (Axis2HttpRequest) attachment);
+    }
+
+    /**
+     * Process a new connection over an existing TCP connection or new
+     * @param conn
+     * @param axis2Req
+     */
+    private void processConnection(final NHttpClientConnection conn, final Axis2HttpRequest axis2Req) {
 
         try {
+            // Reset connection metrics
+            conn.getMetrics().reset();
+
             HttpContext context = conn.getContext();
-            Axis2HttpRequest axis2Req = (Axis2HttpRequest) attachment;
             ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
             axis2Req.setOutputBuffer(outputBuffer);
             context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);
@@ -180,48 +169,84 @@ public class ClientHandler implements NHttpClientHandler {
             HttpRequest request = axis2Req.getRequest();
             request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
             this.httpProcessor.process(request, context);
-
+            if (axis2Req.getTimeout() > 0) {
+                conn.setSocketTimeout(axis2Req.getTimeout());
+            }
+            
             conn.submitRequest(request);
             context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
+        } catch (IOException e) {
+            if (metrics != null) {
+                metrics.incrementFaultsSending();
+            }
+            handleException("I/O Error submitting request : " + e.getMessage(), e, conn);
+        } catch (HttpException e) {
+            if (metrics != null) {
+                metrics.incrementFaultsSending();
+            }
+            handleException("HTTP protocol error submitting request : " + e.getMessage(), e, conn);
+        } finally {
             synchronized(axis2Req) {
                 axis2Req.setReadyToStream(true);
                 axis2Req.notifyAll();
-            }
-
-        } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
-        } catch (HttpException e) {
-            handleException("Unexpected HTTP protocol error: " + e.getMessage(), e, conn);
-        }
-    }
-
-    public void closed(final NHttpClientConnection conn) {
-        ConnectionPool.forget(conn);
-        checkAxisRequestComplete(conn, "Abnormal connection close", null);
-
-        HttpContext context = conn.getContext();
-        context.removeAttribute(RESPONSE_SINK_BUFFER);
-        context.removeAttribute(REQUEST_SOURCE_BUFFER);        
-
-        if (log.isTraceEnabled()) {
-            log.trace("Connection closed");
+            }            
         }
     }
 
     /**
-     * Handle connection timeouts by shutting down the connections
+     * Handle connection close events
+     * @param conn
+     */
+    public void closed(final NHttpClientConnection conn) {
+        ConnectionPool.forget(conn);
+        String message = getErrorMessage("Connection close", conn);
+        if (log.isTraceEnabled()) {
+            log.trace(message);
+        }
+        Axis2HttpRequest axis2Request = (Axis2HttpRequest)
+            conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
+
+        if (axis2Request != null && !axis2Request.isCompleted()) {
+            checkAxisRequestComplete(conn, NhttpConstants.CONNECTION_CLOSED, message, null);
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug(getErrorMessage("Keep-alive connection closed", conn));
+            }
+        }
+
+        HttpContext context = conn.getContext();
+        shutdownConnection(conn);
+        context.removeAttribute(RESPONSE_SINK_BUFFER);
+        context.removeAttribute(REQUEST_SOURCE_BUFFER);
+    }
+
+    /**
+     * Handle connection timeouts by shutting down the connections. These are established
+     * that have reached the SO_TIMEOUT of the socket
      * @param conn the connection being processed
      */
     public void timeout(final NHttpClientConnection conn) {
+        String message = getErrorMessage("Connection timeout", conn);
         if (log.isDebugEnabled()) {
-            log.debug("Connection Timeout");
+            log.debug(message);
         }
-        if (metrics != null) {
-            metrics.incrementTimeoutsSending();
+
+        Axis2HttpRequest axis2Request = (Axis2HttpRequest)
+            conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
+
+        if (axis2Request != null && !axis2Request.isCompleted()) {
+            checkAxisRequestComplete(conn, NhttpConstants.CONNECTION_TIMEOUT, message, null);
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug(getErrorMessage("Keep-alive connection timed out", conn));
+            }
         }
-        checkAxisRequestComplete(conn, "Connection timeout", null);
+
+        HttpContext context = conn.getContext();
         shutdownConnection(conn);
+        context.removeAttribute(RESPONSE_SINK_BUFFER);
+        context.removeAttribute(REQUEST_SOURCE_BUFFER);
     }
 
     /**
@@ -230,12 +255,10 @@ public class ClientHandler implements NHttpClientHandler {
      * @param e the exception encountered
      */
     public void exception(final NHttpClientConnection conn, final HttpException e) {
-        log.error("HTTP protocol violation : " + e.getMessage());
-    	checkAxisRequestComplete(conn, null, e);
+        String message = getErrorMessage("HTTP protocol violation : " + e.getMessage(), conn);
+        log.error(message, e);
+    	checkAxisRequestComplete(conn, NhttpConstants.PROTOCOL_VIOLATION, message, e);
         shutdownConnection(conn);
-        if (metrics != null) {
-            metrics.incrementFaultsSending();
-        }
     }
 
     /**
@@ -244,12 +267,27 @@ public class ClientHandler implements NHttpClientHandler {
      * @param e the exception encountered
      */
     public void exception(final NHttpClientConnection conn, final IOException e) {
-        log.error("I/O error : " + e.getMessage(), e);
-    	checkAxisRequestComplete(conn, null, e);
+        String message = getErrorMessage("I/O error : " + e.getMessage(), conn);
+        log.error(message, e);
+    	checkAxisRequestComplete(conn, NhttpConstants.SND_IO_ERROR_SENDING, message, e);
         shutdownConnection(conn);
-        if (metrics != null) {
-            metrics.incrementFaultsSending();
+    }
+
+    /**
+     * Include remote host and port information to an error message
+     * @param message the initial message
+     * @param conn the connection encountering the error
+     * @return the updated error message
+     */
+    private String getErrorMessage(String message, NHttpClientConnection conn) {
+        if (conn != null && conn instanceof DefaultNHttpClientConnection) {
+            DefaultNHttpClientConnection c = ((DefaultNHttpClientConnection) conn);
+            if (c.getRemoteAddress() != null) {
+                return message + " for : " + c.getRemoteAddress().getHostAddress() + ":" +
+                    c.getRemotePort();
+            }
         }
+        return message;
     }
 
     /**
@@ -257,53 +295,97 @@ public class ClientHandler implements NHttpClientHandler {
      * notify an exception to the message-receiver
      *
      * @param conn the connection being checked for completion
+     * @param errorCode the error code to raise
      * @param errorMessage the text for an error message to be returned to the MR on failure
      * @param exceptionToRaise an Exception to be returned to the MR on failure
      */
     private void checkAxisRequestComplete(NHttpClientConnection conn,
-        final String errorMessage, final Exception exceptionToRaise) {
+        final int errorCode, final String errorMessage, final Exception exceptionToRaise) {
 
         Axis2HttpRequest axis2Request = (Axis2HttpRequest)
                 conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
-
         if (axis2Request != null && !axis2Request.isCompleted()) {
+            markRequestCompletedWithError(axis2Request, errorCode, errorMessage, exceptionToRaise);
+        }
+    }
 
-            axis2Request.setCompleted(true);
-            if (errorMessage == null && exceptionToRaise == null) {
-                return; // no need to continue
-            }
+    /**
+     * Mark request to send failed with error
+     *
+     * @param axis2Request the Axis2HttpRequest to be marked as completed with an error
+     * @param errorCode the error code to raise
+     * @param errorMessage the text for an error message to be returned to the MR on failure
+     * @param exceptionToRaise an Exception to be returned to the MR on failure
+     */
+    protected void markRequestCompletedWithError(Axis2HttpRequest axis2Request, final int errorCode,
+        final String errorMessage, final Exception exceptionToRaise) {
 
-            final MessageContext mc = axis2Request.getMsgContext();
+        axis2Request.setCompleted(true);
+        if (errorCode == -1 && errorMessage == null && exceptionToRaise == null) {
+            return; // no need to continue
+        }
 
-            if (mc.getAxisOperation() != null &&
-                    mc.getAxisOperation().getMessageReceiver() != null) {
+        final MessageContext mc = axis2Request.getMsgContext();
 
-                workerPool.execute( new Runnable() {
-                    public void run() {
-                        MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
-                        try {
-                            MessageContext nioFaultMessageContext = null;
-                            if (errorMessage != null) {
-                                nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
-                                    mc, new AxisFault(errorMessage));
-                            } else if (exceptionToRaise != null) {
-                                nioFaultMessageContext = MessageContextBuilder.createFaultMessageContext(
-                                    /** this is not a mistake I do NOT want getMessage()*/
-                                    mc, new AxisFault(exceptionToRaise.toString(), exceptionToRaise));
-                            }
+        if (mc.getAxisOperation() != null &&
+                mc.getAxisOperation().getMessageReceiver() != null) {
 
-                            if (nioFaultMessageContext != null) {
-                                nioFaultMessageContext.setProperty(
-                                        NhttpConstants.SENDING_FAULT, Boolean.TRUE);
-                                mr.receive(nioFaultMessageContext);
-                            }
-
-                        } catch (AxisFault af) {
-                            log.error("Unable to report back failure to the message receiver", af);
-                        }
+            if (metrics != null) {
+                if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                    if (errorCode == NhttpConstants.CONNECTION_TIMEOUT) {
+                        metrics.incrementTimeoutsReceiving(mc);
+                    } else {
+                        metrics.incrementFaultsSending(errorCode, mc);
                     }
-                });
+                } else {
+                    if (errorCode == NhttpConstants.CONNECTION_TIMEOUT) {
+                        metrics.incrementTimeoutsReceiving();
+                    } else {
+                        metrics.incrementFaultsSending();
+                    }
+                }
             }
+
+            workerPool.execute( new Runnable() {
+                public void run() {
+                    MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+                    try {
+                        AxisFault axisFault = (exceptionToRaise != null ?
+                            new AxisFault(errorMessage, exceptionToRaise) :
+                            new AxisFault(errorMessage));
+
+                        MessageContext nioFaultMessageContext =
+                            MessageContextBuilder.createFaultMessageContext(mc, axisFault);
+
+                        SOAPEnvelope envelope = nioFaultMessageContext.getEnvelope();
+
+                        nioFaultMessageContext.setProperty(
+                            NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                        nioFaultMessageContext.setProperty(
+                                NhttpConstants.ERROR_MESSAGE, errorMessage);
+                        if (errorCode != -1) {
+                            nioFaultMessageContext.setProperty(
+                                NhttpConstants.ERROR_CODE, errorCode);
+                        }
+                        if (exceptionToRaise != null) {
+                            nioFaultMessageContext.setProperty(
+                                NhttpConstants.ERROR_DETAIL, exceptionToRaise.toString());
+                            nioFaultMessageContext.setProperty(
+                                NhttpConstants.ERROR_EXCEPTION, exceptionToRaise);
+                            envelope.getBody().getFault().getDetail().setText(
+                                exceptionToRaise.toString());
+                        } else {
+                            nioFaultMessageContext.setProperty(
+                                NhttpConstants.ERROR_DETAIL, errorMessage);
+                            envelope.getBody().getFault().getDetail().setText(errorMessage);
+                        }
+                        mr.receive(nioFaultMessageContext);
+
+                    } catch (AxisFault af) {
+                        log.error("Unable to report back failure to the message receiver", af);
+                    }
+                }
+            });
         }
     }
 
@@ -320,13 +402,29 @@ public class ClientHandler implements NHttpClientHandler {
         try {
             int bytesRead = inBuf.consumeContent(decoder);
             if (metrics != null && bytesRead > 0) {
-                metrics.incrementBytesReceived(bytesRead);
+                if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                    metrics.incrementBytesReceived(getMessageContext(conn), bytesRead);
+                } else {
+                    metrics.incrementBytesReceived(bytesRead);
+                }
             }
 
             if (decoder.isCompleted()) {
                 if (metrics != null) {
-                    metrics.incrementMessagesReceived();
+                    if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                        MessageContext mc = getMessageContext(conn);
+                        metrics.incrementMessagesReceived(mc);
+                        metrics.notifyReceivedMessageSize(mc, conn.getMetrics().getReceivedBytesCount());
+                        metrics.notifySentMessageSize(mc, conn.getMetrics().getSentBytesCount());
+                        metrics.reportResponseCode(mc, response.getStatusLine().getStatusCode());
+                    } else {
+                        metrics.incrementMessagesReceived();
+                        metrics.notifyReceivedMessageSize(conn.getMetrics().getReceivedBytesCount());
+                        metrics.notifySentMessageSize(conn.getMetrics().getSentBytesCount());
+                    }
                 }
+                // reset metrics on connection
+                conn.getMetrics().reset();
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
@@ -335,7 +433,15 @@ public class ClientHandler implements NHttpClientHandler {
             }
 
         } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
+            if (metrics != null) {
+                if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                    metrics.incrementFaultsReceiving(
+                        NhttpConstants.SND_IO_ERROR_RECEIVING, getMessageContext(conn));
+                } else {
+                    metrics.incrementFaultsReceiving();
+                }
+            }
+            handleException("I/O Error at inputReady : " + e.getMessage(), e, conn);
         }
     }
 
@@ -348,21 +454,28 @@ public class ClientHandler implements NHttpClientHandler {
         HttpContext context = conn.getContext();
 
         ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(REQUEST_SOURCE_BUFFER);
+        if (outBuf == null) return;
 
         try {
             int bytesWritten = outBuf.produceContent(encoder);
             if (metrics != null && bytesWritten > 0) {
-                metrics.incrementBytesSent(bytesWritten);
-            }
-
-            if (encoder.isCompleted()) {
-                if (metrics != null) {
-                    metrics.incrementMessagesSent();
+                if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                    metrics.incrementBytesSent(getMessageContext(conn), bytesWritten);
+                } else {
+                    metrics.incrementBytesSent(bytesWritten);
                 }
             }
 
         } catch (IOException e) {
-            handleException("I/O Error : " + e.getMessage(), e, conn);
+            if (metrics != null) {
+                if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                    metrics.incrementFaultsSending(
+                        NhttpConstants.SND_IO_ERROR_SENDING, getMessageContext(conn));
+                } else {
+                    metrics.incrementFaultsSending();
+                }
+            }
+            handleException("I/O Error at outputReady : " + e.getMessage(), e, conn);
         }
     }
 
@@ -375,11 +488,26 @@ public class ClientHandler implements NHttpClientHandler {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
 
-        /*
-         * responsed received means the whole request has been complete sent to server or
-         * server doesn't need the left data of request
-         */
-    	checkAxisRequestComplete(conn, null, null);
+        // Have we sent out our request fully in the first place? if not, forget about it now..
+        Axis2HttpRequest req = (Axis2HttpRequest) conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
+        if (req != null && !req.isSendingCompleted()) {
+            req.getMsgContext().setProperty(NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
+            req.setCompleted(true);                                              
+            SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
+                conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
+            if (outputBuffer != null) {
+                outputBuffer.shutdown();
+            }
+            log.warn("Remote server aborted request being sent and replied : " + conn);
+            if (metrics != null) {
+                metrics.incrementFaultsSending(NhttpConstants.SEND_ABORT, req.getMsgContext());
+            }
+        }
+
+        if (req != null) {
+            req.setCompleted(true);
+        }
+
         switch (response.getStatusLine().getStatusCode()) {
             case HttpStatus.SC_ACCEPTED : {
                 if (log.isDebugEnabled()) {
@@ -571,7 +699,17 @@ public class ClientHandler implements NHttpClientHandler {
      * Shutdown the connection ignoring any IO errors during the process
      * @param conn the connection to be shutdown
      */
-    private void shutdownConnection(final HttpConnection conn) {
+    private void shutdownConnection(final NHttpClientConnection conn) {
+        SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
+            conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
+        if (outputBuffer != null) {
+            outputBuffer.close();
+        }
+        SharedInputBuffer inputBuffer = (SharedInputBuffer)
+            conn.getContext().getAttribute(RESPONSE_SINK_BUFFER);
+        if (inputBuffer != null) {
+            inputBuffer.close();
+        }
         try {
             conn.shutdown();
         } catch (IOException ignore) {}
@@ -597,5 +735,20 @@ public class ClientHandler implements NHttpClientHandler {
 
     public int getQueueSize() {
         return workerPool.getQueueSize();
+    }
+        
+    public void stop() {
+        try {
+            workerPool.shutdown(1000);
+        } catch (InterruptedException ignore) {}
+    }
+
+    private MessageContext getMessageContext(final NHttpClientConnection conn) {
+        HttpContext context = conn.getContext();
+        Axis2HttpRequest axis2Req = (Axis2HttpRequest) context.getAttribute(AXIS2_HTTP_REQUEST);
+        if (axis2Req != null) {
+            return axis2Req.getMsgContext();
+        }
+        return null;
     }
 }

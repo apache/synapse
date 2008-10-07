@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
  * Serializes {@link DefaultEndpoint} to XML.
@@ -50,7 +50,7 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        EndpointDefinition epAddress = defaultEndpoint.getEndpoint();
+        EndpointDefinition epAddress = defaultEndpoint.getDefinition();
         OMElement defaultElement = serializeEndpointDefinition(epAddress);
         endpointElement.addChild(defaultElement);
 

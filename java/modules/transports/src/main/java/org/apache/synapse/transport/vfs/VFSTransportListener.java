@@ -394,20 +394,21 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 }
             }
 
-            // set to bypass dispatching if we know the service - we already should!
-            AxisService service = cfgCtx.getAxisConfiguration().getService(entry.getServiceName());
-            msgContext.setAxisService(service);
-
-            // find the operation for the message, or default to one
-            Parameter operationParam = service.getParameter(BaseConstants.OPERATION_PARAM);
-            QName operationQName = (
-                operationParam != null ?
-                    BaseUtils.getQNameFromString(operationParam.getValue()) :
-                    BaseConstants.DEFAULT_OPERATION);
-
-            AxisOperation operation = service.getOperation(operationQName);
-            if (operation != null) {
-                msgContext.setAxisOperation(operation);
+            AxisService service = entry.getService();
+            if (service != null) {
+                msgContext.setAxisService(service);
+    
+                // find the operation for the message, or default to one
+                Parameter operationParam = service.getParameter(BaseConstants.OPERATION_PARAM);
+                QName operationQName = (
+                    operationParam != null ?
+                        BaseUtils.getQNameFromString(operationParam.getValue()) :
+                        BaseConstants.DEFAULT_OPERATION);
+    
+                AxisOperation operation = service.getOperation(operationQName);
+                if (operation != null) {
+                    msgContext.setAxisOperation(operation);
+                }
             }
 
             // does the service specify a default reply file URI ?

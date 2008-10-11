@@ -23,9 +23,9 @@ import javax.mail.internet.ContentType;
 
 import org.apache.axis2.transport.testkit.client.ClientOptions;
 import org.apache.axis2.transport.testkit.client.TestClient;
+import org.apache.axis2.transport.testkit.endpoint.AsyncEndpoint;
 import org.apache.axis2.transport.testkit.message.IncomingMessage;
 import org.apache.axis2.transport.testkit.name.Name;
-import org.apache.axis2.transport.testkit.server.AsyncEndpoint;
 
 @Name("mock")
 public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {

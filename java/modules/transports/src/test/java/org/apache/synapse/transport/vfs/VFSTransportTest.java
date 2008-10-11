@@ -24,7 +24,7 @@ import java.io.File;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.axis2.transport.testkit.TransportTestSuite;
+import org.apache.axis2.transport.testkit.ManagedTestSuite;
 import org.apache.axis2.transport.testkit.TransportTestSuiteBuilder;
 import org.apache.axis2.transport.testkit.axis2.SimpleTransportDescriptionFactory;
 import org.apache.axis2.transport.testkit.axis2.TransportDescriptionFactory;
@@ -39,7 +39,7 @@ import org.apache.axis2.transport.testkit.axis2.endpoint.ContentTypeServiceConfi
 public class VFSTransportTest extends TestCase {
     public static TestSuite suite() throws Exception {
         // TODO: the VFS listener doesn't like reuseResources == true...
-        TransportTestSuite suite = new TransportTestSuite(VFSTransportTest.class, false);
+        ManagedTestSuite suite = new ManagedTestSuite(VFSTransportTest.class, false);
         
         // The VFS sender doesn't create files atomically. This can cause the
         // listener to start reading files that are not completely written yet.

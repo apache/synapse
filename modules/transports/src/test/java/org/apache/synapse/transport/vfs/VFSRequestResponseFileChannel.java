@@ -23,10 +23,12 @@ import java.io.File;
 
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.transport.testkit.channel.RequestResponseChannel;
+import org.apache.axis2.transport.testkit.tests.Setup;
+import org.apache.axis2.transport.testkit.tests.Transient;
 
 public class VFSRequestResponseFileChannel extends VFSFileChannel implements RequestResponseChannel {
     private final String replyPath;
-    private File replyFile;
+    private @Transient File replyFile;
     
     public VFSRequestResponseFileChannel(String path, String replyPath) {
         super(path);
@@ -43,7 +45,7 @@ public class VFSRequestResponseFileChannel extends VFSFileChannel implements Req
         service.addParameter("transport.vfs.ReplyFileURI", "vfs:" + replyFile.toURL());
     }
     
-    @SuppressWarnings("unused")
+    @Setup @SuppressWarnings("unused")
     private void setUp(VFSTestEnvironment env) throws Exception {
         replyFile = preparePath(env, replyPath);
     }

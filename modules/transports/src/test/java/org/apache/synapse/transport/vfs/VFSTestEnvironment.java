@@ -21,6 +21,8 @@ package org.apache.synapse.transport.vfs;
 
 import java.io.File;
 
+import org.apache.axis2.transport.testkit.tests.Setup;
+
 public class VFSTestEnvironment {
     private final File rootDir;
     
@@ -28,7 +30,7 @@ public class VFSTestEnvironment {
         this.rootDir = rootDir;
     }
 
-    @SuppressWarnings("unused")
+    @Setup @SuppressWarnings("unused")
     private void setUp() {
         rootDir.mkdirs();
     }

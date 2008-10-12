@@ -26,13 +26,15 @@ import org.apache.axis2.transport.testkit.client.TestClient;
 import org.apache.axis2.transport.testkit.endpoint.AsyncEndpoint;
 import org.apache.axis2.transport.testkit.message.IncomingMessage;
 import org.apache.axis2.transport.testkit.name.Name;
+import org.apache.axis2.transport.testkit.tests.Setup;
+import org.apache.axis2.transport.testkit.tests.Transient;
 
 @Name("mock")
 public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
-    private VFSFileChannel channel;
-    private ContentType contentType;
+    private @Transient VFSFileChannel channel;
+    private @Transient ContentType contentType;
     
-    @SuppressWarnings("unused")
+    @Setup @SuppressWarnings("unused")
     private void setUp(VFSFileChannel channel, TestClient client, ClientOptions options) throws Exception {
         this.channel = channel;
         contentType = client.getContentType(options, options.getBaseContentType());

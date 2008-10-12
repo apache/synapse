@@ -26,11 +26,13 @@ import javax.mail.internet.ContentType;
 import org.apache.axis2.transport.testkit.client.ClientOptions;
 import org.apache.axis2.transport.testkit.client.RequestResponseTestClient;
 import org.apache.axis2.transport.testkit.message.IncomingMessage;
+import org.apache.axis2.transport.testkit.tests.Setup;
+import org.apache.axis2.transport.testkit.tests.Transient;
 
 public class VFSRequestResponseClient extends VFSClient implements RequestResponseTestClient<byte[],byte[]> {
-    private File replyFile;
+    private @Transient File replyFile;
     
-    @SuppressWarnings("unused")
+    @Setup @SuppressWarnings("unused")
     private void setUp(VFSRequestResponseFileChannel channel) {
         replyFile = channel.getReplyFile();
     }

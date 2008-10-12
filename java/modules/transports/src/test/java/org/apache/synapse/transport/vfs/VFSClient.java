@@ -29,12 +29,14 @@ import javax.mail.internet.ContentType;
 import org.apache.axis2.transport.testkit.client.ClientOptions;
 import org.apache.axis2.transport.testkit.client.TestClient;
 import org.apache.axis2.transport.testkit.name.Name;
+import org.apache.axis2.transport.testkit.tests.Setup;
+import org.apache.axis2.transport.testkit.tests.Transient;
 
 @Name("java.io")
 public class VFSClient implements TestClient {
-    private File requestFile;
+    private @Transient File requestFile;
     
-    @SuppressWarnings("unused")
+    @Setup @SuppressWarnings("unused")
     private void setUp(VFSFileChannel channel) {
         requestFile = channel.getRequestFile();
     }

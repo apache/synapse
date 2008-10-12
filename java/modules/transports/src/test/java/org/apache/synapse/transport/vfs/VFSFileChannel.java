@@ -24,10 +24,12 @@ import java.io.File;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.transport.testkit.axis2.AxisServiceConfigurator;
+import org.apache.axis2.transport.testkit.tests.Setup;
+import org.apache.axis2.transport.testkit.tests.Transient;
 
 public class VFSFileChannel implements AxisServiceConfigurator {
     private final String path;
-    private File requestFile;
+    private @Transient File requestFile;
     
     public VFSFileChannel(String path) {
         this.path = path;
@@ -54,7 +56,7 @@ public class VFSFileChannel implements AxisServiceConfigurator {
         return file;
     }
     
-    @SuppressWarnings("unused")
+    @Setup @SuppressWarnings("unused")
     private void setUp(VFSTestEnvironment env) throws Exception {
         requestFile = preparePath(env, path);
     }

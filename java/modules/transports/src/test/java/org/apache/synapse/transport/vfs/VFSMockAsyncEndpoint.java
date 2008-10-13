@@ -22,7 +22,6 @@ package org.apache.synapse.transport.vfs;
 import javax.mail.internet.ContentType;
 
 import org.apache.axis2.transport.testkit.client.ClientOptions;
-import org.apache.axis2.transport.testkit.client.TestClient;
 import org.apache.axis2.transport.testkit.endpoint.AsyncEndpoint;
 import org.apache.axis2.transport.testkit.message.IncomingMessage;
 import org.apache.axis2.transport.testkit.name.Name;
@@ -35,9 +34,9 @@ public class VFSMockAsyncEndpoint implements AsyncEndpoint<byte[]> {
     private @Transient ContentType contentType;
     
     @Setup @SuppressWarnings("unused")
-    private void setUp(VFSFileChannel channel, TestClient client, ClientOptions options) throws Exception {
+    private void setUp(VFSFileChannel channel, ClientOptions options) throws Exception {
         this.channel = channel;
-        contentType = client.getContentType(options, options.getBaseContentType());
+        contentType = options.getTransportContentType();
     }
     
     public void clear() throws Exception {

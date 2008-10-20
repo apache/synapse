@@ -81,7 +81,7 @@ public class AlgorithmContext {
      *
      * @param currentEPR The current position
      */
-    public void setCurrentEPR(int currentEPR) {
+    public void setCurrentEndpointIndex(int currentEPR) {
 
         if (Boolean.TRUE.equals(isClusteringEnabled)) {
 

@@ -39,114 +39,123 @@ import java.net.URL;
  */
 public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
 
-//    TODO FIX-RUWAN
-//    private static final Log log = LogFactory.getLog(DynamicLoadbalanceEndpoint.class);
-//
-//    /**
-//     * The algorithm context , place holder for keep any runtime states related to the load balance
-//     * algorithm
-//     */
-//    private final AlgorithmContext algorithmContext = new AlgorithmContext();
-//
-//    private LoadBalanceMembershipHandler lbMembershipHandler;
-//
-//    public DynamicLoadbalanceEndpoint() {
-//    }
-//
-//    public void setLoadBalanceMembershipHandler(LoadBalanceMembershipHandler lbMembershipHandler) {
-//        this.lbMembershipHandler = lbMembershipHandler;
-//    }
-//
-//    public void send(MessageContext synCtx) {
-//        EndpointReference to = synCtx.getTo();
-//        DynamicLoadbalanceFaultHandler faultHandler = new DynamicLoadbalanceFaultHandler(to);
-//        if (failover) {
-//            synCtx.pushFaultHandler(faultHandler);
-//        }
-//        ConfigurationContext configCtx =
-//                ((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext();
-//        if (lbMembershipHandler.getConfigurationContext() == null) {
-//            lbMembershipHandler.setConfigurationContext(configCtx);
-//        }
+    private static final Log log = LogFactory.getLog(DynamicLoadbalanceEndpoint.class);
+
+    /**
+     * The algorithm context , place holder for keep any runtime states related to the load balance
+     * algorithm
+     */
+    private AlgorithmContext algorithmContext;
+
+    public void init(ConfigurationContext cc) {
+        if (!initialized) {
+            super.init(cc);
+            if (algorithmContext == null) {
+                algorithmContext = new AlgorithmContext(isClusteringEnabled, cc, getName());
+            }
+        }
+    }
+
+    private LoadBalanceMembershipHandler lbMembershipHandler;
+
+    public DynamicLoadbalanceEndpoint() {
+    }
+
+    public void setLoadBalanceMembershipHandler(LoadBalanceMembershipHandler lbMembershipHandler) {
+        this.lbMembershipHandler = lbMembershipHandler;
+    }
+
+    public void send(MessageContext synCtx) {
+        EndpointReference to = synCtx.getTo();
+        DynamicLoadbalanceFaultHandler faultHandler = new DynamicLoadbalanceFaultHandler(to);
+        if (isFailover()) {
+            synCtx.pushFaultHandler(faultHandler);
+        }
+        ConfigurationContext configCtx =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext();
+        if (lbMembershipHandler.getConfigurationContext() == null) {
+            lbMembershipHandler.setConfigurationContext(configCtx);
+        }
 //        algorithmContext.setConfigurationContext(configCtx);
-//        sendToApplicationMember(synCtx, to, faultHandler);
-//    }
-//
-//    public void setName(String name) {
-//        super.setName(name);
+        sendToApplicationMember(synCtx, to, faultHandler);
+    }
+
+    public void setName(String name) {
+        super.setName(name);
 //        algorithmContext.setContextID(name);
-//    }
-//
-//    private void sendToApplicationMember(MessageContext synCtx,
-//                                         EndpointReference to,
-//                                         DynamicLoadbalanceFaultHandler faultHandler) {
-//        org.apache.axis2.context.MessageContext axis2MsgCtx =
-//                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-//
-//        String transport = axis2MsgCtx.getTransportIn().getName();
-//        Member currentMember =
-//                lbMembershipHandler.getNextApplicationMember(algorithmContext);
-//        faultHandler.setCurrentMember(currentMember);
-//        if (currentMember != null) {
-//
-//            // URL rewrite
-//            if (transport.equals("http") || transport.equals("https")) {
-//                String address = to.getAddress();
-//                if (address.indexOf(":") != -1) {
-//                    try {
-//                        address = new URL(address).getPath();
-//                    } catch (MalformedURLException e) {
-//                        String msg = "URL " + address + " is malformed";
-//                        log.error(msg, e);
-//                        throw new SynapseException(msg, e);
-//                    }
-//                }
-//                EndpointReference epr =
-//                        new EndpointReference(transport + "://" + currentMember.getHostName() +
-//                                              ":" + currentMember.getHttpPort() + address);
-//                synCtx.setTo(epr);
-//                if (failover) {
-//                    synCtx.getEnvelope().build();
-//                }
-//
-//                AddressEndpoint endpoint = new AddressEndpoint();
-//                EndpointDefinition definition = new EndpointDefinition();
-//                endpoint.setEndpoint(definition);
-//                endpoint.send(synCtx);
-//            } else {
-//                log.error("Cannot load balance for non-HTTP/S transport " + transport);
-//            }
-//        } else {
-//            synCtx.getFaultStack().pop(); // Remove the DynamicLoadbalanceFaultHandler
-//            String msg = "No application members available";
-//            log.error(msg);
-//            throw new SynapseException(msg);
-//        }
-//    }
-//
-//    /**
-//     * This FaultHandler will try to resend the message to another member if an error occurs
-//     * while sending to some member. This is a failover mechanism
-//     */
-//    private class DynamicLoadbalanceFaultHandler extends FaultHandler {
-//
-//        private EndpointReference to;
-//        private Member currentMember;
-//
-//        public void setCurrentMember(Member currentMember) {
-//            this.currentMember = currentMember;
-//        }
-//
-//        private DynamicLoadbalanceFaultHandler(EndpointReference to) {
-//            this.to = to;
-//        }
-//
-//        public void onFault(MessageContext synCtx) {
-//            if (currentMember == null) {
-//                return;
-//            }
-//            synCtx.pushFaultHandler(this);
-//            sendToApplicationMember(synCtx, to, this);
-//        }
-//    }
+    }
+
+    private void sendToApplicationMember(MessageContext synCtx,
+                                         EndpointReference to,
+                                         DynamicLoadbalanceFaultHandler faultHandler) {
+        org.apache.axis2.context.MessageContext axis2MsgCtx =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+        String transport = axis2MsgCtx.getTransportIn().getName();
+        Member currentMember =
+                lbMembershipHandler.getNextApplicationMember(algorithmContext);
+        faultHandler.setCurrentMember(currentMember);
+        if (currentMember != null) {
+
+            // URL rewrite
+            if (transport.equals("http") || transport.equals("https")) {
+                String address = to.getAddress();
+                if (address.indexOf(":") != -1) {
+                    try {
+                        address = new URL(address).getPath();
+                    } catch (MalformedURLException e) {
+                        String msg = "URL " + address + " is malformed";
+                        log.error(msg, e);
+                        throw new SynapseException(msg, e);
+                    }
+                }
+                EndpointReference epr =
+                        new EndpointReference(transport + "://" + currentMember.getHostName() +
+                                              ":" + currentMember.getHttpPort() + address);
+                synCtx.setTo(epr);
+                if (isFailover()) {
+                    synCtx.getEnvelope().build();
+                }
+
+                AddressEndpoint endpoint = new AddressEndpoint();
+                EndpointDefinition definition = new EndpointDefinition();
+                endpoint.setDefinition(definition);
+                endpoint.send(synCtx);
+            } else {
+                log.error("Cannot load balance for non-HTTP/S transport " + transport);
+            }
+        } else {
+            synCtx.getFaultStack().pop(); // Remove the DynamicLoadbalanceFaultHandler
+            String msg = "No application members available";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+    }
+
+    /**
+     * This FaultHandler will try to resend the message to another member if an error occurs
+     * while sending to some member. This is a failover mechanism
+     */
+    private class DynamicLoadbalanceFaultHandler extends FaultHandler {
+
+        private EndpointReference to;
+        private Member currentMember;
+
+        public void setCurrentMember(Member currentMember) {
+            this.currentMember = currentMember;
+        }
+
+        private DynamicLoadbalanceFaultHandler(EndpointReference to) {
+            this.to = to;
+        }
+
+        public void onFault(MessageContext synCtx) {
+            if (currentMember == null) {
+                return;
+            }
+            synCtx.pushFaultHandler(this);
+            sendToApplicationMember(synCtx, to, this);
+        }
+    }
 }
+

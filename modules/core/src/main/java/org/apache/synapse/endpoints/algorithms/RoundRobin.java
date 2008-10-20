@@ -19,6 +19,7 @@
 
 package org.apache.synapse.endpoints.algorithms;
 
+import org.apache.axis2.clustering.Member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -41,8 +42,18 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      */
     private List endpoints = null;
 
+    private List<Member> members;
+
     public RoundRobin(List endpoints) {
         this.endpoints = endpoints;
+    }
+
+    public void setApplicationMembers(List<Member> members) {
+        this.members = members;
+    }
+
+    public void setEndpoints(List<Endpoint> endpoints) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -69,7 +80,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
                 } else {
                     currentEPR++;
                 }
-                algorithmContext.setCurrentEPR(currentEPR);
+                algorithmContext.setCurrentEndpointIndex(currentEPR);
             }
 
             attempts++;
@@ -82,11 +93,33 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         return nextEndpoint;
     }
 
+    public Member getNextApplicationMember(AlgorithmContext algorithmContext) {
+        if (members.size() == 0) {
+            return null;
+        }
+        int currentMemberIndex = algorithmContext.getCurrentEndpointIndex();
+        if (currentMemberIndex >= members.size()) {
+            currentMemberIndex = 0;
+        }
+        Member current = members.get(currentMemberIndex);
+        if (currentMemberIndex == members.size() - 1) {
+            currentMemberIndex = 0;
+        } else {
+            currentMemberIndex++;
+        }
+        algorithmContext.setCurrentEndpointIndex(currentMemberIndex);
+        if(log.isDebugEnabled()) {
+            log.debug("Members       : " + members.size());
+            log.debug("Current member: " + current);
+        }
+        return current;
+    }
+
     public void reset(AlgorithmContext algorithmContext) {
         if (log.isDebugEnabled()) {
             log.debug("Resetting the Round Robin loadbalancing algorithm ...");
         }
-        algorithmContext.setCurrentEPR(0);
+        algorithmContext.setCurrentEndpointIndex(0);
     }
 
     public String getName() {

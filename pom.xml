@@ -1202,6 +1202,13 @@
             <email>saminda AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
+	<developer>
+            <name>Afkham Azeez</name>
+            <id>saminda</id>
+            <email>azeez AT wso2.com</email>
+            <organization>WSO2</organization>
+	    <url>http://afkham.org/</url> 	
+        </developer>
         <developer>
             <name>Paul Fremantle</name>
             <id>pzf</id>

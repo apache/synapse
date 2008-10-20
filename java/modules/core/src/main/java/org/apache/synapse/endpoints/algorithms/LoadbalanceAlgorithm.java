@@ -36,15 +36,14 @@ public interface LoadbalanceAlgorithm {
      *
      * @param members The application members
      */
-//    TODO FIX-RUWAN
-//    void setApplicationMembers(List<Member> members);
-//
-//    /**
-//     * Set the endpoints
-//     *
-//     * @param endpoints The endpoints
-//     */
-//    void setEndpoints(List<Endpoint> endpoints);
+    void setApplicationMembers(List<Member> members);
+
+    /**
+     * Set the endpoints
+     *
+     * @param endpoints The endpoints
+     */
+    void setEndpoints(List<Endpoint> endpoints);
 
     /**
      * This method returns the next node according to the algorithm implementation.
@@ -64,8 +63,7 @@ public interface LoadbalanceAlgorithm {
      * @param algorithmContext The context in which holds run time states related to the algorithm
      * @return Next application member to which the request has to be sent to
      */
-//    TODO FIX-RUWAN
-//    Member getNextApplicationMember(AlgorithmContext algorithmContext);
+    Member getNextApplicationMember(AlgorithmContext algorithmContext);
 
     /**
      * Resets the algorithm to its initial position. Initial position depends on the implementation.

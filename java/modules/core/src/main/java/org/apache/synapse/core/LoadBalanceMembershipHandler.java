@@ -30,35 +30,35 @@ import java.util.Properties;
  * Generally, this interface will work with a GCF or other membership discovery mechanism
  */
 public interface LoadBalanceMembershipHandler {
-//    TODO FIX-RUWAN
-//    /**
-//     * Initialize this
-//     *
-//     * @param properties The properties specific to this LoadBalanceMembershipHandler
-//     * @param algorithm  The load balancing algorithm
-//     */
-//    void init(Properties properties, LoadbalanceAlgorithm algorithm);
-//
-//    /**
-//     * Set the Axis2 ConfigurationContext
-//     *
-//     * @param configCtx Axis2 ConfigurationContext
-//     */
-//    void setConfigurationContext(ConfigurationContext configCtx);
-//
-//    /**
-//     * Get the Axis2 ConfigurationContext
-//     *
-//     * @return Axis2 ConfigurationContext
-//     */
-//    ConfigurationContext getConfigurationContext();
-//
-//    /**
-//     * Get the next application member to whom the message has to be sent to
-//     *
-//     * @param context The AlgorithmContext which holds information needed for the algorithm
-//     * @return Next application member to whom the message has to be sent to
-//     */
-//     Member getNextApplicationMember(AlgorithmContext context);
-//
+
+    /**
+     * Initialize this
+     *
+     * @param properties The properties specific to this LoadBalanceMembershipHandler
+     * @param algorithm  The load balancing algorithm
+     */
+    void init(Properties properties, LoadbalanceAlgorithm algorithm);
+
+    /**
+     * Set the Axis2 ConfigurationContext
+     *
+     * @param configCtx Axis2 ConfigurationContext
+     */
+    void setConfigurationContext(ConfigurationContext configCtx);
+
+    /**
+     * Get the Axis2 ConfigurationContext
+     *
+     * @return Axis2 ConfigurationContext
+     */
+    ConfigurationContext getConfigurationContext();
+
+    /**
+     * Get the next application member to whom the message has to be sent to
+     *
+     * @param context The AlgorithmContext which holds information needed for the algorithm
+     * @return Next application member to whom the message has to be sent to
+     */
+     Member getNextApplicationMember(AlgorithmContext context);
+
 }

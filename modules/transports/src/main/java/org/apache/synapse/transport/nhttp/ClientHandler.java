@@ -575,10 +575,6 @@ public class ClientHandler implements NHttpClientHandler {
 
                 return;
             }
-            case HttpStatus.SC_BAD_REQUEST : {  
-                log.error("Received bad request: " + response.getStatusLine().getReasonPhrase());
-                return;
-            }
             case HttpStatus.SC_INTERNAL_SERVER_ERROR : {
                 Header contentType = response.getFirstHeader(CONTENT_TYPE);
                 if (contentType != null) {

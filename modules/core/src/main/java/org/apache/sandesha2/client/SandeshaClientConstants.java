@@ -39,4 +39,5 @@ public class SandeshaClientConstants {
 	public static final String AVOID_AUTO_TERMINATION = "AviodAutoTermination";
 	public static final String AUTO_START_NEW_SEQUENCE = "AutoStartNewSequence";
 	public static final String FORBID_MIXED_EPRS_ON_SEQUENCE = "ForbidMixedEPRsOnSequence";//if true means a sequence will not disallow both sync and async clients
+	public static final String ONE_WAY_SEQUENCE = "OneWaySequence"; // if set Sandesha2 will not send any sequene offers
 }

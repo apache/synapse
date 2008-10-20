@@ -34,6 +34,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.util.MessageContextBuilder;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -73,12 +74,12 @@ import org.apache.sandesha2.wsrm.UsesSequenceSTR;
 public class RMMsgCreator {
 
 	private static Log log = LogFactory.getLog(RMMsgCreator.class);
-	
+
 	public static final String ACK_TO_BE_WRITTEN = "ackToBeWritten";
 
 	/**
 	 * Create a new CreateSequence message.
-	 * 
+	 *
 	 * @param applicationRMMsg
 	 * @param internalSequenceId
 	 * @param acksToEPR
@@ -87,7 +88,7 @@ public class RMMsgCreator {
 	 */
 	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::createCreateSeqMsg " + applicationRMMsg);
-		
+
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
 		if (applicationMsgContext == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.appMsgIsNull));
@@ -104,7 +105,7 @@ public class RMMsgCreator {
 
 		MessageContext createSeqmsgContext = SandeshaUtil
 				.createNewRelatedMessageContext(applicationRMMsg, createSequenceOperation);
-		
+
 		OperationContext createSeqOpCtx = createSeqmsgContext.getOperationContext();
 		String createSeqMsgId = SandeshaUtil.getUUID();
 		createSeqmsgContext.setMessageID(createSeqMsgId);
@@ -128,26 +129,31 @@ public class RMMsgCreator {
 				addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
 		}
 		if(log.isDebugEnabled()) log.debug("RMMsgCreator:: addressing name space is " + addressingNamespace);
-		
+
 		// If acksTo has not been set, then default to anonymous, using the correct spec level
 		EndpointReference acksToEPR = rmsBean.getAcksToEndpointReference();
 		if(acksToEPR == null){
 			acksToEPR = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
 		}
-		
+
 		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue);
 
 		// Check if this service includes 2-way operations
 		boolean twoWayService = false;
 		AxisService service = applicationMsgContext.getAxisService();
-		if(service != null) {
-			Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
-			if(p != null && p.getValue() != null) {
-				twoWayService = ((Boolean) p.getValue()).booleanValue();
-				if(log.isDebugEnabled()) log.debug("RMMsgCreator:: twoWayService " + twoWayService);
-			}
-		}
-		
+        if (service != null) {
+            // if the user has specified this sequence as a one way sequence it should not
+            // append the sequence offer.
+            if (!JavaUtils.isTrue(applicationMsgContext.getOptions().getProperty(
+                    SandeshaClientConstants.ONE_WAY_SEQUENCE))) {
+                Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
+                if (p != null && p.getValue() != null) {
+                    twoWayService = ((Boolean) p.getValue()).booleanValue();
+                    if (log.isDebugEnabled()) log.debug("RMMsgCreator:: twoWayService " + twoWayService);
+                }
+            }
+        }
+
 		// Adding sequence offer - if present. We send an offer if the client has assigned an
 		// id, or if we are using WS-RM 1.0 and the service contains out-in MEPs
 		boolean autoOffer = false;

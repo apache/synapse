@@ -26,6 +26,9 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.ClientUtils;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -230,7 +233,35 @@ public class SequenceManager {
 				replyToEPR = null;
 			}
 
-			// For client-side sequences there are 3 options:
+            // if this is an in only service invocation and if the user has set the
+            // use seperate listner option then it should work as an dual channel model.
+            if ((replyToEPR == null) && firstAplicationMsgCtx.getOptions().isUseSeparateListener() &&
+                    firstAplicationMsgCtx.getAxisOperation().getMessageExchangePattern().equals(WSDL2Constants.MEP_URI_OUT_ONLY)){
+
+                // first check whether the transport in is set or not
+                TransportInDescription transportIn = firstAplicationMsgCtx.getTransportIn();
+                if (transportIn == null) {
+                    transportIn = firstAplicationMsgCtx.getOptions().getTransportIn();
+                }
+
+                //If use seperate listner is false then we have to use the annonymous end point.
+                if ((transportIn == null) && firstAplicationMsgCtx.getOptions().isUseSeparateListener()) {
+                    try {
+                        transportIn = ClientUtils.inferInTransport(
+                                firstAplicationMsgCtx.getConfigurationContext().getAxisConfiguration(),
+                                firstAplicationMsgCtx.getOptions(),
+                                firstAplicationMsgCtx);
+                        replyToEPR = firstAplicationMsgCtx.getConfigurationContext().getListenerManager().getEPRforService(
+                            firstAplicationMsgCtx.getAxisService().getName(),
+                            firstAplicationMsgCtx.getAxisOperation().getName().getLocalPart(),
+                            transportIn.getName());
+                    } catch (AxisFault axisFault) {
+                        throw new SandeshaException("Can not infer replyToEPR from the first message context ", axisFault);
+                    }
+                }
+            }
+
+            // For client-side sequences there are 3 options:
 			// 1) An explict AcksTo, set via the client API
 			// 2) The replyTo from the app message
 			// 3) The anonymous URI (for which we can leave a null EPR)

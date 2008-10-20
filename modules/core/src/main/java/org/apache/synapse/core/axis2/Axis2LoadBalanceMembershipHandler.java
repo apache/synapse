@@ -34,7 +34,7 @@ import java.util.Properties;
 /**
  * Bridge between Axis2 membership notification and Synapse load balancing
  */
-public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipHandler{
+public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipHandler {
     private static final Log log = LogFactory.getLog(Axis2LoadBalanceMembershipHandler.class);
 
     private String lbDomain;
@@ -86,9 +86,8 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
      * @param context The AlgorithmContext
      * @return The current member
      */
-//    TODO FIX-RUWAN
-//    public Member getNextApplicationMember(AlgorithmContext context) {
-//        algorithm.setApplicationMembers(lbEventHandler.getMembers());
-//        return algorithm.getNextApplicationMember(context);
-//    }
+    public Member getNextApplicationMember(AlgorithmContext context) {
+        algorithm.setApplicationMembers(lbEventHandler.getMembers());
+        return algorithm.getNextApplicationMember(context);
+    }
 }

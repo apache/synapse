@@ -49,85 +49,85 @@ import java.util.Properties;
  * &lt;/endpoint&gt;
  * </pre>
  */
-//public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
-//    TODO FIX-RUWAN
-//    private static final Log log = LogFactory.getLog(DynamicLoadbalanceEndpointFactory.class);
-//    private static DynamicLoadbalanceEndpointFactory instance =
-//            new DynamicLoadbalanceEndpointFactory();
-//
-//    private DynamicLoadbalanceEndpointFactory() {
-//    }
-//
-//    public static DynamicLoadbalanceEndpointFactory getInstance() {
-//        return instance;
-//    }
-//
-//    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
-//
-//        OMElement loadbalanceElement =
-//                epConfig.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
-//                                                         "dynamicLoadbalance"));
-//
-//        if (loadbalanceElement != null) {
-//
-//            DynamicLoadbalanceEndpoint loadbalanceEndpoint = new DynamicLoadbalanceEndpoint();
-//
-//            // set endpoint name
-//            OMAttribute name =
-//                    epConfig.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
-//
-//            if (name != null) {
-//                loadbalanceEndpoint.setName(name.getAttributeValue());
-//            }
-//
-//            //TODO: Handle session affinity
-//
-//            // set if failover is turned off
-//            String failover = loadbalanceElement.getAttributeValue(new QName("failover"));
-//            if (failover != null && failover.equalsIgnoreCase("false")) {
-//                loadbalanceEndpoint.setFailover(false);
-//            }
-//
-//            OMElement eventHandler =
-//                    loadbalanceElement.
-//                            getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
-//                                                            "membershipHandler"));
-//            if (eventHandler != null) {
-//                String clazz =
-//                        eventHandler.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
-//                                                                 "class")).trim();
-//                try {
-//                    LoadBalanceMembershipHandler lbMembershipHandler =
-//                            (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
-//                    Properties properties = new Properties();
-//                    for (Iterator props = eventHandler.getChildrenWithName(new QName(
-//                            SynapseConstants.SYNAPSE_NAMESPACE, "property")); props.hasNext();) {
-//                        OMElement prop = (OMElement) props.next();
-//                        String propName =
-//                                prop.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
-//                                                                 "name")).trim();
-//                        String propValue =
-//                                prop.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
-//                                                                 "value")).trim();
-//                        properties.put(propName, propValue);
-//                    }
-//
-//                    // Set load balance algorithm
-//                    LoadbalanceAlgorithm algorithm =
-//                            LoadbalanceAlgorithmFactory.
-//                                    createLoadbalanceAlgorithm(loadbalanceElement);
-//                    lbMembershipHandler.init(properties, algorithm);
-//                    loadbalanceEndpoint.setLoadBalanceMembershipHandler(lbMembershipHandler);
-//                } catch (Exception e) {
-//                    String msg = "Could not instantiate " +
-//                            "LoadBalanceMembershipHandler implementation " + clazz;
-//                    log.error(msg, e);
-//                    throw new SynapseException(msg, e);
-//                }
-//            }
-//
-//            return loadbalanceEndpoint;
-//        }
-//        return null;
-//    }
-//}
+public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
+
+    private static final Log log = LogFactory.getLog(DynamicLoadbalanceEndpointFactory.class);
+    private static DynamicLoadbalanceEndpointFactory instance =
+            new DynamicLoadbalanceEndpointFactory();
+
+    private DynamicLoadbalanceEndpointFactory() {
+    }
+
+    public static DynamicLoadbalanceEndpointFactory getInstance() {
+        return instance;
+    }
+
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+
+        OMElement loadbalanceElement =
+                epConfig.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
+                                                         "dynamicLoadbalance"));
+
+        if (loadbalanceElement != null) {
+
+            DynamicLoadbalanceEndpoint loadbalanceEndpoint = new DynamicLoadbalanceEndpoint();
+
+            // set endpoint name
+            OMAttribute name =
+                    epConfig.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+
+            if (name != null) {
+                loadbalanceEndpoint.setName(name.getAttributeValue());
+            }
+
+            //TODO: Handle session affinity
+
+            // set if failover is turned off
+            String failover = loadbalanceElement.getAttributeValue(new QName("failover"));
+            if (failover != null && failover.equalsIgnoreCase("false")) {
+                loadbalanceEndpoint.setFailover(false);
+            }
+
+            OMElement eventHandler =
+                    loadbalanceElement.
+                            getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
+                                                            "membershipHandler"));
+            if (eventHandler != null) {
+                String clazz =
+                        eventHandler.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                                                                 "class")).trim();
+                try {
+                    LoadBalanceMembershipHandler lbMembershipHandler =
+                            (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
+                    Properties properties = new Properties();
+                    for (Iterator props = eventHandler.getChildrenWithName(new QName(
+                            SynapseConstants.SYNAPSE_NAMESPACE, "property")); props.hasNext();) {
+                        OMElement prop = (OMElement) props.next();
+                        String propName =
+                                prop.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                                                                 "name")).trim();
+                        String propValue =
+                                prop.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                                                                 "value")).trim();
+                        properties.put(propName, propValue);
+                    }
+
+                    // Set load balance algorithm
+                    LoadbalanceAlgorithm algorithm =
+                            LoadbalanceAlgorithmFactory.
+                                    createLoadbalanceAlgorithm(loadbalanceElement, null);
+                    lbMembershipHandler.init(properties, algorithm);
+                    loadbalanceEndpoint.setLoadBalanceMembershipHandler(lbMembershipHandler);
+                } catch (Exception e) {
+                    String msg = "Could not instantiate " +
+                            "LoadBalanceMembershipHandler implementation " + clazz;
+                    log.error(msg, e);
+                    throw new SynapseException(msg, e);
+                }
+            }
+
+            return loadbalanceEndpoint;
+        }
+        return null;
+    }
+}

@@ -177,7 +177,11 @@ public class ClientWorker implements Runnable {
                     + this.response.getStatusLine().getReasonPhrase() + " exception : "
                     + e.getMessage();
 
-                log.warn(errorMessage, e);
+                log.warn(errorMessage);
+                if (log.isDebugEnabled()) {
+                    log.debug(errorMessage, e);
+                    log.debug("Creating the SOAPFault to be injected...");
+                }
                 SOAPFactory factory = new SOAP11Factory();
                 envelope = factory.getDefaultFaultEnvelope();
                 SOAPFaultDetail detail = factory.createSOAPFaultDetail();

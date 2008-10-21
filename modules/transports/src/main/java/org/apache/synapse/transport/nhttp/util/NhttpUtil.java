@@ -18,6 +18,14 @@
 */
 package org.apache.synapse.transport.nhttp.util;
 
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.Constants;
+import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axiom.om.OMOutputFormat;
+
 import java.net.InetAddress;
 
 /**
@@ -58,5 +66,69 @@ public class NhttpUtil {
             result = hostAddress;
         }
         return result;
+    }
+
+    /**
+     * Get the EPR for the message passed in
+     * @param msgContext the message context
+     * @return the destination EPR
+     */
+    public static EndpointReference getDestinationEPR(MessageContext msgContext) {
+
+        // Trasnport URL can be different from the WSA-To
+        String transportURL = (String) msgContext.getProperty(
+            Constants.Configuration.TRANSPORT_URL);
+
+        if (transportURL != null) {
+            return new EndpointReference(transportURL);
+        } else if (
+            (msgContext.getTo() != null) &&
+                !AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(
+                    msgContext.getTo().getAddress()) &&
+                !AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(
+                    msgContext.getTo().getAddress())) {
+            return msgContext.getTo();
+        }
+        return null;
+    }
+
+    /**
+     * Retirn the OMOutputFormat to be used for the message context passed in
+     * @param msgContext the message context
+     * @return the OMOutputFormat to be used
+     */
+    public static OMOutputFormat getOMOutputFormat(MessageContext msgContext) {
+
+        OMOutputFormat format = new OMOutputFormat();
+        msgContext.setDoingMTOM(BaseUtils.doWriteMTOM(msgContext));
+        msgContext.setDoingSwA(BaseUtils.doWriteSwA(msgContext));
+        msgContext.setDoingREST(BaseUtils.isDoingREST(msgContext));
+        format.setSOAP11(msgContext.isSOAP11());
+        format.setDoOptimize(msgContext.isDoingMTOM());
+        format.setDoingSWA(msgContext.isDoingSwA());
+
+        format.setCharSetEncoding(BaseUtils.getCharSetEncoding(msgContext));
+        Object mimeBoundaryProperty = msgContext.getProperty(Constants.Configuration.MIME_BOUNDARY);
+        if (mimeBoundaryProperty != null) {
+            format.setMimeBoundary((String) mimeBoundaryProperty);
+        }
+
+        return format;
+    }
+
+    /**
+     * Get the content type for the message passed in
+     * @param msgContext the message
+     * @return content type of the message
+     */
+    public static String getContentType(MessageContext msgContext) {
+        Object contentTypeObject = msgContext.getProperty(Constants.Configuration.CONTENT_TYPE);
+        if (contentTypeObject != null) {
+            return (String) contentTypeObject;
+        } else if (msgContext.isDoingREST()) {
+            return HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
+        } else {
+            return getOMOutputFormat(msgContext).getContentType();
+        }
     }
 }

@@ -269,8 +269,6 @@ public class FaultManager {
 			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
 		else
 			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
-		
-		System.out.println("makingInvalidAck piggy=" + piggybackedMessage + ": soap=" + SOAPVersion);
 
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMsgCtx.getRMNamespaceValue(), 
@@ -546,6 +544,7 @@ public class FaultManager {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::getOrSendFault: " + referenceRMMsgContext + "," + data + "," + throwable + "," + acksToEPR);
+			
 		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
 		
 		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
@@ -652,8 +651,6 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::getOrSendFault");
 	}
-	
-
 
 	public static boolean isRMFault (String faultSubcodeValue) {
 		if (faultSubcodeValue==null)
@@ -1051,34 +1048,37 @@ public class FaultManager {
 		while (iterator.hasNext()) {
 			SenderBean tempBean = (SenderBean) iterator.next();
 
-			String messageStoreKey = tempBean.getMessageContextRefKey();
-			
-			// Retrieve the message context.
-			MessageContext context = storageManager.retrieveMessageContext(messageStoreKey, configCtx);
-			
-			AxisOperation axisOperation = context.getAxisOperation();
-			if (axisOperation != null) {
+			if (tempBean.getMessageType() != Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG &&
+				tempBean.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
+				String messageStoreKey = tempBean.getMessageContextRefKey();
 				
-				MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
-				if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver)) {
+				// Retrieve the message context.
+				MessageContext context = storageManager.retrieveMessageContext(messageStoreKey, configCtx);
+				
+				AxisOperation axisOperation = context.getAxisOperation();
+				if (axisOperation != null) {
 					
-					Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
-					if (callback instanceof Callback) {
-						try {
-							((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
-						} catch (AxisFault axisFault) {
-							throw new SandeshaException(axisFault);
-						}
+					MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
+					if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver)) {
 						
-					((Callback)callback).onError(fault);
-					} else if(callback instanceof AxisCallback) {
-						try {
-							((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
-						} catch (AxisFault axisFault) {
-							throw new SandeshaException(axisFault);
+						Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
+						if (callback instanceof Callback) {
+							try {
+								((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
+							} catch (AxisFault axisFault) {
+								throw new SandeshaException(axisFault);
+							}
+							
+						((Callback)callback).onError(fault);
+						} else if(callback instanceof AxisCallback) {
+							try {
+								((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
+							} catch (AxisFault axisFault) {
+								throw new SandeshaException(axisFault);
+							}
+							
+							((AxisCallback)callback).onError(fault);
 						}
-						
-						((AxisCallback)callback).onError(fault);
 					}
 				}
 			}

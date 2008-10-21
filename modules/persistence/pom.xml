@@ -1,0 +1,120 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+		<groupId>org.apache.sandesha2</groupId>
+		<artifactId>sandesha2-parent</artifactId>
+        <version>SNAPSHOT</version>
+    </parent>
+	
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.sandesha2</groupId>
+    <artifactId>sandesha2-jdbc-storage</artifactId>
+    <packaging>jar</packaging>
+    <name>Sandesha2 - JDBC Persistent Storage</name>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>test-resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>create_test_repos</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <tasks>
+								<ant antfile="test.build.xml" inheritAll="true" target="prepare">
+									<property name="sandesha2.version" value="${sandesha2.version}"/>
+									<property name="build.dir" value="${project.build.directory}"/>
+									<property name="local.repo" value="${settings.localRepository}"/>
+									<property name="addressing.version" value="${axis2.version}"/>
+									<property name="rampart.version" value="${rampart.version}"/>
+								</ant>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+			<plugin>
+    			<artifactId>maven-surefire-plugin</artifactId>
+    			<configuration>
+               		<includes>
+                 		<include>**/*Test.java</include>
+                	</includes>
+                	<forkMode>pertest</forkMode>
+                	<!--<argLine>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
+    			</configuration>
+			</plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+    	<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-core</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+    	<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-policy</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+		<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-samples</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+        </dependency>
+	<dependency>
+    		<groupId>org.apache.derby</groupId>
+    		<artifactId>derby</artifactId>
+    		<version>10.3.2.1</version>
+	</dependency> 
+	<dependency>
+    		<groupId>org.apache.derby</groupId>
+    		<artifactId>derbytools</artifactId>
+    		<version>10.3.2.1</version>
+	</dependency> 
+
+    </dependencies>		
+
+</project>

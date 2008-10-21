@@ -1,0 +1,15 @@
+<!-- Add something like this in axis2.xml for the right DB -->
+    <moduleConfig name="sandesha2">
+    <!-- MySQL 
+     <parameter name="db.connectionstring">jdbc:mysql://localhost/wsrm</parameter>
+    <parameter name="db.driver">com.mysql.jdbc.Driver</parameter>
+    <parameter name="db.user"></parameter>
+    <parameter name="db.password"></parameter>
+    -->
+     <!-- Derby --> 
+    <parameter name="db.connectionstring">jdbc:derby:derby/wsrm</parameter>
+    <parameter name="db.driver">org.apache.derby.jdbc.EmbeddedDriver</parameter>
+    <parameter name="db.user"></parameter>
+    <parameter name="db.password"></parameter>
+   <!-- -->
+    </moduleConfig>

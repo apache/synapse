@@ -1,0 +1,57 @@
+2008-10-21 13:15:03,671 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:15:04,515 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/sandesha2-SNAPSHOT.mar
+2008-10-21 13:15:04,625 [main] INFO  org.apache.axis2.deployment.ServiceDeployer  - Deploying Web service: RMSampleService.aar - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/services/RMSampleService.aar
+2008-10-21 13:15:04,656 [HttpListener-8060-1] INFO  org.apache.axis2.transport.http.server.DefaultConnectionListener  - Listening on port 8060
+2008-10-21 13:15:04,953 [main] INFO  org.apache.axis2.deployment.DeploymentEngine  - No services directory was found under C:\wsfp\pyxis\WAS_build\openSrc\sandeshaCommit\modules\persistence\target\repos\persistence-client.
+2008-10-21 13:15:05,000 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:15:05,031 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2 - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/sandesha2-UnitTest.mar
+2008-10-21 13:15:05,031 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - create PersistentStorageManager
+2008-10-21 13:15:05,046 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - init PersistentStorageManager
+2008-10-21 13:15:28,546 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down connection listener
+2008-10-21 13:15:28,546 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down HTTP processors
+2008-10-21 13:15:31,562 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Force shut down HTTP processors
+2008-10-21 13:15:31,562 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - HTTP protocol handler shut down
+2008-10-21 13:15:31,968 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:15:32,078 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/sandesha2-SNAPSHOT.mar
+2008-10-21 13:15:32,171 [main] INFO  org.apache.axis2.deployment.ServiceDeployer  - Deploying Web service: RMSampleService.aar - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/services/RMSampleService.aar
+2008-10-21 13:15:32,171 [HttpListener-8060-1] INFO  org.apache.axis2.transport.http.server.DefaultConnectionListener  - Listening on port 8060
+2008-10-21 13:15:32,500 [main] INFO  org.apache.axis2.deployment.DeploymentEngine  - No services directory was found under C:\wsfp\pyxis\WAS_build\openSrc\sandeshaCommit\modules\persistence\target\repos\persistence-client.
+2008-10-21 13:15:32,546 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:15:32,593 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2 - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/sandesha2-UnitTest.mar
+2008-10-21 13:15:32,593 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - create PersistentStorageManager
+2008-10-21 13:15:32,593 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - init PersistentStorageManager
+2008-10-21 13:15:32,625 [HttpListener-6060-1] INFO  org.apache.axis2.transport.http.server.DefaultConnectionListener  - Listening on port 6060
+2008-10-21 13:16:05,187 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down connection listener
+2008-10-21 13:16:05,187 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down HTTP processors
+2008-10-21 13:16:08,203 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Force shut down HTTP processors
+2008-10-21 13:16:08,203 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - HTTP protocol handler shut down
+2008-10-21 13:16:08,843 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down connection listener
+2008-10-21 13:16:08,843 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down HTTP processors
+2008-10-21 13:16:11,859 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Force shut down HTTP processors
+2008-10-21 13:16:11,859 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - HTTP protocol handler shut down
+2008-10-21 13:16:12,203 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:16:12,359 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/sandesha2-SNAPSHOT.mar
+2008-10-21 13:16:12,390 [main] INFO  org.apache.axis2.deployment.ServiceDeployer  - Deploying Web service: RMSampleService.aar - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/services/RMSampleService.aar
+2008-10-21 13:16:12,390 [HttpListener-8060-1] INFO  org.apache.axis2.transport.http.server.DefaultConnectionListener  - Listening on port 8060
+2008-10-21 13:16:12,687 [main] INFO  org.apache.axis2.deployment.DeploymentEngine  - No services directory was found under C:\wsfp\pyxis\WAS_build\openSrc\sandeshaCommit\modules\persistence\target\repos\persistence-client.
+2008-10-21 13:16:12,734 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:16:12,750 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2 - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/sandesha2-UnitTest.mar
+2008-10-21 13:16:12,750 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - create PersistentStorageManager
+2008-10-21 13:16:12,750 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - init PersistentStorageManager
+2008-10-21 13:16:33,781 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down connection listener
+2008-10-21 13:16:33,781 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down HTTP processors
+2008-10-21 13:16:36,781 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Force shut down HTTP processors
+2008-10-21 13:16:36,781 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - HTTP protocol handler shut down
+2008-10-21 13:16:37,125 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:16:37,203 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/modules/sandesha2-SNAPSHOT.mar
+2008-10-21 13:16:37,390 [main] INFO  org.apache.axis2.deployment.ServiceDeployer  - Deploying Web service: RMSampleService.aar - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-server/services/RMSampleService.aar
+2008-10-21 13:16:37,390 [HttpListener-8060-1] INFO  org.apache.axis2.transport.http.server.DefaultConnectionListener  - Listening on port 8060
+2008-10-21 13:16:37,703 [main] INFO  org.apache.axis2.deployment.DeploymentEngine  - No services directory was found under C:\wsfp\pyxis\WAS_build\openSrc\sandeshaCommit\modules\persistence\target\repos\persistence-client.
+2008-10-21 13:16:37,734 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: addressing-SNAPSHOT - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/addressing-SNAPSHOT.mar
+2008-10-21 13:16:37,781 [main] INFO  org.apache.axis2.deployment.ModuleDeployer  - Deploying module: sandesha2 - file:/C:/wsfp/pyxis/WAS_build/openSrc/sandeshaCommit/modules/persistence/target/repos/persistence-client/modules/sandesha2-UnitTest.mar
+2008-10-21 13:16:37,781 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - create PersistentStorageManager
+2008-10-21 13:16:37,781 [main] INFO  org.apache.sandesha2.storage.jdbc.PersistentStorageManager  - init PersistentStorageManager
+2008-10-21 13:17:00,000 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down connection listener
+2008-10-21 13:17:00,000 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Shut down HTTP processors
+2008-10-21 13:17:03,000 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - Force shut down HTTP processors
+2008-10-21 13:17:03,000 [main] INFO  org.apache.axis2.transport.http.server.SimpleHttpServer  - HTTP protocol handler shut down

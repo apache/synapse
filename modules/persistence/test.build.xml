@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="prepare">
+   <property name="derby.dir" value="${build.dir}/derby" />
+   <property name="local.repo.derby" value="${local.repo}/org/apache/derby" />
+   <path id="test.class.path">
+    <pathelement path="${local.repo.derby}/derby/10.3.2.1/derby-10.3.2.1.jar"/>
+    <pathelement path="${local.repo.derby}/derbytools/10.3.2.1/derbytools-10.3.2.1.jar"/>
+  </path>
+    <target name="prepare" depends="derby:init,persistence:create" />
+    <target name="derby:init">
+	<mkdir dir="${derby.dir}" />
+    	<java fork="yes" classpathref="test.class.path" classname="org.apache.derby.tools.ij">
+    	   <arg file="${basedir}/src/resources/ddl/sandesha2-derby.ddl" />
+    	   <jvmarg value="-Dij.connection.wsrm=jdbc:derby:${derby.dir}/wsrm;create=true"/>
+    	</java>
+    </target>
+	<target name="persistence:create">
+
+		<property name="persistence.client.path" value="${build.dir}/repos/persistence-client"/>
+		<property name="persistence.server.path" value="${build.dir}/repos/persistence-server"/>
+		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
+			
+		<mkdir dir="${persistence.client.path}" />
+		<mkdir dir="${persistence.client.path}/modules" />
+         
+		<mkdir dir="${persistence.server.path}" />
+		<mkdir dir="${persistence.server.path}/modules" />
+		<mkdir dir="${persistence.server.path}/services" />
+
+		<property name="persistence.temp.path" value="${build.dir}/temp/persistence" />
+		<mkdir dir="${persistence.temp.path}" />
+				
+        	<copy file="${repo.addressing.mar}" toDir="${persistence.server.path}/modules/" />
+        	<copy file="../mar/target/sandesha2-${sandesha2.version}.mar" toDir="${persistence.server.path}/modules/" />
+		<copy file="../tests/test-resources/server_axis2.xml" todir="${persistence.server.path}" />
+
+		<copy todir="${persistence.server.path}/services" >
+            		<fileset dir="../samples/target/aars">
+                		<include name="**/*.aar" />
+            		</fileset>
+		</copy>
+
+        	<copy file="${repo.addressing.mar}" toDir="${persistence.client.path}/modules/" />
+        	<copy file="../tests/test-resources/client_axis2.xml" toFile="${persistence.client.path}/client_axis2.xml" />
+		<replace file="${persistence.client.path}/client_axis2.xml"
+		  token="&lt;!--&lt;/moduleConfig>-->" >
+		  <replacevalue><![CDATA[<!--</moduleConfig>-->
+    <parameter name="Sandesha2StorageManager" locked="false">persistent</parameter>
+    <moduleConfig name="sandesha2">
+     <parameter name="db.connectionstring">jdbc:derby:${derby.dir}/wsrm</parameter>
+    <parameter name="db.driver">org.apache.derby.jdbc.EmbeddedDriver</parameter>
+    <parameter name="db.user"></parameter>
+    <parameter name="db.password"></parameter>
+    </moduleConfig>
+		  ]]></replacevalue>
+		</replace>
+		<replace file="${persistence.client.path}/client_axis2.xml"
+		  token="$${derby.dir}"
+		  value="${derby.dir}" />
+
+		<!-- Switch on serialization in the module.xml file -->
+		<unjar src="../mar/target/sandesha2-${sandesha2.version}.mar" dest="${persistence.temp.path}"/>
+		<replace file="${persistence.temp.path}/META-INF/module.xml" 
+		  value="&lt;sandesha2:PermanentStorageManager>org.apache.sandesha2.storage.jdbc.PersistentStorageManager">
+		  <replacetoken><![CDATA[<sandesha2:PermanentStorageManager>
+					  org.apache.sandesha2.storage.inmemory.InMemoryStorageManager]]></replacetoken>
+		</replace>
+		<jar jarfile="${persistence.client.path}/modules/sandesha2-UnitTest.mar" basedir="${persistence.temp.path}"/>
+		<!--<jar jarfile="${persistence.server.path}/modules/sandesha2-UnitTest.mar" basedir="${persistence.temp.path}"/>-->
+		
+		<!-- <delete dir="${persistence.temp.path}"/> -->
+
+	</target>
+
+</project>

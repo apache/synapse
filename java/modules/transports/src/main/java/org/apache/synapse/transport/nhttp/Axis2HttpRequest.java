@@ -39,6 +39,7 @@ import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
+import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.util.TemporaryData;
 
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class Axis2HttpRequest {
         this.epr = epr;
         this.httpHost = httpHost;
         this.msgContext = msgContext;
-        this.format = NhttpUtils.getOMOutputFormat(msgContext);
+        this.format = NhttpUtil.getOMOutputFormat(msgContext);
         this.messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
     }

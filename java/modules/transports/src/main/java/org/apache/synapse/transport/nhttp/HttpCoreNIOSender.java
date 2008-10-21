@@ -53,6 +53,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -227,7 +228,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             msgContext.setProperty(NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
         }
 
-        EndpointReference epr = NhttpUtils.getDestinationEPR(msgContext);
+        EndpointReference epr = NhttpUtil.getDestinationEPR(msgContext);
         if (epr != null) {
             if (!AddressingConstants.Final.WSA_NONE_URI.equals(epr.getAddress())) {
                 sendAsyncRequest(epr, msgContext);
@@ -356,7 +357,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         ServerWorker worker = (ServerWorker) msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
         HttpResponse response = worker.getResponse();
 
-        OMOutputFormat format = NhttpUtils.getOMOutputFormat(msgContext);
+        OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         response.setHeader(
@@ -449,7 +450,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {
 
-        OMOutputFormat format = NhttpUtils.getOMOutputFormat(msgContext);
+        OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         OutputStream out = (OutputStream) msgContext.getProperty(MessageContext.TRANSPORT_OUT);

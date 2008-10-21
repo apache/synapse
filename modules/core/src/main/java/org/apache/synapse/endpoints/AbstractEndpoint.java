@@ -407,4 +407,12 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
                 " ' for JMX management", e);
         }
     }
+
+    protected void logOnChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
+        if (log.isDebugEnabled()) {
+            log.debug(this + " Detect a Failure in a child endpoint : " + endpoint);
+            log.debug(this + " Retry Attempt for Request with [Message ID : " + synMessageContext.getMessageID()
+                    + "], [To : " + synMessageContext.getTo() + "]");
+        }
+    }
 }

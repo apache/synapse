@@ -22,15 +22,12 @@ package org.apache.synapse.endpoints;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.endpoints.algorithms.AlgorithmContext;
-import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.endpoints.dispatch.SessionInformation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * SALoadbalanceEndpoint supports session affinity based load balancing. Each of this endpoint
@@ -154,6 +151,7 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
      */
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synCtx) {
 
+        logOnChildEndpointFail(endpoint, synCtx);
         Object o = synCtx.getProperty(
                 SynapseConstants.PROP_SAL_ENDPOINT_FIRST_MESSAGE_IN_SESSION);
 

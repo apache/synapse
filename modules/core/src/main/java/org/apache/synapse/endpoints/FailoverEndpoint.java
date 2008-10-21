@@ -44,6 +44,9 @@ public class FailoverEndpoint extends AbstractEndpoint {
 
         boolean isARetry = false;
         if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null) {
+            if (log.isDebugEnabled()) {
+                log.debug(this + " Building the SoapEnvelope");
+            }
             // If not yet a retry, we have to build the envelope since we need to support failover
             synCtx.getEnvelope().build();
         } else {
@@ -92,6 +95,8 @@ public class FailoverEndpoint extends AbstractEndpoint {
     }
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
+
+        logOnChildEndpointFail(endpoint, synMessageContext);
         send(synMessageContext);
     }
 

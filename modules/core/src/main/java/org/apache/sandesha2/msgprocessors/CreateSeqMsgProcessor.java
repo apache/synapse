@@ -19,8 +19,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.Collection;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;

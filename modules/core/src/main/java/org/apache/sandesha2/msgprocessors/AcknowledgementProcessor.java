@@ -87,7 +87,6 @@ public class AcknowledgementProcessor {
 			log.debug("Enter: AcknowledgementProcessor::processAckHeader " + soapHeader);
 		
 		boolean piggybackedAck = !(rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK);
-		
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		ConfigurationContext configCtx = msgCtx.getConfigurationContext();
 
@@ -110,7 +109,10 @@ public class AcknowledgementProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
-		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, outSequenceId, rmsBean, piggybackedAck)) {
+		// If the message type is terminate sequence, then there may be a piggy backed ACK for a 
+		// sequence that has been terminated
+		if (rmMsgCtx.getMessageType()!=Sandesha2Constants.MessageTypes.TERMINATE_SEQ && 
+		    FaultManager.checkForSequenceTerminated(rmMsgCtx, outSequenceId, rmsBean, piggybackedAck)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Sequence terminated");
 			return;

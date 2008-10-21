@@ -400,8 +400,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					lastMessage = true;
 			}
 			
-			if (lastMessage) 
-				rmsBean.setLastOutMessage(messageNumber);		
+			if (lastMessage) {
+				rmsBean.setLastOutMessage(messageNumber);
+				
+				if (msgContext.getTo() == null || (msgContext.getTo() != null && msgContext.getTo().isWSAddressingAnonymous())) {
+				  if (log.isDebugEnabled())
+				    log.debug("Rewriting anonymous EPR for LastMessage to the one stored in the RMSBean");
+				  msgContext.setTo(rmsBean.getToEndpointReference());
+				}
+			}
 	
 			// set this as the response highest message.
 			rmsBean.setHighestOutMessageNumber(messageNumber);

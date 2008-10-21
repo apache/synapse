@@ -114,8 +114,10 @@ public class AcknowledgementManager {
 				if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 					log.debug("Piggybacking ack for sequence: " + inboundSequence);
 				RMDBean sequence = storageManager.getRMDBeanMgr().retrieve(inboundSequence);
-				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, sequence, false);
-				((Sender) storageManager.getSender()).removeScheduledAcknowledgement(inboundSequence);
+				if (sequence != null && !sequence.isTerminated()) {				  
+    				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, sequence, false);
+    				((Sender) storageManager.getSender()).removeScheduledAcknowledgement(inboundSequence);
+				}
 			} else {
 				RMDBean findRMDBean = new RMDBean();
 				findRMDBean.setAcksToEndpointReference(target);

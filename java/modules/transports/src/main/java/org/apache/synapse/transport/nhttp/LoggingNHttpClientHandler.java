@@ -31,7 +31,7 @@ import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
 
 /**
- * Decorator class intended to transparently extend an {@link NHttpClientHandler} 
+ * Decorator class intended to transparently extend an {@link NHttpClientHandler}
  * with basic event logging capabilities using Commons Logging. 
  */
 public class LoggingNHttpClientHandler implements NHttpClientHandler {
@@ -87,14 +87,14 @@ public class LoggingNHttpClientHandler implements NHttpClientHandler {
 
     public void requestReady(final NHttpClientConnection conn) {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Request ready");
+            this.log.debug("HTTP connection " + conn + ": Request ready" + getRequestMessageID(conn));
         }
         this.handler.requestReady(conn);
     }
 
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Output ready");
+            this.log.debug("HTTP connection " + conn + ": Output ready" + getRequestMessageID(conn));
         }
         this.handler.outputReady(conn, encoder);
         if (this.log.isDebugEnabled()) {
@@ -105,7 +105,8 @@ public class LoggingNHttpClientHandler implements NHttpClientHandler {
     public void responseReceived(final NHttpClientConnection conn) {
         HttpResponse response = conn.getHttpResponse();
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": " + response.getStatusLine());
+            this.log.debug("HTTP connection " + conn + " : "
+                    + response.getStatusLine() + getRequestMessageID(conn));
         }
         this.handler.responseReceived(conn);
         if (this.headerlog.isDebugEnabled()) {
@@ -119,7 +120,7 @@ public class LoggingNHttpClientHandler implements NHttpClientHandler {
 
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Input ready");
+            this.log.debug("HTTP connection " + conn + ": Input ready" + getRequestMessageID(conn));
         }
         this.handler.inputReady(conn, decoder);
         if (this.log.isDebugEnabled()) {
@@ -129,9 +130,17 @@ public class LoggingNHttpClientHandler implements NHttpClientHandler {
 
     public void timeout(final NHttpClientConnection conn) {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Timeout");
+            this.log.debug("HTTP connection " + conn + ": Timeout" + getRequestMessageID(conn));
         }
         this.handler.timeout(conn);
     }
 
+    private static String getRequestMessageID(final NHttpClientConnection conn) {
+        Axis2HttpRequest axis2Request = (Axis2HttpRequest)
+                conn.getContext().getAttribute(ClientHandler.AXIS2_HTTP_REQUEST);
+        if (axis2Request != null) {
+            return " [Request Message ID : " + axis2Request.getMsgContext().getMessageID() + "]";
+        }
+        return "";
+    }
 }

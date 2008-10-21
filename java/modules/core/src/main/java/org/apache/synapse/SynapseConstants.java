@@ -301,6 +301,8 @@ public final class SynapseConstants {
     
     public static final String TEMP_FILE_SUFIX = "synapse.tempfile.sufix";
 
+    public static final String DOING_FAIL_OVER = "synapse.doing.failover";
+
     // Known transport error codes
     public static final int RCV_IO_ERROR_SENDING     = 101000;
     public static final int RCV_IO_ERROR_RECEIVING   = 101001;

@@ -115,10 +115,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("child endpoind of load balance endpoint : " + getName() + " failed");
-        }
-
+        logOnChildEndpointFail(endpoint, synMessageContext);
         // resend (to a different endpoint) only if we support failover
         if (failover) {
             send(synMessageContext);

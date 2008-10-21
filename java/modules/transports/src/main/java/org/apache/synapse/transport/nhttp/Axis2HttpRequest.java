@@ -240,7 +240,11 @@ public class Axis2HttpRequest {
     public void streamMessageContents() throws AxisFault {
 
         if (log.isDebugEnabled()) {
-            log.debug("start streaming outgoing http request");
+            log.debug("Start streaming outgoing http request : [Message ID : " + msgContext.getMessageID() + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("Message [Request Message ID : " + msgContext.getMessageID() + "] " +
+                        "[Request Message Payload : [ " + msgContext.getEnvelope() + "]");
+            }
         }
 
         synchronized(this) {
@@ -323,5 +327,15 @@ public class Axis2HttpRequest {
 
     public void setSendingCompleted(boolean sendingCompleted) {
         this.sendingCompleted = sendingCompleted;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Axis2Request [Message ID : ").append(msgContext.getMessageID()).append("] ");
+        sb.append("[Status Completed : ").append(isCompleted() ? "true" : "false").append("] ");
+        sb.append("[Status SendingCompleted : ").append(
+                isSendingCompleted() ? "true" : "false").append("]");
+        return sb.toString();
     }
 }

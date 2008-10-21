@@ -19,27 +19,18 @@
 
 package org.apache.synapse.core.axis2;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPFault;
-import org.apache.axiom.soap.SOAPFaultCode;
-import org.apache.axiom.soap.SOAPFaultReason;
-import org.apache.axiom.soap.SOAPFaultText;
-import org.apache.axiom.soap.SOAPFaultValue;
-import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.MessageHelper;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class SOAPUtils {
 
@@ -98,14 +89,14 @@ public class SOAPUtils {
         if(log.isDebugEnabled()) {
             log.debug("convert SOAP11 to SOAP12");
         }
-
-        SOAPEnvelope oldEnvelope = axisOutMsgCtx.getEnvelope();
+        
+        SOAPEnvelope clonedOldEnv = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope()); 
 
         SOAPFactory soap12Factory = OMAbstractFactory.getSOAP12Factory();
         SOAPEnvelope newEnvelope  = soap12Factory.getDefaultEnvelope();
 
-        if (oldEnvelope.getHeader() != null) {
-            Iterator itr = oldEnvelope.getHeader().getChildren();
+        if (clonedOldEnv.getHeader() != null) {
+            Iterator itr = clonedOldEnv.getHeader().getChildren();
             while (itr.hasNext()) {
                 OMNode omNode = (OMNode) itr.next();
 
@@ -155,11 +146,11 @@ public class SOAPUtils {
 
             } // while (itr.hasNext())
 
-        } // if (oldEnvelope.getHeader() != null)
+        } // if (clonedOldEnv.getHeader() != null)
 
-        if (oldEnvelope.getBody() != null) {
+        if (clonedOldEnv.getBody() != null) {
 
-            Iterator itrBodyChildren = oldEnvelope.getBody().getChildren();
+            Iterator itrBodyChildren = clonedOldEnv.getBody().getChildren();
             while (itrBodyChildren.hasNext()) {
                 OMNode omNode = (OMNode) itrBodyChildren.next();
 
@@ -206,7 +197,7 @@ public class SOAPUtils {
 
             } // while (itrBodyChildren.hasNext())
 
-        } //if (oldEnvelope.getBody() != null)
+        } //if (clonedOldEnv.getBody() != null)
 
         axisOutMsgCtx.setEnvelope(newEnvelope);
     }
@@ -238,12 +229,12 @@ public class SOAPUtils {
             log.debug("convert SOAP12 to SOAP11");
         }
 
-        SOAPEnvelope oldEnvelope = axisOutMsgCtx.getEnvelope();
+        SOAPEnvelope clonedOldEnv = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope()); 
 
         SOAPFactory soap11Factory = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope newEnvelope  = soap11Factory.getDefaultEnvelope();
-        if (oldEnvelope.getHeader() != null) {
-            Iterator itr = oldEnvelope.getHeader().getChildren();
+        if (clonedOldEnv.getHeader() != null) {
+            Iterator itr = clonedOldEnv.getHeader().getChildren();
             while (itr.hasNext()) {
                 OMNode omNode = (OMNode) itr.next();
 
@@ -294,10 +285,10 @@ public class SOAPUtils {
 
             } // while (itr.hasNext())
 
-        } // if (oldEnvelope.getHeader() != null)
+        } // if (clonedOldEnv.getHeader() != null)
 
-        if (oldEnvelope.getBody() != null) {
-            Iterator itr = oldEnvelope.getBody().getChildren();
+        if (clonedOldEnv.getBody() != null) {
+            Iterator itr = clonedOldEnv.getBody().getChildren();
             while (itr.hasNext()) {
                 OMNode omNode = (OMNode) itr.next();
 
@@ -347,7 +338,7 @@ public class SOAPUtils {
 
             } // while (itr.hasNext())
 
-        } // if (oldEnvelope.getBody() != null)
+        } // if (clonedOldEnv.getBody() != null)
         
         axisOutMsgCtx.setEnvelope(newEnvelope);
     }

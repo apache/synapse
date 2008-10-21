@@ -279,16 +279,20 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection encountering the error
      * @return the updated error message
      */
-    private String getErrorMessage(String message, NHttpClientConnection conn) {
-        if (conn != null && conn instanceof DefaultNHttpClientConnection) {
-            DefaultNHttpClientConnection c = ((DefaultNHttpClientConnection) conn);
-            if (c.getRemoteAddress() != null) {
-                return message + " for : " + c.getRemoteAddress().getHostAddress() + ":" +
-                    c.getRemotePort();
-            }
-        }
-        return message;
-    }
+       private String getErrorMessage(String message, NHttpClientConnection conn) {
+           if (conn != null && conn instanceof DefaultNHttpClientConnection) {
+               DefaultNHttpClientConnection c = ((DefaultNHttpClientConnection) conn);
+               Axis2HttpRequest axis2Request = (Axis2HttpRequest)
+                       conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
+
+               if (c.getRemoteAddress() != null) {
+                   return message + " For : " + c.getRemoteAddress().getHostAddress() + ":" +
+                           c.getRemotePort() + (axis2Request != null ? "For Request : "
+                           + axis2Request : "");
+               }
+           }
+           return message;
+       }
 
     /**
      * check to see if http request-response has completed, if not completed yet,
@@ -359,6 +363,11 @@ public class ClientHandler implements NHttpClientHandler {
 
                         SOAPEnvelope envelope = nioFaultMessageContext.getEnvelope();
 
+                        if (log.isDebugEnabled()) {
+                            log.debug("Sending Fault for Request with Message ID : "
+                                    + mc.getMessageID());
+                        }
+                        
                         nioFaultMessageContext.setProperty(
                             NhttpConstants.SENDING_FAULT, Boolean.TRUE);
                         nioFaultMessageContext.setProperty(
@@ -490,23 +499,27 @@ public class ClientHandler implements NHttpClientHandler {
 
         // Have we sent out our request fully in the first place? if not, forget about it now..
         Axis2HttpRequest req = (Axis2HttpRequest) conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
-        if (req != null && !req.isSendingCompleted()) {
-            req.getMsgContext().setProperty(NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
-            req.setCompleted(true);                                              
-            SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
-                conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
-            if (outputBuffer != null) {
-                outputBuffer.shutdown();
+        
+        if (req != null) {
+            req.setCompleted(true);
+            if (log.isDebugEnabled()) {
+                log.debug("Response Received for Request : " + req);
             }
-            log.warn("Remote server aborted request being sent and replied : " + conn);
-            if (metrics != null) {
-                metrics.incrementFaultsSending(NhttpConstants.SEND_ABORT, req.getMsgContext());
+            if (!req.isSendingCompleted()) {
+                req.getMsgContext().setProperty(NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
+                req.setCompleted(true);
+                SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
+                        conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
+                if (outputBuffer != null) {
+                    outputBuffer.shutdown();
+                }
+                log.warn("Remote server aborted request being sent and replied : " + conn);
+                if (metrics != null) {
+                    metrics.incrementFaultsSending(NhttpConstants.SEND_ABORT, req.getMsgContext());
+                }
             }
         }
 
-        if (req != null) {
-            req.setCompleted(true);
-        }
 
         switch (response.getStatusLine().getStatusCode()) {
             case HttpStatus.SC_ACCEPTED : {

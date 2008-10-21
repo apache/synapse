@@ -117,7 +117,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         if (messageID != null) {
             AxisCallback callback = callbackStore.remove(messageID);
             if (log.isDebugEnabled()) {
-                log.debug("Callback removed. Pending callbacks count : " + callbackStore.size());
+                log.debug("Callback removed for request message id : " + messageID +
+                        ". Pending callbacks count : " + callbackStore.size());
             }
 
             RelatesTo[] relates = messageCtx.getRelationships();
@@ -129,12 +130,12 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             }
             
             if (callback != null) {
-                handleMessage(messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());
+                handleMessage(messageID, messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());
                 
             } else {
                 // TODO invoke a generic synapse error handler for this message
                 log.warn("Synapse received a response for the request with message Id : " +
-                    messageID + " But a callback is not registered (anymore) to process this response");
+                        messageID + " But a callback is not registered (anymore) to process this response");
             }
 
         } else if (!messageCtx.isPropertyTrue(NhttpConstants.SC_ACCEPTED)){
@@ -146,13 +147,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     /**
      * Handle the response or error (during a failed send) message received for an outgoing request
      *
+     * @param messageID        Request message ID
      * @param response         the Axis2 MessageContext that has been received and has to be handled
      * @param synapseOutMsgCtx the corresponding (outgoing) Synapse MessageContext for the above
      *                         Axis2 MC, that holds Synapse specific information such as the error
      *                         handler stack and local properties etc.
      * @throws AxisFault       if the message cannot be processed
      */
-    private void handleMessage(MessageContext response,
+    private void handleMessage(String messageID ,MessageContext response,
         org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
 
         Endpoint endpoint = (Endpoint) synapseOutMsgCtx.getProperty(
@@ -189,6 +191,11 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_DETAIL,
                     response.getProperty(SynapseConstants.ERROR_DETAIL));
                 synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, e);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("[Failed Request Message ID : " + messageID + "]" +
+                            " [New to be Retried Request Message ID : " + synapseOutMsgCtx.getMessageID() + "]");
+                }                   
 
                 ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);
             }

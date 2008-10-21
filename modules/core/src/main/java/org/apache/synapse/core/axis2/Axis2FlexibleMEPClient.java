@@ -115,6 +115,11 @@ public class Axis2FlexibleMEPClient {
         // we need to create the response to the original message later on
         MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx);
 
+        if (log.isDebugEnabled()) {
+            log.debug("Message [Original Request Message ID : " + synapseOutMessageContext.getMessageID()
+                    + "]" + " [New Cloned Request Message ID : "
+                    + axisOutMsgCtx.getMessageID() + "]");
+        }
         // set all the details of the endpoint only to the cloned message context
         // so that we can use the original message context for resending through different endpoints
         if (endpoint != null) {

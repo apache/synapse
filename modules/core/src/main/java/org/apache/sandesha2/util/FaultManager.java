@@ -269,6 +269,9 @@ public class FaultManager {
 			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
 		else
 			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+		
+		if (log.isDebugEnabled())
+			log.debug("makingInvalidAck piggy=" + piggybackedMessage + ": soap=" + SOAPVersion);
 
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMsgCtx.getRMNamespaceValue(), 
@@ -276,10 +279,7 @@ public class FaultManager {
 		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckFault));
 		
 		data.setDetail(sequenceAcknowledgement.getOriginalSequenceAckElement());
-							
-		if (log.isDebugEnabled())
-			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-		
+									
 		boolean throwable = !piggybackedMessage;
 		getOrSendFault(rmMsgCtx, data, throwable, acksToEPR);
   }

@@ -132,7 +132,8 @@ public class AcknowledgementProcessor {
 		}
 		
 		EndpointReference replyTo = rmsBean.getReplyToEndpointReference();
-		boolean anonReplyTo = replyTo==null || replyTo.hasAnonymousAddress();
+		boolean anonReplyTo = replyTo==null || replyTo.isWSAddressingAnonymous(); //if this is wsa anonymous
+																				//then we might be using replay
 		
 		String rmVersion = rmMsgCtx.getRMSpecVersion();
 		
@@ -140,6 +141,11 @@ public class AcknowledgementProcessor {
 		// is any new information in this ack message
 		RangeString completedMessages = rmsBean.getClientCompletedMessages();
 		long numberOfNewMessagesAcked = 0;
+		
+		boolean ackNeedsToSendInvalidFault = false; //if this ack includes a msg that we have not sent then
+													//we should try to send a fault back to the client
+		Range firstInvalidRange = null;				//If there is a single invalid range then we set it here.
+													//If there is more than one we report the first invalid range
 
 		while(ackRangeIterator.hasNext()) {
 			Range ackRange = (Range) ackRangeIterator.next();
@@ -162,34 +168,49 @@ public class AcknowledgementProcessor {
 						if (retransmitterBean != null && retransmitterBean.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
 							// Check we haven't got an Ack for an application message that hasn't been sent yet !
 							if (retransmitterBean.getSentCount() == 0 ) {
-								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
-										storageManager, piggybackedAck, null); //do not want to send the fault to acksTo in this case
-								if (log.isDebugEnabled())
-									log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack as message has not been sent");
-								return;
-							}
-							
-							String storageKey = retransmitterBean.getMessageContextRefKey();
-							
-							boolean syncResponseNeeded = false;
-							if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && anonReplyTo) {
-								MessageContext applicationMessage = storageManager.retrieveMessageContext(storageKey, configCtx);
-								AxisOperation operation = applicationMessage.getAxisOperation();
-								if(operation!= null) {
-									int mep = operation.getAxisSpecificMEPConstant();
-									syncResponseNeeded = (mep == WSDLConstants.MEP_CONSTANT_OUT_IN);
+								//invalid ack range
+								if(!ackNeedsToSendInvalidFault){
+									ackNeedsToSendInvalidFault = true;
+									firstInvalidRange = newRanges[rangeIndex];
+									if (log.isDebugEnabled())
+										log.debug("unsent msg has been acked " + retransmitterBean);
 								}
 							}
+							else{
+								//delete the sender bean that has been validly acknowledged (unless
+								//we use replay model)
+								String storageKey = retransmitterBean.getMessageContextRefKey();
+								
+								boolean syncResponseNeeded = false;
+								if (anonReplyTo) {
+									MessageContext applicationMessage = storageManager.retrieveMessageContext(storageKey, configCtx);
+									AxisOperation operation = applicationMessage.getAxisOperation();
+									if(operation!= null) {
+										int mep = operation.getAxisSpecificMEPConstant();
+										syncResponseNeeded = (mep == WSDLConstants.MEP_CONSTANT_OUT_IN);
+									}
+								}
 
-							if (!syncResponseNeeded) {
-								// removing the application message from the storage.
-								retransmitterMgr.delete(retransmitterBean.getMessageID());
-								storageManager.removeMessageContext(storageKey);
+
+								if (!syncResponseNeeded) {
+									// removing the application message from the storage if there is no replay model
+									retransmitterMgr.delete(retransmitterBean.getMessageID());
+									storageManager.removeMessageContext(storageKey);
+								}								
 							}
 						}
 					}//end for
 				}//end for
 			} //end while
+		}
+		
+		if(ackNeedsToSendInvalidFault){
+			//try to send an invalid ack
+			FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, firstInvalidRange,
+					storageManager, piggybackedAck, null); //do not want to send the fault to acksTo in this case
+			if (log.isDebugEnabled())
+				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack as message has not been sent");
+			return;
 		}
 
 		// updating the last activated time of the sequence.
@@ -220,7 +241,8 @@ public class AcknowledgementProcessor {
 
 		// Try and terminate the sequence
 		if (!rmsBean.isAvoidAutoTermination()) 
-			TerminateManager.checkAndTerminate(rmMsgCtx.getConfigurationContext(), storageManager, rmsBean);
+			TerminateManager.checkAndTerminate(rmMsgCtx.getConfigurationContext(), storageManager, rmsBean);			
+
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementProcessor::processAckHeader");

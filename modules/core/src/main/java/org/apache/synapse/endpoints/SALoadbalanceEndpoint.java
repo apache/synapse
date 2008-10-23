@@ -283,7 +283,6 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
             synCtx.setProperty(SynapseConstants.ERROR_CODE, errorCode);
             synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg);
             synCtx.setProperty(SynapseConstants.ERROR_DETAIL, errorMsg);
-            synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, null);
         }
         super.onFault(synCtx);
     }

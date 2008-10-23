@@ -32,50 +32,50 @@ import org.apache.sandesha2.storage.Transaction;
  */
 public class JDBCTransaction implements Transaction {
 	private PersistentStorageManager pmgr = null;
-	private Connection DbConnection = null;
+	private Connection dbConnection = null;
 	private boolean active = false;
 	private Log log = LogFactory.getLog(getClass());
-	
+
 	public JDBCTransaction (PersistentStorageManager pmgr)
 	{
 		log.debug("new JDBCTransaction");
 		try {
 		  this.pmgr = pmgr;
-		  DbConnection = pmgr.dbConnect();
-		  DbConnection.setAutoCommit(false);
+		  dbConnection = pmgr.dbConnect();
+		  dbConnection.setAutoCommit(false);
 		  active = true;
 		} catch (Exception ex) {}
 	}
-	
+
 	public Connection getDbConnection()
 	{
-		return DbConnection;
+		return dbConnection;
 	}
-	
+
 	private void freeTransaction()
 	{
 		try {
-			DbConnection.close();
+			dbConnection.close();
 			pmgr.removeTransaction();
 		} catch (Exception ex) {}
-		
+
 	}
-		
+
 	public void commit()
 	{
 		log.debug("commit JDBCTransaction");
 		try {
-		  DbConnection.commit();
+		  dbConnection.commit();
 		  freeTransaction();
 		} catch (Exception ex) {}
 		active = false;
 	}
-	
+
 	public void rollback()
 	{
 		log.debug("rollback JDBCTransaction");
 		try {
-			  DbConnection.rollback();
+			  dbConnection.rollback();
 			  freeTransaction();
 			} catch (Exception ex) {}
 		active = false;

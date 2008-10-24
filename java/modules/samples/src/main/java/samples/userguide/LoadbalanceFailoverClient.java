@@ -41,12 +41,15 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.wsdl.WSDLConstants;
 
 import javax.xml.namespace.QName;
-import java.util.Random;
+import java.util.*;
 import java.io.File;
 import java.net.URL;
 import java.net.MalformedURLException;
 
 public class LoadbalanceFailoverClient {
+
+    private final static String COOKIE = "Cookie";
+    private final static String SET_COOKIE = "Set-Cookie";
 
     /**
      * @param args 0: simple | session
@@ -84,6 +87,17 @@ public class LoadbalanceFailoverClient {
         String trpUrl = getProperty("trpurl", null);
         String prxUrl = getProperty("prxurl", null);
 
+        String sleep = getProperty("sleep", null);
+
+
+        long sleepTime = -1;
+        if (sleep != null) {
+            try {
+                sleepTime = Long.parseLong(sleep);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
         if (pPort != null) {
             try {
                 Integer.parseInt(pPort);
@@ -109,7 +123,7 @@ public class LoadbalanceFailoverClient {
         value.setText("Sample string");
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/services/LBService1"));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort));
 
         options.setAction("urn:sampleOperation");
 
@@ -117,10 +131,10 @@ public class LoadbalanceFailoverClient {
         ConfigurationContext configContext;
         if (repo != null) {
             configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
+                    repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
         } else {
             configContext = ConfigurationContextFactory.
-                createConfigurationContextFromFileSystem("client_repo", null);
+                    createConfigurationContextFromFileSystem("client_repo", null);
         }
         ServiceClient client = new ServiceClient(configContext, null);
         options.setTimeOutInMilliSeconds(10000000);
@@ -137,7 +151,7 @@ public class LoadbalanceFailoverClient {
         }
         if (prxUrl != null && !"null".equals(prxUrl)) {
             HttpTransportProperties.ProxyProperties proxyProperties =
-                new HttpTransportProperties.ProxyProperties();
+                    new HttpTransportProperties.ProxyProperties();
             try {
                 URL url = new URL(prxUrl);
                 proxyProperties.setProxyName(url.getHost());
@@ -156,6 +170,15 @@ public class LoadbalanceFailoverClient {
 
         long i = 0;
         while (i < iterations || infinite) {
+
+            if (sleepTime != -1) {
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException ignored) {
+                }
+            }
+
+            client.getOptions().setManageSession(true);
             OMElement responseElement = client.sendReceive(value);
             String response = responseElement.getText();
 
@@ -185,6 +208,16 @@ public class LoadbalanceFailoverClient {
         String addUrl = getProperty("addurl", null);
         String trpUrl = getProperty("trpurl", null);
         String prxUrl = getProperty("prxurl", null);
+        String sleep = getProperty("sleep", null);
+        String session = getProperty("session", null);
+
+        long sleepTime = -1;
+        if (sleep != null) {
+            try {
+                sleepTime = Long.parseLong(sleep);
+            } catch (NumberFormatException ignored) {
+            }
+        }
 
         if (pPort != null) {
             try {
@@ -208,7 +241,7 @@ public class LoadbalanceFailoverClient {
         }
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/services/LBService1"));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort));
         options.setAction("urn:sampleOperation");
         options.setTimeOutInMilliSeconds(10000000);
 
@@ -221,9 +254,9 @@ public class LoadbalanceFailoverClient {
             SOAPEnvelope[] envelopes = {env1, env2, env3};
 
             ConfigurationContext configContext = ConfigurationContextFactory.
-                createConfigurationContextFromFileSystem("client_repo", null);
+                    createConfigurationContextFromFileSystem("client_repo", null);
             ServiceClient client = new ServiceClient(configContext, null);
-            
+
             // set addressing, transport and proxy url
             if (addUrl != null && !"null".equals(addUrl)) {
                 client.engageModule("addressing");
@@ -236,7 +269,7 @@ public class LoadbalanceFailoverClient {
             }
             if (prxUrl != null && !"null".equals(prxUrl)) {
                 HttpTransportProperties.ProxyProperties proxyProperties =
-                    new HttpTransportProperties.ProxyProperties();
+                        new HttpTransportProperties.ProxyProperties();
                 try {
                     URL url = new URL(prxUrl);
                     proxyProperties.setProxyName(url.getHost());
@@ -252,28 +285,61 @@ public class LoadbalanceFailoverClient {
             client.setOptions(options);
 
             int i = 0;
-            int sessionNumber;
+            int sessionNumber = 0;
+            String[] cookies = new String[3];
+            boolean httpSession = session != null && "http".equals(session);
+            int cookieNumber = 0;
             while (i < iterations || infinite) {
 
                 i++;
+                if (sleepTime != -1) {
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
 
                 MessageContext messageContext = new MessageContext();
                 sessionNumber = getSessionTurn(envelopes.length);
+
+
                 messageContext.setEnvelope(envelopes[sessionNumber]);
+                cookieNumber = getSessionTurn(cookies.length);
+                String cookie = cookies[cookieNumber];
+                if (httpSession) {
+                    setSessionID(messageContext, cookie);
+                }
+                try {
+                    OperationClient op = client.createClient(ServiceClient.ANON_OUT_IN_OP);
+                    op.addMessageContext(messageContext);
+                    op.execute(true);
 
-                OperationClient op = client.createClient(ServiceClient.ANON_OUT_IN_OP);
-                op.addMessageContext(messageContext);
-                op.execute(true);
+                    MessageContext responseContext =
+                            op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+                    String receivedCookie = extractSessionID(responseContext);
+                    String receivedSetCookie = getSetCookieHeader(responseContext);
+                    if (httpSession) {
 
-                MessageContext responseContext =
-                    op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-                SOAPEnvelope responseEnvelope = responseContext.getEnvelope();
+                        if (receivedSetCookie != null && !"".equals(receivedSetCookie)) {
+                            cookies[cookieNumber] = receivedCookie;
+                        }
+                    }
 
-                OMElement vElement =
-                    responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
-                System.out.println(
-                    "Request: " + i + " Session number: " +
-                        sessionNumber + " " + vElement.getText());
+                    SOAPEnvelope responseEnvelope = responseContext.getEnvelope();
+
+                    OMElement vElement =
+                            responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
+                    System.out.println(
+                            "Request: " + i + " with Session ID: " +
+                                    (httpSession ? cookie : sessionNumber) + " ---- " +
+                                    "Response : with  " + (httpSession && receivedCookie != null ?
+                                    (receivedSetCookie != null ? receivedSetCookie : receivedCookie) : " ") + " " +
+                                    vElement.getText());
+                } catch (AxisFault axisFault) {
+                    System.out.println("Request with session id " +
+                            (httpSession ? cookie : sessionNumber) + " " +
+                            "- Get a Fault : " + axisFault.getMessage());
+                }
             }
 
         } catch (AxisFault axisFault) {
@@ -286,15 +352,56 @@ public class LoadbalanceFailoverClient {
         return random.nextInt(max);
     }
 
+    protected String extractSessionID(MessageContext axis2MessageContext) {
+
+        Object o = axis2MessageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+
+        if (o != null && o instanceof Map) {
+            Map headerMap = (Map) o;
+            String cookie = (String) headerMap.get(SET_COOKIE);
+            if (cookie == null) {
+                cookie = (String) headerMap.get(COOKIE);
+            } else {
+                cookie = cookie.split(";")[0];
+            }
+            return cookie;
+        }
+        return null;
+    }
+
+    protected String getSetCookieHeader(MessageContext axis2MessageContext) {
+
+        Object o = axis2MessageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+
+        if (o != null && o instanceof Map) {
+            Map headerMap = (Map) o;
+            return (String) headerMap.get(SET_COOKIE);
+        }
+        return null;
+    }
+
+    protected void setSessionID(MessageContext axis2MessageContext, String value) {
+
+        if (value == null) {
+            return;
+        }
+        Map map = (Map) axis2MessageContext.getProperty(HTTPConstants.HTTP_HEADERS);
+        if (map == null) {
+            map = new HashMap();
+            axis2MessageContext.setProperty(HTTPConstants.HTTP_HEADERS, map);
+        }
+        map.put(COOKIE, value);
+    }
+
     private SOAPEnvelope buildSoapEnvelope(String clientID, String value) {
 
-        String targetEPR = "http://localhost:9000/services/Service1";
+        String targetEPR = "http://localhost:9000/soap/Service1";
         String opration = "sampleOperation";
 
         SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();
 
         OMNamespace wsaNamespace = soapFactory.
-            createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
+                createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
 
         SOAPEnvelope envelope = soapFactory.createSOAPEnvelope();
 
@@ -302,7 +409,7 @@ public class LoadbalanceFailoverClient {
         envelope.addChild(header);
 
         OMNamespace synNamespace = soapFactory.
-            createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
+                createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
         OMElement clientIDElement = soapFactory.createOMElement("ClientID", synNamespace);
         clientIDElement.setText(clientID);
         header.addChild(clientIDElement);

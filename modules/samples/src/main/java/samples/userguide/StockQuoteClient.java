@@ -55,42 +55,45 @@ public class StockQuoteClient {
     public static void main(String[] args) {
 
         try {
-            executeClient();
-
-            if ("placeorder".equals(InnerStruct.MODE)) {
-                System.out.println("Order placed for " + InnerStruct.QUANTITY
-                        + " shares of stock " + InnerStruct.SYMBOL
-                        + " at a price of $ " + InnerStruct.PRICE);
-            } else {
-                if ("customquote".equals(InnerStruct.MODE)) {
-                    System.out.println("Custom :: Stock price = $" +
-                            StockQuoteHandler.parseCustomQuoteResponse(InnerStruct.RESULT));
-                } else if ("quote".equals(InnerStruct.MODE)) {
-                    System.out.println("Standard :: Stock price = $" +
-                            StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
-                } else if ("dualquote".equals(InnerStruct.MODE)) {
-                    while (true) {
-                        if (InnerStruct.COMPLETED) {
-                            System.out.println("Standard dual channel :: Stock price = $" +
-                                    StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
-                            System.exit(0);
-                        } else {
-                            Thread.sleep(100);
-                        }
-                    }
-                } else if ("fullquote".equals(InnerStruct.MODE)) {
-                    System.out.println("Full :: Average price = $" +
-                            StockQuoteHandler.parseFullQuoteResponse(InnerStruct.RESULT));
-                } else if ("marketactivity".equals(InnerStruct.MODE)) {
-                    System.out.println("Activity :: Average price = $" +
-                            StockQuoteHandler.parseMarketActivityResponse(InnerStruct.RESULT));
-                }
-            }
+            executeClient();           
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private static void printResult() throws Exception {
+        
+        if ("placeorder".equals(InnerStruct.MODE)) {
+            System.out.println("Order placed for " + InnerStruct.QUANTITY
+                    + " shares of stock " + InnerStruct.SYMBOL
+                    + " at a price of $ " + InnerStruct.PRICE);
+        } else {
+            if ("customquote".equals(InnerStruct.MODE)) {
+                System.out.println("Custom :: Stock price = $" +
+                        StockQuoteHandler.parseCustomQuoteResponse(InnerStruct.RESULT));
+            } else if ("quote".equals(InnerStruct.MODE)) {
+                System.out.println("Standard :: Stock price = $" +
+                        StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
+            } else if ("dualquote".equals(InnerStruct.MODE)) {
+                while (true) {
+                    if (InnerStruct.COMPLETED) {
+                        System.out.println("Standard dual channel :: Stock price = $" +
+                                StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
+                        System.exit(0);
+                    } else {
+                        Thread.sleep(100);
+                    }
+                }
+            } else if ("fullquote".equals(InnerStruct.MODE)) {
+                System.out.println("Full :: Average price = $" +
+                        StockQuoteHandler.parseFullQuoteResponse(InnerStruct.RESULT));
+            } else if ("marketactivity".equals(InnerStruct.MODE)) {
+                System.out.println("Activity :: Average price = $" +
+                        StockQuoteHandler.parseMarketActivityResponse(InnerStruct.RESULT));
+            }
+        }
+    }
+    
     public static OMElement executeTestClient() throws Exception {
         executeClient();
         return InnerStruct.RESULT;
@@ -109,6 +112,22 @@ public class StockQuoteClient {
         String rest = getProperty("rest", null);
         String wsrm = getProperty("wsrm", null);
         String itr = getProperty("itr", "1");
+        int iterations = 1;
+        boolean infinite = false;
+
+        String pIterations = getProperty("i", null);
+
+
+        if (pIterations != null) {
+            try {
+                iterations = Integer.parseInt(pIterations);
+                if (iterations != -1) {
+                    infinite = false;
+                }
+            } catch (NumberFormatException e) {
+                // run with default values
+            }
+        }
 
         double price = 0;
         int quantity = 0;
@@ -207,15 +226,20 @@ public class StockQuoteClient {
         } else if ("dualquote".equals(mode)) {
             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback());
         } else {
-            InnerStruct.RESULT = serviceClient.sendReceive(payload);
-            if (Boolean.parseBoolean(wsrm)) {
-                // give some time for RM to terminate normally
-                Thread.sleep(5000);
-                if (configContext != null) {
-                    configContext.getListenerManager().stop();
+            long i = 0;
+            while (i < iterations || infinite) {
+                InnerStruct.RESULT = serviceClient.sendReceive(payload);
+                i++;
+                printResult();
+                if (Boolean.parseBoolean(wsrm)) {
+                    // give some time for RM to terminate normally
+                    Thread.sleep(5000);
+                    if (configContext != null) {
+                        configContext.getListenerManager().stop();
+                    }
+                    serviceClient.cleanup();
+                    System.exit(0);
                 }
-                serviceClient.cleanup();
-                System.exit(0);
             }
         }
 

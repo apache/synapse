@@ -25,6 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.datasource.factory.DataSourceFactory;
+import org.apache.synapse.util.MBeanRepository;
+import org.apache.synapse.util.MBeanRegistrar;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -34,12 +36,14 @@ import java.util.Properties;
 /**
  * Keeps all DataSources in the memory
  */
-public class InMemoryDataSourceRegistry implements DataSourceRegistry {
+public class InMemoryDataSourceRegistry implements DataSourceRegistry, MBeanRepository {
 
     private final static Log log = LogFactory.getLog(InMemoryDataSourceRegistry.class);
 
     private static final InMemoryDataSourceRegistry ourInstance = new InMemoryDataSourceRegistry();
     private final static Map<String, DataSource> dataSources = new HashMap<String, DataSource>();
+    private final static Map<String, DBPoolView> dataSourcesMBeans = new HashMap<String, DBPoolView>();
+    private final static String MBEAN_CATEGORY_DATABASE_CONNECTION_POOL = "DatabaseConnectionPool";
 
     public static InMemoryDataSourceRegistry getInstance() {
         return ourInstance;
@@ -76,6 +80,7 @@ public class InMemoryDataSourceRegistry implements DataSourceRegistry {
             log.debug("Registering a DatSource with name : " + name + " in Local Pool");
         }
 
+        addMBean(name, new DBPoolView(name));
         dataSources.put(name, dataSource);
     }
 
@@ -86,9 +91,7 @@ public class InMemoryDataSourceRegistry implements DataSourceRegistry {
      */
     public DataSource lookUp(String name) {
 
-        if (name == null || "".equals(name)) {
-            handleException("DataSorce name cannot be found.");
-        }
+        assertNull(name, "DataSorce name cannot be found.");
         return dataSources.get(name);
     }
 
@@ -105,10 +108,53 @@ public class InMemoryDataSourceRegistry implements DataSourceRegistry {
             log.info("Clearing all in-memory datasources ");
             dataSources.clear();
         }
+        if (!dataSourcesMBeans.isEmpty()) {
+            log.info("UnRegistering DBPool MBeans");
+            for (DBPoolView dbPoolView : dataSourcesMBeans.values()) {
+                if (dbPoolView != null) {
+                    MBeanRegistrar.getInstance().unRegisterMBean(
+                            MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, dbPoolView.getName());
+                }
+            }
+            dataSourcesMBeans.clear();
+        }
     }
 
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    public void addMBean(String name, Object mBean) {
+        assertNull(name, "DataSorce MBean name cannot be found.");
+        assertNull(mBean, "DataSorce MBean  cannot be found.");
+        assertFalse(mBean instanceof DBPoolView, "Given MBean instance is not matched " +
+                "with the expected MBean - 'DBPoolView'.");
+        dataSourcesMBeans.put(name, (DBPoolView) mBean);
+        MBeanRegistrar mBeanRegistrar = MBeanRegistrar.getInstance();
+        mBeanRegistrar.registerMBean(mBean, MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
+    }
+
+    public Object getMBean(String name) {
+        assertNull(name, "DataSorce MBean name cannot be found.");
+        return dataSourcesMBeans.get(name);
+    }
+
+    private void assertNull(String name, String msg) {
+        if (name == null || "".equals(name)) {
+            handleException(msg);
+        }
+    }
+
+    private void assertNull(Object object, String msg) {
+        if (object == null) {
+            handleException(msg);
+        }
+    }
+
+    private void assertFalse(boolean condition, String msg) {
+        if (!condition) {
+            handleException(msg);
+        }
     }
 }

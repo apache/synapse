@@ -253,7 +253,7 @@ public class DataSourceInformationFactory {
         information.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
         information.setTestWhileIdle(testWhileIdle);
         information.setValidationQuery(validationQuery);
-        information.setMaxIdle(minIdle);
+        information.setMinIdle(minIdle);
         information.setDefaultTransactionIsolation(defaultTransactionIsolation);
         information.setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
         information.setRemoveAbandoned(removeAbandoned);

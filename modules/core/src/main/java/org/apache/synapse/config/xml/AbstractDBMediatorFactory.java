@@ -26,6 +26,9 @@ import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.util.datasource.DataSourceFinder;
+import org.apache.synapse.util.datasource.InMemoryDataSourceRegistry;
+import org.apache.synapse.util.datasource.DBPoolView;
+import org.apache.synapse.util.MBeanRepository;
 import org.jaxen.JaxenException;
 
 import javax.naming.Context;
@@ -140,6 +143,11 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         mediator.addDataSourceProperty(DSNAME_Q, dsName);
         DataSource dataSource = DataSourceFinder.find(dsName);
         if (dataSource != null) {
+            MBeanRepository mBeanRepository = InMemoryDataSourceRegistry.getInstance();
+            Object mBean = mBeanRepository.getMBean(dsName);
+            if (mBean instanceof DBPoolView) {
+                mediator.setDbPoolView((DBPoolView) mBean);
+            }
             return dataSource;
         }
         Properties props = new Properties();

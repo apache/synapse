@@ -43,7 +43,7 @@ public class DataSourceInformation {
     private boolean defaultReadOnly = false;
     private boolean testOnBorrow = true;
     private boolean testOnReturn = false;
-    private int minIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
+    private int minIdle = GenericObjectPool.DEFAULT_MIN_IDLE;
     private int initialSize;
     private int defaultTransactionIsolation = -1;
     private String defaultCatalog;

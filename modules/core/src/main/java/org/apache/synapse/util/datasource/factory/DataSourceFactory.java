@@ -84,7 +84,7 @@ public class DataSourceFactory {
             basicDataSource.setMaxActive(information.getMaxActive());
             basicDataSource.setMaxIdle(information.getMaxIdle());
             basicDataSource.setMaxWait(information.getMaxWait());
-            basicDataSource.setMaxIdle(information.getMaxIdle());
+            basicDataSource.setMinIdle(information.getMinIdle());
             basicDataSource.setDefaultAutoCommit(information.isDefaultAutoCommit());
             basicDataSource.setDefaultReadOnly(information.isDefaultReadOnly());
             basicDataSource.setTestOnBorrow(information.isTestOnBorrow());

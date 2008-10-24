@@ -24,6 +24,8 @@ import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.datasource.DBPoolView;
 import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -44,6 +46,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
     protected Map dataSourceProps = new HashMap();
     /** The DataSource to get DB connections */
     private DataSource dataSource = null;
+    /**
+     * MBean for DBPool monitoring
+     */
+    private DBPoolView dbPoolView;
     /** Statements */
     List statementList = new ArrayList();
 
@@ -168,7 +174,38 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             traceOrDebug(traceOn, "Getting a connection from DataSource " + getDSName() +
                 " and preparing statement : " + stmnt.getRawStatement());
         }
+
         Connection con = getDataSource().getConnection();
+        if (con == null) {
+            String msg = "Connection from DataSource " + getDSName() + " is null.";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+
+        if (dataSource instanceof BasicDataSource) {
+
+            BasicDataSource basicDataSource = (BasicDataSource) dataSource;
+            int numActive = basicDataSource.getNumActive();
+            int numIdle = basicDataSource.getNumIdle();
+            String connectionId = Integer.toHexString(con.hashCode());
+
+
+            DBPoolView dbPoolView = getDbPoolView();
+            if (dbPoolView != null) {
+                dbPoolView.setNumActive(numActive);
+                dbPoolView.setNumIdle(numIdle);
+                dbPoolView.updateConnectionUsage(connectionId);
+            }
+
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "[ DB Connection : " + con + " ]");
+                traceOrDebug(traceOn, "[ DB Connection instance identifier : " +
+                        connectionId + " ]");
+                traceOrDebug(traceOn, "[ Number of Active Connection : " + numActive + " ]");
+                traceOrDebug(traceOn, "[ Number of Idle Connection : " + numIdle + " ]");
+            }
+        }
+
         PreparedStatement ps = con.prepareStatement(stmnt.getRawStatement());
 
         // set parameters if any
@@ -261,4 +298,12 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         }
         return ps;
     }
+
+    public DBPoolView getDbPoolView() {
+        return dbPoolView;
+    }
+
+    public void setDbPoolView(DBPoolView dbPoolView) {
+        this.dbPoolView = dbPoolView;
+    }     
 }

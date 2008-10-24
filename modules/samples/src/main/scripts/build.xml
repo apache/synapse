@@ -98,6 +98,8 @@
     <property name="class.dir" value="target/classes"/>
     <property name="qty" value=""/>
     <property name="propfile" value=""/>
+    <property name="sleep" value=""/>
+    <property name="session" value=""/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
@@ -202,6 +204,8 @@
             <sysproperty key="addurl" value="${addurl}"/>
             <sysproperty key="trpurl" value="${trpurl}"/>
             <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="session" value="${session}"/>
+            <sysproperty key="sleep" value="${sleep}"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
         </java>
     </target>

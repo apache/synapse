@@ -120,6 +120,7 @@
             <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+            <sysproperty key="i" value="${i}"/>
             <!--
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xnoagent"/>

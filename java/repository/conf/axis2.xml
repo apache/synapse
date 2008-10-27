@@ -181,7 +181,7 @@
     </transportReceiver>
 
     <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
-    <transportReceiver name="jms" class="org.apache.synapse.transport.jms.JMSListener">
+    <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
         <parameter name="myTopicConnectionFactory">
         	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>

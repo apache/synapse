@@ -17,12 +17,11 @@
  *  under the License.
  */
 
-package org.apache.synapse.config.xml;
+package org.apache.synapse.util;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.Method;
@@ -165,11 +164,11 @@ public class PropertyHelper {
 
     private static void handleException(String message, Throwable e) {
         log.error(message + e.getMessage());
-        throw new SynapseException(message, e);
+        throw new SynapseUtilException(message, e);
     }
 
     private static void handleException(String message) {
         log.error(message);
-        throw new SynapseException(message);
+        throw new SynapseUtilException(message);
     }    
 }

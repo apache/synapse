@@ -16,11 +16,36 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+package org.apache.synapse.util;
 
-package org.apache.synapse.startup;
+import org.apache.commons.logging.Log;
 
 /**
- * Defines the Task for a SimpleQuartzStartup.
+ *
  */
-public interface Task extends org.apache.synapse.task.Task {
+public class SynapseUtilException extends RuntimeException {
+
+    private static final long serialVersionUID = -7361599095528938810L;
+
+    public SynapseUtilException(String string) {
+        super(string);
+    }
+
+    public SynapseUtilException(String msg, Throwable e) {
+        super(msg, e);
+    }
+
+    public SynapseUtilException(Throwable t) {
+        super(t);
+    }
+
+    public SynapseUtilException(String msg, Log synLog) {
+        super(msg);
+        synLog.error(msg);
+    }
+
+    public SynapseUtilException(String msg, Throwable cause, Log synLog) {
+        super(msg, cause);
+        synLog.error(msg, cause);
+    }
 }

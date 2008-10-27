@@ -1990,24 +1990,25 @@ Connection: Keep-Alive
 <a name="Transport" id="Transport">Transport samples and switching transports</a> </h1>
 <h2>
 <a name="Sample250" id="Sample250">Sample 250: Introduction to switching transports - JMS to http/s</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
-        &lt;target&gt;
-            &lt;inSequence&gt;
-                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
-            &lt;/inSequence&gt;
-            &lt;endpoint&gt;
-                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
-            &lt;/endpoint&gt;
-            &lt;outSequence&gt;
-                &lt;send/&gt;
-            &lt;/outSequence&gt;
-        &lt;/target&gt;
-        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
-    &lt;/proxy&gt;
+    <proxy name="StockQuoteProxy" transports="jms">
+        <target>
+            <inSequence>
+                <property action="set" name="OUT_ONLY" value="true"/>
+            </inSequence>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+            <outSequence>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+        <parameter name="transport.jms.ContentType">application/xml</parameter>
+    </proxy>
 
-&lt;/definitions&gt;</pre>
+</definitions>]]></pre>
 <p>
 <strong>Objective: Introduction to switching transports with proxy services</strong> </p>
 <p>
@@ -2027,7 +2028,9 @@ Connection: Keep-Alive
 <pre xml:space="preserve">[JMSWorker-1] DEBUG ProxyServiceMessageReceiver -Proxy Service StockQuoteProxy received a new message...</pre>
 <p>Now if you examine the console running the sample Axis2 server, you will see a message indicating that the server has accepted an order as follows: </p>
 <pre xml:space="preserve">Accepted order for : 16517 stocks of MSFT at $ 169.14622538721846</pre>
-<p>In this sample, client sends the request message to the proxy service exposed in JMS in Synsape. Synapse forwards this message to the HTTP EPR of the simple stock quote service hosted on the sample Axis2 server, and returns the reply back to the client through a JMS temporary queue. </p>
+<p>In this sample, the client sends the request message to the proxy service exposed over JMS in Synsape. Synapse forwards this message to the HTTP EPR of the simple stock quote service hosted on the sample Axis2 server.
+Note that the operation is out-only and no response is sent back to the client. The transport.jms.ContentType property is necessary because the JMS client doesn't send a Content-Type header.
+The value 'application/xml' indicates to the JMS transport to expect POX messages.</p>
 <p>Note: It is possible to instruct a JMS proxy service to listen to an already existing destination without creating a new one. To do this, use the property elements on the proxy service definition to specify the destination and connection factory etc. </p>
 <p>e.g. </p>
 <pre xml:space="preserve">&lt;property name=&quot;transport.jms.Destination&quot; value=&quot;dynamicTopics/something.TestTopic&quot;/&gt;</pre>

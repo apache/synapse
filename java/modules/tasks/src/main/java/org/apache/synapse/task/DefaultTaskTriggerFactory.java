@@ -67,7 +67,7 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
         }
 
         if (trigger == null) {
-            throw new NullPointerException("Trigger is null for the Task description : " + taskDescription);
+            throw new SynapseTaskException("Trigger is null for the Task description : " + taskDescription);
         }
 
         if (startTime != null) {

@@ -16,11 +16,21 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+package org.apache.synapse.task;
 
-package org.apache.synapse.startup;
+import org.quartz.Trigger;
 
 /**
- * Defines the Task for a SimpleQuartzStartup.
+ * Creates a trigger instance based on given Task Description
  */
-public interface Task extends org.apache.synapse.task.Task {
+public interface TaskTriggerFactory {
+
+    /**
+     * Factory method to create a trigger instance based on given Task Description
+     *
+     * @param taskDescription Task Description encapsulates details need to create a trigger
+     * @return Trigger instance , if there are enough information , otherwise null
+     */
+    public Trigger createTrigger(TaskDescription taskDescription);
+
 }

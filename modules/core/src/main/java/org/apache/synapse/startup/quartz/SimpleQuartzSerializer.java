@@ -19,28 +19,14 @@
 
 package org.apache.synapse.startup.quartz;
 
-import java.util.List;
-
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.task.TaskDescription;
+import org.apache.synapse.task.TaskDescriptionSerializer;
 import org.apache.synapse.config.xml.StartupSerializer;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-
-import javax.xml.namespace.QName;
 
 public class SimpleQuartzSerializer implements StartupSerializer {
-
-    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS
-        = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS
-        = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
-    protected static final QName PROP_Q
-        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property", "syn");
 
     public OMElement serializeStartup(OMElement parent, Startup s) {
 
@@ -50,42 +36,16 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         }
 
         SimpleQuartz sq = (SimpleQuartz) s;
-
-        OMElement task = fac.createOMElement("task", synNS, parent);
-        task.addAttribute("name", sq.getName(), nullNS);
-        task.addAttribute("class", sq.getJobClass(), nullNS);
-
-        List pinnedServers = sq.getPinnedServers();
-        if (pinnedServers != null && !pinnedServers.isEmpty()) {
-          String pinnedServersStr = "" + pinnedServers.get(0);
-          for (int i = 1; i < pinnedServers.size(); i++) {
-            pinnedServersStr = pinnedServersStr + " " + pinnedServers.get(i);
-          }
-          task.addAttribute(fac.createOMAttribute("pinnedServers", nullNS, pinnedServersStr));
-        }
-        
-        OMElement el = fac.createOMElement("trigger", synNS, task);
-        if (sq.getInterval() == 1 && sq.getCount() == 1) {
-            el.addAttribute("once", "true", nullNS);
-        } else if (sq.getCron() != null) {
-            el.addAttribute("cron", sq.getCron(), nullNS);
-        } else {
-            if (sq.getCount() != -1) {
-                el.addAttribute("count", Integer.toString(sq.getCount()), nullNS);
+        TaskDescription taskDescription = sq.getTaskDescription();
+        if (taskDescription != null) {
+            OMElement task = TaskDescriptionSerializer.serializeStartup(parent, taskDescription);
+            if (task == null) {
+                throw new SynapseException("Task Element can not be null.");
             }
-
-            if (sq.getInterval() != 0) {
-                long interval = sq.getInterval() / 1000;
-                el.addAttribute("interval", Long.toString(interval), nullNS);
-            }
-        }
-        
-        for (Object o : sq.getProperties()) {
-            OMElement prop = (OMElement) o;
-            task.addChild(prop.cloneOMElement());
+            return task;
         }
 
-        return task;
+        throw new SynapseException("Task Element is null.");
     }
 
 }

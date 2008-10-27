@@ -210,6 +210,10 @@
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-tasks</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-transports</artifactId>
         </dependency>
     </dependencies>

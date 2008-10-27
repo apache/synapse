@@ -16,11 +16,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-
-package org.apache.synapse.startup;
+package org.apache.synapse.task;
 
 /**
- * Defines the Task for a SimpleQuartzStartup.
+ * Represents a executable Task
  */
-public interface Task extends org.apache.synapse.task.Task {
+public interface Task {
+    /**
+     * Execute method will be invoked by the QuartzJOb.
+     */
+    public void execute();
 }

@@ -7,19 +7,29 @@ package org.apache.synapse.task;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Factory method for retrieve / create a TaskScheduler
+ */
 public class TaskSchedulerFactory {
 
-    private static TaskSchedulerFactory ourInstance = new TaskSchedulerFactory();
+    private final static TaskSchedulerFactory SCHEDULER_FACTORY = new TaskSchedulerFactory();
 
-    private static final Map<String, TaskScheduler> MAP = new HashMap<String, TaskScheduler>();
+    private final static Map<String, TaskScheduler> MAP = new HashMap<String, TaskScheduler>();
 
     public static TaskSchedulerFactory getInstance() {
-        return ourInstance;
+        return SCHEDULER_FACTORY;
     }
 
     private TaskSchedulerFactory() {
     }
 
+    /**
+     * Returns a TaskScheduler whose name is match with given name.
+     * There is an only one instance of TaskScheduler for a given name as Factory caches
+     *
+     * @param name Name of the TaskScheduler
+     * @return TaskScheduler instance
+     */
     public TaskScheduler getTaskScheduler(String name) {
 
         if (name == null || "".equals(name)) {

@@ -24,6 +24,7 @@ import org.quartz.JobDetail;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 
 /**
  * Default JobDetailFactory ships with synapse utils
@@ -34,25 +35,50 @@ public class DefaultTaskJobDetailFactory implements TaskJobDetailFactory {
     /**
      * @see TaskJobDetailFactory
      */
-    public JobDetail createJobDetail(TaskDescription taskDescription, Map resources, Class<Job> jobClass) {
+    public JobDetail createJobDetail(TaskDescription taskDescription, Map<String, Object> resources, Class<Job> jobClass) {
+
+        if (taskDescription == null) {
+            throw new SynapseTaskException("Task Description cannot be found.");
+        }
+
+        if (jobClass == null) {
+            throw new SynapseTaskException("Job Class cannot be found.");
+        }
+
+        if (resources == null) {
+            resources = new HashMap<String, Object>();
+        }
 
         JobDetail jobDetail = new JobDetail();
-        Set xmlProperties = taskDescription.getProperties();
-        String className = taskDescription.getTaskClass();
+        jobDetail.setJobClass(jobClass);
+
         String name = taskDescription.getName();
-        // Give the job a name
+        if (name == null || "".equals(name)) {
+            throw new SynapseTaskException("Name cannot be found.");
+        }
         jobDetail.setName(name);
+
+
         String group = taskDescription.getGroup();
         if (group != null && !"".equals(group)) {
             jobDetail.setGroup(group);
         } else {
             jobDetail.setGroup(TaskDescription.DEFAULT_GROUP);
         }
-        jobDetail.setJobClass(jobClass);
-        JobDataMap jdm = new JobDataMap(resources);
-        jdm.put(TaskDescription.CLASSNAME, className);
-        jdm.put(TaskDescription.PROPERTIES, xmlProperties);
-        jobDetail.setJobDataMap(jdm);
+
+        JobDataMap jobDataMap = new JobDataMap(resources);
+
+        String className = taskDescription.getTaskClass();
+        if (className != null && !"".equals(className)) {
+            jobDataMap.put(TaskDescription.CLASSNAME, className);
+        }
+
+        Set xmlProperties = taskDescription.getProperties();
+        if (xmlProperties != null) {
+            jobDataMap.put(TaskDescription.PROPERTIES, xmlProperties);
+        }
+        jobDetail.setJobDataMap(jobDataMap);
+
         return jobDetail;
     }
 }

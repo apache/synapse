@@ -54,6 +54,9 @@ public class TaskScheduler {
      */
     public static String QUARTZ_CONF = "quartz.conf";
 
+    /**
+     * Name of the scheduler
+     */
     private String name;
 
     public TaskScheduler(String name) {
@@ -74,6 +77,11 @@ public class TaskScheduler {
             String quartzConf = properties.getProperty(QUARTZ_CONF);
             try {
                 if (quartzConf != null && !"".equals(quartzConf)) {
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Initiating a Scheduler with configuration : " + quartzConf);
+                    }
+
                     sf.initialize(quartzConf);
                 }
             } catch (SchedulerException e) {
@@ -83,12 +91,14 @@ public class TaskScheduler {
         }
 
         try {
+
             if (name != null) {
                 scheduler = sf.getScheduler(name);
             }
             if (scheduler == null) {
                 scheduler = sf.getScheduler();
             }
+
         } catch (SchedulerException e) {
             throw new SynapseTaskException("Error getting a  scheduler instance form scheduler factory " + sf, e, log);
         }
@@ -104,6 +114,10 @@ public class TaskScheduler {
         validateInit();
         try {
             if (!scheduler.isStarted()) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Starting a Scheduler : [ " + scheduler.getMetaData() + " ]");
+                }
                 scheduler.start();
             }
         } catch (SchedulerException e) {
@@ -156,6 +170,9 @@ public class TaskScheduler {
         }
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("scheduling job : " + jobDetail + " with trigger " + trigger);
+            }
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             throw new SynapseTaskException("Error scheduling job : " + jobDetail + " with trigger " + trigger);
@@ -170,7 +187,11 @@ public class TaskScheduler {
 
         validateInit();
         validateStart();
+
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("ShutingDown Scheduler : " + scheduler.getMetaData());
+            }
             scheduler.shutdown();
             initialized = false;
         } catch (SchedulerException e) {
@@ -209,6 +230,10 @@ public class TaskScheduler {
         }
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Deleting a Job with [ Name :" + name + " ]" +
+                        " [ Group :" + group + " ]");
+            }
             scheduler.deleteJob(name, group);
         } catch (SchedulerException e) {
             throw new SynapseTaskException("Error deleting a job with  [ Name :" + name + " ]" +
@@ -232,6 +257,16 @@ public class TaskScheduler {
      */
     public void setJobDetailFactory(TaskJobDetailFactory jobDetailFactory) {
         this.jobDetailFactory = jobDetailFactory;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer schedulerMetaData = new StringBuffer();
+        if (scheduler != null) {
+            schedulerMetaData = schedulerMetaData.append("[ Scheduler : ").append(scheduler).append(" ]");
+        }
+        return new StringBuffer().append("[ TaskScheduler[ Name :").
+                append(name).append("]").append(schedulerMetaData).append(" ]").toString();
     }
 
     private void validateInit() {

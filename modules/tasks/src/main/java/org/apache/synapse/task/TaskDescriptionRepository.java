@@ -32,7 +32,13 @@ public class TaskDescriptionRepository {
     private static final Log log = LogFactory.getLog(TaskDescriptionRepository.class);
     private final Map<String, TaskDescription> taskDescriptionMap = new HashMap<String, TaskDescription>();
 
+    /**
+     * Stores a given TaskDescription
+     *
+     * @param taskDescription TaskDescription instance
+     */
     public void addTaskDescription(TaskDescription taskDescription) {
+
         validateTaskDescription(taskDescription);
 
         String name = taskDescription.getName();
@@ -43,12 +49,25 @@ public class TaskDescriptionRepository {
 
     }
 
+    /**
+     * Gets a TaskDescription
+     *
+     * @param name Name of the TaskDescription to be looked up
+     * @return TaskDescription instance
+     */
     public TaskDescription getTaskDescription(String name) {
         validateName(name);
         return taskDescriptionMap.get(name);
     }
 
+    /**
+     * Explicit check for determine whether there is a task description with a name in interest
+     *
+     * @param name Name of the TaskDescription
+     * @return Retunrs true , if there is no TaskDescription associated with given name , otherwise , false
+     */
     public boolean isUnique(String name) {
+        validateName(name);
         return taskDescriptionMap.isEmpty() || !taskDescriptionMap.containsKey(name);
     }
 

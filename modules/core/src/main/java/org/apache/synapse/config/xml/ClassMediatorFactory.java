@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.PropertyHelper;
 import org.apache.synapse.mediators.ext.ClassMediator;
 
 import javax.xml.namespace.QName;

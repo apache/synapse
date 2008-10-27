@@ -21,6 +21,7 @@ package org.apache.synapse.task;
 import org.quartz.CronTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
+import org.quartz.SimpleTrigger;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -37,6 +38,10 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
     public Trigger createTrigger(TaskDescription taskDescription) {
 
         String name = taskDescription.getName();
+        if (name == null || "".equals(name)) {
+            throw new SynapseTaskException("Name of the Task cannot be null");
+        }
+        
         String cron = taskDescription.getCron();
         int repeatCount = taskDescription.getCount();
         long repeatInterval = taskDescription.getInterval();
@@ -44,11 +49,11 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
         Date endTime = taskDescription.getEndTime();
 
         Trigger trigger;
-        if (cron == null) {
+        if (cron == null || "".equals(cron)) {
             if (repeatCount >= 0) {
                 trigger = TriggerUtils.makeImmediateTrigger(repeatCount - 1, repeatInterval);
             } else {
-                trigger = TriggerUtils.makeImmediateTrigger(-1, repeatInterval);
+                trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY, repeatInterval);
             }
 
         } else {
@@ -62,7 +67,7 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
         }
 
         if (trigger == null) {
-            throw new NullPointerException("Trigger is null for Task description : " + taskDescription);
+            throw new NullPointerException("Trigger is null for the Task description : " + taskDescription);
         }
 
         if (startTime != null) {

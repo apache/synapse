@@ -54,7 +54,13 @@ public class SimpleQuartz extends AbstractStartup {
         return SimpleQuartzFactory.TASK;
     }
 
-    public void destroy() {     
+    public void destroy() {
+
+        TaskSchedulerFactory schedulerFactory = TaskSchedulerFactory.getInstance();
+        TaskScheduler taskScheduler = schedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
+        if (taskScheduler != null && taskScheduler.isInitialized()) {
+            taskScheduler.shutDown();
+        }
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {

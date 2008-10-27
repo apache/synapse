@@ -58,51 +58,52 @@ public class PropertyHelper {
                     Class[] params = method1.getParameterTypes();
                     if (params.length != 1) {
                         handleException("Did not find a setter method named : " + mName +
-                                        "() that takes a single String, int, long, float, double " +
-                                        "or boolean parameter");
+                                "() that takes a single String, int, long, float, double ,OMElement " +
+                                "or boolean parameter");
                     } else if (val instanceof String) {
                         String value = (String) val;
-                        if (params[0].equals(String.class)) {
+                        if (String.class.equals(params[0])) {
                             method = obj.getClass().getMethod(mName, String.class);
                             method.invoke(obj, new String[]{value});
-                        } else if (params[0].equals(int.class)) {
-                        } else if (params[0].equals(long.class)) {
+                        } else if (int.class.equals(params[0])) {
+                            method = obj.getClass().getMethod(mName, int.class);
+                            method.invoke(obj, new Integer[]{new Integer(value)});
+                        } else if (long.class.equals(params[0])) {
                             method = obj.getClass().getMethod(mName, long.class);
                             method.invoke(obj, new Long[]{new Long(value)});
-                        } else if (params[0].equals(float.class)) {
+                        } else if (float.class.equals(params[0])) {
                             method = obj.getClass().getMethod(mName, float.class);
                             method.invoke(obj, new Float[]{new Float(value)});
-                        } else if (params[0].equals(double.class)) {
+                        } else if (double.class.equals(params[0])) {
                             method = obj.getClass().getMethod(mName, double.class);
                             method.invoke(obj, new Double[]{new Double(value)});
-                        } else if (params[0].equals(boolean.class)) {
+                        } else if (boolean.class.equals(params[0])) {
                             method = obj.getClass().getMethod(mName, boolean.class);
                             method.invoke(obj, new Boolean[]{Boolean.valueOf(value)});
                         } else {
-                            handleException("Did not find a setter method named : " + mName +
-                                            "() that takes a single String, int, long, float, double " +
-                                            "or boolean parameter");
+                            continue;
                         }
+                    } else if (val instanceof OMElement && OMElement.class.equals(params[0])) {
+                        method = obj.getClass().getMethod(mName, OMElement.class);
+                        method.invoke(obj, new OMElement[]{(OMElement) val});
                     } else {
-                        if (params[0].equals(OMElement.class)) {
-                            method = obj.getClass().getMethod(mName, OMElement.class);
-                            method.invoke(obj, new OMElement[]{(OMElement) val});
-                        }
+                        continue;
                     }
                     invoked = true;
+                    break;
                 }
             }
 
             if (!invoked) {
                 handleException("Did not find a setter method named : " + mName +
-                    "() that takes a single String, int, long, float, double " +
-                    "or boolean parameter");
+                        "() that takes a single String, int, long, float, double " +
+                        "or boolean parameter");
             }
 
         } catch (Exception e) {
             handleException("Error invoking setter method named : " + mName +
-                "() that takes a single String, int, long, float, double " +
-                "or boolean parameter", e);
+                    "() that takes a single String, int, long, float, double " +
+                    "or boolean parameter", e);
         }
     }
 

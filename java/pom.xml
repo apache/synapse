@@ -225,6 +225,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-tasks</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1003,6 +1008,11 @@
             <artifactId>quartz</artifactId>
             <version>${quartz.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <version>${geronimo-spec.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -1113,6 +1123,7 @@
     <modules>
         <module>modules/utils</module>
         <module>modules/transports</module>
+        <module>modules/tasks</module>
         <module>modules/mar</module>
         <module>modules/core</module>
         <module>modules/extensions</module>
@@ -1164,6 +1175,7 @@
         <!-- startup, quartz -->
         <commons-collections.version>3.1</commons-collections.version>
         <quartz.version>1.6.0</quartz.version>
+        <geronimo-spec.version>1.1</geronimo-spec.version>
 
         <!-- xalan xsltc  -->
         <bcel.version>5.2</bcel.version>

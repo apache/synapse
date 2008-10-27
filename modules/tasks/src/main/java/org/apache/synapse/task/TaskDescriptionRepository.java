@@ -64,7 +64,7 @@ public class TaskDescriptionRepository {
      * Explicit check for determine whether there is a task description with a name in interest
      *
      * @param name Name of the TaskDescription
-     * @return Retunrs true , if there is no TaskDescription associated with given name , otherwise , false
+     * @return Returns true , if there is no TaskDescription associated with given name , otherwise , false
      */
     public boolean isUnique(String name) {
         validateName(name);

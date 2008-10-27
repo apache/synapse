@@ -20,6 +20,7 @@ package org.apache.synapse.task;
 
 
 import org.apache.axiom.om.OMElement;
+import org.quartz.SimpleTrigger;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ public class TaskDescription {
     public static final String PROPERTIES = "Properties";
     public static final String DEFAULT_GROUP = "synapse.simple.quartz";
     private String cron;
-    private int repeatCount = -1;
+    private int repeatCount = SimpleTrigger.REPEAT_INDEFINITELY;
     private long repeatInterval; // in milliseconds
     private String className;
     private List pinnedServers;

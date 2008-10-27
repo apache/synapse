@@ -40,14 +40,14 @@ public class SynapseTaskException extends RuntimeException {
         super(t);
     }
 
-    public SynapseTaskException(String msg, Log synLog) {
+    public SynapseTaskException(String msg, Log log) {
         super(msg);
-        synLog.error(msg);
+        log.error(msg);
     }
 
 
-    public SynapseTaskException(String msg, Throwable cause, Log synLog) {
+    public SynapseTaskException(String msg, Throwable cause, Log log) {
         super(msg, cause);
-        synLog.error(msg, cause);
+        log.error(msg, cause);
     }
 }

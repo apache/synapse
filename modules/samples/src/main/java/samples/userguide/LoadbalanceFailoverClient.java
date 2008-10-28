@@ -137,7 +137,9 @@ public class LoadbalanceFailoverClient {
                     createConfigurationContextFromFileSystem("client_repo", null);
         }
         ServiceClient client = new ServiceClient(configContext, null);
-        options.setTimeOutInMilliSeconds(10000000);
+        long timeout = Integer.parseInt(getProperty("timeout", "10000000"));
+        System.out.println("timeout=" + timeout);
+        options.setTimeOutInMilliSeconds(timeout);
 
         // set addressing, transport and proxy url
         if (addUrl != null && !"null".equals(addUrl)) {

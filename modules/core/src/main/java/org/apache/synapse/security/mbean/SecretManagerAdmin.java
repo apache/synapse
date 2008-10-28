@@ -33,6 +33,9 @@ public class SecretManagerAdmin implements SecretManagerAdminMbean {
         this.secretManager = secretManager;
     }
 
+    /**
+     * @see SecretManagerAdminMbean
+     */
     public void init(String identityStorePass, String identityKeyPass, String trustStorePass) {
 
         secretManager.init(identityStorePass, identityKeyPass, trustStorePass);

@@ -76,7 +76,7 @@
                             org.apache.synapse.config,
                             org.apache.synapse.core,
                             org.apache.synapse.core.axis2,
-                            org.apache.synapse.util
+                            org.apache.synapse.uti,
                             *;resolution:=optional,
                         </Import-Package>
                     </instructions>

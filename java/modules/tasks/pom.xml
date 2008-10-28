@@ -62,9 +62,13 @@
                             org.apache.synapse.task.*;-split-package:=merge-last,
                         </Export-Package>
                         <Import-Package>
+                            org.apache.synapse.utils.*,
                             org.apache.commons.io,
                             org.quartz.*,
-                            javax.transaction.* 
+                            javax.transaction.*,
+                            org.apache.axiom.*,
+                            org.apache.commons.collections.*,
+                            *;resolution:=optional,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

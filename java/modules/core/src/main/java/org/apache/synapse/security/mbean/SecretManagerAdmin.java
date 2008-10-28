@@ -27,9 +27,14 @@ import org.apache.synapse.security.secret.SecretManager;
 
 public class SecretManagerAdmin implements SecretManagerAdminMbean {
 
+    private SecretManager secretManager;
+
+    public SecretManagerAdmin(SecretManager secretManager) {
+        this.secretManager = secretManager;
+    }
+
     public void init(String identityStorePass, String identityKeyPass, String trustStorePass) {
 
-        SecretManager secretManager = SecretManager.getInstance();
         secretManager.init(identityStorePass, identityKeyPass, trustStorePass);
     }
 }

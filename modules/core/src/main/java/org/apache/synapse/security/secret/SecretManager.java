@@ -196,7 +196,7 @@ public class SecretManager {
                 handleException("Error creating a instance from class : " + provider);
             }
         }
-//        registerMBean();
+        registerMBean();
         initialized = true;
     }
 
@@ -230,8 +230,8 @@ public class SecretManager {
         throw new SynapseException(msg);
     }
 
-    private static void registerMBean() {
+    private void registerMBean() {
         MBeanRegistrar mBeanRegistrar = MBeanRegistrar.getInstance();
-        mBeanRegistrar.registerMBean(new SecretManagerAdmin(), "SecurityAdminServices", "SecretManagerAdmin");
+        mBeanRegistrar.registerMBean(new SecretManagerAdmin(this), "SecurityAdminServices", "SecretManagerAdmin");
     }
 }

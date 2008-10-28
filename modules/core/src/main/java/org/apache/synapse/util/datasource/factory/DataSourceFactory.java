@@ -24,6 +24,7 @@ import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.security.secret.SecretManager;
 import org.apache.synapse.util.datasource.DataSourceInformation;
 
 import javax.sql.DataSource;
@@ -64,6 +65,10 @@ public class DataSourceFactory {
 
         String user = information.getUser();
         String password = information.getPassword();
+        SecretManager secretManager = SecretManager.getInstance();
+        if (secretManager.isInitialized()) {
+            password = secretManager.getSecret(password);
+        }
         int defaultTransactionIsolation = information.getDefaultTransactionIsolation();
 
 

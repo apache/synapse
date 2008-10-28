@@ -17,7 +17,7 @@ public interface SecretRepository {
 
     /**
      * Returns the secret of provided alias name . An alias represents the logical name
-     * for a lookup secret
+     * for a look up secret
      *
      * @param alias Alias name for look up a secret
      * @return Secret if there is any , otherwise ,alias itself

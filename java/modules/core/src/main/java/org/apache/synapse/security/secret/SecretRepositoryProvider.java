@@ -23,9 +23,16 @@ import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
 
 
 /**
- * 
+ * Factory method for creating a instance of a SecretRepository
  */
 public interface SecretRepositoryProvider {
-    
+
+    /**
+     * Returns a SecretRepository implementation
+     *
+     * @param identity Identity KeyStore
+     * @param trust    Trust KeyStore
+     * @return A SecretRepository implementation
+     */
     public SecretRepository getSecretRepository(IdentityKeyStoreWrapper identity, TrustKeyStoreWrapper trust);
 }

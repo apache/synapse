@@ -19,10 +19,17 @@
 package org.apache.synapse.security.mbean;
 
 /**
- *
+ * Admin service for managing SecretManager
  */
 
 public interface SecretManagerAdminMbean {
 
+    /**
+     * Initialize the SecretManager
+     *
+     * @param identityStorePass Identity keyStore password
+     * @param identityKeyPass   Private key Password
+     * @param trustStorePass    TrustStore password
+     */
     public void init(String identityStorePass, String identityKeyPass, String trustStorePass);
 }

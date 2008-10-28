@@ -21,19 +21,21 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="text_proxy">
+        <log level="full"/>
         <header name="Action" value="urn:placeOrder"/>
         <script language="js"><![CDATA[
             var args = mc.getPayloadXML().toString().split(" ");
             mc.setPayloadXML(
-            <m:placeOrder xmlns:m="http://services.samples/xsd">
-                <m:order>
-                    <m:price>{args[0]}</m:price>
-                    <m:quantity>{args[1]}</m:quantity>
-                    <m:symbol>{args[2]}</m:symbol>
-                </m:order>
-            </m:placeOrder>);
+            <placeOrder xmlns="http://services.samples">
+                <order xmlns="http://services.samples/xsd">
+                    <price>{args[0]}</price>
+                    <quantity>{args[1]}</quantity>
+                    <symbol>{args[2]}</symbol>
+                </order>
+            </placeOrder>);
         ]]></script>
         <property action="set" name="OUT_ONLY" value="true"/>
+        <log level="full"/>
         <send>
             <endpoint>
                 <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
@@ -42,6 +44,7 @@
     </sequence>
 
     <sequence name="mtom_proxy">
+        <log level="full"/>
         <property action="set" name="OUT_ONLY" value="true"/>
         <header name="Action" value="urn:oneWayUploadUsingMTOM"/>
         <send>
@@ -67,13 +70,14 @@
 
     <proxy name="JMSFileUploadProxy" transports="jms">
         <target inSequence="mtom_proxy" outSequence="out"/>
-        <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}element</parameter>
+        <parameter name="Wrapper">{http://services.samples/xsd}element</parameter>
     </proxy>
     <proxy name="JMSTextProxy" transports="jms">
         <target inSequence="text_proxy" outSequence="out"/>
-        <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}text</parameter>
+        <parameter name="Wrapper">{http://services.samples/xsd}text</parameter>
     </proxy>
     <proxy name="JMSPoxProxy" transports="jms">
         <target inSequence="pox_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">application/xml</parameter>
     </proxy>
 </definitions>

@@ -1051,6 +1051,13 @@
             <version>${commons-cli.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <reporting>
@@ -1203,6 +1210,7 @@
         <groovy.version>1.0</groovy.version>
         <servlet-api.version>2.3</servlet-api.version>
         <qpid.version>1.0-incubating-M3-615355</qpid.version>
+        <commons-lang.version>2.1</commons-lang.version>
 
     </properties>
 

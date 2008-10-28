@@ -29,6 +29,7 @@ import org.apache.synapse.util.datasource.DataSourceFinder;
 import org.apache.synapse.util.datasource.InMemoryDataSourceRegistry;
 import org.apache.synapse.util.datasource.DBPoolView;
 import org.apache.synapse.util.MBeanRepository;
+import org.apache.synapse.security.secret.SecretManager;
 import org.jaxen.JaxenException;
 
 import javax.naming.Context;
@@ -184,7 +185,14 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         // load the minimum required properties
         ds.setDriverClassName(getValue(pool, DRIVER_Q));
         ds.setUsername(getValue(pool, USER_Q));
-        ds.setPassword(getValue(pool, PASS_Q));
+        String password = getValue(pool, PASS_Q);
+        SecretManager secretManager = SecretManager.getInstance();
+        if (secretManager.isInitialized()) {
+            password = secretManager.getSecret(password);
+        }
+        if (password != null && !"".equals(password)) {
+            ds.setPassword(password);
+        }
         ds.setUrl(getValue(pool, URL_Q));
 
         //save loaded properties for later

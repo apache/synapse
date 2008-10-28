@@ -18,18 +18,23 @@
  */
 package org.apache.synapse.security.secret.repository.filebased;
 
-import org.apache.synapse.security.secret.SecretRepositoryProvider;
 import org.apache.synapse.security.secret.SecretRepository;
+import org.apache.synapse.security.secret.SecretRepositoryProvider;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
 
 
 /**
- * 
+ * Factory method implementation for FileBaseSecretRepository
  */
 public class FileBaseSecretRepositoryProvider implements SecretRepositoryProvider {
-    
-    public SecretRepository getSecretRepository(IdentityKeyStoreWrapper identity , TrustKeyStoreWrapper trust) {
-        return new FileBaseSecretRepository(identity,trust);
+
+    /**
+     * Returns a  FileBaseSecretRepository instance
+     *
+     * @see org.apache.synapse.security.secret.SecretRepositoryProvider
+     */
+    public SecretRepository getSecretRepository(IdentityKeyStoreWrapper identity, TrustKeyStoreWrapper trust) {
+        return new FileBaseSecretRepository(identity, trust);
     }
 }

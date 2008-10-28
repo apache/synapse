@@ -84,6 +84,7 @@
     <property name="addurl" value=""/>
     <property name="trpurl" value=""/>
     <property name="prxurl" value=""/>
+    <property name="timeout" value=""/>
     <property name="repository" value=""/>
     <property name="policy" value=""/>
     <property name="rest" value=""/>
@@ -114,6 +115,7 @@
             <sysproperty key="addurl" value="${addurl}"/>
             <sysproperty key="trpurl" value="${trpurl}"/>
             <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="timeout" value="${timeout}"/>
             <sysproperty key="repository" value="${repository}"/>
             <sysproperty key="policy" value="${policy}"/>
             <sysproperty key="rest" value="${rest}"/>
@@ -170,6 +172,7 @@
             <sysproperty key="addurl" value="${addurl}"/>
             <sysproperty key="trpurl" value="${trpurl}"/>
             <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="timeout" value="${timeout}"/>
             <sysproperty key="qty"    value="${qty}"/>
             <sysproperty key="repository" value="${repository}"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
@@ -203,6 +206,7 @@
             <sysproperty key="i" value="${i}"/>
             <sysproperty key="addurl" value="${addurl}"/>
             <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="timeout" value="${timeout}"/>
             <sysproperty key="prxurl" value="${prxurl}"/>
             <sysproperty key="session" value="${session}"/>
             <sysproperty key="sleep" value="${sleep}"/>

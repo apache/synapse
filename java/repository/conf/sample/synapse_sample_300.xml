@@ -24,7 +24,7 @@
         <property name="to" value="http://localhost:9000/services/SimpleStockQuoteService"/>
         <property name="soapAction" value="urn:getQuote"/>
         <property name="message">
-            <m0:getQuote xmlns:m0="http://services.samples/xsd">
+            <m0:getQuote xmlns:m0="http://services.samples">
                 <m0:request>
                     <m0:symbol>IBM</m0:symbol>
                 </m0:request>
@@ -38,9 +38,9 @@
     </in>
     <out>
         <log level="custom">
-            <property name="Stock_Quote_on" expression="//ns:return/ns:lastTradeTimestamp/child::text()" xmlns:ns="http://services.samples/xsd"/>
-            <property name="For_the_organization" expression="//ns:return/ns:name/child::text()" xmlns:ns="http://services.samples/xsd"/>
-            <property name="Last_Value" expression="//ns:return/ns:last/child::text()" xmlns:ns="http://services.samples/xsd"/>
+            <property name="Stock_Quote_on" expression="//ns:return/ax21:lastTradeTimestamp/child::text()" xmlns:ax21="http://services.samples/xsd" xmlns:ns="http://services.samples"/>
+            <property name="For_the_organization" expression="//ns:return/ax21:name/child::text()" xmlns:ax21="http://services.samples/xsd" xmlns:ns="http://services.samples"/>
+            <property name="Last_Value" expression="//ns:return/ax21:last/child::text()" xmlns:ax21="http://services.samples/xsd" xmlns:ns="http://services.samples"/>
         </log>
     </out>
 

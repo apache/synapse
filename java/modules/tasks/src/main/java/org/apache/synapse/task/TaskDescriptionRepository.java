@@ -61,6 +61,16 @@ public class TaskDescriptionRepository {
     }
 
     /**
+     * Removing a TaskDescription
+     *
+     * @param name Name of the TaskDescription to be removed
+     */
+    public void removeTaskDescription(String name) {
+        validateName(name);
+        taskDescriptionMap.remove(name);
+    }
+    
+    /**
      * Explicit check for determine whether there is a task description with a name in interest
      *
      * @param name Name of the TaskDescription

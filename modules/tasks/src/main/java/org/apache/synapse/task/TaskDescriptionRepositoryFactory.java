@@ -18,39 +18,34 @@
  */
 package org.apache.synapse.task;
 
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
-/**
- * Factory method for retrieve / create a TaskScheduler
- */
-public class TaskSchedulerFactory {
+public class TaskDescriptionRepositoryFactory {
 
-    private final static Map<String, TaskScheduler> MAP = new HashMap<String, TaskScheduler>();
+    private final static Map<String, TaskDescriptionRepository> repositoryMap = new HashMap<String, TaskDescriptionRepository>();
 
-    private TaskSchedulerFactory() {
+    private TaskDescriptionRepositoryFactory() {
     }
 
     /**
-     * Returns a TaskScheduler whose name is match with given name.
-     * There is an only one instance of TaskScheduler for a given name as Factory caches
+     * Returns a TaskDescriptionRepository instance
+     * There is an only one instance of TaskDescriptionRepository for a given id as Factory caches TaskDescriptionRepositorys
      *
-     * @param name Name of the TaskScheduler
-     * @return TaskScheduler instance
+     * @param id Identifier for TaskDescriptionRepository
+     * @return TaskDescriptionRepository instance
      */
-    public static TaskScheduler getTaskScheduler(String name) {
+    public static TaskDescriptionRepository getTaskDescriptionRepository(String id) {
 
-        if (name == null || "".equals(name)) {
+        if (id == null || "".equals(id)) {
             throw new SynapseTaskException("Name cannot be found.");
         }
 
-        TaskScheduler taskScheduler = MAP.get(name);
-        if (taskScheduler == null) {
-            taskScheduler = new TaskScheduler(name);
-            MAP.put(name, taskScheduler);
+        TaskDescriptionRepository repository = repositoryMap.get(id);
+        if (repository == null) {
+            repository = new TaskDescriptionRepository();
+            repositoryMap.put(id, repository);
         }
-
-        return taskScheduler;
+        return repository;
     }
 }

@@ -32,37 +32,33 @@ import org.apache.commons.logging.LogFactory;
 public class PersistentBeanMgr {
 	Log log = LogFactory.getLog(getClass());
 	PersistentStorageManager pmgr = null;
-	
-	public PersistentBeanMgr(PersistentStorageManager pmgr)
-	{
+
+	public PersistentBeanMgr(PersistentStorageManager pmgr) {
 		this.pmgr = pmgr;
 	}
 
-	public Connection getDbConnection()
-	{
+	public Connection getDbConnection() {
 		return pmgr.getDbConnection();
 	}
-	
+
 	protected Object getObject(ResultSet rs, String field)
-	 throws Exception
-	 {
+			throws Exception {
 		// MySQL JDBC connector returns a byte array 
 		// and Derby an EmbedBlob with :
 		// return rs.getObject(field);
 		// so
 		InputStream bs = rs.getBinaryStream(field);
-		if ( bs == null ) return null;
+		if (bs == null) return null;
 		return (new ObjectInputStream(bs)).readObject();
-	 }
-	
+	}
+
 	protected ByteArrayInputStream serialize(Object obj)
-	  throws Exception
-	{
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    ObjectOutputStream oos = new ObjectOutputStream(baos);
-	    oos.writeObject(obj);
-	    oos.close();
-	    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-	    return bais;
+			throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		oos.writeObject(obj);
+		oos.close();
+		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		return bais;
 	}
 }

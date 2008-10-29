@@ -52,16 +52,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class SandeshaTestCase extends TestCase {
- 
+
 	String resourceDir = ""; //"test-resources";
-    Properties properties = null;
-    final String PROPERTY_FILE_NAME = "sandesha2-test.properties";
-    public final int DEFAULT_SERVER_TEST_PORT = 8060;
-    public ConfigurationContext serverConfigurationContext = null;
-    private final String RMServiceName = "RMSampleService";
+	Properties properties = null;
+	final String PROPERTY_FILE_NAME = "sandesha2-test.properties";
+	public final int DEFAULT_SERVER_TEST_PORT = 8060;
+	public ConfigurationContext serverConfigurationContext = null;
+	private final String RMServiceName = "RMSampleService";
 	private Log log = LogFactory.getLog(getClass());
-    
-	private final static String applicationNamespaceName = "http://tempuri.org/"; 
+
+	private final static String applicationNamespaceName = "http://tempuri.org/";
 	private final static String echoString = "echoString";
 	private final static String ping = "ping";
 	private final static String Text = "Text";
@@ -75,111 +75,111 @@ public class SandeshaTestCase extends TestCase {
 	protected int tickTime = 10000;  // Each wait will check the test assertions each second
 	protected String pingAction = "urn:wsrm:Ping";
 	protected String echoAction = "urn:wsrm:EchoString";
-	
-    public SandeshaTestCase(String name) {
-        super(name);
-        String testRource = "target" + File.separator + "test-classes";
-        resourceDir = new File(testRource).getPath();
-        
-        String propFileStr = resourceDir + File.separator + PROPERTY_FILE_NAME;
-        properties = new Properties ();
-        
-        try {
-			FileInputStream propertyFile = new FileInputStream (new File(propFileStr));
+
+	public SandeshaTestCase(String name) {
+		super(name);
+		String testRource = "target" + File.separator + "test-classes";
+		resourceDir = new File(testRource).getPath();
+
+		String propFileStr = resourceDir + File.separator + PROPERTY_FILE_NAME;
+		properties = new Properties();
+
+		try {
+			FileInputStream propertyFile = new FileInputStream(new File(propFileStr));
 			properties.load(propertyFile);
 		} catch (FileNotFoundException e) {
 			log.error(e);
 		} catch (IOException e) {
 			log.error(e);
 		}
-    }
-    
-    public void setUp () throws Exception {
+	}
+
+	public void setUp() throws Exception {
 		super.setUp();
-    	
+
 		String serverPortStr = getTestProperty("test.server.port");
-		if (serverPortStr!=null) {
+		if (serverPortStr != null) {
 			try {
 				serverPort = Integer.parseInt(serverPortStr);
 			} catch (NumberFormatException e) {
 				log.error(e);
 			}
 		}
-    }
-    
+	}
+
 	public ConfigurationContext startServer(String repoPath, String axis2_xml)
-	throws Exception {
+			throws Exception {
 
 		ConfigurationContext configContext =
-                ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+				ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath, axis2_xml);
 
-		httpServer = new SimpleHTTPServer (configContext,serverPort);
+		httpServer = new SimpleHTTPServer(configContext, serverPort);
 		httpServer.start();
 		Thread.sleep(300);
-		
+
 		return configContext;
 	}
 
-	public void tearDown () throws Exception {
-		if (httpServer!=null) {
+	public void tearDown() throws Exception {
+		if (httpServer != null) {
 			httpServer.stop();
 		}
-		
+
 		Thread.sleep(300);
 	}
 
 	protected InputStreamReader getResource(String relativePath, String resourceName) {
-        String resourceFile = resourceDir + relativePath + File.separator + resourceName;
-        try {
-            FileReader reader = new FileReader(resourceFile);
-            return reader;
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("cannot load the test-resource", e);
-        }
-    }
+		String resourceFile = resourceDir + relativePath + File.separator + resourceName;
+		try {
+			FileReader reader = new FileReader(resourceFile);
+			return reader;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("cannot load the test-resource", e);
+		}
+	}
 
-    protected SOAPEnvelope getSOAPEnvelope() {
-        return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
-    }
+	protected SOAPEnvelope getSOAPEnvelope() {
+		return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+	}
 
-    protected SOAPEnvelope getSOAPEnvelope(String relativePath, String resourceName) {
-        try {
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
-                    getResource(relativePath, resourceName));
-            OMXMLParserWrapper wrapper = OMXMLBuilderFactory.createStAXSOAPModelBuilder(
-                    OMAbstractFactory.getSOAP11Factory(), reader);
-            return (SOAPEnvelope) wrapper.getDocumentElement();
+	protected SOAPEnvelope getSOAPEnvelope(String relativePath, String resourceName) {
+		try {
+			XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+					getResource(relativePath, resourceName));
+			OMXMLParserWrapper wrapper = OMXMLBuilderFactory.createStAXSOAPModelBuilder(
+					OMAbstractFactory.getSOAP11Factory(), reader);
+			return (SOAPEnvelope) wrapper.getDocumentElement();
 
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		} catch (XMLStreamException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    protected SOAPEnvelope getEmptySOAPEnvelope() {
-        return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
-    }
+	protected SOAPEnvelope getEmptySOAPEnvelope() {
+		return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+	}
 
-    protected static OMElement getEchoOMBlock(String text, String sequenceKey) {
+	protected static OMElement getEchoOMBlock(String text, String sequenceKey) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName, "ns1");
 		OMElement echoStringElement = fac.createOMElement(echoString, applicationNamespace);
-		OMElement textElem = fac.createOMElement(Text,applicationNamespace);
-		OMElement sequenceElem = fac.createOMElement(Sequence,applicationNamespace);
-		
+		OMElement textElem = fac.createOMElement(Text, applicationNamespace);
+		OMElement sequenceElem = fac.createOMElement(Sequence, applicationNamespace);
+
 		textElem.setText(text);
 		sequenceElem.setText(sequenceKey);
 		echoStringElement.addChild(textElem);
 		echoStringElement.addChild(sequenceElem);
-		
+
 		return echoStringElement;
 	}
-    
+
 	protected OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName, "ns1");
 		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
-		
+
 		textElem.setText(text);
 		pingElem.addChild(textElem);
 
@@ -189,39 +189,39 @@ public class SandeshaTestCase extends TestCase {
 	protected String checkEchoOMBlock(OMElement response) {
 		assertEquals("Response namespace", applicationNamespaceName, response.getNamespace().getNamespaceURI());
 		assertEquals("Response local name", echoStringResponse, response.getLocalName());
-		
-		OMElement echoStringReturnElem = response.getFirstChildWithName(new QName (applicationNamespaceName,EchoStringReturn));
+
+		OMElement echoStringReturnElem = response.getFirstChildWithName(new QName(applicationNamespaceName, EchoStringReturn));
 		assertNotNull("Echo String Return", echoStringReturnElem);
-		
+
 		String resultStr = echoStringReturnElem.getText();
 		return resultStr;
 	}
 
-    public String getTestProperty (String key) {
-    	if (properties!=null)
-    		return properties.getProperty(key);
-    	 
-    	return null;
-    }
-    
-    public void overrideConfigurationContext (ConfigurationContext context,MessageReceiver messageReceiver, String operationName, boolean newOperation, int mep) throws Exception  {
-    	
-    	
-    	AxisService rmService = context.getAxisConfiguration().getService(RMServiceName);
-    	
-    	AxisOperation operation = null;
-    	
-    	if (newOperation) {
-    		operation = rmService.getOperation(new QName (operationName));
-    		if (operation==null)
-    			throw new Exception ("Given operation not found");
-    	} else {
-    		operation = AxisOperationFactory.getAxisOperation(mep);
-    		rmService.addOperation(operation);
-    	}
-    	
-    	operation.setMessageReceiver(messageReceiver);
-    }
+	public String getTestProperty(String key) {
+		if (properties != null)
+			return properties.getProperty(key);
+
+		return null;
+	}
+
+	public void overrideConfigurationContext(ConfigurationContext context, MessageReceiver messageReceiver, String operationName, boolean newOperation, int mep) throws Exception {
+
+
+		AxisService rmService = context.getAxisConfiguration().getService(RMServiceName);
+
+		AxisOperation operation = null;
+
+		if (newOperation) {
+			operation = rmService.getOperation(new QName(operationName));
+			if (operation == null)
+				throw new Exception("Given operation not found");
+		} else {
+			operation = AxisOperationFactory.getAxisOperation(mep);
+			rmService.addOperation(operation);
+		}
+
+		operation.setMessageReceiver(messageReceiver);
+	}
 
 	protected class TestCallback implements AxisCallback {
 
@@ -229,23 +229,23 @@ public class SandeshaTestCase extends TestCase {
 		boolean completed = false;
 		boolean errorReported = false;
 		String resultStr;
-		
+
 		public boolean isComplete() {
 			return completed;
 		}
-		
+
 		public boolean isErrorReported() {
 			return errorReported;
 		}
 
-		public String getResult () {
+		public String getResult() {
 			return resultStr;
 		}
-		
-		public TestCallback (String name) {
+
+		public TestCallback(String name) {
 			this.name = name;
 		}
-		
+
 		public void onComplete() {
 			completed = true;
 		}
@@ -256,13 +256,13 @@ public class SandeshaTestCase extends TestCase {
 			this.resultStr = checkEchoOMBlock(contents);
 			System.out.println("TestCallback got text: '" + resultStr + "'");
 		}
-		
+
 		public void onFault(MessageContext result) {
 			errorReported = true;
 			System.out.println("TestCallback got fault: " + result.getEnvelope());
 		}
 
-		public void onError (Exception e) {
+		public void onError(Exception e) {
 			errorReported = true;
 			System.out.println("TestCallback got exception");
 			e.printStackTrace();

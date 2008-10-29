@@ -34,18 +34,16 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements InvokerBeanMgr {
 
-	public PersistentInvokerBeanMgr(PersistentStorageManager pmgr)
-	{
+	public PersistentInvokerBeanMgr(PersistentStorageManager pmgr) {
 		super(pmgr);
 	}
 
-	private String requestForModel(InvokerBean bean)
-	{
+	private String requestForModel(InvokerBean bean) {
 		StringBuilder sql = new StringBuilder(" select * from wsrm_invoker");
-		if ( bean == null ) return sql.toString();
+		if (bean == null) return sql.toString();
 		String op = " where";
 		String clause = bean.getMessageContextRefKey();
-		if ( clause != null ) {
+		if (clause != null) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" message_context_ref_key='");
@@ -53,14 +51,14 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 			sql.append("'");
 		}
 		clause = bean.getSequenceID();
-		if ( clause != null ) {
+		if (clause != null) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" sequence_id='");
 			sql.append(clause);
 			sql.append("'");
 		}
-		if ( (bean.getFlags() & InvokerBean.MSG_NO_FLAG ) != 0 ) { 
+		if ((bean.getFlags() & InvokerBean.MSG_NO_FLAG) != 0) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" msg_no=");
@@ -68,22 +66,20 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 		}
 		return sql.toString();
 	}
-	
+
 	private InvokerBean getInvokerBean(ResultSet rs)
-	  throws Exception
-	{
+			throws Exception {
 		InvokerBean invokerBean = new InvokerBean();
 		invokerBean.setMessageContextRefKey(rs.getString("message_context_ref_key"));
 		invokerBean.setSequenceID(rs.getString("sequence_id"));
 		invokerBean.setMsgNo(rs.getLong("msg_no"));
 		invokerBean.setFlags(rs.getInt("flags"));
-		invokerBean.setContext((Serializable)getObject(rs,"context"));
+		invokerBean.setContext((Serializable) getObject(rs, "context"));
 		return invokerBean;
 	}
-	
+
 	public boolean delete(String key)
-	  throws SandeshaStorageException 
-	{
+			throws SandeshaStorageException {
 		try {
 			Statement stmt = getDbConnection().createStatement();
 			stmt.executeUpdate("delete from wsrm_invoker where message_context_ref_key='" + key + "'");
@@ -95,14 +91,13 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 	}
 
 	public List find(InvokerBean bean)
-	  throws SandeshaStorageException
-	{
+			throws SandeshaStorageException {
 		String sql = requestForModel(bean);
 		ArrayList<InvokerBean> lst = new ArrayList<InvokerBean>();
 		try {
 			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
-			while ( rs.next() ) {
+			while (rs.next()) {
 				lst.add(getInvokerBean(rs));
 			}
 			rs.close();
@@ -112,35 +107,34 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 		}
 		return lst;
 	}
-	
+
 	public boolean insert(InvokerBean bean)
-	  throws SandeshaStorageException
-	{
+			throws SandeshaStorageException {
 		try {
-	    	PreparedStatement pstmt = getDbConnection().prepareStatement("insert into wsrm_invoker(message_context_ref_key," +
-			"sequence_id,context,msg_no,flags)values(?,?,?,?,?)");
-		   	pstmt.setString(1,bean.getMessageContextRefKey());
-		   	pstmt.setString(2,bean.getSequenceID());
-		   	pstmt.setLong(4,bean.getMsgNo());
-		   	pstmt.setInt(5,bean.getFlags());
-		   	// Derby ne serialise pas avec setObject
-			 ByteArrayInputStream bais = serialize(bean.getContext());
-			 pstmt.setBinaryStream(3, bais, bais.available());
-		    pstmt.execute();
-		    pstmt.close();
+			PreparedStatement pstmt = getDbConnection().prepareStatement("insert into wsrm_invoker(message_context_ref_key," +
+					"sequence_id,context,msg_no,flags)values(?,?,?,?,?)");
+			pstmt.setString(1, bean.getMessageContextRefKey());
+			pstmt.setString(2, bean.getSequenceID());
+			pstmt.setLong(4, bean.getMsgNo());
+			pstmt.setInt(5, bean.getFlags());
+			// Derby ne serialise pas avec setObject
+			ByteArrayInputStream bais = serialize(bean.getContext());
+			pstmt.setBinaryStream(3, bais, bais.available());
+			pstmt.execute();
+			pstmt.close();
 		} catch (Exception ex) {
 			throw new SandeshaStorageException(ex);
 		}
 		return true;
 	}
+
 	public InvokerBean retrieve(String key)
-	  throws SandeshaStorageException
-	{
+			throws SandeshaStorageException {
 		InvokerBean invokerBean = null;
 		try {
 			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select * from wsrm_invoker where message_context_ref_key='" + key + "'");
-			if ( ! rs.next() ) return invokerBean;
+			if (! rs.next()) return invokerBean;
 			invokerBean = getInvokerBean(rs);
 			rs.close();
 			stmt.close();
@@ -151,51 +145,49 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 	}
 
 	public boolean update(InvokerBean bean)
-	  throws SandeshaStorageException
-	{
+			throws SandeshaStorageException {
 		try {
-	    	PreparedStatement pstmt = getDbConnection().prepareStatement("update wsrm_invoker set " +
-			"sequence_id=?,context=?,msg_no=?,flags=? where message_context_ref_key='" + bean.getMessageContextRefKey() + "'" );
-		   	pstmt.setString(1,bean.getSequenceID());
-		   	pstmt.setLong(3,bean.getMsgNo());
-		   	pstmt.setInt(4,bean.getFlags());
-		   	// Derby ne serialise pas avec setObject
-			 ByteArrayInputStream bais = serialize(bean.getContext());
-			 pstmt.setBinaryStream(2, bais, bais.available());
-		    pstmt.execute();
-		    pstmt.close();
+			PreparedStatement pstmt = getDbConnection().prepareStatement("update wsrm_invoker set " +
+					"sequence_id=?,context=?,msg_no=?,flags=? where message_context_ref_key='" + bean.getMessageContextRefKey() + "'");
+			pstmt.setString(1, bean.getSequenceID());
+			pstmt.setLong(3, bean.getMsgNo());
+			pstmt.setInt(4, bean.getFlags());
+			// Derby ne serialise pas avec setObject
+			ByteArrayInputStream bais = serialize(bean.getContext());
+			pstmt.setBinaryStream(2, bais, bais.available());
+			pstmt.execute();
+			pstmt.close();
 		} catch (Exception ex) {
 			throw new SandeshaStorageException(ex);
 		}
 		return true;
 	}
-	
+
 	public InvokerBean findUnique(InvokerBean bean)
-	  throws SandeshaException
-	{
+			throws SandeshaException {
 		String sql = requestForModel(bean);
 		InvokerBean result = null;
 		try {
 			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
-			while ( rs.next() ) {
-				if ( result == null ) {
-				 result = getInvokerBean(rs);
+			while (rs.next()) {
+				if (result == null) {
+					result = getInvokerBean(rs);
 				} else {
 					String message = SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.nonUniqueResult,
 							result.toString(),
 							getInvokerBean(rs).toString());
 					log.error(message);
-					throw new SandeshaException (message);
+					throw new SandeshaException(message);
 				}
 			}
 			rs.close();
 			stmt.close();
 		} catch (Exception ex) {
 			throw new SandeshaStorageException(ex);
-		}		
+		}
 		return result;
 	}
-			
+
 }

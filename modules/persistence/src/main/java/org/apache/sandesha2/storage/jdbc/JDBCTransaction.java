@@ -30,61 +30,60 @@ import org.apache.sandesha2.storage.Transaction;
  * As there is no method to "release" a transaction, connections are closed on
  * commit or rollback.
  */
+
 public class JDBCTransaction implements Transaction {
 	private PersistentStorageManager pmgr = null;
 	private Connection dbConnection = null;
 	private boolean active = false;
 	private Log log = LogFactory.getLog(getClass());
 
-	public JDBCTransaction (PersistentStorageManager pmgr)
-	{
+	public JDBCTransaction(PersistentStorageManager pmgr) {
 		log.debug("new JDBCTransaction");
 		try {
-		  this.pmgr = pmgr;
-		  dbConnection = pmgr.dbConnect();
-		  dbConnection.setAutoCommit(false);
+			this.pmgr = pmgr;
+			dbConnection = pmgr.dbConnect();
+			dbConnection.setAutoCommit(false);
 			dbConnection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-		  active = true;
-		} catch (Exception ex) {}
+			active = true;
+		} catch (Exception ex) {
+		}
 	}
 
-	public Connection getDbConnection()
-	{
+	public Connection getDbConnection() {
 		return dbConnection;
 	}
 
-	private void freeTransaction()
-	{
+	private void freeTransaction() {
 		try {
 			dbConnection.close();
 			pmgr.removeTransaction();
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+		}
 
 	}
 
-	public void commit()
-	{
+	public void commit() {
 		log.debug("commit JDBCTransaction");
 		try {
-		  dbConnection.commit();
-		  freeTransaction();
-		} catch (Exception ex) {}
+			dbConnection.commit();
+			freeTransaction();
+		} catch (Exception ex) {
+		}
 		active = false;
 	}
 
-	public void rollback()
-	{
+	public void rollback() {
 		log.debug("rollback JDBCTransaction");
 		try {
-			  dbConnection.rollback();
-			  freeTransaction();
-			} catch (Exception ex) {}
+			dbConnection.rollback();
+			freeTransaction();
+		} catch (Exception ex) {
+		}
 		active = false;
 	}
-		
-	public boolean isActive ()
-	{
+
+	public boolean isActive() {
 		return active;
 	}
-	
+
 }

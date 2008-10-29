@@ -26,19 +26,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileSystemException;
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.util.Map;
 
 public class VFSUtils extends BaseUtils {
 
     private static final Log log = LogFactory.getLog(VFSUtils.class);
-
-    private static BaseUtils _instance = new VFSUtils();
-
-    public static BaseUtils getInstace() {
-        return _instance;
-    }
 
     /**
      * Get a String property from FileContent message
@@ -47,53 +39,14 @@ public class VFSUtils extends BaseUtils {
      * @param property property name
      * @return property value
      */
-    @Override
-    public String getProperty(Object message, String property) {
+    public static String getProperty(FileContent message, String property) {
         try {
-            Object o = ((FileContent)message).getAttributes().get(property);
+            Object o = message.getAttributes().get(property);
             if (o instanceof String) {
                 return (String) o;
             }
         } catch (FileSystemException e) {}
         return null;
-    }
-
-    @Override
-    public InputStream getInputStream(Object message) {
-        try {
-            return ((FileContent) message).getInputStream();
-        } catch (FileSystemException e) {
-            handleException("Error creating an input stream to : " +
-                ((FileContent) message).getFile().getName(), e);
-        }
-        return null;
-    }
-
-    @Override
-    public String getMessageTextPayload(Object message) {
-        try {
-            return new String(
-                getBytesFromInputStream(getInputStream(message),
-                (int) ((FileContent) message).getSize()));
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error reading message payload as text for : " +
-                ((FileContent) message).getFile().getName(), e);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public byte[] getMessageBinaryPayload(Object message) {
-        try {
-            return getBytesFromInputStream(getInputStream(message),
-                (int) ((FileContent) message).getSize());
-        } catch (Exception e) {
-            handleException("Error reading message payload as a byte[] for : " +
-                ((FileContent) message).getFile().getName(), e);
-        }
-        return new byte[0];
     }
 
     public static String getFileName(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
@@ -140,28 +93,4 @@ public class VFSUtils extends BaseUtils {
 
       return VFSConstants.DEFAULT_RECONNECT_TIMEOUT; 
     }   
-    
-    public static byte[] getBytesFromInputStream(InputStream is, int length) throws IOException {
-
-        byte[] bytes = new byte[length];
-        int offset = 0;
-        int numRead = 0;
-
-        try {
-            while (offset < bytes.length &&
-                (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-                offset += numRead;
-            }
-
-            // Ensure all the bytes have been read in
-            if (offset < bytes.length) {
-                handleException("Could not completely read the stream to conver to a byte[]");
-            }
-        } finally {
-            try {
-                is.close();
-            } catch (IOException ignore) {}
-        }
-        return bytes;
-    }
 }

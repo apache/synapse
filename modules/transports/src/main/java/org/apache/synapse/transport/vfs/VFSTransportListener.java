@@ -387,10 +387,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             if (contentType == null) {
                 if (entry.getContentType() != null) {
                     contentType = entry.getContentType();
-                } else if (VFSUtils.getInstace().getProperty(
+                } else if (VFSUtils.getProperty(
                     content, BaseConstants.CONTENT_TYPE) != null) {
                     contentType =
-                        VFSUtils.getInstace().getProperty(content, BaseConstants.CONTENT_TYPE);
+                        VFSUtils.getProperty(content, BaseConstants.CONTENT_TYPE);
                 }
             }
 

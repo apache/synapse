@@ -18,26 +18,18 @@
  */
 package org.apache.synapse.security.mbean;
 
-import org.apache.synapse.security.secret.SecretManager;
-
-
 /**
- *
+ * Admin service for managing SecretManager
  */
 
-public class SecretManagerAdmin implements SecretManagerAdminMBean {
-
-    private SecretManager secretManager;
-
-    public SecretManagerAdmin(SecretManager secretManager) {
-        this.secretManager = secretManager;
-    }
+public interface SecretManagerAdminMBean {
 
     /**
-     * @see SecretManagerAdminMBean
+     * Initialize the SecretManager
+     *
+     * @param identityStorePass Identity keyStore password
+     * @param identityKeyPass   Private key Password
+     * @param trustStorePass    TrustStore password
      */
-    public void init(String identityStorePass, String identityKeyPass, String trustStorePass) {
-
-        secretManager.init(identityStorePass, identityKeyPass, trustStorePass);
-    }
+    public void init(String identityStorePass, String identityKeyPass, String trustStorePass);
 }

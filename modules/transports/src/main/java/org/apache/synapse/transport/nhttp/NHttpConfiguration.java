@@ -116,6 +116,10 @@ public class NHttpConfiguration {
         return getProperty(G_BUFFER_SIZE, BUFFER_SIZE);
     }
 
+    public boolean isKeepAliveDisabled() {
+        return getProperty(NhttpConstants.DISABLE_KEEPALIVE, 0) == 1;
+    }
+
     /**
      * Get properties that tune nhttp transport. Preference to system properties
      * @param name name of the system/config property

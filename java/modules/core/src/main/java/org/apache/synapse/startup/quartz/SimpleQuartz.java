@@ -30,9 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerManager;
-import org.apache.synapse.task.TaskDescription;
-import org.apache.synapse.task.TaskSchedulerFactory;
-import org.apache.synapse.task.TaskScheduler;
+import org.apache.synapse.task.*;
 import org.apache.synapse.startup.AbstractStartup;
 
 /*
@@ -45,19 +43,19 @@ import org.apache.synapse.startup.AbstractStartup;
 public class SimpleQuartz extends AbstractStartup {
 
     private static final Log log = LogFactory.getLog(SimpleQuartz.class);
-   
-    private TaskDescription taskDescription;
-    
-    public static String SYNAPSE_STARTUP_TASK_SCHEDULER ="synapse.startup.taskscheduler";
-    
+
+    private String taskDescriptionReference;
+
+    public static String SYNAPSE_STARTUP_TASK_SCHEDULER = "synapse.startup.taskscheduler";
+    public static String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";
+
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
     }
 
     public void destroy() {
 
-        TaskSchedulerFactory schedulerFactory = TaskSchedulerFactory.getInstance();
-        TaskScheduler taskScheduler = schedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
+        TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
         if (taskScheduler != null && taskScheduler.isInitialized()) {
             taskScheduler.shutDown();
         }
@@ -65,44 +63,51 @@ public class SimpleQuartz extends AbstractStartup {
 
     public void init(SynapseEnvironment synapseEnvironment) {
 
-        if(taskDescription == null){
-             throw new NullPointerException("TaskDescription is null");
+        if (taskDescriptionReference == null || "".equals(taskDescriptionReference)) {
+            throw new NullPointerException("TaskDescriptionRefrence key is null or empty");
+        }
+
+        TaskDescriptionRepository repository = TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
+                SimpleQuartz.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
+        TaskDescription taskDescription = repository.getTaskDescription(taskDescriptionReference);
+
+        if (taskDescription == null) {
+            throw new NullPointerException("TaskDescription is null : reference name : " + taskDescriptionReference);
         }
         // this server name given by system property SynapseServerName
         // otherwise take host-name
         // else assume localhost
         String thisServerName = ServerManager.getInstance().getServerName();
-        if(thisServerName == null || thisServerName.equals("")) {
-          try {
-            InetAddress addr = InetAddress.getLocalHost();
-            thisServerName = addr.getHostName();
-  
-          } catch (UnknownHostException e) {
-            log.warn("Could not get local host name", e);
-          }
-          
-          if(thisServerName == null || thisServerName.equals("")) {
-            thisServerName = "localhost";
-          }
+        if (thisServerName == null || thisServerName.equals("")) {
+            try {
+                InetAddress addr = InetAddress.getLocalHost();
+                thisServerName = addr.getHostName();
+
+            } catch (UnknownHostException e) {
+                log.warn("Could not get local host name", e);
+            }
+
+            if (thisServerName == null || thisServerName.equals("")) {
+                thisServerName = "localhost";
+            }
         }
         log.debug("Synapse server name : " + thisServerName);
-        
+
         // start proxy service if either,
         // pinned server name list is empty
         // or pinned server list has this server name
         List pinnedServers = taskDescription.getPinnedServers();
-        if(pinnedServers != null && !pinnedServers.isEmpty()) {
-          if(!pinnedServers.contains(thisServerName)) {
-            log.info("Server name not in pinned servers list. Not starting Task : " + getName());
-            return;
-          }
+        if (pinnedServers != null && !pinnedServers.isEmpty()) {
+            if (!pinnedServers.contains(thisServerName)) {
+                log.info("Server name not in pinned servers list. Not starting Task : " + getName());
+                return;
+            }
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(SimpleQuartzJob.SYNAPSE_ENVIRONMENT, synapseEnvironment);
         try {
-            TaskSchedulerFactory schedulerFactory = TaskSchedulerFactory.getInstance();
-            TaskScheduler taskScheduler = schedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
+            TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
                     taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());
@@ -116,11 +121,11 @@ public class SimpleQuartz extends AbstractStartup {
 
     }
 
-    public TaskDescription getTaskDescription() {
-        return taskDescription;
+    public String getTaskDescriptionReference() {
+        return taskDescriptionReference;
     }
 
-    public void setTaskDescription(TaskDescription taskDescription) {
-        this.taskDescription = taskDescription;
+    public void setTaskDescriptionReference(String taskDescriptionReference) {
+        this.taskDescriptionReference = taskDescriptionReference;
     }
 }

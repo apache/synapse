@@ -24,6 +24,8 @@ import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionSerializer;
+import org.apache.synapse.task.TaskDescriptionRepository;
+import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
 import org.apache.synapse.config.xml.StartupSerializer;
 
 public class SimpleQuartzSerializer implements StartupSerializer {
@@ -36,16 +38,26 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         }
 
         SimpleQuartz sq = (SimpleQuartz) s;
-        TaskDescription taskDescription = sq.getTaskDescription();
-        if (taskDescription != null) {
-            OMElement task = TaskDescriptionSerializer.serializeStartup(parent, taskDescription);
-            if (task == null) {
-                throw new SynapseException("Task Element can not be null.");
+        String taskDescriptionRef = sq.getTaskDescriptionReference();
+        if (taskDescriptionRef != null || !"".equals(taskDescriptionRef)) {
+
+            TaskDescriptionRepository repository = TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
+                    SimpleQuartz.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
+            TaskDescription taskDescription = repository.getTaskDescription(taskDescriptionRef);
+
+            if (taskDescription != null) {
+                OMElement task = TaskDescriptionSerializer.serializeTaskDescription(parent, taskDescription);
+                if (task == null) {
+                    throw new SynapseException("Task Element can not be null.");
+                }
+                return task;
+            } else {
+                throw new SynapseException("Task Description is null for given reference :" + taskDescriptionRef);
             }
-            return task;
+        } else {
+            throw new SynapseException("Task Description Reference is null.");
         }
 
-        throw new SynapseException("Task Element is null.");
     }
 
 }

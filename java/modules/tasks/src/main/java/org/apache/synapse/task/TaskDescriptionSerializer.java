@@ -38,7 +38,7 @@ public class TaskDescriptionSerializer {
     private static final String NULL_NAMESPACE = "";
     private static final OMNamespace NULL_OMNS = omFactory.createOMNamespace(NULL_NAMESPACE, "");
 
-    public static OMElement serializeStartup(OMElement parent, TaskDescription taskDescription) {
+    public static OMElement serializeTaskDescription(OMElement parent, TaskDescription taskDescription) {
 
         if (taskDescription == null) {
             throw new SynapseTaskException("TaskDescription can not be null", log);

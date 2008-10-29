@@ -28,6 +28,7 @@ public class NhttpConstants {
     public static final String DISABLE_KEEPALIVE = "http.connection.disable.keepalive";
     public static final String IGNORE_SC_ACCEPTED = "IGNORE_SC_ACCEPTED";
     public static final String FORCE_SC_ACCEPTED = "FORCE_SC_ACCEPTED";
+    public static final String DISCARD_ON_COMPLETE = "DISCARD_ON_COMPLETE";
 
     public static final String WSDL_EPR_PREFIX = "WSDLEPRPrefix";
     public static final String REMOTE_HOST ="REMOTE_HOST";

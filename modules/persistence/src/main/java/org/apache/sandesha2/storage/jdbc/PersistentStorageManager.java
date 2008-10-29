@@ -65,11 +65,11 @@ import org.apache.sandesha2.workers.Sender;
 
 public class PersistentStorageManager extends StorageManager {
 
-	private Connection DbConnection = null;
-	private String DbConnectionString = null;
-	private String DbDriver = null;
-	private String DbUser = null;
-	private String DbPassword = null;
+	private Connection dbConnection = null;
+	private String dbConnectionString = null;
+	private String dbDriver = null;
+	private String dbUser = null;
+	private String dbPassword = null;
 	private PersistentRMSBeanMgr pRMSBeanMgr = null;
 	private PersistentRMDBeanMgr pRMDBeanMgr = null;
 	private PersistentSenderBeanMgr pSenderBeanMgr = null;
@@ -116,31 +116,31 @@ public class PersistentStorageManager extends StorageManager {
 		ModuleConfiguration mc = context.getAxisConfiguration().getModuleConfig("sandesha2");
 		Parameter param = mc.getParameter("db.connectionstring");
 		if (param != null) {
-			DbConnectionString = (String) param.getValue();
-			log.debug(param.getName() + "=" + DbConnectionString);
+			dbConnectionString = (String) param.getValue();
+			log.debug(param.getName() + "=" + dbConnectionString);
 		}
 		param = mc.getParameter("db.driver");
 		if (param != null) {
-			DbDriver = (String) param.getValue();
-			log.debug(param.getName() + "=" + DbDriver);
+			dbDriver = (String) param.getValue();
+			log.debug(param.getName() + "=" + dbDriver);
 		}
 		param = mc.getParameter("db.user");
 		if (param != null) {
-			DbUser = (String) param.getValue();
-			log.debug(param.getName() + "=" + DbUser);
+			dbUser = (String) param.getValue();
+			log.debug(param.getName() + "=" + dbUser);
 		}
 		param = mc.getParameter("db.password");
 		if (param != null) {
-			DbPassword = (String) param.getValue();
-			log.debug(param.getName() + "=" + DbPassword);
+			dbPassword = (String) param.getValue();
+			log.debug(param.getName() + "=" + dbPassword);
 		}
 	}
 
 	public void shutdown() {
-		if (DbConnection != null) {
+		if (dbConnection != null) {
 			try {
-				DbConnection.close();
-				DbConnection = null;
+				dbConnection.close();
+				dbConnection = null;
 			} catch (Exception ex) {
 			}
 		}
@@ -200,7 +200,7 @@ public class PersistentStorageManager extends StorageManager {
 	 */
 	public Connection getDbConnection() {
 		JDBCTransaction transaction = (JDBCTransaction) threadTransaction.get();
-		if (transaction == null) return DbConnection;
+		if (transaction == null) return dbConnection;
 		return transaction.getDbConnection();
 	}
 
@@ -208,17 +208,17 @@ public class PersistentStorageManager extends StorageManager {
 	public void initStorage(AxisModule moduleDesc)
 			throws SandeshaStorageException {
 		log.info("init PersistentStorageManager");
-		if (DbConnectionString == null || DbDriver == null)
+		if (dbConnectionString == null || dbDriver == null)
 			throw new SandeshaStorageException("Can't proceed. Needed properties are not set.");
 
-		DbConnection = dbConnect();
+		dbConnection = dbConnect();
 	}
 
 	public Connection dbConnect()
 			throws SandeshaStorageException {
 		try {
-			Class.forName(DbDriver);
-			return DriverManager.getConnection(DbConnectionString, DbUser, DbPassword);
+			Class.forName(dbDriver);
+			return DriverManager.getConnection(dbConnectionString, dbUser, dbPassword);
 		} catch (Exception ex) {
 			log.error("Unable to create DB connection ", ex);
 			throw new SandeshaStorageException(ex);

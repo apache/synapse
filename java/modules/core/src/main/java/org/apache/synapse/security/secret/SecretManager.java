@@ -25,7 +25,7 @@ public class SecretManager {
 
     private static Log log = LogFactory.getLog(SecretManager.class);
 
-    private static SecretManager ourInstance = new SecretManager();
+    private final static SecretManager SECRET_MANAGER= new SecretManager();
 
     /* Default configuration file path for secret manager*/
     private final static String DEFAULT_CONF_LOCATION = "secret-manager.properties";
@@ -45,10 +45,11 @@ public class SecretManager {
     private boolean initialized = false;
 
     public static SecretManager getInstance() {
-        return ourInstance;
+        return SECRET_MANAGER;
     }
 
     private SecretManager() {
+        registerMBean();
     }
 
     /**
@@ -196,7 +197,7 @@ public class SecretManager {
                 handleException("Error creating a instance from class : " + provider);
             }
         }
-        registerMBean();
+        
         initialized = true;
     }
 

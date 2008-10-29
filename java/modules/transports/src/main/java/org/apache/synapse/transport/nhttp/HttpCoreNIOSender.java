@@ -319,7 +319,15 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                     log.debug("A new connection established to : " + url.getHost() + ":" + port);
                 }
             } else {
-                handler.submitRequest(conn, axis2Req);
+                try {
+                    handler.submitRequest(conn, axis2Req);
+                } catch (ConnectionClosedException e) {
+                    ioReactor.connect(new InetSocketAddress(url.getHost(), port),
+                        null, axis2Req, sessionRequestCallback);
+                    if (log.isDebugEnabled()) {
+                        log.debug("A new connection established to : " + url.getHost() + ":" + port);
+                    }
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("An existing connection reused to : " + url.getHost() + ":" + port);
                 }

@@ -201,7 +201,13 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
             if (encoder.isCompleted()) {
-                if (!connStrategy.keepAlive(response, context)) {
+                Boolean reqRead = (Boolean) conn.getContext().getAttribute(NhttpConstants.REQUEST_READ);
+                if (reqRead != null && !reqRead) {
+                    try {
+                        // this is a connection we should not re-use
+                        conn.close();
+                    } catch (Exception ignore) {}
+                } else if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
                     conn.requestInput();
@@ -348,7 +354,13 @@ public class ServerHandler implements NHttpServiceHandler {
                         "was closed):" + e.getMessage());
             }
         } else {
-            log.error("I/O error: " + e.getMessage(), e);
+            String msg = e.getMessage().toLowerCase();
+            if (msg.indexOf("broken") != -1) {
+                log.warn("I/O error (Probably the connection " +
+                        "was closed by the remote party):" + e.getMessage());
+            } else {
+                log.error("I/O error: " + e.getMessage(), e);
+            }
             if (metrics != null) {
                 metrics.incrementFaultsReceiving();
             }

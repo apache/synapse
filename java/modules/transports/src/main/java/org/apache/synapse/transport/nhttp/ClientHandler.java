@@ -128,7 +128,8 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection to use to send the request, which has been kept open
      * @param axis2Req the new request
      */
-    public void submitRequest(final NHttpClientConnection conn, Axis2HttpRequest axis2Req) {
+    public void submitRequest(final NHttpClientConnection conn, Axis2HttpRequest axis2Req)
+        throws ConnectionClosedException {
         processConnection(conn, axis2Req);
     }
 
@@ -142,7 +143,14 @@ public class ClientHandler implements NHttpClientHandler {
         if (log.isDebugEnabled() ) {
             log.debug("ClientHandler connected : " + conn);
         }
-        processConnection(conn, (Axis2HttpRequest) attachment);
+        try {
+            processConnection(conn, (Axis2HttpRequest) attachment);
+        } catch (ConnectionClosedException e) {
+            if (metrics != null) {
+                metrics.incrementFaultsSending();
+            }
+            handleException("I/O Error submitting request : " + e.getMessage(), e, conn);
+        }
     }
 
     /**
@@ -150,7 +158,8 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn
      * @param axis2Req
      */
-    private void processConnection(final NHttpClientConnection conn, final Axis2HttpRequest axis2Req) {
+    private void processConnection(final NHttpClientConnection conn,
+        final Axis2HttpRequest axis2Req) throws ConnectionClosedException {
 
         try {
             // Reset connection metrics
@@ -175,7 +184,8 @@ public class ClientHandler implements NHttpClientHandler {
             
             conn.submitRequest(request);
             context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
-
+        } catch (ConnectionClosedException e) {
+            throw e;
         } catch (IOException e) {
             if (metrics != null) {
                 metrics.incrementFaultsSending();
@@ -268,8 +278,12 @@ public class ClientHandler implements NHttpClientHandler {
      */
     public void exception(final NHttpClientConnection conn, final IOException e) {
         String message = getErrorMessage("I/O error : " + e.getMessage(), conn);
-        log.error(message, e);
-    	checkAxisRequestComplete(conn, NhttpConstants.SND_IO_ERROR_SENDING, message, e);
+        if (message.toLowerCase().indexOf("reset") != -1) {
+            log.warn(message);
+        } else {
+            log.error(message, e);
+        }
+        checkAxisRequestComplete(conn, NhttpConstants.SND_IO_ERROR_SENDING, message, e);
         shutdownConnection(conn);
     }
 
@@ -434,7 +448,12 @@ public class ClientHandler implements NHttpClientHandler {
                 }
                 // reset metrics on connection
                 conn.getMetrics().reset();
-                if (!connStrategy.keepAlive(response, context)) {
+                if (context.getAttribute(NhttpConstants.DISCARD_ON_COMPLETE) != null) {
+                    try {
+                        // this is a connection we should not re-use
+                        conn.shutdown();
+                    } catch (Exception ignore) {}
+                } else if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
                     ConnectionPool.release(conn);
@@ -507,13 +526,13 @@ public class ClientHandler implements NHttpClientHandler {
             }
             if (!req.isSendingCompleted()) {
                 req.getMsgContext().setProperty(NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
-                req.setCompleted(true);
                 SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
                         conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
                 if (outputBuffer != null) {
                     outputBuffer.shutdown();
                 }
                 log.warn("Remote server aborted request being sent and replied : " + conn);
+                context.setAttribute(NhttpConstants.DISCARD_ON_COMPLETE, Boolean.TRUE);
                 if (metrics != null) {
                     metrics.incrementFaultsSending(NhttpConstants.SEND_ABORT, req.getMsgContext());
                 }
@@ -698,7 +717,11 @@ public class ClientHandler implements NHttpClientHandler {
     // ----------- utility methods -----------
 
     private void handleException(String msg, Exception e, NHttpClientConnection conn) {
-        log.error(msg, e);
+        if (msg.toLowerCase().indexOf("reset") != -1) {
+            log.warn(msg);
+        } else {
+            log.error(msg, e);
+        }
         if (conn != null) {
             shutdownConnection(conn);
         }

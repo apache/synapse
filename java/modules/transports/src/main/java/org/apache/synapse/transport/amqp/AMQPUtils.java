@@ -9,14 +9,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.DataHandler;
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.attachments.ByteArrayDataSource;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.impl.builder.StAXBuilder;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.builder.BuilderUtil;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterIncludeImpl;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,13 +47,176 @@ public class AMQPUtils extends BaseUtils
 
     private static final Log log = LogFactory.getLog(AMQPUtils.class);
 
-    private static BaseUtils _instance = new AMQPUtils();
+    private static AMQPUtils _instance = new AMQPUtils();
 
-    public static BaseUtils getInstace() {
+    public static AMQPUtils getInstace() {
         return _instance;
     }
 
-    @Override
+    /**
+     * Create a SOAPEnvelope from the given message and set it into
+     * the axis MessageContext passed
+     *
+     * @param message the message object
+     * @param msgContext the axis MessageContext
+     * @param contentType
+     * @throws AxisFault on errors encountered while setting the envelope to the message context
+     */
+    public void setSOAPEnvelope(Object message, MessageContext msgContext, String contentType)
+            throws AxisFault {
+
+        SOAPEnvelope envelope = null;
+        StAXBuilder builder = null;
+
+        String charSetEnc = null;
+        try {
+            if (contentType != null) {
+                charSetEnc = new ContentType(contentType).getParameter("charset");
+            }
+        } catch (ParseException ex) {
+            // ignore
+        }
+        
+        InputStream in = getInputStream(message);
+
+        // handle SOAP payloads when a correct content type is available
+        try {
+            if (contentType != null) {
+                if (contentType.indexOf(BaseConstants.MULTIPART_RELATED) > -1) {
+                    builder = BuilderUtil.getAttachmentsBuilder(msgContext, in, contentType, true);
+                    envelope = (SOAPEnvelope) builder.getDocumentElement();
+                    msgContext.setDoingSwA(true);
+
+                } else {
+                    builder = BuilderUtil.getSOAPBuilder(in, charSetEnc);
+                    envelope = (SOAPEnvelope) builder.getDocumentElement();
+                }
+            }
+        } catch (Exception ignore) {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // ignore
+            }
+            in = getInputStream(message);
+        }
+
+
+        // handle SOAP when content type is missing, or any other POX, binary or text payload
+        if (builder == null) {
+
+            SOAPFactory soapFactory = new SOAP11Factory();
+            try {
+                builder = new StAXOMBuilder(StAXUtils.createXMLStreamReader(in, charSetEnc));
+                builder.setOMBuilderFactory(OMAbstractFactory.getOMFactory());
+                OMNamespace ns = builder.getDocumentElement().getNamespace();
+                if (ns != null) {
+                    String nsUri = ns.getNamespaceURI();
+
+                    if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(nsUri)) {
+                        envelope = BaseUtils.getEnvelope(in, SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+    
+                    } else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(nsUri)) {
+                        envelope = BaseUtils.getEnvelope(in, SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+    
+                    }
+                }
+                if (envelope == null) {
+                    // this is POX ... mark message as REST
+                    msgContext.setDoingREST(true);
+                    envelope = soapFactory.getDefaultEnvelope();
+                    envelope.getBody().addChild(builder.getDocumentElement());
+                }
+
+            } catch (Exception e) {
+                envelope = handleLegacyMessage(msgContext, message);
+            }
+        }
+
+        // Set the encoding scheme in the message context
+        msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEnc);
+
+        String charEncOfMessage =
+            builder == null ? null :
+                builder.getDocument() == null ? null : builder.getDocument().getCharsetEncoding();
+
+        if (!isBlank(charEncOfMessage) &&
+            !isBlank(charSetEnc) &&
+            !charEncOfMessage.equalsIgnoreCase(charSetEnc)) {
+            handleException("Charset encoding of transport differs from that of the payload");
+        }
+
+        msgContext.setEnvelope(envelope);
+    }
+
+    /**
+     * Handle a non SOAP and non XML message, and create a SOAPEnvelope to hold the
+     * pure text or binary content as necessary
+     *
+     * @param msgContext the axis message context
+     * @param message the legacy message
+     * @return the SOAP envelope
+     */
+    private SOAPEnvelope handleLegacyMessage(MessageContext msgContext, Object message) {
+
+        SOAPFactory soapFactory = new SOAP11Factory();
+        SOAPEnvelope envelope;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Non SOAP/XML message received");
+        }
+
+        // pick the name of the element that will act as the wrapper element for the
+        // non-xml payload. If service doesn't define one, default
+        Parameter wrapperParam = msgContext.getAxisService().
+            getParameter(BaseConstants.WRAPPER_PARAM);
+
+        QName wrapperQName = null;
+        OMElement wrapper = null;
+        if (wrapperParam != null) {
+            wrapperQName = BaseUtils.getQNameFromString(wrapperParam.getValue());
+        }
+
+        String textPayload = getMessageTextPayload(message);
+        if (textPayload != null) {
+            OMTextImpl textData = (OMTextImpl) soapFactory.createOMText(textPayload);
+
+            if (wrapperQName == null) {
+                wrapperQName = BaseConstants.DEFAULT_TEXT_WRAPPER;
+            }
+            wrapper = soapFactory.createOMElement(wrapperQName, null);
+            wrapper.addChild(textData);
+
+        } else {
+            byte[] msgBytes = getMessageBinaryPayload(message);
+            if (msgBytes != null) {
+                DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(msgBytes));
+                OMText textData = soapFactory.createOMText(dataHandler, true);
+                if (wrapperQName == null) {
+                    wrapperQName = BaseConstants.DEFAULT_BINARY_WRAPPER;
+                }
+                wrapper = soapFactory.createOMElement(wrapperQName, null);
+                wrapper.addChild(textData);
+                msgContext.setDoingMTOM(true);
+                
+            } else {
+                handleException("Unable to read payload from message of type : "
+                    + message.getClass().getName());
+            }
+        }
+
+        envelope = soapFactory.getDefaultEnvelope();
+        envelope.getBody().addChild(wrapper);
+
+        return envelope;
+    }
+
+    /**
+     * Get an InputStream to the message payload
+     *
+     * @param message Object
+     * @return an InputStream to the payload
+     */
     public InputStream getInputStream(Object message)
     {
         Message msg = (Message)message;
@@ -59,23 +242,32 @@ public class AMQPUtils extends BaseUtils
         }
     }
 
-    @Override
+    /**
+     * Get the message payload as a byte[], if the message is a non-SOAP, non-XML, binary message
+     *
+     * @param message the message Object
+     * @return the payload of the message as a byte[]
+     */
     public byte[] getMessageBinaryPayload(Object message)
     {
         return null;
     }
 
-    @Override
+    /**
+     * Get the message payload as a String, if the message is a non-SOAP, non-XML, plain text message
+     *
+     * @param message the message Object
+     * @return the plain text payload of the message if applicable
+     */
     public String getMessageTextPayload(Object message)
     {
         return null;
     }
 
-    @Override
-    public String getProperty(Object message, String property)
+    public static String getProperty(Message message, String property)
     {
         try {
-            return (String)((Message)message).getMessageProperties().getApplicationHeaders().get(property);
+            return (String)message.getMessageProperties().getApplicationHeaders().get(property);
         } catch (Exception e) {
             return null;
         }

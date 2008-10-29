@@ -18,7 +18,6 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.AbstractTransportSender;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
-import org.apache.axis2.transport.jms.JMSUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.qpidity.api.Message;
@@ -301,7 +300,7 @@ public class AMQPSender extends AbstractTransportSender {
         // workaround as Axis2 1.2 is about to be released and Synapse 1.0
         responseMsgCtx.setServerSide(false);
 
-        String contentType = JMSUtils.getInstace().getProperty(message, BaseConstants.CONTENT_TYPE);
+        String contentType = AMQPUtils.getInstace().getProperty(message, BaseConstants.CONTENT_TYPE);
 
         AMQPUtils.getInstace().setSOAPEnvelope(message, responseMsgCtx, contentType);
         responseMsgCtx.setServerSide(true);

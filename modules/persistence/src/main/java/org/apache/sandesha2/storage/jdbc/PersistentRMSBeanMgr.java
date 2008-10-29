@@ -264,7 +264,7 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	private RMSBean getBean(ResultSet rs)
 	  throws Exception
 	{
-		RMSBean bean = new RMSBean();
+        RMSBean bean = new RMSBean();
 		bean.setSequenceID(rs.getString("sequence_id"));
 
 		Object obj = getObject(rs,"to_epr");
@@ -324,7 +324,7 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	public boolean delete(String msgId)
 	  throws SandeshaStorageException
 	{
-		if(log.isDebugEnabled()) log.debug("delete RMSBean msgId " + msgId);
+        if(log.isDebugEnabled()) log.debug("delete RMSBean msgId " + msgId);
 		try {
 			Statement stmt = getDbConnection().createStatement();
 			stmt.executeUpdate("delete from wsrm_rms where create_seq_msg_id='" + msgId + "'");
@@ -338,10 +338,10 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	public List find(RMSBean bean)
 	  throws SandeshaStorageException
 	{
-		String sql = requestForModel(bean);
+        String sql = requestForModel(bean);
 		ArrayList<RMSBean> lst = new ArrayList<RMSBean>();
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				lst.add(getBean(rs));
@@ -358,7 +358,7 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	public boolean insert(RMSBean bean)
 	  throws SandeshaStorageException
 	{
-		log.debug("insert RMSBean " + bean);
+        log.debug("insert RMSBean " + bean);
 		try {
 		    PreparedStatement pstmt = getDbConnection().prepareStatement("insert into wsrm_rms(" +
 		    		"create_seq_msg_id,sequence_id,to_epr_addr,to_epr,reply_to_epr_addr,reply_to_epr,acks_to_epr_addr,acks_to_epr,rm_version,security_token_data," +
@@ -431,10 +431,10 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	public RMSBean retrieve(String msgId)
 	  throws SandeshaStorageException
 	{
-		log.debug("Retrieve  msdId " + msgId);
+        log.debug("Retrieve  msdId " + msgId);
 		RMSBean bean = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select * from wsrm_rms where create_seq_msg_id='" + msgId + "'");
 			if ( rs.next() ) bean = getBean(rs);
 			rs.close();
@@ -450,7 +450,7 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	public boolean update(RMSBean bean)
 	  throws SandeshaStorageException
 	{
-		if ( log.isDebugEnabled()) {
+        if ( log.isDebugEnabled()) {
 		  log.debug("Update bean : " + bean);
 		}
 			try {
@@ -525,10 +525,10 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 	public RMSBean findUnique(RMSBean bean)
 	  throws SandeshaStorageException
 	{
-		String sql = requestForModel(bean);
+        String sql = requestForModel(bean);
 		RMSBean result = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				if ( result == null ) {
@@ -558,9 +558,10 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
         String sql = requestForModel(dummyBean);
 		RMSBean result = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
-			while ( rs.next() ) {
+
+            while ( rs.next() ) {
 				if ( result == null ) {
 					result = getBean(rs);
 				} else {
@@ -588,7 +589,7 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
         String sql = requestForModel(dummyBean);
 		RMSBean result = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				if ( result == null ) {

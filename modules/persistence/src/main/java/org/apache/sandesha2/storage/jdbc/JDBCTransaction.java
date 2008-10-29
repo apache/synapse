@@ -43,6 +43,7 @@ public class JDBCTransaction implements Transaction {
 		  this.pmgr = pmgr;
 		  dbConnection = pmgr.dbConnect();
 		  dbConnection.setAutoCommit(false);
+			dbConnection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 		  active = true;
 		} catch (Exception ex) {}
 	}

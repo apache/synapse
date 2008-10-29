@@ -41,7 +41,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 	{
 		super(pmgr);
 	}
-	
+
 	private String requestForModel(SenderBean bean)
 	{
 		StringBuilder sql = new StringBuilder("select * from wsrm_sender");
@@ -95,56 +95,56 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 			sql.append(clause);
 			sql.append("'");
 		}
-		
-		if ( (bean.getFlags() & SenderBean.SEND_FLAG ) != 0 ) { 
+
+		if ( (bean.getFlags() & SenderBean.SEND_FLAG ) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" send=");
 			sql.append(bean.isSend() ? 1:0);
 		}
-		if ( (bean.getFlags() & SenderBean.SEND_COUNT_FLAG ) != 0 ) { 
+		if ( (bean.getFlags() & SenderBean.SEND_COUNT_FLAG ) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" sent_count=");
 			sql.append(bean.getSentCount());
 		}
-		if ( (bean.getFlags() & 0x00000100) != 0 ) { 
+		if ( (bean.getFlags() & 0x00000100) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" message_number=");
 			sql.append(bean.getMessageNumber());
 		}
-		if ( (bean.getFlags() & 0x00001000) != 0 ) { 
+		if ( (bean.getFlags() & 0x00001000) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" resend=");
 			sql.append(bean.isReSend() ? 1:0);
 		}
-		if ( (bean.getFlags() & 0x00010000) != 0 ) { 
+		if ( (bean.getFlags() & 0x00010000) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" time_to_send<=");
 			sql.append(bean.getTimeToSend());
 		}
-		if ( (bean.getFlags() & 0x00100000) != 0 ) { 
+		if ( (bean.getFlags() & 0x00100000) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" message_type=");
 			sql.append(bean.getMessageType());
 		}
-		if ( (bean.getFlags() & 0x01000000) != 0 ) { 
+		if ( (bean.getFlags() & 0x01000000) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" last_message=");
 			sql.append(bean.isLastMessage() ? 1:0);
 		}
-		if ( (bean.getFlags() & 0x10000000) != 0 ) { 
+		if ( (bean.getFlags() & 0x10000000) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" inbound_message_number=");
 			sql.append(bean.getInboundMessageNumber());
 		}
-		if ( (bean.getFlags() & 0x00000002) != 0 ) { 
+		if ( (bean.getFlags() & 0x00000002) != 0 ) {
 			sql.append(op);
 			op = " and ";
 			sql.append(" transport_available=");
@@ -153,7 +153,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		log.debug("requestForModel " + sql.toString());
 		return sql.toString();
 	}
-	
+
 	private SenderBean getBean(ResultSet rs)
 	  throws Exception
 	{
@@ -164,16 +164,16 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		bean.setInternalSequenceID(rs.getString("internal_sequence_id"));
 		bean.setToAddress(rs.getString("to_address"));
 		bean.setInboundSequenceId(rs.getString("inbound_sequence_id"));
-				
+
 		bean.setMessageNumber(rs.getLong("message_number"));
 		bean.setTimeToSend(rs.getLong("time_to_send"));
 		bean.setInboundMessageNumber(rs.getLong("inbound_message_number"));
-		
+
 		bean.setSend(rs.getInt("send")!= 0 ? true:false);
 		bean.setReSend(rs.getInt("resend")!= 0 ? true:false);
 		bean.setLastMessage(rs.getInt("last_message")!= 0 ? true:false);
 		bean.setTransportAvailable(rs.getInt("transport_available")!= 0 ? true:false);
-		
+
 		bean.setSentCount(rs.getInt("sent_count"));
 		bean.setMessageType(rs.getInt("message_type"));
 		bean.setFlags(rs.getInt("flags"));
@@ -193,14 +193,14 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		}
 		return true;
 	}
-	
+
 	public List find(SenderBean bean)
 	  throws SandeshaStorageException
 	{
 		String sql = requestForModel(bean);
 		ArrayList<SenderBean> lst = new ArrayList<SenderBean>();
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				lst.add(getBean(rs));
@@ -213,13 +213,13 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		return lst;
 	}
 
-	
+
 	public List find(String internalSequenceId)
 	  throws SandeshaStorageException
 		{
 			ArrayList<SenderBean> lst = new ArrayList<SenderBean>();
 			try {
-				Statement stmt = getDbConnection().createStatement();
+				Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 				ResultSet rs = stmt.executeQuery("select * from wsrm_sender where internal_sequence_id='" +
 						internalSequenceId + "'");
 				while ( rs.next() ) {
@@ -232,7 +232,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 			}
 			return lst;
 		}
-	
+
 	public SenderBean getNextMsgToSend(String sequenceId)
 	  throws SandeshaStorageException
 	{
@@ -262,7 +262,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 	  if(log.isDebugEnabled()) log.debug("Exit getNextMessageToSend " + result);
 	  return result;
 	}
-	
+
 	public boolean insert(SenderBean bean)
 	  throws SandeshaStorageException
 	{
@@ -296,13 +296,13 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		}
 		return true;
 	}
-	
+
 	public SenderBean retrieve(String messageID)
 	  throws SandeshaStorageException
 	{
 		SenderBean bean = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select * from wsrm_sender where message_id='" + messageID + "'");
 			if ( ! rs.next() ) return bean;
 			bean = getBean(rs);
@@ -313,7 +313,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		}
 		return bean;
 	}
-	
+
 	public boolean update(SenderBean bean)
 	  throws SandeshaStorageException
 	{
@@ -347,7 +347,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		}
 		return true;
 	}
-	
+
 	public SenderBean findUnique(SenderBean bean)
 	  throws SandeshaStorageException
 	{
@@ -372,7 +372,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 			stmt.close();
 		} catch (Exception ex) {
 			throw new SandeshaStorageException(ex);
-		}		
+		}
 		return result;
 	}
 
@@ -380,7 +380,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 	{
 		SenderBean bean = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select * from wsrm_sender where message_context_ref_key='" + messageContextRefKey + "'");
 			if ( ! rs.next() ) return bean;
 			bean = getBean(rs);
@@ -395,7 +395,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
     public SenderBean retrieve(String sequnceId, long messageNumber) throws SandeshaStorageException {
         SenderBean bean = null;
         try {
-            Statement stmt = getDbConnection().createStatement();
+            Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery("select * from wsrm_sender where sequence_id='" + sequnceId + "' " +
                     " and message_number=" + messageNumber);
             if (! rs.next()) return bean;

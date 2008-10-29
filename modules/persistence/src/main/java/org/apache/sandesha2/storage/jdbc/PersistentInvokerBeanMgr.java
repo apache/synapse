@@ -100,7 +100,7 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 		String sql = requestForModel(bean);
 		ArrayList<InvokerBean> lst = new ArrayList<InvokerBean>();
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				lst.add(getInvokerBean(rs));
@@ -138,7 +138,7 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 	{
 		InvokerBean invokerBean = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select * from wsrm_invoker where message_context_ref_key='" + key + "'");
 			if ( ! rs.next() ) return invokerBean;
 			invokerBean = getInvokerBean(rs);
@@ -176,7 +176,7 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 		String sql = requestForModel(bean);
 		InvokerBean result = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				if ( result == null ) {

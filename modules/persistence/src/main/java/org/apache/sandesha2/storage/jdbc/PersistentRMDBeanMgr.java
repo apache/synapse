@@ -264,7 +264,7 @@ public class PersistentRMDBeanMgr extends PersistentBeanMgr implements RMDBeanMg
 		String sql = requestForModel(bean);
 		ArrayList<RMDBean> lst = new ArrayList<RMDBean>();
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				lst.add(getBean(rs));
@@ -340,7 +340,7 @@ public class PersistentRMDBeanMgr extends PersistentBeanMgr implements RMDBeanMg
 	{
 		RMDBean bean = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select * from wsrm_rmd where sequence_id='" + sequenceID + "'");
 			if ( ! rs.next() ) return bean;
 			bean = getBean(rs);
@@ -419,7 +419,7 @@ public class PersistentRMDBeanMgr extends PersistentBeanMgr implements RMDBeanMg
 		String sql = requestForModel(bean);
 		RMDBean result = null;
 		try {
-			Statement stmt = getDbConnection().createStatement();
+			Statement stmt = getDbConnection().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery(sql);
 			while ( rs.next() ) {
 				if ( result == null ) {

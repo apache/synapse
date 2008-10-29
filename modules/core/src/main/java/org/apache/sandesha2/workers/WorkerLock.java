@@ -82,7 +82,9 @@ public class WorkerLock {
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: WorkerLock::removeWork " + work);
 		Holder h = (Holder) locks.remove(work);
-		h.release();
+		if (h != null){
+			h.release();
+		}
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: WorkerLock::removeWork");
 	}

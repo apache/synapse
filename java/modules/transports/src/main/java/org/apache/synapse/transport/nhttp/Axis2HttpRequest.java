@@ -229,6 +229,11 @@ public class Axis2HttpRequest {
             HTTP.CONTENT_TYPE,
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
+        if (NHttpConfiguration.getInstance().isKeepAliveDisabled() ||
+            msgContext.isPropertyTrue(NhttpConstants.NO_KEEPALIVE)) {
+            httpRequest.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
+        }
+
         return httpRequest;
     }
 

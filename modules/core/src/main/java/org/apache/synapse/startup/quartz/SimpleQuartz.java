@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.task.*;
 import org.apache.synapse.startup.AbstractStartup;
 
@@ -44,10 +45,10 @@ public class SimpleQuartz extends AbstractStartup {
 
     private static final Log log = LogFactory.getLog(SimpleQuartz.class);
 
-    private String taskDescriptionReference;
+    private TaskDescription taskDescription;
 
-    public static String SYNAPSE_STARTUP_TASK_SCHEDULER = "synapse.startup.taskscheduler";
-    public static String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";
+    private TaskDescriptionRepository repository;
+  
 
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
@@ -55,35 +56,31 @@ public class SimpleQuartz extends AbstractStartup {
 
     public void destroy() {
 
-        TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
+        TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
+                SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
         if (taskScheduler != null && taskScheduler.isInitialized()) {
             taskScheduler.shutDown();
         }
-
-        TaskDescriptionRepository repository = TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                SimpleQuartz.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
-        if (repository != null) {
-            repository.removeTaskDescription(taskDescriptionReference);
+       
+        if (repository != null && taskDescription != null) {
+            repository.removeTaskDescription(taskDescription.getName());
         }
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {
 
-        if (taskDescriptionReference == null || "".equals(taskDescriptionReference)) {
-            handleException("TaskDescriptionRefrence key is null or empty");
+        if (taskDescription == null ) {
+            handleException("TaskDescription is null");
         }
 
-        TaskDescriptionRepository repository = TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                SimpleQuartz.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
+        repository = synapseEnvironment.getSynapseConfiguration().getTaskDescriptionRepository();
+       
         if (repository == null) {
             handleException("Task Description Repository can not found");
         }
-
-        TaskDescription taskDescription = repository.getTaskDescription(taskDescriptionReference);
-
-        if (taskDescription == null) {
-            handleException("TaskDescription is null : reference name : " + taskDescriptionReference);
-        }
+       
+        repository.addTaskDescription(taskDescription);
+       
         // this server name given by system property SynapseServerName
         // otherwise take host-name
         // else assume localhost
@@ -119,7 +116,7 @@ public class SimpleQuartz extends AbstractStartup {
 
         try {
 
-            TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(SYNAPSE_STARTUP_TASK_SCHEDULER);
+            TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
                     taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());
@@ -127,7 +124,7 @@ public class SimpleQuartz extends AbstractStartup {
                 taskScheduler.scheduleTask(taskDescription, map, SimpleQuartzJob.class);
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("TaskScheduler cannot be found for :" + SYNAPSE_STARTUP_TASK_SCHEDULER + " , " +
+                    log.debug("TaskScheduler cannot be found for :" + SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER + " , " +
                             "therefore ignore scheduling of Task  " + taskDescription);
                 }
             }
@@ -139,12 +136,12 @@ public class SimpleQuartz extends AbstractStartup {
 
     }
 
-    public String getTaskDescriptionReference() {
-        return taskDescriptionReference;
+    public TaskDescription getTaskDescription() {
+        return taskDescription;
     }
 
-    public void setTaskDescriptionReference(String taskDescriptionReference) {
-        this.taskDescriptionReference = taskDescriptionReference;
+    public void setTaskDescription(TaskDescription taskDescription) {
+        this.taskDescription = taskDescription;
     }
 
     private static void handleException(String message) {

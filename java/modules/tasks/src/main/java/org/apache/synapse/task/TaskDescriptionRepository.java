@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Local repository for holds Task descriptions
@@ -68,6 +69,15 @@ public class TaskDescriptionRepository {
     public void removeTaskDescription(String name) {
         validateName(name);
         taskDescriptionMap.remove(name);
+    }
+
+    /**
+     * Return all TaskDescritions
+     *
+     * @return Iterator for access taskDescritions
+     */
+    public Iterator<TaskDescription> getAllTaskDescriptions() {
+        return taskDescriptionMap.values().iterator();
     }
     
     /**

@@ -22,6 +22,7 @@ package org.apache.synapse.startup.quartz;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionSerializer;
 import org.apache.synapse.task.TaskDescriptionRepository;
@@ -38,26 +39,22 @@ public class SimpleQuartzSerializer implements StartupSerializer {
         }
 
         SimpleQuartz sq = (SimpleQuartz) s;
-        String taskDescriptionRef = sq.getTaskDescriptionReference();
-        if (taskDescriptionRef != null || !"".equals(taskDescriptionRef)) {
+        
+        TaskDescription taskDescription = sq.getTaskDescription();
 
-            TaskDescriptionRepository repository = TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                    SimpleQuartz.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
-            TaskDescription taskDescription = repository.getTaskDescription(taskDescriptionRef);
-
-            if (taskDescription != null) {
-                OMElement task = TaskDescriptionSerializer.serializeTaskDescription(parent, taskDescription);
-                if (task == null) {
-                    throw new SynapseException("Task Element can not be null.");
-                }
-                return task;
-            } else {
-                throw new SynapseException("Task Description is null for given reference :" + taskDescriptionRef);
+        if (taskDescription != null) {
+            OMElement task = TaskDescriptionSerializer.serializeTaskDescription(
+                    SynapseConstants.SYNAPSE_OMNAMESPACE, taskDescription);
+            if (task == null) {
+                throw new SynapseException("Task Element can not be null.");
             }
+            if (parent != null) {
+                parent.addChild(task);
+            }
+            return task;
         } else {
-            throw new SynapseException("Task Description Reference is null.");
+            throw new SynapseException("Task Description is null");
         }
-
     }
 
 }

@@ -62,11 +62,8 @@ public class SimpleQuartzFactory implements StartupFactory {
                     TaskDescriptionFactory.createTaskDescription(el, XMLConfigConstants.SYNAPSE_OMNAMESPACE);
             if(taskDescription == null){
                 handleException("Invalid task - Task description can not be created  form :"+el);
-            }
-            TaskDescriptionRepository repository = TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                    SimpleQuartz.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
-            repository.addTaskDescription(taskDescription);
-            simpleQuartz.setTaskDescriptionReference(taskDescription.getName());
+            }          
+            simpleQuartz.setTaskDescription(taskDescription);
             return simpleQuartz;
         } else {
             handleException("Syntax error in the task : wrong QName for the task");

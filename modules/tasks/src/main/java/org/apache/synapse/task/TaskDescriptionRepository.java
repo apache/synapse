@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Local repository for holds Task descriptions
@@ -46,6 +46,9 @@ public class TaskDescriptionRepository {
         validateName(name);
         validateUniqueness(name);
 
+        if (log.isDebugEnabled()) {
+            log.debug("Storing a TaskDescription : " + taskDescription);
+        }
         taskDescriptionMap.put(name, taskDescription);
 
     }
@@ -58,17 +61,42 @@ public class TaskDescriptionRepository {
      */
     public TaskDescription getTaskDescription(String name) {
         validateName(name);
-        return taskDescriptionMap.get(name);
+        TaskDescription taskDescription = taskDescriptionMap.get(name);
+        if (taskDescription == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("TaskDescription cannot be found for name :" + name + " , returning null");
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Returning TaskDescription : " + taskDescription);
+            }
+        }
+        return taskDescription;
     }
 
     /**
      * Removing a TaskDescription
      *
      * @param name Name of the TaskDescription to be removed
+     * @return Removed TaskDescription instance
      */
-    public void removeTaskDescription(String name) {
+    public TaskDescription removeTaskDescription(String name) {
         validateName(name);
-        taskDescriptionMap.remove(name);
+        if (log.isDebugEnabled()) {
+            log.debug("Removing a TaskDescription with name : " + name);
+        }
+        TaskDescription taskDescription = taskDescriptionMap.remove(name);
+        if (taskDescription == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no TaskDescription to be removed with name : " + name);
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Removed TaskDescription : " + taskDescription);
+            }
+        }
+        return taskDescription;
+
     }
 
     /**
@@ -79,7 +107,7 @@ public class TaskDescriptionRepository {
     public Iterator<TaskDescription> getAllTaskDescriptions() {
         return taskDescriptionMap.values().iterator();
     }
-    
+
     /**
      * Explicit check for determine whether there is a task description with a name in interest
      *

@@ -132,7 +132,7 @@ public class TaskScheduler {
      * @param resources       Any initial resources for task
      * @param jobClass        Quartz job class
      */
-    public void scheduleTask(TaskDescription taskDescription, Map<String,Object> resources, Class jobClass) {
+    public void scheduleTask(TaskDescription taskDescription, Map<String, Object> resources, Class jobClass) {
 
         validateInit();
         validateStart();

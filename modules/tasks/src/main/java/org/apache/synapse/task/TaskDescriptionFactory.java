@@ -71,7 +71,8 @@ public class TaskDescriptionFactory {
                 }
                 taskDescription.setTaskClass(classname);
             } else {
-                handleException("Syntax error in the Task : no task class specified");
+                log.warn("TaskClass cannot be found." +
+                        "Task implementation may need a task class if there is no default one");
             }
 
             // set pinned server list

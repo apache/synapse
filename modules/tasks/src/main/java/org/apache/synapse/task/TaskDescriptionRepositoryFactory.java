@@ -18,11 +18,15 @@
  */
 package org.apache.synapse.task;
 
-import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.HashMap;
+import java.util.Map;
 
 public class TaskDescriptionRepositoryFactory {
 
+    private static final Log log = LogFactory.getLog(TaskDescriptionRepositoryFactory.class);
     private final static Map<String, TaskDescriptionRepository> repositoryMap = new HashMap<String, TaskDescriptionRepository>();
 
     private TaskDescriptionRepositoryFactory() {
@@ -38,11 +42,14 @@ public class TaskDescriptionRepositoryFactory {
     public static TaskDescriptionRepository getTaskDescriptionRepository(String id) {
 
         if (id == null || "".equals(id)) {
-            throw new SynapseTaskException("Name cannot be found.");
+            throw new SynapseTaskException("Name cannot be found.", log);
         }
 
         TaskDescriptionRepository repository = repositoryMap.get(id);
         if (repository == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a TaskDescriptionRepository with id : " + id);
+            }
             repository = new TaskDescriptionRepository();
             repositoryMap.put(id, repository);
         }

@@ -46,7 +46,11 @@ public class TaskDescriptionSerializer {
 
         OMElement task = omFactory.createOMElement("task", targetNamespace);
         task.addAttribute("name", taskDescription.getName(), NULL_OMNS);
-        task.addAttribute("class", taskDescription.getTaskClass(), NULL_OMNS);
+
+        String taskClass = taskDescription.getTaskClass();
+        if (taskClass != null && !"".equals(taskClass)) {
+            task.addAttribute("class", taskDescription.getTaskClass(), NULL_OMNS);
+        }
 
         List pinnedServers = taskDescription.getPinnedServers();
         if (pinnedServers != null && !pinnedServers.isEmpty()) {

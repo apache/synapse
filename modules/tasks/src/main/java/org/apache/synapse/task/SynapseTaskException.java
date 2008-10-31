@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
  *
  */
 public class SynapseTaskException extends RuntimeException {
-    
+
     private static final long serialVersionUID = -7967803433723984038L;
 
     public SynapseTaskException(String string) {

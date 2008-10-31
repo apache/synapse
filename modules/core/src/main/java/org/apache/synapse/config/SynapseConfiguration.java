@@ -25,6 +25,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.task.TaskDescriptionRepository;
+import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
@@ -100,8 +102,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     /** Hold reference to the Axis2 ConfigurationContext */
 	private AxisConfiguration axisConfiguration = null;
+    
+    private final TaskDescriptionRepository repository = 
+            TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
+                    SynapseConstants.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
 
-	/**
+    /**
 	 * Save the path to the configuration file loaded, to save it later if
 	 * required
 	 */
@@ -901,4 +907,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		log.error(msg);
 		throw new SynapseException(msg);
 	}
+
+    public TaskDescriptionRepository getTaskDescriptionRepository() {
+        return repository;
+    }
 }

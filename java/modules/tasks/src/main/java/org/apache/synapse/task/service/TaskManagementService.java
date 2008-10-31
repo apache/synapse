@@ -18,25 +18,58 @@
  */
 package org.apache.synapse.task.service;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.synapse.task.TaskDescription;
 
 import java.util.List;
 
 /**
- *
+ * A service for management of task
+ * Implementation can be a web service , OSGI service , etc
  */
 public interface TaskManagementService {
 
+    /**
+     * Adding a  TaskDescription instance
+     *
+     * @param taskDescription TaskDescription instance
+     */
     void addTaskDescription(TaskDescription taskDescription);
 
+    /**
+     * Deletes a TaskDescription instance with given name
+     *
+     * @param name Name of the TaskDescription  to be deleted
+     */
     void deleteTaskDescription(String name);
 
+    /**
+     * Edit a TaskDescription
+     * Remove existing one with new one
+     *
+     * @param taskDescription New TaskDescription instance
+     */
     void editTaskDescription(TaskDescription taskDescription);
 
+    /**
+     * Lists of all TaskDescription instances
+     *
+     * @return A List of TaskDescription
+     */
     List<TaskDescription> getAllTaskDescriptions();
 
+    /**
+     * Get a TaskDescription instance with given name
+     *
+     * @param name Name of the TaskDescription instance to be returned
+     * @return TaskDescription instance
+     */
     TaskDescription getTaskDescription(String name);
-    
+
+    /**
+     * Explicit check for availability of a particular TaskDescription instance
+     *
+     * @param name Name of the TaskDescription instance
+     * @return Returns true if there is a TaskDescription instance with given name , otherwise , false
+     */
     boolean isContains(String name);
 }

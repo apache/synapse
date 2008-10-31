@@ -18,10 +18,12 @@
  */
 package org.apache.synapse.task;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
+import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
-import org.quartz.SimpleTrigger;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -31,6 +33,7 @@ import java.util.Random;
  * Default TriggerFactory ship with synapse utils
  */
 public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
+    private static final Log log = LogFactory.getLog(DefaultTaskTriggerFactory.class);
 
     /**
      * @see TaskTriggerFactory
@@ -39,9 +42,9 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
 
         String name = taskDescription.getName();
         if (name == null || "".equals(name)) {
-            throw new SynapseTaskException("Name of the Task cannot be null");
+            throw new SynapseTaskException("Name of the Task cannot be null", log);
         }
-        
+
         String cron = taskDescription.getCron();
         int repeatCount = taskDescription.getCount();
         long repeatInterval = taskDescription.getInterval();
@@ -62,12 +65,12 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
                 cronTrigger.setCronExpression(cron);
                 trigger = cronTrigger;
             } catch (ParseException e) {
-                throw new SynapseTaskException("Error setting cron expression : " + cron);
+                throw new SynapseTaskException("Error setting cron expression : " + cron, log);
             }
         }
 
         if (trigger == null) {
-            throw new SynapseTaskException("Trigger is null for the Task description : " + taskDescription);
+            throw new SynapseTaskException("Trigger is null for the Task description : " + taskDescription, log);
         }
 
         if (startTime != null) {

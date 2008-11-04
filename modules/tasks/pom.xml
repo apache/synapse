@@ -57,13 +57,18 @@
                         <Bundle-Name>org.apache.synapse.task</Bundle-Name>
                         <Bundle-Vendor>Apache Software Foundation</Bundle-Vendor>
                         <Bundle-Description>${pom.description}</Bundle-Description>
-                        <Bundle-SymbolicName>org.apache.synapse.utils</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>org.apache.synapse.tasks</Bundle-SymbolicName>
                         <Export-Package>
                             org.apache.synapse.task.*;-split-package:=merge-last,
                         </Export-Package>
                         <Import-Package>
+                            !javax.xml.namespace,                                                      
+                            org.apache.axiom.*,  
+                            org.apache.commons.logging,
+                            org.apache.log4j,
+                            javax.xml.namespace; version=0.0.0,      
                             org.apache.synapse.utils.*,
-                            org.apache.commons.io,
+                            org.apache.commons.io.*,
                             org.quartz.*,
                             javax.transaction.*,
                             org.apache.axiom.*,

@@ -142,7 +142,7 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>src/main/release/docs</directory>
+                            <directory>modules/distribution/src/main/release/docs</directory>
                             <targetPath>docs</targetPath>
                             <includes>
                                 <include>release_notes.txt</include>

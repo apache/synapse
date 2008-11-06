@@ -21,7 +21,7 @@
     <id>bin</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
-        <format>tar.gz</format>
+        <!--<format>tar.gz</format>-->
         <format>zip</format>
     </formats>
 
@@ -54,7 +54,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>repository</directory>
+            <directory>../../repository</directory>
             <outputDirectory>synapse-${synapse.version}/repository</outputDirectory>
             <excludes>
                 <exclude>conf/axis2.xml</exclude>
@@ -63,7 +63,7 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>repository/conf</directory>
+            <directory>../../repository/conf</directory>
             <outputDirectory>synapse-${synapse.version}/repository/conf</outputDirectory>
             <includes>
                 <include>axis2.xml</include>
@@ -72,7 +72,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>repository/conf/sample/resources/misc/client</directory>
+            <directory>../../repository/conf/sample/resources/misc/client</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/conf
             </outputDirectory>
             <includes>
@@ -80,7 +80,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/core/src/main/resources</directory>
+            <directory>../../modules/core/src/main/resources</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>log4j.properties</include>
@@ -102,7 +102,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>repository/conf/sample/resources/misc/server</directory>
+            <directory>../../repository/conf/sample/resources/misc/server</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/conf
             </outputDirectory>
             <includes>
@@ -110,7 +110,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/mar/target</directory>
+            <directory>../../modules/mar/target</directory>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
                 <include>synapse-${synapse.version}.mar</include>
@@ -129,19 +129,19 @@
             <fileMode>755</fileMode>
         </fileSet>      
         <fileSet>
-            <directory>src/site/resources/images</directory>
+            <directory>../../src/site/resources/images</directory>
             <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/site/resources/logos</directory>
+            <directory>../../src/site/resources/logos</directory>
             <outputDirectory>synapse-${synapse.version}/docs/logos</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/services</directory>
+            <directory>../../modules/samples/services</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/src/main/java</directory>
+            <directory>../../modules/samples/src/main/java</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/src</outputDirectory>
             <excludes>
                 <exclude>**/target</exclude>
@@ -149,7 +149,7 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/src/main/scripts</directory>
+            <directory>../../modules/samples/src/main/scripts</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client</outputDirectory>
             <excludes>
                 <exclude>custom.sh</exclude>
@@ -159,7 +159,7 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/src/main/scripts</directory>
+            <directory>../../modules/samples/src/main/scripts</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
             <includes>
                 <include>axis2server.sh</include>
@@ -167,7 +167,7 @@
             <fileMode>755</fileMode>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/src/main/scripts</directory>
+            <directory>../../modules/samples/src/main/scripts</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
             <includes>
                 <include>axis2server.bat</include>
@@ -197,49 +197,49 @@
         <!--</fileSet>-->
 
         <fileSet>
-            <directory>modules/core/target</directory>
+            <directory>../../modules/core/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-core-${synapse.version}.jar</include>
             </includes>
         </fileSet> 
         <fileSet>
-            <directory>modules/utils/target</directory>
+            <directory>../../modules/utils/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-utils-${synapse.version}.jar</include>
             </includes>
         </fileSet> 
         <fileSet>
-            <directory>modules/tasks/target</directory>
+            <directory>../../modules/tasks/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-tasks-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/target</directory>
+            <directory>../../modules/samples/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-samples-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/extensions/target</directory>
+            <directory>../../modules/extensions/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-extensions-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/transports/target</directory>
+            <directory>../../modules/transports/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-transports-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>patches</directory>
+            <directory>../../patches</directory>
             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
             <includes>
                 <include>*.jar</include>
@@ -249,27 +249,27 @@
     </fileSets>
     <files>
         <file>
-            <source>src/site/xdoc/Synapse_Configuration_Language.xml</source>
+            <source>../../src/site/xdoc/Synapse_Configuration_Language.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Configuration_Language.html</destName>
         </file>
         <file>
-            <source>src/site/xdoc/Synapse_Samples.xml</source>
+            <source>../../src/site/xdoc/Synapse_Samples.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Samples.html</destName>
         </file>
         <file>
-            <source>src/site/xdoc/Synapse_Samples_Setup.xml</source>
+            <source>../../src/site/xdoc/Synapse_Samples_Setup.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Samples_Setup.html</destName>
         </file>
         <file>
-            <source>src/site/xdoc/Synapse_QuickStart.xml</source>
+            <source>../../src/site/xdoc/Synapse_QuickStart.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_QuickStart.html</destName>
         </file>
         <file>
-            <source>src/site/xdoc/Synapse_Extending.xml</source>
+            <source>../../src/site/xdoc/Synapse_Extending.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Extending.html</destName>
         </file>

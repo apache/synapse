@@ -8,12 +8,6 @@ The Synapse JARs could be built with Maven 2 as follows:
 
   mvn clean install
 
-To build the Synapse distributions, first build the jars using the above and then use the following:
-
-  mvn assembly:assembly -Drelease -Dmaven.test.skip
-
-This will build the source and binary distributions in the target folder created.
-
 To build the site, use:
 
   mvn site

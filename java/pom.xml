@@ -89,18 +89,27 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <version>2.2-beta-1</version>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/main/assembly/bin.xml</descriptor>
-                                <descriptor>src/main/assembly/src.xml</descriptor>
-                            </descriptors>
-                            <finalName>synapse-${synapse.version}</finalName>
-                        </configuration>
-                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>org.apache.maven.plugins</groupId>-->
+                        <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                        <!--<version>2.2-beta-1</version>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>distribution-package</id>-->
+                                <!--<phase>package</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>single</goal>-->
+                                <!--</goals>-->
+                                <!--<configuration>-->
+                                    <!--<descriptors>-->
+                                        <!--<descriptor>src/main/assembly/bin.xml</descriptor>-->
+                                        <!--<descriptor>src/main/assembly/src.xml</descriptor>-->
+                                    <!--</descriptors>-->
+                                    <!--<finalName>synapse-${synapse.version}</finalName>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
 
                     <!--<plugin>-->
                     <!--<artifactId>maven-site-plugin</artifactId>-->
@@ -1137,6 +1146,7 @@
         <module>modules/war</module>
         <module>modules/handler</module>
         <module>modules/xar-maven-plugin</module>
+        <module>modules/distribution</module>
     </modules>
 
     <properties>

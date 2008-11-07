@@ -27,6 +27,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.base.AbstractTransportSender;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.LogFactory;
 import quickfix.*;
 import quickfix.field.*;
@@ -180,7 +181,7 @@ public class FIXTransportSender extends AbstractTransportSender {
      * @param targetEPR the EPR to which the message will be sent
      */
     private void setDeliverToXFields(Message message, String targetEPR) {
-        Hashtable<String, String> properties = FIXUtils.getProperties(targetEPR);
+        Hashtable<String, String> properties = BaseUtils.getEPRProperties(targetEPR);
         String deliverTo = properties.get(FIXConstants.DELIVER_TO_COMP_ID);
         //If a DeliverToCompID field is given in EPR put the field in the message
         if (deliverTo != null) {

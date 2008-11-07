@@ -22,6 +22,7 @@ package org.apache.synapse.transport.fix;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import quickfix.*;
@@ -151,7 +152,7 @@ public class FIXSessionFactory {
             }
         }
 
-        Hashtable<String,String> properties = FIXUtils.getProperties(fixEPR);
+        Hashtable<String,String> properties = BaseUtils.getEPRProperties(fixEPR);
         Iterator<String> keys = properties.keySet().iterator();
         while (keys.hasNext()) {
             String currentKey = keys.next();

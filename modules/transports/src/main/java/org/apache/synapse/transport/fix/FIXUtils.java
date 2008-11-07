@@ -28,6 +28,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import quickfix.*;
@@ -539,28 +540,6 @@ public class FIXUtils {
     }
 
     /**
-     * Extracts parameters embedded in FIX EPRs
-     *
-     * @param url a valid FIX EPR
-     * @return a Hashtable of FIX properties
-     */
-    public static Hashtable getProperties(String url) {
-        Hashtable<String, String> h = new Hashtable<String, String>();
-        int propPos = url.indexOf("?");
-        if (propPos != -1) {
-            StringTokenizer st = new StringTokenizer(url.substring(propPos + 1), "&");
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                int sep = token.indexOf("=");
-                if (sep != -1) {
-                    h.put(token.substring(0, sep), token.substring(sep + 1));
-                }
-            }
-        }
-        return h;
-    }
-
-    /**
      * Compares two given FIX URL strings. The second URL is considered equal to the
      * first URL if all the properties in the first URL also exist in the second URL
      * and if they have equals values.
@@ -573,8 +552,8 @@ public class FIXUtils {
         if (!url1.substring(0, url1.indexOf("?")).equals(url2.substring(0, url2.indexOf("?")))) {
              return false;
         } else {
-            Hashtable<String,String> properties1 = getProperties(url1);
-            Hashtable<String, String> properties2 = getProperties(url2);
+            Hashtable<String,String> properties1 = BaseUtils.getEPRProperties(url1);
+            Hashtable<String, String> properties2 = BaseUtils.getEPRProperties(url2);
             Iterator<String> keys = properties1.keySet().iterator();
             while (keys.hasNext()) {
                 String key = keys.next();

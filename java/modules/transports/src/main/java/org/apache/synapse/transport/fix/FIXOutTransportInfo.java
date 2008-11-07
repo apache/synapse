@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.fix;
 
 import org.apache.axis2.transport.OutTransportInfo;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import quickfix.SessionID;
@@ -52,7 +53,7 @@ public class FIXOutTransportInfo implements OutTransportInfo {
                     FIXConstants.FIX_PREFIX);
         }
         else {
-            Hashtable<String,String> properties = FIXUtils.getProperties(targetEPR);
+            Hashtable<String,String> properties = BaseUtils.getEPRProperties(targetEPR);
             this.sessionID = new SessionID(
                     properties.get(FIXConstants.BEGIN_STRING),
                     properties.get(FIXConstants.SENDER_COMP_ID),

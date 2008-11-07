@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.axis2.transport.OutTransportInfo;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,17 +54,17 @@ public class VFSOutTransportInfo implements OutTransportInfo {
             this.outFileURI = outFileURI;
         }
         
-        Map properties = getProperties(outFileURI);
+        Map<String,String> properties = BaseUtils.getEPRProperties(outFileURI);
         if(properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {
-          String strMaxRetryCount = (String) properties.get(VFSConstants.MAX_RETRY_COUNT);
+          String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);
             maxRetryCount = Integer.parseInt(strMaxRetryCount);
         }
         if(properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {
-          String strReconnectTimeout = (String) properties.get(VFSConstants.RECONNECT_TIMEOUT);
+          String strReconnectTimeout = properties.get(VFSConstants.RECONNECT_TIMEOUT);
             reconnectTimeout = Long.parseLong(strReconnectTimeout) * 1000;
         }        
         if (properties.containsKey(VFSConstants.APPEND)) {
-            String strAppend = (String)properties.get(VFSConstants.APPEND);
+            String strAppend = properties.get(VFSConstants.APPEND);
             append = Boolean.parseBoolean(strAppend);
         }
     }
@@ -102,23 +103,5 @@ public class VFSOutTransportInfo implements OutTransportInfo {
 
     public void setAppend(boolean append) {
         this.append = append;
-    }
-
-    public static Map getProperties(String url) {
-        Map h = new HashMap();
-        int propPos = url.indexOf("?");
-        if (propPos != -1) {
-            StringTokenizer st = new StringTokenizer(url.substring(propPos + 1), "&");
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                int sep = token.indexOf("=");
-                if (sep != -1) {
-                    h.put(token.substring(0, sep), token.substring(sep + 1));
-                } else {
-                    continue; // ignore, what else can we do?
-                }
-            }
-        }
-        return h;
     }
 }

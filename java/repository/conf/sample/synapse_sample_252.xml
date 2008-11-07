@@ -70,10 +70,20 @@
 
     <proxy name="JMSFileUploadProxy" transports="jms">
         <target inSequence="mtom_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <bytesMessage>application/octet-stream</bytesMessage>
+            </rules>
+        </parameter>
         <parameter name="Wrapper">{http://services.samples/xsd}element</parameter>
     </proxy>
     <proxy name="JMSTextProxy" transports="jms">
         <target inSequence="text_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <textMessage>text/plain</textMessage>
+            </rules>
+        </parameter>
         <parameter name="Wrapper">{http://services.samples/xsd}text</parameter>
     </proxy>
     <proxy name="JMSPoxProxy" transports="jms">

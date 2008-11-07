@@ -2005,7 +2005,12 @@ Connection: Keep-Alive
             </outSequence>
         </target>
         <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-        <parameter name="transport.jms.ContentType">application/xml</parameter>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <jmsProperty>contentType</jmsProperty>
+                <default>application/xml</default>
+            </rules>
+        </parameter>
     </proxy>
 
 </definitions>]]></pre>
@@ -2029,8 +2034,10 @@ Connection: Keep-Alive
 <p>Now if you examine the console running the sample Axis2 server, you will see a message indicating that the server has accepted an order as follows: </p>
 <pre xml:space="preserve">Accepted order for : 16517 stocks of MSFT at $ 169.14622538721846</pre>
 <p>In this sample, the client sends the request message to the proxy service exposed over JMS in Synsape. Synapse forwards this message to the HTTP EPR of the simple stock quote service hosted on the sample Axis2 server.
-Note that the operation is out-only and no response is sent back to the client. The transport.jms.ContentType property is necessary because the JMS client doesn't send a Content-Type header.
-The value 'application/xml' indicates to the JMS transport to expect POX messages.</p>
+Note that the operation is out-only and no response is sent back to the client. The transport.jms.ContentType property
+is necessary to allow the JMS transport to determine the content type of incoming messages. With the given configuration
+it will first try to read the content type from the 'contentType' message property and fall back to 'application/xml'
+(i.e. POX) if this property is not set. Note that the JMS client used in this example doesn't send any content type information.</p>
 <p>Note: It is possible to instruct a JMS proxy service to listen to an already existing destination without creating a new one. To do this, use the property elements on the proxy service definition to specify the destination and connection factory etc. </p>
 <p>e.g. </p>
 <pre xml:space="preserve">&lt;property name=&quot;transport.jms.Destination&quot; value=&quot;dynamicTopics/something.TestTopic&quot;/&gt;</pre>
@@ -2127,10 +2134,20 @@ java.naming.provider.url=tcp://localhost:61616</pre>
 
     <proxy name="JMSFileUploadProxy" transports="jms">
         <target inSequence="mtom_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <bytesMessage>application/octet-stream</bytesMessage>
+            </rules>
+        </parameter>
         <parameter name="Wrapper">{http://services.samples/xsd}element</parameter>
     </proxy>
     <proxy name="JMSTextProxy" transports="jms">
         <target inSequence="text_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <textMessage>text/plain</textMessage>
+            </rules>
+        </parameter>
         <parameter name="Wrapper">{http://services.samples/xsd}text</parameter>
     </proxy>
     <proxy name="JMSPoxProxy" transports="jms">

@@ -69,7 +69,7 @@ public class XMLConfigConstants {
 	public static final String TRACE_DISABLE = "disable";
 
 	/** The statistics attribute name */
-	public static final String STATISTICS_ATTRIB_NAME = "audit";
+	public static final String STATISTICS_ATTRIB_NAME = "statistics";
 	/** The statistics value 'enable' */
 	public static final String STATISTICS_ENABLE = "enable";
 	/** The statistics value 'disable' */

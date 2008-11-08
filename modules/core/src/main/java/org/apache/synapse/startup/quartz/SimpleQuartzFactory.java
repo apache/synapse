@@ -63,6 +63,7 @@ public class SimpleQuartzFactory implements StartupFactory {
             if(taskDescription == null){
                 handleException("Invalid task - Task description can not be created  form :"+el);
             }          
+            simpleQuartz.setName(taskDescription.getName());
             simpleQuartz.setTaskDescription(taskDescription);
             return simpleQuartz;
         } else {

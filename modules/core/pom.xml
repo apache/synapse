@@ -183,6 +183,7 @@
                             org.apache.ws.commons.schema.resolver,
                             org.jaxen.*,
                             org.quartz.*,
+                            javax.transaction.*,
                             org.springframework.xml.transform,
                             org.w3c.dom,
                             org.wso2.caching.*,

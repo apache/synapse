@@ -19,6 +19,7 @@
 package org.apache.synapse.task.service;
 
 import org.apache.synapse.task.TaskDescription;
+import org.apache.axiom.om.OMElement;
 
 import java.util.List;
 
@@ -72,4 +73,12 @@ public interface TaskManagementService {
      * @return Returns true if there is a TaskDescription instance with given name , otherwise , false
      */
     boolean isContains(String name);
+
+    /**
+     * Returns list of names of assignable instance properties of the task implementation
+     *
+     * @param taskClass A name of the task implementation
+     * @return List of assignable property's names
+     */
+    List<String> getPropertyNames(String taskClass);
 }

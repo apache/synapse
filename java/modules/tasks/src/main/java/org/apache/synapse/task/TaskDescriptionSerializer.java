@@ -79,7 +79,10 @@ public class TaskDescriptionSerializer {
 
         for (Object o : taskDescription.getProperties()) {
             OMElement prop = (OMElement) o;
-            task.addChild(prop.cloneOMElement());
+            if (prop != null) {
+                prop.setNamespace(targetNamespace);
+                task.addChild(prop.cloneOMElement());
+            }
         }
 
         return task;

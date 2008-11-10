@@ -83,7 +83,7 @@ public class TaskDescriptionFactory {
                     // default to all servers
                 } else {
                     StringTokenizer st = new StringTokenizer(pinnedServersValue, " ,");
-                    List pinnedServersList = new ArrayList();
+                    List<String> pinnedServersList = new ArrayList<String>();
                     while (st.hasMoreTokens()) {
                         String token = st.nextToken();
                         if (token.length() != 0) {

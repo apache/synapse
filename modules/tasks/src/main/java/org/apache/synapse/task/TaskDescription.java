@@ -22,10 +22,7 @@ package org.apache.synapse.task;
 import org.apache.axiom.om.OMElement;
 import org.quartz.SimpleTrigger;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Encapsulates details about a task
@@ -40,8 +37,8 @@ public class TaskDescription {
     private int repeatCount = SimpleTrigger.REPEAT_INDEFINITELY;
     private long repeatInterval; // in milliseconds
     private String className;
-    private List pinnedServers;
-    private Set<OMElement> xmlProperties = new HashSet<OMElement>();
+    private final List<String> pinnedServers = new ArrayList<String>();
+    private final Set<OMElement> xmlProperties = new HashSet<OMElement>();
     private String name;
     private String group;
     private Date startTime;
@@ -79,7 +76,7 @@ public class TaskDescription {
         xmlProperties.add(prop);
     }
 
-    public Set getProperties() {
+    public Set<OMElement> getProperties() {
         return xmlProperties;
     }
 
@@ -92,12 +89,14 @@ public class TaskDescription {
         return cron;
     }
 
-    public List getPinnedServers() {
+    public List<String> getPinnedServers() {
         return pinnedServers;
     }
 
-    public void setPinnedServers(List pinnedServers) {
-        this.pinnedServers = pinnedServers;
+    public void setPinnedServers(List<String> pinnedServers) {
+        if (pinnedServers != null) {
+            this.pinnedServers.addAll(pinnedServers);
+        }
     }
 
     public String getName() {

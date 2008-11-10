@@ -10,9 +10,9 @@
 	
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
-    <artifactId>sandesha2-jdbc-storage</artifactId>
+    <artifactId>sandesha2-persistence</artifactId>
     <packaging>jar</packaging>
-    <name>Sandesha2 - JDBC Persistent Storage</name>
+    <name>Sandesha2 - Persistent Storage</name>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>

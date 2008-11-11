@@ -17,6 +17,7 @@
 package org.apache.sandesha2.scenarios;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -122,6 +123,10 @@ public class RMScenariosTest extends SandeshaTestCase {
 	}
 
 	public void runPing(boolean asyncAcks, boolean stopListener) throws Exception {
+		runPing(asyncAcks, stopListener, 1);
+	}
+		
+	public void runPing(boolean asyncAcks, boolean stopListener, int msgCount) throws Exception {
 		
 		Options clientOptions = new Options();
 
@@ -133,7 +138,6 @@ public class RMScenariosTest extends SandeshaTestCase {
 		clientOptions.setAction(pingAction);
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		
 		if(asyncAcks) {
 			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
@@ -142,7 +146,13 @@ public class RMScenariosTest extends SandeshaTestCase {
 			clientOptions.setUseSeparateListener(true);
 		}
 
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		for(int i=0; i<msgCount; i++){
+			String text = "ping" + (i+1);
+			if(i == (msgCount-1)){
+				clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+			}
+			serviceClient.fireAndForget(getPingOMBlock(text)); //start the pingX text at X=1
+		}
 		
 		long limit = System.currentTimeMillis() + waitTime;
 		Error lastError = null;
@@ -152,7 +162,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 			try {
 				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 				System.out.println("Checking Outbound Sequence: " + sequenceReport.getSequenceID());
-				assertTrue("Checking completed messages", sequenceReport.getCompletedMessages().contains(new Long(1)));
+				assertTrue("Checking completed messages", sequenceReport.getCompletedMessages().contains(new Long(msgCount)));
 				assertEquals("Checking sequence terminated", SequenceReport.SEQUENCE_STATUS_TERMINATED, sequenceReport.getSequenceStatus());
 				assertEquals("Checking sequence direction", SequenceReport.SEQUENCE_DIRECTION_OUT, sequenceReport.getSequenceDirection());
 
@@ -297,6 +307,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 		for(Iterator currentSequences = incomingSequences.iterator(); currentSequences.hasNext(); ) {
 			SequenceReport report = (SequenceReport) currentSequences.next();
 			if(!sequenceIds.contains(report.getSequenceID())) {
+				
 				return report;
 			}
 		}

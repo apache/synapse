@@ -112,8 +112,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 if (traceOrDebugOn) {
                     traceOrDebug(traceOn, "Message size exceeds the upper bound for caching, " +
                             "request will not be cached");
-                    return true;
                 }
+                return true;
             }
         }
 

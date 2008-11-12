@@ -59,7 +59,7 @@
                         <Bundle-Description>${pom.description}</Bundle-Description>
                         <Bundle-SymbolicName>org.apache.synapse.utils</Bundle-SymbolicName>
                         <Export-Package>
-                            org.apache.synapse.util.*;-split-package:=merge-last,
+                            org.apache.synapse.commons.util.*;-split-package:=merge-last,
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,

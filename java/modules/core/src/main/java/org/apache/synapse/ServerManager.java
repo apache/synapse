@@ -162,22 +162,11 @@ public class ServerManager {
                 }
             }
 
-            synConfig.init(configctx);
-
             log.info("Ready for processing");
 
         } catch (Throwable t) {
             log.fatal("Synapse startup failed...", t);
             throw new SynapseException("Synapse startup failed", t);
-        }
-    }
-
-    private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
-        if (axisConf.getMessageBuilder("text/plain") == null) {
-            axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
-        }
-        if (axisConf.getMessageBuilder("application/octet-stream") == null) {
-            axisConf.addMessageBuilder("application/octet-stream", new BinaryBuilder());
         }
     }
 
@@ -208,17 +197,6 @@ public class ServerManager {
                 listenerManager.stop();
                 listenerManager.destroy();
             }
-
-            // clear session information used for SA load balancing
-            try {
-                RMIRegistryController.getInstance().removeLocalRegistry();
-                SALSessions.getInstance().reset();
-                InMemoryDataSourceRegistry.getInstance().clear();
-                JNDIBasedDataSourceRegistry registry = JNDIBasedDataSourceRegistry.getInstance();
-                if (registry.isInitialized()) {
-                    registry.clear();
-                }
-            } catch (Throwable ignored) {}
             
             // we need to call this method to clean the temp files we created.
             if (configctx != null) {

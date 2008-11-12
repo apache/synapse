@@ -20,6 +20,7 @@
 package org.apache.synapse.util;
 
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.commons.util.TemporaryData;
 
 import javax.activation.DataSource;
 import java.io.IOException;

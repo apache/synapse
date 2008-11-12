@@ -29,6 +29,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMSourcedElement;
+import org.apache.synapse.commons.util.TemporaryData;
 
 public class TextFileDataSourceTest extends TestCase {
     private static final Charset UTF8 = Charset.forName("UTF-8");

@@ -80,6 +80,8 @@ public class SynapseInitializationModule implements Module {
             ServerManager.getInstance().setConfigurationContext(configurationContext);
         }
 
+        addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
+
         // this will deploy the mediators in the mediator extensions folder
         log.info("Loading mediator extensions...");
         configurationContext.getAxisConfiguration().getConfigurator().loadServices();
@@ -142,6 +144,8 @@ public class SynapseInitializationModule implements Module {
                 proxy.stop(synCfg);
             }
         }
+
+        synCfg.init(configurationContext);
         
         log.info("Synapse initialized successfully...!");
     }
@@ -190,6 +194,15 @@ public class SynapseInitializationModule implements Module {
         synapseConfiguration.init(synEnv);
         
         return synapseConfiguration;
+    }
+
+    private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
+        if (axisConf.getMessageBuilder("text/plain") == null) {
+            axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
+        }
+        if (axisConf.getMessageBuilder("application/octet-stream") == null) {
+            axisConf.addMessageBuilder("application/octet-stream", new BinaryBuilder());
+        }
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {

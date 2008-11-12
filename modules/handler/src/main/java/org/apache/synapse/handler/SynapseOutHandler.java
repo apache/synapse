@@ -22,7 +22,7 @@ package org.apache.synapse.handler;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.util.HandlerUtil;
+import org.apache.synapse.handler.util.HandlerUtil;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;

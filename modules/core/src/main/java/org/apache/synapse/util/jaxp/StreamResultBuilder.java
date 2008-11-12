@@ -35,8 +35,8 @@ import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.TemporaryData;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.util.TemporaryData;
 import org.apache.synapse.util.TextFileDataSource;
 
 /**

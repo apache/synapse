@@ -4,7 +4,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.util.PropertyHelper;
+import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.task.Task;
 
 import org.apache.synapse.core.SynapseEnvironment;

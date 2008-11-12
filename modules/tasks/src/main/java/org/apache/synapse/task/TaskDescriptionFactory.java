@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.util.PropertyHelper;
+import org.apache.synapse.commons.util.PropertyHelper;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;

@@ -40,7 +40,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
-import org.apache.synapse.util.TemporaryData;
+import org.apache.synapse.commons.util.TemporaryData;
 
 import java.io.IOException;
 import java.io.OutputStream;

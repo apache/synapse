@@ -25,6 +25,9 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.util.RMIRegistryController;
+import org.apache.synapse.util.datasource.InMemoryDataSourceRegistry;
+import org.apache.synapse.util.datasource.JNDIBasedDataSourceRegistry;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
@@ -33,6 +36,7 @@ import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -812,6 +816,17 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 }
             }
         }
+
+        // clear session information used for SA load balancing
+        try {
+            RMIRegistryController.getInstance().removeLocalRegistry();
+            SALSessions.getInstance().reset();
+            InMemoryDataSourceRegistry.getInstance().clear();
+            JNDIBasedDataSourceRegistry registry = JNDIBasedDataSourceRegistry.getInstance();
+            if (registry.isInitialized()) {
+                registry.clear();
+            }
+        } catch (Throwable ignored) {}
     }
 
     /**

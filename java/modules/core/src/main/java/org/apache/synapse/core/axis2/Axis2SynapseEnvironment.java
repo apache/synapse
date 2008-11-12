@@ -35,10 +35,9 @@ import org.apache.synapse.audit.AuditHelper;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.EndpointDefinition;
-import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.util.TemporaryData;
+import org.apache.synapse.commons.util.TemporaryData;
 import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
 

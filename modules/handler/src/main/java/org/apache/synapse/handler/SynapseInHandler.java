@@ -28,7 +28,7 @@ import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.util.HandlerUtil;
+import org.apache.synapse.handler.util.HandlerUtil;
 
 /**
  * This is the InHandler which injects the Axis2MC in to Synapse after converting the message

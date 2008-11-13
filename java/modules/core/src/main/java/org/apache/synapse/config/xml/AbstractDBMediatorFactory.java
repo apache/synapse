@@ -24,11 +24,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
-import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.synapse.util.datasource.DataSourceFinder;
-import org.apache.synapse.util.datasource.InMemoryDataSourceRegistry;
-import org.apache.synapse.util.datasource.DBPoolView;
 import org.apache.synapse.util.MBeanRepository;
+import org.apache.synapse.util.datasource.DBPoolView;
+import org.apache.synapse.util.datasource.DataSourceManager;
+import org.apache.synapse.util.datasource.DatasourceMBeanRepository;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.security.secret.SecretManager;
 import org.jaxen.JaxenException;
 
@@ -142,9 +142,9 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
         String dsName = getValue(pool, DSNAME_Q);
         mediator.addDataSourceProperty(DSNAME_Q, dsName);
-        DataSource dataSource = DataSourceFinder.find(dsName);
+        DataSource dataSource = DataSourceManager.getInstance().find(dsName);
         if (dataSource != null) {
-            MBeanRepository mBeanRepository = InMemoryDataSourceRegistry.getInstance();
+            MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();
             Object mBean = mBeanRepository.getMBean(dsName);
             if (mBean instanceof DBPoolView) {
                 mediator.setDbPoolView((DBPoolView) mBean);
@@ -158,7 +158,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         props.put(Context.SECURITY_CREDENTIALS, getValue(pool, PASS_Q));
         props.put(Context.PROVIDER_URL, getValue(pool, URL_Q));
 
-        dataSource = DataSourceFinder.find(dsName, props);
+        dataSource = DataSourceManager.getInstance().find(dsName, props);
         if (dataSource == null) {
             handleException("Cannot find a DataSource for given properties :" + props);
         }

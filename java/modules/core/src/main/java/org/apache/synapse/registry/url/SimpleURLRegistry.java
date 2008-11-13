@@ -182,7 +182,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             }
             root = value;
         } else {
-            handleException("");
+            handleException("Parameter 'root' is null");
         }
 
     }

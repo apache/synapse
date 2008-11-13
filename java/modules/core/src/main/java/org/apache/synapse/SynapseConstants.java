@@ -269,8 +269,6 @@ public final class SynapseConstants {
     /** Synapse server instance name */
     public static final String SERVER_NAME = "serverName";
 
-    public static final String SYNAPSE_DATASOURCES = "synapse.datasources";
-    
     /** Root for relative path */
     public static final String RESOLVE_ROOT = "resolve.root";
 

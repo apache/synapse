@@ -18,39 +18,50 @@
  */
 package org.apache.synapse.util.datasource;
 
-import javax.naming.Context;
 import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Finds a DataSource based on various criteria
+ * Keep all DataSources defined in the Synapse
  */
-public interface DataSourceFinder {
+public interface DataSourceRepository {
 
     /**
-     * Find a DataSource using given name
+     * Initialization with given properties
      *
-     * @param name Name of the DataSource to be found
-     * @return DataSource if found , otherwise null
+     * @param properties configuration properties
      */
-    DataSource find(String name);
+    public void init(Properties properties);
 
     /**
-     * Find a DataSource using the given name and JNDI environment properties
+     * Explicitly check for init
      *
-     * @param dsName  Name of the DataSource to be found
-     * @param jndiEnv JNDI environment properties
-     * @return DataSource if found , otherwise null
+     * @return True , if has already initialized
      */
-    DataSource find(String dsName, Properties jndiEnv);
+    public boolean isInitialized();
 
     /**
-     * Find a DataSource using the given name and naming context
+     * Register a DataSource based on given information
+     * Information is encapsulated in a  DataSourceInformation instance
      *
-     * @param dsName  Name of the DataSource to be found
-     * @param context Naming Context
-     * @return DataSource if found , otherwise null
+     * @param information DataSourceInformation instance
      */
-    DataSource find(String dsName, Context context);
+    void register(DataSourceInformation information);
+    
+
+    void unRegister(String name);
+
+    /**
+     * Find and Returns an registered  DataSource in the DataSourceRegistry
+     *
+     * @param name Name of the DataSoure to be looked up
+     * @return DataSource Instance
+     */
+    DataSource lookUp(String name);
+
+    /**
+     * Clear already registered datasources
+     */
+    public void clear();
 
 }

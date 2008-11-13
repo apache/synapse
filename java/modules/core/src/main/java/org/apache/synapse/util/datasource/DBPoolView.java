@@ -19,12 +19,12 @@
 package org.apache.synapse.util.datasource;
 
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
- * DBPool monitoring 
+ *
  */
 public class DBPoolView implements DBPoolViewMBean {
 
@@ -66,7 +66,7 @@ public class DBPoolView implements DBPoolViewMBean {
             Long currentUsage = connectionsUsage.get(connectionID);
             if (currentUsage != null) {
                 currentUsage += 1;
-                connectionsUsage.put(connectionID,currentUsage);
+                connectionsUsage.put(connectionID, currentUsage);
             } else {
                 connectionsUsage.put(connectionID, (long) 1);
             }

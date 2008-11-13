@@ -22,6 +22,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Encapsulates the All information related to a DataSource
@@ -32,7 +33,7 @@ public class DataSourceInformation {
     public static final String PER_USER_POOL_DATA_SOURCE = "PerUserPoolDataSource";
     private String user;
     private String password;
-    private String name;
+    private String datasourceName;
     private int maxActive = GenericObjectPool.DEFAULT_MAX_ACTIVE;
     private int maxIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
     private long maxWait = GenericObjectPool.DEFAULT_MAX_WAIT;
@@ -53,6 +54,9 @@ public class DataSourceInformation {
     private boolean logAbandoned;
     private boolean poolPreparedStatements;
     private int maxOpenPreparedStatements;
+    private final Properties properties = new Properties();
+    private String repositoryType;
+    private String alias;
 
     private long timeBetweenEvictionRunsMillis =
             GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
@@ -158,12 +162,12 @@ public class DataSourceInformation {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public String getDatasourceName() {
+        return datasourceName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDatasourceName(String datasourceName) {
+        this.datasourceName = datasourceName;
     }
 
     public int getMaxActive() {
@@ -300,5 +304,33 @@ public class DataSourceInformation {
 
     public void setInitialSize(int initialSize) {
         this.initialSize = initialSize;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties.putAll(properties);
+    }
+
+    public String getRepositoryType() {
+        return repositoryType;
+    }
+
+    public void setRepositoryType(String repositoryType) {
+        this.repositoryType = repositoryType;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public Map<String, Object> getAllParameters() {
+        return this.parameters;
     }
 }

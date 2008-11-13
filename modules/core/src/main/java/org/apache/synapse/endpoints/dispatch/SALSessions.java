@@ -377,6 +377,11 @@ public class SALSessions {
     }
 
     public void reset() {
+
+        if (!initialized) {
+            return;
+        }
+        
         log.info("Clearing all states ");
         initialized = false;
         establishedSessions.clear();

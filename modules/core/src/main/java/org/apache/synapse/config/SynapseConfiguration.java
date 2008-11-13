@@ -26,12 +26,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.util.RMIRegistryController;
-import org.apache.synapse.util.datasource.InMemoryDataSourceRegistry;
-import org.apache.synapse.util.datasource.JNDIBasedDataSourceRegistry;
+import org.apache.synapse.util.datasource.DataSourceInformationRepository;
+import org.apache.synapse.util.datasource.InMemoryDataSourceRepository;
+import org.apache.synapse.util.datasource.JNDIBasedDataSourceRepository;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
-import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -40,13 +40,6 @@ import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.eip.splitter.CloneMediator;
-import org.apache.synapse.mediators.eip.splitter.IterateMediator;
-import org.apache.synapse.mediators.eip.Target;
-import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
-import org.apache.synapse.mediators.filters.SwitchMediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
-import org.apache.synapse.mediators.builtin.CacheMediator;
 import org.apache.synapse.registry.Registry;
 
 import javax.xml.namespace.QName;
@@ -110,6 +103,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
     private final TaskDescriptionRepository repository = 
             TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
                     SynapseConstants.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
+    
+    /* Keeps information about datasource -only configuration data - no runtime data */
+    private DataSourceInformationRepository dataSourceInformationRepository;
 
     /**
 	 * Save the path to the configuration file loaded, to save it later if
@@ -821,8 +817,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
         try {
             RMIRegistryController.getInstance().removeLocalRegistry();
             SALSessions.getInstance().reset();
-            InMemoryDataSourceRegistry.getInstance().clear();
-            JNDIBasedDataSourceRegistry registry = JNDIBasedDataSourceRegistry.getInstance();
+            InMemoryDataSourceRepository.getInstance().clear();
+            JNDIBasedDataSourceRepository registry = JNDIBasedDataSourceRepository.getInstance();
             if (registry.isInitialized()) {
                 registry.clear();
             }
@@ -925,5 +921,13 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public TaskDescriptionRepository getTaskDescriptionRepository() {
         return repository;
+    }
+    
+     public DataSourceInformationRepository getDataSourceInformationRepository() {
+        return dataSourceInformationRepository;
+    }
+
+    public void setDataSourceInformationRepository(DataSourceInformationRepository dataSourceInformationRepository) {
+        this.dataSourceInformationRepository = dataSourceInformationRepository;
     }
 }

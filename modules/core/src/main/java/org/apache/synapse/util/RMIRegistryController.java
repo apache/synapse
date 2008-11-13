@@ -53,6 +53,7 @@ public class RMIRegistryController {
             try {
                 log.info("Removing the RMI registy instance from the RMI runtime ");
                 UnicastRemoteObject.unexportObject(localRegistry, true);
+                this.localRegistry = null;
             } catch (NoSuchObjectException e) {
                 String msg = "Error when stoping localregistry(RMI)";
                 handleException(msg, e);

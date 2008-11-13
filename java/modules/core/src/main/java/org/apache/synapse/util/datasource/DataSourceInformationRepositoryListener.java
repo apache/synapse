@@ -18,20 +18,16 @@
  */
 package org.apache.synapse.util.datasource;
 
-import java.util.Map;
+import java.util.Properties;
 
 /**
  *
  */
-public interface DBPoolViewMBean {
+public interface DataSourceInformationRepositoryListener {
 
-    public int getNumActive();
+    void addDataSourceInformation(DataSourceInformation dataSourceInformation);
 
-    public int getNumIdle();
+    void removeDataSourceInformation(DataSourceInformation dataSourceInformation);
 
-    public String getName();
-
-    public Map getConnectionUsage();
-
-    public void reset();
+    void reConfigure(Properties confProperties);
 }

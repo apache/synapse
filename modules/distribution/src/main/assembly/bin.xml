@@ -62,7 +62,15 @@
             <includes>
                 <include>sandesha2-rampart-integration-${version}.jar</include>
             </includes>
-        </fileSet>        
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/persistence/target</directory>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>sandesha2-persistence-${version}.jar</include>
+            </includes>
+        </fileSet> 
+       
         <fileSet>
             <directory>../../modules/mar/target</directory>
             <outputDirectory>sandesha2-${version}-bin</outputDirectory>

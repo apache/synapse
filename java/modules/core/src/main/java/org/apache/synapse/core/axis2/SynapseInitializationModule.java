@@ -24,15 +24,17 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.format.BinaryBuilder;
+import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.axis2.modules.Module;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 

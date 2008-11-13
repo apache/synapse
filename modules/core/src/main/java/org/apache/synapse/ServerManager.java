@@ -108,8 +108,6 @@ public class ServerManager {
             configctx = ConfigurationContextFactory.
                     createConfigurationContextFromFileSystem(axis2Repolocation, axis2Xml);
             
-            addDefaultBuildersAndFormatters(configctx.getAxisConfiguration());
-            
             listenerManager = configctx.getListenerManager();
             if (listenerManager == null) {
                 listenerManager = new ListenerManager();

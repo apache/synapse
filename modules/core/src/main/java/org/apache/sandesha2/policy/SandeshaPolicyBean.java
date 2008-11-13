@@ -108,7 +108,7 @@ public class SandeshaPolicyBean implements Assertion {
         long timeOut = -1;
 
         if (measure == null) {
-            this.inactivityTimeoutInterval = value;
+            timeOut = value;
         } else if ("seconds".equals(measure)) {
             timeOut = value * 1000;
         } else if ("minutes".equals(measure)) {
@@ -127,7 +127,7 @@ public class SandeshaPolicyBean implements Assertion {
     long timeOut = 0;
 
     if (measure == null) {
-        this.sequenceRemovalTimeoutInterval = value;
+        timeOut = value;
     } else if ("seconds".equals(measure)) {
         timeOut = value * 1000;
     } else if ("minutes".equals(measure)) {
@@ -255,8 +255,7 @@ public class SandeshaPolicyBean implements Assertion {
 
 			String prefix = writer.getPrefix(namespaceURI);
 			if (prefix == null) {
-			    prefix = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
-			            .getPrefix();
+			    prefix = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION.getPrefix();
 			    writer.setPrefix(prefix, namespaceURI);
 			}
 
@@ -304,28 +303,11 @@ public class SandeshaPolicyBean implements Assertion {
 			writer.writeCharacters(Long.toString(getInactivityTimeoutInterval()));
 			writer.writeEndElement();
 			
-            
-            // FIXME : Assign default values if inactivityTimeoutMeasure is set to null
-            if (inactivityTimeoutMeasure != null && inactivityTimeoutMeasure.trim().length() > 0) {
-			// <wsrm:InactivityTimeoutMeasure />
-			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT_MEASURES.getLocalPart(), namespaceURI);
-			writer.writeCharacters(inactivityTimeoutMeasure);
-			writer.writeEndElement();
-            }
-
             // <wsrm:SequenceRemovalTimeout />
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEQUENCE_REMOVAL_TIMEOUT.getLocalPart(), namespaceURI);
 			writer.writeCharacters(Long.toString(getSequenceRemovalTimeoutInterval()));
 			writer.writeEndElement();
 			
-			// <wsrm:SequenceRemovalTimeoutMeasure />
-            // FIXME : Assign default values if sequenceRemovalTimeoutMeasure is set to null
-            if (sequenceRemovalTimeoutMeasure != null && sequenceRemovalTimeoutMeasure.trim().length() > 0) {
-			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEQUENCE_REMOVAL_TIMEOUT_MEASURES.getLocalPart(), namespaceURI);
-			writer.writeCharacters(sequenceRemovalTimeoutMeasure);
-			writer.writeEndElement();
-            }
-
 			// <wsrm:InvokeInOrder />
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INVOKE_INORDER.getLocalPart(), namespaceURI);
 			writer.writeCharacters(Boolean.toString(isInOrder()));

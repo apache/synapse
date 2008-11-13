@@ -103,6 +103,12 @@ public class DataSourceInformationFactory {
 
         information.setType(dsType);
 
+        String repositoryType = (String) MiscellaneousUtil.getProperty(
+                properties, prefix + DataSourceConfigurationConstants.PROP_REGISTRY,
+                DataSourceConfigurationConstants.PROP_REGISTRY_MEMORY, String.class);
+
+        information.setRepositoryType(repositoryType);
+
         Integer maxActive = (Integer) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_MAXACTIVE,
                 GenericObjectPool.DEFAULT_MAX_ACTIVE, Integer.class);

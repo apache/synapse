@@ -31,7 +31,8 @@ import java.util.Map;
  *
  */
 public class DatasourceMBeanRepository implements MBeanRepository {
-    private final static Log log = LogFactory.getLog(DataSourceInformationRepository.class);
+    
+    private final static Log log = LogFactory.getLog(DatasourceMBeanRepository.class);
 
     private final static Map<String, DBPoolView> dataSourcesMBeans = new HashMap<String, DBPoolView>();
     private final static DatasourceMBeanRepository DATASOURCE_M_BEAN_REPOSITORY = new DatasourceMBeanRepository();
@@ -45,6 +46,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
     }
 
     public void addMBean(String name, Object mBean) {
+        
         assertNull(name, "DataSorce MBean name cannot be found.");
         assertNull(mBean, "DataSorce MBean  cannot be found.");
         assertFalse(mBean instanceof DBPoolView, "Given MBean instance is not matched " +
@@ -55,16 +57,19 @@ public class DatasourceMBeanRepository implements MBeanRepository {
     }
 
     public Object getMBean(String name) {
+        
         assertNull(name, "DataSorce MBean name cannot be found.");
         return dataSourcesMBeans.get(name);
     }
 
     public void removeMBean(String name) {
+        
         dataSourcesMBeans.remove(name);
         MBeanRegistrar.getInstance().unRegisterMBean(MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
     public void clear() {
+        
         if (!dataSourcesMBeans.isEmpty()) {
             log.info("UnRegistering DBPool MBeans");
             for (DBPoolView dbPoolView : dataSourcesMBeans.values()) {

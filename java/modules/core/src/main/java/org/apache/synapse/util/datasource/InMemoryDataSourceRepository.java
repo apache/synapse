@@ -83,10 +83,8 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
     }
 
     public void unRegister(String name) {
-
-        if (name == null || "".equals(name)) {
-            return;
-        }
+        
+        assertNull(name,"Name of the datasource to be removed is empty or null");
         dataSources.remove(name);
         REPOSITORY.removeMBean(name);
     }
@@ -130,5 +128,4 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
             handleException(msg);
         }
     }
-   
 }

@@ -67,7 +67,7 @@ public class DataSourceConfigurationConstants {
     public static final String PROP_PROVIDER_PORT = "providerPort";
     public final static String PROP_REGISTRY = "registry";
     public final static String PROP_REGISTRY_MEMORY = "memory";
-    public final static String PROP_REGISTRY_JNDI = "JNDI";      
+    public final static String PROP_REGISTRY_JNDI = "JNDI";
     public static final String PROP_ICFACTORY = "icFactory";
     public static final String PROP_PROVIDER_URL = "providerUrl";
     public static final String DOT_STRING = ".";
@@ -76,9 +76,10 @@ public class DataSourceConfigurationConstants {
     public static final String PROP_TYPE = "type";
     public static final String PROP_BASIC_DATA_SOURCE = "BasicDataSource";
     public static final String PROP_CLASS_NAME = "className";
-    public static final String PROP_CPDSADAPTER_DRIVER 
+    public static final String PROP_CPDSADAPTER_DRIVER
             = "org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS";
     public static final String PROP_FACTORY = "factory";
     public static final String PROP_NAME = "name";
+    public static final String DATASOURCE_INFORMATION_REPOSITORY = "DataSourceInformationRepository";
 
 }

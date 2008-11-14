@@ -47,8 +47,12 @@ public interface DataSourceRepository {
      * @param information DataSourceInformation instance
      */
     void register(DataSourceInformation information);
-    
 
+    /**
+     * Removing datasource
+     *
+     * @param name name of the datasource to be removed
+     */
     void unRegister(String name);
 
     /**

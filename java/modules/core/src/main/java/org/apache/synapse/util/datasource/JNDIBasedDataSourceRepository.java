@@ -57,11 +57,13 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
         initialized = true;
         if (jndiEnv == null || jndiEnv.isEmpty()) {
-            log.warn("");
+            log.warn("Provided global JNDI environment properties is empty or null.");
             return;
         }
-        jndiProperties = createJNDIEnvironment(jndiEnv, null);
-        initialContext = createInitialContext(jndiEnv);
+        if (isValid(jndiEnv)) {
+            jndiProperties = createJNDIEnvironment(jndiEnv, null);
+            initialContext = createInitialContext(jndiEnv);
+        }
 
     }
 
@@ -210,8 +212,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         try {
             context.unbind(name);
         } catch (NamingException e) {
-            handleException("Error removing a Datasource with name : "+
-                    name + " from the JNDI context : "+initialContext,e);
+            handleException("Error removing a Datasource with name : " +
+                    name + " from the JNDI context : " + initialContext, e);
         }
     }
 
@@ -497,5 +499,18 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
                     " with JNDI env jndiProperties : " + jndiEnv);
         }
         return null;
+    }
+
+    private boolean isValid(Properties dsProperties) {
+
+        String dataSources = MiscellaneousUtil.getProperty(dsProperties,
+                DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES, null);
+
+        if (dataSources != null && !"".equals(dataSources)) {
+            String[] dataSourcesNames = dataSources.split(",");
+            return !(dataSourcesNames == null || dataSourcesNames.length == 0);
+        }
+
+        return false;
     }
 }

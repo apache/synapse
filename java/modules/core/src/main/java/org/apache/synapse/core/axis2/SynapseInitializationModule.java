@@ -35,8 +35,10 @@ import org.apache.neethi.Policy;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.datasource.DataSourceInformationRepositoryHelper;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -160,14 +162,21 @@ public class SynapseInitializationModule implements Module {
 
         String config = ServerManager.getInstance().getSynapseXMLPath();
 
+        java.util.Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
+
+        DataSourceInformationRepositoryHelper.
+                initializeDataSourceInformationRepository(axisConfiguration, synapseProperties);
+
         if (config != null) {
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
             log.warn("System property or init-parameter '" + SynapseConstants.SYNAPSE_XML +
-                "' is not specified. Using default configuration..");
+                    "' is not specified. Using default configuration..");
             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
+        synapseConfiguration.setProperties(synapseProperties);
+        
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
         synapseConfiguration.setAxisConfiguration(cfgCtx.getAxisConfiguration());
 

@@ -67,4 +67,17 @@ public class SynapsePropertiesLoader {
         tempProperties.putAll(cacheProperties);
         return tempProperties;
     }
+
+    /**
+     * Reloading properties from file
+     *
+     * @return Reloaded properties
+     */
+    public static Properties reloadSynapseProperties() {
+        if (log.isDebugEnabled()) {
+            log.debug("Reloading synapse properties");
+        }
+        cacheProperties = null;
+        return loadSynapseProperties();
+    }
 }

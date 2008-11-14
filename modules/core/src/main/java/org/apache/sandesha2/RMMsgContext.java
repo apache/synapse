@@ -135,11 +135,11 @@ public class RMMsgContext {
 				sequence.toHeader(header);
 			}
 			//there can be more than one sequence ack or ack request in a single message.
-			for (Iterator iter=sequenceAcknowledgements.iterator();iter.hasNext();) {
+			for (Iterator<SequenceAcknowledgement> iter=sequenceAcknowledgements.iterator();iter.hasNext();) {
 				SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
 				sequenceAck.toHeader(header);
 			}
-			for (Iterator iter=ackRequests.iterator();iter.hasNext();) {
+			for (Iterator<AckRequested> iter=ackRequests.iterator();iter.hasNext();) {
 				AckRequested ackReq = (AckRequested) iter.next();
 				ackReq.toHeader(header);
 			}
@@ -353,8 +353,8 @@ public class RMMsgContext {
 	private Sequence sequence = null;
 	
 	//there can be more than one sequence ack or ack request in a single message.
-	private ArrayList sequenceAcknowledgements = new ArrayList();
-	private ArrayList ackRequests = new ArrayList();
+	private ArrayList<SequenceAcknowledgement> sequenceAcknowledgements = new ArrayList<SequenceAcknowledgement>();
+	private ArrayList<AckRequested> ackRequests = new ArrayList<AckRequested>();
 	
 	private CreateSequence createSequence = null;
 	private CreateSequenceResponse createSequenceResponse = null;
@@ -379,7 +379,7 @@ public class RMMsgContext {
 		return sequence;
 	}
 
-	public Iterator getSequenceAcknowledgements() {
+	public Iterator<SequenceAcknowledgement> getSequenceAcknowledgements() {
 		return sequenceAcknowledgements.iterator();
 	}
 
@@ -405,7 +405,7 @@ public class RMMsgContext {
 	}
 
 	public void setSequenceAcknowledgements(
-			ArrayList sequenceAcknowledgements) {
+			ArrayList<SequenceAcknowledgement> sequenceAcknowledgements) {
 		this.sequenceAcknowledgements = sequenceAcknowledgements;
 	}
 	
@@ -421,11 +421,11 @@ public class RMMsgContext {
 		this.terminateSequenceResponse = terminateSequenceResponse;
 	}
 
-	public Iterator getAckRequests() {
+	public Iterator<AckRequested> getAckRequests() {
 		return ackRequests.iterator();
 	}
 
-	public void setAckRequested(ArrayList ackRequests) {
+	public void setAckRequested(ArrayList<AckRequested> ackRequests) {
 		this.ackRequests = ackRequests;
 	}
 	
@@ -499,7 +499,7 @@ public class RMMsgContext {
 		}
 	}
 	
-	private static HashSet bodyLocalNames = new HashSet();
+	private static HashSet<String> bodyLocalNames = new HashSet<String>();
 	static{
 		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE);
 		bodyLocalNames.add(Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE);

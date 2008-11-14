@@ -91,7 +91,7 @@ public class Invoker extends SandeshaThread {
 			
 				InvokerBean selector = new InvokerBean();
 				selector.setSequenceID(sequenceID);
-				Iterator stMapIt = storageMapMgr.find(selector).iterator();
+				Iterator<InvokerBean> stMapIt = storageMapMgr.find(selector).iterator();
 				
 				long highestMsgNumberInvoked = 0;
 				Transaction transaction = null;
@@ -175,7 +175,7 @@ public class Invoker extends SandeshaThread {
 	}
 
 	private void addOutOfOrderInvokerBeansToList(String sequenceID, 
-			StorageManager storageManager, List list)throws SandeshaException{
+			StorageManager storageManager, List<InvokerBean> list)throws SandeshaException{
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::addOutOfOrderInvokerBeansToList " + sequenceID + ", " + list);
 		
@@ -187,7 +187,7 @@ public class Invoker extends SandeshaThread {
 			//Look for any invokable message that lies in one of those ranges
 			InvokerBean selector = new InvokerBean();
 			selector.setSequenceID(sequenceID);
-			Iterator invokerBeansIterator = 
+			Iterator<InvokerBean> invokerBeansIterator = 
 				storageManager.getInvokerBeanMgr().find(selector).iterator();
 			
 			while(invokerBeansIterator.hasNext()){
@@ -221,7 +221,7 @@ public class Invoker extends SandeshaThread {
 			transaction = storageManager.getTransaction();
 			
 			// Pick a sequence using a round-robin approach
-			ArrayList allSequencesList = getSequences();
+			ArrayList<SequenceEntry> allSequencesList = getSequences();
 			int size = allSequencesList.size();
 			log.debug("Choosing one from " + size + " sequences");
 			if(nextIndex >= size) {
@@ -278,7 +278,7 @@ public class Invoker extends SandeshaThread {
 			InvokerBean selector = new InvokerBean();
 			selector.setSequenceID(sequenceId);
 			selector.setMsgNo(nextMsgno);
-			List invokerBeans = storageMapMgr.find(selector);
+			List<InvokerBean> invokerBeans = storageMapMgr.find(selector);
 			
 			//add any msgs that belong to out of order windows
 			addOutOfOrderInvokerBeansToList(sequenceId, 
@@ -294,7 +294,7 @@ public class Invoker extends SandeshaThread {
 				return sleep;
 			}
 			
-			Iterator stMapIt = invokerBeans.iterator();
+			Iterator<InvokerBean> stMapIt = invokerBeans.iterator();
 
 			//TODO correct the locking mechanism to have one lock per sequence.
 			//TODO should this be a while, not an if?

@@ -35,27 +35,28 @@ import org.apache.sandesha2.util.LoggingControl;
 
 import java.util.concurrent.ConcurrentHashMap;;
 
-abstract class InMemoryBeanMgr {
+abstract class InMemoryBeanMgr<T extends RMBean> {
 
 	private static final Log log = LogFactory.getLog(InMemoryBeanMgr.class);
-	protected ConcurrentHashMap table;
+	protected ConcurrentHashMap<String, T> table;
 	protected InMemoryStorageManager mgr;
 
+	@SuppressWarnings("unchecked")
 	protected InMemoryBeanMgr(InMemoryStorageManager mgr, AbstractContext context, String key) {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " <innit> " + mgr + ", " 
 				+ context + ", " + key);
 		this.mgr = mgr;
 		Object obj = context.getProperty(key);
 		if (obj != null) {
-			table = (ConcurrentHashMap) obj;
+			table = (ConcurrentHashMap<String, T>) obj;
 		} else {
-			table = new ConcurrentHashMap();
+			table = new ConcurrentHashMap<String, T>();
 			context.setProperty(key, table);
 		}
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " <init> " + this);
 	}
 	
-	protected boolean insert(Object key, RMBean bean) throws SandeshaStorageException {
+	protected boolean insert(String key, T bean) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " insert " + key + ", " + bean);
 		mgr.enlistBean(bean);
 		
@@ -66,9 +67,9 @@ abstract class InMemoryBeanMgr {
 		return wasInserted;
 	}
 
-	protected RMBean delete(Object key) throws SandeshaStorageException {
+	protected T delete(Object key) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " delete " + key);
-		RMBean bean = (RMBean) table.remove(key);
+		T bean = table.remove(key);
 		if(bean != null) {
 			mgr.enlistBean(bean);
 		}
@@ -76,18 +77,18 @@ abstract class InMemoryBeanMgr {
 		return bean;
 	}
 
-	protected RMBean retrieve(Object key) throws SandeshaStorageException {
+	protected T retrieve(Object key) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " retrieve " + key);
-		RMBean bean = (RMBean) table.get(key);
+		T bean = table.get(key);
 		if(bean != null) {
 			mgr.enlistBean(bean);
-			bean = (RMBean) table.get(key);
+			bean = table.get(key);
 		}
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryBeanMgr " + this.getClass() + " retrieve " + bean);
 		return bean;
 	}
 
-	protected boolean update(Object key, RMBean bean) throws SandeshaStorageException {
+	protected boolean update(String key, T bean) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " update " + key + ", " + bean);
 		mgr.enlistBean(bean);
 		RMBean oldBean = (RMBean) table.put(key, bean);
@@ -97,17 +98,17 @@ abstract class InMemoryBeanMgr {
 		return true;
 	}
 
-	protected List find(RMBean matchInfo) throws SandeshaStorageException {
+	protected List<T> find(T matchInfo) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
-		ArrayList beans = new ArrayList();
+		ArrayList<T> beans = new ArrayList<T>();
 
 		if(matchInfo == null) {
 			beans.addAll(table.values());
 		} else {
-			Iterator i = table.entrySet().iterator();
+			Iterator<Entry<String, T>> i = table.entrySet().iterator();
 			while(i.hasNext()) {
-				Entry e = (Entry)i.next();
-				RMBean candidate = (RMBean)e.getValue();
+				Entry<String, T> e = i.next();
+				T candidate = e.getValue();
 				if(candidate.match(matchInfo)) {
 					mgr.enlistBean(candidate);
 					// Only return beans which are still in the table
@@ -122,17 +123,17 @@ abstract class InMemoryBeanMgr {
 		return beans;
 	}
 	
-	protected List findNoLock(RMBean matchInfo) throws SandeshaStorageException {
+	protected List<T> findNoLock(T matchInfo) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " find " + matchInfo);
-		ArrayList beans = new ArrayList();
+		ArrayList<T> beans = new ArrayList<T>();
 
 		if(matchInfo == null) {
 			beans.addAll(table.values());
 		} else {
-			Iterator i = table.entrySet().iterator();
+			Iterator<Entry<String, T>> i = table.entrySet().iterator();
 			while(i.hasNext()) {
-				Entry e = (Entry)i.next();
-				RMBean candidate = (RMBean)e.getValue();
+				Entry<String, T> e = i.next();
+				T candidate = e.getValue();
 				if(candidate.match(matchInfo)) {
 					beans.add(candidate);
 				}
@@ -142,9 +143,9 @@ abstract class InMemoryBeanMgr {
 		return beans;
 	}
 
-	protected RMBean findUnique (RMBean matchInfo) throws SandeshaStorageException {
+	protected T findUnique (T matchInfo) throws SandeshaStorageException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryBeanMgr " + this.getClass() + " findUnique " + matchInfo);
-		RMBean result = findUniqueNoLock(matchInfo);		
+		T result = findUniqueNoLock(matchInfo);		
 		// Now we have a point-in-time view of the bean, lock it, and double
 		// check that it is still in the table 
 		if(result != null) {
@@ -156,11 +157,11 @@ abstract class InMemoryBeanMgr {
 		return result;
 	}
   
-	protected RMBean findUniqueNoLock (RMBean matchInfo) throws SandeshaStorageException {
-		RMBean result = null;
-		Iterator i = table.values().iterator();
+	protected T findUniqueNoLock (RMBean matchInfo) throws SandeshaStorageException {
+		T result = null;
+		Iterator<T> i = table.values().iterator();
 		while(i.hasNext()) {
-			RMBean candidate = (RMBean)i.next();
+			T candidate = i.next();
 			if(candidate.match(matchInfo)) {
 				if(result == null) {
 					result = candidate;

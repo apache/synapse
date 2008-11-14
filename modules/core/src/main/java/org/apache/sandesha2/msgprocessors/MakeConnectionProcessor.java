@@ -116,7 +116,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			//try looking for RMD beans too
 			RMDBean finderRMD = new RMDBean();
 			finderRMD.setSecurityTokenData(data);
-			List tempList = storageManager.getRMDBeanMgr().find(finderRMD);
+			List<RMDBean> tempList = storageManager.getRMDBeanMgr().find(finderRMD);
 			
 			//combine these two into one list
 			possibleBeans.addAll(tempList);
@@ -163,10 +163,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			//finding the beans that go with the criteria of the passed SenderBean
 			//The reSend flag is ignored for this selection, so there is no need to
 			//set it.
-			Collection collection = senderBeanMgr.find(findSenderBean);
+			Collection<SenderBean> collection = senderBeanMgr.find(findSenderBean);
 			
 			//removing beans that does not pass the resend test
-			for (Iterator it=collection.iterator();it.hasNext();) {
+			for (Iterator<SenderBean> it=collection.iterator();it.hasNext();) {
 				SenderBean bean = (SenderBean) it.next();
 				if (!bean.isReSend() && bean.getSentCount()>0)
 					it.remove();
@@ -186,7 +186,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				pending = true;  //there are more than one message to be delivered using the makeConnection.
 								 //So the MessagePending header should have value true;
 			
-			Iterator it = collection.iterator();
+			Iterator<SenderBean> it = collection.iterator();
 			
 			senderBean = null;
 			for (int item=0;item<size;item++) {

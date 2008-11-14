@@ -61,7 +61,7 @@ public class TerminateManager {
 
 	private static String CLEANED_AFTER_INVOCATION = "CleanedAfterInvocation";
 
-	private static HashMap receivingSideCleanMap = new HashMap();
+	private static HashMap<String, String> receivingSideCleanMap = new HashMap<String, String>();
 
 	public static void checkAndTerminate(ConfigurationContext configurationContext, StorageManager storageManager, RMSBean rmsBean)
 	throws SandeshaStorageException, AxisFault {
@@ -85,7 +85,7 @@ public class TerminateManager {
 				findBean.setToEndpointReference(replyTo);
 
 				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-				List beans = rmdBeanMgr.find(findBean);
+				List<RMDBean> beans = rmdBeanMgr.find(findBean);
 				if(beans.isEmpty()) {
 					rmsBean.setTerminationPauserForCS(true);
 					storageManager.getRMSBeanMgr().update(rmsBean);
@@ -101,7 +101,7 @@ public class TerminateManager {
 				matcher.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 				matcher.setSequenceID(rmsBean.getSequenceID());
 				
-				List matches = storageManager.getSenderBeanMgr().find(matcher);
+				List<SenderBean> matches = storageManager.getSenderBeanMgr().find(matcher);
 				if(!matches.isEmpty()) complete = false;
 			}
 			
@@ -150,7 +150,7 @@ public class TerminateManager {
 		findAckBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		
 		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
-		Iterator ackBeans = senderBeanMgr.find(findAckBean).iterator();
+		Iterator<SenderBean> ackBeans = senderBeanMgr.find(findAckBean).iterator();
 		while (ackBeans.hasNext()) {
 			SenderBean ackBean = (SenderBean) ackBeans.next();
 			senderBeanMgr.delete(ackBean.getMessageID());
@@ -198,8 +198,8 @@ public class TerminateManager {
 		// removing InvokerBean entries
 		InvokerBean invokerFindBean = new InvokerBean();
 		invokerFindBean.setSequenceID(sequenceId);
-		Collection collection = invokerBeanMgr.find(invokerFindBean);
-		Iterator iterator = collection.iterator();
+		Collection<InvokerBean> collection = invokerBeanMgr.find(invokerFindBean);
+		Iterator<InvokerBean> iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			InvokerBean invokerBean = (InvokerBean) iterator.next();
 			String messageStoreKey = invokerBean.getMessageContextRefKey();
@@ -262,11 +262,11 @@ public class TerminateManager {
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
 		// removing retransmitterMgr entries and corresponding message contexts.
-		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
-		Iterator iterator = collection.iterator();
-		List msgsToReallocate = null;
+		Collection<SenderBean> collection = retransmitterBeanMgr.find(internalSequenceId);
+		Iterator<SenderBean> iterator = collection.iterator();
+		List<MessageContext> msgsToReallocate = null;
 		if(reallocateIfPossible){
-			msgsToReallocate = new LinkedList();
+			msgsToReallocate = new LinkedList<MessageContext>();
 		}
 		Range[] ranges = rmsBean.getClientCompletedMessages().getRanges();
 		long lastAckedMsg = -1;

@@ -44,7 +44,7 @@ public class InMemoryTransaction implements Transaction {
 
 	private InMemoryStorageManager manager;
 	private String threadName;
-	private ArrayList enlistedBeans = new ArrayList();
+	private ArrayList<RMBean> enlistedBeans = new ArrayList<RMBean>();
 	private boolean sentMessages = false;
 	private boolean active = true;
 	private Thread thread;
@@ -138,9 +138,9 @@ public class InMemoryTransaction implements Transaction {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::releaseLocks, " + this);
 		manager.removeTransaction(this);
 
-		Iterator beans = enlistedBeans.iterator();
+		Iterator<RMBean> beans = enlistedBeans.iterator();
 		while(beans.hasNext()) {
-			RMBean bean = (RMBean) beans.next();
+			RMBean bean = beans.next();
 			DummyTransaction tran = (DummyTransaction) bean.getTransaction();
 			tran.unlock();
 		}

@@ -30,13 +30,13 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 
-public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
+public class InMemoryRMSBeanMgr extends InMemoryBeanMgr<RMSBean> implements RMSBeanMgr {
 
 	private Lock lock = new ReentrantLock();
 	
-	private ConcurrentHashMap seqID2csm = new ConcurrentHashMap();
-	private ConcurrentHashMap intSeqID2csm = new ConcurrentHashMap();
-	private ConcurrentHashMap inUseSeqIDs = new ConcurrentHashMap();
+	private ConcurrentHashMap<String, String> seqID2csm = new ConcurrentHashMap<String, String>();
+	private ConcurrentHashMap<String, String> intSeqID2csm = new ConcurrentHashMap<String, String>();
+	private ConcurrentHashMap<String, String> inUseSeqIDs = new ConcurrentHashMap<String, String>();
 
 	public InMemoryRMSBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
@@ -111,7 +111,7 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 		return result;		
 	}
 
-	public List find(RMSBean bean) throws SandeshaStorageException {
+	public List<RMSBean> find(RMSBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	

@@ -225,7 +225,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	          	InvokerBean finderBean = new InvokerBean();
 	          	finderBean.setMsgNo(msgNo);
 	          	finderBean.setSequenceID(sequenceId);
-	          	List invokerBeanList = storageManager.getInvokerBeanMgr().find(finderBean);
+	          	List<InvokerBean> invokerBeanList = storageManager.getInvokerBeanMgr().find(finderBean);
 	          	if((invokerBeanList==null || invokerBeanList.size()==0) 
 	          			&& bean.getNextMsgNoToProcess()<=msgNo){
 	          		isDuplicate = false;

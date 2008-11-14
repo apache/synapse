@@ -75,9 +75,9 @@ public class Sender extends SandeshaThread {
 
 	private static int HOUSEKEEPING_INTERVAL = 20000;
 
-	private ConcurrentHashMap ackMap = new ConcurrentHashMap();
+	private ConcurrentHashMap<String, AckHolder> ackMap = new ConcurrentHashMap<String, AckHolder>();
 	
-	private ConcurrentHashMap warnedAlreadyOrphans = new ConcurrentHashMap();
+	private ConcurrentHashMap<String, Long> warnedAlreadyOrphans = new ConcurrentHashMap<String, Long>();
 
 	private static class AckHolder {
 		public long tts = 0;
@@ -109,7 +109,7 @@ public class Sender extends SandeshaThread {
 
 		try {
 			// Pick a sequence using a round-robin approach
-			ArrayList allSequencesList = getSequences();
+			ArrayList<SequenceEntry> allSequencesList = getSequences();
 			int size = allSequencesList.size();
 
 			if (log.isDebugEnabled())
@@ -343,7 +343,7 @@ public class Sender extends SandeshaThread {
 
 			if (deleteTime > 0) {
 				// Find terminated sequences.
-				List rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
+				List<RMSBean> rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
 
 				deleteRMSBeans(rmsBeans, propertyBean, deleteTime);
 
@@ -359,9 +359,9 @@ public class Sender extends SandeshaThread {
 				RMDBean finderRMDBean = new RMDBean();
 				finderRMDBean.setTerminated(true);
 
-				List rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+				List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
 
-				Iterator beans = rmdBeans.iterator();
+				Iterator<RMDBean> beans = rmdBeans.iterator();
 				while (beans.hasNext()) {
 					RMDBean rmdBean = (RMDBean) beans.next();
 
@@ -384,9 +384,9 @@ public class Sender extends SandeshaThread {
 				RMDBean finderRMDBean = new RMDBean();
 				finderRMDBean.setTerminated(false);
 
-				List rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+				List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
 
-				Iterator beans = rmdBeans.iterator();
+				Iterator<RMDBean> beans = rmdBeans.iterator();
 				while (beans.hasNext()) {
 					RMDBean rmdBean = (RMDBean) beans.next();
 
@@ -425,13 +425,13 @@ public class Sender extends SandeshaThread {
 			log.debug("Exit: Sender::deleteTerminatedSequences");
 	}
 
-	private void deleteRMSBeans(List rmsBeans, SandeshaPolicyBean propertyBean, long deleteTime)
+	private void deleteRMSBeans(List<RMSBean> rmsBeans, SandeshaPolicyBean propertyBean, long deleteTime)
 
 	throws SandeshaStorageException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::deleteRMSBeans");
 
-		Iterator beans = rmsBeans.iterator();
+		Iterator<RMSBean> beans = rmsBeans.iterator();
 
 		while (beans.hasNext()) {
 			RMSBean rmsBean = (RMSBean) beans.next();
@@ -470,8 +470,8 @@ public class Sender extends SandeshaThread {
 			finder.setTransportAvailable(true);
 			finder.setTimeToSend(System.currentTimeMillis() - Sandesha2Constants.TRANSPORT_WAIT_TIME);
 
-			List beans = manager.getSenderBeanMgr().find(finder);
-			Iterator beanIter = beans.iterator();
+			List<SenderBean> beans = manager.getSenderBeanMgr().find(finder);
+			Iterator<SenderBean> beanIter = beans.iterator();
 			while (beanIter.hasNext()) {
 				// The beans we have found are assigned to an internal sequence
 				// id, but the create
@@ -574,7 +574,7 @@ public class Sender extends SandeshaThread {
 			finder.setTransportAvailable(false);
 			finder.setTimeToSend(System.currentTimeMillis() - Sandesha2Constants.TRANSPORT_WAIT_TIME);
 
-			List beans = manager.getSenderBeanMgr().find(finder);
+			List<SenderBean> beans = manager.getSenderBeanMgr().find(finder);
 			
 			//Commit this transaction
 			tran.commit();
@@ -582,7 +582,7 @@ public class Sender extends SandeshaThread {
 			// Create a new transaction
 			tran = manager.getTransaction();
 
-			Iterator beanIter = beans.iterator();
+			Iterator<SenderBean> beanIter = beans.iterator();
 			while (beanIter.hasNext()) {
 				SenderBean bean = (SenderBean) beanIter.next();
 
@@ -637,7 +637,7 @@ public class Sender extends SandeshaThread {
 				if( warnedAlreadyOrphans.size() > 1000 || currentTime > (lastRanCleanup + 600000)){
 					if(log.isDebugEnabled()) log.debug("Sender::checkForOrphanMessages.  Cleaning up list of orphans");
 					long timeAnHourAgo = currentTime - 3600000; 
-					Iterator it = warnedAlreadyOrphans.keySet().iterator();
+					Iterator<String> it = warnedAlreadyOrphans.keySet().iterator();
 					while(it.hasNext()){
 						Object key = it.next();
 						long ageOfThisOrphan = ((Long)warnedAlreadyOrphans.get(key)).longValue();

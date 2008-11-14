@@ -47,7 +47,7 @@ public class SandeshaPolicyBean implements Assertion {
     boolean inOrder = true;
     private boolean inOrderSet = false;
     
-    ArrayList msgTypesToDrop = null;
+    ArrayList<Integer> msgTypesToDrop = null;
 
     private String inMemoryStorageManagerClass = null;
 
@@ -174,11 +174,11 @@ public class SandeshaPolicyBean implements Assertion {
         setInOrderSet(true);
     }
 
-    public ArrayList getMsgTypesToDrop() {
+    public ArrayList<Integer> getMsgTypesToDrop() {
         return msgTypesToDrop;
     }
 
-    public void setMsgTypesToDrop(ArrayList msgTypesToDrop) {
+    public void setMsgTypesToDrop(ArrayList<Integer> msgTypesToDrop) {
         this.msgTypesToDrop = msgTypesToDrop;
     }
 
@@ -186,7 +186,7 @@ public class SandeshaPolicyBean implements Assertion {
 
         if (typeNo != null) {
             if (msgTypesToDrop == null)
-                msgTypesToDrop = new ArrayList();
+                msgTypesToDrop = new ArrayList<Integer>();
 
             msgTypesToDrop.add(typeNo);
         }

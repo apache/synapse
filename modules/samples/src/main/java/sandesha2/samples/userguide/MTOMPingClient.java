@@ -45,7 +45,6 @@ public class MTOMPingClient {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
 	private static final String MTOMPing = "MTOMPing";
-	private static final String Text = "Text";
 	
 	private String toIP = "127.0.0.1";
 	

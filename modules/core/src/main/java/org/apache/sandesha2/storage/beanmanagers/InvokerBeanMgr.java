@@ -37,7 +37,7 @@ public interface InvokerBeanMgr extends RMBeanManager {
 
 	public InvokerBean retrieve(String key) throws SandeshaStorageException;
 
-	public List find(InvokerBean bean) throws SandeshaStorageException;
+	public List<InvokerBean> find(InvokerBean bean) throws SandeshaStorageException;
 
 	public InvokerBean findUnique (InvokerBean bean) throws SandeshaException;
 	

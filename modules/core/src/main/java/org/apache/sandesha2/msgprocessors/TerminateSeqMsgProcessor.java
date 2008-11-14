@@ -332,7 +332,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 					sequenceId,	storageManager, true);
 			
 			// copy over the ack parts
-			Iterator iter = ackRMMessage.getSequenceAcknowledgements();
+			Iterator<SequenceAcknowledgement> iter = ackRMMessage.getSequenceAcknowledgements();
 			while (iter.hasNext()) {
 				SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
 				terminateSeqResponseRMMsg.addSequenceAcknowledgement(seqAck);

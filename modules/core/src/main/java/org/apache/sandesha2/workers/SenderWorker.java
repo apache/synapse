@@ -67,6 +67,7 @@ import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class SenderWorker extends SandeshaWorker implements Runnable {
@@ -161,7 +162,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 			// operation is the lowest level Sandesha2 should be attached
-			ArrayList msgsNotToSend = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation()).getMsgTypesToDrop();
+			ArrayList<Integer> msgsNotToSend = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation()).getMsgTypesToDrop();
 
 			if (msgsNotToSend != null && msgsNotToSend.contains(new Integer(rmMsgCtx.getMessageType()))) {
 				if (log.isDebugEnabled())
@@ -468,7 +469,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// The only time that we can have a message of this type is when we are sending a
 			// stand-alone ack request, and in that case we only expect to find a single ack
 			// request header in the message.
-			Iterator ackRequests = rmMsgContext.getAckRequests();
+			Iterator<AckRequested> ackRequests = rmMsgContext.getAckRequests();
 			AckRequested ackRequest = (AckRequested) ackRequests.next(); 
 			if (ackRequests.hasNext()) {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
@@ -481,7 +482,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		//if this is an sync WSRM 1.0 case we always have to add an ack
 		boolean ackPresent = false;
-		Iterator it = rmMsgContext.getSequenceAcknowledgements();
+		Iterator<SequenceAcknowledgement> it = rmMsgContext.getSequenceAcknowledgements();
 		if (it.hasNext()) 
 			ackPresent = true;
 		
@@ -687,8 +688,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setSoapAction("");
 			}
 
-	        InvocationResponse response = null;
-	        
 			if (resenvelope!=null) {
 				//Drive the response msg through the engine
 				//disable addressing validation - this is an inbound response msg so we do not want addressing to validate replyTo
@@ -697,7 +696,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					log.debug("SenderWorker::disable addressing inbound checks, driving response through axis engine " + responseMessageContext);
 				
 				responseMessageContext.setProperty(AddressingConstants.ADDR_VALIDATE_INVOCATION_PATTERN, Boolean.FALSE);
-				response = AxisEngine.receive(responseMessageContext);
+				InvocationResponse response = AxisEngine.receive(responseMessageContext);
 			}
 
 		} catch (Exception e) {

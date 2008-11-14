@@ -47,8 +47,8 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 public class SequenceAcknowledgement implements RMHeaderPart {
 	
 	private Identifier identifier;
-	private ArrayList acknowledgementRangeList;
-	private ArrayList nackList;
+	private ArrayList<Range> acknowledgementRangeList;
+	private ArrayList<Long> nackList;
 	private String namespaceValue = null;
 	private OMNamespace omNamespace = null;
 	private boolean ackNone = false;
@@ -63,8 +63,8 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		}else{
 			omNamespace = Sandesha2Constants.SPEC_2007_02.OM_NS_URI;
 		}
-		acknowledgementRangeList = new ArrayList();
-		nackList = new ArrayList();
+		acknowledgementRangeList = new ArrayList<Range>();
+		nackList = new ArrayList<Long>();
 	}
 
 	public String getNamespaceValue() {
@@ -140,7 +140,7 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		this.identifier = identifier;
 	}
 
-	public void setAckRanges(ArrayList acknowledgementRagngesList) {
+	public void setAckRanges(ArrayList<Range> acknowledgementRagngesList) {
 		acknowledgementRangeList = acknowledgementRagngesList;
 	}
 
@@ -159,11 +159,11 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		return identifier;
 	}
 
-	public List getAcknowledgementRanges() {
+	public List<Range> getAcknowledgementRanges() {
 		return acknowledgementRangeList;
 	}
 
-	public List getNackList() {
+	public List<Long> getNackList() {
 		return nackList;
 	}
 
@@ -201,7 +201,7 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
 		identifier.toOMElement(sequenceAcknowledgementHeaderBlock, omNamespace);
 
-		Iterator ackRangeIt = acknowledgementRangeList.iterator();
+		Iterator<Range> ackRangeIt = acknowledgementRangeList.iterator();
 		while (ackRangeIt.hasNext()) {
 			Range ackRange = (Range) ackRangeIt.next();
 			
@@ -225,7 +225,7 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 			sequenceAcknowledgementHeaderBlock.addChild(acknowledgementRangeElement);
 		}
 
-		Iterator nackIt = nackList.iterator();
+		Iterator<Long> nackIt = nackList.iterator();
 		while (nackIt.hasNext()) {
 			Long nack = (Long) nackIt.next();
 			

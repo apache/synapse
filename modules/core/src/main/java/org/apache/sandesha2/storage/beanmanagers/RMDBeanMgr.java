@@ -37,7 +37,7 @@ public interface RMDBeanMgr extends RMBeanManager {
 
 	public boolean insert(RMDBean bean) throws SandeshaStorageException;
 
-	public List find(RMDBean bean) throws SandeshaStorageException;
+	public List<RMDBean> find(RMDBean bean) throws SandeshaStorageException;
 
 	public boolean update(RMDBean bean) throws SandeshaStorageException;
 	

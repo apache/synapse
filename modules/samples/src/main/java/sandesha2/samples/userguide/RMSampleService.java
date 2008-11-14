@@ -35,7 +35,7 @@ import org.apache.axis2.AxisFault;
 
 public class RMSampleService {
 
-	private static Map sequenceStrings = new HashMap();  //TODO make this non static
+	private static Map<String, String> sequenceStrings = new HashMap<String, String>();  //TODO make this non static
 	private final String applicationNamespaceName = "http://tempuri.org/"; 
 	private final String Text = "Text";
 	private final String Sequence = "Sequence";

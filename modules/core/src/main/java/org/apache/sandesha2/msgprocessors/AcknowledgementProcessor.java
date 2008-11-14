@@ -65,7 +65,7 @@ public class AcknowledgementProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeaders");
 
-		Iterator iter = message.getSequenceAcknowledgements();
+		Iterator<SequenceAcknowledgement> iter = message.getSequenceAcknowledgements();
 		while(iter.hasNext()){
 			SequenceAcknowledgement sa = (SequenceAcknowledgement)iter.next();
 			processAckHeader(message, sa.getOriginalSequenceAckElement(), sa);
@@ -123,7 +123,7 @@ public class AcknowledgementProcessor {
 		SandeshaUtil.assertProofOfPossession(rmsBean, msgCtx, soapHeader);
 
 		if(log.isDebugEnabled()) log.debug("Got Ack for RM Sequence: " + outSequenceId + ", internalSeqId: " + internalSequenceId);
-		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
+		Iterator<Range> ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
 
 		if (FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, sequenceAck, storageManager, rmsBean, piggybackedAck)) {
 			if (log.isDebugEnabled())
@@ -134,8 +134,6 @@ public class AcknowledgementProcessor {
 		EndpointReference replyTo = rmsBean.getReplyToEndpointReference();
 		boolean anonReplyTo = replyTo==null || replyTo.isWSAddressingAnonymous(); //if this is wsa anonymous
 																				//then we might be using replay
-
-		String rmVersion = rmMsgCtx.getRMSpecVersion();
 
 		// Compare the clientCompletedMessages with the range we just got, to work out if there
 		// is any new information in this ack message

@@ -65,9 +65,9 @@ public class InMemoryStorageManager extends StorageManager {
     private InvokerBeanMgr invokerBeanMgr = null;
     private Sender sender = null;
     private PollingManager pollingManager = null;
-    private ConcurrentHashMap transactions = new ConcurrentHashMap();
+    private ConcurrentHashMap<Thread, InMemoryTransaction> transactions = new ConcurrentHashMap<Thread, InMemoryTransaction>();
     private boolean useSerialization = false;
-    private ConcurrentHashMap storageMap = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, Object> storageMap = new ConcurrentHashMap<String, Object>();
     
 	public InMemoryStorageManager(ConfigurationContext context)
 	throws SandeshaException

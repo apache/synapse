@@ -110,7 +110,7 @@ public class RMAssertionBuilder implements AssertionBuilder {
                 propertyBean.setMaximumRetransmissionCount (Integer.parseInt(element.getText().trim()));
             }   else if (Sandesha2Constants.Assertions.ELEM_MSG_TYPES_TO_DROP
                     .equals(name)) {
-            	ArrayList types = new ArrayList ();
+            	ArrayList<Integer> types = new ArrayList<Integer>();
             	String str = element.getText().trim();
             	String[] items  = str.split(Sandesha2Constants.LIST_SEPERATOR);
             	if (items!=null) {

@@ -29,7 +29,7 @@ import org.apache.sandesha2.util.LoggingControl;
 public class WorkerLock {
 
   static final Log log = LogFactory.getLog(WorkerLock.class);
-  private ConcurrentHashMap locks = new ConcurrentHashMap();
+  private ConcurrentHashMap<String, Holder> locks = new ConcurrentHashMap<String, Holder>();
   
   public WorkerLock () {
   }

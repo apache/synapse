@@ -27,14 +27,13 @@ import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.LoggingControl;
 
 
-public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBeanMgr {
+public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr<InvokerBean> implements InvokerBeanMgr {
 	
 	private static final Log log = LogFactory.getLog(InMemoryInvokerBeanMgr.class);
 
@@ -73,7 +72,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		return (InvokerBean) super.retrieve(key);
 	}
 
-	public List find(InvokerBean bean) throws SandeshaStorageException {
+	public List<InvokerBean> find(InvokerBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	
@@ -81,7 +80,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		return super.update(bean.getMessageContextRefKey(), bean);
 	}
 	
-	public InvokerBean findUnique(InvokerBean bean) throws SandeshaException {
+	public InvokerBean findUnique(InvokerBean bean) throws SandeshaStorageException {
 		return (InvokerBean) super.findUnique(bean);
 	}
 

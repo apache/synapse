@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 public class RangeString implements Serializable{
 
 	private static final long serialVersionUID = -3487094584241136861L;
-	private final SortedMap rangeMap;
+	private final SortedMap<Long, Range> rangeMap;
 	
 	/**
 	 * Creates an empty range string
@@ -57,7 +57,7 @@ public class RangeString implements Serializable{
 	 */
 	public RangeString(String s){
 
-		rangeMap = new TreeMap();
+		rangeMap = new TreeMap<Long, Range>();
 
 		if(s!=null && !s.equals("")){
 			//Walk the string building range objects as we go, and
@@ -73,11 +73,11 @@ public class RangeString implements Serializable{
 	}
 	
 	public RangeString(RangeString rs){
-		rangeMap = new TreeMap();
-		Iterator iter = rs.rangeMap.entrySet().iterator(); 
+		rangeMap = new TreeMap<Long, Range>();
+		Iterator<Entry<Long, Range>> iter = rs.rangeMap.entrySet().iterator(); 
 		while(iter.hasNext()){
-			Entry e = (Entry)iter.next(); // Long, Range
-			Range sr = (Range)e.getValue();
+			Entry<Long, Range> e = iter.next(); // Long, Range
+			Range sr = e.getValue();
 			rangeMap.put(e.getKey(), new Range(sr.lowerValue, sr.upperValue));
 		}
 	}
@@ -93,7 +93,7 @@ public class RangeString implements Serializable{
 		else{
 			//start at the specified index and work down the list of ranges
 			//utill we find one
-			Iterator iterator = rangeMap.keySet().iterator();
+			Iterator<Long> iterator = rangeMap.keySet().iterator();
 			
 			while (iterator.hasNext()) {
 				long key = ((Long)iterator.next()).longValue();
@@ -222,8 +222,8 @@ public class RangeString implements Serializable{
 //		for(int i=0; i<sortedList.size(); i++){
 //			returnString = returnString + (rangeMap.get(sortedList.get(i))).toString();
 //		}
-		for(Iterator iter = rangeMap.entrySet().iterator();iter.hasNext();){
-			Entry e = (Entry)iter.next();
+		for(Iterator<Entry<Long, Range>> iter = rangeMap.entrySet().iterator();iter.hasNext();){
+			Entry<Long, Range> e = iter.next();
 			returnString = returnString + e.getValue();
 		}
 		
@@ -234,11 +234,11 @@ public class RangeString implements Serializable{
 	 * @return ordered array of each range object in the string 
 	 */
 	public Range[] getRanges(){
-		Set entrySet = rangeMap.entrySet();
+		Set<Entry<Long, Range>> entrySet = rangeMap.entrySet();
 		Range[] ranges = new Range[entrySet.size()];
 		int i=0;
-		for(Iterator iter = entrySet.iterator();iter.hasNext();){
-			ranges[i] = (Range)((Entry)iter.next()).getValue();
+		for(Iterator<Entry<Long, Range>> iter = entrySet.iterator();iter.hasNext();){
+			ranges[i] = iter.next().getValue();
 			i++;
 		}
 		return ranges;
@@ -250,8 +250,8 @@ public class RangeString implements Serializable{
 	 * in order
 	 * NOTE: inefficient, should be avoided
 	 */
-	public List getContainedElementsAsNumbersList(){
-		List returnList = new LinkedList();
+	public List<Long> getContainedElementsAsNumbersList(){
+		List<Long> returnList = new LinkedList<Long>();
 		Range[] ranges = getRanges();
 		for(int i=0; i<ranges.length; i++){
 			for(long current = ranges[i].lowerValue; current<=ranges[i].upperValue; current++){

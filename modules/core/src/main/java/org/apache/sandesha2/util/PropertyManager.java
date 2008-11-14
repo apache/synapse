@@ -410,9 +410,9 @@ public class PropertyManager {
 				&& !Sandesha2Constants.VALUE_NONE.equals(messageTypesToDrop)) {
 			messageTypesToDrop = messageTypesToDrop.trim();
 			messageTypesToDrop = "[" + messageTypesToDrop + "]";
-			ArrayList messageTypesLst = SandeshaUtil.getArrayListFromString(messageTypesToDrop);
+			ArrayList<String> messageTypesLst = SandeshaUtil.getArrayListFromString(messageTypesToDrop);
 
-			Iterator itr = messageTypesLst.iterator();
+			Iterator<String> itr = messageTypesLst.iterator();
 			while (itr.hasNext()) {
 				String typeStr = (String) itr.next();
 				Integer typeNo = new Integer(typeStr);

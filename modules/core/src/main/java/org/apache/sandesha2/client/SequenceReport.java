@@ -44,11 +44,11 @@ public class SequenceReport {
 	private byte sequenceDirection = SEQUENCE_DIRECTION_UNKNOWN;
 	private String sequenceID = null;
 	private String internalSequenceID = null;   //only for outgoing sequences
-	private ArrayList completedMessages = null; //no of messages acked (both for incoming and outgoing)
+	private ArrayList<Long> completedMessages = null; //no of messages acked (both for incoming and outgoing)
 	private boolean secureSequence = false;
 	
 	public SequenceReport () {
-		completedMessages = new ArrayList ();
+		completedMessages = new ArrayList<Long>();
 	}
 	
 	public void setSequenceStatus (byte sequenceStatus) {
@@ -79,7 +79,7 @@ public class SequenceReport {
 		this.sequenceID = sequenceID;
 	}
 	
-	public List getCompletedMessages () {
+	public List<Long> getCompletedMessages () {
 		return completedMessages;
 	}
 
@@ -87,7 +87,7 @@ public class SequenceReport {
 		completedMessages.add(messageNo);
 	}
 	
-	public void setCompletedMessages (ArrayList completedMessages) {
+	public void setCompletedMessages (ArrayList<Long> completedMessages) {
 		this.completedMessages = completedMessages;
 	}
 

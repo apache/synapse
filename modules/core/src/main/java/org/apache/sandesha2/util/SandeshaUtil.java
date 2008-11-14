@@ -133,9 +133,9 @@ public class SandeshaUtil {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static ArrayList getAckRangeArrayList(RangeString completedMessageRanges, String rmNamespaceValue) {
+	public static ArrayList<Range> getAckRangeArrayList(RangeString completedMessageRanges, String rmNamespaceValue) {
 
-		ArrayList ackRanges = new ArrayList(); //the final ack ranges that we will build up
+		ArrayList<Range> ackRanges = new ArrayList<Range>(); //the final ack ranges that we will build up
 
 		Range[] ranges = completedMessageRanges.getRanges();
 		for(int i=0; i<ranges.length; i++){
@@ -552,10 +552,10 @@ public class SandeshaUtil {
 	}
 
 	//TODO change this method.
-	public static ArrayList getArrayListFromString(String str) {
+	public static ArrayList<String> getArrayListFromString(String str) {
 
 		if (str == null || "".equals(str))
-			return new ArrayList();
+			return new ArrayList<String>();
 
 		if (str.length() < 2) {
 			String message = SandeshaMessageHelper.getMessage(
@@ -576,7 +576,7 @@ public class SandeshaUtil {
 			throw new IllegalArgumentException(message);
 		}
 
-		ArrayList retArr = new ArrayList();
+		ArrayList<String> retArr = new ArrayList<String>();
 
 		String subStr = str.substring(1, length - 1);
 
@@ -647,8 +647,8 @@ public class SandeshaUtil {
 		return sequeunceID;
 	}
 
-	public static String getExecutionChainString(ArrayList executionChain) {
-		Iterator iter = executionChain.iterator();
+	public static String getExecutionChainString(ArrayList<Handler> executionChain) {
+		Iterator<Handler> iter = executionChain.iterator();
 
 		String executionChainStr = "";
 		while (iter.hasNext()) {
@@ -709,7 +709,7 @@ public class SandeshaUtil {
 			Sequence sequence = rmMessageContext.getSequence();
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK) {
-			Iterator sequenceAckIter = rmMessageContext
+			Iterator<SequenceAcknowledgement> sequenceAckIter = rmMessageContext
 					.getSequenceAcknowledgements();
 			
 			//In case of ack messages sequenceId is decided based on the sequenceId of the first 
@@ -719,7 +719,7 @@ public class SandeshaUtil {
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
 			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
-			Iterator ackRequestIter = rmMessageContext
+			Iterator<AckRequested> ackRequestIter = rmMessageContext
 					.getAckRequests();
 	
 			//In case of ack request messages sequenceId is decided based on the sequenceId of the first 
@@ -969,12 +969,12 @@ public class SandeshaUtil {
 		if (!(transportOutDescription instanceof Sandesha2TransportOutDesc))
 			return; //This message is aimed to be stored only if, Sandesha2TransportOutDescription is set.
 		
-		ArrayList executionChain = message.getExecutionChain();
-		ArrayList retransmittablePhases = new ArrayList ();
+		List<Handler> executionChain = message.getExecutionChain();
+		ArrayList<Handler> retransmittablePhases = new ArrayList<Handler>();
 		
 		int executionChainLength = executionChain.size();
 		for(int i=0;i<executionChainLength;i++){
-			Handler handler = (Handler)executionChain.get(i);
+			Handler handler = executionChain.get(i);
 			if("Security".equals(handler.getName())){
 				retransmittablePhases.add(handler);
 			}
@@ -1030,7 +1030,7 @@ public class SandeshaUtil {
 		return targetEnv;
 	}
 	
-	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, List msgsToSend)throws AxisFault{
+	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, List<MessageContext> msgsToSend)throws AxisFault{
 	    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 	        log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");
 	    
@@ -1056,7 +1056,7 @@ public class SandeshaUtil {
       	options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
       	
         //send the msgs - this will setup a new sequence to the same endpoint
-      	Iterator it = msgsToSend.iterator();
+      	Iterator<MessageContext> it = msgsToSend.iterator();
       	while(it.hasNext()){
       		MessageContext msgCtx = (MessageContext)it.next();
       		client.getOptions().setAction(msgCtx.getWSAAction());

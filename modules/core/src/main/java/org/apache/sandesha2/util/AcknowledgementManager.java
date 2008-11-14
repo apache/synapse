@@ -122,8 +122,8 @@ public class AcknowledgementManager {
 				RMDBean findRMDBean = new RMDBean();
 				findRMDBean.setAcksToEndpointReference(target);
 				findRMDBean.setTerminated(false);
-				Collection rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
-				Iterator sequences = rmdBeans.iterator();
+				Collection<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
+				Iterator<RMDBean> sequences = rmdBeans.iterator();
 				while (sequences.hasNext()) {
 					RMDBean sequence = (RMDBean) sequences.next();
 					if (SandeshaUtil.hasReferenceParameters(sequence.getAcksToEndpointReference())) {
@@ -268,8 +268,8 @@ public class AcknowledgementManager {
 		findBean.setSend(true);
 		findBean.setReSend(false);
 		findBean.setSequenceID(sequenceId);
-		Collection coll = retransmitterBeanMgr.find(findBean);
-		Iterator it = coll.iterator();
+		Collection<SenderBean> coll = retransmitterBeanMgr.find(findBean);
+		Iterator<SenderBean> it = coll.iterator();
 
 		while (it.hasNext()) {
 			SenderBean oldAckBean = (SenderBean) it.next();

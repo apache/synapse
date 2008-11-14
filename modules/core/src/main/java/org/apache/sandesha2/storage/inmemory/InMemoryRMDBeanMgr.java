@@ -24,12 +24,11 @@ import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 
-public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
+public class InMemoryRMDBeanMgr extends InMemoryBeanMgr<RMDBean> implements RMDBeanMgr {
 
 	public InMemoryRMDBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);
@@ -48,7 +47,7 @@ public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 		return super.insert(bean.getSequenceID(), bean);
 	}
 
-	public List find(RMDBean bean) throws SandeshaStorageException {
+	public List<RMDBean> find(RMDBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	
@@ -56,11 +55,11 @@ public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 		return super.update(bean.getSequenceID(), bean);
 	}
 
-	public Collection retrieveAll() throws SandeshaStorageException {
+	public Collection<RMDBean> retrieveAll() throws SandeshaStorageException {
 		return super.find(null);
 	}
 	
-	public RMDBean findUnique(RMDBean bean) throws SandeshaException {
+	public RMDBean findUnique(RMDBean bean) throws SandeshaStorageException {
 		return (RMDBean) super.findUnique(bean);
 	}
 }

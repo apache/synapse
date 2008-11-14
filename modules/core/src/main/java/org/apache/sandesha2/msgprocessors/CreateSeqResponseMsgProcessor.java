@@ -247,7 +247,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			target.setInternalSequenceID(internalSequenceId);
 			target.setSend(false);
 			
-			Iterator iterator = retransmitterMgr.find(target).iterator();
+			Iterator<SenderBean> iterator = retransmitterMgr.find(target).iterator();
 			while (iterator.hasNext()) {
 				SenderBean tempBean = (SenderBean) iterator.next();
 	

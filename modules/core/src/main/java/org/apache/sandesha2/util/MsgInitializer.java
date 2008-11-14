@@ -82,9 +82,9 @@ public class MsgInitializer {
 		CreateSequenceResponse createSequenceResponse = rmMsgContext.getCreateSequenceResponse();
 		TerminateSequence terminateSequence = rmMsgContext.getTerminateSequence();
 		TerminateSequenceResponse terminateSequenceResponse = rmMsgContext.getTerminateSequenceResponse();
-		Iterator sequenceAcknowledgementsIter = rmMsgContext.getSequenceAcknowledgements();
+		Iterator<SequenceAcknowledgement> sequenceAcknowledgementsIter = rmMsgContext.getSequenceAcknowledgements();
 		Sequence sequence = rmMsgContext.getSequence();
-		Iterator ackRequestedIter = rmMsgContext.getAckRequests();
+		Iterator<AckRequested> ackRequestedIter = rmMsgContext.getAckRequests();
 		CloseSequence closeSequence = rmMsgContext.getCloseSequence();
 		CloseSequenceResponse closeSequenceResponse = rmMsgContext.getCloseSequenceResponse();
 		MakeConnection makeConnection = rmMsgContext.getMakeConnection();

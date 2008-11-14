@@ -31,18 +31,18 @@ import java.util.List;
  */
 public class SandeshaReport {
 	
-	private ArrayList incomingSequenceList = null;
-	private ArrayList outgoingSequenceList = null;
-	private HashMap sequenceStatusMap = null;
-	private HashMap noOfCompletedMessagesMap = null;
-	private HashMap outgoingInternalSequenceIDMap = null;
+	private ArrayList<String> incomingSequenceList = null;
+	private ArrayList<String> outgoingSequenceList = null;
+	private HashMap<String, Byte> sequenceStatusMap = null;
+	private HashMap<String, Long> noOfCompletedMessagesMap = null;
+	private HashMap<String, String> outgoingInternalSequenceIDMap = null;
 	
 	public SandeshaReport () {
-		incomingSequenceList = new ArrayList ();
-		outgoingSequenceList = new ArrayList ();
-		sequenceStatusMap = new HashMap ();
-		noOfCompletedMessagesMap = new HashMap ();
-		outgoingInternalSequenceIDMap = new HashMap ();
+		incomingSequenceList = new ArrayList<String>();
+		outgoingSequenceList = new ArrayList<String>();
+		sequenceStatusMap = new HashMap<String, Byte>();
+		noOfCompletedMessagesMap = new HashMap<String, Long>();
+		outgoingInternalSequenceIDMap = new HashMap<String, String>();
 	}
 
 	public long getCompletedMessagesCount(String sequenceID) {
@@ -58,7 +58,7 @@ public class SandeshaReport {
 	 * 
 	 * @return A list of Strings. Each giving the SequenceID of an Incoming Sequence.
 	 */
-	public List getIncomingSequenceList() {
+	public List<String> getIncomingSequenceList() {
 		return incomingSequenceList;
 	}
 
@@ -67,7 +67,7 @@ public class SandeshaReport {
 	 * 
 	 * @return A list of Strings. Each giving the SequenceID of an Outgoing Sequence.
 	 */
-	public List getOutgoingSequenceList() {
+	public List<String> getOutgoingSequenceList() {
 		return outgoingSequenceList;
 	}
 

@@ -69,7 +69,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
 		boolean msgCtxPaused = false;
-		Iterator ackRequests = message.getAckRequests();
+		Iterator<AckRequested> ackRequests = message.getAckRequests();
 		while(ackRequests.hasNext()){
 			AckRequested ackReq = (AckRequested)ackRequests.next();
 			boolean paused = processAckRequestedHeader(message, ackReq.getOriginalAckRequestedElement(), ackReq);
@@ -234,8 +234,8 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			// removing old acks.
 			SenderBean findBean = new SenderBean();
 			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			Collection coll = senderBeanMgr.find(findBean);
-			Iterator it = coll.iterator();
+			Collection<SenderBean> coll = senderBeanMgr.find(findBean);
+			Iterator<SenderBean> it = coll.iterator();
 
 			if (it.hasNext()) {
 				SenderBean oldAckBean = (SenderBean) it.next();
@@ -290,7 +290,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		getConfigurationContext().registerOperationContext(ackRequestRMMsg.getMessageId(), opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		
-		Iterator iterator = ackRequestRMMsg.getAckRequests();
+		Iterator<AckRequested> iterator = ackRequestRMMsg.getAckRequests();
 		
 		AckRequested ackRequested = null;
 		while (iterator.hasNext()) {

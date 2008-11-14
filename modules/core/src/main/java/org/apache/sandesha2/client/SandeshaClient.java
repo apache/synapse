@@ -199,9 +199,9 @@ public class SandeshaClient {
 			StorageManager storageManager) {
 		report.setSequenceID(rmsBean.getSequenceID());
 
-		List completedMessageList = rmsBean.getClientCompletedMessages().getContainedElementsAsNumbersList();
+		List<Long> completedMessageList = rmsBean.getClientCompletedMessages().getContainedElementsAsNumbersList();
 
-		Iterator iter = completedMessageList.iterator();
+		Iterator<Long> iter = completedMessageList.iterator();
 		while (iter.hasNext()) {
 			report.addCompletedMessage((Long)iter.next());
 		}
@@ -217,13 +217,13 @@ public class SandeshaClient {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static List getIncomingSequenceReports(ConfigurationContext configCtx) throws SandeshaException {
+	public static List<SequenceReport> getIncomingSequenceReports(ConfigurationContext configCtx) throws SandeshaException {
 
 		SandeshaReport report = getSandeshaReport(configCtx);
-		List incomingSequenceIDs = report.getIncomingSequenceList();
-		Iterator incomingSequenceIDIter = incomingSequenceIDs.iterator();
+		List<String> incomingSequenceIDs = report.getIncomingSequenceList();
+		Iterator<String> incomingSequenceIDIter = incomingSequenceIDs.iterator();
 
-		ArrayList incomingSequenceReports = new ArrayList();
+		ArrayList<SequenceReport> incomingSequenceReports = new ArrayList<SequenceReport>();
 
 		while (incomingSequenceIDIter.hasNext()) {
 			String sequenceID = (String) incomingSequenceIDIter.next();
@@ -257,8 +257,8 @@ public class SandeshaClient {
 		try {
 			reportTransaction = storageManager.getTransaction();
 
-			List rmsBeans = storageManager.getRMSBeanMgr().find(null);
-			Iterator iterator = rmsBeans.iterator();
+			List<RMSBean> rmsBeans = storageManager.getRMSBeanMgr().find(null);
+			Iterator<RMSBean> iterator = rmsBeans.iterator();
 			while (iterator.hasNext()) {
 				RMSBean bean = (RMSBean) iterator.next();
 				String sequenceID = bean.getSequenceID();
@@ -272,9 +272,9 @@ public class SandeshaClient {
 			}
 
 			// incoming sequences
-			Collection rmdBeans = storageManager.getRMDBeanMgr().find(null);
+			Collection<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(null);
 
-			Iterator iter = rmdBeans.iterator();
+			Iterator<RMDBean> iter = rmdBeans.iterator();
 			while (iter.hasNext()) {
 				RMDBean serverCompletedMsgsBean = (RMDBean) iter.next();
 				String sequenceID = serverCompletedMsgsBean.getSequenceID();
@@ -1079,9 +1079,9 @@ public class SandeshaClient {
 
 			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
 
-			List completedMessageList = rmdBean.getServerCompletedMessages().getContainedElementsAsNumbersList();
+			List<Long> completedMessageList = rmdBean.getServerCompletedMessages().getContainedElementsAsNumbersList();
 			
-			Iterator iter = completedMessageList.iterator();
+			Iterator<Long> iter = completedMessageList.iterator();
 			while (iter.hasNext()) {
 				sequenceReport.addCompletedMessage((Long) iter.next());
 			}

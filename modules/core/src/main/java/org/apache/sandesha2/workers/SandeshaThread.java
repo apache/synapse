@@ -49,7 +49,7 @@ public abstract class SandeshaThread extends Thread{
 	private int sleepTime;
     private WorkerLock lock = null;
 
-	private ArrayList workingSequences = new ArrayList();
+	private ArrayList<SequenceEntry> workingSequences = new ArrayList<SequenceEntry>();
 	
 	protected transient ThreadFactory threadPool;
 	protected ConfigurationContext context = null;
@@ -179,7 +179,7 @@ public abstract class SandeshaThread extends Thread{
 			
 			// Set the SandeshaThread to have the same context classloader as the application
 			try{
-				AccessController.doPrivileged(new PrivilegedExceptionAction() {
+				AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
 					public Object run() throws Exception {
 						SandeshaThread.this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
 						return null;
@@ -206,9 +206,9 @@ public abstract class SandeshaThread extends Thread{
 	 * 
 	 * @return a List of SequenceEntry instances
 	 */
-	public synchronized ArrayList getSequences() {
+	public synchronized ArrayList<SequenceEntry> getSequences() {
 		// Need to copy the list for thread safety
-		ArrayList result = new ArrayList();
+		ArrayList<SequenceEntry> result = new ArrayList<SequenceEntry>();
 		result.addAll(workingSequences);
 		return result;
 	}

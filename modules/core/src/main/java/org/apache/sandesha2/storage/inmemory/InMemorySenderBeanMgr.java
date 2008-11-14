@@ -27,7 +27,6 @@ import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -35,11 +34,11 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.LoggingControl;
 
-public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBeanMgr {
+public class InMemorySenderBeanMgr extends InMemoryBeanMgr<SenderBean> implements SenderBeanMgr {
 	
 	private static final Log log = LogFactory.getLog(InMemorySenderBeanMgr.class);
 
-	ConcurrentHashMap sequenceIdandMessNum2MessageId = new ConcurrentHashMap();
+	ConcurrentHashMap<String, String> sequenceIdandMessNum2MessageId = new ConcurrentHashMap<String, String>();
 
 	public InMemorySenderBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.RETRANSMITTER);
@@ -79,13 +78,13 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return result;
 	}
 
-	public List find(String internalSequenceID) throws SandeshaStorageException {
+	public List<SenderBean> find(String internalSequenceID) throws SandeshaStorageException {
 		SenderBean temp = new SenderBean();
 		temp.setInternalSequenceID(internalSequenceID);
 		return super.find(temp);
 	}
 	
-	public List find(SenderBean bean) throws SandeshaStorageException {
+	public List<SenderBean> find(SenderBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 
@@ -99,12 +98,12 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		matcher.setTimeToSend(System.currentTimeMillis());
 		matcher.setTransportAvailable(true);
 		
-		List matches = super.findNoLock(matcher);
+		List<SenderBean> matches = super.findNoLock(matcher);
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Found " + matches.size() + " messages");
 		
 		// Look for the message with the lowest send time, and send that one.
 		SenderBean result = null;
-		Iterator i = matches.iterator();
+		Iterator<SenderBean> i = matches.iterator();
 		while(i.hasNext()) {
 			SenderBean bean = (SenderBean) i.next();
 			if (bean.getTimeToSend()<0)
@@ -145,8 +144,8 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return result;
 	}
 	
-	public SenderBean findUnique(SenderBean bean) throws SandeshaException {
-		return (SenderBean) super.findUnique(bean);
+	public SenderBean findUnique(SenderBean bean) throws SandeshaStorageException {
+		return super.findUnique(bean);
 	}
 
 	public SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {

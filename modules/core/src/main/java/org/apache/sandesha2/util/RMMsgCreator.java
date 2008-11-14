@@ -498,7 +498,7 @@ public class RMMsgCreator {
 		
 		String rmVersion = rmdBean.getRMVersion();
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
+		ArrayList<Range> ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
 		if(ackRangeArrayList!=null && ackRangeArrayList.size()!=0){
 			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("RMMsgCreator::addAckMessage : there are messages to ack " + ackRangeArrayList);

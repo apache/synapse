@@ -61,11 +61,11 @@ public class PollingManager extends SandeshaThread {
 	/**
 	 * By adding an entry to this, the PollingManager will be asked to do a polling request on this sequence.
 	 */
-	private LinkedList scheduledPollingRequests = new LinkedList();
+	private LinkedList<SequenceEntry> scheduledPollingRequests = new LinkedList<SequenceEntry>();
 	
 	private static final int POLLING_MANAGER_WAIT_TIME = 3000;
 	
-	private HashMap pollTimes = new HashMap();
+	private HashMap<String, Long> pollTimes = new HashMap<String, Long>();
 	
 	public PollingManager() {
 		super(POLLING_MANAGER_WAIT_TIME);
@@ -87,7 +87,7 @@ public class PollingManager extends SandeshaThread {
 				}
 			}
 			if(entry == null) {
-				ArrayList allSequencesList = getSequences();
+				ArrayList<SequenceEntry> allSequencesList = getSequences();
 				int size = allSequencesList.size();
 				if(log.isDebugEnabled()) log.debug("Choosing one from " + size + " sequences");
 				if(nextIndex >= size) {

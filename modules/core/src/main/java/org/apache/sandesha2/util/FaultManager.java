@@ -229,8 +229,8 @@ public class FaultManager {
 			log.debug("Enter: FaultManager::checkForInvalidAcknowledgement");
 
 		boolean invalidAck = false;		
-		List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
-		Iterator it = sequenceAckList.iterator();
+		List<Range> sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
+		Iterator<Range> it = sequenceAckList.iterator();
 
 		while (it.hasNext()) {
 			Range acknowledgementRange = (Range) it.next();
@@ -1044,7 +1044,7 @@ public class FaultManager {
 		SenderBean target = new SenderBean();
 		target.setInternalSequenceID(internalSequenceId);
 		
-		Iterator iterator = storageManager.getSenderBeanMgr().find(target).iterator();
+		Iterator<SenderBean> iterator = storageManager.getSenderBeanMgr().find(target).iterator();
 		while (iterator.hasNext()) {
 			SenderBean tempBean = (SenderBean) iterator.next();
 

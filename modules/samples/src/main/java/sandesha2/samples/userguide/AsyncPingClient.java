@@ -18,8 +18,6 @@ package sandesha2.samples.userguide;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;

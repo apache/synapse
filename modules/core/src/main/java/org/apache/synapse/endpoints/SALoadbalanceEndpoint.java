@@ -275,17 +275,7 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
             synCtx.pushFaultHandler(this);
             endpoint.send(synCtx);
         }
-    }
-
-    private void informFailure(MessageContext synCtx, int errorCode, String errorMsg) {
-
-        if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null) {
-            synCtx.setProperty(SynapseConstants.ERROR_CODE, errorCode);
-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg);
-            synCtx.setProperty(SynapseConstants.ERROR_DETAIL, errorMsg);
-        }
-        super.onFault(synCtx);
-    }
+    }  
 
     /*
     * Preparing the endpoint sequence for a new session establishment request

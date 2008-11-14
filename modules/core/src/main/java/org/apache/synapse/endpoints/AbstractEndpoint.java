@@ -415,4 +415,14 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
                     + "], [To : " + synMessageContext.getTo() + "]");
         }
     }
+
+    protected void informFailure(MessageContext synCtx, int errorCode, String errorMsg) {
+
+        if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null) {
+            synCtx.setProperty(SynapseConstants.ERROR_CODE, errorCode);
+            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg);
+            synCtx.setProperty(SynapseConstants.ERROR_DETAIL, errorMsg);
+        }
+        onFault(synCtx);
+    }
 }

@@ -70,23 +70,18 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
                     synCtx.getEnvelope().build();
                 }
             } else {
-                // this is a retry, where we are now failing over to an active node
-                metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_LB_FAIL_OVER);
+                if (metricsMBean != null) {
+                    // this is a retry, where we are now failing over to an active node
+                    metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_LB_FAIL_OVER);
+                }
             }
             synCtx.pushFaultHandler(this);
             endpoint.send(synCtx);
 
         } else {
             // if this is not a retry
-            if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null) {
-                synCtx.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.ENDPOINT_LB_NONE_READY);
-                synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
-                    "Loadbalance endpoint : " + getName() + " - no ready child endpoints");
-                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
-                    "Loadbalance endpoint : " + getName() + " - no ready child endpoints");
-                synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, null);
-            }
-            super.onFault(synCtx);
+            informFailure(synCtx, SynapseConstants.ENDPOINT_LB_NONE_READY, "Loadbalance endpoint : " +
+                    getName() + " - no ready child endpoints");
         }
     }
 

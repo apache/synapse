@@ -65,7 +65,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
             return result;
         }
         if (JNDI_REPOSITORY.isInitialized()) {
-            return IN_MEMORY_REPOSITORY.lookUp(name);
+            return JNDI_REPOSITORY.lookUp(name);
         }
         return null;
     }
@@ -80,7 +80,6 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
     public DataSource find(String dsName, Properties jndiEnv) {
 
         try {
-
             Context context = new InitialContext(jndiEnv);
             return find(dsName, context);
 
@@ -122,6 +121,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
         if (dataSourceInformation == null) {
             return;
         }
+        
         String repositoryType = dataSourceInformation.getRepositoryType();
         if (DataSourceConfigurationConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
             JNDI_REPOSITORY.register(dataSourceInformation);
@@ -131,7 +131,9 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
     }
 
     public void removeDataSourceInformation(DataSourceInformation dataSourceInformation) {
+        
         String repositoryType = dataSourceInformation.getRepositoryType();
+        
         if (DataSourceConfigurationConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
             JNDI_REPOSITORY.unRegister(dataSourceInformation.getDatasourceName());
         } else {
@@ -140,6 +142,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
     }
 
     public void reConfigure(Properties confProperties) {
+        
         JNDI_REPOSITORY.init(confProperties);
         IN_MEMORY_REPOSITORY.init(confProperties);
     }

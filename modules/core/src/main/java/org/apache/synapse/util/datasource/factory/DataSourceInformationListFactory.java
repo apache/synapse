@@ -66,7 +66,7 @@ public class DataSourceInformationListFactory {
 
         for (String dsName : dataSourcesNames) {
 
-            if (dsName == null) {
+            if (dsName == null ) {
                 continue;
             }
             DataSourceInformation information =

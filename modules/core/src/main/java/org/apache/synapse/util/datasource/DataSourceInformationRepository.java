@@ -18,6 +18,10 @@
  */
 package org.apache.synapse.util.datasource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+
 import java.util.*;
 
 /**
@@ -25,47 +29,78 @@ import java.util.*;
  */
 public class DataSourceInformationRepository {
 
+    private static final Log log = LogFactory.getLog(DataSourceInformationRepository.class);
+
     private final Map<String, DataSourceInformation> dataSourceInformationMap =
             new HashMap<String, DataSourceInformation>();
+
     private final List<DataSourceInformationRepositoryListener> listeners =
             new ArrayList<DataSourceInformationRepositoryListener>();
 
     public void setConfigurationProperties(Properties congurationProperties) {
+
         for (DataSourceInformationRepositoryListener listener : listeners) {
-            if (listener != null) {
-                listener.reConfigure(congurationProperties);
-            }
+            listener.reConfigure(congurationProperties);
         }
     }
 
     public void addDataSourceInformation(DataSourceInformation dataSourceInformation) {
+
+        assertNull(dataSourceInformation, "DataSource information is null");
+
         dataSourceInformationMap.put(dataSourceInformation.getAlias(), dataSourceInformation);
         for (DataSourceInformationRepositoryListener listener : listeners) {
-            if (listener != null) {
-                listener.addDataSourceInformation(dataSourceInformation);
-            }
+            listener.addDataSourceInformation(dataSourceInformation);
         }
     }
 
     public DataSourceInformation getDataSourceInformation(String name) {
+
+        assertNull(name, "Name of the datasource  information instance to be returned is null");
+
         return dataSourceInformationMap.get(name);
     }
 
     public DataSourceInformation removeDataSourceInformation(String name) {
+
+        assertNull(name, "Name of the datasource information instance to be removed is null");
+
         DataSourceInformation information = dataSourceInformationMap.remove(name);
+
+        assertNull(information, "There is no datasource information instance for given name :" + name);
+
         for (DataSourceInformationRepositoryListener listener : listeners) {
-            if (listener != null) {
-                listener.removeDataSourceInformation(information);
-            }
+            listener.removeDataSourceInformation(information);
         }
         return information;
     }
 
     public Iterator<DataSourceInformation> getAllDataSourceInformation() {
+
         return dataSourceInformationMap.values().iterator();
     }
 
     public void registerDataSourceInformationRepositoryListener(DataSourceInformationRepositoryListener listener) {
+
+        assertNull(listener, "Provided 'DataSourceInformationRepositoryListener' instance is null");
+
         listeners.add(listener);
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
+    private void assertNull(String name, String msg) {
+        if (name == null || "".equals(name)) {
+            handleException(msg);
+        }
+    }
+
+    private void assertNull(Object object, String msg) {
+        if (object == null) {
+            handleException(msg);
+        }
     }
 }

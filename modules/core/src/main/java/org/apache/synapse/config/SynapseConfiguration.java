@@ -102,11 +102,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
     
     private final TaskDescriptionRepository repository = 
             TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                    SynapseConstants.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);
+                    SynapseConstants.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);        
     
-    /* Keeps information about datasource -only configuration data - no runtime data */
-    private DataSourceInformationRepository dataSourceInformationRepository;
-
     /**
 	 * Save the path to the configuration file loaded, to save it later if
 	 * required
@@ -921,13 +918,5 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public TaskDescriptionRepository getTaskDescriptionRepository() {
         return repository;
-    }
-    
-     public DataSourceInformationRepository getDataSourceInformationRepository() {
-        return dataSourceInformationRepository;
-    }
-
-    public void setDataSourceInformationRepository(DataSourceInformationRepository dataSourceInformationRepository) {
-        this.dataSourceInformationRepository = dataSourceInformationRepository;
-    }
+    }     
 }

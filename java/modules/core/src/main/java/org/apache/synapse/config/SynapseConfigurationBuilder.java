@@ -23,8 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.datasource.DataSourceInformationRepository;
-import org.apache.synapse.util.datasource.factory.DataSourceInformationRepositoryFactory;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
@@ -33,7 +31,6 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Properties;
 
 /**
  * Builds a Synapse Configuration model with a given input
@@ -74,15 +71,10 @@ public class SynapseConfigurationBuilder {
 
         // build the Synapse configuration parsing the XML config file
         try {
-            Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
-            DataSourceInformationRepository repository =
-                    DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(synapseProperties);
             SynapseConfiguration synCfg
                     = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
             log.info("Loaded Synapse configuration from : " + configFile);
             synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
-            synCfg.setProperties(synapseProperties);
-            synCfg.setDataSourceInformationRepository(repository);
             return synCfg;
 
         } catch (FileNotFoundException fnf) {

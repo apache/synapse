@@ -53,12 +53,18 @@ public class FailoverEndpoint extends AbstractEndpoint {
             isARetry = true;
         }
 
+        if (getChildren().isEmpty()) {
+            informFailure(synCtx, SynapseConstants.ENDPOINT_FO_NONE_READY,
+                    "FailoverLoadbalance endpoint : " + getName() + " - no child endpoints");
+            return;
+        }
+        
         if (currentEndpoint == null) {
             currentEndpoint = getChildren().get(0);
         }
 
         if (currentEndpoint.readyToSend()) {
-            if (isARetry) {
+            if (isARetry && metricsMBean != null) {
                 metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_FO_FAIL_OVER);
             }
             synCtx.pushFaultHandler(this);
@@ -70,7 +76,7 @@ public class FailoverEndpoint extends AbstractEndpoint {
                 if (endpoint.readyToSend()) {
                     foundEndpoint = true;
                     currentEndpoint = endpoint;
-                    if (isARetry) {
+                    if (isARetry && metricsMBean != null) {
                         metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_FO_FAIL_OVER);
                     }
                     synCtx.pushFaultHandler(this);
@@ -80,16 +86,8 @@ public class FailoverEndpoint extends AbstractEndpoint {
             }
 
             if (!foundEndpoint) {
-                // if this is not a retry
-                if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null) {
-                    synCtx.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.ENDPOINT_FO_NONE_READY);
-                    synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
-                        "Failover endpoint : " + getName() + " - no ready child endpoints");
-                    synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
-                        "Failover endpoint : " + getName() + " - no ready child endpoints");
-                    synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, null);
-                }
-                super.onFault(synCtx);
+                informFailure(synCtx, SynapseConstants.ENDPOINT_FO_NONE_READY, "Failover endpoint : " + getName()
+                        + " - no ready child endpoints");
             }
         }
     }

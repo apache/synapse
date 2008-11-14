@@ -84,7 +84,9 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     public void switchOn() throws Exception {
         if (endpoint.getChildren() != null) {
             for (Endpoint e : endpoint.getChildren()) {
-                e.getMetricsMBean().switchOn();
+                if (e.getMetricsMBean() != null) {
+                    e.getMetricsMBean().switchOn();
+                }
             }
         } else {
             if (endpoint.getContext() != null) {
@@ -95,12 +97,15 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     /**
      * Switch off a leaf endpoint, or all endpoints of a group - for maintenence
+     *
      * @throws Exception
      */
     public void switchOff() throws Exception {
         if (endpoint.getChildren() != null) {
             for (Endpoint e : endpoint.getChildren()) {
-                e.getMetricsMBean().switchOff();
+                if (e.getMetricsMBean() != null) {
+                    e.getMetricsMBean().switchOff();
+                }
             }
         } else {
             if (endpoint.getContext() != null) {

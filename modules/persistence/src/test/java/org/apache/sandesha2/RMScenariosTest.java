@@ -83,21 +83,27 @@ public class RMScenariosTest extends SandeshaTestCase {
 		runPing(true, true);
 	}
 
-	public void testAsyncEcho() throws Exception {
+	public void testAsyncEchoWithSyncAck() throws Exception {
 		// Test async echo with sync acks
 		Options clientOptions = new Options();
-		runEcho(clientOptions, true, false, false, true, false);
-
-		// Test async echo with async acks
-		clientOptions = new Options();
-		runEcho(clientOptions, true, true, false, true, false);
-
-		// Test async echo with async acks and offer
-		clientOptions = new Options();
-		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, SandeshaUtil.getUUID());
-		runEcho(clientOptions, true, true, false, true, true);
+		runEcho(clientOptions, true, false, false,true,true);
 	}
-
+	
+	public void testAsyncEchoWithAsyncAck() throws Exception {
+		// Test async echo with async acks
+		Options clientOptions = new Options();
+		clientOptions = new Options();
+		runEcho(clientOptions, true, true, false,true,true);
+	}
+	
+	public void testAsyncEchoWithAyncAckAndOffer() throws Exception {
+		// Test async echo with async acks and offer
+		Options clientOptions = new Options();
+		clientOptions = new Options();
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
+		runEcho(clientOptions, true, true, false,true,true);
+	}
+		
 	public void testSyncEchoWithOffer() throws Exception {
 		// Test sync echo with an offer, and the 1.1 spec
 		Options clientOptions = new Options();

@@ -16,11 +16,11 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.SynapseUtilException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -121,7 +121,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
         if (dataSourceInformation == null) {
             return;
         }
-        
+
         String repositoryType = dataSourceInformation.getRepositoryType();
         if (DataSourceConfigurationConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
             JNDI_REPOSITORY.register(dataSourceInformation);
@@ -131,9 +131,9 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
     }
 
     public void removeDataSourceInformation(DataSourceInformation dataSourceInformation) {
-        
+
         String repositoryType = dataSourceInformation.getRepositoryType();
-        
+
         if (DataSourceConfigurationConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
             JNDI_REPOSITORY.unRegister(dataSourceInformation.getDatasourceName());
         } else {
@@ -142,7 +142,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
     }
 
     public void reConfigure(Properties confProperties) {
-        
+
         JNDI_REPOSITORY.init(confProperties);
         IN_MEMORY_REPOSITORY.init(confProperties);
     }
@@ -154,7 +154,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 
     /**
@@ -165,7 +165,7 @@ public class DataSourceManager implements DataSourceInformationRepositoryListene
      */
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseException(msg, e);
+        throw new SynapseUtilException(msg, e);
     }
 
 }

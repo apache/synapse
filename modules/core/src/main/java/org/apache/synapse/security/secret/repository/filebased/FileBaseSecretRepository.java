@@ -26,7 +26,7 @@ import org.apache.synapse.security.tool.CipherTool;
 import org.apache.synapse.security.wrappers.CipherWrapper;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
-import org.apache.synapse.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.io.ByteArrayInputStream;
 import java.security.PublicKey;

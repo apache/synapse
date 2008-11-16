@@ -42,7 +42,7 @@ public class DataSourceInformationSerializer {
         // Prefix for getting particular data source's properties
         String prefix = buffer.toString();
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_USER,
+        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME,
                 information.getUser());
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD,
                 information.getPassword());
@@ -84,8 +84,11 @@ public class DataSourceInformationSerializer {
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION,
                 String.valueOf(information.getDefaultTransactionIsolation()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTCATALOG,
-                String.valueOf(information.getDefaultCatalog()));
+        String defaultCatalog = information.getDefaultCatalog();
+        if (defaultCatalog != null && !"".equals(defaultCatalog)) {
+            addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTCATALOG,
+                    String.valueOf(defaultCatalog));
+        }
 
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
                 String.valueOf(information.isAccessToUnderlyingConnectionAllowed()));
@@ -120,8 +123,11 @@ public class DataSourceInformationSerializer {
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TESTWHILEIDLE,
                 String.valueOf(information.isTestWhileIdle()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_VALIDATIONQUERY,
-                String.valueOf(information.getValidationQuery()));
+        String validationQ = information.getValidationQuery();
+        if (validationQ != null && !"".equals(validationQ)) {
+            addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_VALIDATIONQUERY,
+                    String.valueOf(validationQ));
+        }
 
         properties.putAll(information.getAllParameters());
         properties.putAll(information.getProperties());

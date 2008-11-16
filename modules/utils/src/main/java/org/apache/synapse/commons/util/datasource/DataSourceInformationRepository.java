@@ -16,11 +16,11 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.SynapseUtilException;
 
 import java.util.*;
 
@@ -89,7 +89,7 @@ public class DataSourceInformationRepository {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 
     private void assertNull(String name, String msg) {

@@ -16,13 +16,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.MBeanRegistrar;
-import org.apache.synapse.util.MBeanRepository;
+import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.commons.util.MBeanRepository;
+import org.apache.synapse.commons.util.SynapseUtilException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ import java.util.Map;
  *
  */
 public class DatasourceMBeanRepository implements MBeanRepository {
-    
+
     private final static Log log = LogFactory.getLog(DatasourceMBeanRepository.class);
 
     private final static Map<String, DBPoolView> dataSourcesMBeans = new HashMap<String, DBPoolView>();
@@ -46,7 +46,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
     }
 
     public void addMBean(String name, Object mBean) {
-        
+
         assertNull(name, "DataSorce MBean name cannot be found.");
         assertNull(mBean, "DataSorce MBean  cannot be found.");
         assertFalse(mBean instanceof DBPoolView, "Given MBean instance is not matched " +
@@ -57,19 +57,19 @@ public class DatasourceMBeanRepository implements MBeanRepository {
     }
 
     public Object getMBean(String name) {
-        
+
         assertNull(name, "DataSorce MBean name cannot be found.");
         return dataSourcesMBeans.get(name);
     }
 
     public void removeMBean(String name) {
-        
+
         dataSourcesMBeans.remove(name);
         MBeanRegistrar.getInstance().unRegisterMBean(MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
     public void clear() {
-        
+
         if (!dataSourcesMBeans.isEmpty()) {
             log.info("UnRegistering DBPool MBeans");
             for (DBPoolView dbPoolView : dataSourcesMBeans.values()) {
@@ -106,7 +106,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 
 

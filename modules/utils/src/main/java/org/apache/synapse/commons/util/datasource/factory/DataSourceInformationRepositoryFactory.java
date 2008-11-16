@@ -16,12 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource.factory;
+package org.apache.synapse.commons.util.datasource.factory;
 
-import org.apache.synapse.util.datasource.DataSourceInformation;
-import org.apache.synapse.util.datasource.DataSourceInformationRepository;
-import org.apache.synapse.util.datasource.DataSourceInformationRepositoryListener;
-import org.apache.synapse.util.datasource.DataSourceManager;
+import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
+import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryListener;
+import org.apache.synapse.commons.util.datasource.DataSourceManager;
 
 import java.util.List;
 import java.util.Properties;

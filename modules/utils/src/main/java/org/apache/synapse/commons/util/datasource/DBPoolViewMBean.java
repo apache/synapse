@@ -16,18 +16,22 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
-import java.util.Properties;
+import java.util.Map;
 
 /**
  *
  */
-public interface DataSourceInformationRepositoryListener {
+public interface DBPoolViewMBean {
 
-    void addDataSourceInformation(DataSourceInformation dataSourceInformation);
+    public int getNumActive();
 
-    void removeDataSourceInformation(DataSourceInformation dataSourceInformation);
+    public int getNumIdle();
 
-    void reConfigure(Properties confProperties);
+    public String getName();
+
+    public Map getConnectionUsage();
+
+    public void reset();
 }

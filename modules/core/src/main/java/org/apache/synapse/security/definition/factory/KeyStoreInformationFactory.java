@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.KeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
-import org.apache.synapse.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.util.Properties;
 

@@ -20,7 +20,6 @@ import java.io.File;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -29,12 +28,12 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants.Configuration;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
@@ -83,7 +82,7 @@ public class MTOMPingClient {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		
 		Options clientOptions = new Options ();	
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportToEPR);
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = SandeshaUtil.getUUID();// "sequence2";
@@ -96,7 +95,7 @@ public class MTOMPingClient {
 		
 		clientOptions.setProperty(SandeshaClientConstants.SANDESHA_LISTENER, new SandeshaListenerImpl ());
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		serviceClient.engageModule(new QName ("sandesha2"));
+		serviceClient.engageModule("sandesha2");
 		
 		clientOptions.setAction("urn:wsrm:Ping");
 		serviceClient.setOptions(clientOptions);

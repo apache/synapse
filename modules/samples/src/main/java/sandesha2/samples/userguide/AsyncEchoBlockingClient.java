@@ -26,13 +26,13 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.Constants;
+import org.apache.axis2.Constants.Configuration;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -96,7 +96,7 @@ public class AsyncEchoBlockingClient {
 		String sequenceKey = "sequence4";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportToEPR);
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		

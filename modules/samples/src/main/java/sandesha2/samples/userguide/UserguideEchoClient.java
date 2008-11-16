@@ -17,18 +17,15 @@
 package sandesha2.samples.userguide;
 
 import java.io.File;
-import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.async.AsyncResult;
-import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -39,8 +36,6 @@ public class UserguideEchoClient {
 	private final static String echoString = "echoString";
 	private final static String Text = "Text";
 	private final static String Sequence = "Sequence";
-	private final static String echoStringResponse = "echoStringResponse";
-	private final static String EchoStringReturn = "EchoStringReturn";
 	private static String toEPR = "http://127.0.0.1:8070/axis2/services/RMSampleService";
 
 	private static String CLIENT_REPO_PATH = "Full path to the Client Repo folder";
@@ -57,13 +52,13 @@ public class UserguideEchoClient {
 		clientOptions.setUseSeparateListener(true);
 		serviceClient.setOptions(clientOptions);
 
-		Callback callback1 = new TestCallback ("Callback 1");
+		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1","sequence1"),callback1);
-		Callback callback2 = new TestCallback ("Callback 2");
+		TestCallback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2","sequence1"),callback2);
 
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		Callback callback3 = new TestCallback ("Callback 3");
+		TestCallback callback3 = new TestCallback ("Callback 3");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3","sequence1"),callback3);
 		
         while (!callback3.isComplete()) {
@@ -86,28 +81,5 @@ public class UserguideEchoClient {
 		echoStringElement.addChild(sequenceElem);
 		
 		return echoStringElement;
-	}
-
-	static class TestCallback extends Callback {
-
-		String name = null;
-		public TestCallback (String name) {
-			this.name = name;
-		}
-		
-		public void onComplete(AsyncResult result) {
-			SOAPBody body = result.getResponseEnvelope().getBody();
-			
-			OMElement echoStringResponseElem = body.getFirstChildWithName(new QName (applicationNamespaceName,echoStringResponse));			
-			OMElement echoStringReturnElem = echoStringResponseElem.getFirstChildWithName(new QName (applicationNamespaceName,EchoStringReturn));
-			
-			String resultStr = echoStringReturnElem.getText();
-			System.out.println("Callback '" + name +  "' got result:" + resultStr);
-		}
-
-		public void onError (Exception e) {
-			System.out.println("Error reported for test call back");
-			e.printStackTrace();
-		}
 	}
 }

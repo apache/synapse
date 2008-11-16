@@ -39,7 +39,7 @@ public class DataSourceInformation {
     private long maxWait = GenericObjectPool.DEFAULT_MAX_WAIT;
     private String driver;
     private String url;
-    private String type;
+    private String type = BASIC_DATA_SOURCE;
     private boolean defaultAutoCommit = true;
     private boolean defaultReadOnly = false;
     private boolean testOnBorrow = true;
@@ -48,14 +48,14 @@ public class DataSourceInformation {
     private int initialSize;
     private int defaultTransactionIsolation = -1;
     private String defaultCatalog;
-    private boolean accessToUnderlyingConnectionAllowed;
-    private boolean removeAbandoned;
+    private boolean accessToUnderlyingConnectionAllowed = false;
+    private boolean removeAbandoned = false;
     private long removeAbandonedTimeout;
-    private boolean logAbandoned;
-    private boolean poolPreparedStatements;
+    private boolean logAbandoned = true;
+    private boolean poolPreparedStatements = true;
     private int maxOpenPreparedStatements;
     private final Properties properties = new Properties();
-    private String repositoryType;
+    private String repositoryType = DataSourceConfigurationConstants.PROP_REGISTRY_MEMORY;
     private String alias;
 
     private long timeBetweenEvictionRunsMillis =

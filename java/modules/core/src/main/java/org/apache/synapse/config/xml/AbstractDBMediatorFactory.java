@@ -26,8 +26,9 @@ import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
 import org.apache.synapse.commons.util.MBeanRepository;
 import org.apache.synapse.commons.util.datasource.DBPoolView;
-import org.apache.synapse.commons.util.datasource.DataSourceManager;
 import org.apache.synapse.commons.util.datasource.DatasourceMBeanRepository;
+import org.apache.synapse.commons.util.datasource.RepositoryBasedDataSourceFinder;
+import org.apache.synapse.commons.util.datasource.DataSourceFinder;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.security.secret.SecretManager;
 import org.jaxen.JaxenException;
@@ -142,7 +143,11 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
         String dsName = getValue(pool, DSNAME_Q);
         mediator.addDataSourceProperty(DSNAME_Q, dsName);
-        DataSource dataSource = DataSourceManager.getInstance().find(dsName);
+         DataSource dataSource = null;
+        RepositoryBasedDataSourceFinder finder = RepositoryBasedDataSourceFinder.getInstance();
+        if (finder.isInitialized()) {
+            dataSource = RepositoryBasedDataSourceFinder.getInstance().find(dsName);
+        }
         if (dataSource != null) {
             MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();
             Object mBean = mBeanRepository.getMBean(dsName);
@@ -158,7 +163,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         props.put(Context.SECURITY_CREDENTIALS, getValue(pool, PASS_Q));
         props.put(Context.PROVIDER_URL, getValue(pool, URL_Q));
 
-        dataSource = DataSourceManager.getInstance().find(dsName, props);
+        dataSource = DataSourceFinder.find(dsName, props);
         if (dataSource == null) {
             handleException("Cannot find a DataSource for given properties :" + props);
         }

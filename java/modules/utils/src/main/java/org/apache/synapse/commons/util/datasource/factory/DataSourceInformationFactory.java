@@ -218,7 +218,6 @@ public class DataSourceInformationFactory {
         information.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
         information.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
         information.setTestWhileIdle(testWhileIdle);
-        information.setValidationQuery(validationQuery);
         information.setMinIdle(minIdle);
         information.setDefaultTransactionIsolation(defaultTransactionIsolation);
         information.setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
@@ -228,8 +227,14 @@ public class DataSourceInformationFactory {
         information.setPoolPreparedStatements(poolPreparedStatements);
         information.setMaxOpenPreparedStatements(maxOpenPreparedStatements);
         information.setInitialSize(initialSize);
-        information.setDefaultCatalog(defaultCatalog);
 
+        if (validationQuery != null && !"".equals(validationQuery)) {
+            information.setValidationQuery(validationQuery);
+        }
+
+        if (defaultCatalog != null && !"".equals(defaultCatalog)) {
+            information.setDefaultCatalog(defaultCatalog);
+        }
         return information;
     }
 

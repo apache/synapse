@@ -18,22 +18,22 @@
  */
 package org.apache.synapse.commons.util.datasource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.util.SynapseUtilException;
+
 import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Finds a DataSource based on various criteria
+ *
  */
-public interface DataSourceFinder {
-
-    /**
-     * Find a DataSource using given name
-     *
-     * @param name Name of the DataSource to be found
-     * @return DataSource if found , otherwise null
-     */
-    DataSource find(String name);
+public class DataSourceFinder {
+    
+    private static Log log = LogFactory.getLog(DataSourceFinder.class);
 
     /**
      * Find a DataSource using the given name and JNDI environment properties
@@ -42,7 +42,18 @@ public interface DataSourceFinder {
      * @param jndiEnv JNDI environment properties
      * @return DataSource if found , otherwise null
      */
-    DataSource find(String dsName, Properties jndiEnv);
+    public static DataSource find(String dsName, Properties jndiEnv) {
+
+        try {
+            Context context = new InitialContext(jndiEnv);
+            return find(dsName, context);
+
+        } catch (NamingException e) {
+            handleException("Error looking up DataSource : " + dsName +
+                    " using JNDI properties : " + jndiEnv, e);
+        }
+        return null;
+    }
 
     /**
      * Find a DataSource using the given name and naming context
@@ -51,6 +62,43 @@ public interface DataSourceFinder {
      * @param context Naming Context
      * @return DataSource if found , otherwise null
      */
-    DataSource find(String dsName, Context context);
+    public static DataSource find(String dsName, Context context) {
 
+        try {
+            Object dataSourceO = context.lookup(dsName);
+            if (dataSourceO != null && dataSourceO instanceof DataSource) {
+                return (DataSource) dataSourceO;
+            } else {
+                handleException("DataSource : " + dsName + " not found when looking up" +
+                        " using JNDI properties : " + context.getEnvironment());
+            }
+
+        } catch (NamingException e) {
+            handleException(new StringBuilder().append("Error looking up DataSource : ")
+                    .append(dsName).append(" using JNDI properties : ").
+                    append(context).toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * Helper methods for handle errors.
+     *
+     * @param msg The error message
+     */
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseUtilException(msg);
+    }
+
+    /**
+     * Helper methods for handle errors.
+     *
+     * @param msg The error message
+     * @param e   The exception
+     */
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseUtilException(msg, e);
+    }
 }

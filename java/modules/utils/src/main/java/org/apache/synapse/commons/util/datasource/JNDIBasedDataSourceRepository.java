@@ -44,7 +44,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
     private static final JNDIBasedDataSourceRepository ourInstance =
             new JNDIBasedDataSourceRepository();
-    private static InitialContext initialContext;
+    private InitialContext initialContext;
     private Properties jndiProperties;
     private static final Map<String, InitialContext> perDataSourceICMap = new HashMap<String, InitialContext>();
     private boolean initialized = false;
@@ -60,11 +60,11 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             log.warn("Provided global JNDI environment properties is empty or null.");
             return;
         }
+
         if (isValid(jndiEnv)) {
             jndiProperties = createJNDIEnvironment(jndiEnv, null);
-            initialContext = createInitialContext(jndiEnv);
+            initialContext = createInitialContext(jndiProperties);
         }
-
     }
 
     private JNDIBasedDataSourceRepository() {
@@ -80,16 +80,30 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         validateInitialized();
         String dataSourceName = information.getDatasourceName();
         validateDSName(dataSourceName);
-        Properties jndiEvn = createJNDIEnvironment(information.getProperties(), information.getAlias());
+        Properties properties = information.getProperties();
+        
+        InitialContext context = null;
+        Properties jndiEvn = null;
 
-        InitialContext context = createInitialContext(jndiEvn);
+        if (properties != null && !properties.isEmpty()) {
+            jndiEvn = createJNDIEnvironment(properties, information.getAlias());
+            context = createInitialContext(jndiEvn);
+        }
         if (context == null) {
+
             validateInitialContext(initialContext);
             context = initialContext;
+
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot create a name context with jndi properties : " + jndiEvn);
+                log.debug("Using system-wide jndi properties : " + jndiProperties);
+            }
+
             jndiEvn = jndiProperties;
         } else {
             perDataSourceICMap.put(dataSourceName, context);
         }
+
         String dsType = information.getType();
         String driver = information.getDriver();
         String url = information.getUrl();
@@ -174,7 +188,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
             ref.add(new BinaryRefAddr(
                     DataSourceConfigurationConstants.PROP_JNDI_ENV,
-                    MiscellaneousUtil.serialize(jndiProperties)));
+                    MiscellaneousUtil.serialize(jndiEvn)));
             ref.add(new StringRefAddr(
                     DataSourceConfigurationConstants.PROP_DATA_SOURCE_NAME, name));
             ref.add(new StringRefAddr(
@@ -231,7 +245,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         }
 
         InitialContext context = getCachedInitialContext(dsName);
-        return DataSourceManager.getInstance().find(dsName, context);
+        return DataSourceFinder.find(dsName, context);
     }
 
     public void clear() {

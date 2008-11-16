@@ -34,9 +34,6 @@ public class RMIRegistryController {
      */
     public void createLocalRegistry(int port) {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Creating a RMI registry with port :" + port);
-            }
             localRegistry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
             String msg = "Couldn't create a local registry(RMI) : port " + port +
@@ -53,9 +50,8 @@ public class RMIRegistryController {
             try {
                 log.info("Removing the RMI registy instance from the RMI runtime ");
                 UnicastRemoteObject.unexportObject(localRegistry, true);
-                this.localRegistry = null;
             } catch (NoSuchObjectException e) {
-                String msg = "Error when stoping localregistry(RMI)";
+                String msg = "Error when stopping localregistry(RMI)";
                 handleException(msg, e);
             }
         }

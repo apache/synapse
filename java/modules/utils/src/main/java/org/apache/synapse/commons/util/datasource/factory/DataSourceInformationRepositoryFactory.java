@@ -21,7 +21,7 @@ package org.apache.synapse.commons.util.datasource.factory;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryListener;
-import org.apache.synapse.commons.util.datasource.DataSourceManager;
+import org.apache.synapse.commons.util.datasource.DataSourceRepositoryManager;
 
 import java.util.List;
 import java.util.Properties;
@@ -33,16 +33,16 @@ public class DataSourceInformationRepositoryFactory {
 
     public static DataSourceInformationRepository createDataSourceInformationRepository(Properties properties) {
 
-        return createDataSourceInformationRepository(properties, DataSourceManager.getInstance());
+        return createDataSourceInformationRepository(properties, DataSourceRepositoryManager.getInstance());
     }
 
     public static DataSourceInformationRepository createDataSourceInformationRepository(Properties properties, DataSourceInformationRepositoryListener listener) {
 
-        List<DataSourceInformation> dataSourceInformations = DataSourceInformationListFactory.createDataSourceInformationList(properties);
+        List<DataSourceInformation> sourceInformationList = DataSourceInformationListFactory.createDataSourceInformationList(properties);
         DataSourceInformationRepository repository = new DataSourceInformationRepository();
-        repository.registerDataSourceInformationRepositoryListener(listener);
+        repository.setRepositoryListener(listener);
         repository.setConfigurationProperties(properties);
-        for (DataSourceInformation information : dataSourceInformations) {
+        for (DataSourceInformation information : sourceInformationList) {
             if (information != null) {
                 repository.addDataSourceInformation(information);
             }

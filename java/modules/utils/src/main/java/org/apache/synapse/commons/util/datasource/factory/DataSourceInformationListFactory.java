@@ -16,13 +16,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource.factory;
+package org.apache.synapse.commons.util.datasource.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.util.MiscellaneousUtil;
-import org.apache.synapse.util.datasource.DataSourceConfigurationConstants;
-import org.apache.synapse.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
+import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class DataSourceInformationListFactory {
 
         for (String dsName : dataSourcesNames) {
 
-            if (dsName == null ) {
+            if (dsName == null) {
                 continue;
             }
             DataSourceInformation information =

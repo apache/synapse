@@ -13,8 +13,8 @@ import org.apache.synapse.security.definition.factory.KeyStoreInformationFactory
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
 import org.apache.synapse.security.mbean.SecretManagerAdmin;
-import org.apache.synapse.util.MiscellaneousUtil;
-import org.apache.synapse.util.MBeanRegistrar;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.MBeanRegistrar;
 
 import java.util.Properties;
 

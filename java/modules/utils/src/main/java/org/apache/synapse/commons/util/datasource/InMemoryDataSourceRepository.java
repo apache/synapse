@@ -19,13 +19,13 @@
 /**
  * To change this template use File | Settings | File Templates.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.MBeanRepository;
-import org.apache.synapse.util.datasource.factory.DataSourceFactory;
+import org.apache.synapse.commons.util.MBeanRepository;
+import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.datasource.factory.DataSourceFactory;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -83,8 +83,8 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
     }
 
     public void unRegister(String name) {
-        
-        assertNull(name,"Name of the datasource to be removed is empty or null");
+
+        assertNull(name, "Name of the datasource to be removed is empty or null");
         dataSources.remove(name);
         REPOSITORY.removeMBean(name);
     }
@@ -119,7 +119,7 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 
 

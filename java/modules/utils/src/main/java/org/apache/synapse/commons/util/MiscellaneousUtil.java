@@ -16,15 +16,13 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.util;
+package org.apache.synapse.commons.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 
-import java.util.Properties;
 import java.io.*;
+import java.util.Properties;
 
 /**
  *
@@ -147,7 +145,7 @@ public class MiscellaneousUtil {
                 log.debug("Unable to load file  ' " + filePath + " '");
             }
 
-            filePath = SynapseConstants.CONF_DIRECTORY +
+            filePath = "conf" +
                     File.separatorChar + filePath;
             if (log.isDebugEnabled()) {
                 log.debug("Loading a file ' " + filePath + " ' from classpath");
@@ -166,7 +164,7 @@ public class MiscellaneousUtil {
             } catch (IOException e) {
                 String msg = "Error loading properties from a file at :" + filePath;
                 log.error(msg, e);
-                throw new SynapseException(msg, e);
+                throw new SynapseUtilException(msg, e);
             }
         }
         return properties;
@@ -215,6 +213,6 @@ public class MiscellaneousUtil {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 }

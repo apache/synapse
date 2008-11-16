@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util;
+package org.apache.synapse.commons.util;
 
 /**
  */
@@ -25,9 +25,9 @@ public interface MBeanRepository {
     public void addMBean(String name, Object MBean);
 
     public Object getMBean(String name);
-    
+
     public void removeMBean(String name);
-    
+
     public void clear();
 
 }

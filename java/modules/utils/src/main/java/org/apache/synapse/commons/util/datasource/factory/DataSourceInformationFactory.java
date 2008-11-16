@@ -16,16 +16,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource.factory;
+package org.apache.synapse.commons.util.datasource.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.MiscellaneousUtil;
-import org.apache.synapse.util.datasource.DataSourceConfigurationConstants;
-import org.apache.synapse.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
+import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
 import java.util.Properties;
 
@@ -98,7 +98,7 @@ public class DataSourceInformationFactory {
         information.setDatasourceName(dataSourceName);
 
         String dsType = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_TYPE, 
+                properties, prefix + DataSourceConfigurationConstants.PROP_TYPE,
                 DataSourceConfigurationConstants.PROP_BASIC_DATA_SOURCE, String.class);
 
         information.setType(dsType);
@@ -236,6 +236,6 @@ public class DataSourceInformationFactory {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 }

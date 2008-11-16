@@ -16,11 +16,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util;
+package org.apache.synapse.commons.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -30,7 +29,7 @@ import java.util.Set;
 public class MBeanRegistrar {
 
     private static final MBeanRegistrar ourInstance = new MBeanRegistrar();
-    private static final Log log = LogFactory.getLog(MessageHelper.class);
+    private static final Log log = LogFactory.getLog(MBeanRegistrar.class);
 
     public static MBeanRegistrar getInstance() {
         return ourInstance;
@@ -95,7 +94,7 @@ public class MBeanRegistrar {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 
 }

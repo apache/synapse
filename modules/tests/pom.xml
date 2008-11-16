@@ -188,6 +188,11 @@
             <version>${rampart.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j</artifactId>
+	    <version>${wss4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -233,6 +238,7 @@
 	<properties>
 		<test.property>2.8.1</test.property>
 		<rampart.version>SNAPSHOT</rampart.version>
+		<wss4j.version>SNAPSHOT</wss4j.version>
     </properties>
 	 
 </project>

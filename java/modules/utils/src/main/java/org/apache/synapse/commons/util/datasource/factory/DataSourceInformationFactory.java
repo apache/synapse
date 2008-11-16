@@ -85,13 +85,17 @@ public class DataSourceInformationFactory {
 
         // get other required properties
         String user = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME, "synapse", String.class);
-        information.setUser(user);
+                properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME, null, String.class);
+        if (user != null && !"".equals(user)) {
+            information.setUser(user);
+        }
 
         String password = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD, "synapse", String.class);
+                properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD, null, String.class);
 
-        information.setPassword(password);
+        if (password != null && !"".equals(password)) {
+            information.setPassword(password);
+        }
 
         String dataSourceName = (String) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME, dsName, String.class);

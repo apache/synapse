@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import javax.naming.Context;
 import javax.sql.DataSource;

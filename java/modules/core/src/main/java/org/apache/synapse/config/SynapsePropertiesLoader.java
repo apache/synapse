@@ -19,7 +19,7 @@
 package org.apache.synapse.config;
 
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

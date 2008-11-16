@@ -35,7 +35,7 @@ import org.apache.neethi.Policy;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.datasource.DataSourceInformationRepositoryHelper;
+import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.SynapsePropertiesLoader;

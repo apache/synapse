@@ -19,13 +19,13 @@
 /**
  * To change this template use File | Settings | File Templates.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.MiscellaneousUtil;
-import org.apache.synapse.util.RMIRegistryController;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.RMIRegistryController;
+import org.apache.synapse.commons.util.SynapseUtilException;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -447,7 +447,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 
     /**
@@ -458,7 +458,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
      */
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseException(msg, e);
+        throw new SynapseUtilException(msg, e);
     }
 
     private void validateInitialized() {

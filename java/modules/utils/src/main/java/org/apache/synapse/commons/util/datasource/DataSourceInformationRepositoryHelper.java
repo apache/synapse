@@ -16,15 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.util.datasource;
+package org.apache.synapse.commons.util.datasource;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.datasource.factory.DataSourceInformationRepositoryFactory;
+import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.datasource.factory.DataSourceInformationRepositoryFactory;
 
 import java.util.Properties;
 
@@ -68,11 +68,11 @@ public class DataSourceInformationRepositoryHelper {
 
     private static void handleException(String msg, Throwable error) {
         log.error(msg, error);
-        throw new SynapseException(msg, error);
+        throw new SynapseUtilException(msg, error);
     }
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseException(msg);
+        throw new SynapseUtilException(msg);
     }
 }

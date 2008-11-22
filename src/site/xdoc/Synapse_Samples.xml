@@ -2038,9 +2038,9 @@ Note that the operation is out-only and no response is sent back to the client. 
 is necessary to allow the JMS transport to determine the content type of incoming messages. With the given configuration
 it will first try to read the content type from the 'contentType' message property and fall back to 'application/xml'
 (i.e. POX) if this property is not set. Note that the JMS client used in this example doesn't send any content type information.</p>
-<p>Note: It is possible to instruct a JMS proxy service to listen to an already existing destination without creating a new one. To do this, use the property elements on the proxy service definition to specify the destination and connection factory etc. </p>
+<p>Note: It is possible to instruct a JMS proxy service to listen to an already existing destination without creating a new one. To do this, use the parameter elements on the proxy service definition to specify the destination and connection factory etc. </p>
 <p>e.g. </p>
-<pre xml:space="preserve">&lt;property name=&quot;transport.jms.Destination&quot; value=&quot;dynamicTopics/something.TestTopic&quot;/&gt;</pre>
+<pre xml:space="preserve">&lt;parameter name=&quot;transport.jms.Destination&quot;&gt;dynamicTopics/something.TestTopic&lt;/parameter&gt;</pre>
 <h2>
 <a name="Sample251" id="Sample251">Sample 251: Switching from http/s to JMS</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;

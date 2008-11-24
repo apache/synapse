@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMComment;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
@@ -39,14 +40,15 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * SAX {@link XMLReader} implementation that reads the supplied AXIOM tree and invokes the
  * callback methods on the configured {@link ContentHandler}.
- * <p>
- * NOTE: THIS IS WORK IN PROGRESS!
  */
 public class AXIOMXMLReader implements XMLReader {
+    private static final String URI_LEXICAL_HANDLER = "http://xml.org/sax/properties/lexical-handler";
+    
     private final OMElement element;
     private final AttributesAdapter attributesAdapter = new AttributesAdapter();
     
@@ -54,6 +56,7 @@ public class AXIOMXMLReader implements XMLReader {
     private boolean namespacePrefixes = false;
     
     private ContentHandler contentHandler;
+    private LexicalHandler lexicalHandler;
     private DTDHandler dtdHandler;
     private EntityResolver entityResolver;
     private ErrorHandler errorHandler;
@@ -118,6 +121,8 @@ public class AXIOMXMLReader implements XMLReader {
             return namespaces;
         } else if ("http://xml.org/sax/features/namespace-prefixes".equals(name)) {
             return namespacePrefixes;
+        } else if (URI_LEXICAL_HANDLER.equals(name)) {
+            return lexicalHandler;
         } else {
             throw new SAXNotRecognizedException(name);
         }
@@ -125,7 +130,11 @@ public class AXIOMXMLReader implements XMLReader {
 
     public void setProperty(String name, Object value)
             throws SAXNotRecognizedException, SAXNotSupportedException {
-        throw new SAXNotRecognizedException(name);
+        if (URI_LEXICAL_HANDLER.equals(name)) {
+            lexicalHandler = (LexicalHandler)value;
+        } else {
+            throw new SAXNotRecognizedException(name);
+        }
     }
 
     public void parse(InputSource input) throws IOException, SAXException {
@@ -142,7 +151,24 @@ public class AXIOMXMLReader implements XMLReader {
         contentHandler.endDocument();
     }
     
+    private void generatePrefixMappingEvents(OMElement omElement, boolean start)
+            throws SAXException {
+        
+        for (Iterator it = omElement.getAllDeclaredNamespaces(); it.hasNext(); ) {
+            OMNamespace ns = (OMNamespace)it.next();
+            String prefix = ns.getPrefix();
+            if (prefix != null) {
+                if (start) {
+                    contentHandler.startPrefixMapping(prefix, ns.getNamespaceURI());
+                } else {
+                    contentHandler.endPrefixMapping(prefix);
+                }
+            }
+        }
+    }
+    
     private void generateEvents(OMElement omElement) throws SAXException {
+        generatePrefixMappingEvents(omElement, true);
         OMNamespace omNamespace = omElement.getNamespace();
         String uri;
         String prefix;
@@ -171,11 +197,26 @@ public class AXIOMXMLReader implements XMLReader {
                     generateEvents((OMElement)node);
                     break;
                 case OMNode.TEXT_NODE:
-                case OMNode.CDATA_SECTION_NODE:
                     generateEvents((OMText)node);
+                    break;
+                case OMNode.CDATA_SECTION_NODE:
+                    if (lexicalHandler != null) {
+                        lexicalHandler.startCDATA();
+                    }
+                    generateEvents((OMText)node);
+                    if (lexicalHandler != null) {
+                        lexicalHandler.endCDATA();
+                    }
+                    break;
+                case OMNode.COMMENT_NODE:
+                    if (lexicalHandler != null) {
+                        char[] ch = ((OMComment)node).getValue().toCharArray();
+                        lexicalHandler.comment(ch, 0, ch.length);
+                    }
             }
         }
         contentHandler.endElement(uri, localName, qName);
+        generatePrefixMappingEvents(omElement, false);
     }
     
     private void generateEvents(OMText omText) throws SAXException {
@@ -184,11 +225,9 @@ public class AXIOMXMLReader implements XMLReader {
     }
 
     protected static class AttributesAdapter implements Attributes {
-        private OMElement element;
         private List<OMAttribute> attributes = new ArrayList<OMAttribute>(5);
 
         public void setAttributes(OMElement element) {
-            this.element = element;
             attributes.clear();
             for (Iterator it = element.getAllAttributes(); it.hasNext(); ) {
                 attributes.add((OMAttribute)it.next());
@@ -199,12 +238,22 @@ public class AXIOMXMLReader implements XMLReader {
             return attributes.size();
         }
 
-        public int getIndex(String name) {
-            throw new UnsupportedOperationException();
+        public int getIndex(String qName) {
+            for (int i=0, len=attributes.size(); i<len; i++) {
+                if (getQName(i).equals(qName)) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         public int getIndex(String uri, String localName) {
-            throw new UnsupportedOperationException();
+            for (int i=0, len=attributes.size(); i<len; i++) {
+                if (getURI(i).equals(uri) && getLocalName(i).equals(localName)) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         public String getLocalName(int index) {
@@ -230,12 +279,14 @@ public class AXIOMXMLReader implements XMLReader {
             return attributes.get(index).getAttributeType();
         }
 
-        public String getType(String name) {
-            throw new UnsupportedOperationException();
+        public String getType(String qName) {
+            int index = getIndex(qName);
+            return index == -1 ? null : getType(index);
         }
 
         public String getType(String uri, String localName) {
-            throw new UnsupportedOperationException();
+            int index = getIndex(uri, localName);
+            return index == -1 ? null : getType(index);
         }
 
         public String getURI(int index) {
@@ -247,12 +298,14 @@ public class AXIOMXMLReader implements XMLReader {
             return attributes.get(index).getAttributeValue();
         }
 
-        public String getValue(String name) {
-            throw new UnsupportedOperationException();
+        public String getValue(String qName) {
+            int index = getIndex(qName);
+            return index == -1 ? null : getValue(index);
         }
 
         public String getValue(String uri, String localName) {
-            throw new UnsupportedOperationException();
+            int index = getIndex(uri, localName);
+            return index == -1 ? null : getValue(index);
         }
     }
 }

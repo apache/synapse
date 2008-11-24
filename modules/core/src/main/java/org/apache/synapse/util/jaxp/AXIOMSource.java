@@ -28,8 +28,6 @@ import org.xml.sax.InputSource;
  * Implementation of {@link javax.xml.transform.Source} for AXIOM.
  * The implementation is based on {@link SAXSource} and directly transforms an AXIOM
  * tree into a stream of SAX events using {@link AXIOMXMLReader}.
- * <p>
- * NOTE: THIS IS WORK IN PROGRESS!
  */
 public class AXIOMSource extends SAXSource {
     public AXIOMSource(OMElement element) {

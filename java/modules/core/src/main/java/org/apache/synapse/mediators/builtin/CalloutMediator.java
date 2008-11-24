@@ -34,6 +34,7 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -66,14 +67,13 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Callout mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Callout mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -100,20 +100,18 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
             sc.setOptions(options);
 
             OMElement request = getRequestPayload(synCtx);
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "About to invoke service : " + serviceURL + (action != null ?
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("About to invoke service : " + serviceURL + (action != null ?
                     " with action : " + action : ""));
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace("Request message payload : " + request);
+                if (synLog.isTraceTraceEnabled()) {
+                    synLog.traceTrace("Request message payload : " + request);
                 }
             }
 
             OMElement result = sc.sendReceive(request);
 
-            if (traceOrDebugOn) {
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace("Response payload received : " + result);
-                }
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Response payload received : " + result);
             }
 
             if (result != null) {
@@ -137,9 +135,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                     synCtx.setProperty(targetKey, result);
                 }
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Service returned a null response");
-                }
+                synLog.traceOrDebug("Service returned a null response");
             }
 
         } catch (Exception e) {
@@ -147,9 +143,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                 (action != null ? " with action : " + action : ""), e, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Callout mediator");
-        }
+        synLog.traceOrDebug("End : Callout mediator");
         return true;
     }
 

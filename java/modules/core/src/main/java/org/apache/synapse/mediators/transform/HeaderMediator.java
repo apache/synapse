@@ -28,6 +28,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
@@ -64,14 +65,13 @@ public class HeaderMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Header mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Header mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -80,8 +80,8 @@ public class HeaderMediator extends AbstractMediator {
             String value = (getExpression() == null ? getValue() :
                     expression.stringValueOf(synCtx));
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Set SOAP header : " + qName + " to : " + value);
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Set SOAP header : " + qName + " to : " + value);
             }
 
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
@@ -108,8 +108,8 @@ public class HeaderMediator extends AbstractMediator {
 
         } else {
 
-             if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Removing SOAP Header : " + qName);
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Removing SOAP Header : " + qName);
             }
 
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
@@ -150,9 +150,7 @@ public class HeaderMediator extends AbstractMediator {
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Header mediator");
-        }
+        synLog.traceOrDebug("End : Header mediator");
         return true;
     }
 

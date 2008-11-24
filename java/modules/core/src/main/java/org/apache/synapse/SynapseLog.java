@@ -81,6 +81,24 @@ public interface SynapseLog {
     void traceTrace(Object msg);
     
     /**
+     * Log an audit message.
+     * In mediators this method should be used to replace
+     * {@link AbstractMediator#auditLog(String, MessageContext)}.
+     * 
+     * @param msg the message to be logged
+     */
+    void auditLog(Object msg);
+    
+    /**
+     * Log a warning message.
+     * In mediators this method should be used to replace
+     * {@link AbstractMediator#auditWarn(String, MessageContext)}.
+     * 
+     * @param msg the message to be logged
+     */
+    void auditWarn(Object msg);
+    
+    /**
      * Log a message at level 'error'.
      * 
      * @param msg the message to be logged

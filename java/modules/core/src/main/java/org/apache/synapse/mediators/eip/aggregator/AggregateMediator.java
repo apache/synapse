@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -52,7 +52,6 @@ import java.util.Map;
 public class AggregateMediator extends AbstractMediator implements ManagedLifecycle {
 
     private static final Log log = LogFactory.getLog(AggregateMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /** The duration as a number of milliseconds for this aggregation to complete */
     private long completionTimeoutMillis = 0;
@@ -121,14 +120,13 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Aggregate mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Aggregate mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -155,8 +153,8 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
 
                         } else {
 
-                            if (traceOrDebugOn) {
-                                traceOrDebug(traceOn, "Creating new Aggregator - " +
+                            if (synLog.isTraceOrDebugEnabled()) {
+                                synLog.traceOrDebug("Creating new Aggregator - " +
                                         (completionTimeoutMillis > 0 ? "expires in : "
                                                 + (completionTimeoutMillis / 1000) + "secs" :
                                                 "without expiry time"));
@@ -202,8 +200,8 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                                     break;
                                 }
                             } else {
-                                if (traceOrDebugOn) {
-                                    traceOrDebug(traceOn, "Creating new Aggregator - " +
+                                if (synLog.isTraceOrDebugEnabled()) {
+                                    synLog.traceOrDebug("Creating new Aggregator - " +
                                             (completionTimeoutMillis > 0 ? "expires in : "
                                                     + (completionTimeoutMillis / 1000) + "secs" :
                                                     "without expiry time"));
@@ -231,27 +229,22 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                     }
                     
                 } else {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Unable to find aggrgation correlation property");
-                    }
+                    synLog.traceOrDebug("Unable to find aggrgation correlation property");
                     return true;
                 }
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
-                            "Unable to find aggrgation correlation XPath or property");
-                }
+                synLog.traceOrDebug("Unable to find aggrgation correlation XPath or property");
                 return true;
             }
 
             // if there is an aggregate continue on aggregation
             if (aggregate != null) {
                 boolean collected = aggregate.addMessage(synCtx);
-                if (traceOrDebugOn) {
+                if (synLog.isTraceOrDebugEnabled()) {
                     if (collected) {
-                        traceOrDebug(traceOn, "Collected a message during aggregation");
-                        if (traceOn && trace.isTraceEnabled()) {
-                            trace.trace("Collected message : " + synCtx);
+                        synLog.traceOrDebug("Collected a message during aggregation");
+                        if (synLog.isTraceTraceEnabled()) {
+                            synLog.traceTrace("Collected message : " + synCtx);
                         }
                     }
                 }
@@ -259,15 +252,11 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                 // check the completeness of the aggregate and if completed aggregate the messages
                 // if not completed return false and block the message sequence till it completes
 
-                if (aggregate.isComplete(traceOn, traceOrDebugOn, trace, log)) {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Aggregation completed - invoking onComplete");
-                    }
+                if (aggregate.isComplete(synLog)) {
+                    synLog.traceOrDebug("Aggregation completed - invoking onComplete");
                     completeAggregate(aggregate);
                     
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "End : Aggregate mediator");
-                    }
+                    synLog.traceOrDebug("End : Aggregate mediator");
                     return true;
                 } else {
                     aggregate.releaseLock();
@@ -277,9 +266,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                 // if the aggregation correlation cannot be found then continue the message on the
                 // normal path by returning true
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Unable to find an aggregate for this message - skip");
-                }
+                synLog.traceOrDebug("Unable to find an aggregate for this message - skip");
                 return true;
             }
 
@@ -287,9 +274,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
             handleException("Unable to execute the XPATH over the message", e, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Aggregate mediator");
-        }
+        synLog.traceOrDebug("End : Aggregate mediator");
 
         return false;
     }

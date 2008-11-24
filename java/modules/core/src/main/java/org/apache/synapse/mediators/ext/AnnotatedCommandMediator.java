@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.ext;
 
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.annotations.Namespaces;
 import org.apache.synapse.mediators.annotations.ReadAndUpdate;
 import org.apache.synapse.mediators.annotations.ReadFromMessage;
@@ -45,19 +46,18 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
     
     @Override
     public boolean mediate(MessageContext synCtx) {
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : POJOCommand mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : POJOCommand mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Creating a new instance of POJO class : " + getCommand().getClass());
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Creating a new instance of POJO class : " + getCommand().getClass());
         }
 
         Object commandObject = null;
@@ -69,9 +69,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
                             getCommand().getClass(), e, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Instance created, setting static and dynamic properties");
-        }
+        synLog.traceOrDebug("Instance created, setting static and dynamic properties");
 
         // then set the static/constant properties first
         for (Iterator iter = getStaticSetterProperties().keySet().iterator(); iter.hasNext(); ) {
@@ -110,9 +108,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "POJO initialized successfully, invoking the execute() method");
-        }
+        synLog.traceOrDebug("POJO initialized successfully, invoking the execute() method");
 
         // then call the execute method if the Command interface is implemented
         if (commandObject instanceof Command) {
@@ -140,9 +136,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
 
         // TODO: now update the MessageContext from the commandObject
         
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : POJOCommand mediator");
-        }
+        synLog.traceOrDebug("End : POJOCommand mediator");
         return true;
     }
     

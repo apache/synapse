@@ -20,7 +20,7 @@
 package org.apache.synapse.mediators.eip.aggregator;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.commons.logging.Log;
@@ -38,7 +38,6 @@ import java.util.TimerTask;
 public class Aggregate extends TimerTask {
 
     private static final Log log = LogFactory.getLog(Aggregate.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     private long timeoutMillis = 0;
     /** The time in millis at which this aggregation should be considered as expired */
@@ -99,15 +98,11 @@ public class Aggregate extends TimerTask {
     /**
      * Has this aggregation group completed?
      *
-     * @param traceOn is tracing on
-     * @param traceOrDebugOn is trace or debug on
-     * @param trace trace log to be used
-     * @param log log to be used
+     * @param synLog the Synapse log to use
      *
      * @return boolean true if aggregation is complete
      */
-    public synchronized boolean isComplete(boolean traceOn, boolean traceOrDebugOn,
-        Log trace, Log log) {
+    public synchronized boolean isComplete(SynapseLog synLog) {
 
         if (!completed) {
 
@@ -123,28 +118,24 @@ public class Aggregate extends TimerTask {
                             EIPConstants.MESSAGE_SEQUENCE_DELEMITER);
                     int total = Integer.parseInt(msgSequence[1]);
 
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, trace, log, messages.size() +
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug(messages.size() +
                                 " messages of " + total + " collected in current aggregation");
                     }
 
                     if (messages.size() >= total) {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, trace, log, "Aggregation complete");
-                        }
+                        synLog.traceOrDebug("Aggregation complete");
                         return true;
                     }
                 }
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, trace, log, "No messages collected in current aggregation");
-                }
+                synLog.traceOrDebug("No messages collected in current aggregation");
             }
 
             // if the minimum number of messages has been reached, its complete
             if (minCount > 0 && messages.size() >= minCount) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, trace, log,
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug(
                             "Aggregation complete - the minimum : " + minCount
                                     + " messages has been reached");
                 }
@@ -152,8 +143,8 @@ public class Aggregate extends TimerTask {
             }
 
             if (maxCount > 0 && messages.size() >= maxCount) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, trace, log,
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug(
                             "Aggregation complete - the maximum : " + maxCount
                                     + " messages has been reached");
                 }
@@ -163,30 +154,16 @@ public class Aggregate extends TimerTask {
 
             // else, has this aggregation reached its timeout?
             if (expiryTimeMillis > 0 && System.currentTimeMillis() >= expiryTimeMillis) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, trace, log,
-                            "Aggregation complete - the aggregation has timed out");
-                }
+                synLog.traceOrDebug("Aggregation complete - the aggregation has timed out");
 
                 return true;
             }
         } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, trace, log,
-                        "Aggregation already completed - this message will not be processed in aggregation");
-            }
+            synLog.traceOrDebug(
+                    "Aggregation already completed - this message will not be processed in aggregation");
         }
         
         return false;
-    }
-
-    private void traceOrDebug(boolean traceOn, Log trace, Log log, String msg) {
-        if (traceOn) {
-            trace.info(msg);
-        }
-        if (log.isDebugEnabled()) {
-            log.debug(msg);
-        }
     }
 
     public long getTimeoutMillis() {

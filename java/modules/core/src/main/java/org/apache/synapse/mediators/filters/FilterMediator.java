@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.ListMediator;
@@ -69,14 +70,13 @@ public class FilterMediator extends AbstractListMediator implements
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Filter mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Filter mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -85,8 +85,8 @@ public class FilterMediator extends AbstractListMediator implements
 
             if (thenKey != null) {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, (xpath == null ?
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug((xpath == null ?
                         "Source : " + source + " against : " + regex.pattern() + " matches" :
                         "XPath expression : "  + xpath + " evaluates to true") +
                         " - executing then sequence with key : " + thenKey);
@@ -102,8 +102,8 @@ public class FilterMediator extends AbstractListMediator implements
                 
             } else {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, (xpath == null ?
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug((xpath == null ?
                         "Source : " + source + " against : " + regex.pattern() + " matches" :
                         "XPath expression : "  + xpath + " evaluates to true") +
                         " - executing child mediators");
@@ -116,8 +116,8 @@ public class FilterMediator extends AbstractListMediator implements
 
             if (elseKey != null) {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, (xpath == null ?
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug((xpath == null ?
                         "Source : " + source + " against : " + regex.pattern() + " does not match" :
                         "XPath expression : "  + xpath + " evaluates to false") +
                         " - executing the else sequence with key : " + elseKey);
@@ -134,8 +134,8 @@ public class FilterMediator extends AbstractListMediator implements
                 
             } else if (elseMediator != null) {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, (xpath == null ?
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug((xpath == null ?
                         "Source : " + source + " against : " + regex.pattern() + " does not match" :
                         "XPath expression : "  + xpath + " evaluates to false") +
                         " - executing the else path child mediators");
@@ -144,8 +144,8 @@ public class FilterMediator extends AbstractListMediator implements
 
             } else {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, (xpath == null ?
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug((xpath == null ?
                         "Source : " + source + " against : " + regex.pattern() + " does not match" :
                         "XPath expression : "  + xpath + " evaluates to false and no else path") +
                         " - skipping child mediators");
@@ -154,9 +154,7 @@ public class FilterMediator extends AbstractListMediator implements
             }
         }
 
-        if (traceOrDebugOn) {
-            trace.trace("End : Filter mediator ");
-        }
+        synLog.traceOrDebug("End : Filter mediator ");
         return result;
     }
 
@@ -171,8 +169,7 @@ public class FilterMediator extends AbstractListMediator implements
      */
     public boolean test(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
         if (xpath != null) {
             try {
@@ -184,15 +181,15 @@ public class FilterMediator extends AbstractListMediator implements
         } else if (source != null && regex != null) {
             String sourceString = source.stringValueOf(synCtx);
             if (sourceString == null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Source String : " + source + " evaluates to null");
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Source String : " + source + " evaluates to null");
                 }
                 return false;
             }
             Matcher matcher = regex.matcher(sourceString);
             if (matcher == null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Regex pattren matcher for : " + regex.pattern() +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Regex pattern matcher for : " + regex.pattern() +
                         "against source : " + sourceString + " is null");
                 }
                 return false;

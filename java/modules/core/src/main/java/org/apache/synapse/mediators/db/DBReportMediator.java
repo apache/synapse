@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.db;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,8 +33,7 @@ public class DBReportMediator extends AbstractDBMediator {
 
     protected void processStatement(Statement stmnt, MessageContext msgCtx) {
 
-        boolean traceOn = isTraceOn(msgCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(msgCtx);
 
         Connection con = null;
         try {
@@ -42,13 +42,13 @@ public class DBReportMediator extends AbstractDBMediator {
             int count = ps.executeUpdate();
 
             if (count > 0) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug(
                         "Inserted " + count + " row/s using statement : " + stmnt.getRawStatement());
                 }
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug(
                         "No rows were inserted for statement : " + stmnt.getRawStatement());
                 }
             }

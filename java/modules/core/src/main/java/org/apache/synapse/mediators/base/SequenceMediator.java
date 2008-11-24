@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -65,19 +66,18 @@ public class SequenceMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
         if (isStatisticsEnable()) {
             StatisticsReporter.collect(synCtx, this);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Sequence "
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Sequence "
                     + (name == null ? (key == null ? "<anonymous" : "key=<" + key) : "<" + name) + ">");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -96,15 +96,15 @@ public class SequenceMediator extends AbstractListMediator {
                     errorHandlerMediator = synCtx.getSequence(errorHandler);
 
                     if (errorHandlerMediator != null) {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Setting the onError handler : " +
+                        if (synLog.isTraceOrDebugEnabled()) {
+                            synLog.traceOrDebug("Setting the onError handler : " +
                                     errorHandler + " for the sequence : " + name);
                         }
                         synCtx.pushFaultHandler(
                                 new MediatorFaultHandler(errorHandlerMediator));
                     } else {
-                        auditWarn("onError handler : " + errorHandler + " for sequence : " +
-                                name + " cannot be found", synCtx);
+                        synLog.auditWarn("onError handler : " + errorHandler + " for sequence : " +
+                                name + " cannot be found");
                     }
                 }
 
@@ -125,12 +125,12 @@ public class SequenceMediator extends AbstractListMediator {
                     }
                 }
 
-                if (traceOrDebugOn) {
-                    if (traceOn && trace.isTraceEnabled()) {
-                        trace.trace("Message : " + synCtx.getEnvelope());
+                if (synLog.isTraceOrDebugEnabled()) {
+                    if (synLog.isTraceTraceEnabled()) {
+                        synLog.traceTrace("Message : " + synCtx.getEnvelope());
                     }
 
-                    traceOrDebug(traceOn,
+                    synLog.traceOrDebug(
                             "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }
 
@@ -150,14 +150,14 @@ public class SequenceMediator extends AbstractListMediator {
                 handleException("Sequence named " + key + " cannot be found", synCtx);
 
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Executing with key " + key);
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Executing with key " + key);
                 }
 
                 boolean result = m.mediate(synCtx);
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "End : Sequence key=<" + key + ">");
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("End : Sequence key=<" + key + ">");
                 }
                 return result;
             }

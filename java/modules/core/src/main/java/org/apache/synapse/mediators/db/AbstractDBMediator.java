@@ -21,10 +21,10 @@ package org.apache.synapse.mediators.db;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
-import org.apache.commons.logging.Log;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.util.datasource.DBPoolView;
 import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -87,14 +87,13 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
     public boolean mediate(MessageContext synCtx) {
 
         String name = (this instanceof DBLookupMediator ? "DBLookup" : "DBReport");
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : " + name + " mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : " + name + " mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -102,8 +101,8 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             processStatement((Statement) iter.next(), synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : " + name + " mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("End : " + name + " mediator");
         }
         return true;
     }
@@ -165,13 +164,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      */
     protected PreparedStatement getPreparedStatement(Statement stmnt, MessageContext msgCtx) throws SQLException {
 
-        boolean traceOn = isTraceOn(msgCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(msgCtx);
 
-        Log serviceLog = msgCtx.getServiceLog();
-
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Getting a connection from DataSource " + getDSName() +
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Getting a connection from DataSource " + getDSName() +
                 " and preparing statement : " + stmnt.getRawStatement());
         }
 
@@ -197,12 +193,12 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                 dbPoolView.updateConnectionUsage(connectionId);
             }
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "[ DB Connection : " + con + " ]");
-                traceOrDebug(traceOn, "[ DB Connection instance identifier : " +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("[ DB Connection : " + con + " ]");
+                synLog.traceOrDebug("[ DB Connection instance identifier : " +
                         connectionId + " ]");
-                traceOrDebug(traceOn, "[ Number of Active Connection : " + numActive + " ]");
-                traceOrDebug(traceOn, "[ Number of Idle Connection : " + numIdle + " ]");
+                synLog.traceOrDebug("[ Number of Active Connection : " + numActive + " ]");
+                synLog.traceOrDebug("[ Number of Idle Connection : " + numIdle + " ]");
             }
         }
 
@@ -218,8 +214,8 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             String value = (param.getPropertyName() != null ?
                 param.getPropertyName() : param.getXpath().stringValueOf(msgCtx));
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting as parameter : " + column + " value : " + value +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting as parameter : " + column + " value : " + value +
                     " as JDBC Type : " + param.getType() + "(see java.sql.Types for valid types)");
             }
 
@@ -292,8 +288,8 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Successfully prepared statement : " + stmnt.getRawStatement() +
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Successfully prepared statement : " + stmnt.getRawStatement() +
                 " against DataSource : " + getDSName());
         }
         return ps;

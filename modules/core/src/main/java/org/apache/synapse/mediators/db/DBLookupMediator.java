@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.db;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,8 +35,7 @@ public class DBLookupMediator extends AbstractDBMediator {
 
     protected void processStatement(Statement stmnt, MessageContext msgCtx) {
 
-        boolean traceOn = isTraceOn(msgCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(msgCtx);
 
         // execute the prepared statement, and extract the first result row and
         // set as message context properties, any results that have been specified
@@ -46,8 +46,8 @@ public class DBLookupMediator extends AbstractDBMediator {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug(
                         "Processing the first row returned : " + stmnt.getRawStatement());
                 }
 
@@ -66,22 +66,22 @@ public class DBLookupMediator extends AbstractDBMediator {
                     }
 
                     if (obj != null) {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Column : " + columnStr +
+                        if (synLog.isTraceOrDebugEnabled()) {
+                            synLog.traceOrDebug("Column : " + columnStr +
                                 " returned value : " + obj +
                                 " Setting this as the message property : " + propName);
                         }
                         msgCtx.setProperty(propName, obj.toString());
                     } else {
-                        if (traceOrDebugOn) {
-                            traceOrDebugWarn(traceOn, "Column : " + columnStr +
+                        if (synLog.isTraceOrDebugEnabled()) {
+                            synLog.traceOrDebugWarn("Column : " + columnStr +
                                 " returned null Skip setting message property : " + propName);
                         }
                     }
                 }
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Statement : "
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Statement : "
                         + stmnt.getRawStatement() + " returned 0 rows");
                 }
             }

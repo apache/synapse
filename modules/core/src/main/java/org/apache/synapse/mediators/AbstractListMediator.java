@@ -22,6 +22,7 @@ package org.apache.synapse.mediators;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.axis2.context.ConfigurationContext;
 
@@ -48,8 +49,9 @@ public abstract class AbstractListMediator extends AbstractMediator
         int myEffectiveTraceState = synCtx.getTracingState();
 
         try {
-            if (isTraceOrDebugOn(isTraceOn(synCtx))) {
-                traceOrDebug(isTraceOn(synCtx), "Sequence <" + getType() + "> :: mediate()");
+            SynapseLog synLog = getLog(synCtx);
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Sequence <" + getType() + "> :: mediate()");
             }
 
             for (Mediator mediator : mediators) {

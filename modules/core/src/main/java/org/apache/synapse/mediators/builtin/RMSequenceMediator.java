@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -51,21 +52,18 @@ public class RMSequenceMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : RMSequence mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : RMSequence mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
         if (!(synCtx instanceof Axis2MessageContext)) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Only axis2 message contexts are supported");
-            }
+            synLog.traceOrDebug("Only axis2 message contexts are supported");
 
         } else {
             Axis2MessageContext axis2MessageCtx = (Axis2MessageContext) synCtx;
@@ -89,8 +87,8 @@ public class RMSequenceMediator extends AbstractMediator {
                 orgMessageCtx.getOptions().setProperty(
                     SynapseConstants.MERCURY_LAST_MESSAGE, "true");
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Using WS-RM version " + version +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Using WS-RM version " + version +
                         " and a single message sequence : " + sequenceID +
                         " and offering sequence : " + offeredSeqID);
                 }
@@ -117,17 +115,15 @@ public class RMSequenceMediator extends AbstractMediator {
                     sequenceMap.remove(correlationValue);
                 }
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Correlation value : " + correlationValue +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Correlation value : " + correlationValue +
                         " last message = " + lastMessage + " using sequence : " + sequenceID +
                         (offeredSeqID != null ? " offering sequence : " + offeredSeqID : ""));
                 }
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : RMSequence mediator");
-        }
+        synLog.traceOrDebug("End : RMSequence mediator");
         return true;
     }
 

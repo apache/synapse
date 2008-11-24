@@ -28,6 +28,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -83,30 +84,29 @@ public class FaultMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Fault mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Fault mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
         switch (soapVersion) {
             case SOAP11:
-                makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                makeSOAPFault(synCtx, SOAP11, synLog);
             case SOAP12:
-                makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+                makeSOAPFault(synCtx, SOAP12, synLog);
             case POX:
-                makePOXFault(synCtx, traceOrDebugOn, traceOn);
+                makePOXFault(synCtx, synLog);
 
             default : {
                 // if this is a POX or REST message then make a POX fault
                 if (synCtx.isDoingPOX() || synCtx.isDoingGET()) {
                     
-                    makePOXFault(synCtx, traceOrDebugOn, traceOn);
+                    makePOXFault(synCtx, synLog);
 
                 } else {
                     
@@ -118,16 +118,16 @@ public class FaultMediator extends AbstractMediator {
                             envelop.getNamespace().getNamespaceURI())) {
 
                             soapVersion = SOAP12;
-                            makeSOAPFault(synCtx, SOAP12, traceOrDebugOn, traceOn);
+                            makeSOAPFault(synCtx, SOAP12, synLog);
 
                         } else {
                             soapVersion = SOAP11;
-                            makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                            makeSOAPFault(synCtx, SOAP11, synLog);
                         }
                         
                     } else {
                         // default to SOAP 11
-                        makeSOAPFault(synCtx, SOAP11, traceOrDebugOn, traceOn);
+                        makeSOAPFault(synCtx, SOAP11, synLog);
                     }
                 }
             }
@@ -142,15 +142,15 @@ public class FaultMediator extends AbstractMediator {
         return true;
     }
 
-    private void makePOXFault(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+    private void makePOXFault(MessageContext synCtx, SynapseLog synLog) {
 
         OMFactory fac = synCtx.getEnvelope().getOMFactory();
         OMElement faultPayload = fac.createOMElement(new QName("Exception"));
 
         if (faultDetail != null) {
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting the fault detail : "
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting the fault detail : "
                     + faultDetail + " as the POX Fault");
             }
 
@@ -160,8 +160,8 @@ public class FaultMediator extends AbstractMediator {
 
             String faultDetail = faultDetailExpr.stringValueOf(synCtx);
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting the fault detail : "
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting the fault detail : "
                         + faultDetail + " as the POX Fault");
             }
 
@@ -169,8 +169,8 @@ public class FaultMediator extends AbstractMediator {
             
         } else if (faultReasonValue != null) {
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting the fault reason : "
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting the fault reason : "
                     + faultReasonValue + " as the POX Fault");
             }
 
@@ -181,8 +181,8 @@ public class FaultMediator extends AbstractMediator {
             String faultReason = faultReasonExpr.stringValueOf(synCtx);
             faultPayload.setText(faultReason);
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting the fault reason : "
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting the fault reason : "
                     + faultReason + " as the POX Fault");
             }
         }
@@ -197,12 +197,10 @@ public class FaultMediator extends AbstractMediator {
             synCtx.setFaultResponse(true);
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProcessingFault(true);
 
-            if (traceOrDebugOn) {
+            if (synLog.isTraceOrDebugEnabled()) {
                 String msg = "Original SOAP Message : " + synCtx.getEnvelope().toString() +
                     "POXFault Message created : " + faultPayload.toString();
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace(msg);
-                }
+                synLog.traceTrace(msg);
                 if (log.isTraceEnabled()) {
                     log.trace(msg);
                 }
@@ -216,14 +214,13 @@ public class FaultMediator extends AbstractMediator {
      * Actual transformation of the current message into a fault message
      * @param synCtx the current message context
      * @param soapVersion SOAP version of the resulting fault desired
-     * @param traceOrDebugOn is trace or debug logging on?
-     * @param traceOn is tracing on?
+     * @param synLog the Synapse log to use
      */
     private void makeSOAPFault(MessageContext synCtx, int soapVersion,
-        boolean traceOrDebugOn, boolean traceOn) {
+        SynapseLog synLog) {
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Creating a SOAP "
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Creating a SOAP "
                     + (soapVersion == SOAP11 ? "1.1" : "1.2") + " fault");
         }
 
@@ -265,12 +262,12 @@ public class FaultMediator extends AbstractMediator {
             }
         }
 
-        if (traceOrDebugOn) {
+        if (synLog.isTraceOrDebugEnabled()) {
             String msg =
                 "Original SOAP Message : " + synCtx.getEnvelope().toString() +
                 "Fault Message created : " + faultEnvelope.toString();
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace(msg);
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace(msg);
             }
             if (log.isTraceEnabled()) {
                 log.trace(msg);
@@ -299,9 +296,7 @@ public class FaultMediator extends AbstractMediator {
             synCtx.setRelatesTo(new RelatesTo[] { relatesTo });
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Fault mediator");
-        }
+        synLog.traceOrDebug("End : Fault mediator");
     }
 
     private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {

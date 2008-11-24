@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -62,14 +63,13 @@ public class PropertyMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Property mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Property mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -77,8 +77,8 @@ public class PropertyMediator extends AbstractMediator {
 
             String resultValue = (value != null ? value : expression.stringValueOf(synCtx));
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Setting property : " + name + " at scope : " +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting property : " + name + " at scope : " +
                     (scope == null ? "default" : scope) + " to : " + resultValue + " (i.e. " +
                     (value != null ? "constant : " + value :
                           "result of expression : " + expression) + ")");
@@ -127,8 +127,8 @@ public class PropertyMediator extends AbstractMediator {
             }
 
         } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Removing property : " + name +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Removing property : " + name +
                     " (scope:" + (scope == null ? "default" : scope) + ")");
             }
 
@@ -161,15 +161,11 @@ public class PropertyMediator extends AbstractMediator {
                     Map headersMap = (HashMap) headers;
                     headersMap.remove(name);
                 } else {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "No transport headers found for the message");
-                    }
+                    synLog.traceOrDebug("No transport headers found for the message");
                 }
             }
         }
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Property mediator");
-        }
+        synLog.traceOrDebug("End : Property mediator");
         return true;
     }
 

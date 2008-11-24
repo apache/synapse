@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.eip.splitter;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -64,14 +65,13 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Clone mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Clone mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -80,8 +80,8 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         Iterator<Target> iter = targets.iterator();
         int i = 0;
         while (iter.hasNext()) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Submitting " + (i+1) + " of " + targets.size() +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Submitting " + (i+1) + " of " + targets.size() +
                     " messages for processing in parallel");
             }
 
@@ -97,9 +97,7 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         }
 
         // finalize tracing and debugging
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Clone mediator");
-        }
+        synLog.traceOrDebug("End : Clone mediator");
 
         // if continue parent is true mediators after the clone will be called for the further
         // mediation of the message which is subjected for clonning (parent message)

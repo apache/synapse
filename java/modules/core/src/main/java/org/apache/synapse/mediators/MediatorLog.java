@@ -91,6 +91,32 @@ public class MediatorLog implements SynapseLog {
     }
 
     /**
+     * Log a message at level INFO to all available/enabled logs.
+     */
+    public void auditLog(Object msg) {
+        defaultLog.info(msg);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().info(msg);
+        }
+        if (traceOn) {
+            traceLog.info(msg);
+        }
+    }
+
+    /**
+     * Log a message at level WARN to all available/enabled logs.
+     */
+    public void auditWarn(Object msg) {
+        defaultLog.warn(msg);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().warn(msg);
+        }
+        if (traceOn) {
+            traceLog.warn(msg);
+        }
+    }
+
+    /**
      * Log a message at level ERROR to the default log and to the trace, if trace is enabled.
      */
     public void error(Object msg) {

@@ -23,6 +23,7 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -95,17 +96,16 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
         boolean isResponse = synCtx.isResponse();
         ConfigurationContext cc;
         org.apache.axis2.context.MessageContext axisMC;
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Throttle mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Throttle mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
         // To ensure the creation of throttle is thread safe – It is possible create same throttle
@@ -140,8 +140,8 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                     // this uses a static policy
                     if (throttle == null) {  // only one time creation
 
-                        if (traceOn && trace.isTraceEnabled()) {
-                            trace.trace("Initializing using static throttling policy : "
+                        if (synLog.isTraceTraceEnabled()) {
+                            synLog.traceTrace("Initializing using static throttling policy : "
                                 + inLinePolicy);
                         }
                         try {
@@ -242,20 +242,20 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
             }
         }
         //perform concurrency throttling
-        boolean canAccess = doThrottleByConcurrency(isResponse, traceOrDebugOn, traceOn);
+        boolean canAccess = doThrottleByConcurrency(isResponse, synLog);
 
         //if the access is success through concurrency throttle and if this is a request message
         //then do access rate based throttling
         if (throttle != null && !isResponse && canAccess) {
-            canAccess = throttleByAccessRate(synCtx, axisMC, cc, traceOrDebugOn, traceOn);
+            canAccess = throttleByAccessRate(synCtx, axisMC, cc, synLog);
         }
         // all the replication functionality of the access rate based throttling handles by itself 
         // Just replicate the current state of ConcurrentAccessController
         if (isClusteringEnable && concurrentAccessController != null) {
             if (cc != null) {
                 try {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Going to replicates the  " +
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("Going to replicates the  " +
                             "states of the ConcurrentAccessController with key : " + key);
                     }
                     Replicator.replicate(cc);
@@ -296,9 +296,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Throttle mediator");
-        }
+        synLog.traceOrDebug("End : Throttle mediator");
         return canAccess;
     }
 
@@ -306,32 +304,31 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
      * Helper method that handles the concurrent access through throttle
      *
      * @param isResponse     Current Message is response or not
-     * @param traceOrDebugOn is trace or debug on?
-     * @param traceOn        is trace on?
+     * @param synLog         the Synapse log to use
      * @return true if the caller can access ,o.w. false
      */
-    private boolean doThrottleByConcurrency(boolean isResponse, boolean traceOrDebugOn, boolean traceOn) {
+    private boolean doThrottleByConcurrency(boolean isResponse, SynapseLog synLog) {
         boolean canAcess = true;
         if (concurrentAccessController != null) {
             // do the concurrecy throttling
             int concurrentLimit = concurrentAccessController.getLimit();
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Concurrent access controller for ID : " + id +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Concurrent access controller for ID : " + id +
                     " allows : " + concurrentLimit + " concurrent accesses");
             }
             int available;
             if (!isResponse) {
                 available = concurrentAccessController.getAndDecrement();
                 canAcess = available > 0;
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Concurrency Throttle : Access " +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Concurrency Throttle : Access " +
                         (canAcess ? "allowed" : "denied") + " :: " + available
                         + " of available of " + concurrentLimit + " connections");
                 }
             } else {
                 available = concurrentAccessController.incrementAndGet();
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Concurrency Throttle : Connection returned" + " :: " +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Concurrency Throttle : Connection returned" + " :: " +
                         available + " of available of " + concurrentLimit + " connections");
                 }
             }
@@ -345,11 +342,10 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
      * @param synCtx         MessageContext(Synapse)
      * @param axisMC         MessageContext(Axis2)
      * @param cc             ConfigurationContext
-     * @param traceOrDebugOn is trace or debug on?
-     * @param traceOn        is trace on?
+     * @param synLog         the Synapse log to use
      * @return ue if the caller can access ,o.w. false
      */
-    private boolean throttleByAccessRate(MessageContext synCtx, org.apache.axis2.context.MessageContext axisMC, ConfigurationContext cc, boolean traceOrDebugOn, boolean traceOn) {
+    private boolean throttleByAccessRate(MessageContext synCtx, org.apache.axis2.context.MessageContext axisMC, ConfigurationContext cc, SynapseLog synLog) {
 
         String callerId = null;
         boolean canAccess = true;
@@ -363,8 +359,8 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         // this domain name ,then throttling will occur according to that configuration
         if (domainName != null) {
             // do the domain based throttling
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "The Domain Name of the caller is :" + domainName);
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("The Domain Name of the caller is :" + domainName);
             }
             // loads the DomainBasedThrottleContext
             ThrottleContext context
@@ -388,8 +384,8 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                             canAccess = accessControler.canAccess(context,
                                 callerId, ThrottleConstants.DOMAIN_BASE);
 
-                            if (traceOrDebugOn) {
-                                traceOrDebug(traceOn, "Access " + (canAccess ? "allowed" : "denied")
+                            if (synLog.isTraceOrDebugEnabled()) {
+                                synLog.traceOrDebug("Access " + (canAccess ? "allowed" : "denied")
                                     + " for Domain Name : " + domainName);
                             }
 
@@ -411,9 +407,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                 }
             }
         } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "The Domain name of the caller cannot be found");
-            }
+            synLog.traceOrDebug("The Domain name of the caller cannot be found");
         }
 
         //At this point , any configuration for the remote caller hasn't found ,
@@ -421,14 +415,12 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         if (callerId == null) {
             //do the IP-based throttling
             if (remoteIP == null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "The IP address of the caller cannot be found");
-                }
+                synLog.traceOrDebug("The IP address of the caller cannot be found");
                 canAccess = true;
 
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "The IP Address of the caller is :" + remoteIP);
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("The IP Address of the caller is :" + remoteIP);
                 }
                 try {
                     // Loads the IPBasedThrottleContext
@@ -451,8 +443,8 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                                 canAccess = accessControler.canAccess(context,
                                     callerId, ThrottleConstants.IP_BASE);
 
-                                if (traceOrDebugOn) {
-                                    traceOrDebug(traceOn, "Access " +
+                                if (synLog.isTraceOrDebugEnabled()) {
+                                    synLog.traceOrDebug("Access " +
                                         (canAccess ? "allowed" : "denied")
                                         + " for IP : " + remoteIP);
                                 }

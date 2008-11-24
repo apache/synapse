@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
@@ -42,24 +43,23 @@ public class SynapseMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Mediation using '" + SynapseConstants.MAIN_SEQUENCE_KEY +
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Mediation using '" + SynapseConstants.MAIN_SEQUENCE_KEY +
                 "' sequence Message is a : " + (synCtx.isResponse() ? "response" : "request"));
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }       
         boolean result = super.mediate(synCtx);
 
-        if (traceOrDebugOn) {
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+        if (synLog.isTraceOrDebugEnabled()) {
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
-            traceOrDebug(traceOn, "End : Mediation using '" +
+            synLog.traceOrDebug("End : Mediation using '" +
                 SynapseConstants.MAIN_SEQUENCE_KEY + "' sequence");
         }
         return result;        

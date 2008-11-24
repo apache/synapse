@@ -27,6 +27,7 @@ import org.apache.axis2.saaj.util.SAAJUtil;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
@@ -88,15 +89,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
     public boolean mediate(MessageContext synCtx) {
 
-        // tracing and debuggin related mediation initiation
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Cache mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Cache mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -109,10 +108,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
             } catch (XMLStreamException e) {
                 handleException("Error in checking the message size", e, synCtx);
             } catch (SynapseException syne) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Message size exceeds the upper bound for caching, " +
+                synLog.traceOrDebug("Message size exceeds the upper bound for caching, " +
                             "request will not be cached");
-                }
                 return true;
             }
         }
@@ -125,9 +122,9 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
             return false; // never executes.. but keeps IDE happy
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn,
-                "Looking up cache at scope : " + scope + " with ID : " + cacheManagerKey);
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Looking up cache at scope : " + scope + " with ID : "
+                    + cacheManagerKey);
         }
 
         // look up cache
@@ -143,9 +140,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                     cacheManager = (CacheManager) prop;
 
                 } else {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Creating/recreating the cache object");
-                    }
+                    synLog.traceOrDebug("Creating/recreating the cache object");
                     cacheManager = new CacheManager();
                     cfgCtx.setProperty(cacheManagerKey, cacheManager);
                 }
@@ -156,22 +151,17 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         try {
             
             if (synCtx.isResponse()) {
-                processResponseMessage(synCtx, cfgCtx, traceOrDebugOn, traceOn, cacheManager);
+                processResponseMessage(synCtx, cfgCtx, synLog, cacheManager);
 
             } else {
-                result = processRequestMessage(
-                    synCtx, cfgCtx, traceOrDebugOn, traceOn, cacheManager);
+                result = processRequestMessage(synCtx, cfgCtx, synLog, cacheManager);
             }
             
         } catch (ClusteringFault clusteringFault) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Unable to replicate Cache mediator state among the cluster");
-            }
+            synLog.traceOrDebug("Unable to replicate Cache mediator state among the cluster");
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Cache mediator");
-        }
+        synLog.traceOrDebug("End : Cache mediator");
         
         return result;
     }
@@ -180,15 +170,14 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
      * Process a response message through this cache mediator. This finds the Cache used, and
      * updates it for the corresponding request hash
      *
-     * @param traceOrDebugOn is trace or debug logging on?
-     * @param traceOn        is tracing on?
+     * @param synLog         the Synapse log to use
      * @param synCtx         the current message (response)
      * @param cfgCtx         the abstract context in which the cache will be kept
      * @param cacheManager   the cache manager
      * @throws ClusteringFault is there is an error in replicating the cfgCtx
      */
     private void processResponseMessage(MessageContext synCtx, ConfigurationContext cfgCtx,
-        boolean traceOrDebugOn, boolean traceOn, CacheManager cacheManager) throws ClusteringFault {
+        SynapseLog synLog, CacheManager cacheManager) throws ClusteringFault {
 
         if (!collector) {
             handleException("Response messages cannot be handled in a non collector cache", synCtx);
@@ -197,16 +186,16 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         String requestHash = (String) synCtx.getProperty(CachingConstants.REQUEST_HASH);
 
         if (requestHash != null) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Storing the response message into the cache at scope : " +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Storing the response message into the cache at scope : " +
                     scope + " with ID : " + cacheManagerKey + " for request hash : " + requestHash);
             }
 
             CachedObject cachedObj = cacheManager.getResponseForKey(requestHash, cfgCtx);
             if (cachedObj != null) {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Storing the response for the message with ID : " +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Storing the response for the message with ID : " +
                         synCtx.getMessageID() + " with request hash ID : " +
                         cachedObj.getRequestHash() + " in the cache : " + cacheManagerKey);
                 }
@@ -234,13 +223,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 cfgCtx.setProperty(cacheManagerKey, cacheManager);
                 Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
             } else {
-                auditWarn("A response message without a valid mapping to the " +
-                    "request hash found. Unable to store the response in cache", synCtx);
+                synLog.auditWarn("A response message without a valid mapping to the " +
+                    "request hash found. Unable to store the response in cache");
             }
 
         } else {
-            auditWarn("A response message without a mapping to the " +
-                "request hash found. Unable to store the response in cache", synCtx);
+            synLog.auditWarn("A response message without a mapping to the " +
+                "request hash found. Unable to store the response in cache");
         }
     }
 
@@ -251,14 +240,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
      *
      * @param synCtx         incoming request message
      * @param cfgCtx         the AbstractContext in which the cache will be kept
-     * @param traceOrDebugOn is tracing or debug logging on?
-     * @param traceOn        is tracing on?
+     * @param synLog         the Synapse log to use
      * @param cacheManager   the cache manager
      * @return should this mediator terminate further processing?
      * @throws ClusteringFault if there is an error in replicating the cfgCtx
      */
     private boolean processRequestMessage(MessageContext synCtx, ConfigurationContext cfgCtx,
-        boolean traceOrDebugOn, boolean traceOn, CacheManager cacheManager) throws ClusteringFault {
+        SynapseLog synLog, CacheManager cacheManager) throws ClusteringFault {
 
         if (collector) {
             handleException("Request messages cannot be handled in a collector cache", synCtx);
@@ -273,8 +261,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
             handleException("Error in calculating the hash value of the request", e, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Generated request hash : " + requestHash);
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Generated request hash : " + requestHash);
         }
 
         if (cacheManager.containsKey(requestHash) &&
@@ -286,8 +274,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
             if (!cachedObj.isExpired() && cachedObj.getResponseEnvelope() != null) {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Cache-hit for message ID : " + synCtx.getMessageID());
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Cache-hit for message ID : " + synCtx.getMessageID());
                 }
 
                 // mark as a response and replace envelope from cache
@@ -317,24 +305,22 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 // take specified action on cache hit
                 if (onCacheHitSequence != null) {
                     // if there is an onCacheHit use that for the mediation
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn,
-                            "Delegating message to the onCachingHit " + "Anonymous sequence");
-                    }
+                    synLog.traceOrDebug("Delegating message to the onCachingHit "
+                            + "Anonymous sequence");
                     onCacheHitSequence.mediate(synCtx);
 
                 } else if (onCacheHitRef != null) {
 
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Delegating message to the onCachingHit " +
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("Delegating message to the onCachingHit " +
                             "sequence : " + onCacheHitRef);
                     }
                     synCtx.getSequence(onCacheHitRef).mediate(synCtx);
 
                 } else {
 
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Request message " + synCtx.getMessageID() +
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("Request message " + synCtx.getMessageID() +
                             " was served from the cache : " + cacheManagerKey);
                     }
                     // send the response back if there is not onCacheHit is specified
@@ -348,10 +334,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 // cache exists, but has expired...
                 cachedObj.expire();
                 cachedObj.setTimeout(timeout);
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn,
-                        "Existing cached response has expired. Reset cache element");
-                }
+                synLog.traceOrDebug("Existing cached response has expired. Reset cache element");
 
                 cfgCtx.setProperty(cacheManagerKey, cacheManager);
                 Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
@@ -363,9 +346,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
             if (cacheManager.getCacheKeys().size() == inMemoryCacheSize) {
                 cacheManager.removeExpiredResponses(cfgCtx);
                 if (cacheManager.getCacheKeys().size() == inMemoryCacheSize) {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "In-memory cache is full. Unable to cache");
-                    }
+                    synLog.traceOrDebug("In-memory cache is full. Unable to cache");
                 } else {
                     storeRequestToCache(cfgCtx, requestHash, cacheManager);
                 }

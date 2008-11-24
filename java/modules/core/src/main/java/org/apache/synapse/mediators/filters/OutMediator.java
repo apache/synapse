@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
@@ -38,33 +39,26 @@ public class OutMediator extends AbstractListMediator implements org.apache.syna
      */
     public boolean mediate(MessageContext synCtx) {
         
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Out mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Out mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
         boolean result = true;
         if (test(synCtx)) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Current message is outgoing - executing child mediators");
-            }
+            synLog.traceOrDebug("Current message is outgoing - executing child mediators");
             result = super.mediate(synCtx);
 
         } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Current message is a request - skipping child mediators");
-            }
+            synLog.traceOrDebug("Current message is a request - skipping child mediators");
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Out mediator");
-        }
+        synLog.traceOrDebug("End : Out mediator");
 
         return result;
     }

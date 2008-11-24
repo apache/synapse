@@ -31,6 +31,7 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -144,24 +145,21 @@ public class XQueryMediator extends AbstractMediator {
 
         try {
 
-            boolean traceOn = isTraceOn(synCtx);
-            boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+            SynapseLog synLog = getLog(synCtx);
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Start : XQuery mediator");
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Start : XQuery mediator");
 
-                if (traceOn && trace.isTraceEnabled()) {
-                    trace.trace("Message : " + synCtx.getEnvelope());
+                if (synLog.isTraceTraceEnabled()) {
+                    synLog.traceTrace("Message : " + synCtx.getEnvelope());
                 }
-                traceOrDebug(traceOn, "Performing XQuery using query resource with key : " + queryKey);
+                synLog.traceOrDebug("Performing XQuery using query resource with key : " + queryKey);
             }
 
             // perform the xquery
-            performQuery(synCtx, traceOrDebugOn, traceOn);
+            performQuery(synCtx, synLog);
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "End : XQuery mediator");
-            }
+            synLog.traceOrDebug("End : XQuery mediator");
 
             return true;
 
@@ -175,10 +173,9 @@ public class XQueryMediator extends AbstractMediator {
      * Perform the quering and get the result and attached to the target node
      *
      * @param synCtx         The current MessageContext
-     * @param traceOrDebugOn is tracing or debbug on
-     * @param traceOn        indicate whether trace is ON or OFF
+     * @param synLog         the Synapse log to use
      */
-    private void performQuery(MessageContext synCtx, boolean traceOrDebugOn, boolean traceOn) {
+    private void performQuery(MessageContext synCtx, SynapseLog synLog) {
 
         boolean reLoad = false;
         boolean needBind = false;
@@ -201,9 +198,7 @@ public class XQueryMediator extends AbstractMediator {
                     cachedXQDataSource = new SaxonXQDataSource();
                     //setting up the properties to the XQDataSource
                     if (dataSourceProperties != null && !dataSourceProperties.isEmpty()) {
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Setting up properties to the XQDataSource");
-                        }
+                        synLog.traceOrDebug("Setting up properties to the XQDataSource");
                         for (int i = 0; i < dataSourceProperties.size(); i++) {
                             MediatorProperty prop = (MediatorProperty) dataSourceProperties.get(i);
                             if (prop != null) {
@@ -217,9 +212,7 @@ public class XQueryMediator extends AbstractMediator {
                 if (cachedConnection == null
                         || (cachedConnection != null && cachedConnection.isClosed())) {
                     //get the Connection to XML DataBase
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Creating a connection from the XQDataSource ");
-                    }
+                    synLog.traceOrDebug("Creating a connection from the XQDataSource ");
                     cachedConnection = cachedXQDataSource.getConnection();
                 }
 
@@ -232,9 +225,9 @@ public class XQueryMediator extends AbstractMediator {
 
                         if (cachedPreparedExpression == null) {
 
-                            if (traceOrDebugOn) {
-                                traceOrDebug(traceOn, "Using in-lined query source - " + querySource);
-                                traceOrDebug(traceOn, "Prepare an expression for the query ");
+                            if (synLog.isTraceOrDebugEnabled()) {
+                                synLog.traceOrDebug("Using in-lined query source - " + querySource);
+                                synLog.traceOrDebug("Prepare an expression for the query ");
                             }
 
                             //create an XQPreparedExpression using the query source
@@ -247,8 +240,8 @@ public class XQueryMediator extends AbstractMediator {
 
                         Object o = synCtx.getEntry(queryKey);
                         if (o == null) {
-                            if (traceOrDebugOn) {
-                                traceOrDebug(traceOn, "Couldn't find the xquery source with a key "
+                            if (synLog.isTraceOrDebugEnabled()) {
+                                synLog.traceOrDebug("Couldn't find the xquery source with a key "
                                         + queryKey);
                             }
                             return;
@@ -266,8 +259,8 @@ public class XQueryMediator extends AbstractMediator {
                                 try {
                                     inputStream = dataHandler.getInputStream();
                                     if (inputStream == null) {
-                                        if (traceOrDebugOn) {
-                                            traceOrDebug(traceOn, "Couldn't get" +
+                                        if (synLog.isTraceOrDebugEnabled()) {
+                                            synLog.traceOrDebug("Couldn't get" +
                                                     " the stream from the xquery source with a key "
                                                     + queryKey);
                                         }
@@ -281,17 +274,17 @@ public class XQueryMediator extends AbstractMediator {
                         }
 
                         if ((sourceCode == null || "".equals(sourceCode)) && inputStream == null) {
-                            if (traceOrDebugOn) {
-                                traceOrDebug(traceOn, "Couldn't find the xquery source with a key "
+                            if (synLog.isTraceOrDebugEnabled()) {
+                                synLog.traceOrDebug("Couldn't find the xquery source with a key "
                                         + queryKey);
                             }
                             return;
                         }
 
-                        if (traceOrDebugOn) {
-                            traceOrDebug(traceOn, "Picked up the xquery source from the " +
+                        if (synLog.isTraceOrDebugEnabled()) {
+                            synLog.traceOrDebug("Picked up the xquery source from the " +
                                     "key " + queryKey);
-                            traceOrDebug(traceOn, "Prepare an expression for the query ");
+                            synLog.traceOrDebug("Prepare an expression for the query ");
                         }
 
                         if (sourceCode != null) {
@@ -310,16 +303,14 @@ public class XQueryMediator extends AbstractMediator {
 
                 //Bind the external variables to the DynamicContext
                 if (variables != null & !variables.isEmpty()) {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Binding  external variables to the DynamicContext");
-                    }
+                    synLog.traceOrDebug("Binding  external variables to the DynamicContext");
                     for (int i = 0; i < variables.size(); i++) {
                         MediatorVariable variable = (MediatorVariable) variables.get(i);
                         boolean hasValueChanged = variable.evaluateValue(synCtx);
                         //if the value has changed or need binding because the expression has recreated
                         if (hasValueChanged || needBind) {
                             //Binds the external variable to the DynamicContext
-                            bindVariable(cachedPreparedExpression, variable, traceOrDebugOn, traceOn);
+                            bindVariable(cachedPreparedExpression, variable, synLog);
                         }
                     }
                 }
@@ -330,9 +321,7 @@ public class XQueryMediator extends AbstractMediator {
             }
 
             if (resultSequence == null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Result Sequence is null");
-                }
+                synLog.traceOrDebug("Result Sequence is null");
                 return;
             }
 
@@ -349,15 +338,15 @@ public class XQueryMediator extends AbstractMediator {
                 }
                 int itemKind = itemType.getItemKind();
                 int baseType = itemType.getBaseType();
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "The XQuery Result " + xqItem.getItemAsString());
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("The XQuery Result " + xqItem.getItemAsString());
                 }
 
                 //The target node that is going to modify
                 OMNode destination = getTargetNode(synCtx);
                 if (destination != null) {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "The target node " + destination);
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("The target node " + destination);
                     }
 
                     //If the result is XML
@@ -410,12 +399,11 @@ public class XQueryMediator extends AbstractMediator {
      *
      * @param xqDynamicContext The Dynamic Context  to which the variable will be binded
      * @param variable         The variable which contains the name and vaule for binding
-     * @param traceOrDebugOn   is tracing or debbug on
-     * @param traceOn          indicate whether trace is ON or OF
+     * @param synLog           the Synapse log to use
      * @throws XQException throws if any error occurs when binding the variable
      */
     private void bindVariable(XQDynamicContext xqDynamicContext, MediatorVariable variable,
-                              boolean traceOrDebugOn, boolean traceOn) throws XQException {
+                              SynapseLog synLog) throws XQException {
 
         if (variable != null) {
 
@@ -425,8 +413,8 @@ public class XQueryMediator extends AbstractMediator {
 
             if (value != null && type != -1) {
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Binding a variable to the DynamicContext with a name : "
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Binding a variable to the DynamicContext with a name : "
                             + name + " and a value : " + value);
                 }
 

@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMText;
 import org.apache.bsf.xml.XMLHelper;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -146,19 +147,18 @@ public class ScriptMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Script mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Script mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Scripting language : " + language + " source " +
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Scripting language : " + language + " source " +
                 (key == null ? ": specified inline " : " loaded with key : " + key) +
                 (function != null ? " function : " + function : ""));
         }
@@ -173,12 +173,12 @@ public class ScriptMediator extends AbstractMediator {
             }
         }
 
-        if (traceOn && trace.isTraceEnabled()) {
-            trace.trace("Result message after execution of script : " + synCtx.getEnvelope());
+        if (synLog.isTraceTraceEnabled()) {
+            synLog.traceTrace("Result message after execution of script : " + synCtx.getEnvelope());
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Script mediator return value : " + returnValue);
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("End : Script mediator return value : " + returnValue);
         }
 
         return returnValue;

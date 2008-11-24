@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -72,14 +73,13 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Switch mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Switch mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -90,16 +90,14 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
         int myEffectiveTraceState = synCtx.getTracingState();
 
         String sourceText = source.stringValueOf(synCtx);
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "XPath : " + source + " evaluates to : " + sourceText);
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("XPath : " + source + " evaluates to : " + sourceText);
         }
 
         try {
             if ((sourceText == null || cases.isEmpty()) && defaultCase != null) {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Source XPath evaluated to : null or no switch " +
+                synLog.traceOrDebug("Source XPath evaluated to : null or no switch " +
                         "cases found. Executing the default case");
-                }
 
                 return defaultCase.mediate(synCtx);
 
@@ -107,8 +105,8 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
                 for (SwitchCase swCase : cases) {
                     if (swCase != null) {
                         if (swCase.matches(sourceText)) {
-                            if (traceOrDebugOn) {
-                                traceOrDebug(traceOn, "Matching case found : " + swCase.getRegex());
+                            if (synLog.isTraceOrDebugEnabled()) {
+                                synLog.traceOrDebug("Matching case found : " + swCase.getRegex());
                             }
                             return swCase.mediate(synCtx);
                         }
@@ -117,14 +115,10 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
 
                 if (defaultCase != null) {
                     // if any of the switch cases did not match
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "None of the switch cases matched - executing default");
-                    }
+                    synLog.traceOrDebug("None of the switch cases matched - executing default");
                     return defaultCase.mediate(synCtx);
                 } else {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "None of the switch cases matched - no default case");
-                    }
+                    synLog.traceOrDebug("None of the switch cases matched - no default case");
                 }
             }
 
@@ -132,9 +126,7 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
             synCtx.setTracingState(parentsEffectiveTraceState);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Switch mediator");
-        }
+        synLog.traceOrDebug("End : Switch mediator");
         return true;
     }
 

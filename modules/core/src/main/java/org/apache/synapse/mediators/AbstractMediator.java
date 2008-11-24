@@ -128,6 +128,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      * @param msgCtx the current message
      * @return true if tracing should be performed
      */
+    @Deprecated
     protected boolean isTraceOn(MessageContext msgCtx) {
         return
             (traceState == SynapseConstants.TRACING_ON) ||
@@ -140,6 +141,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      * @param isTraceOn is tracing known to be on?
      * @return true, if either tracing or debug logging is on
      */
+    @Deprecated
     protected boolean isTraceOrDebugOn(boolean isTraceOn) {
         return isTraceOn || log.isDebugEnabled();
     }
@@ -149,6 +151,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      * @param traceOn is runtime trace on for this message?
      * @param msg the message to log/trace
      */
+    @Deprecated
     protected void traceOrDebug(boolean traceOn, String msg) {
         if (traceOn) {
             trace.info(msg);
@@ -163,6 +166,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      * @param traceOn is runtime trace on for this message?
      * @param msg the message to log/trace
      */
+    @Deprecated
     protected void traceOrDebugWarn(boolean traceOn, String msg) {
         if (traceOn) {
             trace.warn(msg);
@@ -178,6 +182,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      * @param msg the log message
      * @param msgContext the message context
      */
+    @Deprecated
     protected void auditLog(String msg, MessageContext msgContext) {
         log.info(msg);
         if (msgContext.getServiceLog() != null) {
@@ -210,6 +215,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      * @param msg the message to log
      * @param msgContext message context
      */
+    @Deprecated
     protected void auditWarn(String msg, MessageContext msgContext) {
         log.warn(msg);
         if (msgContext.getServiceLog() != null) {

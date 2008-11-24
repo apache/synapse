@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -90,19 +91,18 @@ public class POJOCommandMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : POJOCommand mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : POJOCommand mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Creating a new instance of POJO class : " + command.getClass());
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Creating a new instance of POJO class : " + command.getClass());
         }
 
         Object commandObject = null;
@@ -114,9 +114,7 @@ public class POJOCommandMediator extends AbstractMediator {
                 command.getClass(), e, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Instance created, setting static and dynamic properties");
-        }
+        synLog.traceOrDebug("Instance created, setting static and dynamic properties");
 
         // then set the static/constant properties first
         for (String name : staticSetterProperties.keySet()) {
@@ -137,9 +135,7 @@ public class POJOCommandMediator extends AbstractMediator {
             setInstanceProperty(name, value, commandObject, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "POJO initialized successfully, invoking the execute() method");
-        }
+        synLog.traceOrDebug("POJO initialized successfully, invoking the execute() method");
 
         // then call the execute method if the Command interface is implemented
         if (commandObject instanceof Command) {
@@ -192,8 +188,8 @@ public class POJOCommandMediator extends AbstractMediator {
                     }
 
                 } else {
-                    if (traceOrDebugOn) {
-                        traceOrDebug(traceOn, "Unable to set the message property " + resultValue
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("Unable to set the message property " + resultValue
                             + "back to the message : Specified element by the xpath "
                             + xpath + " can not be found");
                     }
@@ -204,9 +200,7 @@ public class POJOCommandMediator extends AbstractMediator {
             }
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : POJOCommand mediator");
-        }
+        synLog.traceOrDebug("End : POJOCommand mediator");
         return true;
     }
 

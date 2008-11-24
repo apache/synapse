@@ -28,6 +28,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -80,14 +81,13 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Iterate mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Iterate mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -101,8 +101,8 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
             // this call will also detach all the iteration elements 
             List splitElements = EIPUtils.getDetachedMatchingElements(envelope, expression);
 
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Splitting with XPath : " + expression + " resulted in " +
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Splitting with XPath : " + expression + " resulted in " +
                     splitElements.size() + " elements");
             }
 
@@ -125,8 +125,8 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
                         + expression + " - result not an OMNode", synCtx);
                 }
 
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Submitting " + (msgNumber+1) + " of " + msgNumber +
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Submitting " + (msgNumber+1) + " of " + msgNumber +
                         " messages for processing in parallel");
                 }
 
@@ -148,9 +148,7 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
             opCtx.setProperty(Constants.RESPONSE_WRITTEN,"SKIP");
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Iterate mediator");
-        }
+        synLog.traceOrDebug("End : Iterate mediator");
 
         // whether to continue mediation on the original message
         return continueParent;

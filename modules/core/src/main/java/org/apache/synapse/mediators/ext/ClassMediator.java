@@ -23,6 +23,7 @@ import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -57,19 +58,18 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 	 */
 	public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Class mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Class mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
-        if (traceOrDebugOn) {
-			traceOrDebug(traceOn, "invoking : " + mediator.getClass() + ".mediate()");
+        if (synLog.isTraceOrDebugEnabled()) {
+			synLog.traceOrDebug("invoking : " + mediator.getClass() + ".mediate()");
 		}
 
         boolean result;
@@ -82,9 +82,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
             throw new SynapseException("Error occured in the mediation of the class mediator", e);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Class mediator");
-        }
+        synLog.traceOrDebug("End : Class mediator");
         
         return result;
     }

@@ -22,10 +22,8 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 
@@ -69,30 +67,19 @@ public class LogMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Log mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Log mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
-        String logMessage = getLogMessage(synCtx);
-        synCtx.getServiceLog().info(logMessage);
+        synLog.auditLog(getLogMessage(synCtx));
 
-        if (log.isInfoEnabled()) {
-            log.info(logMessage);
-        }
-        if (traceOn) {
-            trace.info("Log message : " + logMessage);
-        }
-
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Log mediator");
-        }
+        synLog.traceOrDebug("End : Log mediator");
         return true;
     }
 

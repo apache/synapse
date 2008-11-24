@@ -23,6 +23,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -57,14 +58,13 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
 
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Spring mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Spring mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -73,12 +73,12 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
         // if the configKey refers to a dynamic property
         if (entry != null && entry.isDynamic()) {
             if (!entry.isCached() || entry.isExpired()) {
-                buildAppContext(synCtx, traceOrDebugOn, traceOn);
+                buildAppContext(synCtx, synLog);
             }
         // if the property is not a DynamicProperty, we will create an ApplicationContext only once
         } else {
             if (appContext == null) {
-                buildAppContext(synCtx, traceOrDebugOn, traceOn);
+                buildAppContext(synCtx, synLog);
             }
         }
 
@@ -87,14 +87,14 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
             Object o = appContext.getBean(beanName);    
             if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
                 Mediator m = (Mediator) o;
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Loaded mediator from bean : " + beanName + " executing...");
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Loaded mediator from bean : " + beanName + " executing...");
                 }
                 return m.mediate(synCtx);
 
             } else {
-                if (traceOrDebugOn) {
-                    traceOrDebug(traceOn, "Unable to load mediator from bean : " + beanName);
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Unable to load mediator from bean : " + beanName);
                 }
                 handleException("Could not load bean named : " + beanName +
                     " from the Spring configuration with key : " + configKey, synCtx);
@@ -103,17 +103,15 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
             handleException("Cannot reference application context with key : " + configKey, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Spring mediator");
-        }
+        synLog.traceOrDebug("End : Spring mediator");
         return true;
     }
 
     private synchronized void buildAppContext(MessageContext synCtx,
-        boolean traceOrDebugOn, boolean traceOn) {
+        SynapseLog synLog) {
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Creating Spring ApplicationContext from key : " + configKey);
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Creating Spring ApplicationContext from key : " + configKey);
         }
         GenericApplicationContext appContext = new GenericApplicationContext();
         XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
@@ -130,8 +128,8 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
             new InputStreamResource(
                 SynapseConfigUtils.getStreamSource(springConfig).getInputStream()));
         appContext.refresh();
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Spring ApplicationContext from key : " + configKey + " created");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Spring ApplicationContext from key : " + configKey + " created");
         }
         this.appContext = appContext;
     }
@@ -167,7 +165,7 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
 
   public void init(SynapseEnvironment se) {
         MessageContext synCtx = se.createMessageContext();
-        buildAppContext(synCtx, log.isDebugEnabled(), false);
+        buildAppContext(synCtx, getLog(synCtx));
   }
 
   public void destroy() {

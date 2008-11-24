@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
@@ -41,33 +42,26 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
      */
     public boolean mediate(MessageContext synCtx) {
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        SynapseLog synLog = getLog(synCtx);
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : In mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : In mediator");
 
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
         boolean result = true;
         if (test(synCtx)) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Current message is incoming - executing child mediators");
-            }
+            synLog.traceOrDebug("Current message is incoming - executing child mediators");
             result = super.mediate(synCtx);
 
         } else {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Current message is a response - skipping child mediators");
-            }
+            synLog.traceOrDebug("Current message is a response - skipping child mediators");
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : In mediator");
-        }
+        synLog.traceOrDebug("End : In mediator");
 
         return result;
     }

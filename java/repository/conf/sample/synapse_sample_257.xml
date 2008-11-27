@@ -29,9 +29,9 @@
          <outSequence><log level="full"/><send/></outSequence>
       </target>
          
-      <parameter name="transport.fix.AcceptorConfigURL">file:/home/hiranya/Desktop/fix-config/fix-synapse.cfg</parameter>
+      <parameter name="transport.fix.AcceptorConfigURL">file:repository/conf/sample/resources/fix/fix-synapse.cfg</parameter>
       <parameter name="transport.fix.AcceptorMessageStore">file</parameter>               
-      <parameter name="transport.fix.InitiatorConfigURL">file:/home/hiranya/Desktop/fix-config/synapse-sender.cfg</parameter>
+      <parameter name="transport.fix.InitiatorConfigURL">file:repository/conf/sample/resources/fix/synapse-sender.cfg</parameter>
       <parameter name="transport.fix.InitiatorMessageStore">file</parameter>           
    </proxy>
 </definitions>

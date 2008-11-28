@@ -38,8 +38,8 @@ public class MTOMSwASampleService {
     public OMElement uploadFileUsingMTOM(OMElement request) throws Exception {
 
         OMText binaryNode = (OMText) request.
-            getFirstChildWithName(new QName("http://services.samples/xsd", "request")).
-            getFirstChildWithName(new QName("http://services.samples/xsd", "image")).
+            getFirstChildWithName(new QName("http://services.samples", "request")).
+            getFirstChildWithName(new QName("http://services.samples", "image")).
             getFirstOMChild();
         DataHandler dataHandler = (DataHandler) binaryNode.getDataHandler();
         InputStream is = dataHandler.getInputStream();
@@ -59,7 +59,7 @@ public class MTOMSwASampleService {
         System.out.println("Wrote MTOM content to temp file : " + tempFile.getAbsolutePath());
 
         OMFactory factory = request.getOMFactory();
-        OMNamespace ns = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns = factory.createOMNamespace("http://services.samples", "m0");
         OMElement payload  = factory.createOMElement("uploadFileUsingMTOMResponse", ns);
         OMElement response = factory.createOMElement("response", ns);
         OMElement image    = factory.createOMElement("image", ns);
@@ -83,8 +83,8 @@ public class MTOMSwASampleService {
     public OMElement uploadFileUsingSwA(OMElement request) throws Exception {
 
         String imageContentId = request.
-            getFirstChildWithName(new QName("http://services.samples/xsd", "request")).
-            getFirstChildWithName(new QName("http://services.samples/xsd", "imageId")).
+            getFirstChildWithName(new QName("http://services.samples", "request")).
+            getFirstChildWithName(new QName("http://services.samples", "imageId")).
             getText();
 
         MessageContext msgCtx   = MessageContext.getCurrentMessageContext();
@@ -104,7 +104,7 @@ public class MTOMSwASampleService {
             org.apache.axis2.Constants.VALUE_TRUE);
 
         OMFactory factory = request.getOMFactory();
-        OMNamespace ns = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMNamespace ns = factory.createOMNamespace("http://services.samples", "m0");
         OMElement payload  = factory.createOMElement("uploadFileUsingSwAResponse", ns);
         OMElement response = factory.createOMElement("response", ns);
         OMElement imageId  = factory.createOMElement("imageId", ns);

@@ -337,7 +337,7 @@
                 <include>org.apache.rampart:rampart:mar</include>
                 <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
-            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules
@@ -347,7 +347,7 @@
                 <include>org.apache.rampart:rampart:mar</include>
                 <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
-            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules
@@ -357,7 +357,7 @@
                 <include>org.apache.rampart:rampart:mar</include>
                 <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
-            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
     </dependencySets>
 

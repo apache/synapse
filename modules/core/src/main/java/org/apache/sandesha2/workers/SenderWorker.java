@@ -231,6 +231,33 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				transaction.commit();			
 			
 			transaction = storageManager.getTransaction();
+
+                        //if this is an sync WSRM 1.0 case we always have to add an ack
+			boolean ackPresent = false;
+			Iterator it = rmMsgCtx.getSequenceAcknowledgements();
+			if (it.hasNext()) 
+				ackPresent = true;
+			
+			if (!ackPresent && rmMsgCtx.getMessageContext().isServerSide() 
+					&&
+				(messageType==Sandesha2Constants.MessageTypes.APPLICATION ||
+			     messageType==Sandesha2Constants.MessageTypes.UNKNOWN ||
+			     messageType==Sandesha2Constants.MessageTypes.LAST_MESSAGE)) {
+				
+				String inboundSequenceId = senderBean.getInboundSequenceId();
+				if (inboundSequenceId==null)
+					throw new SandeshaException ("InboundSequenceID is not set for the sequence:" + senderBean.getSequenceID());
+				
+				RMDBean incomingSequenceBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId);
+
+				if (incomingSequenceBean!=null)
+					RMMsgCreator.addAckMessage(rmMsgCtx, inboundSequenceId, incomingSequenceBean, false);
+			}
+
+			if (transaction != null && transaction.isActive()) 
+				transaction.commit();			
+			
+			transaction = storageManager.getTransaction();
 			
 			senderBean = updateMessage(rmMsgCtx,senderBean,storageManager);
 
@@ -480,29 +507,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		// TODO consider adding an extra ack request, as we are about to send the message and we
 		// know which sequence it is associated with.
 		
-		//if this is an sync WSRM 1.0 case we always have to add an ack
-		boolean ackPresent = false;
-		Iterator<SequenceAcknowledgement> it = rmMsgContext.getSequenceAcknowledgements();
-		if (it.hasNext()) 
-			ackPresent = true;
-		
-		if (!ackPresent && rmMsgContext.getMessageContext().isServerSide() 
-				&&
-			(messageType==Sandesha2Constants.MessageTypes.APPLICATION || 
-		     messageType==Sandesha2Constants.MessageTypes.APPLICATION ||
-		     messageType==Sandesha2Constants.MessageTypes.UNKNOWN ||
-		     messageType==Sandesha2Constants.MessageTypes.LAST_MESSAGE)) {
-			
-			String inboundSequenceId = senderBean.getInboundSequenceId();
-			if (inboundSequenceId==null)
-				throw new SandeshaException ("InboundSequenceID is not set for the sequence:" + id);
-			
-			RMDBean incomingSequenceBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId);
-
-			if (incomingSequenceBean!=null)
-				RMMsgCreator.addAckMessage(rmMsgContext, inboundSequenceId, incomingSequenceBean, false);
-		}
-
 		if(id != null && !senderBean.getSequenceID().equals(id.getIdentifier())) {
 			id.setIndentifer(senderBean.getSequenceID());
 

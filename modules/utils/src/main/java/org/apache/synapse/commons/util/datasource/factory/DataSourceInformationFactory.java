@@ -235,6 +235,20 @@ public class DataSourceInformationFactory {
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
             information.setDefaultCatalog(defaultCatalog);
         }
+
+        information.addProperty(prefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
+                MiscellaneousUtil.getProperty(
+                        properties, prefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
+                        null));
+        //Provider URL
+        information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
+                MiscellaneousUtil.getProperty(
+                        properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL, null));
+
+        information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
+                MiscellaneousUtil.getProperty(
+                        properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT, null));
+        
         return information;
     }
 

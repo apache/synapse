@@ -811,7 +811,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
         // clear session information used for SA load balancing
         try {
-            RMIRegistryController.getInstance().removeLocalRegistry();
+            RMIRegistryController.getInstance().shutDown();
             SALSessions.getInstance().reset();
             InMemoryDataSourceRepository.getInstance().clear();
             JNDIBasedDataSourceRepository registry = JNDIBasedDataSourceRepository.getInstance();

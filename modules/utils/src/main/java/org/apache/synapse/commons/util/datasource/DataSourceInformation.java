@@ -314,6 +314,12 @@ public class DataSourceInformation {
         this.properties.putAll(properties);
     }
 
+    public void addProperty(String name, String value) {
+        if (name != null && value != null && !"".equals(name) && !"".equals(value)) {
+            this.properties.put(name, value);
+        }
+    }
+
     public String getRepositoryType() {
         return repositoryType;
     }

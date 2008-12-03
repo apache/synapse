@@ -81,27 +81,41 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         String dataSourceName = information.getDatasourceName();
         validateDSName(dataSourceName);
         Properties properties = information.getProperties();
-        
+
         InitialContext context = null;
         Properties jndiEvn = null;
 
-        if (properties != null && !properties.isEmpty()) {
-            jndiEvn = createJNDIEnvironment(properties, information.getAlias());
-            context = createInitialContext(jndiEvn);
+        if (properties == null || properties.isEmpty()) {
+            if (initialContext != null) {
+                context = initialContext;
+                if (log.isDebugEnabled()) {
+                    log.debug("Empty JNDI properties for datasource " + dataSourceName);
+                    log.debug("Using system-wide jndi properties : " + jndiProperties);
+                }
+
+                jndiEvn = jndiProperties;
+            }
         }
+
         if (context == null) {
 
-            validateInitialContext(initialContext);
-            context = initialContext;
+            jndiEvn = createJNDIEnvironment(properties, information.getAlias());
+            context = createInitialContext(jndiEvn);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot create a name context with jndi properties : " + jndiEvn);
-                log.debug("Using system-wide jndi properties : " + jndiProperties);
+            if (context == null) {
+
+                validateInitialContext(initialContext);
+                context = initialContext;
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot create a name context with provided jndi properties : " + jndiEvn);
+                    log.debug("Using system-wide JNDI properties : " + jndiProperties);
+                }
+
+                jndiEvn = jndiProperties;
+            } else {
+                perDataSourceICMap.put(dataSourceName, context);
             }
-
-            jndiEvn = jndiProperties;
-        } else {
-            perDataSourceICMap.put(dataSourceName, context);
         }
 
         String dsType = information.getType();
@@ -376,27 +390,44 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
     private static Properties createJNDIEnvironment(Properties dsProperties, String name) {
 
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES);
-        buffer.append(DataSourceConfigurationConstants.DOT_STRING);
-        if (name != null && !"".equals(name)) {
-            buffer.append(name);
-            buffer.append(DataSourceConfigurationConstants.DOT_STRING);
-        }
-        // The prefix for root level jndiProperties
-        String rootPrefix = buffer.toString();
+        String namingFactory = DataSourceConfigurationConstants.DEFAULT_IC_FACTORY;
+        String providerUrl = null;
+        int port = DataSourceConfigurationConstants.DEFAULT_PROVIDER_PORT;
+        String providerPort = null;
         // setting naming provider
         Properties jndiEvn = new Properties();  //This is needed for PerUserPoolDatasource
 
-        String namingFactory = MiscellaneousUtil.getProperty(
-                dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
-                "com.sun.jndi.rmi.registry.RegistryContextFactory");
+        if (dsProperties != null && !dsProperties.isEmpty()) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Using properties " + dsProperties + " to create JNDI Environment");
+            }
+
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES);
+            buffer.append(DataSourceConfigurationConstants.DOT_STRING);
+            if (name != null && !"".equals(name)) {
+                buffer.append(name);
+                buffer.append(DataSourceConfigurationConstants.DOT_STRING);
+            }
+            // The prefix for root level jndiProperties
+            String rootPrefix = buffer.toString();
+
+
+            namingFactory = MiscellaneousUtil.getProperty(
+                    dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
+                    DataSourceConfigurationConstants.DEFAULT_IC_FACTORY);
+
+            //Provider URL
+            providerUrl = MiscellaneousUtil.getProperty(
+                    dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL, null);
+            providerPort =
+                    MiscellaneousUtil.getProperty(dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
+                            String.valueOf(DataSourceConfigurationConstants.DEFAULT_PROVIDER_PORT));
+
+        }
 
         jndiEvn.put(Context.INITIAL_CONTEXT_FACTORY, namingFactory);
-
-        //Provider URL
-        String providerUrl = MiscellaneousUtil.getProperty(
-                dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL, null);
 
         if (providerUrl != null && !"".equals(providerUrl)) {
             if (log.isDebugEnabled()) {
@@ -426,21 +457,18 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             }
 
             // default port for RMI registry
-            int port = 2199;
-            String providerPort =
-                    MiscellaneousUtil.getProperty(dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
-                            String.valueOf(port));
-            try {
-                port = Integer.parseInt(providerPort);
-            } catch (NumberFormatException ignored) {
+
+            if (providerPort != null) {
+                try {
+                    port = Integer.parseInt(providerPort);
+                } catch (NumberFormatException ignored) {
+                }
             }
 
             // Create a RMI local registry
             RMIRegistryController.getInstance().createLocalRegistry(port);
+            providerUrl = "rmi://" + providerHost + ":" + port;
 
-            providerUrl = MiscellaneousUtil.getProperty(dsProperties,
-                    rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
-                    "rmi://" + providerHost + ":" + providerPort);
         }
 
         jndiEvn.put(Context.PROVIDER_URL, providerUrl);

@@ -41,7 +41,8 @@ public class DataSourceInformationSerializer {
 
         // Prefix for getting particular data source's properties
         String prefix = buffer.toString();
-
+        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME,
+                information.getDatasourceName());
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME,
                 information.getUser());
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD,

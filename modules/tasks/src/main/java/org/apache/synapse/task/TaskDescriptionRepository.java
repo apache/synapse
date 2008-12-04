@@ -119,7 +119,10 @@ public class TaskDescriptionRepository {
         return taskDescriptionMap.isEmpty() || !taskDescriptionMap.containsKey(name);
     }
 
-
+    public void clear() {
+        this.taskDescriptionMap.clear();
+    }
+    
     private void validateName(String name) {
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task name is null or empty", log);

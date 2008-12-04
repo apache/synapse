@@ -19,20 +19,24 @@
 
 package org.apache.synapse.startup.quartz;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
-
-import javax.xml.namespace.QName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.task.*;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
+import org.apache.synapse.task.TaskDescription;
+import org.apache.synapse.task.TaskDescriptionRepository;
+import org.apache.synapse.task.TaskScheduler;
+import org.apache.synapse.task.TaskSchedulerFactory;
+
+import javax.xml.namespace.QName;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
  * This class is instantiated by SimpleQuartzFactory (or by hand)
@@ -48,7 +52,7 @@ public class SimpleQuartz extends AbstractStartup {
     private TaskDescription taskDescription;
 
     private TaskDescriptionRepository repository;
-  
+
 
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
@@ -56,31 +60,39 @@ public class SimpleQuartz extends AbstractStartup {
 
     public void destroy() {
 
+        if (taskDescription == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no Task to be deleted");
+            }
+            return;
+        }
+
         TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
                 SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
+
         if (taskScheduler != null && taskScheduler.isInitialized()) {
-            taskScheduler.shutDown();
+            taskScheduler.deleteTask(taskDescription.getName(), taskDescription.getGroup());
         }
-       
-        if (repository != null && taskDescription != null) {
+
+        if (repository != null) {
             repository.removeTaskDescription(taskDescription.getName());
         }
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {
 
-        if (taskDescription == null ) {
+        if (taskDescription == null) {
             handleException("TaskDescription is null");
         }
 
         repository = synapseEnvironment.getSynapseConfiguration().getTaskDescriptionRepository();
-       
+
         if (repository == null) {
             handleException("Task Description Repository can not found");
         }
-       
+
         repository.addTaskDescription(taskDescription);
-       
+
         // this server name given by system property SynapseServerName
         // otherwise take host-name
         // else assume localhost
@@ -116,7 +128,8 @@ public class SimpleQuartz extends AbstractStartup {
 
         try {
 
-            TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
+            TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
+                    SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
                     taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());
@@ -124,7 +137,8 @@ public class SimpleQuartz extends AbstractStartup {
                 taskScheduler.scheduleTask(taskDescription, map, SimpleQuartzJob.class);
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("TaskScheduler cannot be found for :" + SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER + " , " +
+                    log.debug("TaskScheduler cannot be found for :" +
+                            SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER + " , " +
                             "therefore ignore scheduling of Task  " + taskDescription);
                 }
             }

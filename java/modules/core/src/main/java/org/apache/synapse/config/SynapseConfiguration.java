@@ -30,6 +30,8 @@ import org.apache.synapse.commons.util.datasource.InMemoryDataSourceRepository;
 import org.apache.synapse.commons.util.datasource.JNDIBasedDataSourceRepository;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
+import org.apache.synapse.task.TaskScheduler;
+import org.apache.synapse.task.TaskSchedulerFactory;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -808,7 +810,17 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 }
             }
         }
+        
+        TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
+                SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
+        if (taskScheduler != null && taskScheduler.isInitialized()) {
+            taskScheduler.shutDown();
+        }
 
+        if (repository != null) {
+            repository.clear();
+        }
+        
         // clear session information used for SA load balancing
         try {
             RMIRegistryController.getInstance().shutDown();

@@ -114,26 +114,28 @@ public class PersistentStorageManager extends StorageManager {
 		if (policy.isInOrder()) invoker = new Invoker();
 		if (policy.isEnableMakeConnection()) pollingManager = new PollingManager();
 		ModuleConfiguration mc = context.getAxisConfiguration().getModuleConfig("sandesha2");
-		Parameter param = mc.getParameter("db.connectionstring");
-		if (param != null) {
-			dbConnectionString = (String) param.getValue();
-			log.debug(param.getName() + "=" + dbConnectionString);
-		}
-		param = mc.getParameter("db.driver");
-		if (param != null) {
-			dbDriver = (String) param.getValue();
-			log.debug(param.getName() + "=" + dbDriver);
-		}
-		param = mc.getParameter("db.user");
-		if (param != null) {
-			dbUser = (String) param.getValue();
-			log.debug(param.getName() + "=" + dbUser);
-		}
-		param = mc.getParameter("db.password");
-		if (param != null) {
-			dbPassword = (String) param.getValue();
-			log.debug(param.getName() + "=" + dbPassword);
-		}
+        if (mc != null) {
+            Parameter param = mc.getParameter("db.connectionstring");
+            if (param != null) {
+                dbConnectionString = (String) param.getValue();
+                log.debug(param.getName() + "=" + dbConnectionString);
+            }
+            param = mc.getParameter("db.driver");
+            if (param != null) {
+                dbDriver = (String) param.getValue();
+                log.debug(param.getName() + "=" + dbDriver);
+            }
+            param = mc.getParameter("db.user");
+            if (param != null) {
+                dbUser = (String) param.getValue();
+                log.debug(param.getName() + "=" + dbUser);
+            }
+            param = mc.getParameter("db.password");
+            if (param != null) {
+                dbPassword = (String) param.getValue();
+                log.debug(param.getName() + "=" + dbPassword);
+            }
+        }
 	}
 
 	public void shutdown() {
@@ -208,9 +210,32 @@ public class PersistentStorageManager extends StorageManager {
 	public void initStorage(AxisModule moduleDesc)
 			throws SandeshaStorageException {
 		log.info("init PersistentStorageManager");
-		if (dbConnectionString == null || dbDriver == null)
-			throw new SandeshaStorageException("Can't proceed. Needed properties are not set.");
+        if (dbConnectionString == null){
+            if (moduleDesc.getParameter("db.connectionstring") != null){
+               dbConnectionString = (String) moduleDesc.getParameter("db.connectionstring").getValue();
+            }
+        }
 
+        if (dbDriver == null){
+            if (moduleDesc.getParameter("db.driver") != null){
+               dbDriver = (String) moduleDesc.getParameter("db.driver").getValue();
+            }
+        }
+
+        if (dbUser == null){
+            if (moduleDesc.getParameter("db.user") != null){
+               dbUser = (String) moduleDesc.getParameter("db.user").getValue();
+            }
+        }
+
+        if (dbPassword == null){
+            if (moduleDesc.getParameter("db.password") != null){
+               dbPassword = (String) moduleDesc.getParameter("db.password").getValue(); 
+            }
+        }
+        if (dbConnectionString == null || dbDriver == null)
+			throw new SandeshaStorageException("Can't proceed. Needed properties are not set.");
+		
 		dbConnection = dbConnect();
 	}
 

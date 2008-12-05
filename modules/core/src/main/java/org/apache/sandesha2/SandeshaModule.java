@@ -71,6 +71,13 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		EndpointReference.addAnonymousEquivalentURI(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX);
 		AxisConfiguration config = configContext.getAxisConfiguration();
 
+		//load the Sandesha2Constants.STORAGE_MANAGER_PARAMETER if it is availabel in module.xml
+        Parameter storageManagerParameter = module.getParameter(Sandesha2Constants.STORAGE_MANAGER_PARAMETER);
+        if ((storageManagerParameter != null)
+				&& (config.getParameter(Sandesha2Constants.STORAGE_MANAGER_PARAMETER) == null)) {
+            config.addParameter(storageManagerParameter.getName(), storageManagerParameter.getValue());
+        }
+
 		//storing the Sandesha module as a parameter.
 		Parameter parameter = new Parameter(Sandesha2Constants.MODULE_CLASS_LOADER,module.getModuleClassLoader());
 		config.addParameter(parameter);

@@ -304,6 +304,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		if(continueSending){
 
+			// Commit the current transaction, so that the SenderWorker can do it's own locking
+			// this transaction should be commited out before gettting the worker lock.
+			// otherwise a dead lock can happen.
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			
 			SandeshaThread sender = storageManager.getSender();
 			WorkerLock lock = sender.getWorkerLock();
 
@@ -335,9 +340,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
 			returnMessage.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, pollMessage.getProperty(RequestResponseTransport.TRANSPORT_CONTROL));
 			
-			// Commit the current transaction, so that the SenderWorker can do it's own locking
-			if(transaction != null && transaction.isActive()) transaction.commit();
-			
+
 			//running the MakeConnection through a SenderWorker.
 			//This will allow Sandesha2 to consider both of following senarios equally.
 			//  1. A message being sent by the Sender thread.

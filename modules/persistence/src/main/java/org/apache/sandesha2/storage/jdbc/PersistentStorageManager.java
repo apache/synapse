@@ -82,6 +82,8 @@ public class PersistentStorageManager extends StorageManager {
 	private static ThreadLocal threadTransaction = null;
 	private static final Log log = LogFactory.getLog(PersistentStorageManager.class);
 
+	private TransactionLock transactionLock;
+
 	public SandeshaThread getInvoker() {
 		return invoker;
 	}
@@ -136,6 +138,8 @@ public class PersistentStorageManager extends StorageManager {
                 log.debug(param.getName() + "=" + dbPassword);
             }
         }
+
+		this.transactionLock = new TransactionLock();
 	}
 
 	public void shutdown() {
@@ -176,8 +180,10 @@ public class PersistentStorageManager extends StorageManager {
 	}
 
 	public Transaction getTransaction() {
+
 		Transaction transaction = (Transaction) threadTransaction.get();
 		if (transaction == null) {
+			this.acquireTransactionLock();
 			transaction = new JDBCTransaction(this);
 			threadTransaction.set(transaction);
 		} else {
@@ -331,6 +337,27 @@ public class PersistentStorageManager extends StorageManager {
 			stmt.close();
 		} catch (Exception ex) {
 			throw new SandeshaStorageException("Exception in removeMessageContext", ex);
+		}
+	}
+
+	public void acquireTransactionLock() {
+		synchronized (this.transactionLock) {
+			if (this.transactionLock.isAcquried()) {
+				try {
+					this.transactionLock.wait();
+				} catch (InterruptedException e) {
+				}
+				// keep on waiting until acquireTransactionLock gain
+				this.acquireTransactionLock();
+			} else {
+				this.transactionLock.lock();
+			}
+		}
+	}
+
+	public void releaseTransactionLock(){
+		synchronized(this.transactionLock){
+			this.transactionLock.release();
 		}
 	}
 

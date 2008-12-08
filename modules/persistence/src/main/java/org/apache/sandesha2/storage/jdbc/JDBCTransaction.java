@@ -70,6 +70,7 @@ public class JDBCTransaction implements Transaction {
 		} catch (Exception ex) {
 		}
 		active = false;
+		pmgr.releaseTransactionLock();
 	}
 
 	public void rollback() {
@@ -80,6 +81,7 @@ public class JDBCTransaction implements Transaction {
 		} catch (Exception ex) {
 		}
 		active = false;
+		pmgr.releaseTransactionLock();
 	}
 
 	public boolean isActive() {

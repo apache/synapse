@@ -36,10 +36,26 @@ public class DataSourceInformationRepositoryHelper {
     private static final Log log = LogFactory.getLog(DataSourceInformationRepositoryHelper.class);
 
     public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration, Properties properties) {
-        DataSourceRepositoryManager listener = DataSourceRepositoryManager.getInstance();
-        RepositoryBasedDataSourceFinder finder = RepositoryBasedDataSourceFinder.getInstance();
-        finder.init(listener);
-        initializeDataSourceInformationRepository(axisConfiguration, properties, listener);
+
+        DataSourceInformationRepository repository = getDataSourceInformationRepository(axisConfiguration);
+        DataSourceInformationRepositoryListener listener = null;
+
+        if (repository != null) {
+            listener = repository.getRepositoryListener();
+        }
+
+        if (listener == null) {
+            listener = DataSourceRepositoryManager.getInstance();
+        }
+
+        if (listener instanceof DataSourceRepositoryManager) {
+            RepositoryBasedDataSourceFinder finder = RepositoryBasedDataSourceFinder.getInstance();
+            finder.init((DataSourceRepositoryManager) listener);
+        }
+
+        if (repository == null) {
+            initializeDataSourceInformationRepository(axisConfiguration, properties, listener);
+        }
     }
 
     public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration, Properties properties, DataSourceInformationRepositoryListener listener) {

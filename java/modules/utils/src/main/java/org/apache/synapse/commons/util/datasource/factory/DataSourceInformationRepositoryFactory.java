@@ -41,7 +41,9 @@ public class DataSourceInformationRepositoryFactory {
         List<DataSourceInformation> sourceInformationList = DataSourceInformationListFactory.createDataSourceInformationList(properties);
         DataSourceInformationRepository repository = new DataSourceInformationRepository();
         repository.setRepositoryListener(listener);
-        repository.setConfigurationProperties(properties);
+        if (properties != null && !properties.isEmpty()) {
+            repository.setConfigurationProperties(properties);
+        }
         for (DataSourceInformation information : sourceInformationList) {
             if (information != null) {
                 repository.addDataSourceInformation(information);

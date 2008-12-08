@@ -57,7 +57,9 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
         initialized = true;
         if (jndiEnv == null || jndiEnv.isEmpty()) {
-            log.warn("Provided global JNDI environment properties is empty or null.");
+            if (log.isDebugEnabled()) {
+                log.debug("Provided global JNDI environment properties is empty or null.");
+            }
             return;
         }
 

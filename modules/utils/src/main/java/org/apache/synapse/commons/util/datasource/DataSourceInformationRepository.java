@@ -86,7 +86,8 @@ public class DataSourceInformationRepository {
         assertNull(listener, "Provided 'DataSourceInformationRepositoryListener' instance is null");
 
         if (this.listener != null) {
-            handleException("There is a 'DataSourceInformationRepositoryListener' associated with 'DataSourceInformationRepository'");
+            handleException("There is a 'DataSourceInformationRepositoryListener' " +
+                    "associated with 'DataSourceInformationRepository'");
         }
         this.listener = listener;
     }

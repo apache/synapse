@@ -29,10 +29,11 @@ import javax.sql.DataSource;
  */
 public class RepositoryBasedDataSourceFinder {
 
-    private final static Log log = LogFactory.getLog(InMemoryDataSourceRepository.class);
+    private final static Log log = LogFactory.getLog(RepositoryBasedDataSourceFinder.class);
     private DataSourceRepositoryManager dataSourceRepositoryManager;
     private boolean initialized;
-    private static final RepositoryBasedDataSourceFinder REPOSITORY_BASED_DATA_SOURCE_FINDER = new RepositoryBasedDataSourceFinder();
+    private static final RepositoryBasedDataSourceFinder
+            REPOSITORY_BASED_DATA_SOURCE_FINDER = new RepositoryBasedDataSourceFinder();
 
     private RepositoryBasedDataSourceFinder() {
     }
@@ -72,20 +73,10 @@ public class RepositoryBasedDataSourceFinder {
         throw new SynapseUtilException(msg);
     }
 
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
-    }
-
     private void assertInitialized() {
         if (!initialized) {
-            handleException("RepositoryBasedDataSourceFinder has not been initialized with a 'DataSourceRepositoryManager' instance ");
+            handleException("RepositoryBasedDataSourceFinder has not been " +
+                    "initialized with a 'DataSourceRepositoryManager' instance ");
         }
     }
 

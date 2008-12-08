@@ -75,11 +75,11 @@ public class SandeshaUtilTest extends TestCase {
 		rangeString.addRange(new Range(8));
 		rangeString.addRange(new Range(2));
 		
-		ArrayList list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		ArrayList<Range> list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
 		assertNotNull(list);
 		assertEquals(list.size(),3);
 		
-		Iterator it = list.iterator();
+		Iterator<Range> it = list.iterator();
 		Range ackRange = null;
 		
 		ackRange = (Range) it.next();
@@ -112,12 +112,12 @@ public class SandeshaUtilTest extends TestCase {
 		//insert a gap - 7 and 8 are missing
 		rangeString.addRange(new Range(9, 10));
 		
-		ArrayList list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		ArrayList<Range> list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
 		assertNotNull(list);
 		//we expect 3 ranges: [1-4] [6] [9-10]
 		assertEquals(list.size(),3);
 		
-		Iterator it = list.iterator();
+		Iterator<Range> it = list.iterator();
 		Range ackRange = null;
 		
 		ackRange = (Range) it.next();

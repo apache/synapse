@@ -40,7 +40,7 @@ import org.apache.sandesha2.SandeshaException;
 public class UnitTestSecurityManager extends SecurityManager {
 	private static Log log = LogFactory.getLog(UnitTestSecurityManager.class);
 
-	private static HashMap tokens = new HashMap();
+	private static HashMap<String, UnitTestSecurityToken> tokens = new HashMap<String, UnitTestSecurityToken>();
 	private static String secNamespace = Sandesha2Constants.SPEC_2005_02.SEC_NS_URI;
 	private static QName unitTestHeader = new QName("http://unit.test.security", "tokenId");
 	

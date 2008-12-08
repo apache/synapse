@@ -38,17 +38,12 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
-import org.apache.sandesha2.interop.RMInteropServiceCallbackHandler;
 import org.apache.sandesha2.interop.RMInteropServiceCallbackHandlerImpl;
 import org.apache.sandesha2.interop.RMInteropServiceStub;
-import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemorySenderBeanMgr;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.tempuri.EchoString;
 import org.tempuri.EchoStringRequestBodyType;
@@ -213,7 +208,7 @@ public class Scenario_2_1 {
 		EndpointReference toEPR = new EndpointReference (toAddress);
 		clientOptions.setTo(toEPR);
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Constants.Configuration.TRANSPORT_URL,transportToEPR);
 		clientOptions.setAction("urn:wsrm:EchoString");
 		
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);

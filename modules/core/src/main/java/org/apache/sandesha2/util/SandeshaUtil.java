@@ -321,15 +321,7 @@ public class SandeshaUtil {
 			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
 			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
 
-		    if (classLoader==null)
-		    	throw new SandeshaException (SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.classLoaderNotFound));
-		    
-		    Class c = classLoader.loadClass(className);
-			Class configContextClass = context.getClass();
-			
-			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
-			Object obj = constructor.newInstance(new Object[] {context});
+			Object obj = newInstance(classLoader, className, context);
 
 			if (obj == null || !(obj instanceof StorageManager))
 				throw new SandeshaException(SandeshaMessageHelper.getMessage(
@@ -348,6 +340,20 @@ public class SandeshaUtil {
 		}
 	}
 
+	private static Object newInstance(ClassLoader classLoader, String className, Object constructorParam) throws Exception{
+		if (classLoader==null)
+	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.classLoaderNotFound));
+	    
+	    Class<?> c = classLoader.loadClass(className);
+		Class<?> configContextClass = constructorParam.getClass();
+		
+		Constructor<?> constructor = c.getConstructor(new Class[] { configContextClass });
+		Object obj = constructor.newInstance(new Object[] {constructorParam});
+		
+		return obj;
+	}
+	
 	public static int getSOAPVersion(SOAPEnvelope envelope) throws SandeshaException {
 		String namespaceName = envelope.getNamespace().getNamespaceURI();
 		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
@@ -661,7 +667,7 @@ public class SandeshaUtil {
 	}
 	
 	public static boolean hasReferenceParameters(EndpointReference epr){
-		Map refParams = epr.getAllReferenceParameters();
+		Map<QName, OMElement> refParams = epr.getAllReferenceParameters();
 		if(refParams!=null){
 			if(!refParams.isEmpty()){
 				return true;
@@ -808,15 +814,10 @@ public class SandeshaUtil {
 			AxisConfiguration config = context.getAxisConfiguration();
 			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
 			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
-				  if (classLoader==null)
-	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
-		    
-		  Class c = classLoader.loadClass(className);
-			Class configContextClass = context.getClass();
 			
-			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
-			Object obj = constructor.newInstance(new Object[] {context});
-					if (!(obj instanceof EPRDecorator)) {
+			Object obj = newInstance(classLoader, className, context);
+			
+			if (!(obj instanceof EPRDecorator)) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.eprDecoratorMustImplement, className);
 				throw new SandeshaException(message);
 			}
@@ -834,16 +835,8 @@ public class SandeshaUtil {
 			AxisConfiguration config = context.getAxisConfiguration();
 			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
 			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
-
 			
-		  if (classLoader==null)
-	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
-		    
-		  	Class c = classLoader.loadClass(className);		  
-			Class configContextClass = context.getClass();
-			
-			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
-			Object obj = constructor.newInstance(new Object[] {context});
+			Object obj = newInstance(classLoader, className, context);
 
 			if (!(obj instanceof SecurityManager)) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.securityManagerMustImplement, className);
@@ -885,14 +878,7 @@ public class SandeshaUtil {
 			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
 			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
 
-			if (classLoader==null)
-				throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
-		    
-			Class c = classLoader.loadClass(className);
-			Class configContextClass = context.getClass();
-			
-			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
-			Object obj = constructor.newInstance(new Object[] {context});
+			Object obj = newInstance(classLoader, className, context);
 
 			if (!(obj instanceof ContextManager)) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.contextManagerMustImplement, className);
@@ -1102,12 +1088,12 @@ public class SandeshaUtil {
 
 	public static EndpointReference cloneEPR (EndpointReference epr) {
 		EndpointReference newEPR = new EndpointReference (epr.getAddress());
-		Map referenceParams = epr.getAllReferenceParameters();
+		Map<QName, OMElement> referenceParams = epr.getAllReferenceParameters();
 		
 		if (referenceParams != null) {
-			for (Iterator entries = referenceParams.entrySet().iterator(); entries
+			for (Iterator<Entry<QName, OMElement>> entries = referenceParams.entrySet().iterator(); entries
 					.hasNext();) {
-				Entry entry = (Entry)entries.next();
+				Entry<QName, OMElement> entry = entries.next();
 				Object referenceParam = entry.getValue();
 
 				if (referenceParam instanceof OMElement) {

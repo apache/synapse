@@ -21,14 +21,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -58,7 +53,7 @@ public class MTOMRMTest extends SandeshaTestCase {
 
 	private final String Attachment = "Attachment";
 
-	private final String SOURCE_IMAGE_FILE =  "modules"+File.separator+"tests" + "mtom-image.jpg";
+//	private final String SOURCE_IMAGE_FILE =  "modules"+File.separator+"tests" + "mtom-image.jpg";
 
 	private final String DESTINATION_IMAGE_FILE = "target" + File.separator + "mtom-image1.jpg";
 
@@ -157,29 +152,29 @@ public class MTOMRMTest extends SandeshaTestCase {
 //		serviceClient.cleanup();
 		
 	}
-
-	private OMElement getMTOMPingOMBlock() throws AxisFault {
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName, "ns1");
-		OMElement pingElem = fac.createOMElement(MTOMping, namespace);
-
-		OMElement attachElem = fac.createOMElement(Attachment, namespace);
-
-		File file = new File(SOURCE_IMAGE_FILE);
-		assertTrue(file.exists());
-
-		sourceLength = file.length();
-
-		DataSource dataSource = new FileDataSource(file);
-		assertNotNull(dataSource);
-		DataHandler dataHandler = new DataHandler(dataSource);
-
-		OMText textData = fac.createOMText(dataHandler, true);
-		attachElem.addChild(textData);
-		pingElem.addChild(attachElem);
-
-		return pingElem;
-	}
+//
+//	private OMElement getMTOMPingOMBlock() throws AxisFault {
+//		OMFactory fac = OMAbstractFactory.getOMFactory();
+//		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName, "ns1");
+//		OMElement pingElem = fac.createOMElement(MTOMping, namespace);
+//
+//		OMElement attachElem = fac.createOMElement(Attachment, namespace);
+//
+//		File file = new File(SOURCE_IMAGE_FILE);
+//		assertTrue(file.exists());
+//
+//		sourceLength = file.length();
+//
+//		DataSource dataSource = new FileDataSource(file);
+//		assertNotNull(dataSource);
+//		DataHandler dataHandler = new DataHandler(dataSource);
+//
+//		OMText textData = fac.createOMText(dataHandler, true);
+//		attachElem.addChild(textData);
+//		pingElem.addChild(attachElem);
+//
+//		return pingElem;
+//	}
 
 	private class MTOMTestMessageReceiver extends RawXMLINOnlyMessageReceiver {
 

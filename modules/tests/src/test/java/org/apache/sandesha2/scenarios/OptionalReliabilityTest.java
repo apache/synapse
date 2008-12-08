@@ -69,7 +69,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		assertTrue(sequenceReport.getCompletedMessages().isEmpty());
 		
 		//assertions for the in sequence
-		List inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
+		List<SequenceReport> inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		assertTrue(inboundReports.isEmpty());
 		
 		configContext.getListenerManager().stop();
@@ -102,7 +102,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		assertTrue(sequenceReport.getCompletedMessages().isEmpty());
 		
 		//assertions for the in sequence
-		List inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
+		List<SequenceReport> inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		assertTrue(inboundReports.isEmpty());
 		
 		configContext.getListenerManager().stop();
@@ -143,7 +143,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 				assertEquals(callback1.getResult(),"echo1");
 				
 				//assertions for the in sequence
-				List inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
+				List<SequenceReport> inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
 				assertTrue(inboundReports.isEmpty());
 				
 				lastError = null;

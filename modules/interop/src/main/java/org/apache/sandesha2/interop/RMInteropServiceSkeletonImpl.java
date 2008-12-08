@@ -23,7 +23,7 @@ import org.tempuri.EchoStringResponseBodyType;
 
 public class RMInteropServiceSkeletonImpl extends RMInteropServiceSkeleton {
 
-	HashMap sequenceTextMap = new HashMap();
+	HashMap<String, String> sequenceTextMap = new HashMap<String, String>();
 
 	public EchoStringResponse EchoString(org.tempuri.EchoString echoString) {
 

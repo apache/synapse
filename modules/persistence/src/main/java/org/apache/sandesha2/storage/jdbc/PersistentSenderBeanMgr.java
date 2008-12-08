@@ -190,7 +190,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 		return true;
 	}
 
-	public List find(SenderBean bean)
+	public List<SenderBean> find(SenderBean bean)
 			throws SandeshaStorageException {
 		String sql = requestForModel(bean);
 		ArrayList<SenderBean> lst = new ArrayList<SenderBean>();
@@ -209,7 +209,7 @@ public class PersistentSenderBeanMgr extends PersistentBeanMgr implements Sender
 	}
 
 
-	public List find(String internalSequenceId)
+	public List<SenderBean> find(String internalSequenceId)
 			throws SandeshaStorageException {
 		ArrayList<SenderBean> lst = new ArrayList<SenderBean>();
 		try {

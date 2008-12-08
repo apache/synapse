@@ -156,17 +156,17 @@ public class PropertyManager {
         if (policySubject == null) {
             return null;
         }
-        Collection policyComponents = policySubject.getAttachedPolicyComponents();
+        Collection<Policy> policyComponents = policySubject.getAttachedPolicyComponents();
         if (policyComponents == null) {
             return null;
         }
-        Iterator policies = policyComponents.iterator();
+        Iterator<Policy> policies = policyComponents.iterator();
         while (!found && policies.hasNext()) {
             Policy policy = (Policy) policies.next();
-            Iterator iterator = policy.getAlternatives();
+            Iterator<List<Assertion>> iterator = policy.getAlternatives();
             while (!found && iterator.hasNext()) {
-                List assertionList = (List) iterator.next();
-                Iterator assertions = assertionList.iterator();
+                List<Assertion> assertionList = (List<Assertion>) iterator.next();
+                Iterator<Assertion> assertions = assertionList.iterator();
                 while (!found && assertions.hasNext()) {
                     assertion = (Assertion) assertions.next();
                     if (assertion instanceof SandeshaPolicyBean) {
@@ -197,17 +197,17 @@ public class PropertyManager {
             return null; // no pilicy is available in the module description
         }
         
-        Iterator iterator = policy.getAlternatives();
+        Iterator<List<Assertion>> iterator = policy.getAlternatives();
         if (! iterator.hasNext()) {
             throw new SandeshaException("No Policy Alternative found");
         }
 
-        List assertionList = (List) iterator.next();
+        List<Assertion> assertionList = (List<Assertion>) iterator.next();
         Assertion assertion = null;
         
         boolean found = false;
         
-        for (Iterator assertions = assertionList.iterator(); assertions.hasNext();) {
+        for (Iterator<Assertion> assertions = assertionList.iterator(); assertions.hasNext();) {
             assertion = (Assertion) assertions.next();
             
             if (assertion instanceof SandeshaPolicyBean) {

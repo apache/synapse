@@ -80,15 +80,15 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
 
-		HashMap axisServices = configContext.getAxisConfiguration().getServices();
+		HashMap<String, AxisService> axisServices = configContext.getAxisConfiguration().getServices();
 		
 		AxisService service = null;
-		Iterator values = axisServices.values().iterator();
+		Iterator<AxisService> values = axisServices.values().iterator();
 		while(values.hasNext())
 			service = (AxisService)values.next();
 
 		// Set the Sequence timout property to 1 second.
-    Iterator operations = service.getOperations();
+    Iterator<AxisOperation> operations = service.getOperations();
     
     while (operations.hasNext())
     {
@@ -164,15 +164,15 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);		
 
-		HashMap axisServices = configContext.getAxisConfiguration().getServices();
+		HashMap<String, AxisService> axisServices = configContext.getAxisConfiguration().getServices();
 		
 		AxisService service = null;
-		Iterator values = axisServices.values().iterator();
+		Iterator<AxisService> values = axisServices.values().iterator();
 		while(values.hasNext())
 			service = (AxisService)values.next();
 
 		// Set the Sequence timout property to 1 second.
-    Iterator operations = service.getOperations();
+    Iterator<AxisOperation> operations = service.getOperations();
     
     while (operations.hasNext())
     {
@@ -233,7 +233,7 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 			Transaction tran = storageManager.getTransaction();
 			
 			RMSBean finderBean = new RMSBean();
-			List rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
+			List<RMSBean> rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
 			
 			tran.commit();
 			
@@ -280,15 +280,15 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		serviceClient.setOptions(clientOptions);
 
-		HashMap axisServices = serverConfigContext.getAxisConfiguration().getServices();
+		HashMap<String, AxisService> axisServices = serverConfigContext.getAxisConfiguration().getServices();
 		
 		AxisService service = null;
-		Iterator values = axisServices.values().iterator();
+		Iterator<AxisService> values = axisServices.values().iterator();
 		while(values.hasNext())
 			service = (AxisService)values.next();
 
 		// Set the Sequence timout property to 1 second.
-    Iterator operations = service.getOperations();
+    Iterator<AxisOperation> operations = service.getOperations();
     
     while (operations.hasNext())
     {
@@ -319,7 +319,7 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 			Transaction tran = storageManager.getTransaction();
 			
 			RMDBean finderBean = new RMDBean();
-			List rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
+			List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
 			
 			tran.commit();
 			
@@ -348,7 +348,7 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 			Transaction tran = storageManager.getTransaction();
 			
 			RMDBean finderBean = new RMDBean();
-			List rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
+			List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
 			
 			tran.commit();
 			

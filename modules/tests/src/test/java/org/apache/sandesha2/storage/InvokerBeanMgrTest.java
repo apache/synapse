@@ -73,7 +73,7 @@ public class InvokerBeanMgrTest extends SandeshaTestCase {
         InvokerBean bean = new InvokerBean();
         bean.setSequenceID("SeqId2");
 
-        Iterator iter = mgr.find(bean).iterator();
+        Iterator<InvokerBean> iter = mgr.find(bean).iterator();
         InvokerBean tmp = (InvokerBean) iter.next();
 
         if (tmp.getMessageContextRefKey().equals("Key2")) {

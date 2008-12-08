@@ -345,7 +345,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 			
 			RMDBean finderBean = new RMDBean();
 			finderBean.setTerminated(false);
-			List rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
+			List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
 			
 			tran.commit();
 			

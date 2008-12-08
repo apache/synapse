@@ -378,7 +378,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 				senderBean.setReSend(false);
 				
 				// Find any sender beans for the to address.
-				List beans = senderManager.find(senderBean);
+				List<SenderBean> beans = senderManager.find(senderBean);
 				assertTrue("SenderBeans found when the list should be empty", beans.isEmpty());
 				
 				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);

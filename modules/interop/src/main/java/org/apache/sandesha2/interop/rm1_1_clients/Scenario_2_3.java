@@ -37,7 +37,6 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -126,7 +125,7 @@ public class Scenario_2_3 {
 		String sequenceKey = "sequence4";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Constants.Configuration.TRANSPORT_URL,transportToEPR);
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
@@ -227,7 +226,7 @@ public class Scenario_2_3 {
 		EndpointReference toEPR = new EndpointReference (toAddress);
 		clientOptions.setTo(toEPR);
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Constants.Configuration.TRANSPORT_URL,transportToEPR);
 		clientOptions.setAction("urn:wsrm:EchoString");
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 

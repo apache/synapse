@@ -155,8 +155,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 						//checking weather the module is engaged at the System level
 						AxisConfiguration axisConfiguration = messageContext.getConfigurationContext().getAxisConfiguration();
 						if (axisConfiguration!=null) {
-							Collection modules = axisConfiguration.getEngagedModules();
-							for (Iterator iter = modules.iterator();iter.hasNext();) {
+							Collection<AxisModule> modules = axisConfiguration.getEngagedModules();
+							for (Iterator<AxisModule> iter = modules.iterator();iter.hasNext();) {
 								AxisModule module = (AxisModule) iter.next();
 								String moduleName = module.getName();
 								if (moduleName!=null && moduleName.startsWith (Sandesha2Constants.MODULE_NAME)) {
@@ -168,8 +168,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 						//checking weather the module is engaged at the Service level
 						AxisService service = messageContext.getAxisService();
 						if (service!=null) {
-							Collection modules = service.getEngagedModules();
-							for (Iterator iter = modules.iterator();iter.hasNext();) {
+							Collection<AxisModule> modules = service.getEngagedModules();
+							for (Iterator<AxisModule> iter = modules.iterator();iter.hasNext();) {
 								AxisModule module = (AxisModule) iter.next();
 								String name = module.getName();
 								if (name!=null && name.startsWith (Sandesha2Constants.MODULE_NAME)) {
@@ -181,8 +181,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 						//checking weather the module is engaged at the Operation level
 						AxisOperation operation = messageContext.getAxisOperation();
 						if (operation!=null) {
-							Collection modules = operation.getEngagedModules();
-							for (Iterator iter = modules.iterator();iter.hasNext();) {
+							Collection<AxisModule> modules = operation.getEngagedModules();
+							for (Iterator<AxisModule> iter = modules.iterator();iter.hasNext();) {
 								AxisModule module = (AxisModule) iter.next();
 								String name = module.getName();
 								if (name!=null && name.startsWith (Sandesha2Constants.MODULE_NAME)) {
@@ -261,7 +261,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		// well, and and we only want to consider the user's operations.
 		if(axisDescription instanceof AxisService) {
 			AxisService service = (AxisService) axisDescription;
-			Iterator ops = service.getOperations();
+			Iterator<AxisOperation> ops = service.getOperations();
 			while(ops.hasNext()) {
 				AxisOperation op = (AxisOperation) ops.next();
 				if (log.isDebugEnabled()) log.debug("Examining operation " + op.getName() + ", mep " + op.getMessageExchangePattern());

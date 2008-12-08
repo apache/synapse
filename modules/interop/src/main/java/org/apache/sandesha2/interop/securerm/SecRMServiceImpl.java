@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMNamespace;
 
 public class SecRMServiceImpl {
 
-	HashMap sequenceTextMap = new HashMap();
+	HashMap<String, String> sequenceTextMap = new HashMap<String, String>();
 	String namespaceValue = "http://tempuri.org/"; 
 	String Ping = "Ping";
 	String Text = "Text";

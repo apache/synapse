@@ -80,7 +80,7 @@ public class SenderBeanMgrTest extends SandeshaTestCase {
             SenderBean target = new SenderBean();
             target.setInternalSequenceID("TmpSeqId2");
 
-            Iterator iterator = mgr.find(target).iterator();
+            Iterator<SenderBean> iterator = mgr.find(target).iterator();
             SenderBean tmp = (SenderBean) iterator.next();
 
             if (tmp.getMessageID().equals("MsgId2")) {

@@ -90,7 +90,7 @@ public class PersistentInvokerBeanMgr extends PersistentBeanMgr implements Invok
 		return true;
 	}
 
-	public List find(InvokerBean bean)
+	public List<InvokerBean> find(InvokerBean bean)
 			throws SandeshaStorageException {
 		String sql = requestForModel(bean);
 		ArrayList<InvokerBean> lst = new ArrayList<InvokerBean>();

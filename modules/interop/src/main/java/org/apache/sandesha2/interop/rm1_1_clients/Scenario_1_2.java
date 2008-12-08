@@ -17,7 +17,6 @@
 package org.apache.sandesha2.interop.rm1_1_clients;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -26,16 +25,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
@@ -209,7 +205,7 @@ public class Scenario_1_2 {
 	}
 	
 	private void setUpOptions (Options clientOptions) {
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Constants.Configuration.TRANSPORT_URL,transportToEPR);
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence1";

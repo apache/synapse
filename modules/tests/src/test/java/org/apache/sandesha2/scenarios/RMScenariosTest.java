@@ -17,7 +17,6 @@
 package org.apache.sandesha2.scenarios;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -216,7 +215,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 		}
 
 		// Establish a baseline count for inbound sequences
-		List oldIncomingReports = SandeshaClient.getIncomingSequenceReports(configContext);
+		List<SequenceReport> oldIncomingReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
@@ -257,7 +256,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 				
 				//assertions for the inbound sequence. The one we care about is a new sequence,
 				//so it will not exist in the oldSequences list.
-				List incomingSequences = SandeshaClient.getIncomingSequenceReports(configContext);
+				List<SequenceReport> incomingSequences = SandeshaClient.getIncomingSequenceReports(configContext);
 				SequenceReport incomingSequenceReport = getNewReport(incomingSequences, oldIncomingReports);
 				System.out.println("Checking Inbound Sequence: " + incomingSequenceReport.getSequenceID());
 				String offer = (String) clientOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
@@ -298,13 +297,13 @@ public class RMScenariosTest extends SandeshaTestCase {
 
 	// Scan through lists of old and new incoming sequences, to find the sequence that
 	// was established by this test. Note that some of the old sequences may have timed out.
-	private SequenceReport getNewReport(List incomingSequences, List oldIncomingReports) {
-		HashSet sequenceIds = new HashSet();
-		for(Iterator oldSequences = oldIncomingReports.iterator(); oldSequences.hasNext(); ) {
+	private SequenceReport getNewReport(List<SequenceReport> incomingSequences, List<SequenceReport> oldIncomingReports) {
+		HashSet<String> sequenceIds = new HashSet<String>();
+		for(Iterator<SequenceReport> oldSequences = oldIncomingReports.iterator(); oldSequences.hasNext(); ) {
 			SequenceReport report = (SequenceReport) oldSequences.next();
 			sequenceIds.add(report.getSequenceID());
 		}
-		for(Iterator currentSequences = incomingSequences.iterator(); currentSequences.hasNext(); ) {
+		for(Iterator<SequenceReport> currentSequences = incomingSequences.iterator(); currentSequences.hasNext(); ) {
 			SequenceReport report = (SequenceReport) currentSequences.next();
 			if(!sequenceIds.contains(report.getSequenceID())) {
 				

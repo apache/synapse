@@ -19,6 +19,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -101,7 +102,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			SecurityToken token = secManager.getSecurityToken(rmMsgCtx.getMessageContext());
 			
 			//we want to find valid sender beans
-			List possibleBeans = null;
+			List<RMSequenceBean> possibleBeans = new ArrayList<RMSequenceBean>();
 			int possibleBeanIndex = -10;
 			SenderBean findSenderBean = new SenderBean();
 			boolean secured = false;
@@ -114,13 +115,14 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				RMSBean finderRMS = new RMSBean();
 				finderRMS.setSecurityTokenData(data);
 				finderRMS.setToEPR(address);
-				possibleBeans = storageManager.getRMSBeanMgr().find(finderRMS);
+				List<RMSBean> tempList2 = storageManager.getRMSBeanMgr().find(finderRMS);
+				possibleBeans.addAll(tempList2);
 				
 				//try looking for RMD beans too
 				RMDBean finderRMD = new RMDBean();
 				finderRMD.setSecurityTokenData(data);
 				finderRMD.setToAddress(address);
-				List tempList = storageManager.getRMDBeanMgr().find(finderRMD);
+				List<RMDBean> tempList = storageManager.getRMDBeanMgr().find(finderRMD);
 				
 				//combine these two into one list
 				possibleBeans.addAll(tempList);
@@ -173,10 +175,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				//finding the beans that go with the criteria of the passed SenderBean
 				//The reSend flag is ignored for this selection, so there is no need to
 				//set it.
-				Collection collection = senderBeanMgr.find(findSenderBean);
+				Collection<SenderBean> collection = senderBeanMgr.find(findSenderBean);
 				
 				//removing beans that does not pass the resend test
-				for (Iterator it=collection.iterator();it.hasNext();) {
+				for (Iterator<SenderBean> it=collection.iterator();it.hasNext();) {
 					SenderBean bean = (SenderBean) it.next();
 					if (!bean.isReSend() && bean.getSentCount()>0)
 						it.remove();
@@ -196,7 +198,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 					pending = true;  //there are more than one message to be delivered using the makeConnection.
 									 //So the MessagePending header should have value true;
 				
-				Iterator it = collection.iterator();
+				Iterator<SenderBean> it = collection.iterator();
 				
 				senderBean = null;
 				for (int item=0;item<size;item++) {

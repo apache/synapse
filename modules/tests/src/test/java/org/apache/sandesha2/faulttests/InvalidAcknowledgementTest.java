@@ -21,14 +21,10 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -252,7 +248,6 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		StorageManager storageManager = 
 			SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());
 		
-		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 		SenderBeanMgr senderMgr = storageManager.getSenderBeanMgr();
 		
 		// Create an RMS on the service.

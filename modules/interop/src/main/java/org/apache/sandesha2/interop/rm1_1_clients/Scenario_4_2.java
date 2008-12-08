@@ -36,18 +36,14 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.interop.RMInteropServiceCallbackHandlerImpl;
 import org.apache.sandesha2.interop.RMInteropServiceStub;
-import org.apache.sandesha2.interop.rm1_1_clients.Scenario_2_1.TestCallback;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.tempuri.EchoString;
 import org.tempuri.EchoStringRequestBodyType;
@@ -108,7 +104,7 @@ public class Scenario_4_2 {
 		
 		Options clientOptions = new Options ();
 
-        serviceClient.engageModule(new QName("rampart"));
+        serviceClient.engageModule("rampart");
         
 		String sequenceKey = "sequence4";
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
@@ -221,7 +217,7 @@ public class Scenario_4_2 {
 		EndpointReference toEPR = new EndpointReference (toAddress);
 		clientOptions.setTo(toEPR);
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(Constants.Configuration.TRANSPORT_URL,transportToEPR);
 		clientOptions.setAction("urn:wsrm:EchoString");
 
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.

@@ -36,6 +36,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.OutOnlyAxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.Handler;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
@@ -320,11 +321,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					}
 				} else {
 	
-					ArrayList retransmittablePhases = (ArrayList) msgCtx.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
+					ArrayList<Handler> retransmittablePhases = (ArrayList<Handler>) msgCtx.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
 					if (retransmittablePhases!=null) {
 						msgCtx.setExecutionChain(retransmittablePhases);
 					} else {
-						ArrayList emptyExecutionChain = new ArrayList ();
+						ArrayList<Handler> emptyExecutionChain = new ArrayList<Handler>();
 						msgCtx.setExecutionChain(emptyExecutionChain);
 					}
 					

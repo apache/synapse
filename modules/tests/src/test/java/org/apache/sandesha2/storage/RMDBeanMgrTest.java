@@ -74,7 +74,7 @@ public class RMDBeanMgrTest extends SandeshaTestCase {
         RMDBean target = new RMDBean();
         target.setNextMsgNoToProcess(1002);
 
-        Iterator iterator = mgr.find(target).iterator();
+        Iterator<RMDBean> iterator = mgr.find(target).iterator();
         RMDBean tmp = (RMDBean) iterator.next();
 
         if (tmp.getSequenceID().equals("SeqId2")) {

@@ -254,7 +254,7 @@ public class PersistentRMDBeanMgr extends PersistentBeanMgr implements RMDBeanMg
 		return true;
 	}
 
-	public List find(RMDBean bean)
+	public List<RMDBean> find(RMDBean bean)
 			throws SandeshaStorageException {
 		String sql = requestForModel(bean);
 		ArrayList<RMDBean> lst = new ArrayList<RMDBean>();
@@ -345,7 +345,7 @@ public class PersistentRMDBeanMgr extends PersistentBeanMgr implements RMDBeanMg
 		return bean;
 	}
 
-	public Collection retrieveAll()
+	public Collection<RMDBean> retrieveAll()
 			throws SandeshaStorageException {
 		return find(null);
 	}

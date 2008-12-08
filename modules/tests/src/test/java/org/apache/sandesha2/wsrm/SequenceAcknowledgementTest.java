@@ -48,7 +48,7 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
         Identifier identifier = sequenceAck.getIdentifier();
         assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifier.getIdentifier());
 
-        Iterator iterator = sequenceAck.getAcknowledgementRanges().iterator();
+        Iterator<Range> iterator = sequenceAck.getAcknowledgementRanges().iterator();
         while (iterator.hasNext()) {
         	Range ackRange = (Range) iterator.next();
             if (ackRange.lowerValue == 1){
@@ -62,9 +62,9 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
             }
         }
 
-        iterator = sequenceAck.getNackList().iterator();
-        while (iterator.hasNext()) {
-            Long nack = (Long) iterator.next();
+        Iterator<Long> iterator2 = sequenceAck.getNackList().iterator();
+        while (iterator2.hasNext()) {
+            Long nack = (Long) iterator2.next();
             if (nack.longValue() == 3) {
 
             } else if (nack.longValue() == 7) {

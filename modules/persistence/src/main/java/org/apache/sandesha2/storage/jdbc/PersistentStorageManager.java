@@ -79,7 +79,7 @@ public class PersistentStorageManager extends StorageManager {
 	private PollingManager pollingManager = null;
 	private boolean useSerialization = false;
 	private HashMap<String, MessageContext> storageMap = null;
-	private static ThreadLocal threadTransaction = null;
+	private static ThreadLocal<Transaction> threadTransaction = null;
 	private static final Log log = LogFactory.getLog(PersistentStorageManager.class);
 
 	private TransactionLock transactionLock;
@@ -101,8 +101,8 @@ public class PersistentStorageManager extends StorageManager {
 			throws SandeshaException {
 		super(context);
 		log.info("create PersistentStorageManager");
-		storageMap = new HashMap();
-		threadTransaction = new ThreadLocal();
+		storageMap = new HashMap<String, MessageContext>();
+		threadTransaction = new ThreadLocal<Transaction>();
 		pRMSBeanMgr = new PersistentRMSBeanMgr(this);
 		pRMDBeanMgr = new PersistentRMDBeanMgr(this);
 		pSenderBeanMgr = new PersistentSenderBeanMgr(this);

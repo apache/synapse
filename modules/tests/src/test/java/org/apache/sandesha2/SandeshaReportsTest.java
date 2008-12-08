@@ -110,7 +110,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 				
 				//testing incoming sequence reports
-				List incomingSequenceReports = SandeshaClient.getIncomingSequenceReports(configContext);
+				List<SequenceReport> incomingSequenceReports = SandeshaClient.getIncomingSequenceReports(configContext);
 				assertEquals(incomingSequenceReports.size(),1);
 				SequenceReport incomingSequenceReport = (SequenceReport) incomingSequenceReports.get(0);
 				assertEquals(incomingSequenceReport.getCompletedMessages().size(),2);
@@ -183,7 +183,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 			 	SequenceReport sequence1Report = null;
 			 	SequenceReport sequence2Report = null;
 			 	
-			 	Iterator iterator = rmReport.getOutgoingSequenceList().iterator();
+			 	Iterator<String> iterator = rmReport.getOutgoingSequenceList().iterator();
 			 	while (iterator.hasNext()) {
 			 		String sequenceID = (String) iterator.next();
 			 		

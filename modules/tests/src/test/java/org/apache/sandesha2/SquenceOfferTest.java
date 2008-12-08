@@ -101,7 +101,7 @@ public class SquenceOfferTest extends SandeshaTestCase {
 				
 				//checking weather the incomingSequenceReport has the offered sequence ID
 				SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
-				List incomingSeqList = rmReport.getIncomingSequenceList();
+				List<String> incomingSeqList = rmReport.getIncomingSequenceList();
 				assertEquals(incomingSeqList.size(),1);
 				assertEquals(incomingSeqList.get(0),offeredSequenceID);	
 	

@@ -16,6 +16,12 @@
 
 package org.apache.sandesha2.interop.rm1_1_clients;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.Properties;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -24,17 +30,12 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.rahas.RahasConstants;
 import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -44,18 +45,12 @@ import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.interop.RMInteropServiceStub;
 import org.tempuri.Ping;
 
-import javax.xml.namespace.QName;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.Properties;
-
 
 public class Scenario_4_1 {
 
 
     private static final String applicationNamespaceName = "http://tempuri.org/"; 
-    private static final String PingRequest = "PingRequest";
+//    private static final String PingRequest = "PingRequest";
     private static final String Text = "Text";
     
     private static String toIP = "127.0.0.1";
@@ -107,7 +102,7 @@ public class Scenario_4_1 {
         ServiceClient serviceClient = new ServiceClient (configurationContext,null);
         
 //      engage Rampart
-        serviceClient.engageModule(new QName("rampart"));
+        serviceClient.engageModule("rampart");
         
         serviceClient.setOptions(clientOptions);
         
@@ -205,7 +200,7 @@ public class Scenario_4_1 {
     }
     
     private void setUpOptions (Options clientOptions) throws Exception {
-        clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+        clientOptions.setProperty(Constants.Configuration.TRANSPORT_URL,transportToEPR);
 //      clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
         clientOptions.setTo(new EndpointReference (toEPR));
         

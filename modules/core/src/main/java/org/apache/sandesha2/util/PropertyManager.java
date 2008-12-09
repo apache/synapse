@@ -20,9 +20,9 @@
 package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collection;
 
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
@@ -30,6 +30,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.PolicySubject;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -156,25 +157,28 @@ public class PropertyManager {
         if (policySubject == null) {
             return null;
         }
-        Collection<Policy> policyComponents = policySubject.getAttachedPolicyComponents();
+        Collection<PolicyComponent> policyComponents = policySubject.getAttachedPolicyComponents();
         if (policyComponents == null) {
             return null;
         }
-        Iterator<Policy> policies = policyComponents.iterator();
+        Iterator<PolicyComponent> policies = policyComponents.iterator();
         while (!found && policies.hasNext()) {
-            Policy policy = (Policy) policies.next();
-            Iterator<List<Assertion>> iterator = policy.getAlternatives();
-            while (!found && iterator.hasNext()) {
-                List<Assertion> assertionList = (List<Assertion>) iterator.next();
-                Iterator<Assertion> assertions = assertionList.iterator();
-                while (!found && assertions.hasNext()) {
-                    assertion = (Assertion) assertions.next();
-                    if (assertion instanceof SandeshaPolicyBean) {
-                        found = true;
-                        break;
-                    }
-                }
-            }
+        	Object next = policies.next();
+        	if(next instanceof Policy){
+        		Policy policy = (Policy) next;
+        		Iterator<List<Assertion>> iterator = policy.getAlternatives();
+        		while (!found && iterator.hasNext()) {
+        			List<Assertion> assertionList = (List<Assertion>) iterator.next();
+        			Iterator<Assertion> assertions = assertionList.iterator();
+        			while (!found && assertions.hasNext()) {
+        				assertion = (Assertion) assertions.next();
+        				if (assertion instanceof SandeshaPolicyBean) {
+        					found = true;
+        					break;
+        				}
+        			}
+        		}
+        	}
         }
 
         // no RMAssertion found

@@ -54,6 +54,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
                 algorithmContext = new AlgorithmContext(isClusteringEnabled, cc, getName());
             }
         }
+        log.info("Dynamic load balance endpoint initialized");
     }
 
     private LoadBalanceMembershipHandler lbMembershipHandler;
@@ -120,6 +121,8 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
                 AddressEndpoint endpoint = new AddressEndpoint();
                 EndpointDefinition definition = new EndpointDefinition();
                 endpoint.setDefinition(definition);
+                endpoint.init(((Axis2MessageContext) synCtx).getAxis2MessageContext().
+                        getConfigurationContext());
                 endpoint.send(synCtx);
             } else {
                 log.error("Cannot load balance for non-HTTP/S transport " + transport);

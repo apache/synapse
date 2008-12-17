@@ -123,7 +123,7 @@ public class LoadbalanceFailoverClient {
         value.setText("Sample string");
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/services/LBService1"));
 
         options.setAction("urn:sampleOperation");
 
@@ -243,7 +243,7 @@ public class LoadbalanceFailoverClient {
         }
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/services/LBService1"));
         options.setAction("urn:sampleOperation");
         options.setTimeOutInMilliSeconds(10000000);
 

@@ -23,9 +23,8 @@ import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.SynapseException;
 
 import java.util.Date;
 
@@ -478,5 +477,12 @@ public class EndpointContext {
     private void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[ Name : ").append(endpointName).
+                append(" ] [ State : ").append(getStateAsString()).append(" ]");
+        return sb.toString();
     }
 }

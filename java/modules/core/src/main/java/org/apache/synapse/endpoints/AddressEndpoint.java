@@ -19,12 +19,8 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.axis2.clustering.ClusterManager;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
  * This class represents an actual endpoint to send the message. It is responsible for sending the
@@ -35,22 +31,32 @@ public class AddressEndpoint extends AbstractEndpoint {
 
     public void onFault(MessageContext synCtx) {
 
-        // is this really a fault or a timeout/connection close etc?
-        if (isTimeout(synCtx)) {
-            getContext().onTimeout();
-        } else if (isSuspendFault(synCtx)) {
-            getContext().onFault();
+        // is this an actual leaf endpoint 
+        if (getParentEndpoint() != null) {
+            // is this really a fault or a timeout/connection close etc?
+            if (isTimeout(synCtx)) {
+                getContext().onTimeout();
+            } else if (isSuspendFault(synCtx)) {
+                getContext().onFault();
+            }
         }
-
         // this should be an ignored error if we get here
-        synCtx.setProperty(SynapseConstants.ERROR_CODE, null);
-        synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, null);
-        synCtx.setProperty(SynapseConstants.ERROR_DETAIL, null);
-        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, null);
+        setErrorOnMessage(synCtx, null, null);
         super.onFault(synCtx);
     }
 
     public void onSuccess() {
         getContext().onSuccess();
+    }
+
+    public void send(MessageContext synCtx) {
+
+        if (getParentEndpoint() == null && !readyToSend()) {
+            // if the this leaf endpoint is too a root endpoint and is in inactive 
+            informFailure(synCtx, SynapseConstants.ENDPOINT_ADDRESS_NONE_READY,
+                    "Currently , Address endpoint : " + getContext());
+        } else {
+            super.send(synCtx);
+        }
     }
 }

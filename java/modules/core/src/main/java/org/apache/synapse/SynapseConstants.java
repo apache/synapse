@@ -322,6 +322,8 @@ public final class SynapseConstants {
     // Endpoint failures
     public static final int ENDPOINT_LB_NONE_READY   = 303000;
     public static final int ENDPOINT_FO_NONE_READY   = 303000;
+    public static final int ENDPOINT_ADDRESS_NONE_READY = 303001;
+    public static final int ENDPOINT_WSDL_NONE_READY = 303002;
     // Failure on endpoint in the session 
     public static final int ENDPOINT_SAL_NOT_READY = 309001;
     public static final int ENDPOINT_SAL_INVALID_PATH = 309002;

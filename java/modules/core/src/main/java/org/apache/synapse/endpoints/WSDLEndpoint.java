@@ -20,11 +20,8 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axis2.clustering.ClusterManager;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 
 /**
  * WSDLEndpoint represents the endpoints built using a WSDL document. It stores the details about
@@ -43,12 +40,18 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private String portName;
 
     public void onFault(MessageContext synCtx) {
-        // is this really a fault or a timeout/connection close etc?
-        if (isTimeout(synCtx)) {
-            getContext().onTimeout();
-        } else if (isSuspendFault(synCtx)) {
-            getContext().onFault();
+        
+        // is this an actual leaf endpoint
+        if (getParentEndpoint() != null) {
+            // is this really a fault or a timeout/connection close etc?
+            if (isTimeout(synCtx)) {
+                getContext().onTimeout();
+            } else if (isSuspendFault(synCtx)) {
+                getContext().onFault();
+            }
         }
+        
+        setErrorOnMessage(synCtx, null, null);
         super.onFault(synCtx);
     }
 
@@ -56,6 +59,17 @@ public class WSDLEndpoint extends AbstractEndpoint {
         getContext().onSuccess();
     }
 
+    public void send(MessageContext synCtx) {
+
+        if (getParentEndpoint() == null && !readyToSend()) {
+            // if the this leaf endpoint is too a root endpoint and is in inactive 
+            informFailure(synCtx, SynapseConstants.ENDPOINT_ADDRESS_NONE_READY,
+                    "Currently , WSDL endpoint : " + getContext());
+        } else {
+            super.send(synCtx);
+        }
+    }
+    
     public String getWsdlURI() {
         return wsdlURI;
     }

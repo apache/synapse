@@ -294,16 +294,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
      * @param synCtx the message at hand
      */
     public void onFault(MessageContext synCtx) {
-        Stack faultStack = synCtx.getFaultStack();
-        if (!faultStack.isEmpty()) {
-            Object faultHandler = faultStack.pop();
-            if (faultHandler instanceof Endpoint) {
-                // This is the parent . need to inform parent with fault child
-                ((Endpoint) faultHandler).onChildEndpointFail(this, synCtx);
-            } else {
-                ((FaultHandler) faultHandler).handleFault(synCtx);
-            }
-        }
+        invokeNextFaultHandler(synCtx);
     }
 
     /**
@@ -419,10 +410,30 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     protected void informFailure(MessageContext synCtx, int errorCode, String errorMsg) {
 
         if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null) {
-            synCtx.setProperty(SynapseConstants.ERROR_CODE, errorCode);
-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg);
-            synCtx.setProperty(SynapseConstants.ERROR_DETAIL, errorMsg);
+            setErrorOnMessage(synCtx, String.valueOf(errorCode), errorMsg);
         }
-        onFault(synCtx);
+        invokeNextFaultHandler(synCtx);
+    }
+
+
+    protected void setErrorOnMessage(MessageContext synCtx, String errorCode, String errorMsg) {
+
+        synCtx.setProperty(SynapseConstants.ERROR_CODE, errorCode);
+        synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg);
+        synCtx.setProperty(SynapseConstants.ERROR_DETAIL, errorMsg);
+    }
+
+    private void invokeNextFaultHandler(MessageContext synCtx) {
+
+        Stack faultStack = synCtx.getFaultStack();
+        if (!faultStack.isEmpty()) {
+            Object faultHandler = faultStack.pop();
+            if (faultHandler instanceof Endpoint) {
+                // This is the parent . need to inform parent with fault child
+                ((Endpoint) faultHandler).onChildEndpointFail(this, synCtx);
+            } else {
+                ((FaultHandler) faultHandler).handleFault(synCtx);
+            }
+        }
     }
 }

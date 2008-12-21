@@ -19,11 +19,13 @@
 
 package samples.userguide;
 
-
-import org.apache.axis2.transport.jms.JMSUtils;
-import org.apache.axis2.transport.jms.JMSConstants;
-
-import javax.jms.*;
+import javax.jms.BytesMessage;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
@@ -70,30 +72,28 @@ public class GenericJMSClient {
 
     private void sendBytesMessage(String destName, byte[] payload) throws Exception {
         InitialContext ic = getInitialContext();
-        ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = JMSUtils.createConnection(
-            confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
-        Session session = JMSUtils.createSession(
-            connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
-
+        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
+        QueueConnection connection = confac.createQueueConnection();
+        QueueSession session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
         BytesMessage bm = session.createBytesMessage();
         bm.writeBytes(payload);
-        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName),
-                JMSConstants.DESTINATION_TYPE_QUEUE,  bm);
+        QueueSender sender = session.createSender((Queue)ic.lookup(destName));
+        sender.send(bm);
+        sender.close();
+        session.close();
         connection.close();
     }
 
     private void sendTextMessage(String destName, String payload) throws Exception {
         InitialContext ic = getInitialContext();
-        ConnectionFactory confac = (ConnectionFactory) ic.lookup("ConnectionFactory");
-        Connection connection = JMSUtils.createConnection(
-            confac, null, null, JMSConstants.DESTINATION_TYPE_QUEUE);
-        Session session = JMSUtils.createSession(
-            connection, false, Session.AUTO_ACKNOWLEDGE, JMSConstants.DESTINATION_TYPE_QUEUE);
-
+        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
+        QueueConnection connection = confac.createQueueConnection();
+        QueueSession session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
         TextMessage tm = session.createTextMessage(payload);
-        JMSUtils.sendMessageToJMSDestination(session, (Destination) ic.lookup(destName),
-                JMSConstants.DESTINATION_TYPE_QUEUE, tm);
+        QueueSender sender = session.createSender((Queue)ic.lookup(destName));
+        sender.send(tm);
+        sender.close();
+        session.close();
         connection.close();
     }
 

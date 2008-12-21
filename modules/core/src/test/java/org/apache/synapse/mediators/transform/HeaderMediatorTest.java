@@ -69,5 +69,21 @@ public class HeaderMediatorTest extends TestCase {
         assertTrue(synCtx.getTo() == null);
     }
 
+    /**
+     * Test that adding a header without namespace triggers an error (SOAP headers MUST be
+     * namespace-qualified).
+     */
+    public void testSetWithNoNamespace() throws Exception {
+        HeaderMediator headerMediator = new HeaderMediator();
+        headerMediator.setQName(new QName("onlyLocalPart"));
+        headerMediator.setValue("value");
 
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        try {
+            headerMediator.mediate(synCtx);
+            fail("HeaderMediator should not allow headers without namespace");
+        } catch (Exception ex) {
+            // This is expected
+        }
+    }
 }

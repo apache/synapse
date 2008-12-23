@@ -19,14 +19,16 @@
 
 package org.apache.synapse.config.xml.endpoints.utils;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,20 +37,48 @@ import java.util.List;
  */
 public class LoadbalanceAlgorithmFactory {
 
+    private static Log log = LogFactory.getLog(LoadbalanceAlgorithmFactory.class);
+
     public static LoadbalanceAlgorithm createLoadbalanceAlgorithm(OMElement loadbalanceElement, List endpoints) {
 
-        LoadbalanceAlgorithm algorithm = null;
+        //default algorithm is round robin
+        LoadbalanceAlgorithm algorithm = new RoundRobin(endpoints);
 
-        String algorithmName = "roundRobin";
-        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(null, XMLConfigConstants.ALGORITHM_NAME));
-        if(algoAttribute != null) {
-            algorithmName = algoAttribute.getAttributeValue();
+        OMAttribute policyAttribute = loadbalanceElement.getAttribute(new QName(null,
+                XMLConfigConstants.LOADBALANCE_POLICY));
+        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(null,
+                XMLConfigConstants.LOADBALANCE_ALGORITHM));
+
+        if (policyAttribute != null && algoAttribute != null) {
+            String msg = "You cannot specify both the 'policy' & 'algorithm' in the configuration. " +
+                         "It is sufficient to provide only the 'algorithm'.";
+            log.fatal(msg); // We cannot continue execution. Hence it is logged at fatal level
+            throw new SynapseException(msg);
         }
 
-        if(algorithmName.equalsIgnoreCase("roundRobin")) {
-                algorithm = new RoundRobin(endpoints);
-        }
+        if (algoAttribute != null) {
+            String algorithmStr = algoAttribute.getAttributeValue().trim();
+            try {
+                algorithm = (LoadbalanceAlgorithm) Class.forName(algorithmStr).newInstance();
+                algorithm.setEndpoints(endpoints);
+            } catch (Exception e) {
+                String msg = "Cannot instantiate LoadbalanceAlgorithm implementation class " +
+                             algorithmStr;
+                log.fatal(msg, e); // We cannot continue execution. Hence it is logged at fatal level
+                throw new SynapseException(msg, e);
+            }
 
+        } else if (policyAttribute != null) {
+            //currently only the roundRobin policy is supported
+            if (!policyAttribute.getAttributeValue().trim().equals("roundRobin")) {
+                String msg = "Unsupported algorithm " + policyAttribute.getAttributeValue().trim() +
+                             " specified. Please use the 'algorithm' attribute to specify the " +
+                             "correct loadbalance algorithm implementation.";
+                log.fatal(msg); // We cannot continue execution. Hence it is logged at fatal level
+                throw new SynapseException(msg);
+            }
+        }
+        
         return algorithm;
     }
 }

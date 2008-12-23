@@ -48,12 +48,12 @@ import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.nio.util.ContentOutputBuffer;
 import org.apache.http.nio.util.ContentInputBuffer;
+import org.apache.http.nio.util.SharedInputBuffer;
+import org.apache.http.nio.util.SharedOutputBuffer;
 import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
-import org.apache.synapse.transport.nhttp.util.SharedInputBuffer;
-import org.apache.synapse.transport.nhttp.util.SharedOutputBuffer;
 
 import java.io.IOException;
 

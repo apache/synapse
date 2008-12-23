@@ -172,8 +172,8 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 os.close();
             }
             // update metrics
-            metrics.incrementMessagesSent();
-            metrics.incrementBytesSent(os.getByteCount());
+            metrics.incrementMessagesSent(msgContext);
+            metrics.incrementBytesSent(msgContext, os.getByteCount());
         } catch (FileSystemException e) {
             metrics.incrementFaultsSending();
             handleException("IO Error while creating response file : " + responseFile.getName(), e);

@@ -23,7 +23,6 @@ import org.apache.axis2.clustering.Member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.ArrayList;
@@ -44,6 +43,10 @@ public class RoundRobin implements LoadbalanceAlgorithm {
 
     private List<Member> members;
 
+    public RoundRobin() {
+
+    }
+
     public RoundRobin(List endpoints) {
         this.endpoints = endpoints;
     }
@@ -53,7 +56,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
     }
 
     public void setEndpoints(List<Endpoint> endpoints) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.endpoints = endpoints;
     }
 
     /**

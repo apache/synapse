@@ -50,15 +50,18 @@ public class AlgorithmContext {
     /* The pointer to current epr - The position of the current EPR */
     private int currentEPR = 0;
 
-    private Map<String, Object> parameters;
+    /* The map of properties stored locally */
+    private Map<String, Object> localProperties;
 
     public AlgorithmContext(boolean clusteringEnabled, ConfigurationContext cfgCtx, String endpointName) {
         this.cfgCtx = cfgCtx;
         if (clusteringEnabled) {
             isClusteringEnabled = Boolean.TRUE;
+        } else {
+            isClusteringEnabled = Boolean.FALSE;
+            localProperties = new HashMap<String, Object>();
         }
         CURRENT_EPR_PROP_KEY = KEY_PREFIX + endpointName + CURRENT_EPR;
-        parameters = new HashMap<String, Object>();
     }
 
     /**
@@ -160,12 +163,38 @@ public class AlgorithmContext {
         }
     }
 
-    public Object getParameter(String key) {
-        return parameters.get(key);
+    /**
+     * Get the property value corresponding to a specified key
+     *
+     * @param key The key of the property
+     * @return The value of the property or null if the key does not exist
+     */
+    public Object getProperty(String key) {
+        if (Boolean.TRUE.equals(isClusteringEnabled)) {
+            return cfgCtx.getPropertyNonReplicable(key);
+        } else {
+            return localProperties.get(key);
+        }
     }
 
-    public void setParameter(String key, Object value) {
-        parameters.put(key, value);
+    /**
+     * Store a property in the algorithm context. In a clustered environment
+     * properties will be saved in the configuration context and replicated.
+     * In non-clustered environments properties will be stored in a local property
+     * map.
+     *
+     * @param key The key of the property
+     * @param value The value of the property
+     */
+    public void setProperty(String key, Object value) {
+
+        if (key != null && value != null) {
+            if (Boolean.TRUE.equals(isClusteringEnabled)) {
+                setAndReplicateState(key, value);
+            } else {
+                localProperties.put(key, value);
+            }
+        }
     }
 
 }

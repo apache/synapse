@@ -18,12 +18,11 @@
 */
 package org.apache.synapse.endpoints.algorithms;
 
-import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.Replicator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,10 +41,13 @@ public class AlgorithmContext {
     private ConfigurationContext cfgCtx;
 
     /* Are we supporting clustering ? */
-    private Boolean isClusteringEnabled = null;
+    private boolean isClusteringEnabled = false;
 
     /* The key for 'currentEPR' attribute when replicated in a clsuter */
     private String CURRENT_EPR_PROP_KEY;
+
+    /* Prefix for uniquely identify  properties of a particular endpoint  */
+    private String PROPERTY_KEY_PREFIX;
 
     /* The pointer to current epr - The position of the current EPR */
     private int currentEPR = 0;
@@ -54,14 +56,16 @@ public class AlgorithmContext {
     private Map<String, Object> localProperties;
 
     public AlgorithmContext(boolean clusteringEnabled, ConfigurationContext cfgCtx, String endpointName) {
+
         this.cfgCtx = cfgCtx;
-        if (clusteringEnabled) {
-            isClusteringEnabled = Boolean.TRUE;
-        } else {
-            isClusteringEnabled = Boolean.FALSE;
+        this.isClusteringEnabled = clusteringEnabled;
+
+        if (!clusteringEnabled) {
             localProperties = new HashMap<String, Object>();
+        } else {
+            PROPERTY_KEY_PREFIX = KEY_PREFIX + endpointName;
+            CURRENT_EPR_PROP_KEY = PROPERTY_KEY_PREFIX + CURRENT_EPR;
         }
-        CURRENT_EPR_PROP_KEY = KEY_PREFIX + endpointName + CURRENT_EPR;
     }
 
     /**
@@ -71,7 +75,7 @@ public class AlgorithmContext {
      */
     public int getCurrentEndpointIndex() {
 
-        if (Boolean.TRUE.equals(isClusteringEnabled)) {
+        if (isClusteringEnabled) {
 
             Object value = cfgCtx.getPropertyNonReplicable(this.CURRENT_EPR_PROP_KEY);
             if (value == null) {
@@ -92,13 +96,12 @@ public class AlgorithmContext {
      */
     public void setCurrentEndpointIndex(int currentEPR) {
 
-        if (Boolean.TRUE.equals(isClusteringEnabled)) {
+        if (isClusteringEnabled) {
 
             if (log.isDebugEnabled()) {
                 log.debug("Set EPR with key : " + CURRENT_EPR_PROP_KEY + " as : " + currentEPR);
             }
-            setAndReplicateState(CURRENT_EPR_PROP_KEY, currentEPR);
-
+            Replicator.setAndReplicateState(CURRENT_EPR_PROP_KEY, currentEPR, cfgCtx);
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("Setting the current EPR as : " + currentEPR);
@@ -117,53 +120,6 @@ public class AlgorithmContext {
     }
 
     /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    protected void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    /**
-     * Helper method to replicates states of the property with given key
-     * Sets property and  replicates the current state  so that all instances
-     * across cluster can see this state
-     *
-     * @param key   The key of the property
-     * @param value The value of the property
-     */
-    private void setAndReplicateState(String key, Object value) {
-
-        if (cfgCtx != null && key != null && value != null) {
-
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Replicating property key : " + key + " as : " + value);
-                }
-                cfgCtx.setProperty(key, value);
-                Replicator.replicate(cfgCtx, new String[]{key});
-
-            } catch (ClusteringFault clusteringFault) {
-                handleException("Error replicating property : " + key + " as : " +
-                    value, clusteringFault);
-            }
-        }
-    }
-
-    /**
      * Get the property value corresponding to a specified key
      *
      * @param key The key of the property
@@ -171,7 +127,7 @@ public class AlgorithmContext {
      */
     public Object getProperty(String key) {
         if (Boolean.TRUE.equals(isClusteringEnabled)) {
-            return cfgCtx.getPropertyNonReplicable(key);
+            return cfgCtx.getPropertyNonReplicable(PROPERTY_KEY_PREFIX + key);
         } else {
             return localProperties.get(key);
         }
@@ -183,14 +139,14 @@ public class AlgorithmContext {
      * In non-clustered environments properties will be stored in a local property
      * map.
      *
-     * @param key The key of the property
+     * @param key   The key of the property
      * @param value The value of the property
      */
     public void setProperty(String key, Object value) {
 
         if (key != null && value != null) {
             if (Boolean.TRUE.equals(isClusteringEnabled)) {
-                setAndReplicateState(key, value);
+                Replicator.setAndReplicateState(PROPERTY_KEY_PREFIX + key, value, cfgCtx);
             } else {
                 localProperties.put(key, value);
             }

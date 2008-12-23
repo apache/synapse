@@ -46,6 +46,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * The server connection handler. An instance of this class is used by each IOReactor, to
@@ -117,10 +119,19 @@ public class ServerHandler implements NHttpServiceHandler {
         conn.getContext().setAttribute(NhttpConstants.REQUEST_READ, Boolean.FALSE);
 
         try {
-            ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+            InputStream is;
+            // Only create an input buffer and ContentInputStream if the request has content
+            if (request instanceof HttpEntityEnclosingRequest) {
+                ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+                context.setAttribute(REQUEST_SINK_BUFFER, inputBuffer);
+                is = new ContentInputStream(inputBuffer);
+            } else {
+                is = null;
+            }
+            
             ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
-            context.setAttribute(REQUEST_SINK_BUFFER, inputBuffer);
             context.setAttribute(RESPONSE_SOURCE_BUFFER, outputBuffer);
+            OutputStream os = new ContentOutputStream(outputBuffer);
 
             // create the default response to this request
             ProtocolVersion httpVersion = request.getRequestLine().getProtocolVersion();
@@ -138,8 +149,7 @@ public class ServerHandler implements NHttpServiceHandler {
             // hand off processing of the request to a thread off the pool
             workerPool.execute(
                 new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
-                    request, new ContentInputStream(inputBuffer),
-                    response, new ContentOutputStream(outputBuffer)));
+                    request, is, response, os));
 
         } catch (Exception e) {
             if (metrics != null) {

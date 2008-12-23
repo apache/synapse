@@ -483,13 +483,19 @@ public class ServerWorker implements Runnable {
 
         } else {
             try {
-                RESTUtil.processURLRequest(
+                if (RESTUtil.processURLRequest(
                         msgContext, os, (request.getFirstHeader(SOAPACTION) != null ?
                         request.getFirstHeader(SOAPACTION).getValue() : null),
-                        request.getRequestLine().getUri(), cfgCtx, parameters);
-                // do not let the output stream close (as by default below) since
-                // we are serving this GET request through the Synapse engine
-                return;
+                        request.getRequestLine().getUri(), cfgCtx, parameters)) {
+                    // If RestUtil succesfully decoded the request, do not let the output
+                    // stream close (as by default below) since we are serving this GET request
+                    // through the Synapse engine
+                    return;
+                } else {
+                    response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
+                    response.addHeader(LOCATION, servicePath + "/");
+                    serverHandler.commitResponseHideExceptions(conn, response);
+                }
                     
             } catch (AxisFault axisFault) {
                 handleException("Error processing GET request for: " +

@@ -21,7 +21,6 @@ package org.apache.synapse.endpoints.algorithms;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.Replicator;
 
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class AlgorithmContext {
     /* Are we supporting clustering ? */
     private boolean isClusteringEnabled = false;
 
-    /* The key for 'currentEPR' attribute when replicated in a clsuter */
+    /* The key for 'currentEPR' attribute when replicated in a cluster */
     private String CURRENT_EPR_PROP_KEY;
 
     /* Prefix for uniquely identify  properties of a particular endpoint  */

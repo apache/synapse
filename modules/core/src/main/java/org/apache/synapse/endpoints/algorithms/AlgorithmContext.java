@@ -25,6 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Keeps the runtime state of the algorithm
  */
@@ -47,12 +50,15 @@ public class AlgorithmContext {
     /* The pointer to current epr - The position of the current EPR */
     private int currentEPR = 0;
 
+    private Map<String, Object> parameters;
+
     public AlgorithmContext(boolean clusteringEnabled, ConfigurationContext cfgCtx, String endpointName) {
         this.cfgCtx = cfgCtx;
         if (clusteringEnabled) {
             isClusteringEnabled = Boolean.TRUE;
         }
         CURRENT_EPR_PROP_KEY = KEY_PREFIX + endpointName + CURRENT_EPR;
+        parameters = new HashMap<String, Object>();
     }
 
     /**
@@ -152,6 +158,14 @@ public class AlgorithmContext {
                     value, clusteringFault);
             }
         }
+    }
+
+    public Object getParameter(String key) {
+        return parameters.get(key);
+    }
+
+    public void setParameter(String key, Object value) {
+        parameters.put(key, value);
     }
 
 }

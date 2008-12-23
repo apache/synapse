@@ -57,6 +57,7 @@ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -455,9 +456,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             handleException("General Error sending response message", e);
         }
 
-        try {
-            worker.getIs().close();
-        } catch (IOException ignore) {}
+        InputStream is = worker.getIs();
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException ignore) {}
+        }
     }
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {

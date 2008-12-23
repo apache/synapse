@@ -126,7 +126,7 @@ public class AlgorithmContext {
      * @return The value of the property or null if the key does not exist
      */
     public Object getProperty(String key) {
-        if (Boolean.TRUE.equals(isClusteringEnabled)) {
+        if (isClusteringEnabled) {
             return cfgCtx.getPropertyNonReplicable(PROPERTY_KEY_PREFIX + key);
         } else {
             return localProperties.get(key);
@@ -145,7 +145,7 @@ public class AlgorithmContext {
     public void setProperty(String key, Object value) {
 
         if (key != null && value != null) {
-            if (Boolean.TRUE.equals(isClusteringEnabled)) {
+            if (isClusteringEnabled) {
                 Replicator.setAndReplicateState(PROPERTY_KEY_PREFIX + key, value, cfgCtx);
             } else {
                 localProperties.put(key, value);

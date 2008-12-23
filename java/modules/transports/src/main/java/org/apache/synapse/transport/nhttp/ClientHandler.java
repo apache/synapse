@@ -486,6 +486,8 @@ public class ClientHandler implements NHttpClientHandler {
 
         try {
             int bytesWritten = outBuf.produceContent(encoder);
+            // TODO: remove the log statement when SYNAPSE-491 has been solved
+            log.debug(">>> Before incrementBytesSent; bytesWritten=" + bytesWritten + "; completes = " + encoder.isCompleted());
             if (metrics != null && bytesWritten > 0) {
                 if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
                     metrics.incrementBytesSent(getMessageContext(conn), bytesWritten);
@@ -493,6 +495,8 @@ public class ClientHandler implements NHttpClientHandler {
                     metrics.incrementBytesSent(bytesWritten);
                 }
             }
+            // TODO: remove the log statement when SYNAPSE-491 has been solved
+            log.debug(">>> After incrementBytesSent");
 
         } catch (IOException e) {
             if (metrics != null) {

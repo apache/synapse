@@ -253,9 +253,11 @@ public class ServerWorker implements Runnable {
                     handleException("General Error sending response message", e);
                 }
 
-                try {
-                    is.close();
-                } catch (IOException ignore) {}
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException ignore) {}
+                }
 
                 // make sure that the output stream is flushed and closed properly
                 try {

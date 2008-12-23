@@ -23,6 +23,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.MBeanRegistrar;
 import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -126,20 +127,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     public void setName(String endpointName) {
         this.endpointName = endpointName;
-        // register with JMX
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        String jmxAgentName = System.getProperty("jmx.agent.name");
-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
-            jmxAgentName = "org.apache.synapse";
-        }
-        String name;
-        try {
-            name = jmxAgentName + ":Type=Endpoint,Name=" + endpointName;
-            metricsMBean = new EndpointView(endpointName, this);
-            registerMBean(mbs, metricsMBean, name);
-        } catch (Exception e) {
-            log.warn("Error registering endpoint : " + endpointName + " for JMX management", e);
-        }
+        metricsMBean = new EndpointView(endpointName, this);
+        MBeanRegistrar.getInstance().registerMBean(metricsMBean, "Endpoint", endpointName);
     }
 
     //----------------------- default method implementations and common code -----------------------
@@ -375,28 +364,6 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     protected void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
-    }
-
-    /**
-     * Utiliry method to register an MBean
-     * @param mbs server
-     * @param mbeanInstance bean
-     * @param objectName name
-     */
-    private void registerMBean(MBeanServer mbs, Object mbeanInstance, String objectName) {
-        try {
-            ObjectName name = new ObjectName(objectName);
-            Set set = mbs.queryNames(name, null);
-            if (set != null && set.isEmpty()) {
-                mbs.registerMBean(mbeanInstance, name);
-            } else {
-                mbs.unregisterMBean(name);
-                mbs.registerMBean(mbeanInstance, name);
-            }
-        } catch (Exception e) {
-            log.warn("Error registering a MBean with objectname ' " + objectName +
-                " ' for JMX management", e);
-        }
     }
 
     protected void logOnChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {

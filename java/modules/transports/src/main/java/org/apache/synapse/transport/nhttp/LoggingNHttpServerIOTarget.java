@@ -128,11 +128,11 @@ public class LoggingNHttpServerIOTarget
     }
 
     public void resetInput() {
-        this.target.requestInput();
+        this.target.resetInput();
     }
 
     public void resetOutput() {
-        this.target.requestOutput();
+        this.target.resetOutput();
     }
 
     public void submitResponse(final HttpResponse response) throws IOException, HttpException {

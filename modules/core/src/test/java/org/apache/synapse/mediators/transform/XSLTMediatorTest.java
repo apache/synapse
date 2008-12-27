@@ -42,7 +42,6 @@ import org.apache.synapse.util.jaxp.AXIOMResultBuilderFactory;
 import org.apache.synapse.util.jaxp.AXIOMSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
 import org.apache.synapse.util.jaxp.DOOMSourceBuilderFactory;
-import org.apache.synapse.util.jaxp.SpringStaxSourceBuilderFactory;
 import org.apache.synapse.util.jaxp.StreamResultBuilderFactory;
 import org.apache.synapse.util.jaxp.StreamSourceBuilderFactory;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -51,7 +50,6 @@ import org.apache.axis2.transport.base.BaseConstants;
 public class XSLTMediatorTest extends TestCase {
     private static final Class[] sourceBuilderFactories = {
         DOOMSourceBuilderFactory.class,
-        SpringStaxSourceBuilderFactory.class,
         StreamSourceBuilderFactory.class,
         AXIOMSourceBuilderFactory.class };
     

@@ -25,7 +25,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.dom.NodeImpl;
-import org.springframework.xml.transform.StaxSource;
+import org.apache.axiom.om.impl.jaxp.OMSource;
 
 /**
  * Utility class with AXIOM helper methods.
@@ -41,12 +41,11 @@ public class AXIOMUtils {
      *         schema validators, etc.
      */
     public static Source asSource(OMNode node) {
+        // Note: Once we depend on JDK 1.6, we could also use StAXSource from JAXP 1.4.
         if (node instanceof NodeImpl) {
             return new DOMSource((NodeImpl)node);
         } else {
-            // We use Spring's StaxSource for the transformation source. Once we depend
-            // on JDK 1.6, we can replace this by StAXSource from JAXP 1.4.
-            return new StaxSource(((OMElement)node).getXMLStreamReader());
+            return new OMSource((OMElement)node);
         }
     }
 }

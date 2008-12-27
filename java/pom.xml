@@ -845,26 +845,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.ws</groupId>
-            <artifactId>spring-xml</artifactId>
-            <version>${springws.version}</version>
-        </dependency>
         
     </dependencies>
 
@@ -1010,8 +990,6 @@
         <wso2commons.version>1.2</wso2commons.version>
         <wso2caching.version>1.6.1</wso2caching.version>
         <wso2throttle.version>1.6</wso2throttle.version>
-        <spring.version>1.2.8</spring.version>
-        <springws.version>1.5.2</springws.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>

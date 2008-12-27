@@ -336,8 +336,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
             try {
                 axis2Req.streamMessageContents();
-                // TODO: remove the log statement when SYNAPSE-491 has been solved
-                log.debug(">>> Before incrementMessagesSent");
                 if (metrics != null) {
                     if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
                         metrics.incrementMessagesSent(msgContext);
@@ -345,8 +343,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                         metrics.incrementMessagesSent();
                     }
                 }
-                // TODO: remove the log statement when SYNAPSE-491 has been solved
-                log.debug("<<< After incrementMessagesSent");
 
             } catch (AxisFault af) {
                 throw af;

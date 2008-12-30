@@ -264,7 +264,9 @@
 <a href="#Class">Extending the mediation in java (Class Mediator)</a>
 <ul>
 <li>
-<a href="#Sample380">Sample 380: Writing your own custom mediation in Java</a></li></ul></li>
+<a href="#Sample380">Sample 380: Writing your own custom mediation in Java</a></li>
+<li>
+<a href="#Sample381">Sample 381: Class mediator to CBR binary messages</a></li></ul></li>
 <li>
 <a href="#XQuery">Evaluating XQuery for mediation (XQuery Mediator)</a>
 <ul>
@@ -3662,6 +3664,73 @@ public class DiscountQuoteMediator implements Mediator {
 <pre xml:space="preserve">Quote value discounted.
 Original price: 162.30945327447262
 Discounted price: 138.77458254967408</pre>
+<p></p>
+<h2>        
+<a name="Sample381" id="Sample381">Sample 381:Class mediator to CBR binary messages</a></h2>
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+	&lt;proxy name=&quot;JMSBinaryProxy&quot; transports=&quot;jms&quot;&gt;
+		&lt;target inSequence=&quot;BINARY_CBR_SEQ&quot; /&gt;
+		&lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
+	&lt;/proxy&gt;
+	&lt;sequence name=&quot;BINARY_CBR_SEQ&quot;&gt;
+		&lt;in&gt;
+			&lt;log level=&quot;full&quot; /&gt;
+			&lt;class name=&quot;samples.mediators.BinaryExtractMediator&quot;&gt;
+				&lt;property name=&quot;offset&quot; value=&quot;11&quot; /&gt;
+				&lt;property name=&quot;length&quot; value=&quot;4&quot; /&gt;
+				&lt;property name=&quot;variableName&quot; value=&quot;symbol&quot; /&gt;
+				&lt;property name=&quot;binaryEncoding&quot; value=&quot;utf-8&quot; /&gt;
+			&lt;/class&gt;
+			&lt;log level=&quot;custom&quot;&gt;
+				&lt;property name=&quot;symbol&quot;
+					expression=&quot;get-property('symbol')&quot; /&gt;
+			&lt;/log&gt;
+			&lt;switch source=&quot;get-property('symbol')&quot;&gt;
+				&lt;case regex=&quot;GOOG&quot;&gt;
+					&lt;send&gt;
+						&lt;endpoint&gt;
+							&lt;address
+								uri=&quot;jms:/mdd.GOOG?transport.jms.ConnectionFactoryJNDIName=TopicConnectionFactory&amp;amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;amp;transport.jms.DestinationType=topic&quot; /&gt;
+						&lt;/endpoint&gt;
+					&lt;/send&gt;
+				&lt;/case&gt;
+				&lt;case regex=&quot;MSFT&quot;&gt;
+					&lt;send&gt;
+						&lt;endpoint&gt;
+							&lt;address
+								uri=&quot;jms:/mdd.MSFT?transport.jms.ConnectionFactoryJNDIName=TopicConnectionFactory&amp;amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;amp;transport.jms.DestinationType=topic&quot; /&gt;
+						&lt;/endpoint&gt;
+					&lt;/send&gt;
+				&lt;/case&gt;
+				&lt;default&gt;&lt;/default&gt;
+			&lt;/switch&gt;
+		&lt;/in&gt;
+	&lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+<p></p>
+<p>
+<strong>Objective: Demonstrate on CBR a message with binary payload</strong> </p>
+<p>
+<strong>Prerequisites:</strong> </p>
+<p>Make sure the synapse-samples-1.0.jar is in your class path (by default this jar is placed in the lib directory when installing Synapse). </p>
+<p>Configure JMS transport using ActiveMQ (refer <a href="Synapse_Samples_Setup.html">Sample Configuration Guide </a>) </p>
+<p>Start Synapse with the sample configuration 381 (i.e. synapse -sample 381) </p>
+
+<p></p>
+<p>In this configuration, a proxy has configured to accept incoming JMS messages. JMS messages contains a binary payload. User configure the offset, length, binary encoding of the text literal that it need to use for CBR. And a variable name to set the  decoded value as a property. Configuration simply route the messages based on the text to different endpoints. </p>
+<p>A JMS producer and two instances of a consumer used to demonstrate the CBR functionality.</p>
+<p>Now run the first consumer using the following command. </p>
+<pre xml:space="preserve">ant mddconsumer -Djms_topic=mdd.MSFT</pre>
+<p>Now run the second consumer using the following command. </p>
+<pre xml:space="preserve">ant mddconsumer -Djms_topic=mdd.GOOG</pre>
+<p>Now run the market data producer to genenrate market data for symbol 'MSFT' using the following command. </p>
+<pre xml:space="preserve">ant mddproducer -Dsymbol=MSFT</pre>
+<p>Now run the market data producer to genenrate market data for symbol 'GOOG' using the following command. </p>
+<pre xml:space="preserve">ant mddproducer -Dsymbol=GOOG</pre>
+<p>You will see the below output in the client console(s) based on the symbol. </p>
+<pre xml:space="preserve">mddconsumer:
+     [java]  Market data recived for symbol : topic://mdd.MSFT
+     [java]  Market data recived for symbol : topic://mdd.MSFT</pre>
 <p></p>
 <h2>
 <a name="XQuery" id="XQuery">Evaluating XQuery for mediation (XQuery Mediator)</a></h2>

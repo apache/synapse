@@ -74,6 +74,14 @@
 
 	example:
         ant amqpconsumer
+
+    ant mddproducer
+        A JMS client to produce market data on binary format seq#|symbol|price|market
+        [-Djms_dest=dynamicQueues/JMSTextProxy]
+        [-Dsymbol=MSFT] [-Dprice=100.20] [-Dmarket=NYSE]
+
+    example:
+        ant mddproducer
     </echo>
     </target>
 
@@ -101,6 +109,9 @@
     <property name="propfile" value=""/>
     <property name="sleep" value=""/>
     <property name="session" value=""/>
+    <property name="price" value=""/>
+    <property name="market" value=""/>
+    <property name="jms_topic" value=""/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
@@ -150,6 +161,23 @@
         <java classname="samples.userguide.AMQPConsumer"
              classpathref="javac.classpath" fork="true">
             <sysproperty key="propfile" value="${propfile}"/>
+        </java>
+    </target>
+
+    <target name="mddproducer" depends="compile">
+        <java classname="samples.userguide.MDDProducer"
+             classpathref="javac.classpath" fork="true">
+            <sysproperty key="jms_dest" value="${jms_dest}"/>
+            <sysproperty key="symbol" value="${symbol}"/>
+            <sysproperty key="price" value="${price}"/>
+            <sysproperty key="market" value="${market}"/>
+        </java>
+    </target>
+
+    <target name="mddconsumer" depends="compile">
+        <java classname="samples.userguide.MDDConsumer"
+             classpathref="javac.classpath" fork="true">
+            <sysproperty key="jms_topic" value="${jms_topic}"/>
         </java>
     </target>
 

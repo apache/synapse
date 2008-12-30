@@ -197,48 +197,6 @@
         <!--</fileSet>-->
 
         <fileSet>
-            <directory>../../modules/core/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <includes>
-                <include>synapse-core-${synapse.version}.jar</include>
-            </includes>
-        </fileSet> 
-        <fileSet>
-            <directory>../../modules/utils/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <includes>
-                <include>synapse-utils-${synapse.version}.jar</include>
-            </includes>
-        </fileSet> 
-        <fileSet>
-            <directory>../../modules/tasks/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <includes>
-                <include>synapse-tasks-${synapse.version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/samples/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <includes>
-                <include>synapse-samples-${synapse.version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/extensions/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <includes>
-                <include>synapse-extensions-${synapse.version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/transports/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <includes>
-                <include>synapse-transports-${synapse.version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>../../patches</directory>
             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
             <includes>
@@ -276,6 +234,7 @@
     </files>
     <dependencySets>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
                 <exclude>tomcat:catalina:jar</exclude>
@@ -324,6 +283,7 @@
             </excludes>
         </dependencySet>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
             <includes>
                 <include>xml-apis:xml-apis:jar</include>
@@ -331,6 +291,7 @@
             </includes>
         </dependencySet>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
@@ -340,6 +301,7 @@
             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules
             </outputDirectory>
             <includes>
@@ -350,6 +312,7 @@
             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules
             </outputDirectory>
             <includes>

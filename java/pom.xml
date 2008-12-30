@@ -926,6 +926,7 @@
         <module>modules/war</module>
         <module>modules/handler</module>
         <module>modules/xar-maven-plugin</module>
+        <module>modules/experimental</module>
         <module>modules/distribution</module>
     </modules>
 

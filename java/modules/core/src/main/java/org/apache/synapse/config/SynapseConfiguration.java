@@ -25,6 +25,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.datasource.InMemoryDataSourceRepository;
 import org.apache.synapse.commons.util.datasource.JNDIBasedDataSourceRepository;
@@ -110,6 +111,13 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * required
 	 */
 	private String pathToConfigFile = null;
+
+
+    /**
+     * Holds Event Sources defined through Synapse
+     */
+    private Map<String, SynapseEventSource> eventSources = new HashMap<String, SynapseEventSource>();
+
 
     /**
 	 * Add a named sequence into the local registry
@@ -929,5 +937,25 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public TaskDescriptionRepository getTaskDescriptionRepository() {
         return repository;
-    }     
+    }
+
+    public void addEventSource(String name, SynapseEventSource eventSource) {
+        eventSources.put(name, eventSource);
+    }
+
+    public SynapseEventSource getEventSource(String name) {
+        return eventSources.get(name);
+    }
+
+    public void removeEventSource(String name) {
+        eventSources.remove(name);
+    }
+
+    public Collection<SynapseEventSource> getEventSources() {
+        return eventSources.values();
+    }
+
+    public void setEventSources(Map<String, SynapseEventSource> eventSources) {
+        this.eventSources = eventSources;
+    }
 }

@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.eventing.EventPublisherMediatorSerializer;
 import sun.misc.Service;
 
 import java.util.HashMap;
@@ -57,7 +58,8 @@ public class MediatorSerializerFinder {
         DBLookupMediatorSerializer.class,
         DBReportMediatorSerializer.class,
         CacheMediatorSerializer.class,
-        CalloutMediatorSerializer.class
+        CalloutMediatorSerializer.class,
+        EventPublisherMediatorSerializer.class            
     };
 
     private static MediatorSerializerFinder instance = null;

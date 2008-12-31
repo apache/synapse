@@ -27,10 +27,12 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.eventing.EventSourceFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -84,6 +86,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineProxy(config, elt);
                 } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
                     defineRegistry(config, elt);
+                } else if (XMLConfigConstants.EVENT_SOURCE_ELT.equals(elt.getQName())) {
+                    defineEventSource(config, elt);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt);
                 } else {
@@ -192,6 +196,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         } else {
             handleException("Invalid endpoint definition without a name");
         }
+    }
+
+   private static void defineEventSource(SynapseConfiguration config, OMElement elem) {
+        SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
+        if (config.getEventSource(eventSource.getName()) != null) {
+            handleException("Duplicate proxy service with name : " + eventSource.getName());
+        }
+        config.addEventSource(eventSource.getName(), eventSource);
     }
 
     /**

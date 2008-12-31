@@ -470,6 +470,12 @@
                 <version>${jms-1.1-spec.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.wso2.eventing</groupId>
+                <artifactId>wso2eventing-api</artifactId>
+                <version>${wso2eventing-api.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -845,6 +851,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Eventing dependencies-->
+        <dependency>
+            <groupId>org.wso2.eventing</groupId>
+            <artifactId>wso2eventing-api</artifactId>
+        </dependency>
         
     </dependencies>
 
@@ -991,6 +1003,7 @@
         <wso2commons.version>1.2</wso2commons.version>
         <wso2caching.version>1.6.1</wso2caching.version>
         <wso2throttle.version>1.6</wso2throttle.version>
+        <wso2eventing-api.version>1.1</wso2eventing-api.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta2</bsf.version>
         <groovy.version>1.0</groovy.version>

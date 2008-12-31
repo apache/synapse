@@ -19,9 +19,11 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.Startup;
+import org.apache.synapse.eventing.SynapseEventSource;
 
 public class SynapseXMLConfigurationSerializer implements ConfigurationSerializer {
 
@@ -58,6 +60,11 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         while (iter.hasNext()) {
             ProxyService service = (ProxyService) iter.next();
             ProxyServiceSerializer.serializeProxy(definitions, service);
+        }
+
+        // Add Event sources 
+        for (SynapseEventSource eventSource : synCfg.getEventSources()) {
+            EventSourceSerializer.serializeEventSource(definitions, eventSource);
         }
 
         Map entries = new HashMap();

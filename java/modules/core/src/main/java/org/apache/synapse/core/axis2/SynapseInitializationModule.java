@@ -39,6 +39,7 @@ import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositor
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.SynapsePropertiesLoader;
+import org.apache.synapse.eventing.SynapseEventSource;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -56,7 +57,7 @@ public class SynapseInitializationModule implements Module {
     private SynapseConfiguration synCfg;
 
     public void init(ConfigurationContext configurationContext,
-        AxisModule axisModule) throws AxisFault {
+                     AxisModule axisModule) throws AxisFault {
 
         log.info("Initializing Synapse at : " + new Date());
         try {
@@ -99,7 +100,7 @@ public class SynapseInitializationModule implements Module {
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();
         AxisService synapseService = new AxisService(SynapseConstants.SYNAPSE_SERVICE_NAME);
         AxisOperation mediateOperation = new InOutAxisOperation(
-            SynapseConstants.SYNAPSE_OPERATION_NAME);
+                SynapseConstants.SYNAPSE_OPERATION_NAME);
         mediateOperation.setMessageReceiver(new SynapseMessageReceiver());
         synapseService.addOperation(mediateOperation);
         List transports = new ArrayList();
@@ -107,28 +108,28 @@ public class SynapseInitializationModule implements Module {
         transports.add(Constants.TRANSPORT_HTTPS);
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
-        
+
         // this server name is given by system property SynapseServerName
         // otherwise take host-name
         // if nothing found assume localhost
         String thisServerName = ServerManager.getInstance().getServerName();
-        if(thisServerName == null || thisServerName.equals("")) {
-          try {
-            InetAddress addr = InetAddress.getLocalHost();
-            thisServerName = addr.getHostName();
+        if (thisServerName == null || thisServerName.equals("")) {
+            try {
+                InetAddress addr = InetAddress.getLocalHost();
+                thisServerName = addr.getHostName();
 
-          } catch (UnknownHostException e) {
-            log.warn("Could not get local host name", e);
-          }
-          
-          if(thisServerName == null || thisServerName.equals("")) {
-            thisServerName = "localhost";
-          }
+            } catch (UnknownHostException e) {
+                log.warn("Could not get local host name", e);
+            }
+
+            if (thisServerName == null || thisServerName.equals("")) {
+                thisServerName = "localhost";
+            }
         }
         log.info("Synapse server name : " + thisServerName);
-        
+
         log.info("Deploying Proxy services...");
-        
+
         for (ProxyService proxy : synCfg.getProxyServices()) {
 
             // start proxy service if either,
@@ -149,8 +150,12 @@ public class SynapseInitializationModule implements Module {
             }
         }
 
-        synCfg.init(configurationContext);
+        for (SynapseEventSource eventSource : synCfg.getEventSources()) {
+            eventSource.buildService(axisCfg);
+        }
         
+        synCfg.init(configurationContext);
+
         log.info("Synapse initialized successfully...!");
     }
 
@@ -176,7 +181,7 @@ public class SynapseInitializationModule implements Module {
         }
 
         synapseConfiguration.setProperties(synapseProperties);
-        
+
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
         synapseConfiguration.setAxisConfiguration(cfgCtx.getAxisConfiguration());
 
@@ -196,14 +201,14 @@ public class SynapseInitializationModule implements Module {
 
         } catch (AxisFault e) {
             String msg =
-                "Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
-                    "' and/or '" + SynapseConstants.SYNAPSE_ENV +
-                    "'to the Axis2 configuration : " + e.getMessage();
+                    "Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
+                            "' and/or '" + SynapseConstants.SYNAPSE_ENV +
+                            "'to the Axis2 configuration : " + e.getMessage();
             log.fatal(msg, e);
             throw new SynapseException(msg, e);
         }
         synapseConfiguration.init(synEnv);
-        
+
         return synapseConfiguration;
     }
 
@@ -229,8 +234,8 @@ public class SynapseInitializationModule implements Module {
     }
 
     public void shutdown(ConfigurationContext configurationContext)
-        throws AxisFault {
+            throws AxisFault {
         // ignore
-    	synCfg.destroy();
+        synCfg.destroy();
     }
 }

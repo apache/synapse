@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.xml.eventing.EventPublisherMediatorFactory;
 import sun.misc.Service;
 
 import javax.xml.namespace.QName;
@@ -70,7 +71,8 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         DBReportMediatorFactory.class,
         DBLookupMediatorFactory.class,
         CacheMediatorFactory.class,
-        CalloutMediatorFactory.class
+        CalloutMediatorFactory.class,
+        EventPublisherMediatorFactory.class               
     };
 
     private static MediatorFactoryFinder instance = null;

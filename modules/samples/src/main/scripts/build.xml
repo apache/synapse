@@ -82,6 +82,31 @@
 
     example:
         ant mddproducer
+
+    ant eventsubscriber
+        A client that subscribe to the Synapse event source
+
+        examples:
+        ant eventsubscriber
+            [-Dmode=subscribe | unsubscribe | getstatus | renew]
+            [-Daddurl=http://localhost:8280/services/eventing]
+            [-Daddress=http://localhost:9000/services/SimpleStockQuoteService]
+            [-Dtopic=/synapse/sample/topic]
+            [-Didentifier=urn:uuid:607498E6483EF9C434122785636889830400199622296]
+            [-Dexpires=2008-12-31T21:07:00.000-08:00]
+
+    ant eventsender
+        A client that sends Events to the Synapse event sink
+
+        examples:
+        ant eventsender
+            [-Daddurl=http://localhost:8280/services/eventing]
+            [-Dtopic=/synapse/sample/topic]
+            [-Dtopicns=http://apache.org/aip]
+            [-Daction=urn:event]
+            [-Dsymbol=DELL]
+            [-Dqty=1000]
+            [-Dprice=100.10]
     </echo>
     </target>
 
@@ -112,6 +137,14 @@
     <property name="price" value=""/>
     <property name="market" value=""/>
     <property name="jms_topic" value=""/>
+    <property name="qty" value=""/>
+    <property name="topic" value=""/>
+    <property name="address" value=""/>
+    <property name="action" value=""/>
+    <property name="topicns" value=""/>
+    <property name="mode" value=""/>
+    <property name="identifier" value=""/>
+    <property name="expires" value=""/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
@@ -253,6 +286,39 @@
             <sysproperty key="t" value="${t}"/>
             <sysproperty key="session" value="${session}"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+        </java>
+    </target>
+
+    <target name="eventsubscriber" depends="compile">
+        <java classname="samples.userguide.EventSubscriber"
+             classpathref="javac.classpath" fork="true">
+            <sysproperty key="addurl" value="${addurl}"/>
+            <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="topic" value="${topic}"/>
+            <sysproperty key="address" value="${address}"/>
+            <sysproperty key="repository" value="${repository}"/>
+            <sysproperty key="mode" value="${mode}"/>
+            <sysproperty key="identifier" value="${identifier}"/>
+            <sysproperty key="expires" value="${expires}"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+        </java>
+    </target>
+
+    <target name="eventsender" depends="compile">
+        <java classname="samples.userguide.EventSender"
+             classpathref="javac.classpath" fork="true">
+            <sysproperty key="symbol" value="${symbol}"/>
+            <sysproperty key="price"   value="${price}"/>
+            <sysproperty key="addurl" value="${addurl}"/>
+            <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="qty"    value="${qty}"/>
+            <sysproperty key="repository" value="${repository}"/>
+            <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+            <sysproperty key="topic"    value="${topic}"/>
+            <sysproperty key="action"    value="${action}"/>
+            <sysproperty key="topicns"    value="${topicns}"/>
         </java>
     </target>
 

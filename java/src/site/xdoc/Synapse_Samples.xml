@@ -3979,7 +3979,7 @@ Discounted price: 138.77458254967408</pre>
 &lt;/definitions&gt;</pre>
     <div>
       <p>
-        <strong>Objective:</strong> Demonstrate the use of the Eventing functionality built with synapse
+        <strong>Objective:</strong> Demonstrate the use of the Eventing functionality built with Synapse
       </p>
       <p>
         <strong>Prerequisites:</strong> Deploy the
@@ -3994,13 +3994,29 @@ Discounted price: 138.77458254967408</pre>
         In this sample, the event source creted based on the configuration. Event subscriber subscribes for the events, Event sender publish events and the SimpleStockQuoteService act as the Event Sink.
       </p>
       <p>
-        Invoke the client (Subscriber) as follows.
+        Invoke the client (Subscriber) as follows:
       </p>
 <pre xml:space="preserve">ant eventsubscriber</pre>
-        <p>
-          Invoke the client (Sender) as follows.
-        </p>
+      <p>
+        This will create a new subscription with the SimpleStockQuoteService deployed on the sample
+        Axis2 server acting as the sink: whenever a new event is published, SimpleStockQuoteService
+        will receive a message with that event.
+      </p>
+      <p>
+        Next, invoke the client (Sender) as follows:
+      </p>
 <pre xml:space="preserve">ant eventsender</pre>
+      <p>
+        This will send a placeOrder message to the EventingProxy. You should see this message in the
+        Synapse logs. Note the presence of the following SOAP header in the request:
+      </p>
+<pre>&lt;aip:Topic xmlns:aip="http://apache.org/aip">synapse/event/test&lt;/aip:Topic></pre>
+      <p>
+        Since there is a single subscription with SimpleStockQuoteService as the sink, Synapse will
+        send the message to the sample Axis2 server and you should see the following message in
+        its logs:
+      </p>
+<pre>Accepted order for : 1000 stocks of GOOG at $ 10.1</pre>
       <p>
         Invoke the client (Un-Subscribe) as follows.
       </p>

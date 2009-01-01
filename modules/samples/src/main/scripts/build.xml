@@ -84,7 +84,7 @@
         ant mddproducer
 
     ant eventsubscriber
-        A client that subscribe to the Synapse event source
+        A client that subscribes to the Synapse event source
 
         examples:
         ant eventsubscriber

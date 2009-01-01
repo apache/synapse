@@ -3928,7 +3928,6 @@ Discounted price: 138.77458254967408</pre>
 <p>The Callout mediator calls the given service URL with the request message which is given by the source attribute, waits for the response and attaches the received response to the destination which is given by the target attribute. Both the source and the target can be a key or an XPath. In the case of the source, this key refers to either a message context property or to a local entry. For the target, this key refers to a message context property only. </p>
 <h2>
 <a name="Sample430" id="Sample430">Sample 430: Simple Callout Mediator for synchronizing web service invocation</a></h2>
-<p>� </p>
 <pre xml:space="preserve">    &lt;!-- Simple callout  mediator --&gt;
 &lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
     &lt;callout serviceURL=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;

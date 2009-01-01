@@ -270,6 +270,7 @@
                 <exclude>org.slf4j:slf4j-api:jar</exclude>
                 <exclude>org.apache.qpid:qpid-common:jar</exclude>
                 <exclude>org.apache.qpid:qpid-client:jar</exclude>
+                <exclude>com.oopsconsultancy:xmltask:jar</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
@@ -311,6 +312,13 @@
                 <include>org.wso2.mercury:mercury-mar:mar</include>
             </includes>
             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>synapse-${synapse.version}/samples/util</outputDirectory>
+            <includes>
+                <include>com.oopsconsultancy:xmltask:jar</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 

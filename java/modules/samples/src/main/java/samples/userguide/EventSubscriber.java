@@ -31,6 +31,8 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.AxisFault;
 import java.io.File;
 
+import javax.xml.namespace.QName;
+
 
 public class EventSubscriber {
 
@@ -117,6 +119,11 @@ public class EventSubscriber {
                 System.out.println("Subscribed to topic " + topic);
                 Thread.sleep(1000);
                 System.out.println("Response Received: " + response.toString());
+                String subId =
+                        response.getFirstChildWithName(new QName(nswse.getNamespaceURI(), "SubscriptionManager"))
+                                .getFirstChildWithName(new QName(nswsa.getNamespaceURI(), "ReferenceParameters"))
+                                .getFirstChildWithName(new QName(nswse.getNamespaceURI(), "Identifier")).getText();
+                System.out.println("Subscription identifier: " + subId);
             } catch (AxisFault e) {
                 System.out.println("Fault Received : "+e.toString());
                 System.out.println("Fault Code     : "+e.getFaultCode().toString());

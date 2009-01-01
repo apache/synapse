@@ -4001,9 +4001,12 @@ Discounted price: 138.77458254967408</pre>
         This will create a new subscription with the SimpleStockQuoteService deployed on the sample
         Axis2 server acting as the sink: whenever a new event is published, SimpleStockQuoteService
         will receive a message with that event.
+        You should see a message like this:
       </p>
+<pre>[java] Subscription identifier: urn:uuid:6989F66706E73C69F5259116575749162017010321</pre>
       <p>
-        Next, invoke the client (Sender) as follows:
+        You will need this identifier to modify the subscription in the next steps below.
+        Now, invoke the client (Sender) as follows:
       </p>
 <pre xml:space="preserve">ant eventsender</pre>
       <p>
@@ -4018,17 +4021,17 @@ Discounted price: 138.77458254967408</pre>
       </p>
 <pre>Accepted order for : 1000 stocks of GOOG at $ 10.1</pre>
       <p>
-        Invoke the client (Un-Subscribe) as follows.
+        To get the current status of the subscription, invoke the client as follows:
       </p>
-<pre xml:space="preserve">ant eventsubscriber -Dmode=unsubscribe -Didentifier=urn:uuid:6DFDF649A67416BFCC1228112473802909001-111373032</pre>
-        <p>
-          Invoke the client (Re-New) as follows.
-        </p>
-<pre xml:space="preserve">ant eventsubscriber -Dmode=renew -Didentifier=urn:uuid:6DFDF649A67416BFCC1228112473802909001-111373032 -Dexpires=2009-12-31T21:07:00.000-08:00</pre>
+<pre xml:space="preserve">ant eventsubscriber -Dmode=getstatus -Didentifier=<i>&lt;identifier></i></pre>
       <p>
-        Invoke the client (GetStatus) as follows.
+        To renew the subscription, invoke the client as follows:
       </p>
-<pre xml:space="preserve">ant eventsubscriber -Dmode=getstatus -Didentifier=urn:uuid:6DFDF649A67416BFCC1228112473802909001-111373032</pre>
+<pre xml:space="preserve">ant eventsubscriber -Dmode=renew -Didentifier=<i>&lt;identifier></i> -Dexpires=2009-12-31T21:07:00.000-08:00</pre>
+      <p>
+        Finally, in order to unsubscribe, use the following command:
+      </p>
+<pre xml:space="preserve">ant eventsubscriber -Dmode=unsubscribe -Didentifier=<i>&lt;identifier></i></pre>
     </div>
    <h2>
       <a name="Sample501" id="Sample501">Sample 501: EventSource with static subscriptions</a>

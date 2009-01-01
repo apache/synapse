@@ -451,7 +451,6 @@ synapse.sh -sample &lt;n&gt;</pre>
     <h2>
       Setting up the JMS Listener
     </h2>
-    <p/>
     <p>
       The samples used in this guide assumes the existence of a local ActiveMQ
       (4.1.0 or higher) installation properly installed and started up. You also
@@ -461,10 +460,10 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <ul>
       <li>
-        activeio-core-3.0.0-incubator.jar
+        activeio-core-3.x.x.jar
       </li>
       <li>
-        activemq-core-4.1.0-incubator.jar
+        activemq-core-4.x.x.jar
       </li>
       <li>
         geronimo-j2ee-management_1.0_spec-1.0.jar
@@ -475,7 +474,7 @@ synapse.sh -sample &lt;n&gt;</pre>
       listener configuration. If you are using a JMS provider other than
       ActiveMQ this configuration should be updated to reflect your environment.
       Once uncommented, the default configuration should be as follows. To
-      enable JMS for synapse, the repository/conf/axis2.xml must be updated,
+      enable JMS for Synapse, the repository/conf/axis2.xml must be updated,
       while to enable JMS support for the sample Axis2 server the
       samples/axis2Server/repository/conf/axis2.xml file must be updated.
     </p>
@@ -499,7 +498,17 @@ synapse.sh -sample &lt;n&gt;</pre>
                 &lt;parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false"&gt;QueueConnectionFactory&lt;/parameter&gt;
         &lt;/parameter&gt;
     &lt;/transportReceiver&gt;</pre>
-    <p/>
+    <p>
+      If you are using ActiveMQ, you can use the Ant script in <tt>samples/util</tt> to set up Synapse
+      (i.e. copying the required JAR files and modifying <tt>axis2.xml</tt>) in an automated way. In order to do
+      this, change into the <tt>samples/util</tt> directory and execute the following command:
+    </p>
+<pre xml:space="preserve">ant setupActiveMQ -Dactivemq.home=<i>&lt;ActiveMQ home directory></i></pre>
+    <p>
+      Note that if the environment variable <tt>ACTIVEMQ_HOME</tt> is defined, you can omit the <tt>-Dactivemq.home</tt>
+      option. If you also want to set up ActiveMQ for the sample Axis2 server, issue the following command:
+    </p>
+<pre xml:space="preserve">ant setupActiveMQ -Daxis2.xml=..\axis2Server\repository\conf\axis2.xml</pre>
     <h2 id="setupamqpjms">
       Configure Synapse for AMQP Transport
     </h2>

@@ -150,28 +150,18 @@
         </fileSet>
         <fileSet>
             <directory>../../modules/samples/src/main/scripts</directory>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Client</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples</outputDirectory>
             <excludes>
-                <exclude>custom.sh</exclude>
-                <exclude>custom.bat</exclude>
-                <exclude>axis2server.sh</exclude>
-                <exclude>axis2server.bat</exclude>
+                <exclude>**/*.sh</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <directory>../../modules/samples/src/main/scripts</directory>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples</outputDirectory>
             <includes>
-                <include>axis2server.sh</include>
+                <include>**/*.sh</include>
             </includes>
             <fileMode>755</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/samples/src/main/scripts</directory>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
-            <includes>
-                <include>axis2server.bat</include>
-            </includes>
         </fileSet>
 
         <!--<fileSet>-->

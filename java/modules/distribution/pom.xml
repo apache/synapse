@@ -51,7 +51,27 @@
             <artifactId>synapse-experimental</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.oopsconsultancy</groupId>
+            <artifactId>xmltask</artifactId>
+            <version>1.14</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <!-- This is for xmltask -->
+        <repository>
+            <id>atlassian-developer-site</id>
+            <name>Atlassian Maven 2 Contributor Repository</name>
+            <url>https://maven.atlassian.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

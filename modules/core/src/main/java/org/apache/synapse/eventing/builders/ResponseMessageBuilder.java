@@ -127,7 +127,8 @@ public class ResponseMessageBuilder {
      */
     public SOAPEnvelope genUnSubscribeResponse(SynapseSubscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
-        OMElement dummyBody = factory.createOMElement("UnSunscribeResponce", null);
+        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EVENTING_PREFIX);
+        OMElement dummyBody = factory.createOMElement("UnsubscribeResponse", eventingNamespace);
         message.getBody().addChild(dummyBody);
         return message;
     }

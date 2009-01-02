@@ -43,12 +43,13 @@ public class MDDConsumer implements MessageListener {
     }
     public void run(String dest) throws Exception {
         InitialContext ic = getInitialContext();
-        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
-        QueueConnection connection = confac.createQueueConnection();
-        QueueSession session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+        TopicConnectionFactory confac = (TopicConnectionFactory) ic.lookup("ConnectionFactory");
+        TopicConnection connection = confac.createTopicConnection();
+        TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         Topic topic = session.createTopic(dest);
-        MessageConsumer consumer = session.createConsumer(topic);
-        consumer.setMessageListener(this);
+        TopicSubscriber topicSubscriber = session.createSubscriber(topic);
+        topicSubscriber.setMessageListener(this);
+        System.out.println("MDD-Consumer listening for topic : "+topic.getTopicName());        
         connection.start();
     }
     public void onMessage(Message message){
@@ -66,7 +67,7 @@ public class MDDConsumer implements MessageListener {
         if (System.getProperty("java.naming.factory.initial") == null) {
             env.put("java.naming.factory.initial",
                 "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        }
+        }        
         return new InitialContext(env);
     }    
 }

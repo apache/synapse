@@ -62,7 +62,7 @@ public class MDDProducer {
         InitialContext ic = getInitialContext();
         QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
         QueueConnection connection = confac.createQueueConnection();
-        QueueSession session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+        QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         BytesMessage bm = session.createBytesMessage();
         bm.writeBytes(buffer);
         QueueSender sender = session.createSender((Queue)ic.lookup(destName));

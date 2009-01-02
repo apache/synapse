@@ -117,7 +117,7 @@ public class EventSubscriber {
             try {
                 OMElement response = serviceClient.sendReceive(subscribeOm);
                 System.out.println("Subscribed to topic " + topic);
-                Thread.sleep(1000);
+                Thread.sleep(1000);                
                 System.out.println("Response Received: " + response.toString());
                 String subId =
                         response.getFirstChildWithName(new QName(nswse.getNamespaceURI(), "SubscriptionManager"))

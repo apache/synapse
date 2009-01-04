@@ -221,6 +221,18 @@
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Extending.html</destName>
         </file>
+        <file>
+            <source>.empty</source>
+            <outputDirectory>synapse-${synapse.version}/work/temp/sampleClient</outputDirectory>
+        </file>
+        <file>
+            <source>.empty</source>
+            <outputDirectory>synapse-${synapse.version}/work/temp/sampleServer</outputDirectory>
+        </file>
+        <file>
+            <source>.empty</source>
+            <outputDirectory>synapse-${synapse.version}/work/temp/synapse</outputDirectory>
+        </file>
     </files>
     <dependencySets>
         <dependencySet>

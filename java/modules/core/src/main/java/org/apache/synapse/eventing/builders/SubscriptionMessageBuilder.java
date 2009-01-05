@@ -131,6 +131,7 @@ public class SubscriptionMessageBuilder {
                         subscription.setEndpoint(ep);
                         subscription.setAddressUrl(notifyToElem.getFirstElement().getText());
                         subscription.setEndpointUrl(notifyToElem.getFirstElement().getText());
+                        subscription.setSubManagerURI(mc.getTo().getAddress());
                     }
                 } else {
                     handleException("NotifyTo element not found in the subscription message");

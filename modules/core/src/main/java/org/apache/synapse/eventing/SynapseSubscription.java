@@ -34,6 +34,7 @@ public class SynapseSubscription extends Subscription {
     private SynapseEventFilter filter;
     private Endpoint endpoint;
     private boolean staticEntry;
+    private String subManagerURI;
     public SynapseSubscription() {
         this.setId(UUIDGenerator.getUUID());
         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
@@ -67,5 +68,13 @@ public class SynapseSubscription extends Subscription {
 
     public void setStaticEntry(boolean staticEntry) {
         this.staticEntry = staticEntry;
+    }
+
+    public String getSubManagerURI() {
+        return subManagerURI;
+    }
+
+    public void setSubManagerURI(String subManagerURI) {
+        this.subManagerURI = subManagerURI;
     }
 }

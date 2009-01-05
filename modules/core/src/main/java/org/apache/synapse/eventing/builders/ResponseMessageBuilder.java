@@ -84,7 +84,7 @@ public class ResponseMessageBuilder {
      */
     public SOAPEnvelope genSubscriptionResponse(SynapseSubscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
-        EndpointReference subscriptionManagerEPR = new EndpointReference(subscription.getAddressUrl());
+        EndpointReference subscriptionManagerEPR = new EndpointReference(subscription.getSubManagerURI());
         subscriptionManagerEPR.addReferenceParameter(new QName(EventingConstants.WSE_EVENTING_NS,
                 EventingConstants.WSE_EN_IDENTIFIER, EventingConstants.WSE_EVENTING_PREFIX), subscription.getId());
         OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS,

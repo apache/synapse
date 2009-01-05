@@ -21,7 +21,6 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <proxy name="JMSBinaryProxy" transports="jms">
         <target inSequence="BINARY_CBR_SEQ" />
-        <property action="set" name="OUT_ONLY" value="true"/>
     </proxy>
     <sequence name="BINARY_CBR_SEQ">
         <in>
@@ -52,6 +51,7 @@
 	     		</case>
                     <default></default>
     		</switch>
+            <property action="set" name="OUT_ONLY" value="true"/>
         </in>
     </sequence>
 </definitions>

@@ -25,6 +25,7 @@
     <sequence name="BINARY_CBR_SEQ">
         <in>
             <log level="full"/>
+             <property action="set" name="OUT_ONLY" value="true"/>
             <class name="samples.mediators.BinaryExtractMediator">
 			    <property name="offset" value="11"/>
 			    <property name="length" value="4"/>
@@ -51,7 +52,6 @@
 	     		</case>
                     <default></default>
     		</switch>
-            <property action="set" name="OUT_ONLY" value="true"/>
         </in>
     </sequence>
 </definitions>

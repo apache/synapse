@@ -3685,11 +3685,11 @@ Discounted price: 138.77458254967408</pre>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
 	&lt;proxy name=&quot;JMSBinaryProxy&quot; transports=&quot;jms&quot;&gt;
 		&lt;target inSequence=&quot;BINARY_CBR_SEQ&quot; /&gt;
-		&lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
 	&lt;/proxy&gt;
 	&lt;sequence name=&quot;BINARY_CBR_SEQ&quot;&gt;
 		&lt;in&gt;
 			&lt;log level=&quot;full&quot; /&gt;
+			&lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
 			&lt;class name=&quot;samples.mediators.BinaryExtractMediator&quot;&gt;
 				&lt;property name=&quot;offset&quot; value=&quot;11&quot; /&gt;
 				&lt;property name=&quot;length&quot; value=&quot;4&quot; /&gt;

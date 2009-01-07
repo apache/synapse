@@ -21,6 +21,7 @@ package samples.userguide;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -103,6 +104,7 @@ public class StockQuoteClient {
 
         // defaults
         String symbol = getProperty("symbol", "IBM");
+        String soapVer = getProperty("soapver", "soap11");
         String mode = getProperty("mode", "quote");
         String addUrl = getProperty("addurl", null);
         String trpUrl = getProperty("trpurl", null);
@@ -212,6 +214,10 @@ public class StockQuoteClient {
                     MercuryClientConstants.SEQUENCE_OFFER, UUIDGenerator.getUUID());
         }
 
+        if ("soap12".equals(soapVer)) {
+            options.setSoapVersionURI(SOAP12Constants. SOAP_ENVELOPE_NAMESPACE_URI);
+        }
+
         serviceClient.setOptions(options);
 
         InnerStruct.MODE = mode;
@@ -242,18 +248,6 @@ public class StockQuoteClient {
                 }
             }
         }
-
-//        try {
-//            if (configContext != null) {
-//                configContext.terminate();
-//            }
-            // the above statement was used on reccomendation by Chamikara as I remember, but
-            // since using Axis2 1.3 - this causes some unexpected classloading issue on the
-            // Axis2 server side - which cannot be described. This using the below as suggested
-            // by Deepal
-//            serviceClient.cleanup();
-//        } catch (Exception ignore) {
-//        }
     }
 
     public static class InnerStruct {

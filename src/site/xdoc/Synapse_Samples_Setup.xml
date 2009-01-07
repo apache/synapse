@@ -210,6 +210,7 @@
     </p>
 <pre xml:space="preserve">ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
   [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
+  [-Dsoapver=soap11 | soap12]
   [-Daddurl=http://localhost:9000/services/SimpleStockQuoteService]
   [-Dtrpurl=http://localhost:8280] [-Dprxurl=http://localhost:8280]
   [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]</pre>

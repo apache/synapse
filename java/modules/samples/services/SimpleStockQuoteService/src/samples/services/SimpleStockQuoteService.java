@@ -22,7 +22,11 @@ import java.util.Date;
 public class SimpleStockQuoteService {
 
     // in-out
-    public GetQuoteResponse getQuote(GetQuote request) {
+    public GetQuoteResponse getQuote(GetQuote request) throws Exception {
+
+        if ("ERR".equals(request.getSymbol())) {
+            throw new Exception("Invalid stock symbol : ERR");
+        }
         System.out.println(new Date() + " " + this.getClass().getName() +
             " :: Generating quote for : " + request.getSymbol());
         return new GetQuoteResponse(request.getSymbol());

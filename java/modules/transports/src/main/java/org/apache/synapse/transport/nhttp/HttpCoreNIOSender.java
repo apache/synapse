@@ -322,15 +322,15 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             } else {
                 try {
                     handler.submitRequest(conn, axis2Req);
+                    if (log.isDebugEnabled()) {
+                        log.debug("An existing connection reused to : " + url.getHost() + ":" + port);
+                    }                    
                 } catch (ConnectionClosedException e) {
                     ioReactor.connect(new InetSocketAddress(url.getHost(), port),
                         null, axis2Req, sessionRequestCallback);
                     if (log.isDebugEnabled()) {
                         log.debug("A new connection established to : " + url.getHost() + ":" + port);
                     }
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug("An existing connection reused to : " + url.getHost() + ":" + port);
                 }
             }
 
@@ -429,27 +429,30 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            handleException("Unexpected HTTP protocol error : " + e.getMessage(), e);
+            handleException("Unexpected HTTP protocol error sending response to : " +
+                worker.getRemoteAddress(), e);
         } catch (ConnectionClosedException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            log.warn("Connection closed by client (Connection closed)");
+            log.warn("Connection closed by client : " + worker.getRemoteAddress());
         } catch (IllegalStateException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            log.warn("Connection closed by client (Buffer closed)");
+            log.warn("Connection closed by client : " + worker.getRemoteAddress());
         } catch (IOException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            handleException("IO Error sending response message", e);
+            handleException("IO Error sending response message to : " +
+                worker.getRemoteAddress(), e);
         } catch (Exception e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            handleException("General Error sending response message", e);
+            handleException("General Error sending response message to : " +
+                worker.getRemoteAddress(), e);
         }
 
         InputStream is = worker.getIs();

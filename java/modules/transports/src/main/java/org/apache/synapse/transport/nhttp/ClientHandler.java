@@ -612,29 +612,9 @@ public class ClientHandler implements NHttpClientHandler {
                 return;
             }
             case HttpStatus.SC_INTERNAL_SERVER_ERROR : {
-                Header contentType = response.getFirstHeader(CONTENT_TYPE);
-                if (contentType != null) {
-
-                    if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0)
-                            || contentType.getValue().indexOf(
-                            SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
-
-                        if (log.isDebugEnabled()) {
-                            log.debug("Received an internal server error with a SOAP payload");
-                        }
-
-                    } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Received an internal server error with a POX/REST payload");
-                        }
-                    }
-                    
-                    processResponse(conn, context, response);
-                    return;
-                }
-                
                 log.error("Received an internal server error : " +
-                        response.getStatusLine().getReasonPhrase());
+                    response.getStatusLine().getReasonPhrase());
+                processResponse(conn, context, response);
                 return;
             }
             case HttpStatus.SC_CONTINUE : {

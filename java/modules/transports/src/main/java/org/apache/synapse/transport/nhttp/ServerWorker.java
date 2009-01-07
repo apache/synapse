@@ -84,6 +84,11 @@ public class ServerWorker implements Runnable {
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String TEXT_HTML    = "text/html";
     private static final String TEXT_XML     = "text/xml";
+    /**
+     * Save requesting user IP address for logging - even during response processing when
+     * the connection may be closed
+     */
+    private String remoteAddress = null;
 
     /**
      * Create a new server side worker to process an incoming message and optionally begin creating
@@ -166,6 +171,7 @@ public class ServerWorker implements Runnable {
             if (remoteAddr != null) {
                 msgContext.setProperty(MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
                 msgContext.setProperty(NhttpConstants.REMOTE_HOST, NhttpUtil.getHostName(remoteAddr));
+                remoteAddress = remoteAddr.getHostAddress();
             }
         }
 
@@ -592,6 +598,10 @@ public class ServerWorker implements Runnable {
 
     public NHttpServerConnection getConn() {
         return conn;
+    }
+
+    public String getRemoteAddress() {
+        return remoteAddress;
     }
 
     /**

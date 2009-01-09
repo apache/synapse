@@ -52,7 +52,10 @@ public class DBReportMediator extends AbstractDBMediator {
                         "No rows were inserted for statement : " + stmnt.getRawStatement());
                 }
             }
-            con.commit();
+            
+            if (!con.getAutoCommit()) {
+                con.commit();
+            }
 
         } catch (SQLException e) {
             handleException("Error execuring insert statement : " + stmnt.getRawStatement() +

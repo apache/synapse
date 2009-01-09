@@ -60,7 +60,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * The remote registry made available to the Synapse configuration. Only one
 	 * is supported
 	 */
-	Registry registry = null;
+	private Registry registry = null;
 
     /**
      * This holds the default QName of the configuration.
@@ -193,21 +193,24 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * @return the sequence referenced by the key
 	 */
 	public Mediator getSequence(String key) {
-		Object o = localRegistry.get(key);
+        Object o = getEntry(key);
 		if (o != null && o instanceof Mediator) {
 			return (Mediator) o;
 		}
 
-		Entry entry;
-		if (o != null && o instanceof Entry) {
-			entry = (Entry) o;
-		} else {
-			entry = new Entry(key);
-			entry.setType(Entry.REMOTE_ENTRY);
-			entry.setMapper(MediatorFactoryFinder.getInstance());
-		}
+        Entry entry;
+        if (o != null && o instanceof Entry) {
+            entry = (Entry) o;
+            if (entry.getMapper() == null) {
+                entry.setMapper(MediatorFactoryFinder.getInstance());
+            }
+        } else {
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+            entry.setMapper(MediatorFactoryFinder.getInstance());
+        }
 
-		if (registry != null) {
+        if (registry != null) {
 			o = registry.getResource(entry);
 			if (o != null && o instanceof Mediator) {
 				localRegistry.put(key, entry);
@@ -369,10 +372,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
 				return entry;
 			}
 			return (Entry) o;
-		} else {
-			handleException("Invalid local registry entry : " + key);
-			return null;
-		}
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no local registry entry for key : " + key);
+            }
+            return null;
+        }
 	}
 
 	/**
@@ -392,7 +397,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      */
     public void clearCachedEntry(String key) {
         Entry entry = getEntryDefinition(key);
-        if (entry.isDynamic() && entry.isCached()) {
+        if (entry != null && entry.isDynamic() && entry.isCached()) {
             entry.clearCache();
         }
     }
@@ -466,22 +471,25 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * @return the endpoint definition
 	 */
 	public Endpoint getEndpoint(String key) {
-        
-        Object o = localRegistry.get(key);
+
+        Object o = getEntry(key);
 		if (o != null && o instanceof Endpoint) {
 			return (Endpoint) o;
 		}
 
-		Entry entry;
-		if (o != null && o instanceof Entry) {
-			entry = (Entry) o;
-		} else {
-			entry = new Entry(key);
-			entry.setType(Entry.REMOTE_ENTRY);
-			entry.setMapper(XMLToEndpointMapper.getInstance());
-		}
+        Entry entry;
+        if (o != null && o instanceof Entry) {
+            entry = (Entry) o;
+            if (entry.getMapper() == null) {
+                entry.setMapper(XMLToEndpointMapper.getInstance());
+            }
+        } else {
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+            entry.setMapper(XMLToEndpointMapper.getInstance());
+        }
 
-		if (registry != null) {
+        if (registry != null) {
 			o = registry.getResource(entry);
 			if (o != null && o instanceof Endpoint) {
 				localRegistry.put(key, entry);

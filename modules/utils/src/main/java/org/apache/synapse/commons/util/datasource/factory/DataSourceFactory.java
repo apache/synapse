@@ -133,7 +133,7 @@ public class DataSourceFactory {
             try {
                 adapterCPDS.setDriver(driver);
             } catch (ClassNotFoundException e) {
-                handleException("Error setting driver : " + driver + " DriverAdapterCPDS");
+                handleException("Error setting driver : " + driver + " in DriverAdapterCPDS", e);
             }
 
             adapterCPDS.setUrl(url);
@@ -190,5 +190,10 @@ public class DataSourceFactory {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseUtilException(msg);
+    }
+
+    private static void handleException(String msg, Throwable throwable) {
+        log.error(msg, throwable);
+        throw new SynapseUtilException(msg, throwable);
     }
 }

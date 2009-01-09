@@ -39,6 +39,7 @@ import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositor
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.SynapsePropertiesLoader;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.eventing.SynapseEventSource;
 
 import java.net.InetAddress;
@@ -59,25 +60,27 @@ public class SynapseInitializationModule implements Module {
     public void init(ConfigurationContext configurationContext,
                      AxisModule axisModule) throws AxisFault {
 
+        String ipAddress = "";
+        String hostName = "";
         log.info("Initializing Synapse at : " + new Date());
         try {
             InetAddress addr = InetAddress.getLocalHost();
             if (addr != null) {
                 // Get IP Address
-                String ipAddr = addr.getHostAddress();
-                if (ipAddr != null) {
-                    MDC.put("ip", ipAddr);
+                ipAddress = addr.getHostAddress();
+                if (ipAddress != null) {
+                    MDC.put("ip", ipAddress);
                 }
 
-                // Get hostname
-                String hostname = addr.getHostName();
-                if (hostname == null) {
-                    hostname = ipAddr;
+                // Get hostName
+                hostName = addr.getHostName();
+                if (hostName == null) {
+                    hostName = ipAddress;
                 }
-                MDC.put("host", hostname);
+                MDC.put("host", hostName);
             }
         } catch (UnknownHostException e) {
-            log.warn("Unable to determine hostname or IP address of the server for logging", e);
+            log.warn("Unable to determine hostName or IP address of the server for logging", e);
         }
 
         // incase of an existing running axis2 instance is used to deploy synapse
@@ -95,6 +98,18 @@ public class SynapseInitializationModule implements Module {
         log.info("Initializing the Synapse configuration ...");
         synCfg = getConfiguration(configurationContext);
 
+        if (hostName != null && !"".equals(hostName)) {
+            Entry entry = new Entry(SynapseConstants.SERVER_HOST);
+            entry.setValue(hostName);
+            synCfg.addEntry(SynapseConstants.SERVER_HOST, entry);
+        }
+
+        if (ipAddress != null && !"".equals(ipAddress)) {
+            Entry entry = new Entry(SynapseConstants.SERVER_IP);
+            entry.setValue(ipAddress);
+            synCfg.addEntry(SynapseConstants.SERVER_IP, entry);
+        }
+        
         log.info("Deploying the Synapse service..");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();

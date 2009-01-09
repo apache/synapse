@@ -23,7 +23,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Entry;
 
 import java.util.List;
 
@@ -41,7 +43,15 @@ public class IndirectEndpoint extends AbstractEndpoint {
      * @param synCtx the message to send
      */
     public void send(MessageContext synCtx) {
-        realEndpoint.send(synCtx);
+
+        reLoadAndInitEndpoint(((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext());
+
+        if (realEndpoint != null) {
+            realEndpoint.send(synCtx);
+        } else {
+            informFailure(synCtx, SynapseConstants.ENDPOINT_IN_DIRECT_NOT_READY,
+                    "Couldn't find the endpoint with the key : " + key);
+        }
     }
 
     public String getKey() {
@@ -89,21 +99,47 @@ public class IndirectEndpoint extends AbstractEndpoint {
      * Figure out the real endpoint we proxy for, and make sure its initialized
      */
     public synchronized void init(ConfigurationContext cc) {
-        Parameter param = cc.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
-        if (param != null && param.getValue() instanceof SynapseConfiguration) {
-            SynapseConfiguration synCfg = (SynapseConfiguration) param.getValue();
-            realEndpoint = synCfg.getEndpoint(key);
-        }
-        if (realEndpoint == null) {
-            handleException("Unable to load endpoint with key : " + key);
-        }
-        if (!realEndpoint.isInitialized()) {
-            realEndpoint.init(cc);
-        }
+       reLoadAndInitEndpoint(cc);
     }
 
     @Override
     public String toString() {
         return "[Indirect Endpoint [ " + key + "]]";
+    }
+
+    /**
+     * Reload as needed , either from registry , local entries or predefined endpoints 
+     * @param cc ConfigurationContext
+     */
+    private synchronized void reLoadAndInitEndpoint(ConfigurationContext cc) {
+
+        Parameter parameter = cc.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
+        if (parameter != null && parameter.getValue() instanceof SynapseConfiguration) {
+            SynapseConfiguration synCfg = (SynapseConfiguration) parameter.getValue();
+
+            boolean reLoad = (realEndpoint == null);
+            if (!reLoad) {
+
+                Entry entry = synCfg.getEntryDefinition(key);
+                if (entry != null && entry.isDynamic()) {
+
+                    if (!entry.isCached() || entry.isExpired()) {
+                        reLoad = true;
+                    }
+                }
+            }
+
+            if (reLoad) {
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Loading real endpoint with key : " + key);
+                }
+
+                realEndpoint = synCfg.getEndpoint(key);
+                if (realEndpoint != null && !realEndpoint.isInitialized()) {
+                    realEndpoint.init(cc);
+                }
+            }
+        }
     }
 }

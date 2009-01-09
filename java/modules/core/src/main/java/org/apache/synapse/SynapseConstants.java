@@ -305,6 +305,11 @@ public final class SynapseConstants {
    
     public static String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";
 
+    // host and ip synapse is running 
+    public static String SERVER_HOST = "SERVER_HOST";
+
+    public static String SERVER_IP = "SERVER_IP";
+
     // Known transport error codes
     public static final int RCV_IO_ERROR_SENDING     = 101000;
     public static final int RCV_IO_ERROR_RECEIVING   = 101001;
@@ -332,5 +337,8 @@ public final class SynapseConstants {
     // endpoints, non fatal warnings etc
     public static final int ENDPOINT_LB_FAIL_OVER    = 303100;
     public static final int ENDPOINT_FO_FAIL_OVER    = 304100;
+
+    // referring real endpoint is null
+    public static final int ENDPOINT_IN_DIRECT_NOT_READY = 305100;
 
 }

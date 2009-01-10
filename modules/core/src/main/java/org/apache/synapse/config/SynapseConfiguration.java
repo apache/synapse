@@ -56,7 +56,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	private static final Log log = LogFactory.getLog(SynapseConfiguration.class);
 
-	/**
+    private static final String ENTRY = "entry";
+    private static final String ENDPOINT = "endpoint";
+    private static final String SEQUENCE = "sequence"; 
+
+    /**
 	 * The remote registry made available to the Synapse configuration. Only one
 	 * is supported
 	 */
@@ -128,7 +132,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *            a Sequence mediator
 	 */
 	public void addSequence(String key, Mediator mediator) {
-		localRegistry.put(key, mediator);
+        assertAlreadyExists(key,SEQUENCE);
+        localRegistry.put(key, mediator);
 	}
 
 	/**
@@ -142,7 +147,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *            resource
 	 */
 	public void addSequence(String key, Entry entry) {
-		localRegistry.put(key, entry);
+        assertAlreadyExists(key,ENTRY);
+        localRegistry.put(key, entry);
 	}
 
 	/**
@@ -266,7 +272,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 */
 	public void addEntry(String key, Entry entry) {
 
-		if (entry.getType() == Entry.URL_SRC && entry.getValue() == null) {
+        assertAlreadyExists(key, ENTRY);
+        
+        if (entry.getType() == Entry.URL_SRC && entry.getValue() == null) {
 			try {
 				entry.setValue(SynapseConfigUtils.getOMElementFromURL(entry.getSrc()
 						.toString()));
@@ -428,7 +436,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *            the endpoint definition
 	 */
 	public void addEndpoint(String key, Endpoint endpoint) {
-		localRegistry.put(key, endpoint);
+        assertAlreadyExists(key, ENDPOINT);
+        localRegistry.put(key, endpoint);
 	}
 
 	/**
@@ -440,7 +449,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *            the actual endpoint definition to be added
 	 */
 	public void addEndpoint(String key, Entry entry) {
-		localRegistry.put(key, entry);
+        assertAlreadyExists(key, ENTRY);
+        localRegistry.put(key, entry);
 	}
 
 	/**
@@ -965,5 +975,16 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public void setEventSources(Map<String, SynapseEventSource> eventSources) {
         this.eventSources = eventSources;
+    }
+
+    private void assertAlreadyExists(String key, String type) {
+
+        if (key == null || "".equals(key)) {
+            handleException("Given entry key is empty or null.");
+        }
+
+        if (localRegistry.containsKey(key.trim())) {
+            handleException("Duplicate " + type + " definition for key : " + key);
+        }
     }
 }

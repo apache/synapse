@@ -23,6 +23,7 @@ import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.Startup;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
 
 public class SynapseXMLConfigurationSerializer implements ConfigurationSerializer {
@@ -74,6 +75,9 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         iter = synCfg.getLocalRegistry().keySet().iterator();
         while (iter.hasNext()) {
             Object key = iter.next();
+            if (SynapseConstants.SERVER_IP.equals(key) || SynapseConstants.SERVER_HOST.equals(key)) {
+                continue;
+            }
             Object o = synCfg.getLocalRegistry().get(key);
             if (o instanceof Mediator) {
                 sequences.put(key, o);

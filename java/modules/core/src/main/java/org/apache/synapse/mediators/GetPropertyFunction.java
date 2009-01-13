@@ -21,6 +21,7 @@ package org.apache.synapse.mediators;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -209,6 +210,20 @@ public class GetPropertyFunction implements Function {
                 String messageID = synCtx.getMessageID();
                 if (messageID != null) {
                     return messageID;
+                } else {
+                    return NULL_STRING;
+                }
+            } else if (SynapseConstants.PROPERTY_FAULT.equals(key)) {
+                if (synCtx.getEnvelope().hasFault()) {
+                    return SynapseConstants.TRUE;
+                } else if (synCtx instanceof Axis2MessageContext) {
+                    org.apache.axis2.context.MessageContext axis2MessageContext
+                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    if (axis2MessageContext.getProperty(BaseConstants.FAULT_MESSAGE) != null
+                        && SynapseConstants.TRUE.equals(
+                            axis2MessageContext.getProperty(BaseConstants.FAULT_MESSAGE))) {
+                        return SynapseConstants.TRUE;
+                    }
                 } else {
                     return NULL_STRING;
                 }

@@ -20,6 +20,12 @@
 package org.apache.synapse.transport.nhttp;
 
 public class NhttpConstants {
+    public static final String TRUE = "TRUE";
+    /**
+     * A message context property indicating "TRUE", if a transport or the message builder
+     * has information that the current message is a fault (e.g. SOAP faults, non-HTTP 2xx, etc)
+     */
+    public static final String FAULT_MESSAGE = "FAULT_MESSAGE"; // corresponds with BaseConstants
     public static final String SC_ACCEPTED = "SC_ACCEPTED";
     public static final String HTTP_SC = "HTTP_SC";
     public static final String FORCE_HTTP_1_0 = "FORCE_HTTP_1.0";

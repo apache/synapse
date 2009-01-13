@@ -198,8 +198,11 @@ public class ClientWorker implements Runnable {
             responseMsgCtx.setEnvelope(envelope);
             // copy the HTTP status code as a message context property with the key HTTP_SC to be
             // used at the sender to set the propper status code when passing the message
-            responseMsgCtx.setProperty(NhttpConstants.HTTP_SC,
-                    this.response.getStatusLine().getStatusCode());
+            int statusCode = this.response.getStatusLine().getStatusCode();
+            responseMsgCtx.setProperty(NhttpConstants.HTTP_SC, statusCode);
+            if (statusCode >= 400) {
+                responseMsgCtx.setProperty(NhttpConstants.FAULT_MESSAGE, NhttpConstants.TRUE);
+            }
             responseMsgCtx.setProperty(NhttpConstants.NON_BLOCKING_TRANSPORT, true);
 
             // process response received

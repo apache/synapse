@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
  * Global constants for the Apache Synapse project
  */
 public final class SynapseConstants {
-
+    public static final String TRUE = "TRUE";
     /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
     /** An OMNamespace object for the Synapse NS */
@@ -70,6 +70,10 @@ public final class SynapseConstants {
     public static final String HEADER_RELATES_TO = "RelatesTo";
     /** Refers to the MessageID header */
     public static final String HEADER_MESSAGE_ID = "MessageID";
+    /** Refers to the property name for which the get-property function would return
+     * true, if the message is a fault
+     */
+    public static final String PROPERTY_FAULT = "FAULT";
     /** Message format: pox, soap11, soap12 */
     public static final String PROPERTY_MESSAGE_FORMAT = "MESSAGE_FORMAT";
     /** WSDL operation name **/

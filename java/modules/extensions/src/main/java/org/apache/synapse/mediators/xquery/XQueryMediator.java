@@ -181,11 +181,14 @@ public class XQueryMediator extends AbstractMediator {
         boolean needBind = false;
         XQResultSequence resultSequence;
 
-        Entry dp = synCtx.getConfiguration().getEntryDefinition(queryKey);
-        // if the queryKey refers to a dynamic resource
-        if (dp != null && dp.isDynamic()) {
-            if (!dp.isCached() || dp.isExpired()) {
-                reLoad = true;
+        if (queryKey != null && !"".equals(queryKey)) {
+           
+            Entry dp = synCtx.getConfiguration().getEntryDefinition(queryKey);
+            // if the queryKey refers to a dynamic resource
+            if (dp != null && dp.isDynamic()) {
+                if (!dp.isCached() || dp.isExpired()) {
+                    reLoad = true;
+                }
             }
         }
 

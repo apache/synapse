@@ -24,8 +24,6 @@ import org.apache.synapse.util.UUIDGenerator;
 import org.wso2.eventing.EventingConstants;
 import org.wso2.eventing.Subscription;
 
-import java.util.Calendar;
-
 /**
  *
  */
@@ -35,6 +33,7 @@ public class SynapseSubscription extends Subscription {
     private Endpoint endpoint;
     private boolean staticEntry;
     private String subManagerURI;
+
     public SynapseSubscription() {
         this.setId(UUIDGenerator.getUUID());
         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);

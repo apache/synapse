@@ -23,15 +23,15 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.AxisFault;
-import java.io.File;
 
 import javax.xml.namespace.QName;
+import java.io.File;
 
 
 public class EventSubscriber {
@@ -62,7 +62,8 @@ public class EventSubscriber {
         String prxUrl = getProperty("prxurl", null);
         String repo = getProperty("repository", "client_repo");
         String topic = getProperty("topic", "synapse/event/test");
-        String address = getProperty("address", "http://localhost:9000/services/SimpleStockQuoteService");
+        String address =
+                getProperty("address", "http://localhost:9000/services/SimpleStockQuoteService");
         String mode = getProperty("mode", "subscribe");
         String identifier = getProperty("identifier", "90000");
         String expires = getProperty("expires", "*"); //Format: 2020-12-31T21:07:00.000-08:00
@@ -79,22 +80,28 @@ public class EventSubscriber {
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement message = factory.createOMElement("message", null);
 
-        OMNamespace nsxmlins = factory.createOMNamespace("http://www.w3.org/2001/XMLSchema", "xmlns");
-        OMNamespace nss11 = factory.createOMNamespace("http://schemas.xmlsoap.org/soap/envelope", "s11");
-        OMNamespace nswsa = factory.createOMNamespace("http://schemas.xmlsoap.org/ws/2004/08/addressing", "wsa");
-        OMNamespace nswse = factory.createOMNamespace("http://schemas.xmlsoap.org/ws/2004/08/eventing", "wse");
+        OMNamespace nsxmlins =
+                factory.createOMNamespace("http://www.w3.org/2001/XMLSchema", "xmlns");
+        OMNamespace nss11 =
+                factory.createOMNamespace("http://schemas.xmlsoap.org/soap/envelope", "s11");
+        OMNamespace nswsa = factory.createOMNamespace(
+                "http://schemas.xmlsoap.org/ws/2004/08/addressing", "wsa");
+        OMNamespace nswse =
+                factory.createOMNamespace("http://schemas.xmlsoap.org/ws/2004/08/eventing", "wse");
 
         if (mode.equals("subscribe")) {
             OMElement subscribeOm = factory.createOMElement("Subscribe", nswse);
             OMElement deliveryOm = factory.createOMElement("Delivery", nswse);
-            deliveryOm.addAttribute(factory.createOMAttribute("Mode", null, "http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push"));
+            deliveryOm.addAttribute(factory.createOMAttribute("Mode", null,
+                    "http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push"));
             OMElement notifyToOm = factory.createOMElement("NotifyTo", nswse);
             OMElement addressOm = factory.createOMElement("Address", nswsa);
             factory.createOMText(addressOm, address);
             OMElement expiresOm = factory.createOMElement("Expires", nswse);
             factory.createOMText(expiresOm, expires);
             OMElement filterOm = factory.createOMElement("Filter", nswse);
-            filterOm.addAttribute(factory.createOMAttribute("Dialect", null, "http://synapse.apache.org/eventing/dialect/topicFilter"));
+            filterOm.addAttribute(factory.createOMAttribute("Dialect", null,
+                    "http://synapse.apache.org/eventing/dialect/topicFilter"));
             factory.createOMText(filterOm, topic);
 
 
@@ -117,16 +124,19 @@ public class EventSubscriber {
             try {
                 OMElement response = serviceClient.sendReceive(subscribeOm);
                 System.out.println("Subscribed to topic " + topic);
-                Thread.sleep(1000);                
+                Thread.sleep(1000);
                 System.out.println("Response Received: " + response.toString());
                 String subId =
-                        response.getFirstChildWithName(new QName(nswse.getNamespaceURI(), "SubscriptionManager"))
-                                .getFirstChildWithName(new QName(nswsa.getNamespaceURI(), "ReferenceParameters"))
-                                .getFirstChildWithName(new QName(nswse.getNamespaceURI(), "Identifier")).getText();
+                        response.getFirstChildWithName(
+                                new QName(nswse.getNamespaceURI(), "SubscriptionManager"))
+                                .getFirstChildWithName(
+                                        new QName(nswsa.getNamespaceURI(), "ReferenceParameters"))
+                                .getFirstChildWithName(
+                                        new QName(nswse.getNamespaceURI(), "Identifier")).getText();
                 System.out.println("Subscription identifier: " + subId);
             } catch (AxisFault e) {
-                System.out.println("Fault Received : "+e.toString());
-                System.out.println("Fault Code     : "+e.getFaultCode().toString());
+                System.out.println("Fault Received : " + e.toString());
+                System.out.println("Fault Code     : " + e.getFaultCode().toString());
             }
         } else if (mode.equals("unsubscribe")) {
             /** Send unsubscribe message
@@ -171,8 +181,8 @@ public class EventSubscriber {
                 Thread.sleep(1000);
                 System.out.println("UnSubscribe Response Received: " + response.toString());
             } catch (AxisFault e) {
-                System.out.println("Fault Received : "+e.toString());
-                System.out.println("Fault Code     : "+e.getFaultCode().toString());
+                System.out.println("Fault Received : " + e.toString());
+                System.out.println("Fault Code     : " + e.getFaultCode().toString());
             }
 
         } else if (mode.equals("renew")) {
@@ -222,10 +232,11 @@ public class EventSubscriber {
                 OMElement response = serviceClient.sendReceive(subscribeOm);
                 System.out.println("SynapseSubscription Renew to ID " + identifier);
                 Thread.sleep(1000);
-                System.out.println("SynapseSubscription Renew Response Received: " + response.toString());
+                System.out.println(
+                        "SynapseSubscription Renew Response Received: " + response.toString());
             } catch (AxisFault e) {
-                System.out.println("Fault Received : "+e.toString());
-                System.out.println("Fault Code     : "+e.getFaultCode().toString());
+                System.out.println("Fault Received : " + e.toString());
+                System.out.println("Fault Code     : " + e.getFaultCode().toString());
             }
 
         } else if (mode.equals("getstatus")) {
@@ -272,9 +283,9 @@ public class EventSubscriber {
                 Thread.sleep(1000);
                 System.out.println("GetStatus Response Received: " + response.toString());
             } catch (AxisFault e) {
-                System.out.println("Fault Received : "+e.toString());
-                System.out.println("Fault Code     : "+e.getFaultCode().toString());
-            } 
+                System.out.println("Fault Received : " + e.toString());
+                System.out.println("Fault Code     : " + e.getFaultCode().toString());
+            }
         }
 
         try {

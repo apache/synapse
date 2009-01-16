@@ -30,12 +30,13 @@ public class XPathBasedEventFilter implements SynapseEventFilter {
 
     private SynapseXPath sourceXpath;
     private String resultValue;
-    private static final String FILTER_SEP ="/";
+    private static final String FILTER_SEP = "/";
+
     public boolean isSatisfied(MessageContext mc) {
         String evaluatedValue = sourceXpath.stringValueOf(mc);
         if (evaluatedValue.equals(resultValue)) {
             return true;
-        } else if (evaluatedValue.startsWith((resultValue+FILTER_SEP).trim())) {
+        } else if (evaluatedValue.startsWith((resultValue + FILTER_SEP).trim())) {
             return true;
         }
         return false;

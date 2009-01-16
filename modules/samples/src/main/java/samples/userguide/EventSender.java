@@ -66,7 +66,7 @@ public class EventSender {
         String qty = getProperty("qty", "1000");
         String topic = getProperty("topic", "synapse/event/test");
         String action = getProperty("action", "urn:event");
-        String topicns = getProperty("topicns","http://apache.org/aip");
+        String topicns = getProperty("topicns", "http://apache.org/aip");
 
         if (repo != null && !"null".equals(repo)) {
             configContext =
@@ -90,16 +90,18 @@ public class EventSender {
         serviceClient.engageModule("addressing");
         options.setTo(new EndpointReference(addUrl));
         options.setAction(action);
-        options.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE); // set for fire and foget
+        options.setProperty(MessageContext.TRANSPORT_NON_BLOCKING,
+                Boolean.FALSE); // set for fire and foget
         serviceClient.setOptions(options);
         serviceClient.addHeader(topicOm);
-        OMElement payload = AXIOMUtil.stringToOM("<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
-                "    <m:order>\n" +
-                "        <m:price>" + price + "</m:price>\n" +
-                "        <m:quantity>" + qty + "</m:quantity>\n" +
-                "        <m:symbol>" + symbol + "</m:symbol>\n" +
-                "    </m:order>\n" +
-                "</m:placeOrder>");
+        OMElement payload =
+                AXIOMUtil.stringToOM("<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
+                        "    <m:order>\n" +
+                        "        <m:price>" + price + "</m:price>\n" +
+                        "        <m:quantity>" + qty + "</m:quantity>\n" +
+                        "        <m:symbol>" + symbol + "</m:symbol>\n" +
+                        "    </m:order>\n" +
+                        "</m:placeOrder>");
 
         System.out.println("Sending Event : \n" + payload.toString());
         try {

@@ -49,15 +49,24 @@ public class SubscriptionMessageBuilder {
 
     private static final Log log = LogFactory.getLog(SubscriptionMessageBuilder.class);
 
-    private static final QName SUBSCRIBE_QNAME = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_SUBSCRIBE);
-    private static final QName DELIVERY_QNAME = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_DELIVERY);
-    private static final QName FILTER_QNAME = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_FILTER);
-    private static final QName NOTIFY_TO_QNAME = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_NOTIFY_TO);
-    private static final QName ATT_DIALECT = new QName(XMLConfigConstants.NULL_NAMESPACE, EventingConstants.WSE_EN_DIALECT);
-    private static final QName ATT_XPATH = new QName(XMLConfigConstants.NULL_NAMESPACE, EventingConstants.WSE_EN_XPATH);
-    private static final QName IDENTIFIER = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_IDENTIFIER);
-    private static final QName EXPIRES = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_EXPIRES);
-    private static final QName RENEW = new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_RENEW);
+    private static final QName SUBSCRIBE_QNAME =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_SUBSCRIBE);
+    private static final QName DELIVERY_QNAME =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_DELIVERY);
+    private static final QName FILTER_QNAME =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_FILTER);
+    private static final QName NOTIFY_TO_QNAME =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_NOTIFY_TO);
+    private static final QName ATT_DIALECT =
+            new QName(XMLConfigConstants.NULL_NAMESPACE, EventingConstants.WSE_EN_DIALECT);
+    private static final QName ATT_XPATH =
+            new QName(XMLConfigConstants.NULL_NAMESPACE, EventingConstants.WSE_EN_XPATH);
+    private static final QName IDENTIFIER =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_IDENTIFIER);
+    private static final QName EXPIRES =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_EXPIRES);
+    private static final QName RENEW =
+            new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_RENEW);
 
     private static String errorSubCode = null;
     private static String errorReason = null;
@@ -127,7 +136,8 @@ public class SubscriptionMessageBuilder {
                 if (notifyToElem != null) {
                     Endpoint ep = getEndpointFromWSAAddress(notifyToElem.getFirstElement());
                     if (ep != null) {
-                        subscription = new SynapseSubscription(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
+                        subscription = new SynapseSubscription(
+                                EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
                         subscription.setEndpoint(ep);
                         subscription.setAddressUrl(notifyToElem.getFirstElement().getText());
                         subscription.setEndpointUrl(notifyToElem.getFirstElement().getText());
@@ -144,22 +154,26 @@ public class SubscriptionMessageBuilder {
             if (subscription != null && filterElem != null) {
                 OMAttribute dialectAttr = filterElem.getAttribute(ATT_DIALECT);
                 if (dialectAttr != null && dialectAttr.getAttributeValue() != null) {
-                    if (SynapseEventingConstants.TOPIC_FILTER_DIALECT.equals(dialectAttr.getAttributeValue())) {
+                    if (SynapseEventingConstants.TOPIC_FILTER_DIALECT
+                            .equals(dialectAttr.getAttributeValue())) {
                         XPathBasedEventFilter filter = new XPathBasedEventFilter();
                         filter.setResultValue(filterElem.getText());
                         if (filterElem.getAttribute(ATT_XPATH) != null) {
                             try {
-                                SynapseXPath xpath = SynapseXPathFactory.getSynapseXPath(filterElem, ATT_XPATH);
+                                SynapseXPath xpath =
+                                        SynapseXPathFactory.getSynapseXPath(filterElem, ATT_XPATH);
                                 filter.setSourceXpath(xpath);
                             } catch (JaxenException e) {
                                 handleException("Unable to create the SynapseEventFilter xpath", e);
                             }
                         }
                         subscription.setFilter(filter);
-                                           SubscriptionData subscriptionData = new SubscriptionData();
-                    subscriptionData.setProperty(SynapseEventingConstants.FILTER_VALUE,filterElem.getText());
-                    subscriptionData.setProperty(SynapseEventingConstants.FILTER_DIALECT,dialectAttr.getAttributeValue());
-                    subscription.setSubscriptionData(subscriptionData);
+                        SubscriptionData subscriptionData = new SubscriptionData();
+                        subscriptionData.setProperty(SynapseEventingConstants.FILTER_VALUE,
+                                filterElem.getText());
+                        subscriptionData.setProperty(SynapseEventingConstants.FILTER_DIALECT,
+                                dialectAttr.getAttributeValue());
+                        subscription.setSubscriptionData(subscriptionData);
                     }
                 } else {
                     handleException("Error in creating subscription. Filter dialect not defined");
@@ -169,9 +183,10 @@ public class SubscriptionMessageBuilder {
             if (expiryElem != null) {
                 Calendar calendarExpires = null;
                 try {
-                    if(expiryElem.getText().startsWith("P")){
-                        calendarExpires = ConverterUtil.convertToDuration(expiryElem.getText()).getAsCalendar();
-                    }else{
+                    if (expiryElem.getText().startsWith("P")) {
+                        calendarExpires = ConverterUtil.convertToDuration(expiryElem.getText())
+                                .getAsCalendar();
+                    } else {
                         calendarExpires = ConverterUtil.convertToDateTime(expiryElem.getText());
                     }
                 } catch (Exception e) {
@@ -186,7 +201,8 @@ public class SubscriptionMessageBuilder {
                 }
             }
         } else {
-            handleException("Subscribe element is required as the payload of the subscription message");
+            handleException(
+                    "Subscribe element is required as the payload of the subscription message");
         }
         return subscription;
     }
@@ -276,22 +292,23 @@ public class SubscriptionMessageBuilder {
         if (renewElem != null) {
             OMElement expiryElem = renewElem.getFirstChildWithName(EXPIRES);
             if (expiryElem != null) {
-                Calendar calendarExpires=null;
-                try{
-                    if(expiryElem.getText().startsWith("P")){
-                        calendarExpires = ConverterUtil.convertToDuration(expiryElem.getText()).getAsCalendar();
-                    }else{
+                Calendar calendarExpires = null;
+                try {
+                    if (expiryElem.getText().startsWith("P")) {
+                        calendarExpires = ConverterUtil.convertToDuration(expiryElem.getText())
+                                .getAsCalendar();
+                    } else {
                         calendarExpires = ConverterUtil.convertToDateTime(expiryElem.getText());
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     setExpirationFault(subscription);
                 }
-                    Calendar calendarNow = Calendar.getInstance();
-                    if (calendarNow.before(calendarExpires)) {
-                        subscription.setExpires(calendarExpires);
-                    } else {
-                        setExpirationFault(subscription);
-                    }
+                Calendar calendarNow = Calendar.getInstance();
+                if (calendarNow.before(calendarExpires)) {
+                    subscription.setExpires(calendarExpires);
+                } else {
+                    setExpirationFault(subscription);
+                }
 
                 subscription.setExpires(calendarExpires);
             } else {

@@ -30,9 +30,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -46,7 +46,8 @@ public class AMQPConsumer {
     private int execID = 1;
 
     private static final String CLASS = "AMQPConsumer";
-    private static final String PROPERTY_FILE = "../../repository/conf/sample/resources/fix/direct.properties";
+    private static final String PROPERTY_FILE =
+            "../../repository/conf/sample/resources/fix/direct.properties";
     private static final String PROP_FILE_NAME = "propfile";
     private static final String LOOKUP_CODE_CON = "directQueue";
     private static final String LOOKUP_CODE_REP = "replyQueue";
@@ -87,24 +88,29 @@ public class AMQPConsumer {
             // As this application is using a MessageConsumer we need to set an ExceptionListener on the connection
             // so that errors raised within the JMS client library can be reported to the application
             System.out.println(
-                    CLASS + ": Setting an ExceptionListener on the connection as sample uses a MessageConsumer");
+                    CLASS +
+                            ": Setting an ExceptionListener on the connection as sample uses a MessageConsumer");
             connection.setExceptionListener(new ExceptionListener() {
                 public void onException(JMSException jmse) {
                     // The connection may have broken invoke reconnect code if available.
                     // The connection may have broken invoke reconnect code if available.
-                    System.err.println(CLASS + ": The sample received an exception through the ExceptionListener" + jmse.getMessage());
+                    System.err.println(CLASS +
+                            ": The sample received an exception through the ExceptionListener" +
+                            jmse.getMessage());
                     jmse.printStackTrace();
                     System.exit(0);
                 }
             });
-            createSession(conFac,destination); // Call to create the sessions
-            createRepQueue(conFac,replyQueue); // Call to create the Reply Queue and close the session
+            createSession(conFac, destination); // Call to create the sessions
+            createRepQueue(conFac,
+                    replyQueue); // Call to create the Reply Queue and close the session
             connection.start(); // Start the connection
-            System.out.println(CLASS + ": Starting connection so the MessageConsumer can receive messages");
+            System.out.println(
+                    CLASS + ": Starting connection so the MessageConsumer can receive messages");
             onMessage();
         } catch (Exception e) {
             //TODO: handle the exception
-            System.out.println("ERROR : "+ e.toString());
+            System.out.println("ERROR : " + e.toString());
             e.printStackTrace();
         }
     }
@@ -112,7 +118,8 @@ public class AMQPConsumer {
     /**
      * @param destination
      */
-    private void createSession(ConnectionFactory conFac,Destination destination) throws JMSException {
+    private void createSession(ConnectionFactory conFac, Destination destination)
+            throws JMSException {
         // Create a session on the connection
         // This session is a default choice of non-transacted and uses the auto acknowledge feature of a session.
         System.out.println(CLASS + ": Creating a non-transacted, auto-acknowledged session");
@@ -124,11 +131,13 @@ public class AMQPConsumer {
 
     /**
      * Create reply queue
+     *
      * @param replyQueue
      * @throws JMSException
      */
-    private void createRepQueue(ConnectionFactory conFac,Destination replyQueue) throws JMSException {
-        MessageProducer messageProducer =  session.createProducer(replyQueue);
+    private void createRepQueue(ConnectionFactory conFac, Destination replyQueue)
+            throws JMSException {
+        MessageProducer messageProducer = session.createProducer(replyQueue);
         System.out.println(CLASS + ": Reply queue created");
     }
 
@@ -174,14 +183,14 @@ public class AMQPConsumer {
         OMElement messageNode = soapBody.getFirstChildWithName(new QName(
                 FIX_MSG));
         Iterator<?> messageElements = (Iterator<?>) messageNode
-                 .getChildElements();
+                .getChildElements();
         while (messageElements.hasNext()) {
             OMElement node = (OMElement) messageElements.next();
             if (node.getQName().getLocalPart().equals(FIX_MSG_BODY)) {
-                Iterator<?> bodyElements =(Iterator<?>) node.getChildElements();
+                Iterator<?> bodyElements = (Iterator<?>) node.getChildElements();
                 while (bodyElements.hasNext()) {
-                   OMElement bodyNode = (OMElement) bodyElements.next();
-                   String tag = bodyNode
+                    OMElement bodyNode = (OMElement) bodyElements.next();
+                    String tag = bodyNode
                             .getAttributeValue(new QName(FIX_MSG_ID));
                     String value = bodyNode.getText();
                     if (tag.equals(FIX_MSG_SYMBOL)) {
@@ -197,47 +206,47 @@ public class AMQPConsumer {
     }
 
     /**
-     *
      * @param message incoming message
      * @throws JMSException on error
      */
     private void sendExecution(Message message) throws JMSException {
-        String repValue = "<m0:message xmlns:m0=\"http://services.samples/xsd/\" inSeession=\"FIX.4.0:EXEC-->SYNAPSE\" count=\"2\">\n"
-                + "<m0:header>"
-                + "<m0:field m0:id=\"35\"><![CDATA[8]]></m0:field>"
-                + "<m0:field m0:id=\"52\"><![CDATA[20080618-08:41:56]]></m0:field>"
-                + "</m0:header>"
-                + "<m0:body>"
-                + "<m0:field m0:id=\"6\"><![CDATA[12.3]]></m0:field>"
-                + "<m0:field m0:id=\"11\"><![CDATA["
-                + inClOrderID
-                + "]]></m0:field>"
-                + "<m0:field m0:id=\"14\"><![CDATA["
-                + inQty
-                + "]]></m0:field>"
-                + "<m0:field m0:id=\"17\"><![CDATA["
-                + execID
-                + "]]></m0:field>"
-                + "<m0:field m0:id=\"20\"><![CDATA[0]]></m0:field>"
-                + "<m0:field m0:id=\"31\"><![CDATA[12.3]]></m0:field>"
-                + "<m0:field m0:id=\"32\"><![CDATA["
-                + inQty
-                + "]]></m0:field>"
-                + "<m0:field m0:id=\"37\"><![CDATA[2]]></m0:field>"
-                + "<m0:field m0:id=\"38\"><![CDATA["
-                + inQty
-                + "]]></m0:field>"
-                + "<m0:field m0:id=\"39\"><![CDATA[2]]></m0:field>"
-                + "<m0:field m0:id=\"54\"><![CDATA[1]]></m0:field>"
-                + "<m0:field m0:id=\"55\"><![CDATA["
-                + inSymbol
-                + "]]></m0:field>"
-                + "<m0:field m0:id=\"150\"><![CDATA[2]]></m0:field>"
-                + "<m0:field m0:id=\"151\"><![CDATA[0]]></m0:field>"
-                + "</m0:body>"
-                + "<m0:trailer>"
-                + "</m0:trailer>"
-                + "</m0:message>";
+        String repValue =
+                "<m0:message xmlns:m0=\"http://services.samples/xsd/\" inSeession=\"FIX.4.0:EXEC-->SYNAPSE\" count=\"2\">\n"
+                        + "<m0:header>"
+                        + "<m0:field m0:id=\"35\"><![CDATA[8]]></m0:field>"
+                        + "<m0:field m0:id=\"52\"><![CDATA[20080618-08:41:56]]></m0:field>"
+                        + "</m0:header>"
+                        + "<m0:body>"
+                        + "<m0:field m0:id=\"6\"><![CDATA[12.3]]></m0:field>"
+                        + "<m0:field m0:id=\"11\"><![CDATA["
+                        + inClOrderID
+                        + "]]></m0:field>"
+                        + "<m0:field m0:id=\"14\"><![CDATA["
+                        + inQty
+                        + "]]></m0:field>"
+                        + "<m0:field m0:id=\"17\"><![CDATA["
+                        + execID
+                        + "]]></m0:field>"
+                        + "<m0:field m0:id=\"20\"><![CDATA[0]]></m0:field>"
+                        + "<m0:field m0:id=\"31\"><![CDATA[12.3]]></m0:field>"
+                        + "<m0:field m0:id=\"32\"><![CDATA["
+                        + inQty
+                        + "]]></m0:field>"
+                        + "<m0:field m0:id=\"37\"><![CDATA[2]]></m0:field>"
+                        + "<m0:field m0:id=\"38\"><![CDATA["
+                        + inQty
+                        + "]]></m0:field>"
+                        + "<m0:field m0:id=\"39\"><![CDATA[2]]></m0:field>"
+                        + "<m0:field m0:id=\"54\"><![CDATA[1]]></m0:field>"
+                        + "<m0:field m0:id=\"55\"><![CDATA["
+                        + inSymbol
+                        + "]]></m0:field>"
+                        + "<m0:field m0:id=\"150\"><![CDATA[2]]></m0:field>"
+                        + "<m0:field m0:id=\"151\"><![CDATA[0]]></m0:field>"
+                        + "</m0:body>"
+                        + "<m0:trailer>"
+                        + "</m0:trailer>"
+                        + "</m0:message>";
         execID++;
         TextMessage repMessage = session.createTextMessage(repValue);
         repMessage.setJMSCorrelationID(message.getJMSMessageID());
@@ -248,8 +257,9 @@ public class AMQPConsumer {
 
     /**
      * Get the system properties
+     *
      * @param name property name
-    * @param def  default value
+     * @param def  default value
      * @return property value
      */
     private static String getProperty(String name, String def) {

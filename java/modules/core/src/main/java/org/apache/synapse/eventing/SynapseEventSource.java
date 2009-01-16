@@ -77,7 +77,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     public void buildService(AxisConfiguration axisCfg) throws AxisFault {
         AxisService eventSourceService = new AxisService();
         eventSourceService.setName(this.name);
-        AxisOperation mediateOperation = new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
+        AxisOperation mediateOperation =
+                new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
         AxisOperation subscribeOperation = new InOutAxisOperation(new QName("subscribe"));
 
         mediateOperation.setMessageReceiver(this);
@@ -116,99 +117,135 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 if (subID != null) {
                     // Send the subscription responce
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending sunscription response for SynapseSubscription ID : " + subscription.getId());
+                        log.debug("Sending sunscription response for SynapseSubscription ID : " +
+                                subscription.getId());
                     }
-                    SOAPEnvelope soapEnvelope = messageBuilder.genSubscriptionResponse(subscription);
-                    dispatchResponse(soapEnvelope, EventingConstants.WSE_SUbSCRIBE_RESPONSE, null, mc, synCfg, synEnv);
+                    SOAPEnvelope soapEnvelope =
+                            messageBuilder.genSubscriptionResponse(subscription);
+                    dispatchResponse(soapEnvelope, EventingConstants.WSE_SUbSCRIBE_RESPONSE, null,
+                            mc, synCfg, synEnv);
                 } else {
                     // Send the Fault responce
                     if (log.isDebugEnabled()) {
                         log.debug("SynapseSubscription Failed, sending fault response");
                     }
-                    SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess", "Unable to subscribe ", "");
-                    dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg, synEnv);
+                    SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+                            EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess",
+                            "Unable to subscribe ", "");
+                    dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
+                            synEnv);
                 }
             } else {
                 // Send the Fault responce
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseSubscription Failed, sending fault response");
                 }
-                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,SubscriptionMessageBuilder.getErrorCode(), SubscriptionMessageBuilder.getErrorSubCode(), SubscriptionMessageBuilder.getErrorReason(), "");
-                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg, synEnv);
+                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+                        SubscriptionMessageBuilder.getErrorCode(),
+                        SubscriptionMessageBuilder.getErrorSubCode(),
+                        SubscriptionMessageBuilder.getErrorReason(), "");
+                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
+                        synEnv);
             }
 
         } else if (EventingConstants.WSE_UNSUBSCRIBE.equals(mc.getWSAAction())) {
             // Unsubscribe for responce
-            SynapseSubscription subscription = SubscriptionMessageBuilder.createUnSubscribeMessage(smc);
+            SynapseSubscription subscription =
+                    SubscriptionMessageBuilder.createUnSubscribeMessage(smc);
             if (log.isDebugEnabled()) {
-                log.debug("UnSubscribe response recived for SynapseSubscription ID : " + subscription.getId());
+                log.debug("UnSubscribe response recived for SynapseSubscription ID : " +
+                        subscription.getId());
             }
             if (subscriptionManager.deleteSubscription(subscription.getId())) {
                 //send the response
                 if (log.isDebugEnabled()) {
-                    log.debug("Sending UnSubscribe responce for SynapseSubscription ID : " + subscription.getId());
+                    log.debug("Sending UnSubscribe responce for SynapseSubscription ID : " +
+                            subscription.getId());
                 }
                 SOAPEnvelope soapEnvelope = messageBuilder.genUnSubscribeResponse(subscription);
                 RelatesTo relatesTo = new RelatesTo(subscription.getId());
-                dispatchResponse(soapEnvelope, EventingConstants.WSE_UNSUBSCRIBE_RESPONSE, relatesTo, mc, synCfg, synEnv);
+                dispatchResponse(soapEnvelope, EventingConstants.WSE_UNSUBSCRIBE_RESPONSE,
+                        relatesTo, mc, synCfg, synEnv);
             } else {
                 // Send the Fault responce
                 if (log.isDebugEnabled()) {
                     log.debug("UnSubscription failed, sending fault repsponse");
                 }
-                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess", "Unable to Unsubscribe", "");
-                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg, synEnv);
+                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+                        EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess",
+                        "Unable to Unsubscribe", "");
+                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
+                        synEnv);
             }
         } else if (EventingConstants.WSE_GET_STATUS.equals(mc.getWSAAction())) {
             // Get responce status
-            SynapseSubscription subscription = SubscriptionMessageBuilder.createGetStatusMessage(smc);
+            SynapseSubscription subscription =
+                    SubscriptionMessageBuilder.createGetStatusMessage(smc);
             if (log.isDebugEnabled()) {
-                log.debug("GetStatus request recived for SynapseSubscription ID : " + subscription.getId());
+                log.debug("GetStatus request recived for SynapseSubscription ID : " +
+                        subscription.getId());
             }
             subscription = subscriptionManager.getSubscription(subscription.getId());
             if (subscription != null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Sending GetStatus responce for SynapseSubscription ID : " + subscription.getId());
+                    log.debug("Sending GetStatus responce for SynapseSubscription ID : " +
+                            subscription.getId());
                 }
                 //send the responce
                 SOAPEnvelope soapEnvelope = messageBuilder.genGetStatusResponse(subscription);
                 RelatesTo relatesTo = new RelatesTo(subscription.getId());
-                dispatchResponse(soapEnvelope, EventingConstants.WSE_GET_STATUS_RESPONSE, relatesTo, mc, synCfg, synEnv);
+                dispatchResponse(soapEnvelope, EventingConstants.WSE_GET_STATUS_RESPONSE, relatesTo,
+                        mc, synCfg, synEnv);
             } else {
                 // Send the Fault responce
                 if (log.isDebugEnabled()) {
                     log.debug("GetStatus failed, sending fault response");
                 }
-                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess", "Subscription Not Found", "");
-                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg, synEnv);
+                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+                        EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess",
+                        "Subscription Not Found", "");
+                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
+                        synEnv);
             }
         } else if (EventingConstants.WSE_RENEW.equals(mc.getWSAAction())) {
             // Renew subscription
-            SynapseSubscription subscription = SubscriptionMessageBuilder.createRenewSubscribeMessage(smc);
+            SynapseSubscription subscription =
+                    SubscriptionMessageBuilder.createRenewSubscribeMessage(smc);
             if (log.isDebugEnabled()) {
-                log.debug("ReNew request recived for SynapseSubscription ID : " + subscription.getId());
+                log.debug("ReNew request recived for SynapseSubscription ID : " +
+                        subscription.getId());
             }
             String subID = subscription.getId();
             if (subID != null) {
                 if (subscriptionManager.renewSubscription(subscription)) {
                     //send the response
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending ReNew response for SynapseSubscription ID : " + subscription.getId());
+                        log.debug("Sending ReNew response for SynapseSubscription ID : " +
+                                subscription.getId());
                     }
-                    SOAPEnvelope soapEnvelope = messageBuilder.genRenewSubscriptionResponse(subscription);
+                    SOAPEnvelope soapEnvelope =
+                            messageBuilder.genRenewSubscriptionResponse(subscription);
                     RelatesTo relatesTo = new RelatesTo(subscription.getId());
-                    dispatchResponse(soapEnvelope, EventingConstants.WSE_RENEW_RESPONSE, relatesTo, mc, synCfg, synEnv);
+                    dispatchResponse(soapEnvelope, EventingConstants.WSE_RENEW_RESPONSE, relatesTo,
+                            mc, synCfg, synEnv);
                 } else {
                     // Send the Fault responce
                     if (log.isDebugEnabled()) {
                         log.debug("ReNew failed, sending fault response");
                     }
-                    SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,EventingConstants.WSE_FAULT_CODE_RECEIVER, "UnableToRenew", "Subscription Not Found", "");
-                    dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg, synEnv);
+                    SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+                            EventingConstants.WSE_FAULT_CODE_RECEIVER, "UnableToRenew",
+                            "Subscription Not Found", "");
+                    dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
+                            synEnv);
                 }
             } else {
-                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,SubscriptionMessageBuilder.getErrorCode(), SubscriptionMessageBuilder.getErrorSubCode(), SubscriptionMessageBuilder.getErrorReason(), "");
-                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg, synEnv);
+                SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+                        SubscriptionMessageBuilder.getErrorCode(),
+                        SubscriptionMessageBuilder.getErrorSubCode(),
+                        SubscriptionMessageBuilder.getErrorReason(), "");
+                dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
+                        synEnv);
             }
         } else {
             // Treat as an Event
@@ -238,7 +275,12 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @param synEnv         Synapse Enviornment
      * @throws AxisFault
      */
-    private void dispatchResponse(SOAPEnvelope soapEnvelope, String responseAction, RelatesTo relatesTo, MessageContext mc, SynapseConfiguration synCfg, SynapseEnvironment synEnv) throws AxisFault {
+    private void dispatchResponse(SOAPEnvelope soapEnvelope,
+                                  String responseAction,
+                                  RelatesTo relatesTo,
+                                  MessageContext mc,
+                                  SynapseConfiguration synCfg,
+                                  SynapseEnvironment synEnv) throws AxisFault {
         String replyAddress = mc.getOptions().getReplyTo().getAddress();
         AddressEndpoint endpoint = new AddressEndpoint();
         EndpointDefinition def = new EndpointDefinition();
@@ -248,7 +290,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         org.apache.synapse.MessageContext rmc = new Axis2MessageContext(mc, synCfg, synEnv);
         rmc.setEnvelope(soapEnvelope);
         rmc.setTo(new EndpointReference(replyAddress));
-        rmc.setWSAAction(responseAction);        //TODO wsa headers cannot see in the response message, it drops just before dispatching
+        rmc.setWSAAction(
+                responseAction);        //TODO wsa headers cannot see in the response message, it drops just before dispatching
         rmc.setSoapAction(responseAction);
         if (relatesTo != null) {
             rmc.setRelatesTo(new RelatesTo[]{relatesTo});

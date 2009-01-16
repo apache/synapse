@@ -23,7 +23,8 @@ package org.apache.synapse.eventing;
  *
  */
 public class SynapseEventingConstants {
-    public static final String TOPIC_FILTER_DIALECT = "http://synapse.apache.org/eventing/dialect/topicFilter";
+    public static final String TOPIC_FILTER_DIALECT =
+            "http://synapse.apache.org/eventing/dialect/topicFilter";
     public static final String FILTER_VALUE = "filter";
     public static final String FILTER_DIALECT = "dialect";
 }

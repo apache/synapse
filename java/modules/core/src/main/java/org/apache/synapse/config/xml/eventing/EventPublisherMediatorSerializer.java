@@ -21,18 +21,11 @@ package org.apache.synapse.config.xml.eventing;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.mediators.eventing.EventPublisherMediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.config.xml.SynapseXPathSerializer;
-
-import java.util.List;
+import org.apache.synapse.mediators.eventing.EventPublisherMediator;
 
 /**
  * Serializer for {@link org.apache.synapse.mediators.eventing.EventPublisherMediator} instances.
- *
- *
  */
 public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer {
 
@@ -47,11 +40,11 @@ public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer
 
         if (mediator.getEventSourceName() != null) {
             elmEventPublisher.addAttribute(fac.createOMAttribute(
-                "eventSourceName", nullNS, mediator.getEventSourceName()));
+                    "eventSourceName", nullNS, mediator.getEventSourceName()));
         } else {
             handleException("Invalid EventPublisher mediator. Event Source Name required");
         }
-        saveTracingState(elmEventPublisher,mediator);
+        saveTracingState(elmEventPublisher, mediator);
 
         if (parent != null) {
             parent.addChild(elmEventPublisher);

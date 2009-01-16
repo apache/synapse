@@ -24,25 +24,21 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.config.xml.SynapseXPathFactory;
-import org.apache.synapse.config.xml.MediatorPropertyFactory;
-import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.mediators.eventing.EventPublisherMediator;
-import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 
 /**
  * Factory for {@link org.apache.synapse.mediators.eventing.EventPublisherMediator} instances.
  * <sequence>
- *   <eventPublisher eventSourceName="name"/>
+ * <eventPublisher eventSourceName="name"/>
  * </sequence>
  */
 public class EventPublisherMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName TAG_NAME    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventPublisher");
-    private static final QName PROP_NAME   = new QName("eventSourceName");
+    private static final QName TAG_NAME =
+            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventPublisher");
+    private static final QName PROP_NAME = new QName("eventSourceName");
 
     public QName getTagQName() {
         return TAG_NAME;
@@ -54,7 +50,8 @@ public class EventPublisherMediatorFactory extends AbstractMediatorFactory {
         if (attEventSource != null) {
             eventPublisherMediator.setEventSourceName(attEventSource.getAttributeValue());
         } else {
-            handleException("The 'eventSourceName' attribute is required for the EventPublisher mediator");
+            handleException(
+                    "The 'eventSourceName' attribute is required for the EventPublisher mediator");
         }
         return eventPublisherMediator;
     }

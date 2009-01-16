@@ -84,12 +84,15 @@ public class ResponseMessageBuilder {
      */
     public SOAPEnvelope genSubscriptionResponse(SynapseSubscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
-        EndpointReference subscriptionManagerEPR = new EndpointReference(subscription.getSubManagerURI());
+        EndpointReference subscriptionManagerEPR =
+                new EndpointReference(subscription.getSubManagerURI());
         subscriptionManagerEPR.addReferenceParameter(new QName(EventingConstants.WSE_EVENTING_NS,
-                EventingConstants.WSE_EN_IDENTIFIER, EventingConstants.WSE_EVENTING_PREFIX), subscription.getId());
+                EventingConstants.WSE_EN_IDENTIFIER, EventingConstants.WSE_EVENTING_PREFIX),
+                subscription.getId());
         OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS,
                 EventingConstants.WSE_EVENTING_PREFIX);
-        OMElement subscribeResponseElement = factory.createOMElement(EventingConstants.WSE_EN_SUBSCRIBE_RESPONSE, eventingNamespace);
+        OMElement subscribeResponseElement = factory.createOMElement(
+                EventingConstants.WSE_EN_SUBSCRIBE_RESPONSE, eventingNamespace);
         try {
             OMElement subscriptionManagerElement = EndpointReferenceHelper.toOM(
                     subscribeResponseElement.getOMFactory(),
@@ -127,7 +130,8 @@ public class ResponseMessageBuilder {
      */
     public SOAPEnvelope genUnSubscribeResponse(SynapseSubscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
-        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EVENTING_PREFIX);
+        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS,
+                EventingConstants.WSE_EVENTING_PREFIX);
         OMElement dummyBody = factory.createOMElement("UnsubscribeResponse", eventingNamespace);
         message.getBody().addChild(dummyBody);
         return message;
@@ -160,10 +164,14 @@ public class ResponseMessageBuilder {
      */
     public SOAPEnvelope genRenewSubscriptionResponse(SynapseSubscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
-        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EVENTING_PREFIX);
-        OMElement renewResponseElement = factory.createOMElement(EventingConstants.WSE_EN_RENEW_RESPONSE, eventingNamespace);
-        OMElement expiresElement = factory.createOMElement(EventingConstants.WSE_EN_EXPIRES, eventingNamespace);
-        factory.createOMText(expiresElement, ConverterUtil.convertToString(subscription.getExpires()));
+        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS,
+                EventingConstants.WSE_EVENTING_PREFIX);
+        OMElement renewResponseElement =
+                factory.createOMElement(EventingConstants.WSE_EN_RENEW_RESPONSE, eventingNamespace);
+        OMElement expiresElement =
+                factory.createOMElement(EventingConstants.WSE_EN_EXPIRES, eventingNamespace);
+        factory.createOMText(expiresElement,
+                ConverterUtil.convertToString(subscription.getExpires()));
         renewResponseElement.addChild(expiresElement);
         message.getBody().addChild(renewResponseElement);
         return message;
@@ -196,11 +204,15 @@ public class ResponseMessageBuilder {
      */
     public SOAPEnvelope genGetStatusResponse(SynapseSubscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
-        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EVENTING_PREFIX);
-        OMElement renewResponseElement = factory.createOMElement(EventingConstants.WSE_EN_GET_STATUS_RESPONSE, eventingNamespace);
-        OMElement expiresElement = factory.createOMElement(EventingConstants.WSE_EN_EXPIRES, eventingNamespace);
+        OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS,
+                EventingConstants.WSE_EVENTING_PREFIX);
+        OMElement renewResponseElement = factory.createOMElement(
+                EventingConstants.WSE_EN_GET_STATUS_RESPONSE, eventingNamespace);
+        OMElement expiresElement =
+                factory.createOMElement(EventingConstants.WSE_EN_EXPIRES, eventingNamespace);
         if (subscription.getExpires() != null) {
-            factory.createOMText(expiresElement, ConverterUtil.convertToString(subscription.getExpires()));
+            factory.createOMText(expiresElement,
+                    ConverterUtil.convertToString(subscription.getExpires()));
         } else {
             factory.createOMText(expiresElement, "*");
         }
@@ -241,16 +253,21 @@ public class ResponseMessageBuilder {
      * @param detail
      * @return
      */
-    public SOAPEnvelope genFaultResponse(MessageContext messageCtx, String code, String subCode, String reason, String detail) {
-        SOAPFactory soapFactory = null;        
+    public SOAPEnvelope genFaultResponse(MessageContext messageCtx,
+                                         String code,
+                                         String subCode,
+                                         String reason,
+                                         String detail) {
+        SOAPFactory soapFactory = null;
         if (messageCtx.isSOAP11()) {
             soapFactory = OMAbstractFactory.getSOAP11Factory();
             SOAPEnvelope message = soapFactory.getDefaultFaultEnvelope();
             SOAPFaultReason soapFaultReason = soapFactory.createSOAPFaultReason();
             soapFaultReason.setText(reason);
             message.getBody().getFault().setReason(soapFaultReason);
-            SOAPFaultCode soapFaultCode = soapFactory.createSOAPFaultCode();            
-            QName qNameSubCode = new QName(EventingConstants.WSE_EVENTING_NS, subCode, EventingConstants.WSE_EVENTING_PREFIX);
+            SOAPFaultCode soapFaultCode = soapFactory.createSOAPFaultCode();
+            QName qNameSubCode = new QName(EventingConstants.WSE_EVENTING_NS, subCode,
+                    EventingConstants.WSE_EVENTING_PREFIX);
             soapFaultCode.setText(qNameSubCode);
             message.getBody().getFault().setCode(soapFaultCode);
             return message;
@@ -271,7 +288,8 @@ public class ResponseMessageBuilder {
             soapFaultCode.setValue(soapFaultValue);
             SOAPFaultSubCode soapFaultSubCode = soapFactory.createSOAPFaultSubCode(soapFaultCode);
             SOAPFaultValue soapFaultValueSub = soapFactory.createSOAPFaultValue(soapFaultSubCode);
-            QName qNameSubCode = new QName(EventingConstants.WSE_EVENTING_NS, subCode, EventingConstants.WSE_EVENTING_PREFIX);
+            QName qNameSubCode = new QName(EventingConstants.WSE_EVENTING_NS, subCode,
+                    EventingConstants.WSE_EVENTING_PREFIX);
             soapFaultValueSub.setText(qNameSubCode);
             soapFaultSubCode.setValue(soapFaultValueSub);
             soapFaultCode.setSubCode(soapFaultSubCode);

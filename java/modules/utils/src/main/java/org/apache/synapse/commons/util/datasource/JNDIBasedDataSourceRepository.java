@@ -31,9 +31,7 @@ import javax.naming.*;
 import javax.sql.DataSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Keep all DataSources in the JNDI Tree
@@ -47,6 +45,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
     private InitialContext initialContext;
     private Properties jndiProperties;
     private static final Map<String, InitialContext> perDataSourceICMap = new HashMap<String, InitialContext>();
+    private static final List<String> cachedNameList = new ArrayList<String>();
+    
     private boolean initialized = false;
 
     public static JNDIBasedDataSourceRepository getInstance() {
@@ -234,6 +234,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         } else {
             handleException("Unsupported data source type : " + dsType);
         }
+        cachedNameList.add(dataSourceName);
     }
 
     public void unRegister(String name) {
@@ -245,6 +246,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             handleException("Error removing a Datasource with name : " +
                     name + " from the JNDI context : " + initialContext, e);
         }
+        cachedNameList.remove(name);
     }
 
     /**
@@ -256,6 +258,12 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
         validateInitialized();
         validateDSName(dsName);
+        if (!cachedNameList.contains(dsName)) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no Datasource with name " + dsName + " in JNDI Datasource Repository");
+            }
+            return null;
+        }
         if (log.isDebugEnabled()) {
             log.debug("Getting a DataSource with name : " + dsName + " from the JNDI tree.");
         }
@@ -269,6 +277,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         initialContext = null;
         jndiProperties.clear();
         perDataSourceICMap.clear();
+        cachedNameList.clear();
     }
 
     private InitialContext getCachedInitialContext(String name) {

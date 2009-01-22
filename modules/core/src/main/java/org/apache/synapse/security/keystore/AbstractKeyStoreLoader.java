@@ -37,6 +37,7 @@ import java.security.cert.CertificateException;
  * Provides the base for loading KeyStores
  */
 public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
+    
     protected static Log log;
 
     protected AbstractKeyStoreLoader() {

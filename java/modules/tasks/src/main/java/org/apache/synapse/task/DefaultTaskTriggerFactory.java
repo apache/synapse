@@ -65,7 +65,7 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
                 cronTrigger.setCronExpression(cron);
                 trigger = cronTrigger;
             } catch (ParseException e) {
-                throw new SynapseTaskException("Error setting cron expression : " + cron, log);
+                throw new SynapseTaskException("Error setting cron expression : " + e.getMessage() + cron, log);
             }
         }
 

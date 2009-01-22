@@ -56,7 +56,7 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
     }
 
     /**
-     * Returns the private key based on initilization data
+     * Returns the private key based on initialization data
      *
      * @return PrivateKey if there is a one , otherwise null
      */
@@ -84,7 +84,7 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
     }
 
     /**
-     * Returns the secret key based on initilization data
+     * Returns the secret key based on initialization data
      *
      * @return SecretKey if there is a one , otherwise null
      */

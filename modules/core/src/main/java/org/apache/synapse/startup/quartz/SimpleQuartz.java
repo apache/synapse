@@ -144,8 +144,9 @@ public class SimpleQuartz extends AbstractStartup {
             }
 
         } catch (Exception e) {
-            log.fatal("Error starting up Scheduler", e);
-            throw new SynapseException("Error starting up Scheduler", e);
+            String msg = "Error starting up Scheduler : " + e.getMessage();
+            log.fatal(msg, e);
+            throw new SynapseException(msg, e);
         }
 
     }

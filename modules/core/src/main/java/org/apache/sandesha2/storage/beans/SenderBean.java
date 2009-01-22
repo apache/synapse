@@ -151,6 +151,30 @@ public class SenderBean extends RMBean {
 		this.setInternalSequenceID(internalSequenceID);
 		this.setMessageNumber(messageNumber);
 	}
+	
+	/**
+	 * Constructor that copies all SenderBean values from the SenderBean supplied
+	 * @param beanToCopy
+	 */	
+	public SenderBean(SenderBean beanToCopy)
+	{
+		this.messageID = beanToCopy.getMessageID();
+		this.messageContextRefKey = beanToCopy.getMessageContextRefKey();
+		this.internalSequenceID = beanToCopy.getInternalSequenceID();
+		this.sequenceID = beanToCopy.getSequenceID();
+		this.toAddress = beanToCopy.getToAddress();
+		this.inboundSequenceId = beanToCopy.getInboundSequenceId();
+		this.send = beanToCopy.isSend();
+		this.sentCount = beanToCopy.getSentCount();
+		this.messageNumber = beanToCopy.getMessageNumber();
+		this.reSend = beanToCopy.isReSend();
+		this.timeToSend = beanToCopy.getTimeToSend();
+		this.messageType = beanToCopy.getMessageType();
+		this.lastMessage = beanToCopy.isLastMessage();
+		this.inboundMessageNumber = beanToCopy.getInboundMessageNumber();
+		this.transportAvailable = beanToCopy.isTransportAvailable();
+		this.flags = beanToCopy.flags;
+	}
 
 	public String getMessageContextRefKey() {
 		return messageContextRefKey;

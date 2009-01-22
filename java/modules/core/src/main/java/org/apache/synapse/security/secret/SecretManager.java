@@ -25,7 +25,7 @@ public class SecretManager {
 
     private static Log log = LogFactory.getLog(SecretManager.class);
 
-    private final static SecretManager SECRET_MANAGER= new SecretManager();
+    private final static SecretManager SECRET_MANAGER = new SecretManager();
 
     /* Default configuration file path for secret manager*/
     private final static String DEFAULT_CONF_LOCATION = "secret-manager.properties";

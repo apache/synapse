@@ -32,6 +32,7 @@ import java.security.cert.Certificate;
  * Wraps the keyStore and provide abstraction need for ciphering in the synapse.
  */
 public abstract class KeyStoreWrapper {
+    
     protected Log log;
     /* Bean that encapsulates the information about KeyStore */
     private KeyStoreInformation keyStoreInformation;
@@ -140,7 +141,7 @@ public abstract class KeyStoreWrapper {
     }
 
     /**
-     * Returns the public key based on initilization data
+     * Returns the public key based on initialization data
      *
      * @return PublicKey if there is a one , otherwise null
      */

@@ -433,7 +433,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             providerUrl = MiscellaneousUtil.getProperty(
                     dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL, null);
             providerPort =
-                    MiscellaneousUtil.getProperty(dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
+                    MiscellaneousUtil.getProperty(dsProperties, rootPrefix +
+                            DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
                             String.valueOf(DataSourceConfigurationConstants.DEFAULT_PROVIDER_PORT));
 
         }

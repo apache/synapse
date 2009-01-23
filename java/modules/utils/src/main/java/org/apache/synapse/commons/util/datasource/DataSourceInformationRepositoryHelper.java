@@ -35,7 +35,8 @@ public class DataSourceInformationRepositoryHelper {
 
     private static final Log log = LogFactory.getLog(DataSourceInformationRepositoryHelper.class);
 
-    public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration, Properties properties) {
+    public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
+                                                                 Properties properties) {
 
         DataSourceInformationRepository repository = getDataSourceInformationRepository(axisConfiguration);
         DataSourceInformationRepositoryListener listener = null;
@@ -58,11 +59,14 @@ public class DataSourceInformationRepositoryHelper {
         }
     }
 
-    public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration, Properties properties, DataSourceInformationRepositoryListener listener) {
+    public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
+                                                                 Properties properties,
+                                                                 DataSourceInformationRepositoryListener listener) {
 
         DataSourceInformationRepository repository =
                 DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(properties, listener);
-        Parameter parameter = new Parameter(DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY, repository);
+        Parameter parameter = new Parameter(
+                DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY, repository);
         try {
             axisConfiguration.addParameter(parameter);
         } catch (AxisFault axisFault) {
@@ -71,9 +75,11 @@ public class DataSourceInformationRepositoryHelper {
         }
     }
 
-    public static DataSourceInformationRepository getDataSourceInformationRepository(AxisConfiguration axisConfiguration) {
+    public static DataSourceInformationRepository getDataSourceInformationRepository(
+            AxisConfiguration axisConfiguration) {
 
-        Parameter parameter = axisConfiguration.getParameter(DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY);
+        Parameter parameter = axisConfiguration.getParameter(
+                DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY);
         if (parameter != null) {
             Object result = parameter.getValue();
             if (!(result instanceof DataSourceInformationRepository)) {

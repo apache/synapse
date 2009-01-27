@@ -21,13 +21,14 @@ package org.apache.synapse.eventing;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -35,8 +36,6 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.SynapseMessageReceiver;
-import org.apache.synapse.endpoints.AddressEndpoint;
-import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.eventing.builders.ResponseMessageBuilder;
 import org.apache.synapse.eventing.builders.SubscriptionMessageBuilder;
 import org.apache.synapse.util.MessageHelper;
@@ -254,7 +253,6 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             }
             List<SynapseSubscription> subscribers = subscriptionManager.getMatchingSubscribers(smc);
             for (SynapseSubscription subscription : subscribers) {
-                //TODO: send a 202 responce to the client, client wait and time outs 
                 smc.setProperty("OUT_ONLY", "true");    // Set one way message for events
                 subscription.getEndpoint().send(MessageHelper.cloneMessageContext(smc));
                 if (log.isDebugEnabled()) {
@@ -281,22 +279,12 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                                   MessageContext mc,
                                   SynapseConfiguration synCfg,
                                   SynapseEnvironment synEnv) throws AxisFault {
-        String replyAddress = mc.getOptions().getReplyTo().getAddress();
-        AddressEndpoint endpoint = new AddressEndpoint();
-        EndpointDefinition def = new EndpointDefinition();
-        def.setAddress(replyAddress.trim());
-        def.setAddressingOn(true);
-        endpoint.setDefinition(def);
-        org.apache.synapse.MessageContext rmc = new Axis2MessageContext(mc, synCfg, synEnv);
+        MessageContext rmc = MessageContextBuilder.createOutMessageContext(mc);
+        rmc.getOperationContext().addMessageContext(rmc);
         rmc.setEnvelope(soapEnvelope);
-        rmc.setTo(new EndpointReference(replyAddress));
-        rmc.setWSAAction(
-                responseAction);        //TODO wsa headers cannot see in the response message, it drops just before dispatching
+        rmc.setWSAAction(responseAction);
         rmc.setSoapAction(responseAction);
-        if (relatesTo != null) {
-            rmc.setRelatesTo(new RelatesTo[]{relatesTo});
-        }
-        rmc.setResponse(true);
-        endpoint.send(rmc);
+        rmc.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+        AxisEngine.send(rmc);
     }
 }

@@ -22,6 +22,8 @@ package org.apache.synapse.experimental;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -45,10 +47,21 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.ListMediator;
 
 public class ProxyDeployer implements Deployer {
+    private final Map<String,String> filenameToProxyNameMap = new HashMap<String,String>();
     private ConfigurationContext cfgCtx = null;
 
     public void init(ConfigurationContext configurationContext) {
         this.cfgCtx = configurationContext;
+    }
+    
+    private SynapseConfiguration getSynapseConfiguration() throws DeploymentException {
+        Parameter synCfgParam =
+                cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
+        if (synCfgParam == null) {
+            throw new DeploymentException("SynapseConfiguration not found. " +
+            		"Are you sure that you are running Synapse?");
+        }
+        return (SynapseConfiguration)synCfgParam.getValue();
     }
     
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
@@ -70,11 +83,8 @@ public class ProxyDeployer implements Deployer {
             throw new DeploymentException("Error parsing " + filename + ": " + ex.getMessage(), ex);
         }
         AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
-        Parameter synCfgParam = axisCfg.getParameter(SynapseConstants.SYNAPSE_CONFIG);
-        if (synCfgParam == null) {
-            throw new DeploymentException("SynapseConfiguration not found. Are you sure that you are running Synapse?");
-        }
-        SynapseConfiguration synCfg = (SynapseConfiguration)synCfgParam.getValue();
+        SynapseConfiguration synCfg = getSynapseConfiguration();
+        filenameToProxyNameMap.put(filename, proxy.getName());
         // Copy from SynapseXMLConfigurationFactory#defineProxy
         synCfg.addProxyService(proxy.getName(), proxy);
         // Copy from SynapseInitializationModule#init (TODO: imcomplete: doesn't take pinnedServers into account)
@@ -111,12 +121,19 @@ public class ProxyDeployer implements Deployer {
         e.init(cc);
     }
 
-    public void setDirectory(String arg0) {
+    public void setDirectory(String directory) {
     }
 
-    public void setExtension(String arg0) {
+    public void setExtension(String extension) {
     }
 
-    public void unDeploy(String arg0) throws DeploymentException {
+    public void unDeploy(String fileName) throws DeploymentException {
+        String proxyName = filenameToProxyNameMap.get(fileName);
+        if (proxyName == null) {
+            throw new DeploymentException("Nothing known about file '" + fileName + "'");
+        } else {
+            getSynapseConfiguration().removeProxyService(proxyName);
+            filenameToProxyNameMap.remove(fileName);
+        }
     }
 }

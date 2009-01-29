@@ -402,7 +402,7 @@ public class SubscriptionMessageBuilder {
 
     private static void setExpirationFault(SynapseSubscription subscription) {
         setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);
-        setErrorSubCode("wse:InvalidExpirationTime");
+        setErrorSubCode("InvalidExpirationTime");
         setErrorReason("The expiration time requested is invalid");
         subscription.setId(null);
     }

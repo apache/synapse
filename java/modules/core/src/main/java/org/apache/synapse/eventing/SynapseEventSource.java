@@ -122,7 +122,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                     SOAPEnvelope soapEnvelope =
                             messageBuilder.genSubscriptionResponse(subscription);
                     dispatchResponse(soapEnvelope, EventingConstants.WSE_SUbSCRIBE_RESPONSE, null,
-                            mc, synCfg, synEnv);
+                            mc, synCfg, synEnv,false);
                 } else {
                     // Send the Fault responce
                     if (log.isDebugEnabled()) {
@@ -132,7 +132,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                             EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess",
                             "Unable to subscribe ", "");
                     dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
-                            synEnv);
+                            synEnv,true);
                 }
             } else {
                 // Send the Fault responce
@@ -144,7 +144,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                         SubscriptionMessageBuilder.getErrorSubCode(),
                         SubscriptionMessageBuilder.getErrorReason(), "");
                 dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
-                        synEnv);
+                        synEnv,true);
             }
 
         } else if (EventingConstants.WSE_UNSUBSCRIBE.equals(mc.getWSAAction())) {
@@ -164,7 +164,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 SOAPEnvelope soapEnvelope = messageBuilder.genUnSubscribeResponse(subscription);
                 RelatesTo relatesTo = new RelatesTo(subscription.getId());
                 dispatchResponse(soapEnvelope, EventingConstants.WSE_UNSUBSCRIBE_RESPONSE,
-                        relatesTo, mc, synCfg, synEnv);
+                        relatesTo, mc, synCfg, synEnv,false);
             } else {
                 // Send the Fault responce
                 if (log.isDebugEnabled()) {
@@ -174,7 +174,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                         EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess",
                         "Unable to Unsubscribe", "");
                 dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
-                        synEnv);
+                        synEnv,true);
             }
         } else if (EventingConstants.WSE_GET_STATUS.equals(mc.getWSAAction())) {
             // Get responce status
@@ -194,7 +194,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 SOAPEnvelope soapEnvelope = messageBuilder.genGetStatusResponse(subscription);
                 RelatesTo relatesTo = new RelatesTo(subscription.getId());
                 dispatchResponse(soapEnvelope, EventingConstants.WSE_GET_STATUS_RESPONSE, relatesTo,
-                        mc, synCfg, synEnv);
+                        mc, synCfg, synEnv,false);
             } else {
                 // Send the Fault responce
                 if (log.isDebugEnabled()) {
@@ -204,7 +204,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                         EventingConstants.WSE_FAULT_CODE_RECEIVER, "EventSourceUnableToProcess",
                         "Subscription Not Found", "");
                 dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
-                        synEnv);
+                        synEnv,true);
             }
         } else if (EventingConstants.WSE_RENEW.equals(mc.getWSAAction())) {
             // Renew subscription
@@ -226,7 +226,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                             messageBuilder.genRenewSubscriptionResponse(subscription);
                     RelatesTo relatesTo = new RelatesTo(subscription.getId());
                     dispatchResponse(soapEnvelope, EventingConstants.WSE_RENEW_RESPONSE, relatesTo,
-                            mc, synCfg, synEnv);
+                            mc, synCfg, synEnv,false);
                 } else {
                     // Send the Fault responce
                     if (log.isDebugEnabled()) {
@@ -236,7 +236,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                             EventingConstants.WSE_FAULT_CODE_RECEIVER, "UnableToRenew",
                             "Subscription Not Found", "");
                     dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
-                            synEnv);
+                            synEnv,true);
                 }
             } else {
                 SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
@@ -244,7 +244,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                         SubscriptionMessageBuilder.getErrorSubCode(),
                         SubscriptionMessageBuilder.getErrorReason(), "");
                 dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, null, mc, synCfg,
-                        synEnv);
+                        synEnv,true);
             }
         } else {
             // Treat as an Event
@@ -271,6 +271,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @param mc             Message Context
      * @param synCfg         Synapse Configuration
      * @param synEnv         Synapse Enviornment
+     * @param faultMessage   Fault message
      * @throws AxisFault
      */
     private void dispatchResponse(SOAPEnvelope soapEnvelope,
@@ -278,13 +279,18 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                                   RelatesTo relatesTo,
                                   MessageContext mc,
                                   SynapseConfiguration synCfg,
-                                  SynapseEnvironment synEnv) throws AxisFault {
+                                  SynapseEnvironment synEnv,
+                                  boolean faultMessage) throws AxisFault {
         MessageContext rmc = MessageContextBuilder.createOutMessageContext(mc);
         rmc.getOperationContext().addMessageContext(rmc);
         rmc.setEnvelope(soapEnvelope);
         rmc.setWSAAction(responseAction);
         rmc.setSoapAction(responseAction);
         rmc.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-        AxisEngine.send(rmc);
+        if(faultMessage){
+            AxisEngine.sendFault(rmc);
+        }else{
+            AxisEngine.send(rmc);
+        }
     }
 }

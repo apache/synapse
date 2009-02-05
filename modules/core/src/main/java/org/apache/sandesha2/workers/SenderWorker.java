@@ -68,7 +68,6 @@ import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
-import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class SenderWorker extends SandeshaWorker implements Runnable {
@@ -233,13 +232,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			transaction = storageManager.getTransaction();
 
-                        //if this is an sync WSRM 1.0 case we always have to add an ack
+			//if this is an sync WSRM 1.0 case we always have to add an ack
 			boolean ackPresent = false;
 			Iterator it = rmMsgCtx.getSequenceAcknowledgements();
 			if (it.hasNext()) 
 				ackPresent = true;
 			
-			if (!ackPresent && rmMsgCtx.getMessageContext().isServerSide() 
+			if (!ackPresent && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgCtx.getRMSpecVersion())
+					&& rmMsgCtx.getMessageContext().isServerSide() 
 					&&
 				(messageType==Sandesha2Constants.MessageTypes.APPLICATION ||
 			     messageType==Sandesha2Constants.MessageTypes.UNKNOWN ||
@@ -498,7 +498,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// stand-alone ack request, and in that case we only expect to find a single ack
 			// request header in the message.
 			Iterator<AckRequested> ackRequests = rmMsgContext.getAckRequests();
-			AckRequested ackRequest = (AckRequested) ackRequests.next(); 
+			AckRequested ackRequest = ackRequests.next(); 
 			if (ackRequests.hasNext()) {
 				throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
 			}

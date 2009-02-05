@@ -41,7 +41,8 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
         log = LogFactory.getLog(getClass());
     }
 
-    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords, int type, int userIDType) {
+    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords,
+                                                              int type, int userIDType) {
 
         Map<String, Map<String, Statistics>> statisticsMap = new HashMap<String, Map<String, Statistics>>();
 
@@ -148,7 +149,8 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
 
     }
 
-    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords, int type, int userIDType) {
+    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords,
+                                                 int type, int userIDType) {
 
         if (id == null || "".equals(id)) {
             handleException("Resource Id cannot be null");

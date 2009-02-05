@@ -243,7 +243,7 @@ public class FaultManager {
 				
 			if (invalidAck) {
 				makeInvalidAcknowledgementFault(ackRMMessageContext, sequenceAcknowledgement, 
-						acknowledgementRange, storageManager, piggybackedMessage, rmsBean.getAcksToEndpointReference());
+						acknowledgementRange, storageManager, piggybackedMessage, rmsBean.getToEndpointReference());
 				return true;
 			}
 		}		

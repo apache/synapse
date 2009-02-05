@@ -217,7 +217,7 @@ public class AcknowledgementProcessor {
 		if(ackNeedsToSendInvalidFault){
 			//try to send an invalid ack
 			FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, firstInvalidRange,
-					storageManager, piggybackedAck, null); //do not want to send the fault to acksTo in this case
+					storageManager, piggybackedAck, null); //do not want to send the fault to To EPR in this case
 			if (log.isDebugEnabled())
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack as message has not been sent");
 			return;

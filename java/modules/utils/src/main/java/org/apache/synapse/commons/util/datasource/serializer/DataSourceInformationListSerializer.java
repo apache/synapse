@@ -25,10 +25,16 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- *
+ * Serializes a list of DataSourceInformation into a properties
  */
 public class DataSourceInformationListSerializer {
 
+    /**
+     * Serializes a list of DataSourceInformation into a properties
+     *
+     * @param dataSourceInformationList A list of DataSourceInformation
+     * @return DataSource configuration properties
+     */
     public static Properties serialize(List<DataSourceInformation> dataSourceInformationList) {
         final Properties properties = new Properties();
         StringBuffer dataSources = new StringBuffer();

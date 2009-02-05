@@ -72,7 +72,7 @@ public class DataSourceInformationFactory {
             handleException(prefix + DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME + " cannot be found.");
         }
 
-        String url = MiscellaneousUtil.getProperty(properties, 
+        String url = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConfigurationConstants.PROP_URL, null);
         if (url == null) {
             handleException(prefix + DataSourceConfigurationConstants.PROP_URL + " cannot be found.");
@@ -249,7 +249,7 @@ public class DataSourceInformationFactory {
         information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
                 MiscellaneousUtil.getProperty(
                         properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT, null));
-        
+
         return information;
     }
 

@@ -21,13 +21,28 @@ package org.apache.synapse.commons.util.datasource;
 import java.util.Properties;
 
 /**
- *
+ * listen and handle events relating to changes in DataSourceInformationRepository
  */
 public interface DataSourceInformationRepositoryListener {
 
+    /**
+     * Event when adding a DataSourceInformation
+     *
+     * @param dataSourceInformation Added DataSourceInformation instance
+     */
     void addDataSourceInformation(DataSourceInformation dataSourceInformation);
 
+    /**
+     * Event when removing a  DataSourceInformation instance
+     *
+     * @param dataSourceInformation removed DataSourceInformation instance
+     */
     void removeDataSourceInformation(DataSourceInformation dataSourceInformation);
 
+    /**
+     * Event when re-configuring the DataSourceInformationRepository
+     *
+     * @param confProperties properties used to configure DataSourceInformationRepository
+     */
     void reConfigure(Properties confProperties);
 }

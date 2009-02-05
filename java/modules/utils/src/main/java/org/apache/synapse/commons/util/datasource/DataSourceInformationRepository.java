@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- *
+ * Keep and maintain DataSourceInformations
  */
 public class DataSourceInformationRepository {
 
@@ -39,12 +39,22 @@ public class DataSourceInformationRepository {
 
     private DataSourceInformationRepositoryListener listener;
 
+    /**
+     * Configuring DataSourceInformationRepository
+     *
+     * @param congurationProperties properties to be used for configure
+     */
     public void setConfigurationProperties(Properties congurationProperties) {
         if (listener != null) {
             listener.reConfigure(congurationProperties);
         }
     }
 
+    /**
+     * Adding a DataSourceInformation instance
+     *
+     * @param dataSourceInformation DataSourceInformation instance
+     */
     public void addDataSourceInformation(DataSourceInformation dataSourceInformation) {
 
         assertNull(dataSourceInformation, "DataSource information is null");
@@ -55,6 +65,12 @@ public class DataSourceInformationRepository {
         }
     }
 
+    /**
+     * Get a existing a DataSourceInformation instance by name
+     *
+     * @param name Name of the DataSourceInformation to be returned
+     * @return DataSourceInformation instance if the are any with given name, otherwise , returns null
+     */
     public DataSourceInformation getDataSourceInformation(String name) {
 
         assertNull(name, "Name of the datasource  information instance to be returned is null");
@@ -62,6 +78,12 @@ public class DataSourceInformationRepository {
         return dataSourceInformationMap.get(name);
     }
 
+    /**
+     * Removing a DataSourceInformation instance by name
+     *
+     * @param name Name of the DataSourceInformation to be removed
+     * @return removed DataSourceInformation instance
+     */
     public DataSourceInformation removeDataSourceInformation(String name) {
 
         assertNull(name, "Name of the datasource information instance to be removed is null");
@@ -76,11 +98,21 @@ public class DataSourceInformationRepository {
         return information;
     }
 
+    /**
+     * Returns all DataSourceInformations in the repository
+     *
+     * @return List of DataSourceInformations
+     */
     public Iterator<DataSourceInformation> getAllDataSourceInformation() {
 
         return dataSourceInformationMap.values().iterator();
     }
 
+    /**
+     * Sets a DataSourceInformationRepositoryListener
+     *
+     * @param listener DataSourceInformationRepositoryListener instance
+     */
     public void setRepositoryListener(DataSourceInformationRepositoryListener listener) {
 
         assertNull(listener, "Provided 'DataSourceInformationRepositoryListener' instance is null");
@@ -92,10 +124,18 @@ public class DataSourceInformationRepository {
         this.listener = listener;
     }
 
+    /**
+     * Remove existing DataSourceInformationRepositoryListener
+     */
     public void removeRepositoryListener() {
         this.listener = null;
     }
 
+    /**
+     * Gets existing DataSourceInformationRepositoryListener
+     *
+     * @return DataSourceInformationRepositoryListener that have been registered
+     */
     public DataSourceInformationRepositoryListener getRepositoryListener() {
         return this.listener;
     }

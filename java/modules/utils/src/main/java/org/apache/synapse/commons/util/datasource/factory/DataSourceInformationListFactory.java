@@ -29,12 +29,18 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- *
+ * Contains Factory method that use to create List of DataSourceInformations - a DataSourceInformation Collection
  */
 public class DataSourceInformationListFactory {
 
     private static final Log log = LogFactory.getLog(DataSourceInformationListFactory.class);
 
+    /**
+     * Factory method for creating a  a DataSourceInformation Collection
+     *
+     * @param dsProperties Datasource configuration properties
+     * @return A List of DataSourceInformations
+     */
     public static List<DataSourceInformation> createDataSourceInformationList(Properties dsProperties) {
 
         final List<DataSourceInformation> dataSourceInformations = new ArrayList<DataSourceInformation>();

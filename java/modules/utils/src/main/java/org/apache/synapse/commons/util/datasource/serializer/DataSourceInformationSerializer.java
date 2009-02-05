@@ -24,10 +24,16 @@ import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 import java.util.Properties;
 
 /**
- *
+ * Serialize  a  DataSourceInformation to a Properties
  */
 public class DataSourceInformationSerializer {
 
+    /**
+     * Serialize  a  DataSourceInformation to a Properties
+     *
+     * @param information DataSourceInformation instance
+     * @return DataSource configuration properties
+     */
     public static Properties serialize(DataSourceInformation information) {
 
         final Properties properties = new Properties();

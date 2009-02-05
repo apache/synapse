@@ -32,7 +32,7 @@ import java.util.Properties;
  *
  */
 public class DataSourceFinder {
-    
+
     private static Log log = LogFactory.getLog(DataSourceFinder.class);
 
     /**

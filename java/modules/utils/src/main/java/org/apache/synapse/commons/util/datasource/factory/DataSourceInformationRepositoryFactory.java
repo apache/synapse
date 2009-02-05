@@ -27,15 +27,29 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- *
+ * Contains Factory methods that use to create DataSourceInformationRepository
  */
 public class DataSourceInformationRepositoryFactory {
 
+    /**
+     * Factory method to create a DataSourceInformationRepository
+     * Use 'DataSourceRepositoryManager' as RepositoryListener
+     *
+     * @param properties DataSource properties
+     * @return DataSourceInformationRepository instance
+     */
     public static DataSourceInformationRepository createDataSourceInformationRepository(Properties properties) {
 
         return createDataSourceInformationRepository(properties, DataSourceRepositoryManager.getInstance());
     }
 
+    /**
+     * Factory method to create a DataSourceInformationRepository
+     *
+     * @param properties DataSource properties
+     * @param listener   DataSourceInformationRepositoryListener
+     * @return DataSourceInformationRepository instance
+     */
     public static DataSourceInformationRepository createDataSourceInformationRepository(
             Properties properties, DataSourceInformationRepositoryListener listener) {
 

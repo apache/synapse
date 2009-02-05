@@ -29,12 +29,18 @@ import org.apache.synapse.commons.util.datasource.factory.DataSourceInformationR
 import java.util.Properties;
 
 /**
- *
+ * Some help functions related with DataSourceInformationRepository
  */
 public class DataSourceInformationRepositoryHelper {
 
     private static final Log log = LogFactory.getLog(DataSourceInformationRepositoryHelper.class);
 
+    /**
+     * Initialize and register DataSourceInformationRepository with AxisConfiguration
+     *
+     * @param axisConfiguration AxisConfiguration instance
+     * @param properties        DataSources configuration properties
+     */
     public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
                                                                  Properties properties) {
 
@@ -46,6 +52,9 @@ public class DataSourceInformationRepositoryHelper {
         }
 
         if (listener == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a new DataSourceInformationRepositoryListener instance ");
+            }
             listener = DataSourceRepositoryManager.getInstance();
         }
 
@@ -55,10 +64,20 @@ public class DataSourceInformationRepositoryHelper {
         }
 
         if (repository == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Initiating a new DataSourceInformationRepository");
+            }
             initializeDataSourceInformationRepository(axisConfiguration, properties, listener);
         }
     }
 
+    /**
+     * Initialize and register DataSourceInformationRepository with AxisConfiguration
+     *
+     * @param axisConfiguration AxisConfiguration instance
+     * @param properties        DataSources configuration properties
+     * @param listener          DataSourceInformationRepositoryListener instance
+     */
     public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
                                                                  Properties properties,
                                                                  DataSourceInformationRepositoryListener listener) {
@@ -75,6 +94,12 @@ public class DataSourceInformationRepositoryHelper {
         }
     }
 
+    /**
+     * Gets DataSourceInformationRepository that is kept in  AxisConfiguration
+     *
+     * @param axisConfiguration AxisConfiguration instance
+     * @return DataSourceInformationRepository instance if there any , otherwise null
+     */
     public static DataSourceInformationRepository getDataSourceInformationRepository(
             AxisConfiguration axisConfiguration) {
 

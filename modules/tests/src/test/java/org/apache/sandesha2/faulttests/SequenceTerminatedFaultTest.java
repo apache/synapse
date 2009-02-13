@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.axiom.soap.SOAP12Constants;
@@ -307,6 +308,26 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	}
 
 	private void runSequenceTerminated(boolean deleteRMSBean, boolean soap12) throws Exception {
+		
+		// Check that the sequence has been deleted.
+		StorageManager storageManager = 
+			SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());
+		
+		Transaction tran = storageManager.getTransaction();
+		
+		RMDBean finderBean = new RMDBean();
+		finderBean.setTerminated(false);
+		List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
+		
+		Iterator beans = rmdBeans.iterator();
+		while (beans.hasNext())
+		{
+			RMDBean theBean = (RMDBean)beans.next();
+			storageManager.getRMDBeanMgr().delete(theBean.getSequenceID());			
+		}
+		
+		tran.commit();
+
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
@@ -337,15 +358,9 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		while(System.currentTimeMillis() < limit) {
 			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
 			
-			// Check that the sequence has been deleted.
-			StorageManager storageManager = 
-				SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());
+			tran = storageManager.getTransaction();
 			
-			Transaction tran = storageManager.getTransaction();
-			
-			RMDBean finderBean = new RMDBean();
-			finderBean.setTerminated(false);
-			List<RMDBean> rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
+			rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
 			
 			tran.commit();
 			
@@ -354,7 +369,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 			if (rmdBeans.isEmpty())
 				lastError = new Error("rmdBeans empty " + rmdBeans);
 			else {
-				RMDBean bean = (RMDBean)rmdBeans.get(0);
+				RMDBean bean = rmdBeans.get(0);
 				if (!bean.getServerCompletedMessages().getContainedElementsAsNumbersList().contains(new Integer(1))) {
 					tran = storageManager.getTransaction();
 					if (deleteRMSBean) {

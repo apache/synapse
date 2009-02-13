@@ -45,7 +45,7 @@ import javax.xml.namespace.QName;
 import java.util.List;
 
 /**
- *
+ *  Eventsource that accepts the event requests using a message reciver. 
  */
 public class SynapseEventSource extends SynapseMessageReceiver {
 

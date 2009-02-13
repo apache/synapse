@@ -232,13 +232,13 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			transaction = storageManager.getTransaction();
 
-			//if this is an sync WSRM 1.0 case we always have to add an ack
+			//if this is a sync RM exchange protocol we always have to add an ack
 			boolean ackPresent = false;
 			Iterator it = rmMsgCtx.getSequenceAcknowledgements();
 			if (it.hasNext()) 
 				ackPresent = true;
 			
-			if (!ackPresent && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgCtx.getRMSpecVersion())
+			if (!ackPresent && toEPR.hasAnonymousAddress()
 					&& rmMsgCtx.getMessageContext().isServerSide() 
 					&&
 				(messageType==Sandesha2Constants.MessageTypes.APPLICATION ||

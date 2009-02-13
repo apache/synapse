@@ -27,22 +27,65 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Subscription Manager for Synapse
+ */
 public abstract class SynapseSubscriptionManager implements SubscriptionManager {
 
     private Map<String, String> properties = new HashMap<String, String>();
 
+    /**
+     * Return all Active subscriptions
+     *
+     * @return List of subscriptions
+     */
     public abstract List<SynapseSubscription> getSynapseSubscribers();
 
+    /**
+     * Get the matching subscriptions for a given filter.
+     *
+     * @param mc Message context
+     * @return List of subscriptions
+     */
     public abstract List<SynapseSubscription> getMatchingSubscribers(MessageContext mc);
 
+    /**
+     * Get the static subscription defined in the configuration
+     *
+     * @return List of static subscriptions
+     */
     public abstract List<SynapseSubscription> getStaticSubscribers();
 
+    /**
+     * Get a subscription by subscription ID
+     *
+     * @param id subscription ID
+     * @return SynapseSubscription
+     */
     public abstract SynapseSubscription getSubscription(String id);
 
+    /**
+     * Add a new subscription to the store
+     *
+     * @param subs Subscription object
+     * @return String subscription ID
+     */
     public abstract String addSubscription(SynapseSubscription subs);
 
+    /**
+     * Delete a given subscription
+     *
+     * @param id Subscription ID
+     * @return True|False
+     */
     public abstract boolean deleteSubscription(String id);
 
+    /**
+     * Renew a given subscription
+     *
+     * @param subscription subscription object
+     * @return True|False
+     */
     public abstract boolean renewSubscription(SynapseSubscription subscription);
 
     public abstract void init();

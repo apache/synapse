@@ -25,7 +25,7 @@ import org.wso2.eventing.EventingConstants;
 import org.wso2.eventing.Subscription;
 
 /**
- *
+ * Bean that keep subscription and subscription metadata.
  */
 public class SynapseSubscription extends Subscription {
 

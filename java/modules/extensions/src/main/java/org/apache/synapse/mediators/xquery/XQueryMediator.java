@@ -305,7 +305,7 @@ public class XQueryMediator extends AbstractMediator {
                 }
 
                 //Bind the external variables to the DynamicContext
-                if (variables != null & !variables.isEmpty()) {
+                if (variables != null && !variables.isEmpty()) {
                     synLog.traceOrDebug("Binding  external variables to the DynamicContext");
                     for (int i = 0; i < variables.size(); i++) {
                         MediatorVariable variable = (MediatorVariable) variables.get(i);

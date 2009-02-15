@@ -114,7 +114,7 @@ public class DataSourceFactory {
             }
 
             String defaultCatalog = information.getDefaultCatalog();
-            if (defaultCatalog != null || !"".equals(defaultCatalog)) {
+            if (defaultCatalog != null && !"".equals(defaultCatalog)) {
                 basicDataSource.setDefaultCatalog(defaultCatalog);
             }
 

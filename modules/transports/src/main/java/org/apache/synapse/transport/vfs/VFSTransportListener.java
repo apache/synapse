@@ -356,10 +356,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                         Long.valueOf(content.getLastModifiedTime()));
             } catch (FileSystemException ignore) {}
 
-            // compute the unique message ID
-            String messageId = filePath + "_" + fileName +
-                "_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
-
             MessageContext msgContext = createMessageContext();
             
             String contentType = entry.getContentType();

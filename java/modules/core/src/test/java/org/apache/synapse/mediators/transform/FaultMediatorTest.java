@@ -20,6 +20,8 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
+
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.synapse.MessageContext;
@@ -57,5 +59,6 @@ public class FaultMediatorTest extends TestCase {
         assertTrue(F_STRING.equals(fault.getReason().getText()));
         assertTrue(F_ACTOR_URI.equals(fault.getRole().getRoleValue()));
         assertTrue(F_DETAIL.equals(fault.getDetail().getText()));
+        assertEquals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI, envelope.getNamespace().getNamespaceURI());
     }
 }

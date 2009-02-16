@@ -43,12 +43,12 @@ public class SALSessions {
 
     private String SESSION_IDS = "synapse.salep.sessionids.";
 
-    private static ConfigurationContext configCtx;
+    private ConfigurationContext configCtx;
 
     /* Is this env. support clustering*/
-    private static boolean isClustered = false;
+    private boolean isClustered = false;
 
-    private static boolean initialized = false;
+    private boolean initialized = false;
 
     /*Cache all path with its endpoint sequence. This is only need for a clustered environment */
     private final Map<List<String>, List<Endpoint>> namesToEndpointsMap =

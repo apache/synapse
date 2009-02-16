@@ -82,7 +82,7 @@ public class BinaryExtractMediator extends AbstractMediator {
     }
 
     public void setTraceState(int traceState) {
-        traceState = traceState;
+        this.traceState = traceState;
     }
 
     public int getTraceState() {

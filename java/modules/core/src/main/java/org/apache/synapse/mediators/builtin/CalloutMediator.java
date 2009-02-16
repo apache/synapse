@@ -62,8 +62,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     private String targetKey = null;
     private String clientRepository = null;
     private String axis2xml = null;
-    public static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
-    public static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
+    public final static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
+    public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
 
     public boolean mediate(MessageContext synCtx) {
 

@@ -75,16 +75,18 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         EventPublisherMediatorFactory.class               
     };
 
-    private static MediatorFactoryFinder instance = null;
+    private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
 
     /**
      * A map of mediator QNames to implementation class
      */
     private static Map<QName, Class> factoryMap = new HashMap<QName, Class>();
 
+    private static boolean initialized = false;
+
     public static synchronized MediatorFactoryFinder getInstance() {
-        if (instance == null) {
-            instance = new MediatorFactoryFinder();
+        if (!initialized) {
+            loadMediatorFactories();
         }
         return instance;
     }
@@ -92,15 +94,15 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
     /**
      * Force re initialization next time
      */
-    public synchronized void reset() {
+    public static synchronized void reset() {
         factoryMap.clear();
-        instance = null;
+        initialized = false;
     }
 
     private MediatorFactoryFinder() {
+    }
 
-        factoryMap = new HashMap<QName, Class>();
-
+    private static void loadMediatorFactories() {
         for (Class c : mediatorFactories) {
             try {
                 MediatorFactory fac = (MediatorFactory) c.newInstance();
@@ -111,6 +113,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         }
         // now iterate through the available pluggable mediator factories
         registerExtensions();
+        initialized = true;
     }
 
     /**
@@ -119,7 +122,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
      * This looks for JAR files containing a META-INF/services that adheres to the following
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
-    private void registerExtensions() {
+    private static void registerExtensions() {
 
         // register MediatorFactory extensions
         Iterator it = Service.providers(MediatorFactory.class);

@@ -33,7 +33,10 @@ import java.util.Random;
  * Default TriggerFactory ship with synapse utils
  */
 public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
+
     private static final Log log = LogFactory.getLog(DefaultTaskTriggerFactory.class);
+
+    private final static  Random RANDOM = new Random();
 
     /**
      * @see TaskTriggerFactory
@@ -80,7 +83,7 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
             trigger.setEndTime(endTime);
         }
         // give the trigger a random name
-        trigger.setName(name + "-trigger-" + String.valueOf((new Random()).nextLong()));
+        trigger.setName(name + "-trigger-" + String.valueOf(RANDOM.nextLong()));
         String group = taskDescription.getGroup();
         if (group != null && !"".equals(group)) {
             trigger.setGroup(group);

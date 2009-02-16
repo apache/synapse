@@ -97,10 +97,13 @@ public class FaultMediator extends AbstractMediator {
         switch (soapVersion) {
             case SOAP11:
                 makeSOAPFault(synCtx, SOAP11, synLog);
+                break;
             case SOAP12:
                 makeSOAPFault(synCtx, SOAP12, synLog);
+                break;
             case POX:
                 makePOXFault(synCtx, synLog);
+                break;
 
             default : {
                 // if this is a POX or REST message then make a POX fault

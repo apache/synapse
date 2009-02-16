@@ -55,44 +55,44 @@ public class CipherTool {
     private static Log log = LogFactory.getLog(CipherTool.class);
 
     /* The argument name for KeyStore location */
-    public static String KEY_STORE = "keystore";
+    public final static String KEY_STORE = "keystore";
     /* The KeyStore type*/
-    public static String STORE_TYPE = "storetype";
+    public final static String STORE_TYPE = "storetype";
     /* The argument name for password to access KeyStore*/
-    public static String STORE_PASS = "storepass";
+    public final static String STORE_PASS = "storepass";
     /* The argument name for password for access private key */
-    public static String KEY_PASS = "keypass";
+    public final static String KEY_PASS = "keypass";
     /* The alias to identify key owner */
-    public static String ALIAS = "alias";
+    public final static String ALIAS = "alias";
 
     /* If the key is from a file , then it's location*/
-    public static String KEY_FILE = "keyfile";
+    public final static String KEY_FILE = "keyfile";
 
     /* The algorithm for encrypting or decrypting */
-    public static String ALGORITHM = "algorithm";
+    public final static String ALGORITHM = "algorithm";
     /* The operation mode of cihper - encrypt or decrypt */
-    public static String OP_MODE = "opmode";
+    public final static String OP_MODE = "opmode";
     /* The cipher type - asymmetric , symmetric */
-    public static String CIPHER_TYPE = "ciphertype";
+    public final static String CIPHER_TYPE = "ciphertype";
 
     /* The cipher or plain text as an in-lined */
-    public static String SOURCE_IN_LINED = "source";
+    public final static String SOURCE_IN_LINED = "source";
     /* The the source from a file*/
-    public static String SOURCE_FILE = "sourcefile";
+    public final static String SOURCE_FILE = "sourcefile";
     /* If  the target has to be written to a file*/
-    public static String TARGET_FILE = "targetfile";
+    public final static String TARGET_FILE = "targetfile";
     /* If  the output of cipher operation need to be encode - only base64*/
-    public static String OUT_TYPE = "outtype";
+    public final static String OUT_TYPE = "outtype";
     /* If  the encode of the input type base64*/
-    public static String IN_TYPE = "intype";
+    public final static String IN_TYPE = "intype";
     /* Is this keyStore a trusted one */
-    public static String TRUSTED = "trusted";
+    public final static String TRUSTED = "trusted";
 
     /* Operation mode */
-    public static String ENCRYPT = "encrypt";
-    public static String DECRYPT = "decrypt";
+    public final static String ENCRYPT = "encrypt";
+    public final static String DECRYPT = "decrypt";
 
-    public static String BASE64 = "base64";
+    public final static String BASE64 = "base64";
 
     public static void main(String args[]) throws Exception {
 
@@ -106,8 +106,6 @@ public class CipherTool {
             // Loads the cipher relate information
             CipherInformation cipherInformation = getCipherInformation(cmd);
             //Key information must not contain any password
-            //Password for access KeyStore
-            String storePass = getArgument(cmd, STORE_PASS);
             //Password for access private key
             String keyPass = getArgument(cmd, KEY_PASS);
             // If Key need to be loaded from a file

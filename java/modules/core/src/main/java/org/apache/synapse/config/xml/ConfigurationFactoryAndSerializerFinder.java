@@ -52,18 +52,21 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
     };
 
 
-    private static ConfigurationFactoryAndSerializerFinder instance = null;
+    private final static ConfigurationFactoryAndSerializerFinder instance =
+            new ConfigurationFactoryAndSerializerFinder();
 
     /**
      * A map of mediator QNames to implementation class
      */
-    private static Map factoryMap = new HashMap();
+    private final static Map<QName,Class> factoryMap = new HashMap<QName,Class>();
 
-    private static Map serializerMap = new HashMap();
+    private final static Map<QName,Class> serializerMap = new HashMap<QName,Class>();
+
+    private static boolean initialized = false;
 
     public static synchronized ConfigurationFactoryAndSerializerFinder getInstance() {
-        if (instance == null) {
-            instance = new ConfigurationFactoryAndSerializerFinder();
+        if (!initialized) {
+            loadConfigurationFatoriesAndSerializers();
         }
         return instance;
     }
@@ -71,32 +74,13 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
     /**
      * Force re initialization next time
      */
-    public synchronized void reset() {
+    public static synchronized void reset() {
         factoryMap.clear();
-        instance = null;
+        serializerMap.clear();
+        initialized = false;
     }
 
     private ConfigurationFactoryAndSerializerFinder() {
-
-        factoryMap = new HashMap();
-
-        for (int i = 0; i < configurationFactories.length; i++) {
-            Class c = configurationFactories[i];
-            try {
-                ConfigurationFactory fac = (ConfigurationFactory) c.newInstance();
-                factoryMap.put(fac.getTagQName(), c);
-                serializerMap.put(fac.getTagQName(), fac.getSerializerClass());
-            } catch (Exception e) {
-                throw new SynapseException("Error instantiating " + c.getName(), e);
-            }
-        }
-        // now iterate through the available pluggable mediator factories
-        registerExtensions();
-    }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 
     private void handleException(String msg) {
@@ -104,13 +88,29 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
         throw new SynapseException(msg);
     }
 
+    private static void loadConfigurationFatoriesAndSerializers() {
+        for (Class c : configurationFactories) {
+            if (c != null) {
+                try {
+                    ConfigurationFactory fac = (ConfigurationFactory) c.newInstance();
+                    factoryMap.put(fac.getTagQName(), c);
+                    serializerMap.put(fac.getTagQName(), fac.getSerializerClass());
+                } catch (Exception e) {
+                    throw new SynapseException("Error instantiating " + c.getName(), e);
+                }
+            }
+        }
+        // now iterate through the available pluggable mediator factories
+        registerExtensions();
+        initialized = true;
+    }
     /**
      * Register pluggable mediator factories from the classpath
      * <p/>
      * This looks for JAR files containing a META-INF/services that adheres to the following
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
-    private void registerExtensions() {
+    private static void registerExtensions() {
 
         // register MediatorFactory extensions
         Iterator it = Service.providers(ConfigurationFactory.class);
@@ -136,7 +136,7 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
     public SynapseConfiguration getConfiguration(OMElement element) {
 
         String localName = element.getLocalName();
-        QName qName = null;
+        QName qName;
         if (element.getNamespace() != null) {
             qName = new QName(element.getNamespace().getNamespaceURI(), localName);
         } else {

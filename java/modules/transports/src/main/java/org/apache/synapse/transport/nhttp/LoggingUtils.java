@@ -29,7 +29,7 @@ import org.apache.http.nio.reactor.IOSession;
 
 public class LoggingUtils {
     
-    public static String HEADER_LOG_ID = "org.apache.synapse.transport.nhttp.headers"; 
+    public final static String HEADER_LOG_ID = "org.apache.synapse.transport.nhttp.headers"; 
 
     public static IOSession decorate(IOSession session, final String id) {
         Log log = LogFactory.getLog(session.getClass());

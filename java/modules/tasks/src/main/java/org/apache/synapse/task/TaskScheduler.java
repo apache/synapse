@@ -52,7 +52,7 @@ public class TaskScheduler {
     /**
      * Property look up key for get a quartz configuration
      */
-    public static String QUARTZ_CONF = "quartz.conf";
+    public final static String QUARTZ_CONF = "quartz.conf";
 
     /**
      * Name of the scheduler

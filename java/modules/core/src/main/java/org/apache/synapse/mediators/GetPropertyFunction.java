@@ -127,16 +127,16 @@ public class GetPropertyFunction implements Function {
      */
     public Object evaluate(Object scopeObject, Object keyObject, Object dateformat,Navigator navigator) {
 
-        boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
-        boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
-
         if (synCtx == null) {
-            if (traceOrDebugOn) {
-                traceOrDebug(traceOn, "Synapse message context has not been set for the " +
-                    "XPath extension function 'synapse:get-property(prop-name)'");
+            if (log.isDebugEnabled()) {
+                log.debug("Synapse message context has not been set for the " +
+                        "XPath extension function 'synapse:get-property(prop-name)'");
             }
             return null;
         }
+
+        boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
+        boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
 
         String scope = StringFunction.evaluate(scopeObject, navigator);
         String key = StringFunction.evaluate(keyObject, navigator);

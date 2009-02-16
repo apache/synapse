@@ -30,9 +30,9 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.clustering.context.Replicator;
+import org.apache.axis2.clustering.state.Replicator;
 import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.clustering.ClusteringAgent;
 import org.wso2.throttle.*;
 
 
@@ -120,9 +120,9 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
             //To ensure check for clustering environment only happens one time
             if ((throttle == null && !isResponse) || (isResponse
                 && concurrentAccessController == null)) {
-                ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
-                if (clusterManager != null &&
-                    clusterManager.getContextManager() != null) {
+                ClusteringAgent clusteringAgent = cc.getAxisConfiguration().getClusteringAgent();
+                if (clusteringAgent != null &&
+                    clusteringAgent.getStateManager() != null) {
                     isClusteringEnable = true;
                 }
             }

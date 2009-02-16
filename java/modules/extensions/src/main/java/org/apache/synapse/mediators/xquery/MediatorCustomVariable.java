@@ -75,7 +75,7 @@ public class MediatorCustomVariable extends MediatorVariable {
     public boolean evaluateValue(MessageContext synCtx) {
 
         if (this.regKey == null) {   // get the node from the current message payload
-            this.value = evaluate(synCtx.getEnvelope());
+            this.value = evaluate(synCtx);
             return true;
         } else {
             //Load the XML document from the registry

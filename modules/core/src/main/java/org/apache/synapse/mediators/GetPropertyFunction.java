@@ -72,6 +72,14 @@ public class GetPropertyFunction implements Function {
      */
     public Object call(Context context, List args) throws FunctionCallException {
 
+        if (synCtx == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Synapse message context has not been set for the " +
+                        "XPath extension function 'synapse:get-property(prop-name)'");
+            }
+            return null;
+        }
+        
         boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
 
@@ -126,14 +134,6 @@ public class GetPropertyFunction implements Function {
      * @return The String value of property using arg one as key and arg two as scope
      */
     public Object evaluate(Object scopeObject, Object keyObject, Object dateformat,Navigator navigator) {
-
-        if (synCtx == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Synapse message context has not been set for the " +
-                        "XPath extension function 'synapse:get-property(prop-name)'");
-            }
-            return null;
-        }
 
         boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();

@@ -26,17 +26,15 @@ import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.util.ElementHelper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.util.xpath.SourceXPathSupport;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
@@ -66,73 +64,37 @@ import java.util.List;
 
 public class XQueryMediator extends AbstractMediator {
 
-    /**
-     * Properties that must set to the XQDataSource
-     */
-    private List dataSourceProperties = new ArrayList();
+    /* Properties that must set to the XQDataSource  */
+    private final List<MediatorProperty> dataSourceProperties = new ArrayList<MediatorProperty>();
 
-    /**
-     * The key for lookup the xquery
-     */
+    /* The key for lookup the xquery */
     private String queryKey;
 
-    /**
-     * The source of the xquery
-     */
+    /* The source of the xquery */
     private String querySource;
 
-    /**
-     * The default xpath to get the first child of the SOAPBody
-     */
-//    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-//                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
-    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
-            "s12:Body/child::*[position()=1]";
+    /*The target node*/
+    private final SourceXPathSupport target = new SourceXPathSupport();
 
-    /**
-     * The (optional) XPath expression which yeilds the target element to attached the result
-     */
-    private AXIOMXPath target = null;
+    /* The list of variables for binding to the DyanamicContext in order to available for querying */
+    private final List<MediatorVariable> variables = new ArrayList<MediatorVariable>();
 
-    /**
-     * The list of variables for binding to the DyanamicContext in order to available for querying
-     */
-    private List variables = new ArrayList();
-
-    /**
-     * Lock used to ensure thread-safe lookup of the object from the registry
-     */
+    /*Lock used to ensure thread-safe lookup of the object from the registry */
     private final Object resourceLock = new Object();
 
-    /**
-     * Is it need to use DOMSource and DOMResult?
-     */
+    /* Is it need to use DOMSource and DOMResult? */
     private boolean useDOMSource = false;
 
-    /**
-     * The DataSource which use to create a connection to XML database
-     */
+    /*The DataSource which use to create a connection to XML database */
     private XQDataSource cachedXQDataSource = null;
 
-    /**
-     * connection with a specific XQuery engine.Connection will live as long as synapse live
-     */
+    /* connection with a specific XQuery engine.Connection will live as long as synapse live */
     private XQConnection cachedConnection = null;
 
-    /**
-     * An expression that use for multiple  executions.Expression will recreate if query has changed
-     */
+    /* An expression that use for multiple  executions.Expression will recreate if query has changed */
     private XQPreparedExpression cachedPreparedExpression = null;
 
     public XQueryMediator() {
-        // create the default XPath
-        try {
-            this.target = new AXIOMXPath(DEFAULT_XPATH);
-            this.target.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-            this.target.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-        } catch (JaxenException e) {
-            handleException("Error creating target XPath expression", e);
-        }
     }
 
     /**
@@ -172,8 +134,8 @@ public class XQueryMediator extends AbstractMediator {
     /**
      * Perform the quering and get the result and attached to the target node
      *
-     * @param synCtx         The current MessageContext
-     * @param synLog         the Synapse log to use
+     * @param synCtx The current MessageContext
+     * @param synLog the Synapse log to use
      */
     private void performQuery(MessageContext synCtx, SynapseLog synLog) {
 
@@ -182,7 +144,7 @@ public class XQueryMediator extends AbstractMediator {
         XQResultSequence resultSequence;
 
         if (queryKey != null && !"".equals(queryKey)) {
-           
+
             Entry dp = synCtx.getConfiguration().getEntryDefinition(queryKey);
             // if the queryKey refers to a dynamic resource
             if (dp != null && dp.isDynamic()) {
@@ -202,10 +164,10 @@ public class XQueryMediator extends AbstractMediator {
                     //setting up the properties to the XQDataSource
                     if (dataSourceProperties != null && !dataSourceProperties.isEmpty()) {
                         synLog.traceOrDebug("Setting up properties to the XQDataSource");
-                        for (int i = 0; i < dataSourceProperties.size(); i++) {
-                            MediatorProperty prop = (MediatorProperty) dataSourceProperties.get(i);
-                            if (prop != null) {
-                                cachedXQDataSource.setProperty(prop.getName(), prop.getValue());
+                        for (MediatorProperty dataSourceProperty : dataSourceProperties) {
+                            if (dataSourceProperty != null) {
+                                cachedXQDataSource.setProperty(dataSourceProperty.getName(),
+                                        dataSourceProperty.getValue());
                             }
                         }
                     }
@@ -307,13 +269,14 @@ public class XQueryMediator extends AbstractMediator {
                 //Bind the external variables to the DynamicContext
                 if (variables != null && !variables.isEmpty()) {
                     synLog.traceOrDebug("Binding  external variables to the DynamicContext");
-                    for (int i = 0; i < variables.size(); i++) {
-                        MediatorVariable variable = (MediatorVariable) variables.get(i);
-                        boolean hasValueChanged = variable.evaluateValue(synCtx);
-                        //if the value has changed or need binding because the expression has recreated
-                        if (hasValueChanged || needBind) {
-                            //Binds the external variable to the DynamicContext
-                            bindVariable(cachedPreparedExpression, variable, synLog);
+                    for (MediatorVariable variable : variables) {
+                        if (variable != null) {
+                            boolean hasValueChanged = variable.evaluateValue(synCtx);
+                            //if the value has changed or need binding because the expression has recreated
+                            if (hasValueChanged || needBind) {
+                                //Binds the external variable to the DynamicContext
+                                bindVariable(cachedPreparedExpression, variable, synLog);
+                            }
                         }
                     }
                 }
@@ -346,7 +309,7 @@ public class XQueryMediator extends AbstractMediator {
                 }
 
                 //The target node that is going to modify
-                OMNode destination = getTargetNode(synCtx);
+                OMNode destination = target.selectOMNode(synCtx, synLog);
                 if (destination != null) {
                     if (synLog.isTraceOrDebugEnabled()) {
                         synLog.traceOrDebug("The target node " + destination);
@@ -428,7 +391,7 @@ public class XQueryMediator extends AbstractMediator {
                         if (value instanceof String) {
                             booleanValue = Boolean.parseBoolean((String) value);
                         } else if (value instanceof Boolean) {
-                            booleanValue = ((Boolean) value).booleanValue();
+                            booleanValue = (Boolean) value;
                         } else {
                             handleException("Incompatible type for the Boolean");
                         }
@@ -445,7 +408,7 @@ public class XQueryMediator extends AbstractMediator {
                                         "for the Integer", e);
                             }
                         } else if (value instanceof Integer) {
-                            intValue = ((Integer) value).intValue();
+                            intValue = (Integer) value;
                         } else {
                             handleException("Incompatible type for the Integer");
                         }
@@ -463,7 +426,7 @@ public class XQueryMediator extends AbstractMediator {
                                 handleException("Incompatible value '" + value + "' for the Int", e);
                             }
                         } else if (value instanceof Integer) {
-                            intValue = ((Integer) value).intValue();
+                            intValue = (Integer) value;
                         } else {
                             handleException("Incompatible type for the Int");
                         }
@@ -482,7 +445,7 @@ public class XQueryMediator extends AbstractMediator {
                                         "for the long ", e);
                             }
                         } else if (value instanceof Long) {
-                            longValue = ((Long) value).longValue();
+                            longValue = (Long) value;
                         } else {
                             handleException("Incompatible type for the Long");
                         }
@@ -501,7 +464,7 @@ public class XQueryMediator extends AbstractMediator {
                                         "for the short ", e);
                             }
                         } else if (value instanceof Short) {
-                            shortValue = ((Short) value).shortValue();
+                            shortValue = (Short) value;
                         } else {
                             handleException("Incompatible type for the Short");
                         }
@@ -520,7 +483,7 @@ public class XQueryMediator extends AbstractMediator {
                                         "for the double ", e);
                             }
                         } else if (value instanceof Double) {
-                            doubleValue = ((Double) value).doubleValue();
+                            doubleValue = (Double) value;
                         } else {
                             handleException("Incompatible type for the Double");
                         }
@@ -539,7 +502,7 @@ public class XQueryMediator extends AbstractMediator {
                                         "for the float ", e);
                             }
                         } else if (value instanceof Float) {
-                            floatValue = ((Float) value).floatValue();
+                            floatValue = (Float) value;
                         } else {
                             handleException("Incompatible type for the Float");
                         }
@@ -558,7 +521,7 @@ public class XQueryMediator extends AbstractMediator {
                                         "for the byte ", e);
                             }
                         } else if (value instanceof Byte) {
-                            byteValue = ((Byte) value).byteValue();
+                            byteValue = (Byte) value;
                         } else {
                             handleException("Incompatible type for the Byte");
                         }
@@ -637,37 +600,6 @@ public class XQueryMediator extends AbstractMediator {
 
     }
 
-    /**
-     * Return the OMNode to be used for the attached the query result. If a target XPath is not specified,
-     * this will default to the first child of the SOAP body i.e. - //*:Envelope/*:Body/child::*
-     *
-     * @param synCtx the message context
-     * @return the OMNode against which the result should be attached
-     */
-    public OMNode getTargetNode(MessageContext synCtx) {
-        try {
-            Object o = target.evaluate(synCtx.getEnvelope());
-            if (o instanceof OMNode) {
-                return (OMNode) o;
-            } else if (o instanceof List && !((List) o).isEmpty()) {
-                Object nodeObject = ((List) o).get(0); // Always fetches *only* the first
-                if (nodeObject instanceof OMNode) {
-                    return (OMNode) nodeObject;
-                } else {
-                    handleException("The evaluation of the XPath expression "
-                            + target + " must target in an OMNode");
-                }
-            } else {
-                handleException("The evaluation of the XPath expression "
-                        + target + " must target in an OMNode");
-            }
-        } catch (JaxenException e) {
-            handleException("Error evaluating XPath " + target +
-                    " on message" + synCtx.getEnvelope());
-        }
-        return null;
-    }
-
     private void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
@@ -694,7 +626,7 @@ public class XQueryMediator extends AbstractMediator {
         this.querySource = querySource;
     }
 
-    public void addAllVariables(List list) {
+    public void addAllVariables(List<MediatorVariable> list) {
         this.variables.addAll(list);
     }
 
@@ -702,23 +634,23 @@ public class XQueryMediator extends AbstractMediator {
         this.variables.add(variable);
     }
 
-    public List getDataSourceProperties() {
+    public List<MediatorProperty> getDataSourceProperties() {
         return dataSourceProperties;
     }
 
-    public List getVariables() {
+    public List<MediatorVariable> getVariables() {
         return variables;
     }
 
-    public AXIOMXPath getTarget() {
-        return target;
+    public SynapseXPath getTarget() {
+        return target.getXPath();
     }
 
-    public void setTarget(AXIOMXPath target) {
-        this.target = target;
+    public void setTarget(SynapseXPath source) {
+        this.target.setXPath(source);
     }
 
-    public void addAllDataSoureProperties(List list) {
+    public void addAllDataSourceProperties(List<MediatorProperty> list) {
         this.dataSourceProperties.addAll(list);
     }
 

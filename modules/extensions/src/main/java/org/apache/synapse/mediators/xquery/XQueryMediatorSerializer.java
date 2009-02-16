@@ -20,15 +20,12 @@ package org.apache.synapse.mediators.xquery;
 
 import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.util.xpath.SourceXPathSupport;
 
 import javax.xml.namespace.QName;
 import java.util.List;
@@ -45,11 +42,6 @@ import java.util.List;
  */
 public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(XQueryMediatorSerializer.class);
-
-    private static final OMNamespace XQUERY_NS
-        = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "xquery");
-
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof XQueryMediator)) {
@@ -61,20 +53,18 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
         String key = queryMediator.getQueryKey();
         if (key != null) {
             xquery.addAttribute(fac.createOMAttribute(
-                "key", nullNS, key));
+                    "key", nullNS, key));
 
         }
 
         saveTracingState(xquery, queryMediator);
 
-        AXIOMXPath targetXPath = queryMediator.getTarget();
-        if (targetXPath != null && !XQueryMediator.DEFAULT_XPATH.equals(targetXPath.toString())) {
-
-            xquery.addAttribute(fac.createOMAttribute("target", nullNS, targetXPath.toString()));
-            serializeNamespaces(xquery, targetXPath);
+        SynapseXPath targetXPath = queryMediator.getTarget();
+        if (targetXPath != null && !SourceXPathSupport.DEFAULT_XPATH.equals(targetXPath.toString())) {
+            SynapseXPathSerializer.serializeXPath(targetXPath, xquery, "target");
         }
 
-        List pros = queryMediator.getDataSourceProperties();
+        List<MediatorProperty> pros = queryMediator.getDataSourceProperties();
         if (pros != null && !pros.isEmpty()) {
             OMElement dataSource = fac.createOMElement("dataSource", synNS);
             serializeProperties(dataSource, pros);
@@ -83,8 +73,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
 
         List list = queryMediator.getVariables();
         if (list != null && !list.isEmpty()) {
-            for (int i = 0; i < list.size(); i++) {
-                Object o = list.get(i);
+            for (Object o : list) {
                 if (o instanceof MediatorBaseVariable) {
                     MediatorBaseVariable variable = (MediatorBaseVariable) o;
                     QName name = variable.getName();
@@ -92,9 +81,9 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                     if (name != null && value != null) {
                         OMElement baseElement = fac.createOMElement("variable", synNS);
                         baseElement.addAttribute(fac.createOMAttribute(
-                            "name", nullNS, name.getLocalPart()));
+                                "name", nullNS, name.getLocalPart()));
                         baseElement.addAttribute(fac.createOMAttribute(
-                            "value", nullNS, (String) value));
+                                "value", nullNS, (String) value));
                         String type = null;
                         int varibelType = variable.getType();
                         if (XQItemType.XQBASETYPE_INT == varibelType) {
@@ -126,7 +115,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                         }
                         if (type != null) {
                             baseElement.addAttribute(fac.createOMAttribute(
-                                "type", nullNS, type));
+                                    "type", nullNS, type));
 
                         }
                         xquery.addChild(baseElement);
@@ -137,19 +126,15 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                     if (name != null) {
                         OMElement customElement = fac.createOMElement("variable", synNS);
                         customElement.addAttribute(fac.createOMAttribute(
-                            "name", nullNS, name.getLocalPart()));
+                                "name", nullNS, name.getLocalPart()));
                         String regkey = variable.getRegKey();
                         if (regkey != null) {
                             customElement.addAttribute(fac.createOMAttribute(
-                                "key", nullNS, regkey));
+                                    "key", nullNS, regkey));
                         }
-                        AXIOMXPath expression = variable.getExpression();
-                        if (expression != null &&
-                            !XQueryMediator.DEFAULT_XPATH.equals(expression.toString())) {
-
-                            customElement.addAttribute(fac.createOMAttribute(
-                                    "expression", nullNS, expression.toString()));
-                            serializeNamespaces(customElement, expression);
+                        SynapseXPath expression = variable.getExpression();
+                        if (expression != null && !SourceXPathSupport.DEFAULT_XPATH.equals(expression.toString())) {
+                            SynapseXPathSerializer.serializeXPath(expression, customElement, "expression");
                         }
                         String type = null;
                         int varibelType = variable.getType();
@@ -182,7 +167,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                         }
                         if (type != null) {
                             customElement.addAttribute(fac.createOMAttribute(
-                                "type", nullNS, type));
+                                    "type", nullNS, type));
 
                         }
                         xquery.addChild(customElement);

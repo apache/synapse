@@ -32,15 +32,15 @@ import org.jaxen.JaxenException;
  * without actually parsing or evaluating it.
  */
 public class SourceXPathSupport {
-    private static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
+    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
             "s12:Body/child::*[position()=1]";
-    
+
     private SynapseXPath xpath;
     private String xpathString;
 
     /**
      * Get the XPath expression.
-     * 
+     *
      * @return the XPath expression
      */
     public SynapseXPath getXPath() {
@@ -49,38 +49,37 @@ public class SourceXPathSupport {
 
     /**
      * Set the XPath expression.
-     * 
+     *
      * @param xpath the XPath expression
      */
     public void setXPath(SynapseXPath xpath) {
         this.xpath = xpath;
     }
-    
+
     /**
      * Set the string representation of the XPath expression.
      * Note that this information is not mandatory and only used for debugging
      * purposes. Setting the string representation explicitly may be useful to
      * make sure that debugging messages contain the XPath expression in the
      * exact form as specified by the user.
-     * 
+     *
      * @param xpathString a string representation of the XPath expression
      */
     public void setXPathString(String xpathString) {
         this.xpathString = xpathString;
     }
-    
+
     /**
      * Get the first node selected by the configured XPath expression.
      * If no XPath expression is set, the first child element of the SOAP body
      * is returned, i.e. in this case the method behaves as if the XPath expression is
      * <code>s11:Body/child::*[position()=1] | s12:Body/child::*[position()=1]</code>.
-     * 
+     *
      * @param synCtx the message context
      * @param synLog
      * @return the first node selected by the XPath expression
-     * @throws SynapseException
-     *            if the evaluation of the XPath expression failed or didn't result in an
-     *            {@link OMNode}
+     * @throws SynapseException if the evaluation of the XPath expression failed or didn't result in an
+     *                          {@link OMNode}
      */
     public OMNode selectOMNode(MessageContext synCtx, SynapseLog synLog) {
         if (xpath == null) {
@@ -96,7 +95,7 @@ public class SourceXPathSupport {
                 return (OMNode) result;
             } else {
                 throw new SynapseException("The evaluation of the XPath expression "
-                    + xpath + " did not result in an OMNode : " + result, synLog);
+                        + xpath + " did not result in an OMNode : " + result, synLog);
             }
         }
     }

@@ -19,17 +19,11 @@
 
 package org.apache.synapse.mediators.builtin;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.clustering.ClusterManager;
-
-import java.util.List;
 
 /**
  * SendMediator sends a message using specified semantics. If it contains an endpoint it will

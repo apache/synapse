@@ -41,6 +41,7 @@ import org.xml.sax.InputSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import javax.activation.DataHandler;
 import java.io.StringReader;
@@ -539,54 +540,15 @@ public class XQueryMediator extends AbstractMediator {
                         break;
                     }
                     case (XQItemType.XQITEMKIND_DOCUMENT): {
-                        if (value instanceof OMNode) {
-                            if (useDOMSource) {
-                                xqDynamicContext.
-                                        bindObject(name,
-                                                new DOMSource(((Element) ElementHelper.
-                                                        importOMElement((OMElement) value,
-                                                                DOOMAbstractFactory.getOMFactory())).
-                                                        getOwnerDocument()), null);
-                            } else {
-                                xqDynamicContext.bindDocument(name,
-                                        new InputSource(SynapseConfigUtils.getInputStream(
-                                                value)));
-                            }
-                        }
+                        bindOMNode(name, value, xqDynamicContext);
                         break;
                     }
                     case (XQItemType.XQITEMKIND_ELEMENT): {
-                        if (value instanceof OMNode) {
-                            if (useDOMSource) {
-                                xqDynamicContext.
-                                        bindObject(name,
-                                                new DOMSource(((Element) ElementHelper.
-                                                        importOMElement((OMElement) value,
-                                                                DOOMAbstractFactory.getOMFactory())).
-                                                        getOwnerDocument()), null);
-                            } else {
-                                xqDynamicContext.bindDocument(name,
-                                        new InputSource(
-                                                SynapseConfigUtils.getInputStream(value)));
-                            }
-                        }
+                        bindOMNode(name, value, xqDynamicContext);
                         break;
                     }
                     case (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT): {
-                        if (value instanceof OMNode) {
-                            if (useDOMSource) {
-                                xqDynamicContext.
-                                        bindObject(name,
-                                                new DOMSource(((Element) ElementHelper.
-                                                        importOMElement((OMElement) value,
-                                                                DOOMAbstractFactory.getOMFactory())).
-                                                        getOwnerDocument()), null);
-                            } else {
-                                xqDynamicContext.bindDocument(name,
-                                        new InputSource(SynapseConfigUtils.getInputStream(
-                                                value)));
-                            }
-                        }
+                        bindOMNode(name, value, xqDynamicContext);
                         break;
                     }
                     default: {
@@ -598,6 +560,43 @@ public class XQueryMediator extends AbstractMediator {
             }
         }
 
+    }
+
+    private void bindOMNode(QName name, Object value, XQDynamicContext xqDynamicContext) throws XQException {
+
+        OMElement varibleValue = null;
+        if (value instanceof String) {
+            varibleValue = createOMElement((String) value);
+        } else if (value instanceof OMElement) {
+            varibleValue = (OMElement) value;
+        }
+
+        if (varibleValue != null) {
+            if (useDOMSource) {
+                xqDynamicContext.
+                        bindObject(name,
+                                new DOMSource(((Element) ElementHelper.
+                                        importOMElement(varibleValue,
+                                                DOOMAbstractFactory.getOMFactory())).
+                                        getOwnerDocument()), null);
+            } else {
+                xqDynamicContext.bindDocument(name,
+                        new InputSource(SynapseConfigUtils.getInputStream(
+                                varibleValue)));
+            }
+        }
+    }
+
+    private OMElement createOMElement(String xml) {
+        try {
+            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                    new StringReader(xml));
+            StAXOMBuilder builder = new StAXOMBuilder(reader);
+            return builder.getDocumentElement();
+        } catch (XMLStreamException e) {
+            handleException("Malform XML : " + xml);
+        }
+        return null;
     }
 
     private void handleException(String msg, Exception e) {

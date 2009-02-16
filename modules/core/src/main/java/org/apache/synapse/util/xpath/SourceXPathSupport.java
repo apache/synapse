@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.jaxen.JaxenException;
 
 /**
@@ -93,6 +94,8 @@ public class SourceXPathSupport {
             }
             if (result instanceof OMNode) {
                 return (OMNode) result;
+            } else if (result instanceof String) {
+                return SynapseConfigUtils.stringToOM((String) result);
             } else {
                 throw new SynapseException("The evaluation of the XPath expression "
                         + xpath + " did not result in an OMNode : " + result, synLog);

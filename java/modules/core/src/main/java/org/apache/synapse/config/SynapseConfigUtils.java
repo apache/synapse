@@ -608,5 +608,19 @@ public class SynapseConfigUtils {
         }
         return null;
     }
+
+    public static OMElement stringToOM(String xml) {
+        try {
+            //TODO if there are any better way of converting string to OM , use it
+            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                    new StringReader(xml));
+            StAXOMBuilder builder = new StAXOMBuilder(reader);
+            return builder.getDocumentElement();
+        } catch (XMLStreamException e) {
+            handleException("Unable to convert a string to OM Node as the string " +
+                    "is malformed , String : " + xml);
+        }
+        return null;
+    }
 }
 

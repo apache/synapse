@@ -21,10 +21,10 @@ package org.apache.synapse.mediators.xquery;
 import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.config.xml.*;
 import org.jaxen.JaxenException;
 
@@ -47,7 +47,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(XQueryMediatorFactory.class);
 
     private static final QName TAG_NAME
-        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "xquery");
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "xquery");
     public static final QName ATT_NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
     public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
     public static final QName ATT_EXPR_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
@@ -72,11 +72,10 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
         }
         if (attrTarget != null) {
             String targetValue = attrTarget.getAttributeValue();
-            if (targetValue != null) {
+            if (targetValue != null && !"".equals(targetValue)) {
                 try {
-                    AXIOMXPath xpath = new AXIOMXPath(attrTarget.getAttributeValue());
-                    OMElementUtils.addNameSpaces(xpath, elem, log);
-                    xQueryMediator.setTarget(xpath);
+                    xQueryMediator.setQuerySource(targetValue);
+                    xQueryMediator.setTarget(SynapseXPathFactory.getSynapseXPath(elem, ATT_TARGET));
                 } catch (JaxenException e) {
                     handleException("Invalid XPath specified for the target attribute : " + targetValue);
                 }
@@ -86,10 +85,10 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
         // set its common attributes such as tracing etc
         processAuditStatus(xQueryMediator, elem);
         OMElement dataSource = elem.getFirstChildWithName(
-            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "dataSource"));
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "dataSource"));
         if (dataSource != null) {
-            xQueryMediator.addAllDataSoureProperties(
-                MediatorPropertyFactory.getMediatorProperties(dataSource));
+            xQueryMediator.addAllDataSourceProperties(
+                    MediatorPropertyFactory.getMediatorProperties(dataSource));
         }
 
         Iterator it = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "variable"));
@@ -103,25 +102,25 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                     MediatorVariable variable;
                     if (value != null && !"".equals(value)) {
                         variable = new MediatorBaseVariable(
-                            new QName(name.trim()));
+                                new QName(name.trim()));
                         variable.setValue(value.trim());
                     } else {
                         String key = variableOM.getAttributeValue(ATT_KEY_Q);
                         String expr = variableOM.getAttributeValue(ATT_EXPR_Q);
                         variable = new MediatorCustomVariable(
-                            new QName(name.trim()));
+                                new QName(name.trim()));
                         if (key != null) {
                             ((MediatorCustomVariable) variable).setRegKey(key.trim());
                         }
                         if (expr != null && !"".equals(expr)) {
                             try {
-                                AXIOMXPath xpath = new AXIOMXPath(expr);
+                                SynapseXPath xpath = new SynapseXPath(expr);
                                 OMElementUtils.addNameSpaces(xpath, variableOM, log);
                                 ((MediatorCustomVariable) variable).setExpression(xpath);
 
                             } catch (JaxenException e) {
                                 handleException("Invalid XPath specified for" +
-                                    " the expression attribute : " + expr);
+                                        " the expression attribute : " + expr);
                             }
                         }
                     }

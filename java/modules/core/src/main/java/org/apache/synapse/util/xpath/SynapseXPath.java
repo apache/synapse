@@ -20,6 +20,7 @@
 package org.apache.synapse.util.xpath;
 
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
@@ -111,7 +112,7 @@ public class SynapseXPath extends AXIOMXPath {
                 xPath = false;
                 String prefix = "rp" + count++;
                 nameSpaces.put(prefix, curSegment);
-                newXPath.append(prefix + ":");
+                newXPath.append(prefix).append(":");
             } else {
                 if (xPath) {
                     curSegment = s;
@@ -238,6 +239,11 @@ public class SynapseXPath extends AXIOMXPath {
                                    baseContextSupport.getNavigator());
             Context context = new Context(contextSupport);
             context.setNodeSet(new SingletonList(env));
+            return context;
+        } else if (obj instanceof OMNode) {
+            ContextSupport baseContextSupport = getContextSupport();
+            Context context = new Context(baseContextSupport);
+            context.setNodeSet(new SingletonList(obj));
             return context;
         } else {
             return super.getContext(obj);

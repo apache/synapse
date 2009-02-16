@@ -304,15 +304,15 @@ public final class SynapseConstants {
     public static final String TEMP_FILE_SUFIX = "synapse.tempfile.sufix";
 
     public static final String DOING_FAIL_OVER = "synapse.doing.failover";
-    
-    public static String SYNAPSE_STARTUP_TASK_SCHEDULER = "synapse.startup.taskscheduler";
-   
-    public static String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";
+
+    public static final String SYNAPSE_STARTUP_TASK_SCHEDULER = "synapse.startup.taskscheduler";
+
+    public static final String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";
 
     // host and ip synapse is running 
-    public static String SERVER_HOST = "SERVER_HOST";
+    public static final String SERVER_HOST = "SERVER_HOST";
 
-    public static String SERVER_IP = "SERVER_IP";
+    public static final String SERVER_IP = "SERVER_IP";
 
     // Known transport error codes
     public static final int RCV_IO_ERROR_SENDING     = 101000;

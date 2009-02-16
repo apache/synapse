@@ -277,18 +277,13 @@ public class SynapseConfigUtils {
             if (log.isDebugEnabled()) {
                 log.info("Content at URL : " + url + " is non XML..");
             }
-
-            Object content = readNonXML(url);
-            if (content instanceof OMNode) {
-                return (OMNode) content;
-            }
+            return readNonXML(url);
         } finally {
             try {
                 inStream.close();
             } catch (IOException ignore) {
             }
         }
-        return null;
     }
 
     public static InputSource getInputSourceFormURI(URI uri) {

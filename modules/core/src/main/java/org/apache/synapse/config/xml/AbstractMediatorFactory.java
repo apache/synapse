@@ -115,7 +115,7 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
             if (attName != null && attValue != null) {
                 String name = attName.getAttributeValue().trim();
                 String value = attValue.getAttributeValue().trim();
-                if (result.containsKey(attName)) {
+                if (result.containsKey(name)) {
                     handleException("Duplicate " + childElementName.getLocalPart()
                             + " with name " + name);
                 } else {

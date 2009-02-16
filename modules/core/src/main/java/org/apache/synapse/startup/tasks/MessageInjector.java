@@ -69,10 +69,10 @@ public class MessageInjector implements Task, ManagedLifecycle {
      */
     private SynapseEnvironment synapseEnvironment;
 
-    public static String SOAP11_FORMAT = "soap11";
-    public static String SOAP12_FORMAT = "soap12";
-    public static String POX_FORMAT = "pox";
-    public static String GET_FORMAT = "get";
+    public final static String SOAP11_FORMAT = "soap11";
+    public final static String SOAP12_FORMAT = "soap12";
+    public final static String POX_FORMAT = "pox";
+    public final static String GET_FORMAT = "get";
 
     /**
      * Initializes the Injector

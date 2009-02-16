@@ -39,7 +39,7 @@ public class StartupFinder {
     private static final Log log = LogFactory
             .getLog(ConfigurationFactoryAndSerializerFinder.class);
 
-    private static StartupFinder instance = null;
+    private final static StartupFinder instance = new StartupFinder();
 
     /**
      * A map of mediator QNames to implementation class
@@ -50,9 +50,11 @@ public class StartupFinder {
     private static Map<QName,Class<? extends StartupSerializer>> serializerMap
                         = new HashMap<QName,Class<? extends StartupSerializer>>();
 
+    private static boolean initialized = false;
+
     public static synchronized StartupFinder getInstance() {
-        if (instance == null) {
-            instance = new StartupFinder();
+        if (!initialized) {
+            loadStartups();
         }
         return instance;
     }
@@ -60,32 +62,36 @@ public class StartupFinder {
     /**
      * Force re initialization next time
      */
-    public synchronized void reset() {
+    public static synchronized void reset() {
         factoryMap.clear();
-        instance = null;
+        serializerMap.clear();
+        initialized = false;
     }
 
     private static final Class<?>[] builtins = {SimpleQuartzFactory.class};
 
     private StartupFinder() {
-        // preregister any built in
-        for (int i = 0; i < builtins.length; i++) {
-            Class<? extends StartupFactory> b = builtins[i].asSubclass(StartupFactory.class);
-            StartupFactory sf;
-            try {
-                sf = b.newInstance();
-            } catch (Exception e) {
-                throw new SynapseException("cannot instantiate " + b.getName(), e);
-
-            }
-            factoryMap.put(sf.getTagQName(), b);
-            serializerMap.put(sf.getTagQName(), sf.getSerializerClass());
-
-        }
-
-        registerExtensions();
     }
 
+    private static void loadStartups() {
+        // preregister any built in
+        for (Class<?> builtin : builtins) {
+            if (builtin != null) {
+                Class<? extends StartupFactory> b = builtin.asSubclass(StartupFactory.class);
+                StartupFactory sf;
+                try {
+                    sf = b.newInstance();
+                } catch (Exception e) {
+                    throw new SynapseException("cannot instantiate " + b.getName(), e);
+
+                }
+                factoryMap.put(sf.getTagQName(), b);
+                serializerMap.put(sf.getTagQName(), sf.getSerializerClass());
+            }
+        }
+        registerExtensions();
+        initialized = true;
+    }
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
@@ -98,7 +104,7 @@ public class StartupFinder {
      * the following
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
-    private void registerExtensions() {
+    private static void registerExtensions() {
 
         // log.debug("Registering mediator extensions found in the classpath : "
         // + System.getResource("java.class.path"));

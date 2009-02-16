@@ -566,7 +566,7 @@ public class XQueryMediator extends AbstractMediator {
 
         OMElement varibleValue = null;
         if (value instanceof String) {
-            varibleValue = createOMElement((String) value);
+            varibleValue = SynapseConfigUtils.stringToOM((String) value);
         } else if (value instanceof OMElement) {
             varibleValue = (OMElement) value;
         }
@@ -585,18 +585,6 @@ public class XQueryMediator extends AbstractMediator {
                                 varibleValue)));
             }
         }
-    }
-
-    private OMElement createOMElement(String xml) {
-        try {
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
-                    new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            return builder.getDocumentElement();
-        } catch (XMLStreamException e) {
-            handleException("Malform XML : " + xml);
-        }
-        return null;
     }
 
     private void handleException(String msg, Exception e) {

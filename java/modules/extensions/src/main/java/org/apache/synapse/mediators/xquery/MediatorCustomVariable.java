@@ -31,6 +31,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -46,34 +47,18 @@ public class MediatorCustomVariable extends MediatorVariable {
 
     private static final Log log = LogFactory.getLog(MediatorCustomVariable.class);
 
-    /**
-     * The XPath expression which yeilds the element from given XMLDocument
-     */
-    private AXIOMXPath expression;
-
-    /**
-     * The key to lookup the xml document from registry
-     */
+    /* The key to lookup the xml document from registry */
     private String regKey;
-
-    /**
-     * The default XPath which yeilds the first child of the SOAP Envelop
-     */
-//    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-//                                               "//s12:Envelope/s12:Body/child::*[position()=1]";
-    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
-        "s12:Body/child::*[position()=1]";
-
-    /**
-     * Lock used to ensure thread-safe lookup of the object from the registry
-     */
+    /* The XPath expression*/
+    private SynapseXPath expression;
+    /*Lock used to ensure thread-safe lookup of the object from the registry */
     private final Object resourceLock = new Object();
 
     public MediatorCustomVariable(QName name) {
         super(name);
         // create the default XPath
         try {
-            this.expression = new AXIOMXPath(DEFAULT_XPATH);
+            this.expression = new SynapseXPath(SourceXPathSupport.DEFAULT_XPATH);
             this.expression.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             this.expression.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
@@ -108,7 +93,7 @@ public class MediatorCustomVariable extends MediatorVariable {
                     hasValueChanged = true;
                     Object o = synCtx.getEntry(this.regKey);
                     if (o != null) {
-                        if (!DEFAULT_XPATH.equals(expression.toString())) {
+                        if (!SourceXPathSupport.DEFAULT_XPATH.equals(expression.toString())) {
                             this.value = evaluate(o);
                         } else {
                             this.value = o;
@@ -135,8 +120,8 @@ public class MediatorCustomVariable extends MediatorVariable {
             if (result instanceof OMNode) {
                 //if the type is not document-node(), then get the text value of the node
                 if (this.getType() != XQItemType.XQITEMKIND_DOCUMENT
-                    && this.getType() != XQItemType.XQITEMKIND_DOCUMENT_ELEMENT
-                    && this.getType() != XQItemType.XQITEMKIND_ELEMENT) {
+                        && this.getType() != XQItemType.XQITEMKIND_DOCUMENT_ELEMENT
+                        && this.getType() != XQItemType.XQITEMKIND_ELEMENT) {
 
                     int nodeType = ((OMNode) result).getType();
                     if (nodeType == OMNode.TEXT_NODE) {
@@ -165,7 +150,7 @@ public class MediatorCustomVariable extends MediatorVariable {
         throw new SynapseException(msg);
     }
 
-    public void setExpression(AXIOMXPath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 
@@ -177,7 +162,7 @@ public class MediatorCustomVariable extends MediatorVariable {
         return regKey;
     }
 
-    public AXIOMXPath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 }

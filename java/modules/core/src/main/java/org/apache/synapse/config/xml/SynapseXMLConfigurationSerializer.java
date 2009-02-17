@@ -36,9 +36,6 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
     private static final OMNamespace synNS = fac.createOMNamespace(
             XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
 
-    private static final OMNamespace nullNS = fac.createOMNamespace(
-            XMLConfigConstants.NULL_NAMESPACE, "");
-
     /**
      * Order of entries is irrelevant, however its nice to have some order.
      *
@@ -107,19 +104,21 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
     }
 
     private static void serializeEntries(OMElement definitions, Map entries) {
-        Iterator iter = entries.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            EntrySerializer.serializeEntry((Entry) entries.get(key),
-                    definitions);
+        for (Object o : entries.keySet()) {
+            if (o instanceof String) {
+                String key = (String) o;
+                EntrySerializer.serializeEntry((Entry) entries.get(key),
+                        definitions);
+            }
         }
     }
 
     private static void serializeStartups(OMElement definitions, Collection startups) {
-        Iterator it = startups.iterator();
-        while (it.hasNext()) {
-            Startup s = (Startup) it.next();
-            StartupFinder.getInstance().serializeStartup(definitions, s);
+        for (Object o : startups) {
+            if (o instanceof Startup) {
+                Startup s = (Startup) o;
+                StartupFinder.getInstance().serializeStartup(definitions, s);
+            }
         }
     }
 
@@ -130,12 +129,13 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
     }
 
     private static void serializeSequences(OMElement definitions, Map sequences) {
-        Iterator iter = sequences.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            Mediator mediator = (Mediator) sequences.get(key);
-            MediatorSerializerFinder.getInstance().getSerializer(mediator)
-                    .serializeMediator(definitions, mediator);
+        for (Object o : sequences.keySet()) {
+            if (o instanceof String) {
+                String key = (String) o;
+                Mediator mediator = (Mediator) sequences.get(key);
+                MediatorSerializerFinder.getInstance().getSerializer(mediator)
+                        .serializeMediator(definitions, mediator);
+            }
         }
     }
 

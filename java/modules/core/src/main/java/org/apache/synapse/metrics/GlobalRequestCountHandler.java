@@ -32,7 +32,7 @@ public class GlobalRequestCountHandler extends AbstractHandler {
 
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         msgContext
-                .setProperty(MetricsConstants.REQUEST_RECEIVED_TIME, new Long(System.currentTimeMillis()));
+                .setProperty(MetricsConstants.REQUEST_RECEIVED_TIME, System.currentTimeMillis());
         // global increment
         ((Counter) msgContext.getParameter(MetricsConstants.GLOBAL_REQUEST_COUNTER).getValue())
                 .increment();

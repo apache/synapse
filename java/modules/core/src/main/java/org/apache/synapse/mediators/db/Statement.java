@@ -34,9 +34,9 @@ import java.util.Map;
  */
 public class Statement {
 
-    String rawStatement = null;
-    List parameters = new ArrayList();
-    Map resultsMap = new HashMap();
+    private String rawStatement = null;
+    private final List<Parameter> parameters = new ArrayList<Parameter>();
+    private final Map<String, String> resultsMap = new HashMap<String, String>();
 
     public Statement(String rawStatement) {
         this.rawStatement = rawStatement;
@@ -54,11 +54,11 @@ public class Statement {
         resultsMap.put(propertyName, column);
     }
 
-    public List getParameters() {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 
-    public Map getResultsMap() {
+    public Map<String, String> getResultsMap() {
         return resultsMap;
     }
 

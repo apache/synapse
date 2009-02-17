@@ -161,8 +161,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
             }
         } else if (requestXPath != null) {
             try {
-                Object o = null;
-                o = requestXPath.evaluate(MessageHelper.cloneMessageContext(synCtx));
+                Object o = requestXPath.evaluate(MessageHelper.cloneMessageContext(synCtx));
 
                 if (o instanceof OMElement) {
                     return (OMElement) o;

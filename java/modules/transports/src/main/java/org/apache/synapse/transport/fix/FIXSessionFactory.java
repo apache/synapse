@@ -282,8 +282,9 @@ public class FIXSessionFactory {
 
         if (acceptor != null) {
             return FIXUtils.generateEPRs(acceptor, serviceName, ip);
-        } else
-            return null;
+        } else {
+            return new String[]{};
+        }
     }
 
     /**

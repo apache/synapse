@@ -28,11 +28,13 @@ import java.util.Map;
  */
 public class PerUserDomainViewStrategy extends PerUserViewStrategy {
 
-    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords, int type) {
+    public Map<String, Map<String, Statistics>> determineView(
+            List<StatisticsRecord> statisticsRecords, int type) {
         return determineView(statisticsRecords, type, DOMAIN);
     }
 
-    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords, int type) {
+    public Map<String, Statistics> determineView(
+            String id, List<StatisticsRecord> statisticsRecords, int type) {
         return determineView(id, statisticsRecords, type, DOMAIN);
     }
 }

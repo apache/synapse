@@ -35,7 +35,7 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
 
     protected final static int IP = 0;
     protected final static int DOMAIN = 1;
-    private static Log log;
+    private Log log;
 
     protected PerUserViewStrategy() {
         log = LogFactory.getLog(getClass());
@@ -226,7 +226,7 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
         return statisticsMap;
     }
 
-    private static void handleException(String msg) {
+    private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }

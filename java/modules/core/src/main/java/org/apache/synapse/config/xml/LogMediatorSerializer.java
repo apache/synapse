@@ -53,9 +53,9 @@ public class LogMediatorSerializer extends AbstractMediatorSerializer {
                 ));
         }
 
-        if (mediator.getSeparator() != LogMediator.DEFAULT_SEP) {
+        if (!LogMediator.DEFAULT_SEP.equals(mediator.getSeparator())) {
             log.addAttribute(fac.createOMAttribute(
-                "separator", nullNS, mediator.getSeparator()));
+                    "separator", nullNS, mediator.getSeparator()));
         }
 
         super.serializeProperties(log, mediator.getProperties());

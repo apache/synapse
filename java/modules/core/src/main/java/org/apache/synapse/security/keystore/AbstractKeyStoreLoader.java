@@ -38,7 +38,7 @@ import java.security.cert.CertificateException;
  */
 public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
     
-    protected static Log log;
+    protected Log log;
 
     protected AbstractKeyStoreLoader() {
         log = LogFactory.getLog(this.getClass());

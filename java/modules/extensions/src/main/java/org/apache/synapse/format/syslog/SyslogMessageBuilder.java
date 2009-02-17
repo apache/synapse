@@ -134,7 +134,7 @@ public class SyslogMessageBuilder implements Builder {
         if (pid != -1) {
             message.addAttribute(factory.createOMAttribute(SyslogConstants.PID, null, String.valueOf(pid)));
         }
-        message.setText(content.toString());
+        message.setText(content);
         
         return message;
     }

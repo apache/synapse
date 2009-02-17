@@ -36,15 +36,15 @@ public class MiscellaneousUtil {
     /**
      * Helper method to get the value of the property from a given property bag
      *
-     * @param dsProperties The property collection
+     * @param properties   The property collection
      * @param name         The name of the property
      * @param defaultValue The default value for the property
      * @return The value of the property if it is found , otherwise , default value
      */
-    public static String getProperty(Properties dsProperties, String name, String defaultValue) {
+    public static String getProperty(Properties properties, String name, String defaultValue) {
 
-        String result = dsProperties.getProperty(name);
-        if ((result == null || result.length() == 0 || "".equals(result)) && defaultValue != null) {
+        String result = properties.getProperty(name);
+        if ((result == null || result.length() == 0) && defaultValue != null) {
             if (log.isDebugEnabled()) {
                 log.debug("The name with ' " + name + " ' cannot be found. " +
                         "Using default value " + defaultValue);

@@ -79,7 +79,7 @@ public class DiscountQuoteMediator extends AbstractMediator {
     }
 
     public void setTraceState(int traceState) {
-        traceState = 0;
+        this.traceState = traceState;
     }
 
     public int getTraceState() {

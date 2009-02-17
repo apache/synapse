@@ -39,7 +39,7 @@ public class SampleAxis2ServerManager {
 
     private static SampleAxis2ServerManager ourInstance = new SampleAxis2ServerManager();
 
-    public static int DEFAULT_PORT = 9000;
+    public final static int DEFAULT_PORT = 9000;
 
     private ConfigurationContext configctx;
     

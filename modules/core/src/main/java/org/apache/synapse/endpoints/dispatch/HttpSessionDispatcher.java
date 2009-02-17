@@ -55,9 +55,9 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
      */
     public void updateSession(MessageContext synCtx) {
 
-        Object cookie = extractSessionID(synCtx, SET_COOKIE);
+        String cookie = extractSessionID(synCtx, SET_COOKIE);
 
-        if (cookie != null && cookie instanceof String) {
+        if (cookie != null) {
 
             // extract the first name value pair of the Set-Cookie header, which is considered
             // as the session id which will be sent back from the client with the Cookie header
@@ -70,7 +70,16 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
                 log.debug("Found the HTTP header 'Set-Cookie: "
                         + cookie + "' for updating the session");
             }
-            String sessionId = ((String) cookie).split(";")[0];
+
+            String[] sessionIds = cookie.split(";");
+            if (sessionIds == null || sessionIds.length == 0) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot find a session id for the cookie : " + cookie);
+                }
+                return;
+            }
+
+            String sessionId = sessionIds[0];
 
             if (log.isDebugEnabled()) {
                 log.debug("Using the session id '" + sessionId +

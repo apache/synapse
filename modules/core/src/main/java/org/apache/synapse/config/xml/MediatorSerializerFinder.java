@@ -62,18 +62,15 @@ public class MediatorSerializerFinder {
         EventPublisherMediatorSerializer.class            
     };
 
-    private static MediatorSerializerFinder instance = null;
+    private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
 
     /**
      * A map of mediator QNames to implementation class
      */
-    private static Map<String, MediatorSerializer> serializerMap
+    private final Map<String, MediatorSerializer> serializerMap
             = new HashMap<String, MediatorSerializer>();
 
     public static synchronized MediatorSerializerFinder getInstance() {
-        if (instance == null) {
-            instance = new MediatorSerializerFinder();
-        }
         return instance;
     }
 
@@ -82,9 +79,6 @@ public class MediatorSerializerFinder {
     }
 
     private MediatorSerializerFinder() {
-
-        serializerMap = new HashMap<String, MediatorSerializer>();
-
         for (Class c : mediatorSerializers) {
             try {
                 MediatorSerializer ser = (MediatorSerializer) c.newInstance();

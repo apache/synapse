@@ -36,7 +36,9 @@ public class SynapsePropertiesLoader {
     private SynapsePropertiesLoader() {
     }
 
-    private static Properties cacheProperties;
+    private final static Properties cacheProperties = new Properties();
+
+    private static boolean reload = true;
 
     /**
      * Loads the properties
@@ -46,14 +48,15 @@ public class SynapsePropertiesLoader {
      */
     public static Properties loadSynapseProperties() {
 
-        if (cacheProperties == null) {
+        if (reload) {
 
             if (log.isDebugEnabled()) {
                 log.debug("Loading synapse properties from a property file");
             }
 
-            cacheProperties = MiscellaneousUtil.loadProperties(
-                    SynapseConstants.SYNAPSE_PROPERTIES);
+            cacheProperties.putAll(MiscellaneousUtil.loadProperties(
+                    SynapseConstants.SYNAPSE_PROPERTIES));
+            reload = false;
 
         } else {
 
@@ -77,7 +80,8 @@ public class SynapsePropertiesLoader {
         if (log.isDebugEnabled()) {
             log.debug("Reloading synapse properties");
         }
-        cacheProperties = null;
+        reload = true;
+        cacheProperties.clear();
         return loadSynapseProperties();
     }
 }

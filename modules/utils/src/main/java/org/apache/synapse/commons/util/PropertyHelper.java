@@ -117,7 +117,7 @@ public class PropertyHelper {
      */
     public static void setStaticProperty(OMElement property, Object o) {
 
-        if (property.getLocalName().toLowerCase().equals("property")) {
+        if (("property".equals(property.getLocalName().toLowerCase()))) {
 
             String propertyName = property.getAttributeValue(new QName("name"));
             String mName = "set"

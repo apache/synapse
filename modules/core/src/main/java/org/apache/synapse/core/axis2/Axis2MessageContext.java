@@ -481,14 +481,5 @@ public class Axis2MessageContext implements MessageContext {
         }
 
         return sb.toString();
-    }
-
-    private void initAudit(MessageContext synCtx) {
-        
-        if (XMLConfigConstants.STATISTICS_ENABLE.equals(
-                synCtx.getConfiguration().getProperty(SynapseConstants.SYNAPSE_AUDIT_STATE))) {
-            synCtx.setProperty(SynapseConstants.SYNAPSE_AUDIT_CONFIGURATION,
-                    new AuditConfiguration(SynapseConstants.SYNAPSE_AUDIT, true));
-        }
-    }
+    }   
 }

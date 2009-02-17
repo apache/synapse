@@ -87,7 +87,6 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
         // if I have been explicitly asked to enable or disable tracing, set it to the message
         // to pass it on; else, do nothing -> i.e. let the parents state flow
         setEffectiveTraceState(synCtx);
-        int myEffectiveTraceState = synCtx.getTracingState();
 
         String sourceText = source.stringValueOf(synCtx);
         if (synLog.isTraceOrDebugEnabled()) {

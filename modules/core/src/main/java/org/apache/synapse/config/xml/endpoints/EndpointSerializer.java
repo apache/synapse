@@ -39,7 +39,7 @@ import org.apache.synapse.endpoints.EndpointDefinition;
  */
 public abstract class EndpointSerializer {
 
-    private static Log log;
+    private Log log;
 
     protected OMFactory fac;
 

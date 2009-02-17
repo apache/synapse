@@ -57,7 +57,7 @@ public class LogMediator extends AbstractMediator {
     /** The separator for which used to separate logging information */
     private String separator = DEFAULT_SEP;
     /** The holder for the custom properties */
-    private List properties = new ArrayList();
+    private final List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
 
     /**
      * Logs the current message according to the supplied semantics
@@ -107,20 +107,21 @@ public class LogMediator extends AbstractMediator {
     private String getSimpleLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         if (synCtx.getTo() != null)
-            sb.append("To: " + synCtx.getTo().getAddress());
+            sb.append("To: ").append(synCtx.getTo().getAddress());
         else
             sb.append("To: ");
         if (synCtx.getFrom() != null)
-            sb.append(separator + "From: " + synCtx.getFrom().getAddress());
+            sb.append(separator).append("From: ").append(synCtx.getFrom().getAddress());
         if (synCtx.getWSAAction() != null)
-            sb.append(separator + "WSAction: " + synCtx.getWSAAction());
+            sb.append(separator).append("WSAction: ").append(synCtx.getWSAAction());
         if (synCtx.getSoapAction() != null)
-            sb.append(separator + "SOAPAction: " + synCtx.getSoapAction());
+            sb.append(separator).append("SOAPAction: ").append(synCtx.getSoapAction());
         if (synCtx.getReplyTo() != null)
-            sb.append(separator + "ReplyTo: " + synCtx.getReplyTo().getAddress());
+            sb.append(separator).append("ReplyTo: ").append(synCtx.getReplyTo().getAddress());
         if (synCtx.getMessageID() != null)
-            sb.append(separator + "MessageID: " + synCtx.getMessageID());
-        sb.append(separator + "Direction: " + (synCtx.isResponse() ? "response" : "request"));
+            sb.append(separator).append("MessageID: ").append(synCtx.getMessageID());
+        sb.append(separator).append("Direction: ").append(
+                synCtx.isResponse() ? "response" : "request");
         setCustomProperties(sb, synCtx);
         return trimLeadingSeparator(sb);
     }
@@ -134,12 +135,12 @@ public class LogMediator extends AbstractMediator {
                     Object o = iter.next();
                     if (o instanceof SOAPHeaderBlock) {
                         SOAPHeaderBlock headerBlk = (SOAPHeaderBlock) o;
-                        sb.append(separator + headerBlk.getLocalName() + " : " +
-                                headerBlk.getText());
+                        sb.append(separator).append(headerBlk.getLocalName()).
+                                append(" : ").append(headerBlk.getText());
                     } else if (o instanceof OMElement) {
                         OMElement headerElem = (OMElement) o;
-                        sb.append(separator + headerElem.getLocalName() + " : " +
-                                headerElem.getText());
+                        sb.append(separator).append(headerElem.getLocalName()).
+                                append(" : ").append(headerElem.getText());
                     }
                 }
             }
@@ -152,17 +153,18 @@ public class LogMediator extends AbstractMediator {
         StringBuffer sb = new StringBuffer();
         sb.append(getSimpleLogMessage(synCtx));
         if (synCtx.getEnvelope() != null)
-            sb.append(separator + "Envelope: " + synCtx.getEnvelope());        
+            sb.append(separator).append("Envelope: ").append(synCtx.getEnvelope());
         return trimLeadingSeparator(sb);
     }
 
     private void setCustomProperties(StringBuffer sb, MessageContext synCtx) {
         if (properties != null && !properties.isEmpty()) {
-            for (Iterator iter = properties.iterator(); iter.hasNext();) {
-                MediatorProperty prop = (MediatorProperty) iter.next();
-                sb.append(separator + prop.getName() + " = " +
-                        (prop.getValue() != null ? prop.getValue() :
-                                prop.getEvaluatedExpression(synCtx)));
+            for (MediatorProperty property : properties) {
+                if(property != null){
+                sb.append(separator).append(property.getName()).append(" = ").append(property.getValue()
+                        != null ? property.getValue() :
+                        property.getEvaluatedExpression(synCtx));
+                }
             }
         }
     }
@@ -187,11 +189,11 @@ public class LogMediator extends AbstractMediator {
         properties.add(p);
     }
 
-    public void addAllProperties(List list) {
+    public void addAllProperties(List<MediatorProperty> list) {
         properties.addAll(list);
     }
 
-    public List getProperties() {
+    public List<MediatorProperty> getProperties() {
         return properties;
     }
 

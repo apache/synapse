@@ -302,7 +302,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             log.warn("Configuration uses deprecated style for endpoint 'suspendDurationOnFailure'");
             try {
                 definition.setInitialSuspendDuration(
-                    1000 * Integer.parseInt(suspendDurationOnFailure.getText().trim()));
+                        1000 * Long.parseLong(suspendDurationOnFailure.getText().trim()));
                 definition.setSuspendProgressionFactor((float) 1.0);
             } catch (NumberFormatException e) {
                 handleException("The initial suspend duration should be specified " +

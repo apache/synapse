@@ -274,11 +274,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                     handleException("Unable to find onAccept sequence with key : "
                         + onAcceptSeqKey, synCtx);
                 }
-            } else if (onAcceptMediator != null) {
-                return onAcceptMediator.mediate(synCtx);
-            } else {
-                return true;
-            }
+            } else return onAcceptMediator == null || onAcceptMediator.mediate(synCtx);
 
         } else {
             if (onRejectSeqKey != null) {
@@ -289,11 +285,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                     handleException("Unable to find onReject sequence with key : "
                         + onRejectSeqKey, synCtx);
                 }
-            } else if (onRejectMediator != null) {
-                return onRejectMediator.mediate(synCtx);
-            } else {
-                return false;
-            }
+            } else return onRejectMediator != null && onRejectMediator.mediate(synCtx);
         }
 
         synLog.traceOrDebug("End : Throttle mediator");

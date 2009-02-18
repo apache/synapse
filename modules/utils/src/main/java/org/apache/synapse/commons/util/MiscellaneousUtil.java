@@ -90,7 +90,7 @@ public class MiscellaneousUtil {
             if (result instanceof String) {
                 return result;
             } else {
-                handleException("Invalid type , expect String");
+                handleException("Invalid type , expected String");
             }
 
         } else if (Boolean.class.equals(type)) {
@@ -99,7 +99,7 @@ public class MiscellaneousUtil {
             } else if (result instanceof Boolean) {
                 return result;
             } else {
-                handleException("Invalid type , expect Boolean");
+                handleException("Invalid type , expected Boolean");
             }
 
         } else if (Integer.class.equals(type)) {
@@ -108,7 +108,7 @@ public class MiscellaneousUtil {
             } else if (result instanceof Integer) {
                 return result;
             } else {
-                handleException("Invalid type , expect Integer");
+                handleException("Invalid type , expected Integer");
             }
         } else if (Long.class.equals(type)) {
             if (result instanceof String) {
@@ -116,7 +116,7 @@ public class MiscellaneousUtil {
             } else if (result instanceof Long) {
                 return result;
             } else {
-                handleException("Invalid type , expect Long");
+                handleException("Invalid type , expected Long");
             }
         } else {
             return result;
@@ -192,14 +192,12 @@ public class MiscellaneousUtil {
             if (binOut != null) {
                 try {
                     binOut.close();
-                } catch (IOException ex) {
-                }
+                } catch (IOException ignored) {}
             }
             if (outputStream != null) {
                 try {
                     outputStream.close();
-                } catch (IOException ex) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         return result;

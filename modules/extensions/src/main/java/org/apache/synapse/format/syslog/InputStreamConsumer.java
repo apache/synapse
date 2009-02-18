@@ -111,7 +111,8 @@ public class InputStreamConsumer {
     public void expect(int expected) throws IOException, ProtocolException {
         int next = next();
         if (next != expected) {
-            throw new ProtocolException("Unexpected byte: expected " + expected + " ('" + (char)expected + "') , got " + next + " ('" + (char)next + "')");
+            throw new ProtocolException("Unexpected byte: expected " + expected +
+                    " ('" + (char) expected + "') , got " + next + " ('" + (char) next + "')");
         }
     }
     

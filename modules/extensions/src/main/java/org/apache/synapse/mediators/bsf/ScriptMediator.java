@@ -194,11 +194,8 @@ public class ScriptMediator extends AbstractMediator {
             } else {
                 returnObject = mediateForInlineScript(synCtx);
             }
-            if (returnObject != null && returnObject instanceof Boolean) {
-                returnValue = ((Boolean) returnObject).booleanValue();
-            } else {
-                returnValue = true;
-            }
+            returnValue = !(returnObject != null && returnObject instanceof Boolean)
+                    || (Boolean) returnObject;
 
         } catch (ScriptException e) {
             handleException("The script engine returned an error executing the " +

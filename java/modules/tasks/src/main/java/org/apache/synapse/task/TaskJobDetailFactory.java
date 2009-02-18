@@ -29,14 +29,17 @@ import java.util.Map;
 public interface TaskJobDetailFactory {
 
     /**
-     * Factory method for creating a JobDetail based on give Task Description , additional resources and job class
+     * Factory method for creating a JobDetail based on give Task Description ,
+     * additional resources and job class
      *
      * @param taskDescription TaskDescription instance
      * @param resources       Additional resources .
      *                        This can be used to provide context specific resources
      *                        Example : Synapse Environment
      * @param jobClass        Job class
-     * @return JobDetail instance , if there are enough information to create a instance , otherwise , return null
+     * @return JobDetail instance , if there are enough information to create a instance ,
+     *         otherwise , return null
      */
-    JobDetail createJobDetail(TaskDescription taskDescription, Map<String, Object> resources, Class<Job> jobClass);
+    JobDetail createJobDetail(TaskDescription taskDescription, Map<String,
+            Object> resources, Class<Job> jobClass);
 }

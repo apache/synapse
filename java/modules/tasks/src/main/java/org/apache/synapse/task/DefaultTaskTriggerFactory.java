@@ -36,7 +36,7 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
 
     private static final Log log = LogFactory.getLog(DefaultTaskTriggerFactory.class);
 
-    private final static  Random RANDOM = new Random();
+    private final static Random RANDOM = new Random();
 
     /**
      * @see TaskTriggerFactory
@@ -59,7 +59,8 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
             if (repeatCount >= 0) {
                 trigger = TriggerUtils.makeImmediateTrigger(repeatCount - 1, repeatInterval);
             } else {
-                trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY, repeatInterval);
+                trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY,
+                        repeatInterval);
             }
 
         } else {
@@ -68,12 +69,14 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
                 cronTrigger.setCronExpression(cron);
                 trigger = cronTrigger;
             } catch (ParseException e) {
-                throw new SynapseTaskException("Error setting cron expression : " + e.getMessage() + cron, log);
+                throw new SynapseTaskException("Error setting cron expression : " +
+                        e.getMessage() + cron, log);
             }
         }
 
         if (trigger == null) {
-            throw new SynapseTaskException("Trigger is null for the Task description : " + taskDescription, log);
+            throw new SynapseTaskException("Trigger is null for the Task description : " +
+                    taskDescription, log);
         }
 
         if (startTime != null) {

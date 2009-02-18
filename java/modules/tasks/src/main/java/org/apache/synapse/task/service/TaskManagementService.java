@@ -70,7 +70,8 @@ public interface TaskManagementService {
      * Explicit check for availability of a particular TaskDescription instance
      *
      * @param name Name of the TaskDescription instance
-     * @return Returns true if there is a TaskDescription instance with given name , otherwise , false
+     * @return Returns true if there is a TaskDescription instance with given name ,
+     *         otherwise , false
      */
     boolean isContains(String name);
 

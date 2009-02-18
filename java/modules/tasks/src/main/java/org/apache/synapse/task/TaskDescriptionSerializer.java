@@ -38,7 +38,8 @@ public class TaskDescriptionSerializer {
     private static final String NULL_NAMESPACE = "";
     private static final OMNamespace NULL_OMNS = omFactory.createOMNamespace(NULL_NAMESPACE, "");
 
-    public static OMElement serializeTaskDescription(OMNamespace targetNamespace, TaskDescription taskDescription) {
+    public static OMElement serializeTaskDescription(OMNamespace targetNamespace,
+                                                     TaskDescription taskDescription) {
 
         if (taskDescription == null) {
             throw new SynapseTaskException("TaskDescription can not be null", log);
@@ -58,7 +59,8 @@ public class TaskDescriptionSerializer {
             for (int i = 1; i < pinnedServers.size(); i++) {
                 pinnedServersStr = pinnedServersStr + " " + pinnedServers.get(i);
             }
-            task.addAttribute(omFactory.createOMAttribute("pinnedServers", NULL_OMNS, pinnedServersStr));
+            task.addAttribute(omFactory.createOMAttribute("pinnedServers",
+                    NULL_OMNS, pinnedServersStr));
         }
 
         OMElement el = omFactory.createOMElement("trigger", targetNamespace, task);

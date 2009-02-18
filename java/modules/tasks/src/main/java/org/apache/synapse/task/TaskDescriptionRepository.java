@@ -31,7 +31,8 @@ import java.util.Map;
 public class TaskDescriptionRepository {
 
     private static final Log log = LogFactory.getLog(TaskDescriptionRepository.class);
-    private final Map<String, TaskDescription> taskDescriptionMap = new HashMap<String, TaskDescription>();
+    private final Map<String, TaskDescription> taskDescriptionMap
+            = new HashMap<String, TaskDescription>();
 
     /**
      * Stores a given TaskDescription
@@ -64,7 +65,8 @@ public class TaskDescriptionRepository {
         TaskDescription taskDescription = taskDescriptionMap.get(name);
         if (taskDescription == null) {
             if (log.isDebugEnabled()) {
-                log.debug("TaskDescription cannot be found for name :" + name + " , returning null");
+                log.debug("TaskDescription cannot be found for name :" + name +
+                        " , returning null");
             }
         } else {
             if (log.isDebugEnabled()) {
@@ -112,7 +114,8 @@ public class TaskDescriptionRepository {
      * Explicit check for determine whether there is a task description with a name in interest
      *
      * @param name Name of the TaskDescription
-     * @return Returns true , if there is no TaskDescription associated with given name , otherwise , false
+     * @return Returns true , if there is no TaskDescription associated with given name ,
+     *         otherwise , false
      */
     public boolean isUnique(String name) {
         validateName(name);
@@ -122,7 +125,7 @@ public class TaskDescriptionRepository {
     public void clear() {
         this.taskDescriptionMap.clear();
     }
-    
+
     private void validateName(String name) {
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task name is null or empty", log);

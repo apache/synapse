@@ -47,7 +47,8 @@ public class DataSourceInformationListSerializer {
                 properties.putAll(DataSourceInformationSerializer.serialize(information));
             }
         }
-        properties.put(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES, dataSources.toString());
+        properties.put(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES,
+                dataSources.toString());
         return properties;
     }
 }

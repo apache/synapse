@@ -43,6 +43,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.registry.Registry;
+import org.apache.axiom.om.OMNode;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -198,34 +199,51 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *            the key being referenced
 	 * @return the sequence referenced by the key
 	 */
-	public Mediator getSequence(String key) {
-        Object o = getEntry(key);
-		if (o != null && o instanceof Mediator) {
-			return (Mediator) o;
-		}
+    public Mediator getSequence(String key) {
 
-        Entry entry;
-        if (o != null && o instanceof Entry) {
-            entry = (Entry) o;
-            if (entry.getMapper() == null) {
-                entry.setMapper(MediatorFactoryFinder.getInstance());
-            }
-        } else {
+        Object o = getEntry(key);
+        if (o instanceof Mediator) {
+            return (Mediator) o;
+        }
+
+        Entry entry = null;
+        if (o == null) {
             entry = new Entry(key);
             entry.setType(Entry.REMOTE_ENTRY);
+        } else {
+            Object object = localRegistry.get(key);
+            if (object instanceof Entry) {
+                entry = (Entry) object;
+            }
+        }
+
+        assertEnrtyNull(entry, key);
+
+        if (entry.getMapper() == null) {
             entry.setMapper(MediatorFactoryFinder.getInstance());
         }
 
-        if (registry != null) {
-			o = registry.getResource(entry);
-			if (o != null && o instanceof Mediator) {
-				localRegistry.put(key, entry);
-				return (Mediator) o;
-			}
-		}
+        if (entry.getType() == Entry.REMOTE_ENTRY) {
+            if (registry != null) {
+                o = registry.getResource(entry);
+                if (o != null && o instanceof Mediator) {
+                    localRegistry.put(key, entry);
+                    return (Mediator) o;
+                }
+            }
+        } else {
+            Object value = entry.getValue();
+            if (value instanceof OMNode) {
+                Object object = entry.getMapper().getObjectFromOMNode((OMNode) value);
+                if (object instanceof Mediator) {
+                    entry.setValue(object);
+                    return (Mediator) object;
+                }
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 	/**
 	 * Removes a sequence from the local registry
@@ -480,35 +498,50 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 *            the key of the endpoint
 	 * @return the endpoint definition
 	 */
-	public Endpoint getEndpoint(String key) {
+    public Endpoint getEndpoint(String key) {
 
         Object o = getEntry(key);
-		if (o != null && o instanceof Endpoint) {
-			return (Endpoint) o;
-		}
+        if (o != null && o instanceof Endpoint) {
+            return (Endpoint) o;
+        }
 
-        Entry entry;
-        if (o != null && o instanceof Entry) {
-            entry = (Entry) o;
-            if (entry.getMapper() == null) {
-                entry.setMapper(XMLToEndpointMapper.getInstance());
-            }
-        } else {
+        Entry entry = null;
+        if (o == null) {
             entry = new Entry(key);
             entry.setType(Entry.REMOTE_ENTRY);
+        } else {
+            Object object = localRegistry.get(key);
+            if (object instanceof Entry) {
+                entry = (Entry) object;
+            }
+        }
+
+        assertEnrtyNull(entry, key);
+
+        if (entry.getMapper() == null) {
             entry.setMapper(XMLToEndpointMapper.getInstance());
         }
 
-        if (registry != null) {
-			o = registry.getResource(entry);
-			if (o != null && o instanceof Endpoint) {
-				localRegistry.put(key, entry);
-				return (Endpoint) o;
-			}
-		}
-
-		return null;
-	}
+        if (entry.getType() == Entry.REMOTE_ENTRY) {
+            if (registry != null) {
+                o = registry.getResource(entry);
+                if (o != null && o instanceof Endpoint) {
+                    localRegistry.put(key, entry);
+                    return (Endpoint) o;
+                }
+            }
+        } else {
+            Object value = entry.getValue();
+            if (value instanceof OMNode) {
+                Object object = entry.getMapper().getObjectFromOMNode((OMNode) value);
+                if (object instanceof Endpoint) {
+                    entry.setValue(object);
+                    return (Endpoint) object;
+                }
+            }
+        }
+        return null;
+    }
 
 	/**
 	 * Deletes the endpoint with the given key
@@ -985,6 +1018,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
         if (localRegistry.containsKey(key.trim())) {
             handleException("Duplicate " + type + " definition for key : " + key);
+        }
+    }
+
+    private void assertEnrtyNull(Entry entry, String key) {
+        if (entry == null) {
+            handleException("Cannot locate an either local or remote enrty for key : " + key);
         }
     }
 }

@@ -56,7 +56,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public boolean getBoolean(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Boolean) {
-			return ((Boolean) o).booleanValue();
+			return (Boolean) o;
 		} else {
 			throw new RuntimeException("getBoolean(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Boolean");
@@ -66,7 +66,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public byte getByte(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Byte) {
-			return ((Byte) o).byteValue();
+			return (Byte) o;
 		} else {
 			throw new RuntimeException("getByte(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Byte");
@@ -86,7 +86,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public char getChar(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Character) {
-			return ((Character) o).charValue();
+			return (Character) o;
 		} else {
 			throw new RuntimeException("getChar(" + name + "): "
 					+ o.getClass().getName()
@@ -97,7 +97,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public double getDouble(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Double) {
-			return ((Double) o).doubleValue();
+			return (Double) o;
 		} else {
 			throw new RuntimeException("getDouble(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Double");
@@ -107,7 +107,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public float getFloat(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Float) {
-			return ((Float) o).floatValue();
+			return (Float) o;
 		} else {
 			throw new RuntimeException("getFloat(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Float");
@@ -117,7 +117,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public int getInt(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Integer) {
-			return ((Integer) o).intValue();
+			return (Integer) o;
 		} else {
 			throw new RuntimeException("getInt(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Integer");
@@ -127,7 +127,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public long getLong(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Long) {
-			return ((Long) o).longValue();
+			return (Long) o;
 		} else {
 			throw new RuntimeException("getLong(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Long");
@@ -137,7 +137,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	public short getShort(String name) {
 		Object o = this.get((Object) name);
 		if (o instanceof Short) {
-			return ((Short) o).shortValue();
+			return (Short) o;
 		} else {
 			throw new RuntimeException("getShort(" + name + "): "
 					+ o.getClass().getName() + " is not an instance of Short");
@@ -159,12 +159,12 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	}
 
 	public void putBoolean(String name, boolean b) {
-		this.put((Object) name, new Boolean(b));
+		this.put((Object) name, b);
 
 	}
 
 	public void putByte(String name, byte b) {
-		this.put((Object) name, new Byte(b));
+		this.put((Object) name, b);
 
 	}
 
@@ -174,32 +174,32 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 	}
 
 	public void putChar(String name, char c) {
-		this.put((Object) name, new Character(c));
+		this.put((Object) name, c);
 
 	}
 
 	public void putDouble(String name, double d) {
-		this.put((Object) name, new Double(d));
+		this.put((Object) name, d);
 
 	}
 
 	public void putFloat(String name, float fl) {
-		this.put((Object) name, new Float(fl));
+		this.put((Object) name, fl);
 
 	}
 
 	public void putInt(String name, int i) {
-		this.put((Object) name, new Integer(i));
+		this.put((Object) name, i);
 
 	}
 
 	public void putLong(String name, long l) {
-		this.put((Object) name, new Long(l));
+		this.put((Object) name, l);
 
 	}
 
 	public void putShort(String name, short s) {
-		this.put((Object) name, new Short(s));
+		this.put((Object) name, s);
 
 	}
 
@@ -214,54 +214,51 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 
 	public OMElement getOMElement(OMFactory fac) {
 		OMElement mapElement = fac.createOMElement(PayloadHelper.MAPELT);
-		
-		for (Iterator it = this.keySet().iterator(); it.hasNext();) {
-			OMElement entry = fac.createOMElement(new QName(
-					PayloadHelper.AXIOMPAYLOADNS, ENTRY), mapElement);
-			
-			
-			Object key = it.next();
-			if (key instanceof String) {
-				Object o = this.get(key);
-				entry.addAttribute(NAME, (String) key, attrNS);
-				if (o instanceof Character) {
-					entry.addAttribute(TYPE, CHAR, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof Boolean) {
-					entry.addAttribute(TYPE, BOOLEAN, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof String) {
-					entry.addAttribute(TYPE, STRING, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof Byte) {
-					entry.addAttribute(TYPE, BYTE, attrNS);
-					entry.setText(((Byte) o).toString());
-				} else if (o instanceof byte[]) {
-					entry.addAttribute(TYPE, BYTEARRAY, attrNS);
-					OMText text = fac.createOMText(new DataHandler(
-							new ByteArrayDataSource((byte[]) o)), true);
-					entry.addChild(text);
-				} else if (o instanceof Float) {
-					entry.addAttribute(TYPE, FLOAT, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof Double) {
-					entry.addAttribute(TYPE, DOUBLE, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof Long) {
-					entry.addAttribute(TYPE, LONG, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof Short) {
-					entry.addAttribute(TYPE, SHORT, attrNS);
-					entry.setText(o.toString());
-				} else if (o instanceof Integer) {
-					entry.addAttribute(TYPE, INTEGER, attrNS);
-					entry.setText(o.toString());
-				}
 
-			} else {
-				// shouldn't be any non-string keys. Ignore!
-			}
-		}
+        for (Object key : this.keySet()) {
+            if (key instanceof String) {
+                OMElement entry = fac.createOMElement(new QName(
+                        PayloadHelper.AXIOMPAYLOADNS, ENTRY), mapElement);
+                Object o = this.get(key);
+                entry.addAttribute(NAME, (String) key, attrNS);
+                if (o instanceof Character) {
+                    entry.addAttribute(TYPE, CHAR, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof Boolean) {
+                    entry.addAttribute(TYPE, BOOLEAN, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof String) {
+                    entry.addAttribute(TYPE, STRING, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof Byte) {
+                    entry.addAttribute(TYPE, BYTE, attrNS);
+                    entry.setText(((Byte) o).toString());
+                } else if (o instanceof byte[]) {
+                    entry.addAttribute(TYPE, BYTEARRAY, attrNS);
+                    OMText text = fac.createOMText(new DataHandler(
+                            new ByteArrayDataSource((byte[]) o)), true);
+                    entry.addChild(text);
+                } else if (o instanceof Float) {
+                    entry.addAttribute(TYPE, FLOAT, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof Double) {
+                    entry.addAttribute(TYPE, DOUBLE, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof Long) {
+                    entry.addAttribute(TYPE, LONG, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof Short) {
+                    entry.addAttribute(TYPE, SHORT, attrNS);
+                    entry.setText(o.toString());
+                } else if (o instanceof Integer) {
+                    entry.addAttribute(TYPE, INTEGER, attrNS);
+                    entry.setText(o.toString());
+                }
+
+            } else {
+                // shouldn't be any non-string keys. Ignore!
+            }
+        }
 
 		return mapElement;
 	}
@@ -288,13 +285,13 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
 					 if (type.equals(INTEGER)) {
 						this.put((Object)name, new Integer(text.getText()));
 					} else if (type.equals(CHAR)) {
-						this.put((Object)name, new Character((text.getText().charAt(0))));
+						this.put((Object)name, (text.getText().charAt(0)));
 					} else if (type.equals(DOUBLE)) {
 						this.put((Object)name, new Double(text.getText()));
 					} else if (type.equals(FLOAT)) {
 						this.put((Object)name, new Float(text.getText()));
 					} else if (type.equals(BYTE)) {
-						this.put((Object)name, new Byte(text.getText().getBytes()[0]));
+						this.put((Object)name, text.getText().getBytes()[0]);
 					} else if (type.equals(SHORT)) {
 						this.put((Object)name, new Short(text.getText()));
 					} else if (type.equals(LONG)) {

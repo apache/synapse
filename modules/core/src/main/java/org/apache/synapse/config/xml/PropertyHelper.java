@@ -48,47 +48,47 @@ public class PropertyHelper {
     public static void setInstanceProperty(String name, Object val, Object obj) {
 
         String mName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-        Method method = null;
+        Method method;
 
         try {
             Method[] methods = obj.getClass().getMethods();
             boolean invoked = false;
 
-            for (int i=0; i<methods.length; i++) {
-                if (mName.equals(methods[i].getName())) {
-                    Class[] params = methods[i].getParameterTypes();
+            for (Method method1 : methods) {
+                if (method1 != null && mName.equals(method1.getName())) {
+                    Class[] params = method1.getParameterTypes();
                     if (params.length != 1) {
                         handleException("Did not find a setter method named : " + mName +
-                            "() that takes a single String, int, long, float, double " +
-                            "or boolean parameter");
+                                "() that takes a single String, int, long, float, double " +
+                                "or boolean parameter");
                     } else if (val instanceof String) {
                         String value = (String) val;
                         if (params[0].equals(String.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{String.class});
+                            method = obj.getClass().getMethod(mName, String.class);
                             method.invoke(obj, new String[]{value});
                         } else if (params[0].equals(int.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{int.class});
+                            method = obj.getClass().getMethod(mName, int.class);
                             method.invoke(obj, new Integer[]{new Integer(value)});
                         } else if (params[0].equals(long.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{long.class});
+                            method = obj.getClass().getMethod(mName, long.class);
                             method.invoke(obj, new Long[]{new Long(value)});
                         } else if (params[0].equals(float.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{float.class});
+                            method = obj.getClass().getMethod(mName, float.class);
                             method.invoke(obj, new Float[]{new Float(value)});
                         } else if (params[0].equals(double.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{double.class});
+                            method = obj.getClass().getMethod(mName, double.class);
                             method.invoke(obj, new Double[]{new Double(value)});
                         } else if (params[0].equals(boolean.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{boolean.class});
-                            method.invoke(obj, new Boolean[]{new Boolean(value)});
+                            method = obj.getClass().getMethod(mName, boolean.class);
+                            method.invoke(obj, new Object[]{new Boolean[]{Boolean.valueOf(value)}});
                         } else {
                             handleException("Did not find a setter method named : " + mName +
-                                "() that takes a single String, int, long, float, double " +
-                                "or boolean parameter");
+                                    "() that takes a single String, int, long, float, double " +
+                                    "or boolean parameter");
                         }
                     } else {
                         if (params[0].equals(OMElement.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{OMElement.class});
+                            method = obj.getClass().getMethod(mName, OMElement.class);
                             method.invoke(obj, new OMElement[]{(OMElement) val});
                         }
                     }
@@ -130,12 +130,12 @@ public class PropertyHelper {
                 String value = property.getAttributeValue(new QName("value"));
 
                 try {
-                    Method method = o.getClass().getMethod(mName, new Class[]{String.class});
+                    Method method = o.getClass().getMethod(mName, String.class);
                     if (log.isDebugEnabled()) {
                         log.debug("Setting property :: invoking method "
                                 + mName + "(" + value + ")");
                     }
-                    method.invoke(o, new Object[]{value});
+                    method.invoke(o, value);
 
                 } catch (Exception e) {
                     handleException("Error setting property : " + propertyName
@@ -149,12 +149,12 @@ public class PropertyHelper {
                 if (value != null) {
 
                     try {
-                        Method method = o.getClass().getMethod(mName, new Class[]{OMElement.class});
+                        Method method = o.getClass().getMethod(mName, OMElement.class);
                         if (log.isDebugEnabled()) {
                             log.debug("Setting property :: invoking method "
                                     + mName + "(" + value + ")");
                         }
-                        method.invoke(o, new Object[]{value});
+                        method.invoke(o, value);
 
                     } catch (Exception e) {
                         handleException("Error setting property : " + propertyName

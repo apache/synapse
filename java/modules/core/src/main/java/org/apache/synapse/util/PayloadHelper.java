@@ -129,15 +129,12 @@ public class PayloadHelper {
 			return null;
 		}
 		OMText text = (OMText) textNode;
-		DataHandler dh = null;
-		try {
-			dh = (DataHandler) text.getDataHandler();
-		} catch (ClassCastException ce) {
-			log.error("cannot get DataHandler" + ce.getMessage());
-			return null;
-		}
-		return dh;
-
+        try {
+            return (DataHandler) text.getDataHandler();
+        } catch (ClassCastException ce) {
+            log.error("cannot get DataHandler" + ce.getMessage());
+            return null;
+        }
 	}
 
 	public static DataHandler getBinaryPayload(MessageContext mc) {
@@ -226,8 +223,7 @@ public class PayloadHelper {
 			log.error("Wrong QName" + el.getQName());
 			return null;
 		}
-		SimpleMap map = new SimpleMapImpl(el);
-		return map;
+        return new SimpleMapImpl(el);
 	}
 
 	public static SimpleMap getMapPayload(MessageContext mc) {

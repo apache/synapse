@@ -19,8 +19,6 @@
 
 package org.apache.synapse.util.concurrent;
 
-import org.apache.synapse.config.SynapseConfiguration;
-
 import java.util.concurrent.*;
 
 /**

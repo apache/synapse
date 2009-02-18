@@ -38,9 +38,11 @@ public class DataSourceInformationRepositoryFactory {
      * @param properties DataSource properties
      * @return DataSourceInformationRepository instance
      */
-    public static DataSourceInformationRepository createDataSourceInformationRepository(Properties properties) {
+    public static DataSourceInformationRepository createDataSourceInformationRepository(
+            Properties properties) {
 
-        return createDataSourceInformationRepository(properties, DataSourceRepositoryManager.getInstance());
+        return createDataSourceInformationRepository(properties,
+                DataSourceRepositoryManager.getInstance());
     }
 
     /**

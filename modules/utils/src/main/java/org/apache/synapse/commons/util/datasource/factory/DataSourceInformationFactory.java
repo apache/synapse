@@ -48,7 +48,8 @@ public class DataSourceInformationFactory {
      * @param properties Properties to create and configure DataSource
      * @return DataSourceInformation instance
      */
-    public static DataSourceInformation createDataSourceInformation(String dsName, Properties properties) {
+    public static DataSourceInformation createDataSourceInformation(String dsName,
+                                                                    Properties properties) {
 
         if (dsName == null || "".equals(dsName)) {
             if (log.isDebugEnabled()) {
@@ -69,13 +70,15 @@ public class DataSourceInformationFactory {
         String driver = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME, null);
         if (driver == null) {
-            handleException(prefix + DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME + " cannot be found.");
+            handleException(prefix + DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME +
+                    " cannot be found.");
         }
 
         String url = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConfigurationConstants.PROP_URL, null);
         if (url == null) {
-            handleException(prefix + DataSourceConfigurationConstants.PROP_URL + " cannot be found.");
+            handleException(prefix + DataSourceConfigurationConstants.PROP_URL +
+                    " cannot be found.");
         }
 
         DataSourceInformation information = new DataSourceInformation();
@@ -86,20 +89,23 @@ public class DataSourceInformationFactory {
 
         // get other required properties
         String user = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME, null, String.class);
+                properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME, null,
+                String.class);
         if (user != null && !"".equals(user)) {
             information.setUser(user);
         }
 
         String password = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD, null, String.class);
+                properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD, null,
+                String.class);
 
         if (password != null && !"".equals(password)) {
             information.setPassword(password);
         }
 
         String dataSourceName = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME, dsName, String.class);
+                properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME, dsName,
+                String.class);
         information.setDatasourceName(dataSourceName);
 
         String dsType = (String) MiscellaneousUtil.getProperty(
@@ -132,32 +138,39 @@ public class DataSourceInformationFactory {
 
         // Construct DriverAdapterCPDS reference
         String suffix = DataSourceConfigurationConstants.PROP_CPDSADAPTER +
-                DataSourceConfigurationConstants.DOT_STRING + DataSourceConfigurationConstants.PROP_CLASS_NAME;
+                DataSourceConfigurationConstants.DOT_STRING +
+                DataSourceConfigurationConstants.PROP_CLASS_NAME;
         String className = MiscellaneousUtil.getProperty(properties, prefix + suffix,
                 DataSourceConfigurationConstants.PROP_CPDSADAPTER_DRIVER);
         information.addParameter(suffix, className);
         suffix = DataSourceConfigurationConstants.PROP_CPDSADAPTER +
-                DataSourceConfigurationConstants.DOT_STRING + DataSourceConfigurationConstants.PROP_FACTORY;
+                DataSourceConfigurationConstants.DOT_STRING +
+                DataSourceConfigurationConstants.PROP_FACTORY;
         String factory = MiscellaneousUtil.getProperty(properties, prefix + suffix,
                 DataSourceConfigurationConstants.PROP_CPDSADAPTER_DRIVER);
         information.addParameter(suffix, factory);
         suffix = DataSourceConfigurationConstants.PROP_CPDSADAPTER +
-                DataSourceConfigurationConstants.DOT_STRING + DataSourceConfigurationConstants.PROP_NAME;
+                DataSourceConfigurationConstants.DOT_STRING +
+                DataSourceConfigurationConstants.PROP_NAME;
         String name = MiscellaneousUtil.getProperty(properties, prefix + suffix,
                 "cpds");
         information.addParameter(suffix, name);
 
         boolean defaultAutoCommit = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_DEFAULTAUTOCOMMIT, true, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_DEFAULTAUTOCOMMIT, true,
+                Boolean.class);
 
         boolean defaultReadOnly = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_DEFAULTREADONLY, false, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_DEFAULTREADONLY, false,
+                Boolean.class);
 
         boolean testOnBorrow = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_TESTONBORROW, true, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_TESTONBORROW, true,
+                Boolean.class);
 
         boolean testOnReturn = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_TESTONRETURN, false, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_TESTONRETURN, false,
+                Boolean.class);
 
         long timeBetweenEvictionRunsMillis = (Long) MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConfigurationConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
@@ -172,40 +185,50 @@ public class DataSourceInformationFactory {
                 GenericObjectPool.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS, Long.class);
 
         boolean testWhileIdle = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_TESTWHILEIDLE, false, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_TESTWHILEIDLE, false,
+                Boolean.class);
 
         String validationQuery = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConfigurationConstants.PROP_VALIDATIONQUERY, null);
 
         int minIdle = (Integer) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_MINIDLE, GenericObjectPool.DEFAULT_MIN_IDLE,
+                prefix + DataSourceConfigurationConstants.PROP_MINIDLE,
+                GenericObjectPool.DEFAULT_MIN_IDLE,
                 Integer.class);
 
         int initialSize = (Integer) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_INITIALSIZE, 0, Integer.class);
+                properties, prefix + DataSourceConfigurationConstants.PROP_INITIALSIZE, 0,
+                Integer.class);
 
         int defaultTransactionIsolation = (Integer) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION, -1, Integer.class);
+                prefix + DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION, -1,
+                Integer.class);
 
         String defaultCatalog = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTCATALOG, null);
 
         boolean accessToUnderlyingConnectionAllowed =
                 (Boolean) MiscellaneousUtil.getProperty(properties,
-                        prefix + DataSourceConfigurationConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+                        prefix +
+                                DataSourceConfigurationConstants.
+                                        PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
                         false, Boolean.class);
 
         boolean removeAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONED, false, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONED, false,
+                Boolean.class);
 
         int removeAbandonedTimeout = (Integer) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONEDTIMEOUT, 300, Integer.class);
+                prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONEDTIMEOUT, 300,
+                Integer.class);
 
         boolean logAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_LOGABANDONED, false, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_LOGABANDONED, false,
+                Boolean.class);
 
         boolean poolPreparedStatements = (Boolean) MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConfigurationConstants.PROP_POOLPREPAREDSTATEMENTS, false, Boolean.class);
+                prefix + DataSourceConfigurationConstants.PROP_POOLPREPAREDSTATEMENTS, false,
+                Boolean.class);
 
         int maxOpenPreparedStatements = (Integer) MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConfigurationConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
@@ -244,11 +267,13 @@ public class DataSourceInformationFactory {
         //Provider URL
         information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
                 MiscellaneousUtil.getProperty(
-                        properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL, null));
+                        properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
+                        null));
 
         information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
                 MiscellaneousUtil.getProperty(
-                        properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT, null));
+                        properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
+                        null));
 
         return information;
     }

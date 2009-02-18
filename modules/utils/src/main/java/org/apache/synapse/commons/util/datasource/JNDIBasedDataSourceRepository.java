@@ -44,9 +44,10 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             new JNDIBasedDataSourceRepository();
     private InitialContext initialContext;
     private Properties jndiProperties;
-    private static final Map<String, InitialContext> perDataSourceICMap = new HashMap<String, InitialContext>();
+    private static final Map<String, InitialContext> perDataSourceICMap
+            = new HashMap<String, InitialContext>();
     private static final List<String> cachedNameList = new ArrayList<String>();
-    
+
     private boolean initialized = false;
 
     public static JNDIBasedDataSourceRepository getInstance() {
@@ -110,7 +111,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
                 context = initialContext;
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Cannot create a name context with provided jndi properties : " + jndiEvn);
+                    log.debug("Cannot create a name context with provided jndi properties : " +
+                            jndiEvn);
                     log.debug("Using system-wide JNDI properties : " + jndiProperties);
                 }
 
@@ -137,7 +139,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             Reference ref = new Reference("javax.sql.DataSource",
                     "org.apache.commons.dbcp.BasicDataSourceFactory", null);
 
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME, driver));
+            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME,
+                    driver));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_URL, url));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_USER_NAME, user));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_PASSWORD, password));
@@ -186,7 +189,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER, driver));
             cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_URL, url));
             cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_USER, user));
-            cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_PASSWORD, password));
+            cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_PASSWORD,
+                    password));
 
             try {
                 context.rebind(name, cpdsRef);
@@ -260,7 +264,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         validateDSName(dsName);
         if (!cachedNameList.contains(dsName)) {
             if (log.isDebugEnabled()) {
-                log.debug("There is no Datasource with name " + dsName + " in JNDI Datasource Repository");
+                log.debug("There is no Datasource with name " + dsName +
+                        " in JNDI Datasource Repository");
             }
             return null;
         }
@@ -308,7 +313,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         reference.add(new StringRefAddr(
                 DataSourceConfigurationConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
                 String.valueOf(information.getTimeBetweenEvictionRunsMillis())));
-        reference.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_NUMTESTSPEREVICTIONRUN,
+        reference.add(new StringRefAddr(
+                DataSourceConfigurationConstants.PROP_NUMTESTSPEREVICTIONRUN,
                 String.valueOf(information.getNumTestsPerEvictionRun())));
         reference.add(new StringRefAddr(
                 DataSourceConfigurationConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
@@ -331,7 +337,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
      * @param ref         The naming reference instance
      * @param information DataSourceInformation instance
      */
-    private static void setBasicDataSourceParameters(Reference ref, DataSourceInformation information) {
+    private static void setBasicDataSourceParameters(Reference ref,
+                                                     DataSourceInformation information) {
 
         int defaultTransactionIsolation = information.getDefaultTransactionIsolation();
         String defaultCatalog = information.getDefaultCatalog();
@@ -363,7 +370,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
                 String.valueOf(information.getMaxOpenPreparedStatements())));
         ref.add(new StringRefAddr(
                 DataSourceConfigurationConstants.PROP_INITIALSIZE, String.valueOf(
-                information.getInitialSize())));
+                        information.getInitialSize())));
 
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
             ref.add(new StringRefAddr
@@ -431,7 +438,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
             //Provider URL
             providerUrl = MiscellaneousUtil.getProperty(
-                    dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL, null);
+                    dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
+                    null);
             providerPort =
                     MiscellaneousUtil.getProperty(dsProperties, rootPrefix +
                             DataSourceConfigurationConstants.PROP_PROVIDER_PORT,

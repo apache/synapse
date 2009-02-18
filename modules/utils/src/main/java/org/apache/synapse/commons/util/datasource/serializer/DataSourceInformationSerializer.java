@@ -88,7 +88,8 @@ public class DataSourceInformationSerializer {
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_INITIALSIZE,
                 String.valueOf(information.getInitialSize()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION,
                 String.valueOf(information.getDefaultTransactionIsolation()));
 
         String defaultCatalog = information.getDefaultCatalog();
@@ -97,34 +98,41 @@ public class DataSourceInformationSerializer {
                     String.valueOf(defaultCatalog));
         }
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
                 String.valueOf(information.isAccessToUnderlyingConnectionAllowed()));
 
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONED,
                 String.valueOf(information.isRemoveAbandoned()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONEDTIMEOUT,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_REMOVEABANDONEDTIMEOUT,
                 String.valueOf(information.getRemoveAbandonedTimeout()));
 
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_LOGABANDONED,
                 String.valueOf(information.isLogAbandoned()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_POOLPREPAREDSTATEMENTS,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_POOLPREPAREDSTATEMENTS,
                 String.valueOf(information.isPoolPreparedStatements()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
                 String.valueOf(information.getMaxOpenPreparedStatements()));
 
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_REGISTRY,
                 String.valueOf(information.getRepositoryType()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
                 String.valueOf(information.getTimeBetweenEvictionRunsMillis()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_NUMTESTSPEREVICTIONRUN,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_NUMTESTSPEREVICTIONRUN,
                 String.valueOf(information.getNumTestsPerEvictionRun()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
+        addProperty(properties, prefix +
+                DataSourceConfigurationConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
                 String.valueOf(information.getMinEvictableIdleTimeMillis()));
 
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TESTWHILEIDLE,

@@ -69,7 +69,8 @@ public class DataSourceInformationRepository {
      * Get a existing a DataSourceInformation instance by name
      *
      * @param name Name of the DataSourceInformation to be returned
-     * @return DataSourceInformation instance if the are any with given name, otherwise , returns null
+     * @return DataSourceInformation instance if the are any with given name, otherwise
+     *         , returns null
      */
     public DataSourceInformation getDataSourceInformation(String name) {
 
@@ -90,7 +91,8 @@ public class DataSourceInformationRepository {
 
         DataSourceInformation information = dataSourceInformationMap.remove(name);
 
-        assertNull(information, "There is no datasource information instance for given name :" + name);
+        assertNull(information, "There is no datasource information instance for given name :" +
+                name);
 
         if (assertListerNotNull()) {
             listener.removeDataSourceInformation(information);
@@ -115,7 +117,8 @@ public class DataSourceInformationRepository {
      */
     public void setRepositoryListener(DataSourceInformationRepositoryListener listener) {
 
-        assertNull(listener, "Provided 'DataSourceInformationRepositoryListener' instance is null");
+        assertNull(listener, "Provided 'DataSourceInformationRepositoryListener' " +
+                "instance is null");
 
         if (this.listener != null) {
             handleException("There is a 'DataSourceInformationRepositoryListener' " +

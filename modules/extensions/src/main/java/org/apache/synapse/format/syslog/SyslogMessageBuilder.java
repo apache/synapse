@@ -117,7 +117,8 @@ public class SyslogMessageBuilder implements Builder {
             }
         }
         catch (ProtocolException ex) {
-            log.error("Protocol error: " + ex.getMessage() + " [pri=" + facility + "." + severity + " tag=" + tag + " pid=" + pid + "]");
+            log.error("Protocol error: " + ex.getMessage() + " [pri=" + facility + "." +
+                    severity + " tag=" + tag + " pid=" + pid + "]");
             throw new AxisFault("Protocol error", ex);
         }
         catch (IOException ex) {

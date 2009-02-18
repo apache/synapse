@@ -116,7 +116,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 if (subID != null) {
                     // Send the subscription responce
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending sunscription response for SynapseSubscription ID : " +
+                        log.debug("Sending sunbcription response for SynapseSubscription ID : " +
                                 subscription.getId());
                     }
                     SOAPEnvelope soapEnvelope =

@@ -80,8 +80,10 @@ public class DataSourceConfigurationConstants {
             = "org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS";
     public static final String PROP_FACTORY = "factory";
     public static final String PROP_NAME = "name";
-    public static final String DATASOURCE_INFORMATION_REPOSITORY = "DataSourceInformationRepository";
-    public static final String DEFAULT_IC_FACTORY = "com.sun.jndi.rmi.registry.RegistryContextFactory";
+    public static final String DATASOURCE_INFORMATION_REPOSITORY =
+            "DataSourceInformationRepository";
+    public static final String DEFAULT_IC_FACTORY =
+            "com.sun.jndi.rmi.registry.RegistryContextFactory";
     public static final int DEFAULT_PROVIDER_PORT = 2199;
 
 }

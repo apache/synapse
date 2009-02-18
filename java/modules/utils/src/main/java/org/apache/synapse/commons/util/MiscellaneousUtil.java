@@ -70,7 +70,8 @@ public class MiscellaneousUtil {
      * @param type         Expected Type using Class
      * @return Value corresponding to the given property name
      */
-    public static Object getProperty(Properties properties, String name, Object defaultValue, Class type) {
+    public static Object getProperty(Properties properties, String name,
+                                     Object defaultValue, Class type) {
 
         Object result = properties.getProperty(name);
         if (result == null && defaultValue != null) {

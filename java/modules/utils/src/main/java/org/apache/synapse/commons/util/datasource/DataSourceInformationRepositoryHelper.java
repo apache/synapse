@@ -44,7 +44,8 @@ public class DataSourceInformationRepositoryHelper {
     public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
                                                                  Properties properties) {
 
-        DataSourceInformationRepository repository = getDataSourceInformationRepository(axisConfiguration);
+        DataSourceInformationRepository repository =
+                getDataSourceInformationRepository(axisConfiguration);
         DataSourceInformationRepositoryListener listener = null;
 
         if (repository != null) {
@@ -83,7 +84,8 @@ public class DataSourceInformationRepositoryHelper {
                                                                  DataSourceInformationRepositoryListener listener) {
 
         DataSourceInformationRepository repository =
-                DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(properties, listener);
+                DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(
+                        properties, listener);
         Parameter parameter = new Parameter(
                 DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY, repository);
         try {

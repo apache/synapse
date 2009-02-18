@@ -32,10 +32,13 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
 
     private static final Log log = LogFactory.getLog(DataSourceRepositoryManager.class);
 
-    private static final DataSourceRepositoryManager DATA_SOURCE_REPOSITORY_MANAGER = new DataSourceRepositoryManager();
+    private static final DataSourceRepositoryManager DATA_SOURCE_REPOSITORY_MANAGER
+            = new DataSourceRepositoryManager();
 
-    private static final DataSourceRepository IN_MEMORY_REPOSITORY = InMemoryDataSourceRepository.getInstance();
-    private static final DataSourceRepository JNDI_REPOSITORY = JNDIBasedDataSourceRepository.getInstance();
+    private static final DataSourceRepository IN_MEMORY_REPOSITORY
+            = InMemoryDataSourceRepository.getInstance();
+    private static final DataSourceRepository JNDI_REPOSITORY
+            = JNDIBasedDataSourceRepository.getInstance();
 
     public DataSourceRepositoryManager() {
     }

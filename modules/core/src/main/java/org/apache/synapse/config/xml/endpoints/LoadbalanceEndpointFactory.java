@@ -127,7 +127,7 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
             return loadbalanceEndpoint;
         }
 
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;  //ToDo
     }
 
     private List<Member> getMembers(OMElement loadbalanceElement) {

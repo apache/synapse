@@ -59,8 +59,8 @@ public class PropertyHelper {
                     Class[] params = method1.getParameterTypes();
                     if (params.length != 1) {
                         handleException("Did not find a setter method named : " + mName +
-                                "() that takes a single String, int, long, float, double ,OMElement " +
-                                "or boolean parameter");
+                                "() that takes a single String, int, long, float, double ," +
+                                "OMElement or boolean parameter");
                     } else if (val instanceof String) {
                         String value = (String) val;
                         if (String.class.equals(params[0])) {

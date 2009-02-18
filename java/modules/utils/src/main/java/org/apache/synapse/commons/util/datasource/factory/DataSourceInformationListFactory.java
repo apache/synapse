@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Contains Factory method that use to create List of DataSourceInformations - a DataSourceInformation Collection
+ * Contains Factory method that use to create List of DataSourceInformations -
+ * a DataSourceInformation Collection
  */
 public class DataSourceInformationListFactory {
 
@@ -41,9 +42,11 @@ public class DataSourceInformationListFactory {
      * @param dsProperties Datasource configuration properties
      * @return A List of DataSourceInformations
      */
-    public static List<DataSourceInformation> createDataSourceInformationList(Properties dsProperties) {
+    public static List<DataSourceInformation> createDataSourceInformationList(
+            Properties dsProperties) {
 
-        final List<DataSourceInformation> dataSourceInformations = new ArrayList<DataSourceInformation>();
+        final List<DataSourceInformation> dataSourceInformations =
+                new ArrayList<DataSourceInformation>();
         if (dsProperties == null) {
             if (log.isDebugEnabled()) {
                 log.debug("DataSource properties cannot be found..");

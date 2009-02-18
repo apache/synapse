@@ -102,7 +102,8 @@ public class DataSourceInformation {
         return accessToUnderlyingConnectionAllowed;
     }
 
-    public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
+    public void setAccessToUnderlyingConnectionAllowed(
+            boolean accessToUnderlyingConnectionAllowed) {
         this.accessToUnderlyingConnectionAllowed = accessToUnderlyingConnectionAllowed;
     }
 

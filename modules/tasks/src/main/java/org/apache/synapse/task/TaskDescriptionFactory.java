@@ -131,7 +131,8 @@ public class TaskDescriptionFactory {
                             "a simple trigger, but no interval specified");
                 } else if (repeatInterval != null && repeatInterval.getAttributeValue() != null) {
                     try {
-                        long repeatIntervalInSeconds = Long.parseLong(repeatInterval.getAttributeValue());
+                        long repeatIntervalInSeconds = Long.parseLong(
+                                repeatInterval.getAttributeValue());
                         long repeatIntervalInMillis = repeatIntervalInSeconds * 1000;
                         taskDescription.setInterval(repeatIntervalInMillis);
                     } catch (Exception e) {

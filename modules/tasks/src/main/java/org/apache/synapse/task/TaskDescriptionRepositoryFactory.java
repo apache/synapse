@@ -27,14 +27,16 @@ import java.util.Map;
 public class TaskDescriptionRepositoryFactory {
 
     private static final Log log = LogFactory.getLog(TaskDescriptionRepositoryFactory.class);
-    private final static Map<String, TaskDescriptionRepository> repositoryMap = new HashMap<String, TaskDescriptionRepository>();
+    private final static Map<String, TaskDescriptionRepository> repositoryMap
+            = new HashMap<String, TaskDescriptionRepository>();
 
     private TaskDescriptionRepositoryFactory() {
     }
 
     /**
      * Returns a TaskDescriptionRepository instance
-     * There is an only one instance of TaskDescriptionRepository for a given id as Factory caches TaskDescriptionRepositorys
+     * There is an only one instance of TaskDescriptionRepository for a given id as
+     *  Factory caches TaskDescriptionRepositorys
      *
      * @param id Identifier for TaskDescriptionRepository
      * @return TaskDescriptionRepository instance

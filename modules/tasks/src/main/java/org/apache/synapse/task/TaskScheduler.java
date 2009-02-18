@@ -100,7 +100,8 @@ public class TaskScheduler {
             }
 
         } catch (SchedulerException e) {
-            throw new SynapseTaskException("Error getting a  scheduler instance form scheduler factory " + sf, e, log);
+            throw new SynapseTaskException("Error getting a  scheduler instance form scheduler" +
+                    " factory " + sf, e, log);
         }
         initialized = true;
         start();
@@ -132,7 +133,8 @@ public class TaskScheduler {
      * @param resources       Any initial resources for task
      * @param jobClass        Quartz job class
      */
-    public void scheduleTask(TaskDescription taskDescription, Map<String, Object> resources, Class jobClass) {
+    public void scheduleTask(TaskDescription taskDescription, Map<String,
+            Object> resources, Class jobClass) {
 
         validateInit();
         validateStart();
@@ -146,7 +148,8 @@ public class TaskScheduler {
         }
 
         if (!Job.class.isAssignableFrom(jobClass)) {
-            throw new SynapseTaskException("Invalid Job Class : [ Expected " + Job.class.getName() + "]" +
+            throw new SynapseTaskException("Invalid Job Class : [ Expected " +
+                    Job.class.getName() + "]" +
                     " [ Found " + jobClass.getName() + " ]", log);
         }
 
@@ -160,10 +163,12 @@ public class TaskScheduler {
 
         Trigger trigger = triggerFactory.createTrigger(taskDescription);
         if (trigger == null) {
-            throw new SynapseTaskException("Trigger can not be created from : " + taskDescription, log);
+            throw new SynapseTaskException("Trigger can not be created from : "
+                    + taskDescription, log);
         }
 
-        JobDetail jobDetail = jobDetailFactory.createJobDetail(taskDescription, resources, jobClass);
+        JobDetail jobDetail = jobDetailFactory.createJobDetail(taskDescription,
+                resources, jobClass);
         if (jobDetail == null) {
             throw new SynapseTaskException("JobDetailcan not be created from : " + taskDescription +
                     " and job class " + jobClass.getName(), log);
@@ -175,7 +180,8 @@ public class TaskScheduler {
             }
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
-            throw new SynapseTaskException("Error scheduling job : " + jobDetail + " with trigger " + trigger);
+            throw new SynapseTaskException("Error scheduling job : " + jobDetail
+                    + " with trigger " + trigger);
         }
 
     }
@@ -225,7 +231,8 @@ public class TaskScheduler {
         if (group == null || "".equals(group)) {
             group = TaskDescription.DEFAULT_GROUP;
             if (log.isDebugEnabled()) {
-                log.debug("Task group is null or empty , using default group :" + TaskDescription.DEFAULT_GROUP);
+                log.debug("Task group is null or empty , using default group :"
+                        + TaskDescription.DEFAULT_GROUP);
             }
         }
 
@@ -263,7 +270,8 @@ public class TaskScheduler {
     public String toString() {
         StringBuffer schedulerMetaData = new StringBuffer();
         if (scheduler != null) {
-            schedulerMetaData = schedulerMetaData.append("[ Scheduler : ").append(scheduler).append(" ]");
+            schedulerMetaData = schedulerMetaData.append("[ Scheduler : ")
+                    .append(scheduler).append(" ]");
         }
         return new StringBuffer().append("[ TaskScheduler[ Name :").
                 append(name).append("]").append(schedulerMetaData).append(" ]").toString();

@@ -21,6 +21,7 @@ package org.apache.synapse.config;
 
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -611,14 +612,10 @@ public class SynapseConfigUtils {
 
     public static OMElement stringToOM(String xml) {
         try {
-            //TODO if there are any better way of converting string to OM , use it
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
-                    new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            return builder.getDocumentElement();
+            return AXIOMUtil.stringToOM(xml);  // Just wrapp to add loging for any errors
         } catch (XMLStreamException e) {
             handleException("Unable to convert a string to OM Node as the string " +
-                    "is malformed , String : " + xml);
+                    "is malformed , String : " + xml, e);
         }
         return null;
     }

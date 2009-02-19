@@ -22,6 +22,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.eventing.SynapseSubscription;
 import org.apache.synapse.eventing.SynapseSubscriptionManager;
@@ -69,7 +70,7 @@ public class EventPublisherMediator extends AbstractMediator {
 
         public void run() {
             for (SynapseSubscription subscription : subscribers) {
-                synCtx.setProperty("OUT_ONLY", "true");    // Set one way message for events
+                synCtx.setProperty(SynapseConstants.OUT_ONLY, "true");    // Set one way message for events
                 try {
                     subscription.getEndpoint().send(MessageHelper.cloneMessageContext(synCtx));
                 } catch (AxisFault axisFault) {

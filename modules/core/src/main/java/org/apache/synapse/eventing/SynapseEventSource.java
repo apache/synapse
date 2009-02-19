@@ -253,7 +253,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             }
             List<SynapseSubscription> subscribers = subscriptionManager.getMatchingSubscribers(smc);
             for (SynapseSubscription subscription : subscribers) {
-                smc.setProperty("OUT_ONLY", "true");    // Set one way message for events
+                smc.setProperty(SynapseConstants.OUT_ONLY, "true");    // Set one way message for events
                 subscription.getEndpoint().send(MessageHelper.cloneMessageContext(smc));
                 if (log.isDebugEnabled()) {
                     log.debug("Event push to  : " + subscription.getEndpointUrl());

@@ -34,7 +34,6 @@ import org.wso2.mercury.util.MercuryClientConstants;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class RMSequenceMediator extends AbstractMediator {
@@ -48,7 +47,8 @@ public class RMSequenceMediator extends AbstractMediator {
     private static final String WSRM_SpecVersion_1_1 = "Spec_2007_02";
     // set sequence expiry time to 5 minutes
     private static final long SEQUENCE_EXPIRY_TIME = 300000;
-    private static Map sequenceMap = Collections.synchronizedMap(new HashMap());
+    private static final Map<String, Entry> sequenceMap =
+            Collections.synchronizedMap(new HashMap<String, Entry>());
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -128,7 +128,7 @@ public class RMSequenceMediator extends AbstractMediator {
     }
 
     private String retrieveSequenceID(String correlationValue) {
-        String sequenceID = null;
+        String sequenceID;
         if (!sequenceMap.containsKey(correlationValue)) {
             sequenceID = UUIDGenerator.getUUID();
             if (log.isDebugEnabled()) {
@@ -148,20 +148,18 @@ public class RMSequenceMediator extends AbstractMediator {
     }
 
     private String getCorrelationValue(MessageContext smc) {
-        OMElement node = null;
         try {
-            node = (OMElement) getCorrelation().selectSingleNode(smc);
-
+            OMElement node = (OMElement) getCorrelation().selectSingleNode(smc);
             if (node != null) {
                 return node.getText();
             } else {
                 handleException("XPath expression : " + getCorrelation() +
-                    " did not return any node", smc);
+                        " did not return any node", smc);
             }
 
         } catch (JaxenException e) {
             handleException("Error evaluating XPath expression to determine correlation : " +
-                getCorrelation(), e, smc);
+                    getCorrelation(), e, smc);
         }
         return null; // never called
     }
@@ -189,10 +187,8 @@ public class RMSequenceMediator extends AbstractMediator {
     }
 
     private synchronized void cleanupSequenceMap() {
-        Iterator itKey = sequenceMap.keySet().iterator();
-        while (itKey.hasNext()) {
-            Object key = itKey.next();
-            Entry sequenceEntry = (Entry) sequenceMap.get(key);
+        for (String key : sequenceMap.keySet()) {
+            Entry sequenceEntry = sequenceMap.get(key);
             if (sequenceEntry.isExpired()) {
                 sequenceMap.remove(key);
             }
@@ -200,12 +196,7 @@ public class RMSequenceMediator extends AbstractMediator {
     }
 
     public boolean isSingle() {
-        if (getSingle() != null && getSingle().booleanValue()) {
-            return true;
-
-        } else {
-            return false;
-        }
+        return getSingle() != null && getSingle();
     }
 
     public SynapseXPath getCorrelation() {

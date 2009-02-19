@@ -240,11 +240,6 @@ public class SynapseXPath extends AXIOMXPath {
             Context context = new Context(contextSupport);
             context.setNodeSet(new SingletonList(env));
             return context;
-        } else if (obj instanceof OMNode) {
-            ContextSupport baseContextSupport = getContextSupport();
-            Context context = new Context(baseContextSupport);
-            context.setNodeSet(new SingletonList(obj));
-            return context;
         } else {
             return super.getContext(obj);
         }

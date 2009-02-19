@@ -116,7 +116,8 @@ public class XQueryMediator extends AbstractMediator {
                 if (synLog.isTraceTraceEnabled()) {
                     synLog.traceTrace("Message : " + synCtx.getEnvelope());
                 }
-                synLog.traceOrDebug("Performing XQuery using query resource with key : " + queryKey);
+                synLog.traceOrDebug("Performing XQuery using query resource with key : " +
+                        queryKey);
             }
 
             // perform the xquery
@@ -197,7 +198,8 @@ public class XQueryMediator extends AbstractMediator {
                             }
 
                             //create an XQPreparedExpression using the query source
-                            cachedPreparedExpression = cachedConnection.prepareExpression(querySource);
+                            cachedPreparedExpression =
+                                    cachedConnection.prepareExpression(querySource);
                             // need binding because the expression just has recreated
                             needBind = true;
                         }
@@ -347,7 +349,8 @@ public class XQueryMediator extends AbstractMediator {
                     } else if (XQItemType.XQBASETYPE_BYTE == baseType) {
                         ((OMElement) destination).setText(String.valueOf(xqItem.getByte()));
                     } else if (XQItemType.XQBASETYPE_STRING == baseType) {
-                        ((OMElement) destination).setText(String.valueOf(xqItem.getItemAsString()));
+                        ((OMElement) destination).setText(
+                                String.valueOf(xqItem.getItemAsString()));
                     }
                 }
                 break;   // Only take the *first* value of the result sequence
@@ -424,7 +427,8 @@ public class XQueryMediator extends AbstractMediator {
                             try {
                                 intValue = Integer.parseInt((String) value);
                             } catch (NumberFormatException e) {
-                                handleException("Incompatible value '" + value + "' for the Int", e);
+                                handleException("Incompatible value '" + value +
+                                        "' for the Int", e);
                             }
                         } else if (value instanceof Integer) {
                             intValue = (Integer) value;
@@ -562,27 +566,28 @@ public class XQueryMediator extends AbstractMediator {
 
     }
 
-    private void bindOMNode(QName name, Object value, XQDynamicContext xqDynamicContext) throws XQException {
+    private void bindOMNode(QName name, Object value,
+                            XQDynamicContext xqDynamicContext) throws XQException {
 
-        OMElement varibleValue = null;
+        OMElement variableValue = null;
         if (value instanceof String) {
-            varibleValue = SynapseConfigUtils.stringToOM((String) value);
+            variableValue = SynapseConfigUtils.stringToOM((String) value);
         } else if (value instanceof OMElement) {
-            varibleValue = (OMElement) value;
+            variableValue = (OMElement) value;
         }
 
-        if (varibleValue != null) {
+        if (variableValue != null) {
             if (useDOMSource) {
                 xqDynamicContext.
                         bindObject(name,
                                 new DOMSource(((Element) ElementHelper.
-                                        importOMElement(varibleValue,
+                                        importOMElement(variableValue,
                                                 DOOMAbstractFactory.getOMFactory())).
                                         getOwnerDocument()), null);
             } else {
                 xqDynamicContext.bindDocument(name,
                         new InputSource(SynapseConfigUtils.getInputStream(
-                                varibleValue)));
+                                variableValue)));
             }
         }
     }

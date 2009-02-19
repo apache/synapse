@@ -41,7 +41,7 @@
                 <out>
                     <xquery key="xquery/xquery_commisson.xq">
                         <variable name="payload" type="ELEMENT"></variable>
-                            <variable name="commission" type="ELEMENT" key="misc/commission.xml"></variable>
+                        <variable name="commission" type="ELEMENT" key="misc/commission.xml"></variable>
                     </xquery>
                     <send/>
                 </out>

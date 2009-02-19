@@ -38,7 +38,7 @@ public abstract class AbstractListMediator extends AbstractMediator
     implements ListMediator, ManagedLifecycle {
 
     /** the list of child mediators held. These are executed sequentially */
-    protected List<Mediator> mediators = new ArrayList<Mediator>();
+    protected final List<Mediator> mediators = new ArrayList<Mediator>();
 
     public boolean mediate(MessageContext synCtx) {
 

@@ -51,13 +51,10 @@ public class DBLookupMediator extends AbstractDBMediator {
                         "Processing the first row returned : " + stmnt.getRawStatement());
                 }
 
-                Iterator propNameIter = stmnt.getResultsMap().keySet().iterator();
-                while (propNameIter.hasNext()) {
+                for (String propName : stmnt.getResultsMap().keySet()) {
 
-                    String propName = (String) propNameIter.next();
-                    String columnStr = (String) stmnt.getResultsMap().get(propName);
-
-                    Object obj = null;
+                    String columnStr =  stmnt.getResultsMap().get(propName);
+                    Object obj;
                     try {
                         int colNum = Integer.parseInt(columnStr);
                         obj = rs.getObject(colNum);
@@ -68,14 +65,14 @@ public class DBLookupMediator extends AbstractDBMediator {
                     if (obj != null) {
                         if (synLog.isTraceOrDebugEnabled()) {
                             synLog.traceOrDebug("Column : " + columnStr +
-                                " returned value : " + obj +
-                                " Setting this as the message property : " + propName);
+                                    " returned value : " + obj +
+                                    " Setting this as the message property : " + propName);
                         }
                         msgCtx.setProperty(propName, obj.toString());
                     } else {
                         if (synLog.isTraceOrDebugEnabled()) {
                             synLog.traceOrDebugWarn("Column : " + columnStr +
-                                " returned null Skip setting message property : " + propName);
+                                    " returned null Skip setting message property : " + propName);
                         }
                     }
                 }

@@ -51,7 +51,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      */
     private DBPoolView dbPoolView;
     /** Statements */
-    List statementList = new ArrayList();
+    private final List<Statement> statementList = new ArrayList<Statement>();
 
     /**
      * Initializes the mediator. Does nothing right now. If DataSource lookup is supported, could
@@ -97,8 +97,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             }
         }
 
-        for (Iterator iter = statementList.iterator(); iter.hasNext(); ) {
-            processStatement((Statement) iter.next(), synCtx);
+        for (Statement aStatement : statementList) {
+            if (aStatement != null) {
+                processStatement(aStatement, synCtx);
+            }
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
@@ -162,7 +164,8 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @return
      * @throws SQLException
      */
-    protected PreparedStatement getPreparedStatement(Statement stmnt, MessageContext msgCtx) throws SQLException {
+    protected PreparedStatement getPreparedStatement(Statement stmnt,
+                                                     MessageContext msgCtx) throws SQLException {
 
         SynapseLog synLog = getLog(msgCtx);
 
@@ -205,18 +208,20 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         PreparedStatement ps = con.prepareStatement(stmnt.getRawStatement());
 
         // set parameters if any
-        List params = stmnt.getParameters();
+        List<Statement.Parameter> params = stmnt.getParameters();
         int column = 1;
 
-        for (Iterator pi = params.iterator(); pi.hasNext(); ) {
-
-            Statement.Parameter param = (Statement.Parameter) pi.next();
+        for (Statement.Parameter param : params) {
+            if (param == null) {
+                continue;
+            }
             String value = (param.getPropertyName() != null ?
-                param.getPropertyName() : param.getXpath().stringValueOf(msgCtx));
+                    param.getPropertyName() : param.getXpath().stringValueOf(msgCtx));
 
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Setting as parameter : " + column + " value : " + value +
-                    " as JDBC Type : " + param.getType() + "(see java.sql.Types for valid types)");
+                        " as JDBC Type : " + param.getType() + "(see java.sql.Types for valid " +
+                        "types)");
             }
 
             switch (param.getType()) {
@@ -280,9 +285,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                 // skip CLOB, BLOB, ARRAY, DISTINCT, STRUCT, REF, JAVA_OBJECT
                 default: {
                     String msg = "Trying to set an un-supported JDBC Type : " + param.getType() +
-                        " against column : " + column + " and statement : " + stmnt.getRawStatement() +
-                        " used by a DB mediator against DataSource : " + getDSName() +
-                        " (see java.sql.Types for valid type values)";
+                            " against column : " + column + " and statement : " +
+                            stmnt.getRawStatement() +
+                            " used by a DB mediator against DataSource : " + getDSName() +
+                            " (see java.sql.Types for valid type values)";
                     handleException(msg, msgCtx);
                 }
             }
@@ -301,5 +307,5 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
 
     public void setDbPoolView(DBPoolView dbPoolView) {
         this.dbPoolView = dbPoolView;
-    }     
+    }
 }

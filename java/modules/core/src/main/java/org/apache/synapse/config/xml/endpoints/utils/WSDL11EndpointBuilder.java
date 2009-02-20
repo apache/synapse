@@ -60,21 +60,20 @@ public class WSDL11EndpointBuilder {
      * endpoint configuration.
      *
      * @param baseUri base uri of the wsdl
-     * @param wsdl OMElement representing the inline WSDL
+     * @param wsdl    OMElement representing the inline WSDL
      * @param service Service of the endpoint
-     * @param port Port of the endpoint
-     *
+     * @param port    Port of the endpoint
      * @return EndpointDefinition containing the information retrieved from the WSDL
      */
     public EndpointDefinition createEndpointDefinitionFromWSDL(String baseUri, OMElement wsdl,
-        String service, String port) {
+                                                               String service, String port) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             wsdl.serialize(baos);
             InputStream in = new ByteArrayInputStream(baos.toByteArray());
             InputSource inputSource = new InputSource(in);
-            WSDLLocator wsdlLocator = new CustomWSDLLocator(inputSource,baseUri);
+            WSDLLocator wsdlLocator = new CustomWSDLLocator(inputSource, baseUri);
             Document doc = null;
             try {
                 doc = XMLUtils.newDocument(inputSource);
@@ -83,7 +82,7 @@ public class WSDL11EndpointBuilder {
             } catch (SAXException e) {
                 handleException("Parser SAX Error", e);
             } catch (IOException e) {
-                handleException(WSDLException.INVALID_WSDL+ "IO Error",e);
+                handleException(WSDLException.INVALID_WSDL + "IO Error", e);
             }
             if (doc != null) {
                 WSDLFactory fac = WSDLFactory.newInstance();
@@ -92,16 +91,16 @@ public class WSDL11EndpointBuilder {
                 return createEndpointDefinitionFromWSDL(definition, service, port);
             }
         } catch (XMLStreamException e) {
-            handleException("Error retrieving the WSDL definition from the inline WSDL.");
+            handleException("Error retrieving the WSDL definition from the inline WSDL.", e);
         } catch (WSDLException e) {
-            handleException("Error retrieving the WSDL definition from the inline WSDL.");
+            handleException("Error retrieving the WSDL definition from the inline WSDL.", e);
         }
 
         return null;
     }
 
     private EndpointDefinition createEndpointDefinitionFromWSDL(Definition definition,
-        String serviceName, String portName) {
+                                                                String serviceName, String portName) {
 
         if (definition == null) {
             handleException("WSDL document is not specified.");

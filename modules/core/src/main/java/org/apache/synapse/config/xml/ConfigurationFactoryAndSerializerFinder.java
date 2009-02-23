@@ -145,7 +145,7 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
         if (log.isDebugEnabled()) {
             log.debug("getConfiguration(" + qName + ")");
         }
-        Class cls = (Class) factoryMap.get(qName);
+        Class cls = factoryMap.get(qName);
 
 
         if (cls == null) {

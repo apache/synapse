@@ -59,7 +59,8 @@ public class SimpleQuartzFactory implements StartupFactory {
             
             SimpleQuartz simpleQuartz = new SimpleQuartz();
             TaskDescription taskDescription =
-                    TaskDescriptionFactory.createTaskDescription(el, XMLConfigConstants.SYNAPSE_OMNAMESPACE);
+                    TaskDescriptionFactory.createTaskDescription(el,
+                            XMLConfigConstants.SYNAPSE_OMNAMESPACE);
             if(taskDescription == null){
                 handleException("Invalid task - Task description can not be created  form :"+el);
             }          

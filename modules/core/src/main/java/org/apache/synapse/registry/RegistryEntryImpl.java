@@ -116,15 +116,15 @@ public class RegistryEntryImpl implements RegistryEntry {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("RegistryEntry {")
-            .append(" Key : " + key)
-            .append(" Name : " + name)
-            .append(" Ver : " + version)
-            .append(" Type : " + type)
-            .append(" Desc : " + description)
-            .append(" Created : " + new Date(created))
-            .append(" Modified : " + new Date(lastModified))
-            .append(" Cacheable for : " + (cachableDuration / 1000) + "sec")
-            .append("}");
+                .append(" Key : ").append(key)
+                .append(" Name : ").append(name)
+                .append(" Version : ").append(version)
+                .append(" Type : ").append(type)
+                .append(" Description : ").append(description)
+                .append(" Created : ").append(new Date(created))
+                .append(" Modified : ").append(new Date(lastModified))
+                .append(" Cacheable for : ").append(cachableDuration / 1000)
+                .append("sec").append("}");
         return sb.toString();
     }
 }

@@ -133,7 +133,7 @@ public class ProxyService {
     /**
      * A list of any service parameters (e.g. JMS parameters etc)
      */
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private final Map<String, Object> parameters = new HashMap<String, Object>();
     /**
      * The key for the base WSDL
      */
@@ -159,7 +159,7 @@ public class ProxyService {
     /**
      * The keys for any supplied policies that would apply at the service level
      */
-    private List<String> serviceLevelPolicies = new ArrayList<String>();
+    private final List<String> serviceLevelPolicies = new ArrayList<String>();
     /**
      * The keys for any supplied policies that would apply at the in message level
      */

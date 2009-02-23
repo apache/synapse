@@ -47,7 +47,8 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
      */
     protected int traceState = SynapseConstants.TRACING_UNSET;
 
-    private final AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.ANONYMOUS_SEQUENCE);
+    private final AuditConfigurable auditConfigurable = new AuditConfiguration(
+            SynapseConstants.ANONYMOUS_SEQUENCE);
 
     /**
      * A constructor that makes subclasses pick up the correct logger

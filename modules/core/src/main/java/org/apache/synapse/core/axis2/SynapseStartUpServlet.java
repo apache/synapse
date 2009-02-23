@@ -42,8 +42,8 @@ public class SynapseStartUpServlet extends HttpServlet {
     private static final String ALREADY_INITED = "synapseAlreadyInited";
 
     public void init() throws ServletException {
-    	ServletConfig servletConfig = getServletConfig();
-    	ServletContext servletContext = servletConfig.getServletContext();
+        ServletConfig servletConfig = getServletConfig();
+        ServletContext servletContext = servletConfig.getServletContext();
         if (Boolean.TRUE.equals(servletContext.getAttribute(ALREADY_INITED))) {
             return;
         }
@@ -57,20 +57,24 @@ public class SynapseStartUpServlet extends HttpServlet {
             if (webinfPath == null || !webinfPath.endsWith("WEB-INF")) {
                 handleException("Unable to determine web application root directory");
             } else {
-                synHome = webinfPath.substring(0, webinfPath.length()-7);
+                synHome = webinfPath.substring(0, webinfPath.length() - 7);
                 log.info("Setting synapse.home to : " + synHome);
             }
         }
         serverManager.setSynapseHome(synHome);
-        
-        serverManager.setSynapseXMLPath(loadParameter(servletConfig, SynapseConstants.SYNAPSE_XML, true));
+
+        serverManager.setSynapseXMLPath(loadParameter(servletConfig,
+                SynapseConstants.SYNAPSE_XML, true));
         String resolveRoot = loadParameter(servletConfig, SynapseConstants.RESOLVE_ROOT, false);
         if (resolveRoot != null) {
             serverManager.setResolveRoot(resolveRoot);
         }
-        serverManager.setAxis2Repolocation(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_REPO, true));
-        serverManager.setAxis2Xml(loadParameter(servletConfig, org.apache.axis2.Constants.AXIS2_CONF, true));
-        serverManager.setServerName(loadParameter(servletConfig, SynapseConstants.SERVER_NAME, false));
+        serverManager.setAxis2Repolocation(loadParameter(servletConfig,
+                org.apache.axis2.Constants.AXIS2_REPO, true));
+        serverManager.setAxis2Xml(loadParameter(servletConfig,
+                org.apache.axis2.Constants.AXIS2_CONF, true));
+        serverManager.setServerName(loadParameter(servletConfig,
+                SynapseConstants.SERVER_NAME, false));
 
         serverManager.start();
         servletContext.setAttribute(ALREADY_INITED, Boolean.TRUE);
@@ -96,7 +100,7 @@ public class SynapseStartUpServlet extends HttpServlet {
     }
 
     private String loadParameter(ServletConfig servletConfig, String name, boolean required)
-        throws ServletException {
+            throws ServletException {
 
         if (System.getProperty(name) == null) {
 
@@ -104,7 +108,8 @@ public class SynapseStartUpServlet extends HttpServlet {
             log.debug("Init parameter '" + name + "' : " + value);
 
             if ((value == null || value.trim().length() == 0) && required) {
-                handleException("A valid system property or init parameter '" + name + "' is required");
+                handleException("A valid system property or init parameter '" +
+                        name + "' is required");
             } else {
                 return value;
             }

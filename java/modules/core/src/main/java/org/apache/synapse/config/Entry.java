@@ -121,8 +121,9 @@ public class Entry {
     }
 
     /**
+     * Set the mapper
      *
-     * @param mapper
+     * @param mapper XMLToObjectMapper instance
      */
     public void setMapper(XMLToObjectMapper mapper) {
         this.mapper = mapper;
@@ -145,11 +146,8 @@ public class Entry {
     }
 
     public boolean isExpired() {
-        if (getType() == REMOTE_ENTRY && getExpiryTime() > 0) {
-            return System.currentTimeMillis() > expiryTime;
-        } else {
-            return false;
-        }
+        return getType() == REMOTE_ENTRY && getExpiryTime() > 0
+                && System.currentTimeMillis() > expiryTime;
     }
 
     public boolean isCached() {

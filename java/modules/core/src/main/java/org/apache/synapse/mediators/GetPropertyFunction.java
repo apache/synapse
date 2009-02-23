@@ -34,7 +34,6 @@ import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.text.Format;

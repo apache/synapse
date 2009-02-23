@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.task.TaskDescription;
@@ -85,7 +86,8 @@ public class SimpleQuartz extends AbstractStartup {
             handleException("TaskDescription is null");
         }
 
-        repository = synapseEnvironment.getSynapseConfiguration().getTaskDescriptionRepository();
+        SynapseConfiguration  synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
+        repository = synapseConfiguration.getTaskDescriptionRepository();
 
         if (repository == null) {
             handleException("Task Description Repository can not found");
@@ -118,7 +120,8 @@ public class SimpleQuartz extends AbstractStartup {
         List pinnedServers = taskDescription.getPinnedServers();
         if (pinnedServers != null && !pinnedServers.isEmpty()) {
             if (!pinnedServers.contains(thisServerName)) {
-                log.info("Server name not in pinned servers list. Not starting Task : " + getName());
+                log.info("Server name not in pinned servers list. Not starting Task : " +
+                        getName());
                 return;
             }
         }
@@ -132,7 +135,7 @@ public class SimpleQuartz extends AbstractStartup {
                     SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
-                    taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());
+                    taskScheduler.init(synapseConfiguration.getProperties());
                 }
                 taskScheduler.scheduleTask(taskDescription, map, SimpleQuartzJob.class);
             } else {

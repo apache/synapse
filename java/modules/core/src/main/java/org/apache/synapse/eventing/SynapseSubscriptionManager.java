@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public abstract class SynapseSubscriptionManager implements SubscriptionManager {
 
-    private Map<String, String> properties = new HashMap<String, String>();
+    private final Map<String, String> properties = new HashMap<String, String>();
 
     /**
      * Return all Active subscriptions

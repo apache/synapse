@@ -110,7 +110,7 @@ public class ServerManager {
             for (Object o : configctx.getAxisConfiguration().getTransportsIn().keySet()) {
                 
                 String trp = (String) o;
-                TransportInDescription trsIn = (TransportInDescription)
+                TransportInDescription trsIn =
                     configctx.getAxisConfiguration().getTransportsIn().get(trp);
 
                 String msg = "Starting transport " + trsIn.getName();

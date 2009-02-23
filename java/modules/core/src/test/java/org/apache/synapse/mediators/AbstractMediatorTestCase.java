@@ -22,6 +22,7 @@ package org.apache.synapse.mediators;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.synapse.config.SynapseConfigUtils;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
@@ -31,16 +32,6 @@ import java.io.StringReader;
 public class AbstractMediatorTestCase extends TestCase {
 
     protected static OMElement createOMElement(String xml) {
-        try {
-
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
-
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
+        return SynapseConfigUtils.stringToOM(xml);
     }
 }

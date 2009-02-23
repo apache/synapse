@@ -70,7 +70,7 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * A Map containing features to be passed to the actual validator (Xerces)
      */
-    private List<MediatorProperty> explicityFeatures = new ArrayList<MediatorProperty>();
+    private final List<MediatorProperty> explicityFeatures = new ArrayList<MediatorProperty>();
 
     /**
      * This is the actual schema instance used to create a new schema
@@ -86,7 +86,8 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * The SchemaFactory used to create new schema instances.
      */
-    private  SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    private final SchemaFactory factory = SchemaFactory.newInstance(
+            XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
     public boolean mediate(MessageContext synCtx) {
 

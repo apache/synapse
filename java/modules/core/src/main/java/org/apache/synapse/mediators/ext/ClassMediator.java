@@ -46,7 +46,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
     /** The reference to the actual class that implments the Mediator interface */
     private Mediator mediator = null;
     /** A list of simple properties that would be set on the class before being used */
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
 	 * Don't use a new instance... do one instance of the object per instance of

@@ -48,9 +48,9 @@ import org.apache.commons.logging.LogFactory;
 public class ScriptMessageContext implements MessageContext {
 
     /** The actual Synapse message context reference */
-    private MessageContext mc;
+    private final MessageContext mc;
     /** The OMElement to scripting language object converter for the selected language */
-    private XMLHelper xmlHelper;
+    private final XMLHelper xmlHelper;
 
     public ScriptMessageContext(MessageContext mc, XMLHelper xmlHelper) {
         this.mc = mc;
@@ -58,24 +58,22 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     /**
-     * Get the XML representation of SOAP Body payload. 
+     * Get the XML representation of SOAP Body payload.
      * The payload is the first element inside the SOAP <Body> tags
-     * 
+     *
      * @return the XML SOAP Body
-     * @throws ScriptException 
-     * @throws OMException 
+     * @throws ScriptException For erroing when geting the XML representation of SOAP Body payload
      */
-    public Object getPayloadXML() throws OMException, ScriptException {
+    public Object getPayloadXML() throws ScriptException {
         return xmlHelper.toScriptXML(mc.getEnvelope().getBody().getFirstElement());
     }
 
     /**
      * Set the SOAP body payload from XML
-     * 
-     * @param payload
-     * @throws ScriptException 
-     * @throws OMException 
-     * 
+     *
+     * @param payload Message payload
+     * @throws ScriptException For errors in converitng xml To OM
+     * @throws OMException     For errors in OM manipulaion
      */
 
     public void setPayloadXML(Object payload) throws OMException, ScriptException {
@@ -87,7 +85,7 @@ public class ScriptMessageContext implements MessageContext {
     /**
      * Get the XML representation of the complete SOAP envelope
      * @return return an object that represents the payload in the current scripting language
-     * @throws ScriptException 
+     * @throws ScriptException For erroing when geting the XML representation of SOAP envelope
      */
     public Object getEnvelopeXML() throws ScriptException {
         return xmlHelper.toScriptXML(mc.getEnvelope());
@@ -97,12 +95,15 @@ public class ScriptMessageContext implements MessageContext {
     public void setTo(String reference) {
         mc.setTo(new EndpointReference(reference));
     }
+
     public void setFaultTo(String reference) {
         mc.setFaultTo(new EndpointReference(reference));
     }
+
     public void setFrom(String reference) {
         mc.setFrom(new EndpointReference(reference));
     }
+
     public void setReplyTo(String reference) {
         mc.setReplyTo(new EndpointReference(reference));
     }
@@ -128,7 +129,7 @@ public class ScriptMessageContext implements MessageContext {
         return mc.getContextEntries();
     }
 
-    public void setContextEntries(Map entries) {
+    public void setContextEntries(Map<String, Object> entries) {
         mc.setContextEntries(entries);
     }
 

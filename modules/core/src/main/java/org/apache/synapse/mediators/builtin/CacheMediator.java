@@ -100,9 +100,9 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         }
 
         // if maxMessageSize is specified check for the message size before processing
-        FixedByteArrayOutputStream fbaos = null;
+
         if (maxMessageSize > 0) {
-            fbaos = new FixedByteArrayOutputStream(maxMessageSize);
+            FixedByteArrayOutputStream fbaos = new FixedByteArrayOutputStream(maxMessageSize);
             try {
                 MessageHelper.cloneSOAPEnvelope(synCtx.getEnvelope()).serialize(fbaos);
             } catch (XMLStreamException e) {

@@ -41,10 +41,13 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
         log = LogFactory.getLog(getClass());
     }
 
-    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords,
-                                                              int type, int userIDType) {
+    public Map<String, Map<String, Statistics>> determineView(
+            List<StatisticsRecord> statisticsRecords,
+            int type,
+            int userIDType) {
 
-        Map<String, Map<String, Statistics>> statisticsMap = new HashMap<String, Map<String, Statistics>>();
+        final Map<String, Map<String, Statistics>> statisticsMap =
+                new HashMap<String, Map<String, Statistics>>();
 
         if (statisticsRecords == null) {
             if (log.isDebugEnabled()) {
@@ -126,7 +129,8 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
                 StatisticsLog statisticsLog = statisticsLogMap.get(rName);
                 if (statisticsLog == null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Statistics Logs cannot be found for resource with given name " + rName);
+                        log.debug("Statistics Logs cannot be found for resource with given name " +
+                                rName);
                     }
                     continue;
                 }
@@ -149,8 +153,10 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
 
     }
 
-    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords,
-                                                 int type, int userIDType) {
+    public Map<String, Statistics> determineView(String id,
+                                                 List<StatisticsRecord> statisticsRecords,
+                                                 int type,
+                                                 int userIDType) {
 
         if (id == null || "".equals(id)) {
             handleException("Resource Id cannot be null");

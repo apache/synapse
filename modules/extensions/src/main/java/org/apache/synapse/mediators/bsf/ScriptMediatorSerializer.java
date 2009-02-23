@@ -18,28 +18,24 @@
  */
 package org.apache.synapse.mediators.bsf;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
 /**
  * Serializer for a script mediator
+ *
  * @see org.apache.synapse.mediators.bsf.ScriptMediatorFactory
  */
 public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(ScriptMediatorSerializer.class);
-
     public OMElement serializeMediator(OMElement parent, Mediator m) {
-        if (!(m instanceof ScriptMediator) ) {
+        if (!(m instanceof ScriptMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
         }
 
@@ -58,18 +54,19 @@ public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
             }
         } else {
             script.addAttribute(fac.createOMAttribute("language", nullNS, language));
-            OMTextImpl textData = (OMTextImpl) fac.createOMText(scriptMediator.getScriptSrc().trim());
+            OMTextImpl textData = (OMTextImpl) fac.createOMText(
+                    scriptMediator.getScriptSrc().trim());
             textData.setType(XMLStreamConstants.CDATA);
             script.addChild(textData);
         }
-        
-        Map includeMap = scriptMediator.getIncludeMap();
-        Iterator iterIncludeMap = includeMap.keySet().iterator();
-        while(iterIncludeMap.hasNext()) {
-          String includeKey = (String) iterIncludeMap.next();
-          OMElement includeKeyElement = fac.createOMElement("include", synNS);
-          includeKeyElement.addAttribute(fac.createOMAttribute("key", nullNS, includeKey));
-          script.addChild(includeKeyElement);
+
+        Map<String, Object> includeMap = scriptMediator.getIncludeMap();
+        for (String includeKey : includeMap.keySet()) {
+            if (includeKey != null && includeKey.length() != 0) {
+                OMElement includeKeyElement = fac.createOMElement("include", synNS);
+                includeKeyElement.addAttribute(fac.createOMAttribute("key", nullNS, includeKey));
+                script.addChild(includeKeyElement);
+            }
         }
 
         saveTracingState(script, scriptMediator);

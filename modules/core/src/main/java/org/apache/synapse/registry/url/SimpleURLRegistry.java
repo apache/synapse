@@ -134,7 +134,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
     public RegistryEntry getRegistryEntry(String key) {
-        
+
         if (log.isDebugEnabled()) {
             log.debug("Perform RegistryEntry lookup for key : " + key);
         }
@@ -227,13 +227,11 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             if (!file.isDirectory()) {
                 return null;
             }
-            InputStream inStream = null;
+            BufferedReader reader = null;
             try {
-                inStream = (InputStream) url.getContent();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-                ArrayList entryList = new ArrayList();
-                String key = "";
+                reader = new BufferedReader(new InputStreamReader((InputStream) url.getContent()));
+                ArrayList<RegistryEntry> entryList = new ArrayList<RegistryEntry>();
+                String key;
                 while ((key = reader.readLine()) != null) {
                     RegistryEntryImpl registryEntryImpl = new RegistryEntryImpl();
                     if (entry.getKey().equals("")) {
@@ -251,14 +249,19 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
                 RegistryEntry[] entries = new RegistryEntry[entryList.size()];
                 for (int i = 0; i < entryList.size(); i++) {
-                    entries[i] = (RegistryEntry) entryList.get(i);
+                    entries[i] = entryList.get(i);
                 }
                 return entries;
-
             } catch (Exception e) {
                 throw new SynapseException("Error in reading the URL.");
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException ignored) {
+                    }
+                }
             }
-
         } else {
             throw new SynapseException("Invalid protocol.");
         }
@@ -266,47 +269,33 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
     public RegistryEntry[] getDescendants(RegistryEntry entry) {
 
-        ArrayList list = new ArrayList();
-        RegistryEntry[] entries = getChildren(entry);
-        if (entries != null) {
-            for (int i = 0; i < entries.length; i++) {
-
-                if (list.size() > MAX_KEYS) {
-                    break;
-                }
-
-                fillDescendants(entries[i], list);
-            }
-        }
+        ArrayList<RegistryEntry> list = new ArrayList<RegistryEntry>();
+        fillDescendants(entry, list);
 
         RegistryEntry[] descendants = new RegistryEntry[list.size()];
         for (int i = 0; i < list.size(); i++) {
-            descendants[i] = (RegistryEntry) list.get(i);
+            descendants[i] = list.get(i);
         }
 
         return descendants;
     }
 
-    private void fillDescendants(RegistryEntry parent, ArrayList list) {
+    private void fillDescendants(RegistryEntry parent, ArrayList<RegistryEntry> list) {
 
-        RegistryEntry[] entries = getChildren(parent);
-        if (entries != null) {
-            for (int i = 0; i < entries.length; i++) {
-
+        RegistryEntry[] children = getChildren(parent);
+        if (children != null) {
+            for (RegistryEntry child : children) {
+                if (child == null) {
+                    continue;
+                }
                 if (list.size() > MAX_KEYS) {
                     break;
                 }
-
-                fillDescendants(entries[i], list);
+                fillDescendants(child, list);
             }
         } else {
             list.add(parent);
         }
-    }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 
     private void handleException(String msg) {

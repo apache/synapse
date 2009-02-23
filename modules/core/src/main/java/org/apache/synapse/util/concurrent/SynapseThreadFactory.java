@@ -29,13 +29,13 @@ import java.util.concurrent.ThreadFactory;
 public class SynapseThreadFactory implements ThreadFactory {
 
     /** Holds the ThreadGroup under which this factory creates threads */
-    final ThreadGroup group;
+    private final ThreadGroup group;
 
     /** Holds the AtomicInteger class instance for the factory */
-    final AtomicInteger count;
+    private final AtomicInteger count;
 
     /** prefix for the thread id, thread number will be followed to construct the id */
-    final String namePrefix;
+    private final String namePrefix;
 
     /**
      * Constructor for the ThreadFactory to create new threads

@@ -21,8 +21,6 @@ package org.apache.synapse.mediators.spring;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.MediatorSerializer;
@@ -34,9 +32,8 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 public class SpringMediatorSerializer extends AbstractMediatorSerializer
     implements MediatorSerializer {
 
-    private static final OMNamespace sprNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE+"/spring", "spring");
-
-    private static final Log log = LogFactory.getLog(SpringMediatorSerializer.class);
+    private static final OMNamespace sprNS =
+            fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE+"/spring", "spring");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 

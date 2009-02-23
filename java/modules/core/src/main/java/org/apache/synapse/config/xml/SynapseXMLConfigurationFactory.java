@@ -267,12 +267,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         throw new SynapseException(msg);
     }
 
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-
     public QName getTagQName() {
 
         return XMLConfigConstants.DEFINITIONS_ELT;

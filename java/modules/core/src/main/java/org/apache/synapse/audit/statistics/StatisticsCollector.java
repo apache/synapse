@@ -53,14 +53,17 @@ public class StatisticsCollector {
     }
 
     /**
-     * Returns a particular statistics view according to a given strategy for a given resource with particular type
+     * Returns a particular statistics view according to a given strategy for a given
+     * resource with particular type
      *
      * @param id       Resource id
      * @param type     Type of the resource
      * @param strategy Statistics viewing strategy
      * @return Statistics view
      */
-    public Map<String, Statistics> getStatistics(String id, int type, StatisticsViewStrategy strategy) {
+    public Map<String, Statistics> getStatistics(String id,
+                                                 int type,
+                                                 StatisticsViewStrategy strategy) {
         return strategy.determineView(id, statisticsCollection, type);
     }
 
@@ -71,7 +74,8 @@ public class StatisticsCollector {
      * @param strategy strategy Statistics viewing strategy
      * @return Statistics view
      */
-    public Map<String, Map<String, Statistics>> getStatistics(int type, StatisticsViewStrategy strategy) {
+    public Map<String, Map<String, Statistics>> getStatistics(int type,
+                                                              StatisticsViewStrategy strategy) {
         return strategy.determineView(statisticsCollection, type);
     }
 

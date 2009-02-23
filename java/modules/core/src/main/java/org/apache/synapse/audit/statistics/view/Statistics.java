@@ -133,7 +133,8 @@ public class Statistics {
     }
 
     public String toString() {
-        return new StringBuffer().append("[Avg Processing Time : ").append(avgProcessingTime).append(" ]")
+        return new StringBuffer()
+                .append("[Avg Processing Time : ").append(avgProcessingTime).append(" ]")
                 .append(" [Max Processing Time : ").append(maxProcessingTime).append(" ]")
                 .append(" [Min Processing Time : ").append(minProcessingTime).append(" ]")
                 .append(" [Total Request Count : ").append(count).append(" ]")

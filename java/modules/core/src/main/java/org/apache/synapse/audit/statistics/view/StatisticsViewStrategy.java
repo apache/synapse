@@ -35,7 +35,9 @@ public interface StatisticsViewStrategy {
      * @param type              Type of resource
      * @return A particular statistics view
      */
-    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords, int type);
+    public Map<String, Map<String, Statistics>> determineView(
+            List<StatisticsRecord> statisticsRecords,
+            int type);
 
     /**
      * Return a statistics view for a resource with given type and given name
@@ -45,5 +47,7 @@ public interface StatisticsViewStrategy {
      * @param type              Type of resource
      * @return A particular statistics view
      */
-    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords, int type);
+    public Map<String, Statistics> determineView(String id,
+                                                 List<StatisticsRecord> statisticsRecords,
+                                                 int type);
 }

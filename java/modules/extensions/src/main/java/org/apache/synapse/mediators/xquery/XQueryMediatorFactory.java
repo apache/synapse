@@ -58,8 +58,10 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         XQueryMediator xQueryMediator = new XQueryMediator();
-        OMAttribute xqueryKey = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
-        OMAttribute attrTarget = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "target"));
+        OMAttribute xqueryKey = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                "key"));
+        OMAttribute attrTarget = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                "target"));
         if (xqueryKey != null) {
             String queryKey = xqueryKey.getAttributeValue();
             if (queryKey != null) {
@@ -77,7 +79,8 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                     xQueryMediator.setQuerySource(targetValue);
                     xQueryMediator.setTarget(SynapseXPathFactory.getSynapseXPath(elem, ATT_TARGET));
                 } catch (JaxenException e) {
-                    handleException("Invalid XPath specified for the target attribute : " + targetValue);
+                    handleException("Invalid XPath specified for the target attribute : " +
+                            targetValue);
                 }
             }
         }
@@ -91,7 +94,8 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
                     MediatorPropertyFactory.getMediatorProperties(dataSource));
         }
 
-        Iterator it = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "variable"));
+        Iterator it = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+                "variable"));
         while (it.hasNext()) {
             OMElement variableOM = (OMElement) it.next();
             String name = variableOM.getAttributeValue(ATT_NAME_Q);

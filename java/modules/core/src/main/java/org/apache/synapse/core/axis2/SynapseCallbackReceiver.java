@@ -59,7 +59,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private static final Log log = LogFactory.getLog(SynapseCallbackReceiver.class);
 
     /** This is the synchronized callbackStore that maps outgoing messageID's to callback objects */
-    private Map<String, AxisCallback> callbackStore;  // will made thread safe in the constructor
+    private final Map<String, AxisCallback> callbackStore;  // will made thread safe in the constructor
 
     /**
      * Create the *single* instance of this class that would be used by all anonymous services

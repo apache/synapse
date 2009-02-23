@@ -43,7 +43,7 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private SynapseXPath source = null;
     /** The list of switch cases    */
-    private List<SwitchCase> cases = new ArrayList<SwitchCase>();
+    private final List<SwitchCase> cases = new ArrayList<SwitchCase>();
     /** The default switch case, if any */
     private SwitchCase defaultCase = null;
 

@@ -34,13 +34,10 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.audit.AuditConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.MediatorFaultHandler;
 
 import java.util.*;
 
@@ -57,16 +54,16 @@ public class Axis2MessageContext implements MessageContext {
     private SynapseEnvironment synEnv = null;
 
     /** Synapse Message Context properties */
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Local entries fetched from the configuration or from the registry for the transactional
      * resource access
      */
-    private Map<String, Object> localEntries = new HashMap<String, Object>();
+    private final Map<String, Object> localEntries = new HashMap<String, Object>();
 
     /** Fault Handler stack which will be popped and called the handleFault in error states */
-    private Stack<FaultHandler> faultStack = new Stack<FaultHandler>();
+    private final Stack<FaultHandler> faultStack = new Stack<FaultHandler>();
 
     /** The Axis2 MessageContext reference */
     private org.apache.axis2.context.MessageContext axis2MessageContext = null;
@@ -104,7 +101,7 @@ public class Axis2MessageContext implements MessageContext {
     }
 
     public void setContextEntries(Map<String, Object> entries) {
-        this.localEntries = entries;
+        this.localEntries.putAll(entries);
     }
 
     public Mediator getMainSequence() {

@@ -75,7 +75,7 @@ public class ResourceMap {
      * @return an <code>InputSource</code> object for the referenced resource
      */
     public InputSource resolve(SynapseConfiguration synCfg, String location) {
-        String key = (String)resources.get(location);
+        String key = resources.get(location);
         if (key == null) {
             if (log.isDebugEnabled()) {
                 log.debug("No resource mapping is defined for location '" + location + "'");

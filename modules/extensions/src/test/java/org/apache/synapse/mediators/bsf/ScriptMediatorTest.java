@@ -33,8 +33,6 @@ public class ScriptMediatorTest extends TestCase {
 
     private static final String inlinescript = "var state=5;";
 
-    private String randomno = null;
-
     private String threadsafetyscript = "var rno = mc.getPayloadXML().toString(); rno=rno*2; mc.setPayloadXML" +
             "(<randomNo>{rno}</randomNo>)";
 
@@ -47,7 +45,7 @@ public class ScriptMediatorTest extends TestCase {
     public void testThreadSafety() throws Exception {
         MessageContext mc = TestUtils.getTestContext("<randomNo/>", null);
         Random rand = new Random();
-        randomno = new Integer(rand.nextInt(200)).toString();
+        String randomno = Integer.toString(rand.nextInt(200));
         mc.getEnvelope().getBody().getFirstElement().setText(randomno);
         ScriptMediator mediator = new ScriptMediator("js", threadsafetyscript);
         mediator.mediate(mc);

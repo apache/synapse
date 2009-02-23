@@ -32,7 +32,6 @@ import javax.script.*;
 import javax.activation.DataHandler;
 import java.util.TreeMap;
 import java.util.Map;
-import java.util.Iterator;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -70,9 +69,9 @@ public class ScriptMediator extends AbstractMediator {
      */
     private String language;
     /**
-     * The map of included scripts; key = registry entry key, value = script source 
+     * The map of included scripts; key = registry entry key, value = script source
      */
-    private Map includes = new TreeMap();
+    private final Map<String, Object> includes;
     /**
      * The optional name of the function to be invoked, defaults to mediate
      */
@@ -98,11 +97,14 @@ public class ScriptMediator extends AbstractMediator {
      */
     private Invocable invocableScript;
     /**
-     * The BSF helper to convert between the XML representations used by Java and the scripting language
+     * The BSF helper to convert between the XML representations used by Java
+     * and the scripting language
      */
     private XMLHelper xmlHelper;
 
-    /** Lock used to ensure thread-safe lookup of the object from the registry */
+    /**
+     * Lock used to ensure thread-safe lookup of the object from the registry
+     */
     private final Object resourceLock = new Object();
 
     /**
@@ -114,27 +116,30 @@ public class ScriptMediator extends AbstractMediator {
     public ScriptMediator(String language, String scriptSourceCode) {
         this.language = language;
         this.scriptSourceCode = scriptSourceCode;
+        this.includes = new TreeMap<String, Object>();
         initInlineScript();
     }
 
     /**
      * Create a script mediator for the given language and given script entry key and function
      *
-     * @param language the BSF language
-     * @param key      the registry entry key to load the script
-     * @param function the function to be invoked
+     * @param language       the BSF language
+     * @param includeKeysMap Inclued script keys
+     * @param key            the registry entry key to load the script
+     * @param function       the function to be invoked
      */
-    public ScriptMediator(String language, Map includeKeysMap, String key, String function) {
+    public ScriptMediator(String language, Map<String, Object> includeKeysMap,
+                          String key, String function) {
         this.language = language;
         this.key = key;
         this.includes = includeKeysMap;
         if (function != null) {
             this.function = function;
         }
-
         initScriptEngine();
         if (!(scriptEngine instanceof Invocable)) {
-            throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
+            throw new SynapseException("Script engine is not an Invocable" +
+                    " engine for language: " + language);
         }
         invocableScript = (Invocable) scriptEngine;
     }
@@ -159,8 +164,8 @@ public class ScriptMediator extends AbstractMediator {
 
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Scripting language : " + language + " source " +
-                (key == null ? ": specified inline " : " loaded with key : " + key) +
-                (function != null ? " function : " + function : ""));
+                    (key == null ? ": specified inline " : " loaded with key : " + key) +
+                    (function != null ? " function : " + function : ""));
         }
 
         boolean returnValue;
@@ -199,15 +204,15 @@ public class ScriptMediator extends AbstractMediator {
 
         } catch (ScriptException e) {
             handleException("The script engine returned an error executing the " +
-                (key == null ? "inlined " : "external ") + language + " script" +
-                (key != null? " : " + key : "") +
-                (function != null ? " function " + function : ""), e, synCtx);
+                    (key == null ? "inlined " : "external ") + language + " script" +
+                    (key != null ? " : " + key : "") +
+                    (function != null ? " function " + function : ""), e, synCtx);
             returnValue = false;
         } catch (NoSuchMethodException e) {
             handleException("The script engine returned a NoSuchMethodException executing the " +
-                (key == null ? "inlined " : "external ") + language + " script" +
-                (key != null? " : " + key : "") +
-                (function != null ? " function " + function : ""), e, synCtx);
+                    (key == null ? "inlined " : "external ") + language + " script" +
+                    (key != null ? " : " + key : "") +
+                    (function != null ? " function " + function : ""), e, synCtx);
             returnValue = false;
         }
         return returnValue;
@@ -218,9 +223,11 @@ public class ScriptMediator extends AbstractMediator {
      *
      * @param synCtx the message context
      * @return script result
-     * @throws ScriptException
+     * @throws ScriptException       For any errors , when comiple , run the script
+     * @throws NoSuchMethodException If the funcation is not defined in the script
      */
-    protected Object mediateWithExternalScript(MessageContext synCtx) throws ScriptException, NoSuchMethodException {
+    private Object mediateWithExternalScript(MessageContext synCtx)
+            throws ScriptException, NoSuchMethodException {
         prepareExternalScript(synCtx);
         ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
         return invocableScript.invokeFunction(function, new Object[]{scriptMC});
@@ -231,9 +238,9 @@ public class ScriptMediator extends AbstractMediator {
      *
      * @param synCtx message context
      * @return true, or the script return value
-     * @throws ScriptException
+     * @throws ScriptException For any errors , when comiple , run the script
      */
-    protected Object mediateForInlineScript(MessageContext synCtx) throws ScriptException {
+    private Object mediateForInlineScript(MessageContext synCtx) throws ScriptException {
 
         ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
 
@@ -260,15 +267,16 @@ public class ScriptMediator extends AbstractMediator {
 
             if (scriptEngine instanceof Compilable) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Script engine supports Compilable interface, compiling script code..");
+                    log.debug("Script engine supports Compilable interface, " +
+                            "compiling script code..");
                 }
-                compiledScript = ((Compilable)scriptEngine).compile(scriptSourceCode);
+                compiledScript = ((Compilable) scriptEngine).compile(scriptSourceCode);
             } else {
                 // do nothing. If the script enging doesn't support Compilable then
                 // the inline script will be evaluated on each invocation
                 if (log.isDebugEnabled()) {
                     log.debug("Script engine does not support the Compilable interface, " +
-                        "inlined script would be evaluated on each invocation..");
+                            "inlined script would be evaluated on each invocation..");
                 }
             }
 
@@ -280,16 +288,19 @@ public class ScriptMediator extends AbstractMediator {
     /**
      * Prepares the mediator for the invocation of an external script
      *
-     * @throws ScriptException
+     * @param synCtx MessageContext script
+     * @throws ScriptException For any errors , when comiple the script
      */
-    protected synchronized void prepareExternalScript(MessageContext synCtx) throws ScriptException {
+    protected synchronized void prepareExternalScript(MessageContext synCtx)
+            throws ScriptException {
 
         // TODO: only need this synchronized method for dynamic registry entries. If there was a way
         // to access the registry entry during mediator initialization then for non-dynamic entries
         // this could be done just the once during mediator initialization.
 
         Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
-        boolean needsReload = (entry != null) && entry.isDynamic() && (!entry.isCached() || entry.isExpired());
+        boolean needsReload = (entry != null) && entry.isDynamic() &&
+                (!entry.isCached() || entry.isExpired());
         synchronized (resourceLock) {
             if (scriptSourceCode == null || needsReload) {
                 Object o = synCtx.getEntry(key);
@@ -329,8 +340,7 @@ public class ScriptMediator extends AbstractMediator {
         }
 
         // load <include /> scripts; reload each script if needed
-        for (Iterator iter = includes.keySet().iterator(); iter.hasNext();) {
-            String includeKey = (String) iter.next();
+        for (String includeKey : includes.keySet()) {
             String includeSourceCode = (String) includes.get(includeKey);
             Entry includeEntry = synCtx.getConfiguration().getEntryDefinition(includeKey);
             boolean includeEntryNeedsReload = (includeEntry != null) && includeEntry.isDynamic()
@@ -389,7 +399,7 @@ public class ScriptMediator extends AbstractMediator {
 
         this.multiThreadedEngine = scriptEngine.getFactory().getParameter("THREADING") != null;
         log.debug("Script mediator for language : " + language +
-            " supports multithreading? : " + multiThreadedEngine);
+                " supports multithreading? : " + multiThreadedEngine);
     }
 
     public String getLanguage() {
@@ -413,12 +423,8 @@ public class ScriptMediator extends AbstractMediator {
         throw new SynapseException(msg);
     }
 
-    public Map getIncludeMap() {
-      return includes;
+    public Map<String, Object> getIncludeMap() {
+        return includes;
     }
 
-    public void setIncludeMap(Map includeMap) {
-      this.includes = includeMap;
-    }
-    
 }

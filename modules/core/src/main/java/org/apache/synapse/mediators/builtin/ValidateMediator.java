@@ -201,7 +201,7 @@ public class ValidateMediator extends AbstractListMediator {
      * Get the validation Source for the message context
      *
      * @param synCtx the current message to validate
-     * @param synLog
+     * @param synLog  SynapseLog instance
      * @return the validation Source for the current message
      */
     private Source getValidationSource(MessageContext synCtx, SynapseLog synLog) {

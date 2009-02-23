@@ -41,7 +41,6 @@ import org.xml.sax.InputSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import javax.activation.DataHandler;
 import java.io.StringReader;

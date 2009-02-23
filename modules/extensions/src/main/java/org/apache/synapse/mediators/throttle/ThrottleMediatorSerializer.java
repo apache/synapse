@@ -19,10 +19,7 @@
 package org.apache.synapse.mediators.throttle;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.SequenceMediatorSerializer;
@@ -42,11 +39,6 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  */
 
 public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
-
-    private static final Log log = LogFactory.getLog(ThrottleMediatorSerializer.class);
-
-    private static final OMNamespace throttleNS
-            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "throttle");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
         if (!(m instanceof ThrottleMediator)) {
@@ -70,14 +62,15 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
         saveTracingState(throttle, throttleMediator);
 
         String id = throttleMediator.getId();
-        if(id != null){
+        if (id != null) {
             throttle.addAttribute(fac.createOMAttribute(
                     "id", nullNS, id));
         }
-        
+
         String onReject = throttleMediator.getOnRejectSeqKey();
         if (onReject != null) {
-            throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONREJECT, nullNS, onReject));
+            throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONREJECT, nullNS,
+                    onReject));
         } else {
             Mediator mediator = throttleMediator.getOnRejectMediator();
             SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
@@ -90,7 +83,8 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
         }
         String onAccept = throttleMediator.getOnAcceptSeqKey();
         if (onAccept != null) {
-            throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONACCEPT, nullNS, onAccept));
+            throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONACCEPT, nullNS,
+                    onAccept));
         } else {
             Mediator mediator = throttleMediator.getOnAcceptMediator();
             SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();

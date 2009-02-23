@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -54,16 +55,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
     }
 
     protected OMElement createOMElement(String xml) {
-        try {
-
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            return builder.getDocumentElement();
-
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
+        return SynapseConfigUtils.stringToOM(xml);
     }
 
     protected boolean serialization(String inputXml, MediatorFactory mediatorFactory, MediatorSerializer mediatorSerializer) {

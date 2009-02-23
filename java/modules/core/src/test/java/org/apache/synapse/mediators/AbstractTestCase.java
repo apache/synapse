@@ -33,6 +33,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MediatorSerializer;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.xml.sax.SAXException;
 
@@ -58,17 +59,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
     }
 
     protected OMElement createOMElement(String xml) {
-        try {
-
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
-
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
+        return SynapseConfigUtils.stringToOM(xml);
     }
 
     protected boolean serialization(String inputXml, MediatorFactory mediatorFactory, MediatorSerializer mediatorSerializer) {

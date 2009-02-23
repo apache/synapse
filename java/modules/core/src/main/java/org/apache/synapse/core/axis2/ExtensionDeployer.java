@@ -202,11 +202,4 @@ public class ExtensionDeployer implements Deployer {
         }
         throw new DeploymentException(message, e);
     }
-
-    private void handleException(String message) throws DeploymentException {
-        if (log.isDebugEnabled()) {
-            log.debug(message);
-        }
-        throw new DeploymentException(message);
-    }
 }

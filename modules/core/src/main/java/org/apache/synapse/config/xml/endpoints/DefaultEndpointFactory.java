@@ -83,8 +83,8 @@ public class DefaultEndpointFactory extends EndpointFactory {
         if (defaultElement != null) {
             EndpointDefinition endpoint = createEndpointDefinition(defaultElement);
             defaultEndpoint.setDefinition(endpoint);
+            processAuditStatus(defaultEndpoint, defaultElement);
         }
-        processAuditStatus(defaultEndpoint, defaultElement);
         return defaultEndpoint;
     }
 

@@ -21,7 +21,6 @@ package org.apache.synapse.samples.n2n;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.ServerManager;
-import org.apache.axis2.engine.ListenerManager;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -58,7 +57,7 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
     }
 
     protected void setUpNSContext() {
-        Map m = new HashMap();
+        Map<String, String> m = new HashMap<String, String>();
         m.put("ms", "http://services.samples");
         m.put("ns", "http://services.samples");
         NamespaceContext nsCtx = new SimpleNamespaceContext(m);

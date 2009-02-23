@@ -35,6 +35,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
@@ -89,16 +90,7 @@ public class TestUtils {
     }
 
     public static OMElement createOMElement(String xml) {
-        try {
-
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
-
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
+        return SynapseConfigUtils.stringToOM(xml);
     }
 
 }

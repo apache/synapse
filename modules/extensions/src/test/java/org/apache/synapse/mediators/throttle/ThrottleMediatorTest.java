@@ -29,17 +29,14 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.throttle.*;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
-import java.io.StringReader;
 
 /**
  * Throttle Mediator Test - This class test throttling when policy has specified as both of
@@ -118,23 +115,10 @@ public class ThrottleMediatorTest extends TestCase {
                 OMAbstractFactory.getSOAP11Factory().createOMDocument();
         omDoc.addChild(envelope);
 
-        envelope.getBody().addChild(createOMElement(payload));
+        envelope.getBody().addChild(SynapseConfigUtils.stringToOM(payload));
 
         synMc.setEnvelope(envelope);
         return synMc;
-    }
-
-    public static OMElement createOMElement(String xml) {
-        try {
-            XMLStreamReader reader = XMLInputFactory
-                    .newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void testMediate() throws Exception {

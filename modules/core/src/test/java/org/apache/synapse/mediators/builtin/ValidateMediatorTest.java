@@ -20,28 +20,25 @@
 package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.config.xml.ValidateMediatorFactory;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
 
 public class ValidateMediatorTest extends TestCase {
 
-    private static final String SCHEMA_FULL_CHECKING_FEATURE_ID = 
+    private static final String SCHEMA_FULL_CHECKING_FEATURE_ID =
         "http://apache.org/xml/features/validation/schema-full-checking";
 
-    private static final String HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID = 
+    private static final String HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID =
         "http://apache.org/xml/features/honour-all-schemaLocations";
 
     public static final String FEATURE_SECURE_PROCESSING =
@@ -87,7 +84,7 @@ public class ValidateMediatorTest extends TestCase {
             "<Codes>String</Codes>\n" +
             "</CheckPriceRequest>\n";
 
-    private static final String DEFAULT_FEATURES_MEDIATOR_CONFIG = 
+    private static final String DEFAULT_FEATURES_MEDIATOR_CONFIG =
             "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
             "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <on-fail>" +
@@ -98,7 +95,7 @@ public class ValidateMediatorTest extends TestCase {
             "   </on-fail>" +
             "</validate>";
 
-    private static final String CUSTOM_FEATURES_MEDIATOR_CONFIG = 
+    private static final String CUSTOM_FEATURES_MEDIATOR_CONFIG =
             "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
             "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <feature name=\"" + SCHEMA_FULL_CHECKING_FEATURE_ID + "\" value=\"false\"/>" +
@@ -133,20 +130,20 @@ public class ValidateMediatorTest extends TestCase {
         final MutableInt onFailInvoked = new MutableInt();
         TestMediator testMediator = new TestMediator();
         testMediator.setHandler(
-            new TestMediateHandler() {
-                public void handle(MessageContext synCtx) {
-                    onFailInvoked.setValue(1);
-                }
-            });
+                new TestMediateHandler() {
+                    public void handle(MessageContext synCtx) {
+                        onFailInvoked.setValue(1);
+                    }
+                });
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
         validate.mediate(synCtx);
         if (expectFail) {
             assertTrue("Expected ValidateMediator to trigger fail sequence",
-                       onFailInvoked.intValue() == 1);
+                    onFailInvoked.intValue() == 1);
         } else {
             assertTrue("ValidateMediator unexpectedly triggered fail sequence",
-                       onFailInvoked.intValue() == 0);
+                    onFailInvoked.intValue() == 0);
         }
     }
 
@@ -171,7 +168,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Arrays.asList(new String[] { "xsd-key-1", "xsd-key-2"}));
+        validate.setSchemaKeys(Arrays.asList("xsd-key-1", "xsd-key-2"));
         validate.setSource(createXPath("//m1:Outer"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -188,7 +185,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Arrays.asList(new String[] { "xsd-key-1", "xsd-key-2"}));
+        validate.setSchemaKeys(Arrays.asList("xsd-key-1", "xsd-key-2"));
         validate.setSource(createXPath("//m1:Outer"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -251,8 +248,8 @@ public class ValidateMediatorTest extends TestCase {
     public void testValidateMediatorDefaultFeatures() throws Exception {
 
         ValidateMediatorFactory mf = new ValidateMediatorFactory();
-        ValidateMediator validate = (ValidateMediator)mf.createMediator(
-            createOMElement(DEFAULT_FEATURES_MEDIATOR_CONFIG));
+        ValidateMediator validate = (ValidateMediator) mf.createMediator(
+                SynapseConfigUtils.stringToOM(DEFAULT_FEATURES_MEDIATOR_CONFIG));
 
         assertNull(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID));
         assertNull(validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
@@ -260,16 +257,15 @@ public class ValidateMediatorTest extends TestCase {
         makeValidInvocation(validate);
     }
 
-    public void testValidateMediatorCustomFeatures() throws Exception 
-    {
+    public void testValidateMediatorCustomFeatures() throws Exception {
         ValidateMediatorFactory mf = new ValidateMediatorFactory();
-        ValidateMediator validate = (ValidateMediator)mf.createMediator(
-            createOMElement(CUSTOM_FEATURES_MEDIATOR_CONFIG));
+        ValidateMediator validate = (ValidateMediator) mf.createMediator(
+                SynapseConfigUtils.stringToOM(CUSTOM_FEATURES_MEDIATOR_CONFIG));
 
         assertNotNull(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID));
-        assertFalse("true".equals((String)validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID)));
+        assertFalse("true".equals(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID)));
         assertNotNull(validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
-        assertTrue("true".equals((String)validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID)));
+        assertTrue("true".equals(validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID)));
 
         makeValidInvocation(validate);
     }
@@ -287,13 +283,5 @@ public class ValidateMediatorTest extends TestCase {
         test(validate, synCtx, false);
     }
 
-    private static OMElement createOMElement(String xml) {
-        try {
-            StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xml.getBytes()));
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 }

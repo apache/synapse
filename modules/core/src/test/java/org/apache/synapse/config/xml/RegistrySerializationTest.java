@@ -25,17 +25,13 @@ import org.apache.synapse.registry.Registry;
 
 public class RegistrySerializationTest extends AbstractTestCase {
 
-    private RegistryFactory registryFactory = null;
-    private RegistrySerializer registrySerializer = null;
-
     public RegistrySerializationTest() {
-        registryFactory = new RegistryFactory();
-        registrySerializer = new RegistrySerializer();
     }
 
     public void testRegistrySerialization() {
 
-        String regitryConfiguration = "<syn:registry xmlns:syn=\"http://ws.apache.org/ns/synapse\" provider=\"org.apache.synapse.registry.url.SimpleURLRegistry\">" +
+        String regitryConfiguration = "<syn:registry xmlns:syn=\"http://ws.apache.org/ns/synapse\" " +
+                "provider=\"org.apache.synapse.registry.url.SimpleURLRegistry\">" +
                 "<syn:parameter name=\"root\">file:./../../repository/</syn:parameter>" +
                 "<syn:parameter name=\"cachableDuration\">15000</syn:parameter>" +
                 "</syn:registry>";

@@ -177,7 +177,7 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
 
     /**
      * setting the default case ...which contains mediators to invoke when no case condition satisfy
-     * @param defaultCase
+     * @param defaultCase A SwitchCase instance representing default case
      */
     public void setDefaultCase(SwitchCase defaultCase) {
         this.defaultCase = defaultCase;

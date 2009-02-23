@@ -129,17 +129,17 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * Any parameters which should be passed into the XSLT transformation
      */
-    private List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
+    private final List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
 
     /**
      * Any features which should be set to the TransformerFactory explicitly
      */
-    private List<MediatorProperty> transformerFactoryFeatures = new ArrayList<MediatorProperty>();
+    private final List<MediatorProperty> transformerFactoryFeatures = new ArrayList<MediatorProperty>();
 
     /**
      * Any attributes which should be set to the TransformerFactory explicitly
      */
-    private List<MediatorProperty> transformerFactoryAttributes
+    private final List<MediatorProperty> transformerFactoryAttributes
                 = new ArrayList<MediatorProperty>();
 
     /**

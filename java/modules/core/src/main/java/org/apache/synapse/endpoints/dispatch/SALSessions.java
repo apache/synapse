@@ -41,7 +41,7 @@ public class SALSessions {
 
     private static final Log log = LogFactory.getLog(SALSessions.class);
 
-    private String SESSION_IDS = "synapse.salep.sessionids.";
+    private final static String SESSION_IDS = "synapse.salep.sessionids.";
 
     private ConfigurationContext configCtx;
 

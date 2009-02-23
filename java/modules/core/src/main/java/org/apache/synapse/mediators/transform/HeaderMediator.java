@@ -33,7 +33,6 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -173,8 +172,7 @@ public class HeaderMediator extends AbstractMediator {
         if (headersList == null || headersList.isEmpty()) {
             return;
         }
-        for ( Iterator iter = headersList.iterator();iter.hasNext();) {
-            Object o = iter.next();
+        for (Object o : headersList) {
             if (o instanceof SOAPHeaderBlock) {
                 SOAPHeaderBlock header = (SOAPHeaderBlock) o;
                 if (header.getLocalName().equals(qName.getLocalPart())) {

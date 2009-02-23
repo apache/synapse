@@ -50,7 +50,7 @@ public class ServerManager {
     private static final Log log = LogFactory.getLog(ServerManager.class);
 
     /** The singleton server manager instance */
-    private static ServerManager instance = new ServerManager();
+    private final static ServerManager instance = new ServerManager();
 
     /** The Axis2 repository location */
     private String axis2Repolocation;

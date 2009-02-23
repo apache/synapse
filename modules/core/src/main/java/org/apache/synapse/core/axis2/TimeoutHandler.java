@@ -49,19 +49,17 @@ public class TimeoutHandler extends TimerTask {
     private static final Log log = LogFactory.getLog(TimeoutHandler.class);
 
     /** The callback map - already a Collections.synchronized() hash map */
-    private Map callbackStore = null;
+    private final Map callbackStore;
     /** a lock to prevent concurrent execution while ensuring least overhead */
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private boolean alreadyExecuting = false;
-    /**
-     * this is the timeout for otherwise non-expiring callbacks
-     * to ensure system stability over time
-     */
+    /*This is the timeout for otherwise non-expiring callbacks to ensure system stability over time */
     private long globalTimeout = SynapseConstants.DEFAULT_GLOBAL_TIMEOUT;
+    private static final String SEND_TIMEOUT_MESSAGE = "Send timeout";
 
     public TimeoutHandler(Map callbacks) {
         this.callbackStore = callbacks;
-        globalTimeout = ServerManager.getInstance().getGlobalTimeoutInterval();
+        this.globalTimeout = ServerManager.getInstance().getGlobalTimeoutInterval();
         log.info("This engine will expire all callbacks after : " + (globalTimeout /1000) +
             " seconds, irrespective of the timeout action, after the specified or optional timeout");
     }
@@ -97,13 +95,16 @@ public class TimeoutHandler extends TimerTask {
             if (callbackStore.size() > 0) {
 
                 long currentTime = currentTime();
-                Iterator i = callbackStore.keySet().iterator();
 
-                while (i.hasNext()) {
+                for (Object key : callbackStore.keySet()) {
 
-                    Object key = i.next();
                     AsyncCallback callback = (AsyncCallback) callbackStore.get(key);
-
+                    if (callback == null) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("There is no callback for key :" + key);
+                        }
+                        continue;
+                    }
                     if (callback.getTimeOutAction() != SynapseConstants.NONE) {
 
                         if (callback.getTimeOutOn() <= currentTime) {
@@ -116,8 +117,10 @@ public class TimeoutHandler extends TimerTask {
 
                                 // add an error code to the message context, so that error sequences
                                 // can identify the cause of error
-                                msgContext.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.HANDLER_TIME_OUT);
-                                msgContext.setProperty(SynapseConstants.ERROR_MESSAGE, "Send timeout");
+                                msgContext.setProperty(SynapseConstants.ERROR_CODE,
+                                        SynapseConstants.HANDLER_TIME_OUT);
+                                msgContext.setProperty(SynapseConstants.ERROR_MESSAGE,
+                                        SEND_TIMEOUT_MESSAGE);
 
                                 Stack faultStack = msgContext.getFaultStack();
 
@@ -133,7 +136,7 @@ public class TimeoutHandler extends TimerTask {
 
                     } else if (currentTime > globalTimeout + callback.getTimeOutOn()) {
                         log.warn("Expiring message ID : " + key + "; dropping message after " +
-                            "global timeout of : " + (globalTimeout/1000) + " seconds");
+                                "global timeout of : " + (globalTimeout / 1000) + " seconds");
                         callbackStore.remove(key);
                     }
                 }

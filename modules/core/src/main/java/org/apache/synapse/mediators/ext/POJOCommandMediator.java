@@ -55,31 +55,31 @@ public class POJOCommandMediator extends AbstractMediator {
      * 'static' properties whose values are constant and does not depend
      * on the current message (i.e. and XPath over it)
      */
-    private Map<String, Object> staticSetterProperties = new HashMap<String, Object>();
+    private final Map<String, Object> staticSetterProperties = new HashMap<String, Object>();
 
     /**
      * 'dynamic' properties whose values are dynamically evaluated before each
      * invocation of the command, by evaluating an XPath against the current message
      */
-    private Map<String, SynapseXPath> messageSetterProperties = new HashMap<String, SynapseXPath>();
+    private final Map<String, SynapseXPath> messageSetterProperties = new HashMap<String, SynapseXPath>();
 
     /**
      * 'dynamic' properties whose values are dynamically evaluated before each
      * invocation of the command, by getting a property from the message context
      */
-    private Map<String, String> contextSetterProperties = new HashMap<String, String>();
+    private final Map<String, String> contextSetterProperties = new HashMap<String, String>();
 
     /**
      * 'context' properties whose values are set back to the message context as message
      * context properties
      */
-    private Map<String, String> contextGetterProperties = new HashMap<String, String>();
+    private final Map<String, String> contextGetterProperties = new HashMap<String, String>();
 
     /**
      * 'messsage' properties whose values are set back to the current message, from the command
      * and as specified by the XPATH
      */
-    private Map<String, SynapseXPath> messageGetterProperties = new HashMap<String, SynapseXPath>();
+    private final Map<String, SynapseXPath> messageGetterProperties = new HashMap<String, SynapseXPath>();
 
     /**
      * Implements the mediate method of the Mediator interface. This method will instantiate

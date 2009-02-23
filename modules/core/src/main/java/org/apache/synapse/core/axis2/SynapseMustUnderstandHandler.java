@@ -41,7 +41,7 @@ public class SynapseMustUnderstandHandler extends AbstractHandler {
 
         if (envelope.getHeader() != null) {
             Iterator headerBlocks = envelope.getHeader().getHeadersToProcess(null);
-            ArrayList markedHeaderBlocks = new ArrayList();
+            ArrayList<SOAPHeaderBlock> markedHeaderBlocks = new ArrayList<SOAPHeaderBlock>();
 
             while (headerBlocks.hasNext()) {
                 SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) headerBlocks.next();

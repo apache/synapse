@@ -43,7 +43,7 @@ import java.util.*;
 public abstract class AbstractDBMediator extends AbstractMediator implements ManagedLifecycle {
 
     /** Hold JDBC properties */
-    protected Map dataSourceProps = new HashMap();
+    protected final Map dataSourceProps = new HashMap();
     /** The DataSource to get DB connections */
     private DataSource dataSource = null;
     /**

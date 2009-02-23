@@ -19,9 +19,6 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-
 /**
  * This class represents an endpoint with the EPR as the 'To' header of the message. It is
  * responsible for sending the message to this EPR, performing retries etc on failure and

@@ -37,11 +37,11 @@ public abstract class AbstractRegistry implements Registry {
     private static final Log log = LogFactory.getLog(AbstractRegistry.class);
 
     /** The list of configuration properties */
-    protected Properties properties = new Properties();
+    protected final Properties properties = new Properties();
 
     /**
      * Get the resource for the given key from this registry
-     * @param entry
+     * @param entry The Enrty instance that contains meta-data
      * @return the matching resultant object
      */
     public Object getResource(Entry entry) {
@@ -88,7 +88,8 @@ public abstract class AbstractRegistry implements Registry {
                     entry.setExpiryTime(-1);
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
+                    log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 +
+                            "s");
                 }
 
                 // return cached object
@@ -158,6 +159,6 @@ public abstract class AbstractRegistry implements Registry {
     }
 
     public void init(Properties properties) {
-        this.properties =properties;
+        this.properties.putAll(properties);
     }
 }

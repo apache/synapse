@@ -27,7 +27,6 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TimerTask;

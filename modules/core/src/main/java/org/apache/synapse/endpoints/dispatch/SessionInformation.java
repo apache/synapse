@@ -35,7 +35,7 @@ public class SessionInformation implements Serializable {
     private String rootEndpointName;
     private List<String> path;
     private long expiryTime;
-    private transient List<Endpoint> endpointList;
+    private final transient List<Endpoint> endpointList;
 
     public SessionInformation(String id, List<Endpoint> endpointList, long expiryTime) {
         this.id = id;
@@ -69,10 +69,6 @@ public class SessionInformation implements Serializable {
 
     public List<Endpoint> getEndpointList() {
         return endpointList;
-    }
-
-    public void setEndpointList(List<Endpoint> endpointList) {
-        this.endpointList = endpointList;
     }
 
     public String getRootEndpointName() {

@@ -103,8 +103,8 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
     /**
      * Get a SynapseLog instance appropriate for the given context.
      * 
-     * @param synCtx
-     * @return
+     * @param synCtx  the current message context
+     * @return MediatorLog instance - an implementation of the SynapseLog
      */
     protected SynapseLog getLog(MessageContext synCtx) {
         return new MediatorLog(log, isTraceOn(synCtx), synCtx);

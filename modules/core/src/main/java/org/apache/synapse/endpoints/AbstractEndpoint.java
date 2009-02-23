@@ -32,12 +32,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.clustering.ClusteringAgent;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import java.util.Stack;
 import java.util.List;
-import java.util.Set;
-import java.lang.management.ManagementFactory;
+import java.util.Stack;
+
 
 /**
  * An abstract base class for all Endpoint implementations
@@ -196,7 +193,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     /**
      * Is this a leaf level endpoint? or parent endpoint that has children?
-     * @return
+     * @return true if this is a leaf endpoint
      */
     public boolean isLeafEndpoint() {
         return children == null || children.size() == 0;

@@ -56,12 +56,12 @@ public class SendMediator extends AbstractMediator {
 
             if (synLog.isTraceOrDebugEnabled()) {
                 StringBuffer sb = new StringBuffer();
-                sb.append("Sending " + (synCtx.isResponse() ? "response" : "request")
-                        + " message using implicit message properties..");
-                sb.append("\nSending To: " + (synCtx.getTo() != null ?
-                        synCtx.getTo().getAddress() : "null"));
-                sb.append("\nSOAPAction: " + (synCtx.getWSAAction() != null ?
-                        synCtx.getWSAAction() : "null"));
+                sb.append("Sending ").append(synCtx.isResponse() ? "response" : "request").
+                        append(" message using implicit message properties..");
+                sb.append("\nSending To: ").append(synCtx.getTo() != null ?
+                        synCtx.getTo().getAddress() : "null");
+                sb.append("\nSOAPAction: ").append(synCtx.getWSAAction() != null ?
+                        synCtx.getWSAAction() : "null");
                 synLog.traceOrDebug(sb.toString());
             }
 

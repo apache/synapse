@@ -20,11 +20,11 @@
 package org.apache.synapse.mediators.ext;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -118,21 +118,20 @@ public class POJOCommandMediator extends AbstractMediator {
 
         // then set the static/constant properties first
         for (String name : staticSetterProperties.keySet()) {
-            setInstanceProperty(name, staticSetterProperties.get(name), commandObject, synCtx);
+            PropertyHelper.setInstanceProperty(name, staticSetterProperties.get(name), commandObject);
         }
 
         // now set the any dynamic properties from the message context properties
         for (String name : contextSetterProperties.keySet()) {
-            setInstanceProperty(name, synCtx.getProperty(contextSetterProperties.get(name)),
-                commandObject, synCtx);
+            PropertyHelper.setInstanceProperty(name, synCtx.getProperty(contextSetterProperties.get(name)),
+                commandObject);
         }
 
         // now set the any dynamic properties evaluating XPath's on the current message
         for (String name : messageSetterProperties.keySet()) {
             SynapseXPath xpath = messageSetterProperties.get(name);
             String value = xpath.stringValueOf(synCtx);
-
-            setInstanceProperty(name, value, commandObject, synCtx);
+            PropertyHelper.setInstanceProperty(name, value, commandObject);
         }
 
         synLog.traceOrDebug("POJO initialized successfully, invoking the execute() method");
@@ -148,10 +147,9 @@ public class POJOCommandMediator extends AbstractMediator {
 
         } else {
 
-            Method exeMethod = null;
             try {
-                exeMethod = command.getMethod("execute", new Class[]{});
-                exeMethod.invoke(commandObject, new Object[]{});
+                Method exeMethod = command.getMethod("execute");
+                exeMethod.invoke(commandObject);
             } catch (NoSuchMethodException e) {
                 handleException("Cannot locate an execute() method on POJO class : " +
                     command.getClass(), e, synCtx);
@@ -233,85 +231,6 @@ public class POJOCommandMediator extends AbstractMediator {
         }
 
         return null;
-    }
-
-    /**
-     * Find and invoke the setter method with the name of form setXXX passing in the value given
-     * on the POJO object
-     *
-     * @param name name of the setter field
-     * @param value value to be set
-     * @param obj POJO instance
-     * @param synCtx current message
-     */
-    protected void setInstanceProperty(
-        String name, Object value, Object obj, MessageContext synCtx) {
-
-        String mName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-        Method method = null;
-
-        try {
-            Method[] methods = obj.getClass().getMethods();
-            boolean invoked = false;
-
-            for (int i=0; i<methods.length; i++) {
-                if (mName.equals(methods[i].getName())) {
-                    Class[] params = methods[i].getParameterTypes();
-                    if (params.length != 1) {
-                        handleException("Did not find a setter method named : " + mName +
-                            "() that takes a single String, int, long, float, double " +
-                            "or boolean or OMElement parameter", synCtx);
-                    } else if (value instanceof String) {
-                        if (params[0].equals(String.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{String.class});
-                            method.invoke(obj, new String[]{(String) value});
-                        } else if (params[0].equals(int.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{int.class});
-                            method.invoke(obj, new Integer[]{new Integer((String) value)});
-                        } else if (params[0].equals(long.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{long.class});
-                            method.invoke(obj, new Long[]{new Long((String) value)});
-                        } else if (params[0].equals(float.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{float.class});
-                            method.invoke(obj, new Float[]{new Float((String) value)});
-                        } else if (params[0].equals(double.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{double.class});
-                            method.invoke(obj, new Double[]{new Double((String) value)});
-                        } else if (params[0].equals(boolean.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{boolean.class});
-                            method.invoke(obj, new Boolean[]{new Boolean((String) value)});
-                        } else {
-                            handleException("Did not find a setter method named : " + mName +
-                                "() that takes a single String, int, long, float, double " +
-                                "or boolean parameter", synCtx);
-                        }
-                    } else if (value instanceof OMElement) {
-                        if (params[0].equals(OMElement.class)) {
-                            method = obj.getClass().getMethod(mName, new Class[]{OMElement.class});
-                            method.invoke(obj, new OMElement[]{(OMElement) value});                            
-                        } else {
-                            handleException("Did not find a setter method named : " + mName
-                                + "() that takes an OMElement as the parameter", synCtx);
-                        }
-                    } else {
-                        handleException("Can not handle the value type : "
-                            + value.getClass(), synCtx);
-                    }
-                    invoked = true;
-                }
-            }
-
-            if (!invoked) {
-                handleException("Did not find a setter method named : " + mName +
-                    "() that takes a single String, int, long, float, double " +
-                    "or boolean parameter", synCtx);
-            }
-
-        } catch (Exception e) {
-            handleException("Error invoking setter method named : " + mName +
-                "() that takes a single String, int, long, float, double " +
-                "or boolean parameter", e, synCtx);
-        }
     }
 
     public Class getCommand() {

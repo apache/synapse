@@ -194,7 +194,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
                 if (log.isDebugEnabled()) {
                     log.debug("[Failed Request Message ID : " + messageID + "]" +
-                            " [New to be Retried Request Message ID : " + synapseOutMsgCtx.getMessageID() + "]");
+                            " [New to be Retried Request Message ID : " +
+                            synapseOutMsgCtx.getMessageID() + "]");
                 }                   
 
                 ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);

@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManager {
 
-    private Map<String, SynapseSubscription> store =
+    private final Map<String, SynapseSubscription> store =
             new ConcurrentHashMap<String, SynapseSubscription>();
     private String topicHeaderName;
     private String topicHeaderNS;
@@ -91,11 +91,13 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
     }
 
     public List<SynapseSubscription> getMatchingSubscribers(MessageContext mc) {
-        LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
+        final LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
         for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
             XPathBasedEventFilter filter =
                     (XPathBasedEventFilter) stringSubscriptionEntry.getValue().getSynapseFilter();
-            filter.setSourceXpath(topicXPath);
+            if (filter != null) {
+                filter.setSourceXpath(topicXPath);
+            }
             if (filter == null || filter.isSatisfied(mc)) {
                 SynapseSubscription subscription = stringSubscriptionEntry.getValue();
                 Calendar current = Calendar.getInstance(); //Get current date and time

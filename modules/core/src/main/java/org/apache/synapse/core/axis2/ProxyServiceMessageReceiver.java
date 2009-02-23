@@ -194,7 +194,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     /**
      * Set reference to actual proxy service
-     * @param proxy
+     * @param proxy  ProxyService instance
      */
     public void setProxy(ProxyService proxy) {
         this.proxy = proxy;

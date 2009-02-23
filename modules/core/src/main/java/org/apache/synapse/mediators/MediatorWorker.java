@@ -20,7 +20,6 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.*;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

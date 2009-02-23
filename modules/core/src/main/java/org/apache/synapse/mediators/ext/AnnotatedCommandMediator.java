@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.ext;
 import org.apache.synapse.Command;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.mediators.annotations.Namespaces;
 import org.apache.synapse.mediators.annotations.ReadAndUpdate;
 import org.apache.synapse.mediators.annotations.ReadFromMessage;
@@ -72,9 +73,10 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
         synLog.traceOrDebug("Instance created, setting static and dynamic properties");
 
         // then set the static/constant properties first
-        for (Iterator iter = getStaticSetterProperties().keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = getStaticSetterProperties().keySet().iterator(); iter.hasNext();) {
             String name = (String) iter.next();
-            setInstanceProperty(name, (String) getStaticSetterProperties().get(name), commandObject, synCtx);
+            PropertyHelper.setInstanceProperty(name, getStaticSetterProperties().get(name),
+                    commandObject);
         }
         
         

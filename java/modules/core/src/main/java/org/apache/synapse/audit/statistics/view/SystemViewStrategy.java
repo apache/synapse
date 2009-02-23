@@ -35,9 +35,13 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
 
     private static final Log log = LogFactory.getLog(SystemViewStrategy.class);
 
-    public Map<String, Map<String, Statistics>> determineView(List<StatisticsRecord> statisticsRecords, int type) {
+    public Map<String, Map<String, Statistics>> determineView(
+            List<StatisticsRecord> statisticsRecords,
+            int type) {
 
-        Map<String, Map<String, Statistics>> statisticsMap = new HashMap<String, Map<String, Statistics>>();
+        final Map<String, Map<String, Statistics>> statisticsMap =
+                new HashMap<String, Map<String, Statistics>>();
+
         if (statisticsRecords == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Statistics records cannot be found.");
@@ -87,7 +91,8 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
                     StatisticsLog statisticsLog = statisticsLogMap.get(rName);
                     if (statisticsLog == null) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Cannot find the statistics log for resource with name : " + rName);
+                            log.debug("Cannot find the statistics log for resource with name : " +
+                                    rName);
                         }
                         continue;
                     }
@@ -104,7 +109,8 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
                     }
 
                     if (statistics != null) {
-                        statistics.update(statisticsLog.getProcessingTime(), record.isFaultResponse());
+                        statistics.update(statisticsLog.getProcessingTime(),
+                                record.isFaultResponse());
                     }
                 }
             }
@@ -116,7 +122,9 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
 
     }
 
-    public Map<String, Statistics> determineView(String id, List<StatisticsRecord> statisticsRecords, int type) {
+    public Map<String, Statistics> determineView(String id,
+                                                 List<StatisticsRecord> statisticsRecords,
+                                                 int type) {
 
         if (id == null || "".equals(id)) {
             handleException("Resource Id cannot be null");

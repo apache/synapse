@@ -41,8 +41,9 @@ public class DataSourceInformationRepositoryHelper {
      * @param axisConfiguration AxisConfiguration instance
      * @param properties        DataSources configuration properties
      */
-    public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
-                                                                 Properties properties) {
+    public static void initializeDataSourceInformationRepository(
+            AxisConfiguration axisConfiguration,
+            Properties properties) {
 
         DataSourceInformationRepository repository =
                 getDataSourceInformationRepository(axisConfiguration);
@@ -79,9 +80,10 @@ public class DataSourceInformationRepositoryHelper {
      * @param properties        DataSources configuration properties
      * @param listener          DataSourceInformationRepositoryListener instance
      */
-    public static void initializeDataSourceInformationRepository(AxisConfiguration axisConfiguration,
-                                                                 Properties properties,
-                                                                 DataSourceInformationRepositoryListener listener) {
+    public static void initializeDataSourceInformationRepository(
+            AxisConfiguration axisConfiguration,
+            Properties properties,
+            DataSourceInformationRepositoryListener listener) {
 
         DataSourceInformationRepository repository =
                 DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(

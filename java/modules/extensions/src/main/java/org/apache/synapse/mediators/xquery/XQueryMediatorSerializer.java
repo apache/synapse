@@ -60,7 +60,8 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
         saveTracingState(xquery, queryMediator);
 
         SynapseXPath targetXPath = queryMediator.getTarget();
-        if (targetXPath != null && !SourceXPathSupport.DEFAULT_XPATH.equals(targetXPath.toString())) {
+        if (targetXPath != null &&
+                !SourceXPathSupport.DEFAULT_XPATH.equals(targetXPath.toString())) {
             SynapseXPathSerializer.serializeXPath(targetXPath, xquery, "target");
         }
 
@@ -133,8 +134,10 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
                                     "key", nullNS, regkey));
                         }
                         SynapseXPath expression = variable.getExpression();
-                        if (expression != null && !SourceXPathSupport.DEFAULT_XPATH.equals(expression.toString())) {
-                            SynapseXPathSerializer.serializeXPath(expression, customElement, "expression");
+                        if (expression != null &&
+                                !SourceXPathSupport.DEFAULT_XPATH.equals(expression.toString())) {
+                            SynapseXPathSerializer.serializeXPath(expression,
+                                    customElement, "expression");
                         }
                         String type = null;
                         int varibelType = variable.getType();

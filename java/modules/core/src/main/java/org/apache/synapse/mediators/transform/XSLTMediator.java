@@ -360,9 +360,9 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * Set the properties defined in the mediator as parameters on the stylesheet.
      * 
-     * @param transformer
-     * @param synCtx
-     * @param synLog
+     * @param transformer Transformer instance
+     * @param synCtx MessageContext instance
+     * @param synLog SynapseLog instance 
      */
     private void applyProperties(Transformer transformer, MessageContext synCtx,
                                  SynapseLog synLog) {

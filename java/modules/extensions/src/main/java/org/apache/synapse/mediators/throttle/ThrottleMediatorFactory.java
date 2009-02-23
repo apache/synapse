@@ -20,8 +20,6 @@ package org.apache.synapse.mediators.throttle;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
@@ -43,8 +41,6 @@ import javax.xml.namespace.QName;
  */
 
 public class ThrottleMediatorFactory extends AbstractMediatorFactory {
-
-    private static final Log log = LogFactory.getLog(ThrottleMediatorFactory.class);
 
     /**
      * The Tag Name for throttle

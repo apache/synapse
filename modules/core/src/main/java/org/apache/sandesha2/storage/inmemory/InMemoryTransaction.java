@@ -81,12 +81,15 @@ public class InMemoryTransaction implements Transaction {
 		this.useSerialization = useSerialization;
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
-	
-	public void commit() {
-		releaseLocks();
-		if(sentMessages && useSerialization) manager.getSender().wakeThread();
-		active = false;
-	}
+
+    public void commit() {
+        try {
+            releaseLocks();
+        } catch (RuntimeException e) {
+        }
+        if (sentMessages && useSerialization) manager.getSender().wakeThread();
+        active = false;
+    }
 
 	public void rollback() {
 		releaseLocks();

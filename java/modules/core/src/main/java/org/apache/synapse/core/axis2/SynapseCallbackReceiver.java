@@ -308,6 +308,13 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         (String) key, synapseOutMsgCtx.getProperty((String) key));
             }
 
+            // If this response is related to session affinity endpoints -Server initiated session
+            Dispatcher dispatcher =
+                    (Dispatcher) synapseOutMsgCtx.getProperty(
+                            SynapseConstants.PROP_SAL_ENDPOINT_CURRENT_DISPATCHER);
+            if (dispatcher != null && dispatcher.isServerInitiatedSession()) {
+                dispatcher.updateSession(synapseInMessageContext);
+            }
             // send the response message through the synapse mediation flow
             try {
                 synapseOutMsgCtx.getEnvironment().injectMessage(synapseInMessageContext);

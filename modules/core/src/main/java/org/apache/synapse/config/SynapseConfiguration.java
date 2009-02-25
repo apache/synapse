@@ -82,19 +82,19 @@ public class SynapseConfiguration implements ManagedLifecycle {
     /**
      * Holds Proxy services defined through Synapse
      */
-	private Map<String, ProxyService> proxyServices = new HashMap<String, ProxyService>();
+    private final Map<String, ProxyService> proxyServices = new HashMap<String, ProxyService>();
 
     /**
      * This holds a Map of ManagedLifecycle objects
      */
-    private Map<String, Startup> startups = new HashMap<String, Startup>();
+    private final Map<String, Startup> startups = new HashMap<String, Startup>();
 
     /**
 	 * The local registry is a simple HashMap and provides the ability to
 	 * override definitions of a remote registry for entries defined locally
 	 * with the same key
 	 */
-	private Map<String, Object> localRegistry = new HashMap<String, Object>();
+    private final Map<String, Object> localRegistry = new HashMap<String, Object>();
 
     /** Holds the synapse properties */
     private Properties properties = new Properties();

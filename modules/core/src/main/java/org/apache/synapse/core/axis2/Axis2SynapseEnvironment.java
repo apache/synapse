@@ -35,6 +35,7 @@ import org.apache.synapse.audit.AuditHelper;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.commons.util.TemporaryData;
@@ -202,6 +203,15 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 Axis2Sender.sendBack(synCtx);
             }
         } else {
+            // If this request is related to session affinity endpoints - For client initiated session
+            Dispatcher dispatcher =
+                    (Dispatcher) synCtx.getProperty(
+                            SynapseConstants.PROP_SAL_ENDPOINT_CURRENT_DISPATCHER);
+            if (dispatcher != null) {
+                if (!dispatcher.isServerInitiatedSession()) {
+                    dispatcher.updateSession(synCtx);
+                }
+            }
             Axis2Sender.sendOn(endpoint, synCtx);
         }
     }

@@ -256,8 +256,7 @@ public class ProxyService {
             } catch (IOException e) {
                 //handleException("Error reading from wsdl URI", e);
                 boolean enablePublishWSDLSafeMode = false;
-                Map proxyParameters = null;
-                proxyParameters = this.getParameterMap();
+                Map proxyParameters= this.getParameterMap();
                 if (!proxyParameters.isEmpty()) {
                     if (proxyParameters.containsKey("enablePublishWSDLSafeMode")) {
                         enablePublishWSDLSafeMode =
@@ -331,7 +330,6 @@ public class ProxyService {
                         + wsdlNamespace.getNamespaceURI());
 
                     if (wsdlNamespace != null) {
-                        boolean isWSDL11 = false;
                         WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
 
                         if (WSDL2Constants.WSDL_NAMESPACE.
@@ -343,7 +341,6 @@ public class ProxyService {
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
                                     new WSDL11ToAxisServiceBuilder(wsdlInputStream);
-                            isWSDL11 = true;
                         } else {
                             handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                         }

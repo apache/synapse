@@ -1008,7 +1008,7 @@
 
         <xerces.version>2.9.1</xerces.version>
         <xalan.version>2.7.1</xalan.version>
-        <js.version>1.7R1</js.version>
+        <js.version>1.6R5</js.version>
 
         <!-- startup, quartz -->
         <commons-collections.version>3.2.1</commons-collections.version>

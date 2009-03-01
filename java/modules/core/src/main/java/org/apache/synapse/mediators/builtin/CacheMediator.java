@@ -21,7 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.state.Replicator;
+import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.saaj.util.SAAJUtil;
 import org.apache.synapse.ManagedLifecycle;
@@ -100,7 +100,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         }
 
         // if maxMessageSize is specified check for the message size before processing
-
         if (maxMessageSize > 0) {
             FixedByteArrayOutputStream fbaos = new FixedByteArrayOutputStream(maxMessageSize);
             try {

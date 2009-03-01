@@ -30,9 +30,9 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.clustering.state.Replicator;
+import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.ClusteringAgent;
+import org.apache.axis2.clustering.ClusterManager;
 import org.wso2.throttle.*;
 
 
@@ -120,9 +120,9 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
             //To ensure check for clustering environment only happens one time
             if ((throttle == null && !isResponse) || (isResponse
                 && concurrentAccessController == null)) {
-                ClusteringAgent clusteringAgent = cc.getAxisConfiguration().getClusteringAgent();
-                if (clusteringAgent != null &&
-                    clusteringAgent.getStateManager() != null) {
+                ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+                if (clusterManager != null &&
+                    clusterManager.getContextManager() != null) {
                     isClusteringEnable = true;
                 }
             }
@@ -249,7 +249,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         if (throttle != null && !isResponse && canAccess) {
             canAccess = throttleByAccessRate(synCtx, axisMC, cc, synLog);
         }
-        // all the replication functionality of the access rate based throttling handles by itself 
+        // all the replication functionality of the access rate based throttling handles by itself
         // Just replicate the current state of ConcurrentAccessController
         if (isClusteringEnable && concurrentAccessController != null) {
             if (cc != null) {
@@ -274,7 +274,11 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                     handleException("Unable to find onAccept sequence with key : "
                         + onAcceptSeqKey, synCtx);
                 }
-            } else return onAcceptMediator == null || onAcceptMediator.mediate(synCtx);
+            } else if (onAcceptMediator != null) {
+                return onAcceptMediator.mediate(synCtx);
+            } else {
+                return true;
+            }
 
         } else {
             if (onRejectSeqKey != null) {
@@ -285,7 +289,11 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                     handleException("Unable to find onReject sequence with key : "
                         + onRejectSeqKey, synCtx);
                 }
-            } else return onRejectMediator != null && onRejectMediator.mediate(synCtx);
+            } else if (onRejectMediator != null) {
+                return onRejectMediator.mediate(synCtx);
+            } else {
+                return false;
+            }
         }
 
         synLog.traceOrDebug("End : Throttle mediator");

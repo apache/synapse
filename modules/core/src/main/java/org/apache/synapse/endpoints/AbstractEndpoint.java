@@ -19,22 +19,21 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.commons.util.MBeanRegistrar;
-import org.apache.synapse.audit.statistics.StatisticsReporter;
+import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.BaseConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.clustering.ClusteringAgent;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
+import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 
 import java.util.List;
 import java.util.Stack;
-
 
 /**
  * An abstract base class for all Endpoint implementations
@@ -133,8 +132,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     public synchronized void init(ConfigurationContext cc) {
         if (!initialized) {
             // The check for clustering environment
-            ClusteringAgent clusteringAgent = cc.getAxisConfiguration().getClusteringAgent();
-            if (clusteringAgent != null && clusteringAgent.getStateManager() != null) {
+            ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+            if (clusterManager != null && clusterManager.getContextManager() != null) {
                 isClusteringEnabled = Boolean.TRUE;
             } else {
                 isClusteringEnabled = Boolean.FALSE;
@@ -193,7 +192,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     /**
      * Is this a leaf level endpoint? or parent endpoint that has children?
-     * @return true if this is a leaf endpoint
+     * @return
      */
     public boolean isLeafEndpoint() {
         return children == null || children.size() == 0;

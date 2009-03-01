@@ -25,7 +25,7 @@ import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.util.CommandLineOption;
 import org.apache.axis2.util.CommandLineOptionParser;
 import org.apache.axis2.util.OptionsValidator;
-import org.apache.axis2.clustering.ClusteringAgent;
+//import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,7 +39,7 @@ public class SampleAxis2ServerManager {
 
     private static SampleAxis2ServerManager ourInstance = new SampleAxis2ServerManager();
 
-    public final static int DEFAULT_PORT = 9000;
+    public static final int DEFAULT_PORT = 9000;
 
     private ConfigurationContext configctx;
     
@@ -98,12 +98,12 @@ public class SampleAxis2ServerManager {
             // Need to initialize the cluster manager at last since we are changing the servers
             // HTTP/S ports above. In the axis2.xml file, we need to set the "AvoidInitiation" param
             // to "true"
-            ClusteringAgent clusteringAgent =
+            /*ClusteringAgent clusteringAgent =
                     configctx.getAxisConfiguration().getClusteringAgent();
             if(clusteringAgent != null) {
                 clusteringAgent.setConfigurationContext(configctx);
                 clusteringAgent.init();
-            }
+            }*/
 
             // Finally start the transport listeners
             listenerManager = new ListenerManager();

@@ -31,6 +31,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.commons.util.MBeanRegistrar;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.List;
 import java.util.Stack;
@@ -129,7 +131,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     //----------------------- default method implementations and common code -----------------------
 
-    public synchronized void init(ConfigurationContext cc) {
+    public void init(SynapseEnvironment synapseEnvironment) {
+        ConfigurationContext cc =
+                ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
         if (!initialized) {
             // The check for clustering environment
             ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
@@ -145,7 +149,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
         if (children != null) {
             for (Endpoint e : children) {
-                e.init(cc);
+                e.init(synapseEnvironment);
             }
         }
     }
@@ -398,5 +402,10 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
                 ((FaultHandler) faultHandler).handleFault(synCtx);
             }
         }
+    }
+
+    public void destroy() {
+        MBeanRegistrar.getInstance().unRegisterMBean("Endpoint", endpointName);
+        this.initialized = false;
     }
 }

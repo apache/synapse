@@ -37,14 +37,11 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
 import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.ListMediator;
+import org.apache.synapse.core.SynapseEnvironment;
 
 public class ProxyDeployer implements Deployer {
     private final Map<String,String> filenameToProxyNameMap = new HashMap<String,String>();
@@ -53,15 +50,25 @@ public class ProxyDeployer implements Deployer {
     public void init(ConfigurationContext configurationContext) {
         this.cfgCtx = configurationContext;
     }
-    
+
     private SynapseConfiguration getSynapseConfiguration() throws DeploymentException {
         Parameter synCfgParam =
                 cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
         if (synCfgParam == null) {
             throw new DeploymentException("SynapseConfiguration not found. " +
-            		"Are you sure that you are running Synapse?");
+                    "Are you sure that you are running Synapse?");
         }
-        return (SynapseConfiguration)synCfgParam.getValue();
+        return (SynapseConfiguration) synCfgParam.getValue();
+    }
+
+    private SynapseEnvironment getSynapseEnvironment() throws DeploymentException {
+        Parameter synCfgParam =
+                cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
+        if (synCfgParam == null) {
+            throw new DeploymentException("SynapseEnvironment not found. " +
+                    "Are you sure that you are running Synapse?");
+        }
+        return (SynapseEnvironment) synCfgParam.getValue();
     }
     
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
@@ -84,6 +91,7 @@ public class ProxyDeployer implements Deployer {
         }
         AxisConfiguration axisCfg = cfgCtx.getAxisConfiguration();
         SynapseConfiguration synCfg = getSynapseConfiguration();
+        SynapseEnvironment synapseEnvironment = getSynapseEnvironment();
         filenameToProxyNameMap.put(filename, proxy.getName());
         // Copy from SynapseXMLConfigurationFactory#defineProxy
         synCfg.addProxyService(proxy.getName(), proxy);
@@ -91,34 +99,20 @@ public class ProxyDeployer implements Deployer {
         proxy.buildAxisService(synCfg, axisCfg);
         // Copy from SynapseConfiguration#init
         if (proxy.getTargetInLineEndpoint() != null) {
-            initEndpoint(proxy.getTargetInLineEndpoint(), cfgCtx);
+            proxy.getTargetInLineEndpoint().init(synapseEnvironment);
         }
 
         if (proxy.getTargetInLineInSequence() != null) {
-            initEndpointsOfChildren(proxy.getTargetInLineInSequence(), cfgCtx);
+            proxy.getTargetInLineInSequence().init(synapseEnvironment);
         }
 
         if (proxy.getTargetInLineOutSequence() != null) {
-            initEndpointsOfChildren(proxy.getTargetInLineOutSequence(), cfgCtx);
+            proxy.getTargetInLineOutSequence().init(synapseEnvironment);
         }
 
         if (proxy.getTargetInLineFaultSequence() != null) {
-            initEndpointsOfChildren(proxy.getTargetInLineFaultSequence(), cfgCtx);
+            proxy.getTargetInLineFaultSequence().init(synapseEnvironment);
         }
-    }
-
-    // Copy from SynapseConfiguration
-    private void initEndpointsOfChildren(ListMediator s, ConfigurationContext cc) {
-        for (Mediator m : s.getList()) {
-            if (m instanceof AbstractMediator) {
-                ((AbstractMediator)m).init(cc);
-            } 
-        }
-    }
-    
-    // Copy from SynapseConfiguration
-    private void initEndpoint(Endpoint e, ConfigurationContext cc) {
-        e.init(cc);
     }
 
     public void setDirectory(String directory) {

@@ -276,6 +276,9 @@ public final class SynapseConstants {
     /** Root for relative path */
     public static final String RESOLVE_ROOT = "resolve.root";
 
+    /* The deployment mode */
+    public static final String DEPLOYMENT_MODE = "deployment.mode";
+
     /* URL connection read timeout and connection timeout */
 
     public static final int DEFAULT_READTIMEOUT = 100000;

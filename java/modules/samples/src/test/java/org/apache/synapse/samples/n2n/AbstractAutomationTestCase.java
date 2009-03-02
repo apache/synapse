@@ -21,6 +21,7 @@ package org.apache.synapse.samples.n2n;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.ServerConfigurationInformation;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -52,7 +53,9 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
         System.setProperty("org.apache.xerces.xni.parser.XMLParserConfiguration",
                 "org.apache.xerces.parsers.XMLGrammarCachingConfiguration");
         System.setProperty("axis2.xml", "modules/samples/target/test_repos/synapse/conf/axis2.xml");
-        ServerManager.getInstance().setAxis2Repolocation(SYNAPSE_REPO);
+        ServerConfigurationInformation information = new ServerConfigurationInformation();
+        information.setAxis2RepoLocation(SYNAPSE_REPO);
+        ServerManager.getInstance().init(information, null);
         ServerManager.getInstance().start();
     }
 
@@ -73,7 +76,8 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
     protected void startCustomAxis2Server(String httpPort, String httpsPort) throws Exception {
         System.setProperty("http_port", httpPort);
         System.setProperty("https_port", httpsPort);
-        SampleAxis2ServerManager.getInstance().start(new String[]{"-repo", "modules/samples/target/test_repos/axis2Server/",
+        SampleAxis2ServerManager.getInstance().start(new String[]{"-repo",
+                "modules/samples/target/test_repos/axis2Server/",
                     "-conf", "modules/samples/target/test_repos/axis2Server/conf/axis2.xml"});
     }
     protected void stopCustomAxis2Server(String httpPort, String httpsPort) throws Exception {

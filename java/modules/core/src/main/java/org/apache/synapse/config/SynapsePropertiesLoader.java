@@ -84,4 +84,15 @@ public class SynapsePropertiesLoader {
         cacheProperties.clear();
         return loadSynapseProperties();
     }
+
+    /**
+     * Load a value of the property from the synapse properties
+     *
+     * @param key           Key of the property
+     * @param deafaultValue Default value
+     * @return Value of the propoerty
+     */
+    public static String getPropertyValue(String key, String deafaultValue) {
+        return MiscellaneousUtil.getProperty(loadSynapseProperties(), key, deafaultValue);
+    }
 }

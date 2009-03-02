@@ -38,6 +38,8 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.ServerConfigurationInformation;
+import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.utils.Services;
 
@@ -49,12 +51,15 @@ import java.io.*;
 public class SynapseCommodityServiceTest extends TestCase {
 
     protected void setUp() throws java.lang.Exception {
-        ServerManager.getInstance().setSynapseHome(".");
+
+        ServerConfigurationInformation information = new ServerConfigurationInformation();
+        information.setCreateNewInstance(false);
+        information.setSynapseHome(".");
         // Initializing Synapse repository
-        ServerManager.getInstance().setSynapseXMLPath(
-                           "./../../repository/conf/sample/resources/misc/synapse.xml");
-        ServerManager.getInstance().setAxis2Xml(
-                           "./../../repository/conf/axis2.xml");
+        information.setSynapseXMLLocation(
+                "./../../repository/conf/sample/resources/misc/synapse.xml");
+        information.setAxis2Xml(
+                "./../../repository/conf/axis2.xml");
 
         findAndReplace(
             new File("./../../repository/conf/axis2.xml"),
@@ -67,13 +72,18 @@ public class SynapseCommodityServiceTest extends TestCase {
                         "./target/test_repos/synapse",
                         "./target/test_repos/axis2.xml");
 
-        TransportInDescription synTrsIn = (TransportInDescription)
-            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
+        TransportInDescription synTrsIn =
+                synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
         synTrsIn.getParameter("port").setValue("10100");
-        synTrsIn = (TransportInDescription)
-            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
+        synTrsIn =
+                synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         synTrsIn.getParameter("port").setValue("12100");
         startServer(synapseConfigCtx);
+
+        ServerContextInformation contextInformation = new ServerContextInformation(synapseConfigCtx);
+        ServerManager serverManager = ServerManager.getInstance();
+        serverManager.init(information, contextInformation);
+        serverManager.start();
 
         // Initializing Business Endpoint
         
@@ -112,11 +122,11 @@ public class SynapseCommodityServiceTest extends TestCase {
                                           Services.class.getClassLoader());
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
-        TransportInDescription busTrsIn = (TransportInDescription)
-            businessConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
+        TransportInDescription busTrsIn =
+                businessConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
         busTrsIn.getParameter("port").setValue("10101");
-        busTrsIn = (TransportInDescription)
-            businessConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
+        busTrsIn =
+                businessConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         busTrsIn.getParameter("port").setValue("12101");
         startServer(businessConfigCtx);
     }
@@ -135,7 +145,7 @@ public class SynapseCommodityServiceTest extends TestCase {
             getTransportsIn().keySet().iterator();
         while (iter.hasNext()) {
             String trp = (String) iter.next();
-            TransportInDescription trsIn = (TransportInDescription)
+            TransportInDescription trsIn =
                 configctx.getAxisConfiguration().getTransportsIn().get(trp);
             listenerManager.addListener(trsIn, false);
         }

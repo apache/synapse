@@ -26,8 +26,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.LoadBalanceMembershipHandler;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.endpoints.algorithms.AlgorithmContext;
 
 import java.net.MalformedURLException;
@@ -47,9 +50,12 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
      */
     private AlgorithmContext algorithmContext;
 
-    public void init(ConfigurationContext cc) {
+    @Override
+    public void init(SynapseEnvironment synapseEnvironment) {
+        ConfigurationContext cc =
+                ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
         if (!initialized) {
-            super.init(cc);
+            super.init(synapseEnvironment);
             if (algorithmContext == null) {
                 algorithmContext = new AlgorithmContext(isClusteringEnabled, cc, getName());
             }
@@ -121,8 +127,10 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
                 AddressEndpoint endpoint = new AddressEndpoint();
                 EndpointDefinition definition = new EndpointDefinition();
                 endpoint.setDefinition(definition);
-                endpoint.init(((Axis2MessageContext) synCtx).getAxis2MessageContext().
-                        getConfigurationContext());
+                endpoint.init((SynapseEnvironment)
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().
+                        getConfigurationContext().getAxisConfiguration().
+                        getParameterValue(SynapseConstants.SYNAPSE_ENV));
                 endpoint.send(synCtx);
             } else {
                 log.error("Cannot load balance for non-HTTP/S transport " + transport);

@@ -19,11 +19,9 @@
 
 package org.apache.synapse;
 
-import org.apache.axis2.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.File;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -38,8 +36,9 @@ public class SynapseServer {
     private static final Log log = LogFactory.getLog(SynapseServer.class);
 
     private static final String USAGE_TXT =
-        "Usage: SynapseServer <axis2_repository> <axis2_xml> <synapse_home> <synapse_xml> <resolve_root>" +
-        "\n Opts: -? this message";
+            "Usage: SynapseServer <axis2_repository> <axis2_xml> <synapse_home> <synapse_xml> " +
+                    "<resolve_root> <deployment mode>" +
+                    "\n Opts: -? this message";
 
     public static void printUsage() {
         System.out.println(USAGE_TXT);
@@ -49,36 +48,15 @@ public class SynapseServer {
     public static void main(String[] args) throws Exception {
 
         // first check if we should print usage
-        if (args.length != 1 && args.length != 4 && args.length != 5 && args.length != 6) {
+        if (args.length != 1 && args.length != 4 && args.length != 5 && args.length != 6
+                && args.length != 6 && args.length != 7) {
             printUsage();
         }
 
+        ServerConfigurationInformation configurationInformation =
+                ServerConfigurationInformationFactory.createServerConfigurationInformation(args);
         ServerManager serverManager = ServerManager.getInstance();
-        serverManager.setAxis2Repolocation(args[0]);
-        if (args.length == 1) {
-            log.warn("Configuring server manager using deprecated system properties; please update your configuration");
-            serverManager.setAxis2Xml(System.getProperty(Constants.AXIS2_CONF));
-            serverManager.setSynapseHome(System.getProperty(SynapseConstants.SYNAPSE_HOME));
-            serverManager.setSynapseXMLPath(System.getProperty(SynapseConstants.SYNAPSE_XML));
-            serverManager.setResolveRoot(System.getProperty(SynapseConstants.RESOLVE_ROOT));
-        } else if(args.length == 4) {
-            serverManager.setAxis2Xml(args[1]);
-            serverManager.setSynapseHome(args[2]);
-            serverManager.setSynapseXMLPath(args[3]);
-            serverManager.setResolveRoot(args[2] + File.separator + "repository");
-        } else if(args.length == 5) {
-            serverManager.setAxis2Xml(args[1]);
-            serverManager.setSynapseHome(args[2]);
-            serverManager.setSynapseXMLPath(args[3]);
-            serverManager.setResolveRoot(args[4]);
-        } else if(args.length == 6) {
-            serverManager.setAxis2Xml(args[1]);
-            serverManager.setSynapseHome(args[2]);
-            serverManager.setSynapseXMLPath(args[3]);
-            serverManager.setResolveRoot(args[4]);
-            serverManager.setServerName(args[5]);
-        }
-        
+        serverManager.init(configurationInformation, null);
         serverManager.start();
         addShutdownHook();
         

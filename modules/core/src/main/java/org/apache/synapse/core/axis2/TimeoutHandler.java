@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ServerManager;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 
 import java.util.Map;
@@ -58,9 +58,10 @@ public class TimeoutHandler extends TimerTask {
 
     public TimeoutHandler(Map callbacks) {
         this.callbackStore = callbacks;
-        this.globalTimeout = ServerManager.getInstance().getGlobalTimeoutInterval();
-        log.info("This engine will expire all callbacks after : " + (globalTimeout /1000) +
-            " seconds, irrespective of the timeout action, after the specified or optional timeout");
+        this.globalTimeout = SynapseConfigUtils.getGlobalTimeoutInterval();
+        log.info("This engine will expire all callbacks after : " + (globalTimeout / 1000) +
+                " seconds, irrespective of the timeout action," +
+                " after the specified or optional timeout");
     }
 
     /**
@@ -88,7 +89,8 @@ public class TimeoutHandler extends TimerTask {
         // the time for doing nothing would be a inefficient task.
 
         // we have to synchronize this on the callbackStore as iterators of thread safe collections
-        // are not thread safe. callbackStore can be modified concurrently by the SynapseCallbackReceiver.
+        // are not thread safe. callbackStore can be modified
+        // concurrently by the SynapseCallbackReceiver.
         synchronized(callbackStore) {
 
             if (callbackStore.size() > 0) {

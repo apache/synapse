@@ -19,23 +19,19 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseLog;
+import org.apache.synapse.*;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.audit.AuditConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.context.ConfigurationContext;
 
 /**
  * This is the superclass of all mediators, and defines common logging, tracing other aspects
  * for all mediators who extend from this.
  * elements of a mediator class.
  */
-public abstract class AbstractMediator implements Mediator, AuditConfigurable{
+public abstract class AbstractMediator implements Mediator, AuditConfigurable, ManagedLifecycle {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
     protected Log log;
@@ -265,12 +261,9 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable{
         this.auditConfigurable.setAuditId(id);
     }
 
-    /**
-     * Initialize  mediator with configuration context.
-     * By default nothing to initiate and let it to decide each mediator itself
-     *
-     * @param cc ConfigurationContext instance
-     */
-    public void init(ConfigurationContext cc) {
+    public void init(SynapseEnvironment se) {
+    }
+
+    public void destroy() {
     }
 }

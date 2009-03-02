@@ -22,18 +22,15 @@ package org.apache.synapse.mediators.eip.splitter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,40 +152,32 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         this.targets.add(target);
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
 
         for (Target target : targets) {
-            SequenceMediator seq = target.getSequence();
+            ManagedLifecycle seq = target.getSequence();
             if (seq != null) {
                 seq.init(se);
             }
-        }
-    }
-
-    public void destroy() {
-        
-        for (Target target : targets) {
-            SequenceMediator seq = target.getSequence();
-            if (seq != null) {
-                seq.destroy();
+            ManagedLifecycle endpoint = target.getEndpoint();
+            if (endpoint != null) {
+                endpoint.init(se);
             }
         }
     }
 
-    public void init(ConfigurationContext cc) {
-        
+    @Override
+    public void destroy() {
+
         for (Target target : targets) {
-            
-            if (target != null) {
-                
-                Endpoint endpoint = target.getEndpoint();
-                if (endpoint != null) {
-                    endpoint.init(cc);
-                }
-                SequenceMediator seq = target.getSequence();
-                if (seq != null) {
-                    seq.init(cc);
-                }
+            ManagedLifecycle seq = target.getSequence();
+            if (seq != null) {
+                seq.destroy();
+            }
+            ManagedLifecycle endpoint = target.getEndpoint();
+            if (endpoint != null) {
+                endpoint.destroy();
             }
         }
     }

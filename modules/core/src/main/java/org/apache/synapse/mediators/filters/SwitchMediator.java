@@ -25,9 +25,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +46,7 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
     private SwitchCase defaultCase = null;
 
     public void init(SynapseEnvironment se) {
-        for (SwitchCase swCase : cases) {
+        for (ManagedLifecycle swCase : cases) {
             swCase.init(se);
         }
         if (defaultCase != null) {
@@ -57,7 +55,7 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
     }
 
     public void destroy() {
-        for (SwitchCase swCase : cases) {
+        for (ManagedLifecycle swCase : cases) {
             swCase.destroy();
         }
         if (defaultCase != null) {
@@ -181,23 +179,5 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
      */
     public void setDefaultCase(SwitchCase defaultCase) {
         this.defaultCase = defaultCase;
-    }
-
-    public void init(ConfigurationContext cc) {
-        
-        for (SwitchCase aCase : cases) {
-            initCase(aCase, cc);
-        }
-        initCase(defaultCase, cc);
-    }
-
-    private void initCase(SwitchCase aCase, ConfigurationContext cc) {
-        
-        if (aCase != null) {
-            ListMediator listMediator = aCase.getCaseMediator();
-            if (listMediator instanceof AbstractMediator) {
-                ((AbstractMediator) listMediator).init(cc);
-            }
-        }
     }
 }

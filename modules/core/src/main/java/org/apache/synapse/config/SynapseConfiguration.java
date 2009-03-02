@@ -20,7 +20,6 @@
 package org.apache.synapse.config;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,8 +39,6 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.ListMediator;
-import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.registry.Registry;
 import org.apache.axiom.om.OMNode;
 
@@ -927,59 +924,18 @@ public class SynapseConfiguration implements ManagedLifecycle {
         }
 
         // initialize managed mediators
-        for (SequenceMediator seq : getDefinedSequences().values()) {
+        for (ManagedLifecycle seq : getDefinedSequences().values()) {
             if (seq != null) {
                 seq.init(se);
             }
         }
-    }
-
-    public void init(ConfigurationContext cc) {
-
-        if (log.isDebugEnabled()) {
-            log.debug("Initializing the Synapse Configuration using the ConfigurationContext");
-        }
-
-        // Initialize endpoints
-        for (Endpoint e : getDefinedEndpoints().values()) {
-            initEndpoint(e, cc);
-        }
-
-        for (SequenceMediator s : getDefinedSequences().values()) {
-            initEndpointsOfChildren(s, cc);
-        }
-
-        for (ProxyService p : getProxyServices()) {
-            if (p.getTargetInLineEndpoint() != null) {
-                initEndpoint(p.getTargetInLineEndpoint(), cc);
-            }
-
-            if (p.getTargetInLineInSequence() != null) {
-                initEndpointsOfChildren(p.getTargetInLineInSequence(), cc);
-            }
-
-            if (p.getTargetInLineOutSequence() != null) {
-                initEndpointsOfChildren(p.getTargetInLineOutSequence(), cc);
-            }
-
-            if (p.getTargetInLineFaultSequence() != null) {
-                initEndpointsOfChildren(p.getTargetInLineFaultSequence(), cc);
+        // initialize the startups
+        for (Startup stp : getStartups()) {
+            if (stp != null) {
+                stp.init(se);
             }
         }
     }
-
-    private void initEndpointsOfChildren(ListMediator s, ConfigurationContext cc) {
-        for (Mediator m : s.getList()) {
-            if (m instanceof AbstractMediator) {
-                ((AbstractMediator)m).init(cc);
-            } 
-        }
-    }
-    
-    private void initEndpoint(Endpoint e, ConfigurationContext cc) {
-        e.init(cc);
-    }
-
 
     private void handleException(String msg) {
 		log.error(msg);

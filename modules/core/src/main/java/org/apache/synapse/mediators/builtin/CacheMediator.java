@@ -75,12 +75,14 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
     private String cacheManagerKey = CachingConstants.CACHE_MANAGER; // default per-host
     private static final String CACHE_MANAGER_PREFIX = "synapse.cache_manager_";
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (onCacheHitSequence != null) {
             onCacheHitSequence.init(se);
         }
     }
-
+    
+    @Override
     public void destroy() {
         if (onCacheHitSequence != null) {
             onCacheHitSequence.destroy();
@@ -460,12 +462,5 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
     public void setMaxMessageSize(int maxMessageSize) {
         this.maxMessageSize = maxMessageSize;
-    }
-
-    public void init(ConfigurationContext cc) {
-        
-        if (onCacheHitSequence != null) {
-            onCacheHitSequence.init(cc);
-        }
     }
 }

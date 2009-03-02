@@ -28,7 +28,7 @@ public class ServerContextInformation {
     /* Underlying server's context - EX : Axis2 ConfigurationConext */
     private Object serverContext;
     /* A map to hold any context information*/
-    private final Map<String, Object> property = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     public ServerContextInformation(Object serverContext) {
         this.serverContext = serverContext;
@@ -42,10 +42,10 @@ public class ServerContextInformation {
     }
 
     public void addProperty(String key, Object value) {
-        property.put(key, value);
+        properties.put(key, value);
     }
 
     public Object getProperty(String key) {
-        return property.get(key);
+        return properties.get(key);
     }
 }

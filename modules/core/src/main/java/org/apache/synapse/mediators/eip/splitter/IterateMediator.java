@@ -28,6 +28,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -255,9 +256,9 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
     @Override
     public void init(SynapseEnvironment se) {
         if (target != null) {
-            ManagedLifecycle endpoint = target.getEndpoint();
-            if (endpoint != null) {
-                endpoint.init(se);
+            Endpoint endpoint = target.getEndpoint();
+            if (endpoint instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) endpoint).init(se);
             }
             ManagedLifecycle seq = target.getSequence();
             if (seq != null) {
@@ -269,9 +270,9 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
     @Override
     public void destroy() {
         if (target != null) {
-            ManagedLifecycle endpoint = target.getEndpoint();
-            if (endpoint != null) {
-                endpoint.destroy();
+            Endpoint endpoint = target.getEndpoint();
+            if (endpoint instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) endpoint).destroy();
             }
             ManagedLifecycle seq = target.getSequence();
             if (seq != null) {

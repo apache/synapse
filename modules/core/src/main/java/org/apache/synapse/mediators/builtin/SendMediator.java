@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -89,15 +90,15 @@ public class SendMediator extends AbstractMediator {
 
     @Override
     public void init(SynapseEnvironment synapseEnvironment) {
-        if (endpoint != null) {
-            endpoint.init(synapseEnvironment);
+        if (endpoint instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) endpoint).init(synapseEnvironment);
         }
     }
 
     @Override
     public void destroy() {
-        if (endpoint != null) {
-            endpoint.destroy();
+        if (endpoint instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) endpoint).destroy();
         }
     }
 }

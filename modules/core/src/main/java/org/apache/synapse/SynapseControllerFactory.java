@@ -69,15 +69,10 @@ public class SynapseControllerFactory {
         return null;
     }
 
-    private static void handleFatal(String msgPre) {
-        String msg = "The " + msgPre + " must be set as a system property or init-parameter";
-        log.fatal(msg);
-        throw new SynapseException(msg);
-    }
-
     /**
      * Validate core settings for startup
-     * @param information  ServerConfigurationInformation to be validated
+     *
+     * @param information ServerConfigurationInformation to be validated
      */
     private static void validate(ServerConfigurationInformation information) {
 
@@ -121,8 +116,17 @@ public class SynapseControllerFactory {
             log.info("Using server name : " + serverName);
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Using Server Configuration As : " + information);
+        }
+
         log.info("The timeout handler will run every : " +
                 (SynapseConfigUtils.getTimeoutHandlerInterval() / 1000) + "s");
     }
 
+    private static void handleFatal(String msgPre) {
+        String msg = "The " + msgPre + " must be set as a system property or init-parameter";
+        log.fatal(msg);
+        throw new SynapseException(msg);
+    }
 }

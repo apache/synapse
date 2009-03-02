@@ -851,20 +851,20 @@ public class SynapseConfiguration implements ManagedLifecycle {
         }
 
         // destroy the managed mediators
-        for (SequenceMediator seq : getDefinedSequences().values()) {
-            if (seq != null) {
-                seq.destroy();
+        for (ManagedLifecycle seq : getDefinedSequences().values()) {
+            seq.destroy();
+        }
+
+        // destroy the managed endpoints
+        for (Endpoint endpoint : getDefinedEndpoints().values()) {
+            if (endpoint instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) endpoint).destroy();
             }
         }
 
         // destroy the startups
-        if (startups != null) {
-            
-            for (Startup stp : startups.values()) {
-                if (stp != null) {
-                    stp.destroy();
-                }
-            }
+        for (ManagedLifecycle stp : startups.values()) {
+            stp.destroy();
         }
         
         TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
@@ -906,31 +906,43 @@ public class SynapseConfiguration implements ManagedLifecycle {
         if (registry != null && registry instanceof ManagedLifecycle) {
             ((ManagedLifecycle) registry).init(se);
         }
-        
-        // initialize all the proxy services
-        for (ProxyService p : getProxyServices()) {
-            
-                if (p.getTargetInLineInSequence() != null) {
-                    p.getTargetInLineInSequence().init(se);
-                }
-            
-                if (p.getTargetInLineOutSequence() != null) {
-                    p.getTargetInLineOutSequence().init(se);
-                }
-                
-                if (p.getTargetInLineFaultSequence() != null) {
-                    p.getTargetInLineFaultSequence().init(se);
-                }
+
+        //initialize endpoints
+        for (Endpoint endpoint : getDefinedEndpoints().values()) {
+            if (endpoint instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) endpoint).init(se);
+            }
         }
 
-        // initialize managed mediators
+         // initialize managed mediators
         for (ManagedLifecycle seq : getDefinedSequences().values()) {
             if (seq != null) {
                 seq.init(se);
             }
         }
+
+        // initialize all the proxy services
+        for (ProxyService proxy : getProxyServices()) {
+
+            if (proxy.getTargetInLineEndpoint() instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) proxy.getTargetInLineEndpoint()).init(se);
+            }
+
+            if (proxy.getTargetInLineInSequence() != null) {
+                proxy.getTargetInLineInSequence().init(se);
+            }
+
+            if (proxy.getTargetInLineOutSequence() != null) {
+                proxy.getTargetInLineOutSequence().init(se);
+            }
+
+            if (proxy.getTargetInLineFaultSequence() != null) {
+                proxy.getTargetInLineFaultSequence().init(se);
+            }
+        }
+
         // initialize the startups
-        for (Startup stp : getStartups()) {
+        for (ManagedLifecycle stp : getStartups()) {
             if (stp != null) {
                 stp.init(se);
             }

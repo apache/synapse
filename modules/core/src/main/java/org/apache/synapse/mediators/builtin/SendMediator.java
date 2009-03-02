@@ -21,15 +21,9 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.clustering.ClusterManager;
-
-import java.util.List;
 
 /**
  * SendMediator sends a message using specified semantics. If it contains an endpoint it will
@@ -62,12 +56,12 @@ public class SendMediator extends AbstractMediator {
 
             if (synLog.isTraceOrDebugEnabled()) {
                 StringBuffer sb = new StringBuffer();
-                sb.append("Sending " + (synCtx.isResponse() ? "response" : "request")
-                        + " message using implicit message properties..");
-                sb.append("\nSending To: " + (synCtx.getTo() != null ?
-                        synCtx.getTo().getAddress() : "null"));
-                sb.append("\nSOAPAction: " + (synCtx.getWSAAction() != null ?
-                        synCtx.getWSAAction() : "null"));
+                sb.append("Sending ").append(synCtx.isResponse() ? "response" : "request")
+                        .append(" message using implicit message properties..");
+                sb.append("\nSending To: ").append(synCtx.getTo() != null ?
+                        synCtx.getTo().getAddress() : "null");
+                sb.append("\nSOAPAction: ").append(synCtx.getWSAAction() != null ?
+                        synCtx.getWSAAction() : "null");
                 synLog.traceOrDebug(sb.toString());
             }
 
@@ -93,10 +87,17 @@ public class SendMediator extends AbstractMediator {
         this.endpoint = endpoint;
     }
 
-    public void init(ConfigurationContext cc) {
-        
+    @Override
+    public void init(SynapseEnvironment synapseEnvironment) {
         if (endpoint != null) {
-            endpoint.init(cc);
+            endpoint.init(synapseEnvironment);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (endpoint != null) {
+            endpoint.destroy();
         }
     }
 }

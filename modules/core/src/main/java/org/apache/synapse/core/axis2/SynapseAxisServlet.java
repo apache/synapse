@@ -20,6 +20,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.transport.http.AxisServlet;
 import org.apache.axis2.transport.http.ListingAgent;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerManager;
@@ -44,7 +45,8 @@ public class SynapseAxisServlet extends AxisServlet {
      */
     public void init(ServletConfig config) throws ServletException {
         ServletContext servletContext = config.getServletContext();
-        this.configContext = ServerManager.getInstance().getConfigurationContext();
+        this.configContext = (ConfigurationContext) ServerManager.getInstance().
+                getContextInformation().getServerContext();
         this.axisConfiguration = this.configContext.getAxisConfiguration();
         servletContext.setAttribute(this.getClass().getName(), this);
         this.servletConfig = config;

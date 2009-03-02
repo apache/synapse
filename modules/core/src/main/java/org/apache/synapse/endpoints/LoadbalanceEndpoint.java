@@ -23,6 +23,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.algorithms.AlgorithmContext;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
@@ -44,9 +46,12 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
     /** The algorithm context to hold runtime state related to the load balance algorithm */
     private AlgorithmContext algorithmContext = null;
 
-    public void init(ConfigurationContext cc) {
+    @Override
+    public void init(SynapseEnvironment synapseEnvironment) {
+        ConfigurationContext cc =
+                ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
         if (!initialized) {
-            super.init(cc);
+            super.init(synapseEnvironment);
             if (algorithmContext == null) {
                 algorithmContext = new AlgorithmContext(isClusteringEnabled, cc, getName());
             }
@@ -108,6 +113,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
         return false;
     }
 
+    @Override
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
 
         logOnChildEndpointFail(endpoint, synMessageContext);

@@ -24,7 +24,6 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.List;
  * @see ListMediator
  */
 public abstract class AbstractListMediator extends AbstractMediator
-    implements ListMediator, ManagedLifecycle {
+        implements ListMediator {
 
     /** the list of child mediators held. These are executed sequentially */
     protected final List<Mediator> mediators = new ArrayList<Mediator>();
@@ -102,13 +101,11 @@ public abstract class AbstractListMediator extends AbstractMediator
             log.debug("Initializing child mediators");
         }
 
-        for (Object mediator : mediators) {
-            Mediator m = (Mediator) mediator;
-
-            if (m instanceof ManagedLifecycle) {
-                ((ManagedLifecycle) m).init(se);
+        for (Mediator mediator : mediators) {
+            if (mediator instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) mediator).init(se);
             }
-        } 
+        }
     }
 
     /**
@@ -123,15 +120,6 @@ public abstract class AbstractListMediator extends AbstractMediator
 
             if (mediator instanceof ManagedLifecycle) {
                 ((ManagedLifecycle) mediator).destroy();
-            }
-        } 
-    }
-
-    public void init(ConfigurationContext cc) {
-
-        for (Mediator m : mediators) {
-            if (m instanceof AbstractMediator) {
-                ((AbstractMediator) m).init(cc);
             }
         }
     }

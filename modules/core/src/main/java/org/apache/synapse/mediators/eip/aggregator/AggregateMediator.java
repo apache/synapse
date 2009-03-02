@@ -32,7 +32,6 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.axis2.context.ConfigurationContext;
 import org.jaxen.JaxenException;
 
 import java.util.Collections;
@@ -436,12 +435,5 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
 
     public Map getActiveAggregates() {
         return activeAggregates;
-    }
-
-    public void init(ConfigurationContext cc) {
-        
-        if (onCompleteSequence != null) {
-            onCompleteSequence.init(cc);
-        }
     }
 }

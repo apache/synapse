@@ -23,16 +23,10 @@ import org.apache.axis2.modules.Module;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.AxisDescription;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.AxisFault;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.core.axis2.SynapseInitializationModule;
-import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,119 +41,55 @@ import java.io.File;
  */
 public class SynapseModule implements Module {
 
+    private final ServerManager serverManager = ServerManager.getInstance();
     /**
      * Log variable to be used as the logging appender
      */
     private static final Log log = LogFactory.getLog(SynapseModule.class);
 
     /**
-     * Normal SynapseInitializationModule which initiates the Synapse
-     */
-    private SynapseInitializationModule initializationModule = null;
-
-    /**
      * This method will call the normal initiation after setting the SYNAPSE_XML file to get from
      * the axis2 respository/conf folder
-     * 
+     *
      * @param configurationContext - ConfigurationContext of the Axis2 env
-     * @param axisModule - AxisModule describing handler initializationModule of Synapse
+     * @param axisModule           - AxisModule describing handler initializationModule of Synapse
      * @throws AxisFault - incase of a failure in initiation
      */
     public void init(ConfigurationContext configurationContext,
                      AxisModule axisModule) throws AxisFault {
-        if (System.getProperty(SynapseConstants.SYNAPSE_XML) == null) {
-            ServerManager.getInstance().setSynapseXMLPath(configurationContext.
-                    getAxisConfiguration().getRepository().getPath() + "/conf/synapse.xml");
+        ServerConfigurationInformation information = new ServerConfigurationInformation();
+        String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
+        if (synapseHome == null) {
+            synapseHome = new File(".").getAbsolutePath();
         }
-        if (new File(ServerManager.getInstance().getSynapseXMLPath()).exists()) {
-            initializationModule = new org.apache.synapse.core.axis2.SynapseInitializationModule();
-            initializationModule.init(configurationContext, axisModule);
-
-            // now initialize SynapseConfig
-            Parameter synEnv = configurationContext
-                .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
-            Parameter synCfg = configurationContext
-                .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
-            String message = "Unable to initialize the Synapse Configuration : Can not find the ";
-            if (synCfg == null || synCfg.getValue() == null
-                || !(synCfg.getValue() instanceof SynapseConfiguration)) {
-                log.fatal(message + "Synapse Configuration");
-                throw new SynapseException(message + "Synapse Configuration");
-            }
-
-            if (synEnv == null || synEnv.getValue() == null
-                || !(synEnv.getValue() instanceof SynapseEnvironment)) {
-                log.fatal(message + "Synapse Environment");
-                throw new SynapseException(message + "Synapse Environment");
-            }
-
-            ((SynapseConfiguration) synCfg.getValue()).init((SynapseEnvironment) synEnv.getValue());
-        } else {
-            handleException("Unable to initialize the Synapse initializationModule. Couldn't " +
-                    "find the configuration file in the location "
-                    + ServerManager.getInstance().getSynapseXMLPath());
+        information.setSynapseHome(synapseHome);
+        String synapseXMl = System.getProperty(SynapseConstants.SYNAPSE_XML);
+        if (synapseXMl == null) {
+            synapseXMl = configurationContext.
+                    getAxisConfiguration().getRepository().getPath() + "/conf/synapse.xml";
         }
+        information.setSynapseXMLLocation(synapseXMl);
+
+        ServerContextInformation contextInformation =
+                new ServerContextInformation(configurationContext);
+        serverManager.init(information, contextInformation);
     }
 
-    /**
-     * Just do what the main SynapseInitializationModule tells you to do
-     * 
-     * @param axisDescription
-     * @throws AxisFault
-     */
+
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {
-        if (initializationModule != null) {
-            initializationModule.engageNotify(axisDescription);
-        } else {
-            handleException("Couldn't find the initializationModule");
-        }
+        serverManager.start();
     }
 
-    /**
-     * Just do what the main SynapseInitializationModule tells you to do
-     * 
-     * @param assertion
-     * @return
-     */
     public boolean canSupportAssertion(Assertion assertion) {
-        if (initializationModule != null) {
-            return initializationModule.canSupportAssertion(assertion);
-        } else {
-            return false;
-        }
+        return false;
     }
 
-    /**
-     * Just do what the main SynapseInitializationModule tells you to do
-     * 
-     * @param policy
-     * @param axisDescription
-     * @throws AxisFault
-     */
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
-        if (initializationModule != null) {
-            initializationModule.applyPolicy(policy, axisDescription);
-        } else {
-            handleException("Couldn't find the initializationModule");
-        }
+
     }
 
-    /**
-     * Just do what the main SynapseInitializationModule tells you to do
-     * 
-     * @param configurationContext
-     * @throws AxisFault
-     */
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
-        if (initializationModule != null) {
-            initializationModule.shutdown(configurationContext);
-        } else {
-            handleException("Couldn't find the initializationModule");
-        }
+        serverManager.stop();
     }
 
-    private void handleException(String message) throws AxisFault {
-        log.error(message);
-        throw new AxisFault(message);
-    }
 }

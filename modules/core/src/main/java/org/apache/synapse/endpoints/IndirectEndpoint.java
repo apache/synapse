@@ -24,6 +24,8 @@ import org.apache.axis2.description.Parameter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 
@@ -44,7 +46,8 @@ public class IndirectEndpoint extends AbstractEndpoint {
      */
     public void send(MessageContext synCtx) {
 
-        reLoadAndInitEndpoint(((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext());
+        reLoadAndInitEndpoint(((Axis2MessageContext) synCtx).
+                getAxis2MessageContext().getConfigurationContext());
 
         if (realEndpoint != null) {
             realEndpoint.send(synCtx);
@@ -98,8 +101,10 @@ public class IndirectEndpoint extends AbstractEndpoint {
     /**
      * Figure out the real endpoint we proxy for, and make sure its initialized
      */
-    public synchronized void init(ConfigurationContext cc) {
-       reLoadAndInitEndpoint(cc);
+    public void init(SynapseEnvironment synapseEnvironment) {
+        ConfigurationContext cc =
+                ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
+        reLoadAndInitEndpoint(cc);
     }
 
     @Override
@@ -113,9 +118,15 @@ public class IndirectEndpoint extends AbstractEndpoint {
      */
     private synchronized void reLoadAndInitEndpoint(ConfigurationContext cc) {
 
-        Parameter parameter = cc.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
-        if (parameter != null && parameter.getValue() instanceof SynapseConfiguration) {
+        Parameter parameter = cc.getAxisConfiguration().getParameter(
+                SynapseConstants.SYNAPSE_CONFIG);
+        Parameter synEnvParameter = cc.getAxisConfiguration().getParameter(
+                SynapseConstants.SYNAPSE_ENV);
+        if (parameter.getValue() instanceof SynapseConfiguration &&
+                synEnvParameter.getValue() instanceof SynapseEnvironment) {
+
             SynapseConfiguration synCfg = (SynapseConfiguration) parameter.getValue();
+            SynapseEnvironment synapseEnvironment = (SynapseEnvironment) synEnvParameter.getValue();
 
             boolean reLoad = (realEndpoint == null);
             if (!reLoad) {
@@ -137,7 +148,7 @@ public class IndirectEndpoint extends AbstractEndpoint {
 
                 realEndpoint = synCfg.getEndpoint(key);
                 if (realEndpoint != null && !realEndpoint.isInitialized()) {
-                    realEndpoint.init(cc);
+                    realEndpoint.init(synapseEnvironment);
                 }
             }
         }

@@ -33,7 +33,7 @@ import java.util.List;
  * endpoint url. Endpoints may contain zero or more endpoints in them and build up a hierarchical
  * structure of endpoints.
  */
-public interface Endpoint extends ManagedLifecycle {
+public interface Endpoint {
 
     /**
      * Sends the message context according to an endpoint specific behavior.

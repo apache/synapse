@@ -24,10 +24,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.*;
 import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.commons.util.MBeanRegistrar;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -40,7 +37,7 @@ import java.util.Stack;
 /**
  * An abstract base class for all Endpoint implementations
  */
-public abstract class AbstractEndpoint extends FaultHandler implements Endpoint {
+public abstract class AbstractEndpoint extends FaultHandler implements Endpoint, ManagedLifecycle {
 
     protected Log log;
     protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
@@ -149,7 +146,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
         if (children != null) {
             for (Endpoint e : children) {
-                e.init(synapseEnvironment);
+                if (e instanceof ManagedLifecycle) {
+                    ((ManagedLifecycle) e).init(synapseEnvironment);
+                }
             }
         }
     }
@@ -196,7 +195,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     /**
      * Is this a leaf level endpoint? or parent endpoint that has children?
-     * @return
+     * @return true if there is no children - a leaf endpoint 
      */
     public boolean isLeafEndpoint() {
         return children == null || children.size() == 0;

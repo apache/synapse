@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.eip.splitter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.MessageHelper;
@@ -160,9 +161,9 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
             if (seq != null) {
                 seq.init(se);
             }
-            ManagedLifecycle endpoint = target.getEndpoint();
-            if (endpoint != null) {
-                endpoint.init(se);
+            Endpoint endpoint = target.getEndpoint();
+            if (endpoint instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) endpoint).init(se);
             }
         }
     }
@@ -175,9 +176,9 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
             if (seq != null) {
                 seq.destroy();
             }
-            ManagedLifecycle endpoint = target.getEndpoint();
-            if (endpoint != null) {
-                endpoint.destroy();
+            Endpoint endpoint = target.getEndpoint();
+            if (endpoint instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) endpoint).destroy();
             }
         }
     }

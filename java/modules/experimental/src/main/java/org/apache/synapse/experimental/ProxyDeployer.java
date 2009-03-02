@@ -38,6 +38,7 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -98,8 +99,8 @@ public class ProxyDeployer implements Deployer {
         // Copy from SynapseInitializationModule#init (TODO: imcomplete: doesn't take pinnedServers into account)
         proxy.buildAxisService(synCfg, axisCfg);
         // Copy from SynapseConfiguration#init
-        if (proxy.getTargetInLineEndpoint() != null) {
-            proxy.getTargetInLineEndpoint().init(synapseEnvironment);
+        if (proxy.getTargetInLineEndpoint() instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) proxy.getTargetInLineEndpoint()).init(synapseEnvironment);
         }
 
         if (proxy.getTargetInLineInSequence() != null) {

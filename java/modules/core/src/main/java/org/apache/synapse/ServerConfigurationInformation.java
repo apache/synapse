@@ -230,4 +230,16 @@ public class ServerConfigurationInformation {
             log.warn("Unable to get the hostName or IP address of the server", e);
         }
     }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[ Server Name : ").append(serverName).append(" ]");
+        sb.append("[ Synapse Home : ").append(synapseHome).append(" ]");
+        sb.append("[ Synapse XML : ").append(synapseXMLLocation).append(" ]");
+        sb.append("[ Server Host : ").append(hostName).append(" ]");
+        sb.append("[ Server IP : ").append(ipAddress).append(" ]");
+        sb.append("[ Axis2 Repository : ").append(axis2RepoLocation).append(" ]");
+        sb.append("[ Axis2 XML : ").append(axis2Xml).append(" ]");
+        return sb.toString();
+    }
 }

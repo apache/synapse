@@ -24,7 +24,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
@@ -141,7 +140,7 @@ public class WSDLEndpointFactory extends EndpointFactory {
                     (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "definitions"));
             if (endpoint == null && definitionElement != null) {
                 wsdlEndpoint.setWsdlDoc(definitionElement);
-                String resolveRoot = ServerManager.getInstance().getResolveRoot();
+                String resolveRoot = SynapseConfigUtils.getResolveRoot();
                 String baseUri = "file:./";
                 if (resolveRoot != null) {
                     baseUri = resolveRoot.trim();

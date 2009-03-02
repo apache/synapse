@@ -33,12 +33,12 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.audit.AuditConfigurable;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -69,13 +69,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
 
         callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
-        ServerManager.getInstance().setCallbackStore(callbackStore);
+        // TODO if this need , where to set . may be separate MBean if need to manage this
+//        ServerManager.getInstance().setCallbackStore(callbackStore);
 
         // create the Timer object and a TimeoutHandler task
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
         
         Timer timeOutTimer = synCfg.getSynapseTimer();
-        long timeoutHandlerInterval = ServerManager.getInstance().getTimeoutHandlerInterval();
+        long timeoutHandlerInterval = SynapseConfigUtils.getTimeoutHandlerInterval();
 
         // schedule timeout handler to run every n seconds (n : specified or defaults to 15s)
         timeOutTimer.schedule(timeoutHandler, 0, timeoutHandlerInterval);

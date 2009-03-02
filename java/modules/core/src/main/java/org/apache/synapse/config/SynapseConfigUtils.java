@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.security.definition.KeyStoreInformation;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
@@ -145,7 +147,7 @@ public class SynapseConfigUtils {
                         log.debug("Can not open a connection to the URL with a path :" +
                                 path);
                     }
-                    String synapseHome = ServerManager.getInstance().getSynapseHome();
+                    String synapseHome = getSynapseHome();
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
@@ -319,14 +321,6 @@ public class SynapseConfigUtils {
         return null;
     }
 
-    private static int getReadTimeout() {
-        return ServerManager.getInstance().getReadTimeout();
-    }
-
-    private static int getConnectionTimeout() {
-        return ServerManager.getInstance().getConnectTimeout();
-    }
-
     private static void handleException(String msg, Exception e) {
         log.warn(msg, e);
         throw new SynapseException(msg, e);
@@ -467,7 +461,7 @@ public class SynapseConfigUtils {
                 connection = url.openConnection();
             }
             connection.setReadTimeout(getReadTimeout());
-            connection.setConnectTimeout(getConnectionTimeout());
+            connection.setConnectTimeout(getConnectTimeout());
             connection.setRequestProperty("Connection", "close"); // if http is being used
             return connection;
         } catch (IOException e) {
@@ -518,7 +512,7 @@ public class SynapseConfigUtils {
                         log.debug("Can not open a connection to the URL with a path :" +
                                 path);
                     }
-                    String synapseHome = ServerManager.getInstance().getSynapseHome();
+                    String synapseHome = getSynapseHome();
                     if (synapseHome != null) {
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
@@ -608,6 +602,61 @@ public class SynapseConfigUtils {
             }
         }
         return null;
+    }
+
+    public static int getConnectTimeout() {
+        return Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                SynapseConstants.CONNECTTIMEOUT,
+                String.valueOf(SynapseConstants.DEFAULT_CONNECTTIMEOUT)));
+
+    }
+
+    public static int getReadTimeout() {
+        return Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                SynapseConstants.READTIMEOUT,
+                String.valueOf(SynapseConstants.DEFAULT_READTIMEOUT)));
+
+    }
+
+    public static long getTimeoutHandlerInterval() {
+        return Long.parseLong(SynapsePropertiesLoader.getPropertyValue(
+                SynapseConstants.TIMEOUT_HANDLER_INTERVAL,
+                String.valueOf(SynapseConstants.DEFAULT_TIMEOUT_HANDLER_INTERVAL)));
+
+    }
+
+    public static long getGlobalTimeoutInterval() {
+        return Long.parseLong(SynapsePropertiesLoader.getPropertyValue(
+                SynapseConstants.GLOBAL_TIMEOUT_INTERVAL,
+                String.valueOf(SynapseConstants.DEFAULT_GLOBAL_TIMEOUT)));
+
+    }
+
+    public static String getSynapseHome() {
+        ServerConfigurationInformation information =
+                ServerManager.getInstance().getInformation();
+        if (information != null) {
+            return information.getSynapseHome();
+        }
+        return "";
+    }
+
+    public static String getServerName() {
+        ServerConfigurationInformation information =
+                ServerManager.getInstance().getInformation();
+        if (information != null) {
+            return information.getServerName();
+        }
+        return "";
+    }
+
+    public static String getResolveRoot() {
+        ServerConfigurationInformation information =
+                ServerManager.getInstance().getInformation();
+        if (information != null) {
+            return information.getResolveRoot();
+        }
+        return "";
     }
 
     public static OMElement stringToOM(String xml) {

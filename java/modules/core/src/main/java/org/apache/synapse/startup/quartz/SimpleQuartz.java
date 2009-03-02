@@ -21,9 +21,7 @@ package org.apache.synapse.startup.quartz;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
@@ -31,6 +29,8 @@ import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskScheduler;
 import org.apache.synapse.task.TaskSchedulerFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 import java.net.InetAddress;
@@ -86,7 +86,7 @@ public class SimpleQuartz extends AbstractStartup {
             handleException("TaskDescription is null");
         }
 
-        SynapseConfiguration  synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
+        SynapseConfiguration synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
         repository = synapseConfiguration.getTaskDescriptionRepository();
 
         if (repository == null) {
@@ -98,7 +98,7 @@ public class SimpleQuartz extends AbstractStartup {
         // this server name given by system property SynapseServerName
         // otherwise take host-name
         // else assume localhost
-        String thisServerName = ServerManager.getInstance().getServerName();
+        String thisServerName = SynapseConfigUtils.getServerName();
         if (thisServerName == null || thisServerName.equals("")) {
             try {
                 InetAddress addr = InetAddress.getLocalHost();

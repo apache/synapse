@@ -22,6 +22,8 @@ package org.apache.synapse.endpoints;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.endpoints.dispatch.SessionInformation;
@@ -59,11 +61,12 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
     /* Sessions time out interval*/
     private long sessionTimeout = -1;
 
-    public void init(ConfigurationContext cc) {
-
+    public void init(SynapseEnvironment synapseEnvironment) {
+        ConfigurationContext cc =
+                ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
         if (!initialized) {
 
-            super.init(cc);
+            super.init(synapseEnvironment);
             // Initialize the SAL Sessions if already has not been initialized.
             SALSessions salSessions = SALSessions.getInstance();
             if (!salSessions.isInitialized()) {

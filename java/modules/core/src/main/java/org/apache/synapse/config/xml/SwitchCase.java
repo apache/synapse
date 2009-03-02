@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.regex.Matcher;
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
  * for message mediation
  */
 
-public class SwitchCase {
+public class SwitchCase implements ManagedLifecycle {
 
     private static final Log log = LogFactory.getLog(SwitchCase.class);
 

@@ -75,6 +75,10 @@ public class SynapseControllerFactory {
         throw new SynapseException(msg);
     }
 
+    /**
+     * Validate core settings for startup
+     * @param information  ServerConfigurationInformation to be validated
+     */
     private static void validate(ServerConfigurationInformation information) {
 
         String synapseHome = information.getSynapseHome();

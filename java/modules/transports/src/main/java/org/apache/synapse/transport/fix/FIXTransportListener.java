@@ -61,10 +61,13 @@ public class FIXTransportListener extends AbstractTransportListener {
 
         super.init(cfgCtx, trpInDesc);
         //initialize the FIXSessionFactory
-        fixSessionFactory = new FIXSessionFactory(new FIXApplicationFactory(this.cfgCtx, this.workerPool));
+        fixSessionFactory = new FIXSessionFactory(
+                new FIXApplicationFactory(this.cfgCtx, this.workerPool));
         FIXTransportSender sender = (FIXTransportSender) cfgCtx.
                 getAxisConfiguration().getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
-        sender.setSessionFactory(fixSessionFactory);
+        if (sender != null) {
+            sender.setSessionFactory(fixSessionFactory);
+        }
         log.info("FIX transport listener initialized...");
     }
 

@@ -123,6 +123,12 @@ public final class SynapseConstants {
     /** conf directory name **/
     public static final String CONF_DIRECTORY = "conf";
 
+    // proxy servicec servicetype parameter
+        /** service type parameter name */
+        public static final String SERVICE_TYPE_PARAM_NAME = "serviceType";
+        /** service type param value for the proxy services */
+        public static final String PROXY_SERVICE_TYPE = "proxy";
+
     //- Synapse Message Context Properties -
         /** The Synapse MC property name that holds the name of the Proxy service thats handling it */
         public static final String PROXY_SERVICE = "proxy.name";

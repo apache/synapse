@@ -62,27 +62,32 @@ public class SynapseInHandler extends AbstractHandler {
         if (!messageContext.isServerSide()) {
             synCtx.setProperty(SynapseConstants.RESPONSE, Boolean.TRUE);
             synCtx.setResponse(true);
+            try {
+                // if synapse says ok let the message to flow through
+                if (HandlerUtil.mediateOutMessage(log, messageContext, synCtx)) {
+                    return InvocationResponse.CONTINUE;
+                } else {
+                    // if not abort the further processings
+                    log.debug("Synapse has decided to abort the message:\n" + synCtx);
+                    return InvocationResponse.ABORT;
+                }
+            } catch (SynapseException syne) {
+                // todo : invoke the fault sequence
+            }
         } else {
             synCtx.setProperty(SynapseConstants.RESPONSE, Boolean.FALSE);
             synCtx.setResponse(false);
-        }
-
-        try {
-            // if synapse says ok let the message to flow through
-            if (synCtx.getEnvironment().injectMessage(synCtx)) {
-                return InvocationResponse.CONTINUE;
-            } else {
-                // if not abort the further processings
-                log.debug("Synapse has decided to abort the message:\n" + synCtx.getEnvelope());
-                return InvocationResponse.ABORT;
-            }
-        } catch (SynapseException syne) {
-            if (!synCtx.getFaultStack().isEmpty()) {
-                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx, syne);
-            } else {
-                log.error("Synapse encountered an exception, " +
-                        "No error handlers found.\n" + syne.getMessage());
-                throw new AxisFault("Synapse encountered an error." + syne);
+            try {
+                // if synapse says ok let the message to flow through
+                if (HandlerUtil.mediateInMessage(log, messageContext, synCtx)) {
+                    return InvocationResponse.CONTINUE;
+                } else {
+                    // if not abort the further processings
+                    log.debug("Synapse has decided to abort the message:\n" + synCtx);
+                    return InvocationResponse.ABORT;
+                }
+            } catch (SynapseException syne) {
+                // todo : invoke the fault sequence
             }
         }
 

@@ -526,6 +526,8 @@ public class ProxyService {
         }
 
         try {
+            proxyService.addParameter(
+                    SynapseConstants.SERVICE_TYPE_PARAM_NAME, SynapseConstants.PROXY_SERVICE_TYPE);
             auditInfo("Adding service " + name + " to the Axis2 configuration");
             axisCfg.addService(proxyService);
             this.setRunning(true);

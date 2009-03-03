@@ -59,12 +59,12 @@
                         <Bundle-Description>${pom.description}</Bundle-Description>
                         <Bundle-SymbolicName>org.apache.synapse.extension</Bundle-SymbolicName>
                         <Export-Package>
-                            org.apache.synapse.format.hessian.*;-split-package:=merge-last,
-                            org.apache.synapse.format.syslog.*;-split-package:=merge-last,
-                            org.apache.synapse.mediators.bsf.*;-split-package:=merge-last,
-                            org.apache.synapse.mediators.spring.*;-split-package:=merge-last,
-                            org.apache.synapse.mediators.throttle.*;-split-package:=merge-last,
-                            org.apache.synapse.mediators.xquery.*;-split-package:=merge-last,
+                            org.apache.synapse.format.hessian.*,
+                            org.apache.synapse.format.syslog.*,
+                            org.apache.synapse.mediators.bsf.*,
+                            org.apache.synapse.mediators.spring.*,
+                            org.apache.synapse.mediators.throttle.*,
+                            org.apache.synapse.mediators.xquery.*,
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
@@ -72,25 +72,18 @@
                             javax.xml.stream,
                             javax.xml.transform.dom,
                             javax.xml.transform.stream,
-                            <!--net.sf.saxon.javax.xml.xquery,-->
-                            <!--net.sf.saxon.xqj,-->
                             org.apache.axiom.*,
                             org.apache.axis2.*,
-                            <!--org.apache.bsf.xml,-->
                             org.apache.commons.logging,
                             org.apache.neethi,
                             org.apache.synapse.*,
                             org.jaxen,
-                            <!--org.springframework.beans.factory.support,-->
-                            <!--org.springframework.beans.factory.xml,-->
-                            <!--org.springframework.context,-->
-                            <!--org.springframework.context.support,-->
-                            <!--org.springframework.core.io,-->
                             org.w3c.dom,
-                            <!--org.wso2.throttle,-->
-                            org.xml.sax
+                            org.xml.sax,
+                            *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Fragment-Host>org.apache.synapse.core</Fragment-Host>
                     </instructions>
                 </configuration>
             </plugin>

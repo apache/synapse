@@ -42,7 +42,7 @@ import java.util.Map;
  * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
  */
 
-public  class MediatorFactoryFinder implements XMLToObjectMapper {
+public class MediatorFactoryFinder implements XMLToObjectMapper {
 
 	private static final Log log = LogFactory.getLog(MediatorFactoryFinder.class);
 

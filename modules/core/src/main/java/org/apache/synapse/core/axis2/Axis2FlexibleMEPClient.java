@@ -217,6 +217,9 @@ public class Axis2FlexibleMEPClient {
         AxisService anoymousService =
             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),
             axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
+        // mark the anon services created to be used in the client side of synapse as hidden
+        // from the server side of synapse point of view
+        anoymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
         ServiceGroupContext sgc = new ServiceGroupContext(
             axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);

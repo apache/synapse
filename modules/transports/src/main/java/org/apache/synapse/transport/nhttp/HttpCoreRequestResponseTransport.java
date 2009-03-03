@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 public class HttpCoreRequestResponseTransport implements RequestResponseTransport {
 
     private static final Log log = LogFactory.getLog(HttpCoreRequestResponseTransport.class);
-    private RequestResponseTransportStatus status = RequestResponseTransportStatus.INITIAL;
+    private RequestResponseTransportStatus status = RequestResponseTransportStatus.WAITING;
     private MessageContext msgContext = null;
     private boolean responseWritten = false;
 

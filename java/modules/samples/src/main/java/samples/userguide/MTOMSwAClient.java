@@ -64,6 +64,9 @@ public class MTOMSwAClient {
         } else if ("swa".equals(mode)) {
             sendUsingSwA(fileName, targetEPR);
         }
+
+        // let the server read the stream before exit
+        Thread.sleep(1000);
     }
 
     public static MessageContext sendUsingSwA(String fileName, String targetEPR) throws IOException {

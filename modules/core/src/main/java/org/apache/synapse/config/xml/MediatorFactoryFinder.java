@@ -72,7 +72,8 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         DBLookupMediatorFactory.class,
         CacheMediatorFactory.class,
         CalloutMediatorFactory.class,
-        EventPublisherMediatorFactory.class               
+        EventPublisherMediatorFactory.class,
+        TransactionMediatorFactory.class
     };
 
     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();

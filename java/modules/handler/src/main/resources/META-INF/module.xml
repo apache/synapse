@@ -27,13 +27,13 @@
 
     <InFlow>
         <handler name="SynapseIn" class="org.apache.synapse.handler.SynapseInHandler">
-            <order phase="PreDispatch"/>
+            <order phase="OperationInPhase"/>
         </handler>
     </InFlow>
 
     <OutFlow>
         <handler name="SynapseOut" class="org.apache.synapse.handler.SynapseOutHandler">
-            <order phase="MessageOut"/>
+            <order phase="OperationOutPhase"/>
         </handler>
     </OutFlow>
     

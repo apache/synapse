@@ -33,12 +33,13 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.audit.AuditConfigurable;
-import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -262,6 +263,26 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 response.setProperty(
                         org.apache.axis2.Constants.Configuration.ENABLE_SWA,
                         org.apache.axis2.Constants.VALUE_TRUE);
+            }
+
+            // when axis2 receives a soap message without addressing headers it users
+            // DISABLE_ADDRESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing
+            // headers on the response. this causes a problem for synapse if the original message
+            // it receivs (from client) has addressing and the synaspse service invocation has not
+            // engage addressing. in this case when synapse receives the response from the server
+            // addessing In handler dissable addressing since that response does not have addressing
+            // headers. synapse sends the response to its orignal client using the same message
+            // context. Then this response does not have addressing headers since it already
+            // disable. to avoid this we need to set the DISABLE_ADDRESSING_FOR_OUT_MESSAGES
+            // property state to original state.
+            if (axisOutMsgCtx.getProperty(
+                    AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES) != null) {
+                
+                response.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
+                        axisOutMsgCtx.getProperty(
+                                AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES));
+            } else {
+                response.removeProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
             }
 
              // copy the message type property thats used by the out message to the response message

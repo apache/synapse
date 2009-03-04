@@ -30,6 +30,11 @@ public class ServerContextInformation {
     /* A map to hold any context information*/
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
+    private ServerState serverState = ServerState.UNDETERMINED;
+
+    public ServerContextInformation() {
+    }
+
     public ServerContextInformation(Object serverContext) {
         this.serverContext = serverContext;
     }
@@ -37,7 +42,8 @@ public class ServerContextInformation {
     public Object getServerContext() {
         return serverContext;
     }
-    public void setServerContext(Object serverContext){
+
+    public void setServerContext(Object serverContext) {
         this.serverContext = serverContext;
     }
 
@@ -47,5 +53,13 @@ public class ServerContextInformation {
 
     public Object getProperty(String key) {
         return properties.get(key);
+    }
+
+    public ServerState getServerState() {
+        return serverState;
+    }
+
+    public void setServerState(ServerState serverState) {
+        this.serverState = serverState;
     }
 }

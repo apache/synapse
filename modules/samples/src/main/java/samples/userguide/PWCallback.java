@@ -81,17 +81,17 @@ public class PWCallback implements CallbackHandler {
 
                 * This usage type is used only in case we received a
 
-                * username token with a password of type PasswordText or
+                * username token with a secret of type PasswordText or
 
-                * an unknown password type.
+                * an unknown secret type.
 
                 *
 
                 * This case the WSPasswordCallback object contains the
 
-                * identifier (aka username), the password we received, and
+                * identifier (aka username), the secret we received, and
 
-                * the password type string to identify the type.
+                * the secret type string to identify the type.
 
                 *
 
@@ -127,11 +127,11 @@ public class PWCallback implements CallbackHandler {
 
                 /*
 
-                 * here call a function/method to lookup the password for
+                 * here call a function/method to lookup the secret for
 
                  * the given identifier (e.g. a user name or keystore alias)
 
-                 * e.g.: pc.setPassword(passStore.getPassword(pc.getIdentfifier))
+                 * e.g.: pc.setSecret(passStore.getSecret(pc.getIdentfifier))
 
                  * for Testing we supply a fixed name here.
 

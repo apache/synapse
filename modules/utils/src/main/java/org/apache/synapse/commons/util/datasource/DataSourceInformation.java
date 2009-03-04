@@ -19,6 +19,7 @@
 package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class DataSourceInformation {
     private final Properties properties = new Properties();
     private String repositoryType = DataSourceConfigurationConstants.PROP_REGISTRY_MEMORY;
     private String alias;
+    private SecretCallbackHandler passwordProvider;
 
     private long timeBetweenEvictionRunsMillis =
             GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
@@ -339,5 +341,13 @@ public class DataSourceInformation {
 
     public Map<String, Object> getAllParameters() {
         return this.parameters;
+    }
+
+    public SecretCallbackHandler getPasswordProvider() {
+        return passwordProvider;
+    }
+
+    public void setPasswordProvider(SecretCallbackHandler passwordProvider) {
+        this.passwordProvider = passwordProvider;
     }
 }

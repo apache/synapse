@@ -43,6 +43,12 @@ public class SecretManager {
     /* True , if secret manage has been started up properly- need to have a at
     least one Secret Repository*/
     private boolean initialized = false;
+    /* Identity key store password*/
+    private String identityStorePassword;
+    /* Identity key password */
+    private String identityKeyPassword;
+    /* Trust store password */
+    private String trustStorePassword;
 
     public static SecretManager getInstance() {
         return SECRET_MANAGER;
@@ -53,14 +59,9 @@ public class SecretManager {
     }
 
     /**
-     * Initializes the Secret Manager .Paswords for both trusted and private keyStores have to be
-     * provided separately due to security reasons
-     *
-     * @param identityStorePass Password to access private  keyStore
-     * @param identityKeyPass   Password to access private or secret keys
-     * @param trustStorePass    Password to access trusted KeyStore
+     * Initialize the Secret Manager
      */
-    public void init(String identityStorePass, String identityKeyPass, String trustStorePass) {
+    public void init() {
 
         if (initialized) {
             if (log.isDebugEnabled()) {
@@ -69,27 +70,70 @@ public class SecretManager {
             return;
         }
 
-        Properties keyStoreProperties = SynapsePropertiesLoader.loadSynapseProperties();
-        if (keyStoreProperties == null) {
+        Properties configurationProperties = loadConfigurationPropertis();
+        if (configurationProperties == null) {
             if (log.isDebugEnabled()) {
-                log.debug("KeyStore configuration properties cannot be found");
+                log.debug("Secret Manager configuration properties cannot be found. " +
+                        "Cannot initialize SecretManager");
             }
             return;
         }
 
-        String configurationFile = MiscellaneousUtil.getProperty(
-                keyStoreProperties, SECRET_MANAGER_CONF, DEFAULT_CONF_LOCATION);
-
-        Properties configurationProperties = MiscellaneousUtil.loadProperties(configurationFile);
-        if (configurationProperties == null || configurationProperties.isEmpty()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Configuration properties can not be loaded form : " +
-                        configurationFile + " Will use synapse properties");
-            }
-            configurationProperties = keyStoreProperties;
-
+        if (assertValidPasswords(identityStorePassword, identityKeyPassword, trustStorePassword)) {
+            init(configurationProperties, identityStorePassword, identityKeyPassword, trustStorePassword);
         }
+    }
 
+    /**
+     * Returns the secret corresponding to the given alias name
+     *
+     * @param alias The logical or alias name
+     * @return If there is a secret , otherwise , alias itself
+     */
+    public String getSecret(String alias) {
+        if (!initialized || parentRepository == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("There is no secret repository. Returning alias itself");
+            }
+            return alias;
+        }
+        return parentRepository.getSecret(alias);
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void shoutDown() {
+        this.parentRepository = null;
+        this.initialized = false;
+    }
+
+    public void setIdentityStorePassword(String identityStorePassword) {
+        this.identityStorePassword = identityStorePassword;
+    }
+
+    public void setIdentityKeyPassword(String identityKeyPassword) {
+        this.identityKeyPassword = identityKeyPassword;
+    }
+
+    public void setTrustStorePassword(String trustStorePassword) {
+        this.trustStorePassword = trustStorePassword;
+    }
+
+    /**
+     * Initializes the Secret Manager .Paswords for both trusted and private keyStores have to be
+     * provided separately due to security reasons
+     *
+     * @param configurationProperties Secret Manager configuration properties
+     * @param identityStorePass       Password to access private  keyStore
+     * @param identityKeyPass         Password to access private or secret keys
+     * @param trustStorePass          Password to access trusted KeyStore
+     */
+    private void init(Properties configurationProperties, String identityStorePass,
+                      String identityKeyPass, String trustStorePass) {
+
+        Properties keyStoreProperties = SynapsePropertiesLoader.loadSynapseProperties();
         String repositoriesString = MiscellaneousUtil.getProperty(
                 configurationProperties, SECRET_REPOSITORIES, null);
         if (repositoriesString == null || "".equals(repositoriesString)) {
@@ -105,30 +149,6 @@ public class SecretManager {
                 log.debug("No secret repositories have been configured");
             }
             return;
-        }
-
-        boolean inValid = false;
-        if (identityStorePass == null || "".equals(identityStorePass)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Identity KeyStore Password cannot be found.");
-            }
-            inValid = true;
-        }
-
-        if (identityKeyPass == null || "".equals(identityKeyPass)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Identity Key Password cannot be found.");
-            }
-        }
-
-        if (trustStorePass == null || "".equals(trustStorePass)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Trust Store Password cannot be null.");
-            }
-            if (inValid) {
-                handleException("Either Identity or Trust keystore password is mandotory" +
-                        " in order to initialized secret manager.");
-            }
         }
 
         //Create a KeyStore Information  for private key entry KeyStore
@@ -183,10 +203,12 @@ public class SecretManager {
                     secretRepository.setParent(currentParent);
                     currentParent = secretRepository;
                     if (log.isDebugEnabled()) {
-                        log.debug("Successfully Initiate a Secret Repository provided by : " + provider);
+                        log.debug("Successfully Initiate a Secret Repository provided by : " +
+                                provider);
                     }
                 } else {
-                    handleException("Invalid class as SecretRepositoryProvider : Class Name : " + provider);
+                    handleException("Invalid class as SecretRepositoryProvider : Class Name : " +
+                            provider);
                 }
 
             } catch (ClassNotFoundException e) {
@@ -197,33 +219,45 @@ public class SecretManager {
                 handleException("Error creating a instance from class : " + provider);
             }
         }
-        
+
         initialized = true;
     }
 
-    /**
-     * Returns the secret corresponding to the given alias name
-     *
-     * @param alias The logical or alias name
-     * @return If there is a secret , otherwise , alias itself
-     */
-    public String getSecret(String alias) {
-        if (!initialized || parentRepository == null) {
+    private boolean assertValidPasswords(String identityStorePass,
+                                         String identityKeyPass, String trustStorePass) {
+        boolean isValid = false;
+        if (trustStorePass != null && !"".equals(trustStorePass)) {
             if (log.isDebugEnabled()) {
-                log.debug("There is no secret repository. Returning alias itself");
+                log.debug("Trust Store Password cannot be found.");
             }
-            return alias;
+            isValid = true;
+        } else {
+            if (identityStorePass != null && !"".equals(identityStorePass) &&
+                    identityKeyPass != null && !"".equals(identityKeyPass)) {
+                isValid = true;
+            }
         }
-        return parentRepository.getSecret(alias);
+        return isValid;
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
+    private Properties loadConfigurationPropertis() {
+        Properties keyStoreProperties = SynapsePropertiesLoader.loadSynapseProperties();
+        if (keyStoreProperties != null) {
+            String configurationFile = MiscellaneousUtil.getProperty(
+                    keyStoreProperties, SECRET_MANAGER_CONF, DEFAULT_CONF_LOCATION);
 
-    public void shoutDown() {
-        this.parentRepository = null;
-        this.initialized = false;
+            Properties configurationProperties = MiscellaneousUtil.loadProperties(configurationFile);
+            if (configurationProperties == null || configurationProperties.isEmpty()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Configuration properties can not be loaded form : " +
+                            configurationFile + " Will use synapse properties");
+                }
+                configurationProperties = keyStoreProperties;
+
+            }
+            return configurationProperties;
+        }
+        return null;
     }
 
     private static void handleException(String msg) {
@@ -233,6 +267,7 @@ public class SecretManager {
 
     private void registerMBean() {
         MBeanRegistrar mBeanRegistrar = MBeanRegistrar.getInstance();
-        mBeanRegistrar.registerMBean(new SecretManagerAdmin(this), "SecurityAdminServices", "SecretManagerAdmin");
+        mBeanRegistrar.registerMBean(new SecretManagerAdmin(this), "SecurityAdminServices",
+                "SecretManagerAdmin");
     }
 }

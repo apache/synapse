@@ -24,9 +24,14 @@ import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
+import org.apache.synapse.commons.util.secret.SecretLoadingModule;
+import org.apache.synapse.commons.util.secret.SecretCallback;
+import org.apache.synapse.commons.util.secret.SingleSecretCallback;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * Factory for creating a DataSource based on information in DataSourceInformation
@@ -34,6 +39,7 @@ import javax.sql.DataSource;
 public class DataSourceFactory {
 
     private final static Log log = LogFactory.getLog(DataSourceFactory.class);
+    private final static String PROMPT = "DataBase Password for ";
 
     private DataSourceFactory() {
     }
@@ -64,11 +70,19 @@ public class DataSourceFactory {
 
         String user = information.getUser();
         String password = information.getPassword();
-        //TODO move security code
-//        SecretManager secretManager = SecretManager.getInstance();
-//        if (secretManager.isInitialized()) {
-//            password = secretManager.getSecret(password);
-//        }
+        SecretCallbackHandler secretCallbackHandler = information.getPasswordProvider();
+
+        if (secretCallbackHandler != null) {
+            SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
+            secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHandler});
+            SecretCallback[] secretCallbacks = new SecretCallback[0];
+            SingleSecretCallback secretCallback = new SingleSecretCallback();
+            secretCallback.setPrompt(PROMPT + information.getAlias());
+            secretCallbacks[0] = secretCallback;
+            secretLoadingModule.load(secretCallbacks);
+            password = secretCallback.getSecret();
+        }
+
         int defaultTransactionIsolation = information.getDefaultTransactionIsolation();
 
 

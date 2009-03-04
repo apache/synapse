@@ -633,28 +633,37 @@ public class SynapseConfigUtils {
     }
 
     public static String getSynapseHome() {
-        ServerConfigurationInformation information =
-                ServerManager.getInstance().getInformation();
-        if (information != null) {
-            return information.getSynapseHome();
+        ServerManager serverManager = ServerManager.getInstance();
+        if (serverManager.isInitialized()) {
+            ServerConfigurationInformation information =
+                    serverManager.getInformation();
+            if (information != null) {
+                return information.getSynapseHome();
+            }
         }
         return "";
     }
 
     public static String getServerName() {
-        ServerConfigurationInformation information =
-                ServerManager.getInstance().getInformation();
-        if (information != null) {
-            return information.getServerName();
+        ServerManager serverManager = ServerManager.getInstance();
+        if (serverManager.isInitialized()) {
+            ServerConfigurationInformation information =
+                    serverManager.getInformation();
+            if (information != null) {
+                return information.getServerName();
+            }
         }
         return "";
     }
 
     public static String getResolveRoot() {
-        ServerConfigurationInformation information =
-                ServerManager.getInstance().getInformation();
-        if (information != null) {
-            return information.getResolveRoot();
+        ServerManager serverManager = ServerManager.getInstance();
+        if (serverManager.isInitialized()) {
+            ServerConfigurationInformation information =
+                    serverManager.getInformation();
+            if (information != null) {
+                return information.getResolveRoot();
+            }
         }
         return "";
     }

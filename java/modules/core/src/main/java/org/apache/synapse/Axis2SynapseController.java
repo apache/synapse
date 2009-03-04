@@ -82,7 +82,8 @@ public class Axis2SynapseController implements SynapseController {
 
         this.information = configurationInformation;
 
-        if (contextInformation == null) {
+        if (contextInformation == null || contextInformation.getServerContext() == null ||
+                configurationInformation.isCreateNewInstance()) {
             if (log.isDebugEnabled()) {
                 log.debug("Initializing Synapse in a new axis2 server environment instance ");
             }

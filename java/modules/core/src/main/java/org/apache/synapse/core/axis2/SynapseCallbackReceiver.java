@@ -33,7 +33,6 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.audit.AuditConfigurable;
@@ -70,8 +69,6 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
 
         callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
-        // TODO if this need , where to set . may be separate MBean if need to manage this
-//        ServerManager.getInstance().setCallbackStore(callbackStore);
 
         // create the Timer object and a TimeoutHandler task
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
@@ -266,7 +263,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             }
 
             // when axis2 receives a soap message without addressing headers it users
-            // DISABLE_ADDRESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing
+            // ESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing
             // headers on the response. this causes a problem for synapse if the original message
             // it receivs (from client) has addressing and the synaspse service invocation has not
             // engage addressing. in this case when synapse receives the response from the server

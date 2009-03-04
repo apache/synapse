@@ -30,14 +30,13 @@ public class ServerStateDetectionStrategy {
     /**
      * Determine the next possible server state based on current states and other facts
      *
-     * @param previousState Previuos server state , a state where server was
-     *                      there when last time check
-     * @param information   ServerConfigurationInformation instance
+     * @param contextInformation ServerContextInformation instance
+     * @param information        ServerConfigurationInformation instance
      * @return The actual current state possible states for the server
      */
-    public static ServerState currentState(ServerState previousState,
+    public static ServerState currentState(ServerContextInformation contextInformation,
                                            ServerConfigurationInformation information) {
-
+        ServerState previousState = contextInformation.getServerState();
         String deploymentMode = information.getDeploymentMode();
         if (previousState == ServerState.UNDETERMINED) {
 

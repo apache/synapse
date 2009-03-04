@@ -16,36 +16,29 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.security.mbean;
+package org.apache.synapse.commons.util.secret;
 
 /**
- * Admin service for managing SecretManager
+ *
  */
+public class SingleSecretCallback implements SecretCallback {
 
-public interface SecretManagerAdminMBean {
+    private String secret;
+    private String prompt;
 
-    /**
-     * Initialize the SecretManager
-     */
-    public void init();
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
 
-    /**
-     * Shutting Down the SecretManager
-     */
-    public void shutDown();
+    public String getSecret() {
+        return this.secret;
+    }
 
-    /**
-     * @param identityStorePassword Identity keyStore password
-     */
-    public void setIdentityStorePassword(String identityStorePassword);
+    public String getPrompt() {
+        return prompt;
+    }
 
-    /**
-     * @param identityKeyPassword Private key Password
-     */
-    public void setIdentityKeyPassword(String identityKeyPassword);
-
-    /**
-     * @param trustStorePassword TrustStore password
-     */
-    public void setTrustStorePassword(String trustStorePassword);
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
 }

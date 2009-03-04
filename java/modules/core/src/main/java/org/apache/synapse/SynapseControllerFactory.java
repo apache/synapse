@@ -56,15 +56,15 @@ public class SynapseControllerFactory {
             if (instance != null && instance instanceof SynapseController) {
                 return (SynapseController) instance;
             } else {
-                handleFatal("Invalid class as SecretRepositoryProvider : Class Name : " + provider);
+                fatal("Invalid class as SynapseController : Class Name : " + provider);
             }
 
         } catch (ClassNotFoundException e) {
-            handleFatal("A Secret Provider cannot be found for class name : " + provider);
+            fatal("A SynapseController cannot be found for class name : " + provider, e);
         } catch (IllegalAccessException e) {
-            handleFatal("Error creating a instance from class : " + provider);
+            fatal("Error creating a instance from class : " + provider, e);
         } catch (InstantiationException e) {
-            handleFatal("Error creating a instance from class : " + provider);
+            fatal("Error creating a instance from class : " + provider, e);
         }
         return null;
     }
@@ -76,9 +76,13 @@ public class SynapseControllerFactory {
      */
     private static void validate(ServerConfigurationInformation information) {
 
+        if (information == null) {
+            fatal("Server Configuration Information is null");
+        }
+
         String synapseHome = information.getSynapseHome();
         if (synapseHome == null || !new File(synapseHome).exists()) {
-            handleFatal("Synapse home");
+            fatalOnParameterValidationFailure("Synapse home");
         } else {
             log.info("Using Synapse home as : " + synapseHome);
         }
@@ -86,7 +90,7 @@ public class SynapseControllerFactory {
         if (information.isCreateNewInstance()) {
             String axis2Repolocation = information.getAxis2RepoLocation();
             if (axis2Repolocation == null || !new File(axis2Repolocation).exists()) {
-                handleFatal("Axis2 repository");
+                fatalOnParameterValidationFailure("Axis2 repository");
             } else {
                 log.info("Using the Axis2 Repository : " +
                         new File(axis2Repolocation).getAbsolutePath());
@@ -94,7 +98,7 @@ public class SynapseControllerFactory {
 
             String axis2Xml = information.getAxis2Xml();
             if (axis2Xml == null || !new File(axis2Xml).exists()) {
-                handleFatal("axis2.xml location");
+                fatalOnParameterValidationFailure("axis2.xml location");
             } else {
                 log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
             }
@@ -102,7 +106,7 @@ public class SynapseControllerFactory {
 
         String synapseXMLPath = information.getSynapseXMLLocation();
         if (synapseXMLPath == null || !new File(synapseXMLPath).exists()) {
-            handleFatal("synapse.xml path");
+            fatalOnParameterValidationFailure("synapse.xml path");
         }
 
         String serverName = information.getServerName();
@@ -124,9 +128,19 @@ public class SynapseControllerFactory {
                 (SynapseConfigUtils.getTimeoutHandlerInterval() / 1000) + "s");
     }
 
-    private static void handleFatal(String msgPre) {
+    private static void fatalOnParameterValidationFailure(String msgPre) {
         String msg = "The " + msgPre + " must be set as a system property or init-parameter";
         log.fatal(msg);
         throw new SynapseException(msg);
+    }
+
+    private static void fatal(String msg) {
+        log.fatal(msg);
+        throw new SynapseException(msg);
+    }
+
+    private static void fatal(String msg, Exception e) {
+        log.fatal(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

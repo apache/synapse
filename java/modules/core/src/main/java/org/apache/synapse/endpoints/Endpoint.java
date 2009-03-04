@@ -20,7 +20,6 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.ManagedLifecycle;
 
 import java.util.List;
 

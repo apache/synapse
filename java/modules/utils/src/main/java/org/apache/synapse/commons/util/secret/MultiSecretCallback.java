@@ -16,36 +16,28 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.security.mbean;
+package org.apache.synapse.commons.util.secret;
+
+import java.util.*;
 
 /**
- * Admin service for managing SecretManager
+ * Represents group of any number of Callbacks - group means, they provide secret for a one use
  */
 
-public interface SecretManagerAdminMBean {
+public class MultiSecretCallback implements SecretCallback {
 
-    /**
-     * Initialize the SecretManager
-     */
-    public void init();
+    private final Map<String, SecretCallback> secretCallbacks =
+            new HashMap<String, SecretCallback>();
 
-    /**
-     * Shutting Down the SecretManager
-     */
-    public void shutDown();
+    public void addSecretCallback(String id, SecretCallback secretCallback) {
+        secretCallbacks.put(id, secretCallback);
+    }
 
-    /**
-     * @param identityStorePassword Identity keyStore password
-     */
-    public void setIdentityStorePassword(String identityStorePassword);
+    public Iterator<SecretCallback> getSecretCallbacks() {
+        return secretCallbacks.values().iterator();
+    }
 
-    /**
-     * @param identityKeyPassword Private key Password
-     */
-    public void setIdentityKeyPassword(String identityKeyPassword);
-
-    /**
-     * @param trustStorePassword TrustStore password
-     */
-    public void setTrustStorePassword(String trustStorePassword);
+    public SecretCallback getSecretCallback(String id) {
+        return secretCallbacks.get(id);
+    }
 }

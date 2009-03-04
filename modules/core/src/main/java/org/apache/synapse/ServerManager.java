@@ -37,14 +37,16 @@ public class ServerManager {
 
     private final static ServerManager instance = new ServerManager();
 
-    /* The controller for synapse create and Destroy synapse artifacts in a particular environment*/
+    /* The controller for synapse create and Destroy synapse artifacts in a particular environment
+       Only for internal usage - DON"T PUT GETTER ,SETTER */
     private SynapseController synapseController;
     /* Server Configuration  */
     private ServerConfigurationInformation configurationInformation;
     /* Server context */
     private ServerContextInformation contextInformation;
-    /* The state of the server - the state that marked at last operation on server */
-    private ServerState serverState = ServerState.UNDETERMINED;
+    /*Only represents whether server manager has been initialized by given required
+     configuration information - not server state or internal usage - DON"T PUT SETTER */
+    private boolean initialized = false;
 
     public static ServerManager getInstance() {
         return instance;
@@ -59,12 +61,20 @@ public class ServerManager {
      */
     public ServerState init(ServerConfigurationInformation configurationInformation,
                             ServerContextInformation contextInformation) {
+
         this.configurationInformation = configurationInformation;
-        this.contextInformation = contextInformation;
+        if (contextInformation == null) {
+            this.contextInformation = new ServerContextInformation();
+        } else {
+            this.contextInformation = contextInformation;
+        }
         this.synapseController = SynapseControllerFactory
                 .createSynapseController(configurationInformation);
+
+        this.initialized = true;
+
         doInit();
-        return this.serverState;
+        return this.contextInformation.getServerState();
     }
 
     /**
@@ -73,9 +83,10 @@ public class ServerManager {
      * @return ServerState - The state of the server after call this operation
      */
     public ServerState start() {
+        assertInitialized();
         doInit();
         doStart();
-        return this.serverState;
+        return this.contextInformation.getServerState();
     }
 
     /**
@@ -84,8 +95,9 @@ public class ServerManager {
      * @return ServerState - The state of the server after call this operation
      */
     public ServerState stop() {
+        assertInitialized();
         doStop();
-        return this.serverState;
+        return this.contextInformation.getServerState();
     }
 
     /**
@@ -94,6 +106,7 @@ public class ServerManager {
      * @return ServerConfigurationInformation insatnce
      */
     public ServerConfigurationInformation getInformation() {
+        assertInitialized();
         return configurationInformation;
     }
 
@@ -103,6 +116,7 @@ public class ServerManager {
      * @return ServerContextInformation instance
      */
     public ServerContextInformation getContextInformation() {
+        assertInitialized();
         return contextInformation;
     }
 
@@ -111,11 +125,11 @@ public class ServerManager {
      */
     private void doInit() {
 
-        this.serverState = ServerStateDetectionStrategy.currentState(serverState,
+        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
                 configurationInformation);
 
-        if (this.serverState == ServerState.INITIALIZABLE) {
-            
+        if (serverState == ServerState.INITIALIZABLE) {
+
             this.synapseController.init(configurationInformation, contextInformation);
 
             if (this.contextInformation == null) {
@@ -124,8 +138,9 @@ public class ServerManager {
             } else if (this.contextInformation.getServerContext() == null) {
                 this.contextInformation.setServerContext(this.synapseController.getContext());
             }
-
-            this.serverState = ServerState.INITIALIZED;
+            chanageState(ServerState.INITIALIZED);
+        } else {
+            chanageState(serverState);
         }
     }
 
@@ -134,15 +149,17 @@ public class ServerManager {
      */
     private void doStart() {
 
-        this.serverState = ServerStateDetectionStrategy.currentState(serverState,
+        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
                 configurationInformation);
 
-        if (this.serverState == ServerState.INITIALIZED) {
+        if (serverState == ServerState.INITIALIZED) {
 
             this.synapseController.createSynapseConfiguration();
             this.synapseController.createSynapseEnvironment();
-            this.serverState = ServerState.STARTED;
+            chanageState(ServerState.STARTED);
             log.info("Ready for processing");
+        } else {
+            chanageState(serverState);
         }
     }
 
@@ -151,7 +168,7 @@ public class ServerManager {
      */
     private void doStop() {
 
-        this.serverState = ServerStateDetectionStrategy.currentState(serverState,
+        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
                 configurationInformation);
 
         switch (serverState) {
@@ -166,7 +183,33 @@ public class ServerManager {
                 break;
             }
         }
-        this.serverState = ServerState.STOPPED;
+        chanageState(ServerState.STOPPED);
+        this.initialized = false;
+    }
+
+    private void chanageState(ServerState serverState) {
+        this.contextInformation.setServerState(serverState);
+    }
+
+    private void assertInitialized() {
+        if (!initialized) {
+            String msg = "Server manager has not been initialized by giving " +
+                    "required configurations information." +
+                    "It is needed to initiate by giving required configurations information ," +
+                    " before access any operations";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+    }
+
+    /**
+     * Has server manager  been initialized ?
+     *
+     * @return true if the server manager has been initialized by given required
+     *         configuration information
+     */
+    public boolean isInitialized() {
+        return initialized;
     }
 }
 

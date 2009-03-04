@@ -25,6 +25,7 @@ public class DataSourceConfigurationConstants {
 
     public static final String PROP_USER_NAME = "username";
     public static final String PROP_PASSWORD = "password";
+    public static final String PROP_PASSWORD_PROVIDER = "passwordProvider";
     public static final String PROP_DRIVER_CLS_NAME = "driverClassName";
     public static final String PROP_DSNAME = "dsName";
     public static final String PROP_URL = "url";

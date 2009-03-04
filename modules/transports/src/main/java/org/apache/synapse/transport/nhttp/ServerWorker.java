@@ -32,19 +32,20 @@ import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.MessageContextBuilder;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
-import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.ws.commons.schema.XmlSchema;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -381,6 +382,12 @@ public class ServerWorker implements Runnable {
             AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
                 getServices().get(serviceName);
             if (service != null) {
+                String parameterValue = (String) service.getParameterValue("serviceType");
+                if ("proxy".equals(parameterValue) && !isWSDLProvidedForProxyService(service)) {
+                    handleBrowserException("No WSDL was provided for the Service " + serviceName +
+                            ". A WSDL cannot be generated.", null);
+                    return;
+                }
                 try {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     service.printWSDL2(baos, getIpAddress());
@@ -459,6 +466,12 @@ public class ServerWorker implements Runnable {
             AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
                     getServices().get(serviceName);
             if (service != null) {
+                String parameterValue = (String) service.getParameterValue("serviceType");
+                if ("proxy".equals(parameterValue) && !isWSDLProvidedForProxyService(service)) {
+                    handleBrowserException("No WSDL was provided for the Service " + serviceName +
+                            ". A WSDL cannot be generated.", null);
+                    return;
+                }
                 try {
                     byte[] bytes =
                         HTTPTransportReceiver.printServiceHTML(serviceName, cfgCtx).getBytes();
@@ -534,7 +547,7 @@ public class ServerWorker implements Runnable {
                 os.close();
             } catch (IOException ignore) {}
         }
-
+        
         if (conn != null) {
             try {
                 conn.shutdown();
@@ -579,6 +592,14 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    private boolean isWSDLProvidedForProxyService(AxisService service) {
+        boolean isWSDLProvided = false;
+        if (service.getParameterValue(WSDLConstants.WSDL_4_J_DEFINITION) != null ||
+                service.getParameterValue(WSDLConstants.WSDL_20_DESCRIPTION) != null) {
+            isWSDLProvided = true;
+        }
+        return isWSDLProvided;
+    }
 
     public HttpResponse getResponse() {
         return response;

@@ -78,8 +78,12 @@ public class FIXTransportListener extends AbstractTransportListener {
      * @param service the service for which to listen for messages
      */
     protected void startListeningForService(AxisService service) {
-        fixSessionFactory.createFIXAcceptor(service);
-        fixSessionFactory.createFIXInitiator(service);
+        try {
+            fixSessionFactory.createFIXAcceptor(service);
+            fixSessionFactory.createFIXInitiator(service);
+        } catch (AxisFault axisFault) {
+            disableTransportForService(service);
+        }
     }
 
     /**

@@ -83,8 +83,9 @@ public class FIXSessionFactory {
      * acceptorStore keyed by the service name and start it.
      *
      * @param service the AxisService
+     * @throws AxisFault if the acceptor cannot be created
      */
-    public void createFIXAcceptor(AxisService service) {
+    public void createFIXAcceptor(AxisService service) throws AxisFault {
 
         //Try to get an InputStream to the FIX configuration file
         InputStream fixConfigStream = getFIXConfigAsStream(service, true);
@@ -113,11 +114,16 @@ public class FIXSessionFactory {
                 acceptor.start();
                 return;
             } catch (ConfigError e) {
-                log.error("Error in the specified FIX configuration. Unable to initialize a " +
-                        "FIX session for the service " + service.getName(), e);
+                String msg = "Error in the specified FIX configuration. Unable to initialize a " +
+                        "FIX session for the service " + service.getName();
+                log.error(msg, e);
+                throw new AxisFault(msg, e);
             }
         }
-        log.info("Unable to initialize a FIX acceptor session for the service " + service.getName());
+        String msg = "Unable to initialize a FIX acceptor session for the service "
+                + service.getName();
+        log.error(msg);
+        throw new AxisFault(msg);
     }
 
     /**
@@ -193,7 +199,7 @@ public class FIXSessionFactory {
         } catch (InterruptedException ignore) { }
     }
 
-    public void createFIXInitiator(AxisService service) {
+    public void createFIXInitiator(AxisService service) throws AxisFault {
 
         InputStream fixConfigStream = getFIXConfigAsStream(service, false);
         if (fixConfigStream != null) {
@@ -220,27 +226,30 @@ public class FIXSessionFactory {
                     messageFactory);
 
                 String[] EPRs = FIXUtils.getEPRs(settings);
-                for (int i=0; i<EPRs.length; i++) {
-                    initiatorStore.put(EPRs[i], initiator);
-                    applicationStore.put(EPRs[i], messageHandler);
+                for (String EPR : EPRs) {
+                    initiatorStore.put(EPR, initiator);
+                    applicationStore.put(EPR, messageHandler);
                 }
                 initiator.start();
-            }
-            catch (FieldConvertError e) {
-                log.info("FIX configuration file for the initiator session of the service " +
+            } catch (FieldConvertError e) {
+                String msg = "FIX configuration file for the initiator session of the service " +
                         service.getName() + " is either incomplete or invalid." +
-                        " Not creating the initiator session at this stage.");
-            }
-            catch (ConfigError e) {
-                log.info("FIX configuration file for the initiator session of the service " +
+                        " Not creating the initiator session at this stage.";
+                log.error(msg, e);
+                throw new AxisFault(msg, e);
+            } catch (ConfigError e) {
+                String msg = "FIX configuration file for the initiator session of the service " +
                         service.getName() + " is either incomplete or invalid." +
-                        " Not creating the initiator session at this stage.");
+                        " Not creating the initiator session at this stage.";
+                log.error(msg, e);
+                throw new AxisFault(msg, e);
             }
 
-        }
-        else {
-            log.info("The " + FIXConstants.FIX_INITIATOR_CONFIG_URL_PARAM + " parameter is not specified. " +
-                    "Unable to initialize the initiator session at this stage.");
+        } else {
+            String msg = "The " + FIXConstants.FIX_INITIATOR_CONFIG_URL_PARAM + " parameter is " +
+                    "not specified. Unable to initialize the initiator session at this stage.";
+            log.info(msg);
+            throw new AxisFault(msg);
         }
     }
 
@@ -424,9 +433,7 @@ public class FIXSessionFactory {
     public Application getApplication(String fixEPR) {
         Application app = applicationStore.get(fixEPR);
         if (app == null) {
-            Iterator<String> keys = applicationStore.keySet().iterator();
-            while (keys.hasNext()) {
-                String epr = keys.next();
+            for (String epr : applicationStore.keySet()) {
                 if (FIXUtils.compareURLs(epr, fixEPR)) {
                     app = applicationStore.get(epr);
                     applicationStore.remove(epr);

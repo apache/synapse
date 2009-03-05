@@ -126,7 +126,7 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/core/target</directory>
+                            <directory>modules/mar/target</directory>
                             <targetPath>WEB-INF/repository/modules</targetPath>
                             <includes>
                                 <include>synapse-${synapse.version}.mar</include>

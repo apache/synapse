@@ -32,6 +32,7 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
@@ -109,7 +110,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                     messageID = relatesTo.getValue();
                 }
             }
-        } else if (messageCtx.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY) == null) {
+        } else if (messageCtx.getProperty(SandeshaClientConstants.SEQUENCE_KEY) == null) {
             messageID = (String) messageCtx.getProperty(SynapseConstants.RELATES_TO_FOR_POX);
         }
 

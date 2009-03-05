@@ -447,9 +447,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wso2.mercury</groupId>
-                <artifactId>mercury-core</artifactId>
-                <version>${mercury.version}</version>
+                <groupId>org.apache.sandesha2</groupId>
+                <artifactId>sandesha2-core</artifactId>
+                <version>${sandesha2.version}</version>
             </dependency>
 
             <dependency>
@@ -577,11 +577,11 @@
             <type>mar</type>
         </dependency>
 
-        <!-- Mercury -->
+        <!-- Sandesha2 -->
         <dependency>
-            <groupId>org.wso2.mercury</groupId>
-            <artifactId>mercury-mar</artifactId>
-            <version>${mercury.version}</version>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${sandesha2.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
@@ -591,9 +591,9 @@
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.mercury</groupId>
-            <artifactId>mercury-core</artifactId>
-            <version>${mercury.version}</version>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-core</artifactId>
+            <version>${sandesha2.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
@@ -999,7 +999,7 @@
         <!-- addressing, rampart, neethi -->
         <addressing.version>1.5-beta-2</addressing.version>
         <rampart.version>SNAPSHOT</rampart.version>
-        <mercury.version>0.91</mercury.version>
+        <sandesha2.version>SNAPSHOT</sandesha2.version>
         <neethi.version>2.0.4</neethi.version>
         <wss4j.version>SNAPSHOT</wss4j.version>
         <opensaml.version>1.1</opensaml.version>

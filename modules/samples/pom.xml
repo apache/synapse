@@ -296,9 +296,9 @@
                                             </outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>org.wso2.mercury</groupId>
-                                            <artifactId>mercury-mar</artifactId>
-                                            <version>${mercury.version}</version>
+                                            <groupId>org.apache.sandesha2</groupId>
+                                            <artifactId>sandesha2</artifactId>
+                                            <version>${sandesha2.version}</version>
                                             <type>mar</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>target/test_repos/axis2Server/modules
@@ -325,9 +325,9 @@
                                             </outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>org.wso2.mercury</groupId>
-                                            <artifactId>mercury-mar</artifactId>
-                                            <version>${mercury.version}</version>
+                                            <groupId>org.apache.sandesha2</groupId>
+                                            <artifactId>sandesha2</artifactId>
+                                            <version>${sandesha2.version}</version>
                                             <type>mar</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>target/test_repos/synapse/modules

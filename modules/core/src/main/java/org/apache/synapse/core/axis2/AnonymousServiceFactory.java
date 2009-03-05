@@ -120,7 +120,7 @@ public class AnonymousServiceFactory {
 
                         if (wsRMOn) {
                             service.engageModule(axisCfg.getModule(
-                                SynapseConstants.MERCURY_MODULE_NAME), axisCfg);
+                                SynapseConstants.RM_MODULE_NAME), axisCfg);
                         }
                     }
                     // if WS-A is off, WS-RM should be too

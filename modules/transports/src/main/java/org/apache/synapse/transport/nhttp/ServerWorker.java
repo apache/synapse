@@ -308,7 +308,6 @@ public class ServerWorker implements Runnable {
         }
 
         String serviceName = null;
-        String operation = null;
         if (uri.startsWith(servicePath)) {
             serviceName = uri.substring(servicePath.length());
             if (serviceName.startsWith("/")) {
@@ -322,7 +321,6 @@ public class ServerWorker implements Runnable {
         if (serviceName != null) {
             int opnStart = serviceName.indexOf("/");
             if (opnStart != -1) {
-                operation = serviceName.substring(opnStart+1);
                 serviceName = serviceName.substring(0, opnStart);
             }
         }
@@ -361,7 +359,7 @@ public class ServerWorker implements Runnable {
             serverHandler.commitResponseHideExceptions(conn, response);
 
         } else if (serviceName != null && parameters.containsKey("wsdl")) {
-            AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+            AxisService service = cfgCtx.getAxisConfiguration().
                 getServices().get(serviceName);
             if (service != null) {
                 try {
@@ -379,7 +377,7 @@ public class ServerWorker implements Runnable {
             }
 
         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
-            AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+            AxisService service = cfgCtx.getAxisConfiguration().
                 getServices().get(serviceName);
             if (service != null) {
                 String parameterValue = (String) service.getParameterValue("serviceType");
@@ -404,7 +402,7 @@ public class ServerWorker implements Runnable {
 
         } else if (serviceName != null && parameters.containsKey("xsd")) {
             if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
-                AxisService service = (AxisService) cfgCtx.getAxisConfiguration()
+                AxisService service = cfgCtx.getAxisConfiguration()
                     .getServices().get(serviceName);
                 if (service != null) {
                     try {
@@ -424,7 +422,7 @@ public class ServerWorker implements Runnable {
             } else {
                 //cater for named xsds - check for the xsd name
                 String schemaName = parameters.get("xsd");
-                AxisService service = (AxisService) cfgCtx.getAxisConfiguration()
+                AxisService service = cfgCtx.getAxisConfiguration()
                     .getServices().get(serviceName);
 
                 if (service != null) {
@@ -463,7 +461,7 @@ public class ServerWorker implements Runnable {
 
         }
         else if (serviceName != null && parameters.containsKey("info")) {
-            AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+            AxisService service = cfgCtx.getAxisConfiguration().
                     getServices().get(serviceName);
             if (service != null) {
                 String parameterValue = (String) service.getParameterValue("serviceType");

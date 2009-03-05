@@ -367,7 +367,7 @@
 <h2>
 <a name="Sample2" id="Sample2">Sample 2: CBR with the Switch-case mediator, using message properties</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-    &lt;switch source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
+    &lt;switch source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples&quot;&gt;
         &lt;case regex=&quot;IBM&quot;&gt;
             &lt;!-- the property mediator sets a local property on the *current* message --&gt;
             &lt;property name=&quot;symbol&quot; value=&quot;Great stock - IBM&quot;/&gt;
@@ -379,7 +379,7 @@
             &lt;!-- it is possible to assign the result of an XPath expression as well --&gt;
             &lt;property name=&quot;symbol&quot;
                   expression=&quot;fn:concat('Normal Stock - ', //m0:getQuote/m0:request/m0:symbol)&quot;
-                  xmlns:m0=&quot;http://services.samples/xsd&quot;/&gt;
+                  xmlns:m0=&quot;http://services.samples&quot;/&gt;
         &lt;/default&gt;
     &lt;/switch&gt;
 
@@ -478,7 +478,7 @@
     &lt;!-- default message handling sequence used by Synapse - named 'main' --&gt;
     &lt;sequence name=&quot;main&quot;&gt;
         &lt;in&gt;
-            &lt;switch source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
+            &lt;switch source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples&quot;&gt;
                 &lt;case regex=&quot;IBM&quot;&gt;
                     &lt;send&gt;
                         &lt;endpoint&gt;&lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;&lt;/endpoint&gt;
@@ -609,9 +609,9 @@
 
     &lt;localEntry key=&quot;validate_schema&quot;&gt;
         &lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;
-                    xmlns=&quot;http://www.apache-synapse.org/test&quot; elementFormDefault=&quot;qualified&quot;
+                    xmlns=&quot;http://services.samples&quot; elementFormDefault=&quot;qualified&quot;
                     attributeFormDefault=&quot;unqualified&quot;
-                    targetNamespace=&quot;http://services.samples/xsd&quot;&gt;
+                    targetNamespace=&quot;http://services.samples&quot;&gt;
             &lt;xs:element name=&quot;getQuote&quot;&gt;
                 &lt;xs:complexType&gt;
                     &lt;xs:sequence&gt;

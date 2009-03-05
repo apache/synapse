@@ -20,6 +20,7 @@ package org.apache.synapse;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.*;
@@ -30,10 +31,10 @@ import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.SynapsePropertiesLoader;
-import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
@@ -42,9 +43,9 @@ import org.apache.synapse.core.axis2.SynapseMessageReceiver;
 import org.apache.synapse.eventing.SynapseEventSource;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 /**
  * Axis2 Based Synapse Controller
@@ -96,6 +97,8 @@ public class Axis2SynapseController implements SynapseController {
                             "axis2 server environment instance");
                 }
                 configurationContext = (ConfigurationContext) context;
+                configurationContext.setProperty(
+                        AddressingConstants.ADDR_VALIDATE_ACTION, Boolean.FALSE);
             } else {
                 handleFatal("Synapse startup initialization failed : Provided server context is" +
                         " invalid,expected a Axis2 ConfigurationContext instance");
@@ -250,6 +253,9 @@ public class Axis2SynapseController implements SynapseController {
             configurationContext = ConfigurationContextFactory.
                     createConfigurationContextFromFileSystem(information.getAxis2RepoLocation(),
                             information.getAxis2Xml());
+
+            configurationContext.setProperty(
+                    AddressingConstants.ADDR_VALIDATE_ACTION, Boolean.FALSE);
 
             listenerManager = configurationContext.getListenerManager();
             if (listenerManager == null) {

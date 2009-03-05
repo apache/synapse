@@ -105,6 +105,11 @@ public class FIXTransportListener extends AbstractTransportListener {
      * @throws AxisFault
      */
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
+
+        if (serviceName.indexOf('.') != -1) {
+            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
+        }
+        
         //Try to get the list of EPRs from the FIXSessionFactory
         String[] serviceEPRStrings = fixSessionFactory.getServiceEPRs(serviceName, ip);
         if (serviceEPRStrings != null) {

@@ -48,12 +48,12 @@ public final class SynapseConstants {
     public static final QName SYNAPSE_OPERATION_NAME = new QName("mediate");
 
     //- names of modules to be engaged at runtime -
-    /** The Name of the WS-RM Mercury module */
+    /** The Name of the WS-RM module */
     public static final String RM_MODULE_NAME = "sandesha2";
     /** The Name of the WS-A Addressing module */
     public static final String ADDRESSING_MODULE_NAME = "addressing";
-    /** The Name of the WS-Security Rampart module */
-    public static final String RAMPART_MODULE_NAME = "rampart";
+    /** The Name of the WS-Security module */
+    public static final String SECURITY_MODULE_NAME = "rampart";
 
     //- Standard headers that can be read as get-property('header')-
     /** Refers to the To header */

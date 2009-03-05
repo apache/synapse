@@ -127,7 +127,7 @@ public class AnonymousServiceFactory {
 
                     if (wsSecOn) {
                         service.engageModule(axisCfg.getModule(
-                                SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
+                                SynapseConstants.SECURITY_MODULE_NAME), axisCfg);
                     }
                 }
             }

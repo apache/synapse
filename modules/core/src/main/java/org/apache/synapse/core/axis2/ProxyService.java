@@ -569,7 +569,7 @@ public class ProxyService {
             auditInfo("WS-Security is enabled for service : " + name);
             try {
                 proxyService.engageModule(axisCfg.getModule(
-                    SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
+                    SynapseConstants.SECURITY_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS Sec module on proxy service : "
                         + name, axisFault);

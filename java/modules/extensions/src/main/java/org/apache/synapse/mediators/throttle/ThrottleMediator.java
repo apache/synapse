@@ -470,10 +470,6 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         return canAccess;
     }
 
-    public String getType() {
-        return ThrottleMediator.class.getName();
-    }
-
     /**
      * To get the policy key - The key for which will used to lookup policy from the registry
      *

@@ -20,7 +20,7 @@
 <serviceGroup>
 <service name="ReliableStockQuoteService">
 
-    <module ref="Mercury"/>
+    <module ref="sandesha2"/>
 	
     <messageReceivers>
     <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"

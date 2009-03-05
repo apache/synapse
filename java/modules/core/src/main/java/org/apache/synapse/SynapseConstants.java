@@ -49,7 +49,7 @@ public final class SynapseConstants {
 
     //- names of modules to be engaged at runtime -
     /** The Name of the WS-RM Mercury module */
-    public static final String MERCURY_MODULE_NAME = "Mercury";
+    public static final String RM_MODULE_NAME = "sandesha2";
     /** The Name of the WS-A Addressing module */
     public static final String ADDRESSING_MODULE_NAME = "addressing";
     /** The Name of the WS-Security Rampart module */
@@ -155,13 +155,6 @@ public final class SynapseConstants {
         public static final String ERROR_EXCEPTION = "ERROR_EXCEPTION";
         /** The default/generic error code */
         public static final int DEFAULT_ERROR= 0;
-
-        /** Mercury last message property name */
-        public static final String MERCURY_LAST_MESSAGE = "MercuryLastMessage";
-        /** Mercury last sequence key property name */
-        public static final String MERCURY_SEQUENCE_KEY = "MercurySequenceKey";
-        /** Mercury WS-RM specification version property name */
-        public static final String MERCURY_SPEC_VERSION = "MercuryRMSpecVersion";
 
     /** An Axis2 message context property that indicates the maximum time to spend on sending the message */
     public static final String SEND_TIMEOUT = "SEND_TIMEOUT";

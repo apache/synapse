@@ -239,34 +239,15 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
-                <exclude>tomcat:catalina:jar</exclude>
-                <exclude>tomcat:catalina-optional:jar</exclude>
-                <exclude>tomcat:jasper-compiler:jar</exclude>
-                <exclude>tomcat:jasper-compiler-jdt:jar</exclude>
-                <exclude>tomcat:jasper-runtime:jar</exclude>
-                <exclude>tomcat:naming-factory:jar</exclude>
-                <exclude>tomcat:naming-resources:jar</exclude>
-                <exclude>tomcat:servlets-default:jar</exclude>
-                <exclude>tomcat:tomcat-coyote:jar</exclude>
-                <exclude>tomcat:tomcat-http:jar</exclude>
-                <exclude>tomcat:tomcat-util:jar</exclude>
-                <exclude>tomcat:naming-factory-dbcp:jar</exclude>
-                <exclude>tomcat:tomcat-apr:jar</exclude>
-                <exclude>tomcat:jsp-api:jar</exclude>
-                <exclude>tomcat:servlet-api:jar</exclude>
-                <exclude>mx4j:mx4j-tools:jar</exclude>
-                <exclude>mx4j:mx4j-jmx:jar</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
                 <exclude>org.apache.ant:ant:jar</exclude>
                 <exclude>org.apache.ant:ant-nodeps:jar</exclude>
                 <exclude>org.apache.ant:ant-launcher:jar</exclude>
-                <exclude>axis:axis-ant:jar</exclude>
                 <exclude>javax.servlet:servlet-api:jar</exclude>
                 <exclude>commons-discovery:commons-discovery:jar</exclude>
                 <!--<exclude>commons-cli:commons-cli:jar</exclude>-->
-                <exclude>org.apache.geronimo.specs:geronimo-javamail:jar</exclude>
                 <exclude>xml-apis:xml-apis:jar</exclude>
                 <exclude>xerces:xercesImpl:jar</exclude>
                 <exclude>junit:junit:jar</exclude>
@@ -278,7 +259,6 @@
                 <exclude>quickfixj:quickfixj-msg-fix42:jar</exclude>
                 <exclude>quickfixj:quickfixj-msg-fix43:jar</exclude>
                 <exclude>quickfixj:quickfixj-msg-fix44:jar</exclude>
-                <exclude>org.slf4j:slf4j-jdk14:jar</exclude>
                 <exclude>org.slf4j:slf4j-api:jar</exclude>
                 <exclude>org.apache.qpid:qpid-common:jar</exclude>
                 <exclude>org.apache.qpid:qpid-client:jar</exclude>

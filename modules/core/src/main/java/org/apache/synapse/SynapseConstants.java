@@ -132,8 +132,6 @@ public final class SynapseConstants {
         /** service type param value for the proxy services */
         public static final String PROXY_SERVICE_TYPE = "proxy";
 
-
-
     //- Synapse Message Context Properties -
         /** The Synapse MC property name that holds the name of the Proxy service thats handling it */
         public static final String PROXY_SERVICE = "proxy.name";

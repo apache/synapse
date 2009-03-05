@@ -31,7 +31,7 @@
     </parent>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse</artifactId>
+    <artifactId>synapse-module</artifactId>
 
     <name>Apache Synapse - Module</name>
     <description>Apache Synapse - Module</description>
@@ -89,7 +89,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <copy file="target/synapse-${synapse.version}.jar"
+                                <copy file="target/synapse-module-${synapse.version}.jar"
                                       tofile="target/synapse-${synapse.version}.mar"/>
                             </tasks>
                         </configuration>

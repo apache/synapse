@@ -20,6 +20,7 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
 
@@ -67,11 +68,11 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 
         OMElement code = fac.createOMElement("code", synNS, fault);
         if (mediator.getFaultCodeValue() != null) {
-            code.addAttribute(fac.createOMAttribute(
-                    "value", nullNS, mediator.getFaultCodeValue().getPrefix() + ":"
-                    + mediator.getFaultCodeValue().getLocalPart()));
-            code.declareNamespace(mediator.getFaultCodeValue().getNamespaceURI(),
+            OMNamespace ns = code.declareNamespace(mediator.getFaultCodeValue().getNamespaceURI(),
                     mediator.getFaultCodeValue().getPrefix());
+            code.addAttribute(fac.createOMAttribute(
+                    "value", nullNS, ns.getPrefix() + ":"
+                    + mediator.getFaultCodeValue().getLocalPart()));
 
         } else if (mediator.getFaultCodeExpr() != null) {
             SynapseXPathSerializer.serializeXPath(mediator.getFaultCodeExpr(), code, "expression");

@@ -139,6 +139,9 @@ public class Axis2FlexibleMEPClient {
             } else if (SynapseConstants.FORMAT_SOAP11.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(false);
                 axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
+                // We need to set this ezplicitly here in case the requset was not a POST
+                axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
+                    Constants.Configuration.HTTP_METHOD_POST);
                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }
@@ -148,7 +151,10 @@ public class Axis2FlexibleMEPClient {
                 
             } else if (SynapseConstants.FORMAT_SOAP12.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(false);
-                axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);                
+                axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
+                // We need to set this ezplicitly here in case the requset was not a POST
+                axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
+                    Constants.Configuration.HTTP_METHOD_POST);
                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
                 }

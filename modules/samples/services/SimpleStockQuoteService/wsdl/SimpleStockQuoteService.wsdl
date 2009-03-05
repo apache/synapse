@@ -120,6 +120,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getSimpleQuote">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="symbol" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
 
             <xs:element name="GetQuote" type="ns:GetQuote"/>
             <xs:complexType name="GetQuote">
@@ -158,6 +165,9 @@
     <wsdl:message name="getQuoteMessage">
         <wsdl:part name="part1" element="ns0:getQuote"/>
     </wsdl:message>
+    <wsdl:message name="getSimpleQuoteMessage">
+        <wsdl:part name="part1" element="ns0:getSimpleQuote"/>
+    </wsdl:message>
     <wsdl:message name="getQuoteResponse">
         <wsdl:part name="part1" element="ns0:getQuoteResponse"/>
     </wsdl:message>
@@ -183,6 +193,11 @@
                         message="axis2:getQuoteMessage" wsaw:Action="urn:getQuote"/>
             <wsdl:output message="axis2:getQuoteResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="getSimpleQuote">
+            <wsdl:input xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                        message="axis2:getSimpleQuoteMessage" wsaw:Action="urn:getSimpleQuote"/>
+            <wsdl:output message="axis2:getQuoteResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="getMarketActivity">
             <wsdl:input xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
                         message="axis2:getMarketActivityMessage"
@@ -206,6 +221,15 @@
         </wsdl:operation>
         <wsdl:operation name="getQuote">
             <soap:operation soapAction="urn:getQuote" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSimpleQuote">
+            <soap:operation soapAction="urn:getSimpleQuote" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -243,6 +267,15 @@
         </wsdl:operation>
         <wsdl:operation name="getQuote">
             <soap12:operation soapAction="urn:getQuote" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSimpleQuote">
+            <soap12:operation soapAction="urn:getSimpleQuote" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>

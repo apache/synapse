@@ -123,6 +123,7 @@
                             org.apache.ws.commons.schema,
                             *;resolution:=optional,
                         </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>

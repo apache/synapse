@@ -1,17 +1,14 @@
 package org.apache.synapse.util;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.mediators.eip.EIPConstants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.SOAP11Constants;
+
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -20,8 +17,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.synapse.SynapseConstants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.eip.EIPConstants;
 
 import java.util.*;
 
@@ -309,18 +310,18 @@ public class MessageHelper {
 
     public static void copyRMOptions(org.apache.axis2.context.MessageContext oriContext, Options targetOptions) {
         Options oriOptions = oriContext.getOptions();
-        if (oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE) != null) {
-            targetOptions.setProperty(SynapseConstants.MERCURY_LAST_MESSAGE,
-                    oriOptions.getProperty(SynapseConstants.MERCURY_LAST_MESSAGE));
+        if (oriOptions.getProperty(SandeshaClientConstants.LAST_MESSAGE) != null) {
+            targetOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE,
+                    oriOptions.getProperty(SandeshaClientConstants.LAST_MESSAGE));
         }
-        if (oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION) != null) {
-            targetOptions.setProperty(SynapseConstants.MERCURY_SPEC_VERSION,
-                    oriOptions.getProperty(SynapseConstants.MERCURY_SPEC_VERSION));
+        if (oriOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION) != null) {
+            targetOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,
+                    oriOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION));
         }
-        if (oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY) != null) {
-            targetOptions.setProperty(SynapseConstants.MERCURY_SEQUENCE_KEY,
-                    oriOptions.getProperty(SynapseConstants.MERCURY_SEQUENCE_KEY));
-        }
+        if (oriOptions.getProperty(SandeshaClientConstants.SEQUENCE_KEY) != null) {
+            targetOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,
+                    oriOptions.getProperty(SandeshaClientConstants.SEQUENCE_KEY));
+         }
     }
 
     /**

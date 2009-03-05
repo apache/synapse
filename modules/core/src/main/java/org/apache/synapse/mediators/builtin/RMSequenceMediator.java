@@ -20,8 +20,8 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
@@ -30,7 +30,6 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
-import org.wso2.mercury.util.MercuryClientConstants;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,23 +73,21 @@ public class RMSequenceMediator extends AbstractMediator {
 
             String version = getVersionValue();
             orgMessageCtx.getOptions().setProperty(
-                SynapseConstants.MERCURY_SPEC_VERSION, version);
+                SandeshaClientConstants.RM_SPEC_VERSION, version);
 
             if (isSingle()) {
-                String sequenceID = UUIDGenerator.getUUID();
-                String offeredSeqID = UUIDGenerator.getUUID();
-
+//                String sequenceID = UUIDGenerator.getUUID();
+//                String offeredSeqID = UUIDGenerator.getUUID();
+//
+//                orgMessageCtx.getOptions().setProperty(
+//                    SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
+//                orgMessageCtx.getOptions().setProperty(
+//                    MercuryClientConstants.SEQUENCE_OFFER, offeredSeqID);
                 orgMessageCtx.getOptions().setProperty(
-                    SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
-                orgMessageCtx.getOptions().setProperty(
-                    MercuryClientConstants.SEQUENCE_OFFER, offeredSeqID);
-                orgMessageCtx.getOptions().setProperty(
-                    SynapseConstants.MERCURY_LAST_MESSAGE, "true");
+                    SandeshaClientConstants.LAST_MESSAGE, "true");
 
                 if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("Using WS-RM version " + version +
-                        " and a single message sequence : " + sequenceID +
-                        " and offering sequence : " + offeredSeqID);
+                    synLog.traceOrDebug("Using WS-RM version " + version);
                 }
 
             } else {
@@ -102,23 +99,23 @@ public class RMSequenceMediator extends AbstractMediator {
                 if (!sequenceMap.containsKey(correlationValue)) {
                     offeredSeqID = UUIDGenerator.getUUID();
                     orgMessageCtx.getOptions().setProperty(
-                        MercuryClientConstants.SEQUENCE_OFFER, offeredSeqID);
+                        SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
                 }
 
                 String sequenceID = retrieveSequenceID(correlationValue);
                 orgMessageCtx.getOptions().setProperty(
-                    SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
+                    SandeshaClientConstants.SEQUENCE_KEY, sequenceID);
 
                 if (lastMessage) {
                     orgMessageCtx.getOptions().setProperty(
-                        SynapseConstants.MERCURY_LAST_MESSAGE, "true");
+                        SandeshaClientConstants.LAST_MESSAGE, "true");
                     sequenceMap.remove(correlationValue);
                 }
 
                 if (synLog.isTraceOrDebugEnabled()) {
                     synLog.traceOrDebug("Correlation value : " + correlationValue +
-                        " last message = " + lastMessage + " using sequence : " + sequenceID +
-                        (offeredSeqID != null ? " offering sequence : " + offeredSeqID : ""));
+                            " last message = " + lastMessage + " using sequence : " + sequenceID +
+                            (offeredSeqID != null ? " offering sequence : " + offeredSeqID : ""));
                 }
             }
         }

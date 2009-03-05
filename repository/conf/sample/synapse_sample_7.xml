@@ -22,9 +22,9 @@
 
     <localEntry key="validate_schema">
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                    xmlns="http://services.samples/xsd" elementFormDefault="qualified"
+                    xmlns="http://services.samples" elementFormDefault="qualified"
                     attributeFormDefault="unqualified"
-                    targetNamespace="http://services.samples/xsd">
+                    targetNamespace="http://services.samples">
             <xs:element name="getQuote">
                 <xs:complexType>
                     <xs:sequence>

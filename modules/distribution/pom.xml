@@ -51,6 +51,63 @@
             <artifactId>synapse-experimental</artifactId>
             <version>${pom.version}</version>
         </dependency>
+
+        <!-- Modules -->
+        <dependency>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart</artifactId>
+            <version>${rampart.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>mex</artifactId>
+                </exclusion>                
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden-api</artifactId>
+                </exclusion>
+            </exclusions>
+            <type>mar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${sandesha2.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+            </exclusions>
+            <type>mar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>addressing</artifactId>
+            <version>${addressing.version}</version>
+            <type>mar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Additional transports -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-jms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-mail</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.oopsconsultancy</groupId>
             <artifactId>xmltask</artifactId>

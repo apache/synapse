@@ -564,13 +564,13 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     public void pause() throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         state = BaseConstants.PAUSED;
-        log.info("Sender paused");
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + "Sender Paused");
     }
 
     public void resume() throws AxisFault {
         if (state != BaseConstants.PAUSED) return;
         state = BaseConstants.STARTED;
-        log.info("Sender resumed");
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + "Sender Resumed");
     }
 
     public void maintenenceShutdown(long millis) throws AxisFault {

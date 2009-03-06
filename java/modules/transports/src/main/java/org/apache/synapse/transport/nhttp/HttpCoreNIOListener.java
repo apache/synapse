@@ -357,7 +357,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         try {
             ioReactor.pause();
             state = BaseConstants.PAUSED;
-            log.info("Listener paused");
+            log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Paused");
         } catch (IOException e) {
             handleException("Error pausing IOReactor", e);
         }
@@ -372,7 +372,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         try {
             ioReactor.resume();
             state = BaseConstants.STARTED;
-            log.info("Listener resumed");
+            log.info((sslContext == null ? "HTTP" : "HTTPS") + "Listener Resumed");
         } catch (IOException e) {
             handleException("Error resuming IOReactor", e);
         }

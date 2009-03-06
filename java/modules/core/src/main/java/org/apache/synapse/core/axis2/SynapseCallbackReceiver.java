@@ -264,7 +264,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             }
 
             // when axis2 receives a soap message without addressing headers it users
-            // ESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing
+            // DISABLE_ADDRESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing
             // headers on the response. this causes a problem for synapse if the original message
             // it receivs (from client) has addressing and the synaspse service invocation has not
             // engage addressing. in this case when synapse receives the response from the server

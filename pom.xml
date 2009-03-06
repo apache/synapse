@@ -332,10 +332,6 @@
                 <version>${rampart.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>jcl-over-slf4j</artifactId>
                     </exclusion>
@@ -367,10 +363,6 @@
                         <artifactId>mex</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.woden</groupId>
                         <artifactId>woden-api</artifactId>
                     </exclusion>
@@ -384,10 +376,6 @@
                     <exclusion>
                         <groupId>org.apache.axis2</groupId>
                         <artifactId>mex</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.woden</groupId>
@@ -498,18 +486,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-jms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-mail</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
         </dependency>
         <dependency>
@@ -531,65 +507,7 @@
             <artifactId>neethi</artifactId>
         </dependency>
 
-        <!-- Rampart -->
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-policy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-trust</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart</artifactId>
-            <version>${rampart.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>mex</artifactId>
-                </exclusion>                
-                <exclusion>
-                    <groupId>jaxen</groupId>
-                    <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.woden</groupId>
-                    <artifactId>woden-api</artifactId>
-                </exclusion>
-            </exclusions>
-            <type>mar</type>
-        </dependency>
-
         <!-- Sandesha2 -->
-        <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2</artifactId>
-            <version>${sandesha2.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
-                </exclusion>
-            </exclusions>
-            <type>mar</type>
-        </dependency>
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
@@ -598,24 +516,6 @@
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
                     <artifactId>axis2</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Addressing -->
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>addressing</artifactId>
-            <version>${addressing.version}</version>
-            <type>mar</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

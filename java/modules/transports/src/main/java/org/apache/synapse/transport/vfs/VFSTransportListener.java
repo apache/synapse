@@ -18,16 +18,22 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.description.*;
+import org.apache.axis2.format.DataSourceMessageBuilder;
+import org.apache.axis2.format.ManagedDataSource;
+import org.apache.axis2.format.ManagedDataSourceFactory;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.AbstractPollingTransportListener;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.ParamUtils;
+import org.apache.axis2.builder.Builder;
+import org.apache.axis2.builder.BuilderUtil;
+import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.vfs.*;
@@ -36,7 +42,6 @@ import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import java.util.*;
 import java.io.File;
@@ -418,18 +423,45 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     new VFSOutTransportInfo((String) param.getValue()));
             }
 
+            // Determine the message builder to use
+            Builder builder;
+            if (contentType == null) {
+                log.debug("No content type specified. Using SOAP builder.");
+                builder = new SOAPBuilder();
+            } else {
+                int index = contentType.indexOf(';');
+                String type = index > 0 ? contentType.substring(0, index) : contentType;
+                builder = BuilderUtil.getBuilderFromSelector(type, msgContext);
+                if (builder == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("No message builder found for type '" + type +
+                                "'. Falling back to SOAP.");
+                    }
+                    builder = new SOAPBuilder();
+                }
+            }
 
             // set the message payload to the message context
-            InputStream in = content.getInputStream();
+            InputStream in;
+            ManagedDataSource dataSource;
+            if (builder instanceof DataSourceMessageBuilder && entry.isStreaming()) {
+                in = null;
+                dataSource = ManagedDataSourceFactory.create(
+                        new FileObjectDataSource(file, contentType));
+            } else {
+                in = content.getInputStream();
+                dataSource = null;
+            }
+            
             try {
-                SOAPEnvelope envelope;
-                try {
-                    envelope = TransportUtils.createSOAPMessage(msgContext, in, contentType);
-                } catch (XMLStreamException ex) {
-                    handleException("Error parsing XML", ex);
-                    return;
+                OMElement documentElement;
+                if (in != null) {
+                    documentElement = builder.processDocument(in, contentType, msgContext);
+                } else {
+                    documentElement = ((DataSourceMessageBuilder)builder).processDocument(
+                            dataSource, contentType, msgContext);
                 }
-                msgContext.setEnvelope(envelope);
+                msgContext.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                 
                 handleIncomingMessage(
                     msgContext,
@@ -439,10 +471,14 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 );
             }
             finally {
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    handleException("Error closing stream", ex);
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        handleException("Error closing stream", ex);
+                    }
+                } else {
+                    dataSource.destroy();
                 }
             }
 
@@ -504,6 +540,11 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 entry.setMoveTimestampFormat(moveTimestampFormat);
             }
 
+            String strStreaming = ParamUtils.getOptionalParam(params, VFSConstants.STREAMING);
+            if (strStreaming != null) {
+                entry.setStreaming(Boolean.parseBoolean(strStreaming));
+            }
+            
             String strMaxRetryCount = ParamUtils.getOptionalParam(
                 params, VFSConstants.MAX_RETRY_COUNT);
             if(strMaxRetryCount != null)

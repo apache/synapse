@@ -48,6 +48,8 @@ public class VFSTransportTest extends TestCase {
         // Since VFS has no Content-Type header, SwA is not supported.
         suite.addExclude("(test=AsyncSwA)");
         
+        suite.addExclude("(!(&(test=AsyncBinary)(endpoint=axis)))");
+        
         TransportDescriptionFactory tdf =
             new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
                     VFSTransportSender.class);

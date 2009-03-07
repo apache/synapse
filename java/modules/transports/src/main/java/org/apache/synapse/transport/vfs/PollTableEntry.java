@@ -56,6 +56,8 @@ public class PollTableEntry extends AbstractPollTableEntry {
     /** moved file will have this formatted timestamp prefix */    
     private DateFormat moveTimestampFormat;
 
+    private boolean streaming;
+
     private int maxRetryCount;
     private long reconnectTimeout;
 
@@ -158,6 +160,14 @@ public class PollTableEntry extends AbstractPollTableEntry {
         } else {
             this.moveAfterFailure = moveAfterFailure;
         }
+    }
+
+    public boolean isStreaming() {
+        return streaming;
+    }
+
+    public void setStreaming(boolean streaming) {
+        this.streaming = streaming;
     }
 
     public int getMaxRetryCount() {

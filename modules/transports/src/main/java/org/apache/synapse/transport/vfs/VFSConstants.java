@@ -42,6 +42,8 @@ public class VFSConstants {
 
     public static final String DEFAULT_RESPONSE_FILE = "response.xml";
     
+    public static final String STREAMING = "transport.vfs.Streaming";
+    
     public static final String MAX_RETRY_COUNT = "transport.vfs.MaxRetryCount";
     public static final String RECONNECT_TIMEOUT = "transport.vfs.ReconnectTimeout";
     public static final String APPEND = "transport.vfs.Append";

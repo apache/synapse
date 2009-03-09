@@ -38,4 +38,10 @@ public final class HessianConstants {
 
     /** Hessian content type */
     public static final String HESSIAN_CONTENT_TYPE = "x-application/hessian";
+    
+    /** Hessian fault marker for protocol version 1.0 */
+    public static final char HESSIAN_V1_FAULT_IDENTIFIER = 'f';
+    
+    /** Hessian fault marker for protocol version 2.0 */
+    public static final char HESSIAN_V2_FAULT_IDENTIFIER = 'F';
 }

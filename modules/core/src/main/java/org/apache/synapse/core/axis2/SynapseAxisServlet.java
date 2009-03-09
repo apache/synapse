@@ -18,11 +18,9 @@
  */
 package org.apache.synapse.core.axis2;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.http.AxisServlet;
 import org.apache.axis2.transport.http.ListingAgent;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerManager;
 
 import javax.servlet.ServletConfig;
@@ -35,12 +33,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 public class SynapseAxisServlet extends AxisServlet {
-    private final static Log log = LogFactory.getLog(SynapseAxisServlet.class);
     
     /**
      * Overrides init method so that avoid  starting listeners again
      *
-     * @param config
+     * @param config the servlet configuration on which synapse initializes.
      * @throws ServletException
      */
     public void init(ServletConfig config) throws ServletException {

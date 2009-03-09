@@ -44,7 +44,7 @@ public class SOAPUtils {
      * @param axisOutMsgCtx  messageContext where version conversion is done
      * @param soapVersionURI either org.apache.axis2.namespace.Constants.URI_SOAP12_ENV or
      *                       org.apache.axis2.namespace.Constants.URI_SOAP11_ENV
-     * @throws AxisFault
+     * @throws AxisFault in case of an error in conversion
      */
     public static void convertSoapVersion(org.apache.axis2.context.MessageContext axisOutMsgCtx,
         String soapVersionURI) throws AxisFault {
@@ -80,8 +80,8 @@ public class SOAPUtils {
      *     <li>faultstring to First Fault/Reason/Text with lang=en</li>
      * </ol>
      *
-     * @param axisOutMsgCtx
-     * @throws AxisFault
+     * @param axisOutMsgCtx message context to be converted
+     * @throws AxisFault incase conversion process fails
      */
     public static void convertSOAP11toSOAP12(
         org.apache.axis2.context.MessageContext axisOutMsgCtx) throws AxisFault {
@@ -154,41 +154,39 @@ public class SOAPUtils {
             while (itrBodyChildren.hasNext()) {
                 OMNode omNode = (OMNode) itrBodyChildren.next();
 
-                if (omNode instanceof SOAPFault) {
+                if (omNode != null && omNode instanceof SOAPFault) {
+                    
                     SOAPFault soapFault = (SOAPFault) omNode;
-                    if(soapFault != null) {
-                        SOAPFault newSOAPFault = soap12Factory.createSOAPFault();
-                        newEnvelope.getBody().addChild(newSOAPFault);
-                        // get the existing envelope
-                        SOAPFaultCode code = soapFault.getCode();
-                        if(code != null) {
-                            SOAPFaultCode newSOAPFaultCode = soap12Factory.createSOAPFaultCode();
-                            newSOAPFault.setCode(newSOAPFaultCode);
+                    SOAPFault newSOAPFault = soap12Factory.createSOAPFault();
+                    newEnvelope.getBody().addChild(newSOAPFault);
+                    // get the existing envelope
+                    SOAPFaultCode code = soapFault.getCode();
+                    if(code != null) {
+                        SOAPFaultCode newSOAPFaultCode = soap12Factory.createSOAPFaultCode();
+                        newSOAPFault.setCode(newSOAPFaultCode);
 
-                            String value = code.getText();
-                            if(value != null) {
-                                SOAPFaultValue newSOAPFaultValue
+                        String value = code.getText();
+                        if(value != null) {
+                            SOAPFaultValue newSOAPFaultValue
                                     = soap12Factory.createSOAPFaultValue(newSOAPFaultCode);
-                                newSOAPFaultValue.setText(value);
-                            }
-
+                            newSOAPFaultValue.setText(value);
                         }
 
-                        SOAPFaultReason reason = soapFault.getReason();
-                        if(reason != null) {
-                            SOAPFaultReason newSOAPFaultReason
+                    }
+
+                    SOAPFaultReason reason = soapFault.getReason();
+                    if(reason != null) {
+                        SOAPFaultReason newSOAPFaultReason
                                 = soap12Factory.createSOAPFaultReason(newSOAPFault);
-                            String reasonText = reason.getText();
-                            if(reasonText != null) {
-                                SOAPFaultText newSOAPFaultText
+                        String reasonText = reason.getText();
+                        if(reasonText != null) {
+                            SOAPFaultText newSOAPFaultText
                                     = soap12Factory.createSOAPFaultText(newSOAPFaultReason);
-                                newSOAPFaultText.setLang("en"); // hard coded
-                                newSOAPFaultText.setText(reasonText);
-                            }
-                            newSOAPFault.setReason(newSOAPFaultReason);
+                            newSOAPFaultText.setLang("en"); // hard coded
+                            newSOAPFaultText.setText(reasonText);
                         }
-
-                    } // if(soapFault != null)
+                        newSOAPFault.setReason(newSOAPFaultReason);
+                    }
 
                 } else {
                     newEnvelope.getBody().addChild(omNode);
@@ -219,8 +217,8 @@ public class SOAPUtils {
      *     <li>Fault/Code to faultcode</li>
      *     <li>First Fault/Reason/Text to faultstring</li>
      * </ol>
-     * @param axisOutMsgCtx
-     * @throws AxisFault
+     * @param axisOutMsgCtx message context to be converted
+     * @throws AxisFault in case of an error in conversion
      */
     public static void convertSOAP12toSOAP11(
         org.apache.axis2.context.MessageContext axisOutMsgCtx) throws AxisFault {
@@ -292,45 +290,38 @@ public class SOAPUtils {
             while (itr.hasNext()) {
                 OMNode omNode = (OMNode) itr.next();
 
-                if (omNode instanceof SOAPFault) {
+                if (omNode != null && omNode instanceof SOAPFault) {
 
                     SOAPFault soapFault = (SOAPFault) omNode;
-                    if(soapFault != null) {
-                        SOAPFault newSOAPFault = soap11Factory.createSOAPFault();
-                        newEnvelope.getBody().addChild(newSOAPFault);
+                    SOAPFault newSOAPFault = soap11Factory.createSOAPFault();
+                    newEnvelope.getBody().addChild(newSOAPFault);
 
-                        SOAPFaultCode code = soapFault.getCode();
-                        if(code != null) {
-                            SOAPFaultCode newSOAPFaultCode
+                    SOAPFaultCode code = soapFault.getCode();
+                    if(code != null) {
+                        SOAPFaultCode newSOAPFaultCode
                                 = soap11Factory.createSOAPFaultCode(newSOAPFault);
 
-                            SOAPFaultValue value = code.getValue();
-                            if(value != null) {
-                                soap11Factory.createSOAPFaultValue(newSOAPFaultCode);
-                                if(value.getText() != null) {
-                                    newSOAPFaultCode.setText(value.getText());
-                                }
+                        SOAPFaultValue value = code.getValue();
+                        if(value != null) {
+                            soap11Factory.createSOAPFaultValue(newSOAPFaultCode);
+                            if(value.getText() != null) {
+                                newSOAPFaultCode.setText(value.getText());
                             }
                         }
+                    }
 
-                        SOAPFaultReason reason = soapFault.getReason();
-                        if(reason != null) {
-                            SOAPFaultReason newSOAPFaultReason
+                    SOAPFaultReason reason = soapFault.getReason();
+                    if(reason != null) {
+                        SOAPFaultReason newSOAPFaultReason
                                 = soap11Factory.createSOAPFaultReason(newSOAPFault);
 
-                            List allSoapTexts = reason.getAllSoapTexts();
-                            Iterator iterAllSoapTexts = allSoapTexts.iterator();
-                            while(iterAllSoapTexts.hasNext()) {
-                                SOAPFaultText soapFaultText
-                                    = (SOAPFaultText) iterAllSoapTexts.next();
-                                SOAPFaultText newSOAPFaultText
-                                    = soap11Factory.createSOAPFaultText(newSOAPFaultReason);
-                                newSOAPFaultReason.setText(soapFaultText.getText());
-                                break;
-                            }
+                        List allSoapTexts = reason.getAllSoapTexts();
+                        Iterator iterAllSoapTexts = allSoapTexts.iterator();
+                        if (iterAllSoapTexts.hasNext()) {
+                            SOAPFaultText soapFaultText = (SOAPFaultText) iterAllSoapTexts.next();
+                            newSOAPFaultReason.setText(soapFaultText.getText());
                         }
-
-                    } // if(soapFault != null)
+                    }
 
                 } else {
                     newEnvelope.getBody().addChild(omNode);

@@ -18,7 +18,9 @@
  */
 package org.apache.synapse.commons.util.secret;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents group of any number of Callbacks - group means, they provide secret for a one use
@@ -26,18 +28,25 @@ import java.util.*;
 
 public class MultiSecretCallback implements SecretCallback {
 
-    private final Map<String, SecretCallback> secretCallbacks =
-            new HashMap<String, SecretCallback>();
+    /* All the children SecretCallbacks */
+    private final List<SecretCallback> secretCallbacks =
+            new ArrayList<SecretCallback>();
 
-    public void addSecretCallback(String id, SecretCallback secretCallback) {
-        secretCallbacks.put(id, secretCallback);
+    /**
+     * Add a SecretCallback
+     *
+     * @param secretCallback SecretCallback instance
+     */
+    public void addSecretCallback(SecretCallback secretCallback) {
+        secretCallbacks.add(secretCallback);
     }
 
+    /**
+     * Returns all SecretCallbacks
+     *
+     * @return SecretCallbacks as Iterator
+     */
     public Iterator<SecretCallback> getSecretCallbacks() {
-        return secretCallbacks.values().iterator();
-    }
-
-    public SecretCallback getSecretCallback(String id) {
-        return secretCallbacks.get(id);
+        return secretCallbacks.iterator();
     }
 }

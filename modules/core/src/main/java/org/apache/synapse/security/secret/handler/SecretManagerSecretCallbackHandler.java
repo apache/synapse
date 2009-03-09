@@ -16,41 +16,24 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.secret;
+package org.apache.synapse.security.secret.handler;
+
+import org.apache.synapse.commons.util.secret.SingleSecretCallback;
+import org.apache.synapse.commons.util.secret.AbstractSecretCallbackHandler;
+import org.apache.synapse.security.secret.SecretManager;
 
 /**
- * A single secret callback that can be used to collect a single secret
+ * SecretManager based secret provider , this can be used by other application
+ * to get secret form  SecretManager
  */
-public class SingleSecretCallback implements SecretCallback {
+public class SecretManagerSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
-    /* The secret  */
-    private String secret;
-    /* The prompt to be used whenever need to request the password */
-    private String prompt;
-    /* The Id to identify the context that secret is going to be used */
-    private String id;
+    private final SecretManager secretManager = SecretManager.getInstance();
 
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public String getSecret() {
-        return this.secret;
-    }
-
-    public String getPrompt() {
-        return prompt;
-    }
-
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
+        String id = singleSecretCallback.getId();
+        if (id != null && !"".equals(id)) {
+            singleSecretCallback.setSecret(secretManager.getSecret(id));
+        }
     }
 }

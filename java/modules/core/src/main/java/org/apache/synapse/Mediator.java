@@ -19,7 +19,6 @@
 
 package org.apache.synapse;
 
-import org.apache.synapse.MessageContext;
 
 /**
  * All Synapse mediators must implement this Mediator interface. As a message passes

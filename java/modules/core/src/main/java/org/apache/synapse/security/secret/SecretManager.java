@@ -80,7 +80,8 @@ public class SecretManager {
         }
 
         if (assertValidPasswords(identityStorePassword, identityKeyPassword, trustStorePassword)) {
-            init(configurationProperties, identityStorePassword, identityKeyPassword, trustStorePassword);
+            init(configurationProperties, identityStorePassword,
+                    identityKeyPassword, trustStorePassword);
         }
     }
 
@@ -246,7 +247,8 @@ public class SecretManager {
             String configurationFile = MiscellaneousUtil.getProperty(
                     keyStoreProperties, SECRET_MANAGER_CONF, DEFAULT_CONF_LOCATION);
 
-            Properties configurationProperties = MiscellaneousUtil.loadProperties(configurationFile);
+            Properties configurationProperties = MiscellaneousUtil.loadProperties(
+                    configurationFile);
             if (configurationProperties == null || configurationProperties.isEmpty()) {
                 if (log.isDebugEnabled()) {
                     log.debug("Configuration properties can not be loaded form : " +

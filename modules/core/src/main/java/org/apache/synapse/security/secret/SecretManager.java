@@ -119,6 +119,12 @@ public class SecretManager {
                         PROP_SECRET_MANAGER + DOT + PROP_PASSWORD_PROVIDER);
 
         if (secretCallbackHandler == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to find a SecretCallbackHandler and so " +
+                        " cannot get passwords required for " +
+                        "root level secret repositories - trust store password or  identity " +
+                        "store password and it's private key password");
+            }
             return;
         }
 
@@ -126,6 +132,7 @@ public class SecretManager {
         String identityKeyPass;
         String trustStorePass;
 
+        // Creating required password class backs
         SingleSecretCallback trustStorePassSecretCallback
                 = new SingleSecretCallback(TRUSTSTORE_PASSWORD_PROMPT);
         SingleSecretCallback identityStorePassSecretCallback
@@ -133,15 +140,18 @@ public class SecretManager {
         SingleSecretCallback identityKeyPassSecretCallback
                 = new SingleSecretCallback(IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT);
 
+        // Group all as a one callback
         MultiSecretCallback callback = new MultiSecretCallback();
         callback.addSecretCallback(trustStorePassSecretCallback);
         callback.addSecretCallback(identityStorePassSecretCallback);
         callback.addSecretCallback(identityKeyPassSecretCallback);
+        SecretCallback[] secretCallbacks = new SecretCallback[]{callback};
 
+        // Create and initiating SecretLoadingModule
         SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
         secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHandler});
 
-        SecretCallback[] secretCallbacks = new SecretCallback[]{callback};
+        //load passwords
         secretLoadingModule.load(secretCallbacks);
 
         identityKeyPass = identityKeyPassSecretCallback.getSecret();
@@ -265,7 +275,7 @@ public class SecretManager {
     }
 
     private boolean validatePasswords(String identityStorePass,
-                                   String identityKeyPass, String trustStorePass) {
+                                      String identityKeyPass, String trustStorePass) {
         boolean isValid = false;
         if (trustStorePass != null && !"".equals(trustStorePass)) {
             if (log.isDebugEnabled()) {

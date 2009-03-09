@@ -21,6 +21,9 @@ package org.apache.synapse.commons.util.secret;
 
 import java.util.Iterator;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 /**
  * A Base SecretCallbackHandler
  * This expose API to handle SingleSecretCallback and all other functionality
@@ -28,9 +31,14 @@ import java.util.Iterator;
  */
 public abstract class AbstractSecretCallbackHandler implements SecretCallbackHandler {
 
+    private static final Log log = LogFactory.getLog(AbstractSecretCallbackHandler.class);
+
     public void handle(SecretCallback[] secretCallbacks) {
 
-        if (secretCallbacks == null) {
+        if (secretCallbacks == null || secretCallbacks.length == 0) {
+            if (log.isDebugEnabled()) {
+                log.debug("Provided  SecretCallbacks are empty or null.");
+            }
             return;
         }
 

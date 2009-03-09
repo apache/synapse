@@ -66,10 +66,26 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     }
 
     /**
-     * This is to Initialize the mediator with the default attributes
+     * This is to Initialize the mediator with the default attributes.
+     * 
+     * @deprecated This method is deprecated. As of Synapse 1.3, please use
+     *             {@link #processAuditStatus(Mediator, OMElement)}
      *
      * @param mediator of which trace state has to be set
      * @param mediatorOmElement from which the trace state is extracted
+     */
+    @Deprecated
+    protected void processTraceState(Mediator mediator, OMElement mediatorOmElement) {
+        processAuditStatus(mediator, mediatorOmElement);
+    }
+    
+    /**
+     * This is to Initialize the mediator regarding tracing and statistics.
+     *
+     * @param mediator of which trace state has to be set
+     * @param mediatorOmElement from which the trace state is extracted
+     * 
+     * @since 1.3
      */
     protected void processAuditStatus(Mediator mediator, OMElement mediatorOmElement) {
 

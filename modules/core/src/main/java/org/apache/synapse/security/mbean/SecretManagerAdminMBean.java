@@ -33,19 +33,4 @@ public interface SecretManagerAdminMBean {
      * Shutting Down the SecretManager
      */
     public void shutDown();
-
-    /**
-     * @param identityStorePassword Identity keyStore password
-     */
-    public void setIdentityStorePassword(String identityStorePassword);
-
-    /**
-     * @param identityKeyPassword Private key Password
-     */
-    public void setIdentityKeyPassword(String identityKeyPassword);
-
-    /**
-     * @param trustStorePassword TrustStore password
-     */
-    public void setTrustStorePassword(String trustStorePassword);
 }

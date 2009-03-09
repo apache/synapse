@@ -459,16 +459,16 @@ public class ProxyService {
 
                 if (pi.isServicePolicy()) {
 
-                    proxyService.getPolicyInclude().addPolicyElement(
-                            PolicyInclude.AXIS_SERVICE_POLICY,
+                    proxyService.getPolicySubject().attachPolicy(
                             getPolicyFromKey(pi.getPolicyKey(), synCfg));
 
                 } else if (pi.isOperationPolicy()) {
 
                     AxisOperation op = proxyService.getOperation(pi.getOperation());
                     if (op != null) {
-                        op.getPolicyInclude().addPolicyElement(PolicyInclude.AXIS_OPERATION_POLICY,
+                        op.getPolicySubject().attachPolicy(
                                 getPolicyFromKey(pi.getPolicyKey(), synCfg));
+
                     } else {
                         handleException("Couldn't find the operation specified " +
                                 "by the QName : " + pi.getOperation());
@@ -480,8 +480,7 @@ public class ProxyService {
 
                         AxisOperation op = proxyService.getOperation(pi.getOperation());
                         if (op != null) {
-                            op.getMessage(pi.getMessageLable()).getPolicyInclude().addPolicyElement(
-                                    PolicyInclude.MESSAGE_POLICY,
+                            op.getMessage(pi.getMessageLable()).getPolicySubject().attachPolicy(
                                     getPolicyFromKey(pi.getPolicyKey(), synCfg));
                         } else {
                             handleException("Couldn't find the operation " +
@@ -501,8 +500,7 @@ public class ProxyService {
 
                                     AxisMessage message = ((AxisOperation)
                                             obj).getMessage(pi.getMessageLable());
-                                    message.getPolicyInclude().addPolicyElement(
-                                            PolicyInclude.AXIS_MESSAGE_POLICY,
+                                    message.getPolicySubject().attachPolicy(
                                             getPolicyFromKey(pi.getPolicyKey(), synCfg));
                                 }
                             }

@@ -19,20 +19,27 @@
 
 package org.apache.synapse.format.hessian;
 
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMText;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 
-import javax.activation.DataHandler;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
+
+import javax.activation.DataHandler;
 
 /**
  * Enables a message encoded using the Hessian binary protocol to be received by axis2/synapse
@@ -43,22 +50,22 @@ import java.io.InputStream;
  */
 public class HessianMessageBuilder implements Builder {
 
-	private static final Log log = LogFactory.getLog(HessianMessageBuilder.class);
+    private static final Log log = LogFactory.getLog(HessianMessageBuilder.class);
 
-	/**
-	 * Returns an OMElement from a Hessian encoded message
-	 *
-	 * @param inputStream stream containg the hessian message to be built
-	 * @param contentType content type of the message
-	 * @param messageContext message to which the hessian message has to be attached
-	 * @return OMElement containing Hessian data handler keeping the message
-	 * @throws AxisFault in case of a failure in building the hessian message
+    /**
+     * Returns an OMElement from a Hessian encoded message
+     *
+     * @param inputStream stream containing the Hessian message to be built
+     * @param contentType content type of the message
+     * @param messageContext message to which the hessian message has to be attached
+     * @return OMElement containing Hessian data handler keeping the message
+     * @throws AxisFault in case of a failure in building the hessian message
      *
      * @see org.apache.axis2.builder.Builder#processDocument(java.io.InputStream,
      * String, org.apache.axis2.context.MessageContext)
-	 */
-	public OMElement processDocument(InputStream inputStream, String contentType,
-        MessageContext messageContext) throws AxisFault {
+     */
+    public OMElement processDocument(final InputStream inputStream, final String contentType,
+            final MessageContext messageContext) throws AxisFault {
 
         if (log.isDebugEnabled()) {
             log.debug("Start building the hessian message in to a HessianDataSource");
@@ -72,17 +79,18 @@ public class HessianMessageBuilder implements Builder {
 
         try {
 
-            Parameter synEnv = messageContext.getConfigurationContext()
-                    .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
+            Parameter synEnv = messageContext.getConfigurationContext().getAxisConfiguration()
+                    .getParameter(SynapseConstants.SYNAPSE_ENV);
+
+            PushbackInputStream pis = detectAndMarkMessageFault(messageContext, inputStream);
 
             DataHandler dataHandler;
             if (synEnv != null && synEnv.getValue() != null) {
-                dataHandler = new DataHandler(new SynapseBinaryDataSource(
-                        inputStream, contentType, (SynapseEnvironment) synEnv.getValue()));
+                dataHandler = new DataHandler(new SynapseBinaryDataSource(pis, contentType,
+                        (SynapseEnvironment) synEnv.getValue()));
             } else {
                 // add Hessian data inside a data handler
-                dataHandler = new DataHandler(
-                        new SynapseBinaryDataSource(inputStream,contentType));
+                dataHandler = new DataHandler(new SynapseBinaryDataSource(pis, contentType));
             }
             OMText textData = factory.createOMText(dataHandler, true);
             element.addChild(textData);
@@ -100,4 +108,42 @@ public class HessianMessageBuilder implements Builder {
         return element;
     }
 
+    /**
+     * Reads the first four bytes of the inputstream to detect whether the message represents a
+     * fault message. Once a fault message has been detected, a property used to mark fault messages
+     * is stored in the Axis2 message context. The implementaton uses a PushbackInputStream to be
+     * able to put those four bytes back at the end of processing.
+     *
+     * @param   messageContext  the Axis2 message context
+     * @param   inputStream     the inputstream to read the Hessian message
+     *
+     * @return  the wrapped (pushback) input stream
+     *
+     * @throws  IOException  if an I/O error occurs
+     */
+    private PushbackInputStream detectAndMarkMessageFault(final MessageContext messageContext,
+            final InputStream inputStream) throws IOException {
+
+        int bytesToRead = 4;
+        PushbackInputStream pis = new PushbackInputStream(inputStream, bytesToRead);
+        byte[] headerBytes = new byte[bytesToRead];
+        int n = pis.read(headerBytes);
+
+        // checking fourth byte for fault marker
+        if (n == bytesToRead) {
+            if (headerBytes[bytesToRead - 1] == HessianConstants.HESSIAN_V1_FAULT_IDENTIFIER
+                    || headerBytes[bytesToRead - 1] == HessianConstants.HESSIAN_V2_FAULT_IDENTIFIER) {
+                messageContext.setProperty(BaseConstants.FAULT_MESSAGE, SynapseConstants.TRUE);
+                if (log.isDebugEnabled()) {
+                    log.debug("Hessian fault detected, marking in Axis2 message context");
+                }
+            }
+            pis.unread(headerBytes);
+        } else if (n > 0) {
+                byte[] bytesRead = new byte[n];
+                System.arraycopy(headerBytes, 0, bytesRead, 0, n);
+                pis.unread(bytesRead);
+        }
+        return pis;
+    }
 }

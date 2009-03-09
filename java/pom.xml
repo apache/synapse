@@ -334,6 +334,11 @@
                 <artifactId>axis2-mtompolicy</artifactId>
                 <version>${axis2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>mex</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
 
             <!-- Rampart -->
             <dependency>
@@ -679,6 +684,11 @@
             <groupId>bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
             <version>${bcprov.jdk15.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>mex</artifactId>
+            <version>${axis2.version}</version>
         </dependency>
 
         <!-- dependencies for xsltc in xalan -->

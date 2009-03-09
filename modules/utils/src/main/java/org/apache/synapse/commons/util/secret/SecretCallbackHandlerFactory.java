@@ -32,7 +32,8 @@ public class SecretCallbackHandlerFactory {
 
     private static final Log log = LogFactory.getLog(SecretCallbackHandlerFactory.class);
 
-    public static SecretCallbackHandler createSecretCallbackHandler(Properties properties, String key) {
+    public static SecretCallbackHandler createSecretCallbackHandler(Properties properties,
+                                                                    String key) {
         String provider = MiscellaneousUtil.getProperty(
                 properties, key,
                 null);

@@ -26,12 +26,21 @@ import org.apache.commons.logging.Log;
 import java.util.Properties;
 
 /**
- *
+ * Contains factory methods to create SecretCallbackHandler
  */
 public class SecretCallbackHandlerFactory {
 
     private static final Log log = LogFactory.getLog(SecretCallbackHandlerFactory.class);
 
+    /**
+     * Creates a   SecretCallbackHandler instance based on given properties
+     * At future , can extend this , if SecretCallbackHandler instance need
+     * some data in the initialization
+     *
+     * @param properties properties contains some information about how to create a SecretCallbackHandler
+     * @param key        use for getting related properties out of all properties
+     * @return SecretCallbackHandler instance
+     */
     public static SecretCallbackHandler createSecretCallbackHandler(Properties properties,
                                                                     String key) {
         String provider = MiscellaneousUtil.getProperty(
@@ -41,7 +50,14 @@ public class SecretCallbackHandlerFactory {
 
     }
 
+    /**
+     * Creates a SecretCallbackHandler instance based on provided class
+     *
+     * @param provider provider class name
+     * @return SecretCallbackHandler instance
+     */
     public static SecretCallbackHandler createSecretCallbackHandler(String provider) {
+
         if (provider != null && !"".equals(provider)) {
 
             try {

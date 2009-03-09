@@ -61,8 +61,8 @@ public class SynapseMessageReceiver implements MessageReceiver {
             if (traceOn && trace.isTraceEnabled()) {
                 String[] cids = mc.getAttachmentMap().getAllContentIDs();
                 if (cids != null && cids.length > 0) {
-                    for (int i=0; i<cids.length; i++) {
-                        trace.trace("Attachment : " + cids[i]);
+                    for (String cid : cids) {
+                        trace.trace("Attachment : " + cid);
                     }
                 }
                 trace.trace("Envelope : " + mc.getEnvelope());

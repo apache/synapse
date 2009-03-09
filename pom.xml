@@ -485,6 +485,12 @@
                 <version>${wso2eventing-api.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>${jline.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -786,7 +792,12 @@
             <groupId>org.wso2.eventing</groupId>
             <artifactId>wso2eventing-api</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+        </dependency>
+
     </dependencies>
 
     <reporting>
@@ -939,6 +950,7 @@
         <saxon.version>8.9</saxon.version>
         <commons_io.version>1.4</commons_io.version>
         <commons-cli.version>1.0</commons-cli.version>
+        <jline.version>0.9.94</jline.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

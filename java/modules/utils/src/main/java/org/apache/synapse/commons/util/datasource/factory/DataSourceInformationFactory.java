@@ -24,7 +24,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
+import org.apache.synapse.commons.util.secret.SecretCallbackHandlerFactory;
 import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
@@ -275,32 +275,11 @@ public class DataSourceInformationFactory {
                 MiscellaneousUtil.getProperty(
                         properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
                         null));
-        String provider = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD_PROVIDER,
-                null);
 
-        if (provider != null && !"".equals(provider)) {
+        information.setPasswordProvider(
+                SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
+                        prefix + DataSourceConfigurationConstants.PROP_PASSWORD_PROVIDER));
 
-            try {
-                Class aClass = Thread.currentThread().getContextClassLoader().loadClass(provider);
-                Object instance = aClass.newInstance();
-
-                if (instance != null && instance instanceof SecretCallbackHandler) {
-                    information.setPasswordProvider((SecretCallbackHandler) instance);
-                } else {
-                    handleException("Invalid class as SecretCallbackHandler : Class Name : " +
-                            provider);
-                }
-
-            } catch (ClassNotFoundException e) {
-                handleException("A SecretCallbackHandler cannot be found for class name : " +
-                        provider, e);
-            } catch (IllegalAccessException e) {
-                handleException("Error creating a instance from class : " + provider, e);
-            } catch (InstantiationException e) {
-                handleException("Error creating a instance from class : " + provider, e);
-            }
-        }
         return information;
     }
 
@@ -312,16 +291,5 @@ public class DataSourceInformationFactory {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseUtilException(msg);
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   Thorwen Exception
-     */
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
     }
 }

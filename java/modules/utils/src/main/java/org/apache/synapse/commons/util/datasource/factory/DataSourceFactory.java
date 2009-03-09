@@ -75,10 +75,9 @@ public class DataSourceFactory {
         if (secretCallbackHandler != null) {
             SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
             secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHandler});
-            SecretCallback[] secretCallbacks = new SecretCallback[0];
-            SingleSecretCallback secretCallback = new SingleSecretCallback();
-            secretCallback.setPrompt(PROMPT + information.getAlias());
-            secretCallbacks[0] = secretCallback;
+            SingleSecretCallback secretCallback =
+                    new SingleSecretCallback(PROMPT + information.getAlias());
+            SecretCallback[] secretCallbacks = new SecretCallback[]{secretCallback};
             secretLoadingModule.load(secretCallbacks);
             password = secretCallback.getSecret();
         }

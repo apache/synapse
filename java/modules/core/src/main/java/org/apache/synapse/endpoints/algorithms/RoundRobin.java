@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

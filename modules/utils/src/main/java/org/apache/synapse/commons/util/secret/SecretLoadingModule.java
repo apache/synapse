@@ -22,13 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Loads the secret on behalf of applications
  */
 public class SecretLoadingModule {
 
     private final List<SecretCallbackHandler> secretCallbackHandlers =
             new ArrayList<SecretCallbackHandler>();
 
+    /**
+     * Initialized SecretLoadingModule with SecretCallbackHandlers
+     *
+     * @param secretCallbackHandlers SecretCallbackHandlers
+     */
     public void init(SecretCallbackHandler[] secretCallbackHandlers) {
         for (SecretCallbackHandler secretCallbackHandler : secretCallbackHandlers) {
             if (secretCallbackHandler != null) {
@@ -37,6 +42,11 @@ public class SecretLoadingModule {
         }
     }
 
+    /**
+     * Load secrets into given clasbacks. Use all registered call back handlers
+     *
+     * @param secretCallbacks SecretCallbacks
+     */
     public void load(SecretCallback[] secretCallbacks) {
         for (SecretCallbackHandler secretCallbackHandler : secretCallbackHandlers) {
             if (secretCallbackHandler != null) {

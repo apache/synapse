@@ -139,7 +139,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     inSequenceResult = inSequence.mediate(synCtx);
 
                 } else {
-                    handleException("Unable to find in-sequence : " + proxy.getTargetInSequence(), synCtx);
+                    handleException("Unable to find in-sequence : "
+                            + proxy.getTargetInSequence(), synCtx);
                 }
 
             } else if (proxy.getTargetInLineInSequence() != null) {

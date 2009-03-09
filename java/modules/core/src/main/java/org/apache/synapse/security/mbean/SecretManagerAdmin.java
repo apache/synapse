@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.security.mbean;
 
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.security.secret.SecretManager;
 
 
@@ -37,22 +38,10 @@ public class SecretManagerAdmin implements SecretManagerAdminMBean {
      * @see SecretManagerAdminMBean
      */
     public void init() {
-        this.secretManager.init();
+        this.secretManager.init(SynapsePropertiesLoader.loadSynapseProperties());
     }
 
     public void shutDown() {
         this.secretManager.shoutDown();
-    }
-
-    public void setIdentityStorePassword(String identityStorePassword) {
-        this.secretManager.setIdentityKeyPassword(identityStorePassword);
-    }
-
-    public void setIdentityKeyPassword(String identityKeyPassword) {
-        secretManager.setIdentityKeyPassword(identityKeyPassword);
-    }
-
-    public void setTrustStorePassword(String trustStorePassword) {
-        this.secretManager.setTrustStorePassword(trustStorePassword);
     }
 }

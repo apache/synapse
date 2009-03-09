@@ -365,7 +365,7 @@ public class ProxyService {
                             // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
                             if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
                                 ((WSDL11ToAxisServiceBuilder)
-                                    wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
+                                    wsdlToAxisServiceBuilder).setCustomWSDLResolver(
                                     new CustomWSDLLocator(new InputSource(wsdlInputStream),
                                                           wsdlURI != null ? wsdlURI.toString() : "",
                                                           resourceMap, synCfg));
@@ -378,7 +378,7 @@ public class ProxyService {
                             // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
                             if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
                                 ((WSDL11ToAxisServiceBuilder)
-                                    wsdlToAxisServiceBuilder).setCustomWSLD4JResolver(
+                                    wsdlToAxisServiceBuilder).setCustomWSDLResolver(
                                     new CustomWSDLLocator(new InputSource(wsdlInputStream),
                                             wsdlURI != null ? wsdlURI.toString() : ""));
                             }

@@ -312,7 +312,7 @@ public class SALSessions {
             if (isClustered) {
 
                 List<String> toBeRemoved = new ArrayList<String>();
-                for (Iterator props = configCtx.getPropertyNames(); props.hasNext();) {
+                for (Iterator<String> props = configCtx.getPropertyNames(); props.hasNext();) {
                     Object name = props.next();
 
                     if (name instanceof String && ((String) name).startsWith(SESSION_IDS)) {
@@ -440,6 +440,7 @@ public class SALSessions {
         }
 
         Map<String, Endpoint> map = childEndpoints.get(root);
+        assert endpointNames != null;
         for (String endpointName : endpointNames) {
             Endpoint endpoint = null;
             if (map != null) {
@@ -483,6 +484,7 @@ public class SALSessions {
             handleException("Endpoint cannot be null.");
         }
 
+        assert endpoint != null;
         String endpointName = endpoint.getName();
         if (endpointName == null && endpoint instanceof IndirectEndpoint) {
             endpointName = ((IndirectEndpoint) endpoint).getKey();
@@ -519,6 +521,7 @@ public class SALSessions {
         }
 
         long expireTimeWindow = -1;
+        assert endpoints != null;
         for (Endpoint endpoint : endpoints) {
 
             if (endpoint instanceof SALoadbalanceEndpoint) {

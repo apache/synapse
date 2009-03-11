@@ -117,14 +117,14 @@ public class ServerConfigurationInformationFactory {
             information.setSynapseHome(args[2]);
             information.setSynapseXMLLocation(args[3]);
             information.setResolveRoot(args[4]);
-            information.setServerName(args[5]);
+            information.setDeploymentMode(args[5]);
         } else if (args.length == 7) {
             information.setAxis2Xml(args[1]);
             information.setSynapseHome(args[2]);
             information.setSynapseXMLLocation(args[3]);
             information.setResolveRoot(args[4]);
-            information.setServerName(args[5]);
-            information.setDeploymentMode(args[6]);
+            information.setDeploymentMode(args[5]);
+            information.setServerName(args[6]);
         }
         return information;
 

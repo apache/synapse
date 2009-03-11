@@ -158,11 +158,9 @@ public class SecretManager {
         identityStorePass = identityStorePassSecretCallback.getSecret();
         trustStorePass = trustStorePassSecretCallback.getSecret();
 
-        if (validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Either Identity or Trust keystore password is mandotory" +
+        if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
+            log.info("Either Identity or Trust keystore password is mandotory" +
                         " in order to initialized secret manager.");
-            }
             return;
         }
 
@@ -269,8 +267,7 @@ public class SecretManager {
     }
 
     private void registerMBean() {
-        MBeanRegistrar mBeanRegistrar = MBeanRegistrar.getInstance();
-        mBeanRegistrar.registerMBean(new SecretManagerAdmin(this),
+        MBeanRegistrar.getInstance().registerMBean(new SecretManagerAdmin(this),
                 "SecurityAdminServices", "SecretManagerAdmin");
     }
 

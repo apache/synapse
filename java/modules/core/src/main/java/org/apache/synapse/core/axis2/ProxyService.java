@@ -935,4 +935,11 @@ public class ProxyService {
     public void addPolicyInfo(PolicyInfo pi) {
         this.policies.add(pi);
     }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[ Proxy Service [ Name : ").append(name).append(" ] ]");
+        return sb.toString();
+    }
 }

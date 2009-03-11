@@ -122,52 +122,28 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             }
         }
 
-        // if this is a response to a proxy service
-        if (synCtx.getProperty(SynapseConstants.PROXY_SERVICE) != null) {
-
-            if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
-                    SynapseConstants.PROXY_SERVICE)).getTargetOutSequence() != null) {
-
-                String sequenceName = synCtx.getConfiguration().getProxyService((String) synCtx.
-                        getProperty(SynapseConstants.PROXY_SERVICE)).getTargetOutSequence();
-                Mediator outSequence = synCtx.getSequence(sequenceName);
-
-                if (outSequence != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Using the sequence named " + sequenceName
-                                + " for the outgoing message mediation of the proxy service "
-                                + synCtx.getProperty(SynapseConstants.PROXY_SERVICE));
-                    }
-                    outSequence.mediate(synCtx);
-                } else {
-                    log.error("Unable to find the out-sequence " +
-                            "specified by the name " + sequenceName);
-                    throw new SynapseException("Unable to find the " +
-                            "out-sequence specified by the name " + sequenceName);
-                }
-
-            } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
-                    SynapseConstants.PROXY_SERVICE)).getTargetInLineOutSequence() != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Using the anonymous out-sequence specified in the proxy service "
-                            + synCtx.getProperty(SynapseConstants.PROXY_SERVICE)
-                            + " for outgoing message mediation");
-                }
-                synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
-                        SynapseConstants.PROXY_SERVICE)).getTargetInLineOutSequence().mediate(synCtx);
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Proxy service " + synCtx.getProperty(SynapseConstants.PROXY_SERVICE)
-                            + " does not specifies an out-sequence - sending the response back");
-                }
-                Axis2Sender.sendBack(synCtx);
-            }
-
-        } else {
+        // if this is not a response to a proxy service
+        String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
+        if (proxyName == null || "".equals(proxyName)) {
             if (log.isDebugEnabled()) {
                 log.debug("Using Main Sequence for injected message");
             }
             return synCtx.getMainSequence().mediate(synCtx);
+        }
+
+        ProxyService proxyService = synCtx.getConfiguration().getProxyService(proxyName);
+        if (proxyService != null) {
+
+            Mediator outSequence = getProxyOutSequence(synCtx, proxyService);
+            if (outSequence != null) {
+                outSequence.mediate(synCtx);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(proxyService
+                            + " does not specifies an out-sequence - sending the response back");
+                }
+                Axis2Sender.sendBack(synCtx);
+            }
         }
         return true;
     }
@@ -353,4 +329,43 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         throw new SynapseException(message, e);
     }
 
+    /**
+     * Helper method to determine out sequence of the proxy service
+     *
+     * @param synCtx       Current Message
+     * @param proxyService Proxy Service
+     * @return Out Sequence of the given proxy service, if there are any, otherwise null
+     */
+    private Mediator getProxyOutSequence(MessageContext synCtx, ProxyService proxyService) {
+        //TODO is it meaningful  to move this method into proxy service or
+        //TODO a class that Strategically detects out sequence  ?
+        String sequenceName = proxyService.getTargetOutSequence();
+        if (sequenceName != null && !"".equals(sequenceName)) {
+            Mediator outSequence = synCtx.getSequence(sequenceName);
+            if (outSequence != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Using the sequence named " + sequenceName
+                            + " for the outgoing message mediation of the proxy service "
+                            + proxyService);
+                }
+                return outSequence;
+            } else {
+                log.error("Unable to find the out-sequence " +
+                        "specified by the name " + sequenceName);
+                throw new SynapseException("Unable to find the " +
+                        "out-sequence specified by the name " + sequenceName);
+            }
+        } else {
+            Mediator outSequence = proxyService.getTargetInLineOutSequence();
+            if (outSequence != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Using the anonymous out-sequence specified in the proxy service "
+                            + proxyService
+                            + " for outgoing message mediation");
+                }
+                return outSequence;
+            }
+        }
+        return null;
+    }
 }

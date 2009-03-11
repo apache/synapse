@@ -21,6 +21,8 @@ package org.apache.synapse.security.secret.handler;
 import org.apache.synapse.commons.util.secret.SingleSecretCallback;
 import org.apache.synapse.commons.util.secret.AbstractSecretCallbackHandler;
 import org.apache.synapse.security.secret.SecretManager;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * SecretManager based secret provider , this can be used by other application
@@ -31,6 +33,14 @@ public class SecretManagerSecretCallbackHandler extends AbstractSecretCallbackHa
     private final SecretManager secretManager = SecretManager.getInstance();
 
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
+
+        if (!secretManager.isInitialized()) {
+            if (log.isDebugEnabled()) {
+                log.debug("SecretManager has not been initialized.Cannot collect secrets");
+            }
+            return;
+        }
+
         String id = singleSecretCallback.getId();
         if (id != null && !"".equals(id)) {
             singleSecretCallback.setSecret(secretManager.getSecret(id));

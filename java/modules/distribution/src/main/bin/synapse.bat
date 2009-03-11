@@ -111,7 +111,7 @@ rem
 rem Start the Wrapper
 rem
 :startup
-"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% wrapper.app.parameter.7=%_SERVER_NAME% %_XDEBUG%
+"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% wrapper.app.parameter.8=%_SERVER_NAME% %_XDEBUG%
 
 if not errorlevel 1 goto :eof
 pause

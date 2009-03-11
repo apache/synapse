@@ -31,7 +31,11 @@ import org.apache.commons.logging.Log;
  */
 public abstract class AbstractSecretCallbackHandler implements SecretCallbackHandler {
 
-    private static final Log log = LogFactory.getLog(AbstractSecretCallbackHandler.class);
+    protected Log log;
+
+    protected AbstractSecretCallbackHandler() {
+        log = LogFactory.getLog(getClass());
+    }
 
     public void handle(SecretCallback[] secretCallbacks) {
 

@@ -54,8 +54,8 @@ public class DatasourceMBeanRepository implements MBeanRepository {
         assertFalse(mBean instanceof DBPoolView, "Given MBean instance is not matched " +
                 "with the expected MBean - 'DBPoolView'.");
         dataSourcesMBeans.put(name, (DBPoolView) mBean);
-        MBeanRegistrar mBeanRegistrar = MBeanRegistrar.getInstance();
-        mBeanRegistrar.registerMBean(mBean, MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
+        MBeanRegistrar.getInstance().registerMBean(mBean,
+                MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
     public Object getMBean(String name) {

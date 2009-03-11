@@ -50,7 +50,7 @@ public class InMemoryTransaction implements Transaction {
 	
 	// Allow the deadlock timeout to be configured to help debug
 	static{
-		String deadlockProperty = (String) AccessController.doPrivileged(new PrivilegedAction<String>(){
+		String deadlockProperty = AccessController.doPrivileged(new PrivilegedAction<String>(){
 			public String run() {
 				return System.getProperty("deadlockTimeout");
 			}});
@@ -83,10 +83,7 @@ public class InMemoryTransaction implements Transaction {
 	}
 
     public void commit() {
-        try {
-            releaseLocks();
-        } catch (RuntimeException e) {
-        }
+        releaseLocks();
         if (sentMessages && useSerialization) manager.getSender().wakeThread();
         active = false;
     }
@@ -156,7 +153,8 @@ public class InMemoryTransaction implements Transaction {
 					}
 				}
 
-				enlistedBeans.add(bean);
+				if (locked)
+					enlistedBeans.add(bean);
 
 			}
 		}

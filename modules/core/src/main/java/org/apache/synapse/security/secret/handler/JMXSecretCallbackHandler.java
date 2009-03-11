@@ -32,8 +32,7 @@ public class JMXSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
     static {
         secretsMBean = new SecretsMBeanImplementation();
-        MBeanRegistrar mBeanRegistrar = MBeanRegistrar.getInstance();
-        mBeanRegistrar.registerMBean(secretsMBean, "SecretsMBean",
+        MBeanRegistrar.getInstance().registerMBean(secretsMBean, "SecretsMBean",
                 "SecretsMBean");
     }
 

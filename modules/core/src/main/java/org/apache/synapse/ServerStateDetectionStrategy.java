@@ -19,6 +19,7 @@
 package org.apache.synapse;
 
 import org.apache.synapse.security.secret.SecretManager;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 
 /**
  * Detects possible current server state
@@ -44,6 +45,11 @@ public class ServerStateDetectionStrategy {
                 SecretManager secretManager = SecretManager.getInstance();
                 if (secretManager.isInitialized()) {
                     return ServerState.INITIALIZABLE;
+                } else {
+                    secretManager.init(SynapsePropertiesLoader.loadSynapseProperties());
+                    if (secretManager.isInitialized()) {
+                        return ServerState.INITIALIZABLE;
+                    }
                 }
             } else {
                 return ServerState.INITIALIZABLE;

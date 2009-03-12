@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -63,8 +64,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -91,6 +91,16 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
     private int state = BaseConstants.STOPPED;
+    /** The proxy host */
+    private String proxyHost = null;
+    /** The proxy port */
+    private int proxyPort = 80;
+    /** The list of hosts for which the proxy should be bypassed */
+    private String[] proxyBypassList = null;
+    /** The list of known hosts to bypass proxy */
+    private List<String> knownDirectHosts = new ArrayList<String>();
+    /** The list of known hosts to go via proxy */
+    private List<String> knownProxyHosts = new ArrayList<String>();
 
     /**
      * Initialize the transport sender, and execute reactor in new seperate thread
@@ -104,6 +114,35 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         // is this an SSL Sender?
         sslContext = getSSLContext(transportOut);
         sslIOSessionHandler = getSSLIOSessionHandler(transportOut);
+
+        // configure proxy settings - only supports HTTP right now (See SYNAPSE-418)
+        if (sslContext == null) {
+            Parameter proxyHostParam = transportOut.getParameter("http.proxyHost");
+            if (proxyHostParam != null || System.getProperty("http.proxyHost") != null) {
+                if (proxyHostParam != null) {
+                    proxyHost = (String) proxyHostParam.getValue();
+                } else {
+                    proxyHost = System.getProperty("http.proxyHost");
+                }
+
+                Parameter proxyPortParam = transportOut.getParameter("http.proxyPort");
+                if (proxyPortParam != null) {
+                    proxyPort = Integer.parseInt((String) proxyPortParam.getValue());
+                } else if (System.getProperty("http.proxyPort") != null) {
+                    proxyPort = Integer.parseInt(System.getProperty("http.proxyPort"));
+                }
+
+                Parameter bypassList = transportOut.getParameter("http.nonProxyHosts");
+                if (bypassList != null) {
+                    proxyBypassList = ((String) bypassList.getValue()).split("\\|");
+                } else if (System.getProperty("http.nonProxyHosts") != null) {
+                    proxyBypassList = (System.getProperty("http.nonProxyHosts")).split("\\|");
+                }
+
+                log.info("HTTP Sender using Proxy : "
+                    + proxyHost + ":" + proxyPort + " bypassing : " + Arrays.toString(proxyBypassList));
+            }
+        }
 
         HttpParams params = getClientParameters();
         try {
@@ -294,6 +333,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private void sendAsyncRequest(EndpointReference epr, MessageContext msgContext) throws AxisFault {
         try {
             URL url = new URL(epr.getAddress());
+            String host = url.getHost();
             int port = url.getPort();
             if (port == -1) {
                 // use default
@@ -303,7 +343,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                     port = 443;
                 }
             }
-            HttpHost httpHost = new HttpHost(url.getHost(), port, url.getProtocol());
+            HttpHost httpHost = new HttpHost(host, port, url.getProtocol());
 
             Axis2HttpRequest axis2Req = new Axis2HttpRequest(epr, httpHost, msgContext);
             Object timeout = msgContext.getProperty(NhttpConstants.SEND_TIMEOUT);
@@ -311,25 +351,43 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 axis2Req.setTimeout( (int) ((Long) timeout).longValue());
             }
 
-            NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), port);
+            // do we have a proxy configured?
+            if (proxyHost != null) {
+                // but are we supposed to bypass for this host?
+                if (knownProxyHosts.contains(host)) {
+                    // this has already been found to be a proxy host
+                    host = proxyHost;
+                    port = proxyPort;
+                } else if (knownDirectHosts.contains(host)) {
+                    // do nothing, let this request go directly bypassing proxy
+                } else {
+                    // we are encountering this host:port pair for the first time
+                    if (!isBypass(host)) {
+                        host = proxyHost;
+                        port = proxyPort;
+                    }
+                }
+            }
+            
+            NHttpClientConnection conn = ConnectionPool.getConnection(host, port);
 
             if (conn == null) {
-                ioReactor.connect(new InetSocketAddress(url.getHost(), port),
+                ioReactor.connect(new InetSocketAddress(host, port),
                     null, axis2Req, sessionRequestCallback);
                 if (log.isDebugEnabled()) {
-                    log.debug("A new connection established to : " + url.getHost() + ":" + port);
+                    log.debug("A new connection established to : " + host + ":" + port);
                 }
             } else {
                 try {
                     handler.submitRequest(conn, axis2Req);
                     if (log.isDebugEnabled()) {
-                        log.debug("An existing connection reused to : " + url.getHost() + ":" + port);
+                        log.debug("An existing connection reused to : " + host + ":" + port);
                     }                    
                 } catch (ConnectionClosedException e) {
-                    ioReactor.connect(new InetSocketAddress(url.getHost(), port),
+                    ioReactor.connect(new InetSocketAddress(host, port),
                         null, axis2Req, sessionRequestCallback);
                     if (log.isDebugEnabled()) {
-                        log.debug("A new connection established to : " + url.getHost() + ":" + port);
+                        log.debug("A new connection established to : " + host + ":" + port);
                     }
                 }
             }
@@ -551,6 +609,17 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     }
 
     // -------------- utility methods -------------
+    private boolean isBypass(String hostName) {
+        for (String entry : proxyBypassList) {
+            if (hostName.matches(entry)) {
+                knownDirectHosts.add(hostName);
+                return true;
+            }
+        }
+        knownProxyHosts.add(hostName);
+        return false;
+    }
+
     private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);

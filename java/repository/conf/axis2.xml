@@ -222,6 +222,9 @@
 
     <transportSender name="http"  class="org.apache.synapse.transport.nhttp.HttpCoreNIOSender">
         <parameter name="non-blocking" locked="false">true</parameter>
+        <!--parameter name="http.proxyHost" locked="false">localhost</parameter>
+        <parameter name="http.proxyPort" locked="false">3128</parameter>
+        <parameter name="http.nonProxyHosts" locked="false">localhost|moon|sun</parameter-->
     </transportSender>
     <transportSender name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender">
         <parameter name="non-blocking" locked="false">true</parameter>

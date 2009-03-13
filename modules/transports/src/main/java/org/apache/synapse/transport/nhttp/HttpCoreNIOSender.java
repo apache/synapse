@@ -96,7 +96,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /** The proxy port */
     private int proxyPort = 80;
     /** The list of hosts for which the proxy should be bypassed */
-    private String[] proxyBypassList = null;
+    private String[] proxyBypassList = new String[0];
     /** The list of known hosts to bypass proxy */
     private List<String> knownDirectHosts = new ArrayList<String>();
     /** The list of known hosts to go via proxy */

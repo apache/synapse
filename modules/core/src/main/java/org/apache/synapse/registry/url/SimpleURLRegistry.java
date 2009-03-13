@@ -56,8 +56,10 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
     public OMNode lookup(String key) {
 
-        log.debug("==> Repository fetch of resource with key : " + key);
+        if (log.isDebugEnabled()) {
+            log.debug("==> Repository fetch of resource with key : " + key);
 
+        }
         URL url = SynapseConfigUtils.getURLFromPath(root + key);
         if (url == null) {
             return null;
@@ -161,7 +163,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             wre.setCachableDuration(
                     connection.getExpiration() - System.currentTimeMillis());
         } else {
-            wre.setCachableDuration(getCachableDuration(key));
+            wre.setCachableDuration(getCachableDuration());
         }
         return wre;
     }
@@ -182,7 +184,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             }
             root = value;
         } else {
-            handleException("Parameter 'root' is null");
+            handleException("Parameter root is null");
         }
 
     }
@@ -205,7 +207,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
 
-    public long getCachableDuration(String rootPath) {
+    private long getCachableDuration() {
         String cachableDuration = (String) properties.get("cachableDuration");
         return cachableDuration == null ? 1500 : Long.parseLong(cachableDuration);
     }

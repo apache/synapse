@@ -72,13 +72,11 @@ public class SynapseXPathFunctionContext implements FunctionContext {
         throws UnresolvableException {
 
         if (localName != null && SynapseXPathConstants.GET_PROPERTY_FUNCTION.equals(localName)) {
-            
+
             // create an instance of a synapse:get-property()
             // function and set it to the xpath
-            GetPropertyFunction getPropertyFunc = new GetPropertyFunction();
-            getPropertyFunc.setSynCtx(synCtx);
+            return new GetPropertyFunction(synCtx);
 
-            return getPropertyFunc;
         }
 
         // if not the get-property function then try to get it from the parent context

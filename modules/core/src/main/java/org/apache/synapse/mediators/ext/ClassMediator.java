@@ -83,30 +83,32 @@ public class ClassMediator extends AbstractMediator {
         return result;
     }
 
-	public void destroy() {
+    @Override
+    public void destroy() {
         if (log.isDebugEnabled()) {
             log.debug("Destroying class mediator instance for : " + mediator.getClass());
         }
         if (mediator instanceof ManagedLifecycle) {
-			((ManagedLifecycle) mediator).destroy();
-		}
-	}
+            ((ManagedLifecycle) mediator).destroy();
+        }
+    }
 
-	public void init(SynapseEnvironment se) {
+    @Override
+    public void init(SynapseEnvironment se) {
         if (log.isDebugEnabled()) {
             log.debug("Initializing class mediator instance for : " + mediator.getClass());
         }
         if (mediator == null) {
             log.warn("init() called before mediator reference set");
             return;
-		}
+        }
 
-		if (mediator instanceof ManagedLifecycle) {
-			((ManagedLifecycle) mediator).init(se);
-		}
-	}
+        if (mediator instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) mediator).init(se);
+        }
+    }
 
-	public void setMediator(Mediator mediator) {
+    public void setMediator(Mediator mediator) {
 		this.mediator = mediator;
 	}
 

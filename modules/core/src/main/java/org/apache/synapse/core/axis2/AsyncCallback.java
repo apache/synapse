@@ -30,7 +30,7 @@ import org.apache.synapse.SynapseConstants;
 public class AsyncCallback implements AxisCallback {
 
     /** The corresponding Synapse outgoing message context this instance is holding onto */
-    private MessageContext synapseOutMsgCtx = null;
+    private final MessageContext synapseOutMsgCtx;
 
     /** Time to timeout this callback */
     private long timeOutOn;

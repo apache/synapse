@@ -59,6 +59,7 @@ public abstract class AbstractDBMediator extends AbstractMediator {
      * do the IC lookup here
      * @param se the Synapse environment reference
      */
+    @Override
     public void init(SynapseEnvironment se) {
         // do nothing
     }
@@ -66,6 +67,7 @@ public abstract class AbstractDBMediator extends AbstractMediator {
     /**
      * Destroys the mediator. If we are using our custom DataSource, then shut down the connections
      */
+    @Override
     public void destroy() {
         if (this.dataSource instanceof BasicDataSource) {
             try {

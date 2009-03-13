@@ -28,9 +28,9 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.synapse.mediators.eip.EIPUtils;
@@ -47,7 +47,7 @@ import java.util.List;
  * each resulting element. This is very much similar to the clone mediator, and
  * hands over the newly created messages to a target for processing
  */
-public class IterateMediator extends AbstractMediator implements ManagedLifecycle {
+public class IterateMediator extends AbstractMediator {
 
     /** Continue mediation on the parent message or not? */
     private boolean continueParent = false;

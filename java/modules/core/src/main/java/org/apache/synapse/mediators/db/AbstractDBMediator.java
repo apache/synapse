@@ -21,7 +21,6 @@ package org.apache.synapse.mediators.db;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
@@ -34,13 +33,15 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This abstract DB mediator will perform common DB connection pooling etc. for all DB mediators
  */
-public abstract class AbstractDBMediator extends AbstractMediator implements ManagedLifecycle {
+public abstract class AbstractDBMediator extends AbstractMediator {
 
     /** Hold JDBC properties */
     protected final Map dataSourceProps = new HashMap();

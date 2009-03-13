@@ -19,11 +19,7 @@
 
 package org.apache.synapse.mediators.ext;
 
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseLog;
+import org.apache.synapse.*;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -41,7 +37,7 @@ import java.util.Map;
  * 
  * @see Mediator
  */
-public class ClassMediator extends AbstractMediator implements ManagedLifecycle {
+public class ClassMediator extends AbstractMediator {
 
     /** The reference to the actual class that implments the Mediator interface */
     private Mediator mediator = null;

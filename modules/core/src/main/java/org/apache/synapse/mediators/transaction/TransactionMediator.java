@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.transaction;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractMediator;
 
 import javax.transaction.Status;
@@ -47,15 +48,13 @@ public class TransactionMediator extends AbstractMediator {
     public boolean mediate(MessageContext synCtx) {
 
         TransactionManager transactionManager;
+        final SynapseLog synLog = getLog(synCtx);
 
-        boolean traceOn = isTraceOn(synCtx);
-        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Transaction mediator (" + action + ")");
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "Start : Transaction mediator (" + action + ")");
-
-            if (traceOn && trace.isTraceEnabled()) {
-                trace.trace("Message : " + synCtx.getEnvelope());
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
 
@@ -150,8 +149,8 @@ public class TransactionMediator extends AbstractMediator {
             handleException("Invalid transaction mediator action : " + action, synCtx);
         }
 
-        if (traceOrDebugOn) {
-            traceOrDebug(traceOn, "End : Transaction mediator");
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("End : Transaction mediator");
         }
 
         return true;

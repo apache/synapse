@@ -24,8 +24,8 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.Context;
@@ -34,10 +34,10 @@ import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
 
-import java.util.List;
-import java.util.Map;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the XPath extension function synapse:get-property(scope,prop-name)
@@ -50,14 +50,14 @@ public class GetPropertyFunction implements Function {
     public static final String NULL_STRING = "";
 
     /** Synapse Message context*/
-    private MessageContext synCtx = null;
+    private final MessageContext synCtx;
+
+    public GetPropertyFunction(MessageContext synCtx) {
+        this.synCtx = synCtx;
+    }
 
     public MessageContext getSynCtx() {
         return synCtx;
-    }
-
-    public void setSynCtx(MessageContext synCtx) {
-        this.synCtx = synCtx;
     }
 
     /**

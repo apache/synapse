@@ -22,10 +22,10 @@ package org.apache.synapse.mediators.base;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.audit.statistics.StatisticsReporter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.audit.statistics.StatisticsReporter;
 
 import java.util.Stack;
 
@@ -170,6 +170,7 @@ public class SequenceMediator extends AbstractListMediator {
      * This method will ensure that each and every sequence wil only be initialized atmost once
      * @param se - enviorenment to be initialized
      */
+    @Override
     public synchronized void init(SynapseEnvironment se) {
         if (!initialized) {
             super.init(se);
@@ -177,6 +178,7 @@ public class SequenceMediator extends AbstractListMediator {
         }
     }
 
+    @Override
     public synchronized void destroy() {
         if (initialized) {
             super.destroy();

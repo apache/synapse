@@ -23,7 +23,6 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -48,7 +47,7 @@ import java.util.Map;
  * so that aggregations that never would complete could be timed out and cleared from memory and
  * any fault conditions handled
  */
-public class AggregateMediator extends AbstractMediator implements ManagedLifecycle {
+public class AggregateMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(AggregateMediator.class);
 

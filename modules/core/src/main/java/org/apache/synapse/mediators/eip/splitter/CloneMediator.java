@@ -19,23 +19,23 @@
 
 package org.apache.synapse.mediators.eip.splitter;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.SynapseLog;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.util.MessageHelper;
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.eip.Target;
-import org.apache.synapse.mediators.eip.EIPConstants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.OperationContext;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseLog;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.eip.EIPConstants;
+import org.apache.synapse.mediators.eip.Target;
+import org.apache.synapse.util.MessageHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This mediator will clone the message into multiple messages and mediate as specified in the
@@ -43,7 +43,7 @@ import java.util.Iterator;
  * specifies an Action and/or To address to be set to the cloned message. The number of cloned
  * messages created is the number of targets specified
  */
-public class CloneMediator extends AbstractMediator implements ManagedLifecycle {
+public class CloneMediator extends AbstractMediator {
 
     /**
      * Continue processing the parent message or not?

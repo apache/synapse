@@ -157,10 +157,13 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
             return dataSource;
         }
         Properties props = new Properties();
+        String password = getValue(pool, PASS_Q);
         // load the minimum required properties
         props.put(Context.INITIAL_CONTEXT_FACTORY, (getValue(pool, ICCLASS_Q)));
         props.put(Context.SECURITY_PRINCIPAL, getValue(pool, USER_Q));
-        props.put(Context.SECURITY_CREDENTIALS, getValue(pool, PASS_Q));
+        if (password != null && !"".equals(password)) {
+            props.put(Context.SECURITY_CREDENTIALS, getActualPassword(password));
+        }
         props.put(Context.PROVIDER_URL, getValue(pool, URL_Q));
 
         dataSource = DataSourceFinder.find(dsName, props);
@@ -171,7 +174,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         mediator.addDataSourceProperty(ICCLASS_Q, getValue(pool, ICCLASS_Q));
         mediator.addDataSourceProperty(URL_Q, getValue(pool, URL_Q));
         mediator.addDataSourceProperty(USER_Q, getValue(pool, USER_Q));
-        mediator.addDataSourceProperty(PASS_Q, getValue(pool, PASS_Q));
+        mediator.addDataSourceProperty(PASS_Q, password);
 
         return dataSource;
     }
@@ -191,12 +194,8 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         ds.setDriverClassName(getValue(pool, DRIVER_Q));
         ds.setUsername(getValue(pool, USER_Q));
         String password = getValue(pool, PASS_Q);
-        SecretManager secretManager = SecretManager.getInstance();
-        if (secretManager.isInitialized()) {
-            password = secretManager.getSecret(password);
-        }
         if (password != null && !"".equals(password)) {
-            ds.setPassword(password);
+            ds.setPassword(getActualPassword(password));
         }
         ds.setUrl(getValue(pool, URL_Q));
 
@@ -204,7 +203,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         mediator.addDataSourceProperty(DRIVER_Q, getValue(pool, DRIVER_Q));
         mediator.addDataSourceProperty(URL_Q, getValue(pool, URL_Q));
         mediator.addDataSourceProperty(USER_Q, getValue(pool, USER_Q));
-        mediator.addDataSourceProperty(PASS_Q, getValue(pool, PASS_Q));
+        mediator.addDataSourceProperty(PASS_Q, password);
 
         Iterator props = pool.getChildrenWithName(PROP_Q);
         while (props.hasNext()) {
@@ -360,6 +359,22 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
             return a.getAttributeValue();
         }
         return null;
+    }
+
+    /**
+     * Get the password from SecretManager . here only use SecretManager
+     *
+     * @param aliasPasword alias password
+     * @return if the SecretManager is initiated , then , get the corresponding secret
+     *         , else return alias itself
+     */
+
+    private String getActualPassword(String aliasPasword) {
+        SecretManager secretManager = SecretManager.getInstance();
+        if (secretManager.isInitialized()) {
+            return secretManager.getSecret(aliasPasword);
+        }
+        return aliasPasword;
     }
 }
 

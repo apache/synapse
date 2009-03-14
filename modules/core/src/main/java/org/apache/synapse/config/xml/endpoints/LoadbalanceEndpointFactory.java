@@ -46,7 +46,7 @@ import java.util.List;
  * &lt;/loadbalance&gt;
  * &lt;/endpoint&gt;
  */
-public class LoadbalanceEndpointFactory extends EndpointFactory {
+public final class LoadbalanceEndpointFactory extends EndpointFactory {
 
     private static LoadbalanceEndpointFactory instance = new LoadbalanceEndpointFactory();
     private static final QName MEMBER = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "member");
@@ -115,6 +115,14 @@ public class LoadbalanceEndpointFactory extends EndpointFactory {
 //                loadbalanceEndpoint.startApplicationMembershipTimer();
             }
 
+            if (loadbalanceEndpoint.getChildren() == null) {
+                String msg = "Invalid Synapse configuration.\n"
+                    + "A LoadbalanceEndpoint must have child elements, but the LoadbalanceEndpoint "
+                    + "'" + loadbalanceEndpoint.getName() + "' does not have any child elements.";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+            
             // set load balance algorithm
             loadbalanceEndpoint.setAlgorithm(algorithm);
 

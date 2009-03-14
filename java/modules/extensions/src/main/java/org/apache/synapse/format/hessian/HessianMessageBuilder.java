@@ -35,11 +35,11 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 
+import javax.activation.DataHandler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-
-import javax.activation.DataHandler;
 
 /**
  * Enables a message encoded using the Hessian binary protocol to be received by axis2/synapse

@@ -122,6 +122,12 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
     /**
      * Should this mediator perform tracing? True if its explicitly asked to
      * trace, or its parent has been asked to trace and it does not reject it
+     * 
+     * @deprecated This method will be removed in a future version of Synapse.
+     *             Please use the {@link SynapseLog} instance returned by
+     *             {@link #getLog(MessageContext)} for all logging inside a
+     *             mediator.
+     * 
      * @param msgCtx the current message
      * @return true if tracing should be performed
      */
@@ -135,6 +141,12 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
 
     /**
      * Is tracing or debug logging on?
+     * 
+     * @deprecated This method will be removed in a future version of Synapse.
+     *             Please use the {@link SynapseLog} instance returned by
+     *             {@link #getLog(MessageContext)} for all logging inside a
+     *             mediator.
+     * 
      * @param isTraceOn is tracing known to be on?
      * @return true, if either tracing or debug logging is on
      */
@@ -145,6 +157,12 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
 
     /**
      * Perform Trace and Debug logging of a message @INFO (trace) and DEBUG (log)
+     * 
+     * @deprecated This method will be removed in a future version of Synapse.
+     *             Please use the {@link SynapseLog} instance returned by
+     *             {@link #getLog(MessageContext)} for all logging inside a
+     *             mediator.
+     * 
      * @param traceOn is runtime trace on for this message?
      * @param msg the message to log/trace
      */
@@ -160,6 +178,12 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
 
     /**
      * Perform Trace and Debug logging of a message @WARN
+     * 
+     * @deprecated This method will be removed in a future version of Synapse.
+     *             Please use the {@link SynapseLog} instance returned by
+     *             {@link #getLog(MessageContext)} for all logging inside a
+     *             mediator.
+     * 
      * @param traceOn is runtime trace on for this message?
      * @param msg the message to log/trace
      */
@@ -176,6 +200,12 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
     /**
      * Perform an audit log message to all logs @ INFO. Writes to the general log, the service log
      * and the trace log (of trace is on)
+     * 
+     * @deprecated This method will be removed in a future version of Synapse.
+     *             Please use the {@link SynapseLog} instance returned by
+     *             {@link #getLog(MessageContext)} for all logging inside a
+     *             mediator.
+     * 
      * @param msg the log message
      * @param msgContext the message context
      */
@@ -209,6 +239,12 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
 
     /**
      * Write an audit entry at WARN and trace and standard logs @WARN
+     * 
+     * @deprecated This method will be removed in a future version of Synapse.
+     *             Please use the {@link SynapseLog} instance returned by
+     *             {@link #getLog(MessageContext)} for all logging inside a
+     *             mediator.
+     * 
      * @param msg the message to log
      * @param msgContext message context
      */

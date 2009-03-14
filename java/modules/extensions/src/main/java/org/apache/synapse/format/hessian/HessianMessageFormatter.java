@@ -29,11 +29,13 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import javax.activation.DataHandler;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,142 +45,70 @@ import java.util.Iterator;
 
 /**
  * Enables a message encoded using the Hessian binary protocol to be written to transport by
- * axis2/synapse and this formats the HessianDataSource to a hessian message
+ * axis2/synapse and this formats the HessianDataSource to a Hessian message.
  *
  * @see org.apache.axis2.transport.MessageFormatter
  * @see org.apache.synapse.util.SynapseBinaryDataSource
  */
 public class HessianMessageFormatter implements MessageFormatter {
 
-	private static final Log log = LogFactory.getLog(HessianMessageFormatter.class);
+    private static final Log log = LogFactory.getLog(HessianMessageFormatter.class);
 
     /**
-	 * Formats the content type to be written in to the transport
-	 *
-	 * @param msgCtxt message of which the content type has to be formatted
-	 * @param format fomat of the expected formatted message
-	 * @param soapActionString soap action of the message
-	 * @return contentType formatted content type as a String
-	 */
-	public String getContentType(MessageContext msgCtxt, OMOutputFormat format,
-        String soapActionString) {
+     * Formats the content type to be written in to the transport
+     *
+     * @param msgCtxt message of which the content type has to be formatted
+     * @param format fomat of the expected formatted message
+     * @param soapActionString soap action of the message
+     * 
+     * @return contentType formatted content type as a String
+     */
+    public String getContentType(MessageContext msgCtxt, OMOutputFormat format,
+            String soapActionString) {
 
         String contentType = (String) msgCtxt.getProperty(Constants.Configuration.CONTENT_TYPE);
-		String encoding = format.getCharSetEncoding();
-
         if (contentType == null) {
-			contentType = HessianConstants.HESSIAN_CONTENT_TYPE;
-		}
+            contentType = HessianConstants.HESSIAN_CONTENT_TYPE;
+        }
 
+        String encoding = format.getCharSetEncoding();
         if (encoding != null) {
-			contentType += "; charset=" + encoding;
-		}
+            contentType += "; charset=" + encoding;
+        }
 
         return contentType;
-	}
+    }
 
-	/**
-	 * Extract Hessian bytes from the received SOAP message and write it onto the wire
-	 *
-	 * @param msgCtxt message from which the hessian message has to be extracted
-	 * @param format mwssage format to be written
-	 * @param out stream to which the message is written
-	 * @param preserve whether to preserve the indentations
-	 * @throws AxisFault in case of a failure in writing the message to the provided stream
-	 */
-	public void writeTo(MessageContext msgCtxt, OMOutputFormat format, OutputStream out,
-        boolean preserve) throws AxisFault {
+    /**
+     * Extract Hessian bytes from the received SOAP message and write it onto the wire
+     *
+     * @param msgCtx message from which the Hessian message has to be extracted
+     * @param format message format to be written
+     * @param out stream to which the message is written
+     * @param preserve whether to preserve the indentations
+     * 
+     * @throws AxisFault in case of a failure in writing the message to the provided stream
+     */
+    public void writeTo(MessageContext msgCtx, OMOutputFormat format, OutputStream out,
+            boolean preserve) throws AxisFault {
 
         if (log.isDebugEnabled()) {
-			log.debug("Start writing the message to OutputStream");
-		}
-
-        // Check whther the message to be written is a fault message
-        if (msgCtxt.getFLOW() == MessageContext.OUT_FAULT_FLOW
-                || msgCtxt.getEnvelope().hasFault()) {
-
-            try {
-
-                SOAPFault fault = msgCtxt.getEnvelope().getBody().getFault();
-                String hessianFaultDetail = "";
-                String hessianFaultMessage = "";
-                String hessianFaultCode = "500";
-
-                if (fault.getDetail() != null) {
-					hessianFaultDetail = fault.getDetail().getText();
-				}
-
-                if (fault.getReason() != null) {
-					hessianFaultMessage = fault.getReason().getText();
-				}
-
-                if (fault.getCode() != null) {
-                    hessianFaultCode = fault.getCode().getText();
-                }
-
-                BufferedOutputStream faultOutStream = new BufferedOutputStream(out);
-                HessianUtils.writeFault(
-                        hessianFaultCode, hessianFaultMessage, hessianFaultDetail, faultOutStream);
-                faultOutStream.flush();
-                faultOutStream.close();
-
-            } catch (IOException e) {
-				handleException("Unalbe to write the fault as a hessian message", e);
-			}
-
-            // if the message is not a fault extract the Hessian bytes and write it to the wire
+            log.debug("Start writing the Hessian message to OutputStream");
+        }
+        
+        // Check whether the message to be written is a fault message
+        if (msgCtx.getFLOW() == MessageContext.OUT_FAULT_FLOW || msgCtx.getEnvelope().hasFault()) {
+            
+            SOAPFault soapFault = msgCtx.getEnvelope().getBody().getFault();
+            convertAndWriteHessianFault(soapFault, out);
         } else {
-
-            OMText hessianOMText = null;
-            OMElement omElement = msgCtxt.getEnvelope().getBody().getFirstElement();
-
-            Iterator it = omElement.getChildren();
-            while (it.hasNext()) {
-
-                OMNode hessianElement =  (OMNode) it.next();
-                if (hessianElement instanceof OMText) {
-
-                    OMText tempNode = (OMText) hessianElement;
-                    if (tempNode.getDataHandler() != null && ((DataHandler) tempNode
-                            .getDataHandler()).getDataSource() instanceof SynapseBinaryDataSource) {
-
-                        hessianOMText = tempNode;
-                    }
-                }
-            }
-
-            if (hessianOMText != null) {
-
-                try {
-
-                    SynapseBinaryDataSource synapseBinaryDataSource = (SynapseBinaryDataSource) (
-                            (DataHandler) hessianOMText.getDataHandler()).getDataSource();
-
-                    InputStream inputStream = synapseBinaryDataSource.getInputStream();
-                    BufferedOutputStream outputStream = new BufferedOutputStream(out);
-
-                    byte[] buffer = new byte[1024];
-                    int byteCount;
-                    while ((byteCount=inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, byteCount);
-                    }
-
-                    inputStream.close();
-                    outputStream.flush();
-                    outputStream.close();
-
-                } catch (IOException e) {
-                    handleException("Couldn't get the bytes from the HessianDataSource", e);
-                }
-
-            } else {
-                handleException("Unable to find the hessian content in the payload");
-            }
-
+            
+            // no differentiation between normal reply and fault (pass the original message through)
+            writeHessianMessage(msgCtx, out);
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Writing message as a hessian message is successful");
+            log.debug("Writing message as a Hessian message is successful");
         }
     }
 
@@ -186,32 +116,180 @@ public class HessianMessageFormatter implements MessageFormatter {
      * This method is not supported because of large file handling limitations
      *
      * @param msgCtxt message which contains the Hessian message inside the HessianDataSource
-     * @param format message fromat to be written
+     * @param format message format to be written
+     * 
      * @return Hessian binary bytes of the message
-     * @throws AxisFault for any invoke
+     * 
+     * @throws AxisFault for any invocation
      */
     public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) throws AxisFault {
-        throw new AxisFault("Method not supported. Use the " +
-                "HessianMessageFormatter#writeTo method instead");
+        throw new AxisFault("Method not supported. Use the "
+                + "HessianMessageFormatter#writeTo method instead");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * Simply returns the soapAction unchanged.
+     */
     public String formatSOAPAction(MessageContext messageContext, OMOutputFormat format,
-        String soapAction) {
+            String soapAction) {
 
         return soapAction;
-	}
+    }
 
-    public URL getTargetAddress(MessageContext messageContext, OMOutputFormat format,
-        URL targetURL) throws AxisFault {
+    /**
+     * {@inheritDoc}
+     * 
+     * @return A templated URL based on the given target URL. 
+     */
+    public URL getTargetAddress(MessageContext messageContext, OMOutputFormat format, URL targetURL)
+            throws AxisFault {
 
         return URLTemplatingUtil.getTemplatedURL(targetURL, messageContext, false);
-	}
+    }
 
-    private void handleException(String msg, Throwable e) throws AxisFault {
+    /**
+     * Writes the Hessian message contained in the message context to the provided output stream.
+     * 
+     * @param msgCtxt the message context containing the Hessian message
+     * @param out the provided output stream to which the message shall be written
+     * 
+     * @throws AxisFault if an error occurs writing to the output stream
+     */
+    private void writeHessianMessage(MessageContext msgCtxt, OutputStream out) throws AxisFault {
+ 
+        OMElement omElement = msgCtxt.getEnvelope().getBody().getFirstElement();
+        SynapseBinaryDataSource synapseBinaryDataSource = extractSynapseBinaryDataSource(omElement);
+
+        if (synapseBinaryDataSource != null) {
+
+            InputStream inputStream = null;
+            try {
+                inputStream = synapseBinaryDataSource.getInputStream();
+                IOUtils.copy(inputStream, out);
+            } catch (IOException e) {
+                handleException("Couldn't get the bytes from the HessianDataSource", e);
+            } finally {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException ignore) {
+                        log.warn("Error closing input stream.", ignore);
+                    }
+                }
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException ignore) {
+                        log.warn("Error closing output stream.", ignore);
+                    }
+                }
+            }
+
+        } else {
+            handleException("Unable to find the Hessian content in the payload");
+        }
+    }
+
+    /**
+     * Tries to extract the binary data source containing the Hessian message.
+     * 
+     * @param omElement
+     * 
+     * @return the binary data source containing the Hessian message or null, if the OMElement
+     *         does not contain a binary datasource.
+     */
+    private SynapseBinaryDataSource extractSynapseBinaryDataSource(OMElement omElement) {
+        
+        SynapseBinaryDataSource synapseBinaryDataSource = null;
+        Iterator it = omElement.getChildren();
+
+        while (it.hasNext() && synapseBinaryDataSource == null) {
+
+            OMNode hessianElement = (OMNode) it.next();
+            if (hessianElement instanceof OMText) {
+
+                OMText tempNode = (OMText) hessianElement;
+                if (tempNode.getDataHandler() != null
+                        && ((DataHandler) tempNode.getDataHandler()).getDataSource() instanceof SynapseBinaryDataSource) {
+
+                    synapseBinaryDataSource = (SynapseBinaryDataSource) ((DataHandler) tempNode
+                            .getDataHandler()).getDataSource();
+                }
+            }
+        }
+
+        return synapseBinaryDataSource;
+    }
+
+    /**
+     * Reads details from the SOAPFault and creates a new Hessian fault using those details and
+     * writes it to the output stream.
+     * 
+     * @param soapFault the SOAP fault to convert and write as a Hessian fault
+     * @param out the output stream to write the Hessian fault to
+     * 
+     * @throws AxisFault if an error occurs writing the message to the output stream
+     */
+    private void convertAndWriteHessianFault(SOAPFault soapFault, OutputStream out) throws AxisFault {
+
+        BufferedOutputStream faultOutStream = new BufferedOutputStream(out);
+
+        try {
+            String hessianFaultCode = "500";
+            String hessianFaultMessage = "";
+            String hessianFaultDetail = "";
+            
+            if (soapFault.getCode() != null) {
+                hessianFaultCode = soapFault.getCode().getText();
+            }
+            
+            if (soapFault.getReason() != null) {
+                hessianFaultMessage = soapFault.getReason().getText();
+            }
+
+            if (soapFault.getDetail() != null) {
+                hessianFaultDetail = soapFault.getDetail().getText();
+            }            
+
+            HessianUtils.writeFault(hessianFaultCode, hessianFaultMessage, hessianFaultDetail,
+                    faultOutStream);
+            faultOutStream.flush();
+
+        } catch (IOException e) {
+            handleException("Unalbe to write the fault as a Hessian message", e);
+        } finally {
+            try {
+                if (faultOutStream != null) {
+                    faultOutStream.close();
+                }
+            } catch (IOException ignore) {
+                log.warn("Error closing output stream.", ignore);
+            }
+        }
+    }
+
+    /**
+     * Logs the original exception, wrappes it in an AxisFault and rethrows it.
+     * 
+     * @param msg the error message
+     * @param e the original exception
+     * 
+     * @throws AxisFault 
+     */
+    private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);
     }
-
+    
+    /**
+     * Logs an error message and throws a newly created AxisFault. 
+     * 
+     * @param msg the error message
+     * 
+     * @throws AxisFault 
+     */
     private void handleException(String msg) throws AxisFault {
         log.error(msg);
         throw new AxisFault(msg);

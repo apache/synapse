@@ -19,14 +19,6 @@
 
 package org.apache.synapse.format.hessian;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-
-import javax.activation.DataHandler;
-
-import junit.framework.TestCase;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
@@ -41,6 +33,14 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 
+import javax.activation.DataHandler;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+
+import junit.framework.TestCase;
+
 /**
  * Test the HessianMessageBuilder using several Hessian example
  * messages (including normal and fault messages) provided as 
@@ -48,12 +48,6 @@ import org.apache.synapse.util.SynapseBinaryDataSource;
  */
 public class HessianMessageBuilderTest extends TestCase {
 
-    private static final String HESSIAN_DUMMY_FAULT_V1_RESPONSE = "hessianDummyFaultResponse_V1.bin";
-
-    private static final String HESSIAN_DUMMY_REQUEST = "hessianDummyRequest.bin";
-
-    private static final String HESSIAN_INCOMPLETE = "hessianIncomplete.bin";
-    
     public void testProcessDocumentFaultWithSynEnv() throws IOException {
         SynapseEnvironment synEnv = new Axis2SynapseEnvironment(new ConfigurationContext(
                 new AxisConfiguration()), new SynapseConfiguration());
@@ -73,29 +67,21 @@ public class HessianMessageBuilderTest extends TestCase {
     public void testProcessDocumentWithoutSynEnv() throws IOException {
         testProcessDocument(null);
     }
-    
+
     public void testIncompleteHessianMessage() throws IOException {
-        test(HESSIAN_INCOMPLETE, null);
+        test(HessianTestHelper.HESSIAN_INCOMPLETE, null);
     }
-    
+
     private MessageContext test(String testMessageName, SynapseEnvironment synEnv)
             throws IOException {
 
-        // create mock message context
-        MessageContext msgContext = new MessageContext();
-        AxisConfiguration axisConfig = new AxisConfiguration();
-        ConfigurationContext configContext = new ConfigurationContext(axisConfig);
-        axisConfig.addParameter(SynapseConstants.SYNAPSE_ENV, synEnv);
-        msgContext.setConfigurationContext(configContext);
-
-        HessianMessageBuilder messageBuilder = new HessianMessageBuilder();
-        InputStream is = getClass().getResourceAsStream(testMessageName);
-        OMElement element = messageBuilder.processDocument(is,
-                HessianConstants.HESSIAN_CONTENT_TYPE, msgContext);
+        HessianTestHelper hessianTestHelper = new HessianTestHelper();
+        MessageContext msgContext = hessianTestHelper.createAxis2MessageContext(synEnv);
+        OMElement element = hessianTestHelper.buildHessianTestMessage(testMessageName, msgContext);
         OMNode hessianNode = element.getFirstOMChild();
         OMText hessianTextNode = (OMText) hessianNode;
-        SynapseBinaryDataSource synapseBinaryDataSource = (SynapseBinaryDataSource) ((DataHandler) hessianTextNode
-                .getDataHandler()).getDataSource();
+        SynapseBinaryDataSource synapseBinaryDataSource = (SynapseBinaryDataSource) 
+            ((DataHandler) hessianTextNode.getDataHandler()).getDataSource();
         InputStream inputStream = synapseBinaryDataSource.getInputStream();
         byte[] originalByteArray = IOUtils.toByteArray(getClass().getResourceAsStream(
                 testMessageName));
@@ -107,14 +93,15 @@ public class HessianMessageBuilderTest extends TestCase {
 
     private void testProcessDocumentFault(SynapseEnvironment synEnv) throws IOException {
 
-        MessageContext axis2MessageContext = test(HESSIAN_DUMMY_FAULT_V1_RESPONSE, synEnv);
-        assertEquals(SynapseConstants.TRUE, axis2MessageContext
-                .getProperty(BaseConstants.FAULT_MESSAGE));
+        MessageContext axis2MessageContext = test(
+                HessianTestHelper.HESSIAN_DUMMY_FAULT_V1_RESPONSE, synEnv);
+        assertEquals(SynapseConstants.TRUE, 
+                axis2MessageContext.getProperty(BaseConstants.FAULT_MESSAGE));
     }
 
     private void testProcessDocument(SynapseEnvironment synEnv) throws IOException {
 
-        MessageContext axis2MessageContext = test(HESSIAN_DUMMY_REQUEST, synEnv);
+        MessageContext axis2MessageContext = test(HessianTestHelper.HESSIAN_DUMMY_REQUEST, synEnv);
         assertNull(axis2MessageContext.getProperty(BaseConstants.FAULT_MESSAGE));
     }
 

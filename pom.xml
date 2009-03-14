@@ -338,6 +338,7 @@
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>mex</artifactId>
                 <version>${axis2.version}</version>
+                <classifier>impl</classifier>
             </dependency>
 
             <!-- Rampart -->
@@ -355,10 +356,6 @@
                         <artifactId>log4j-over-slf4j</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.apache.axis2</groupId>
-                        <artifactId>mex</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.woden</groupId>
                         <artifactId>woden-api</artifactId>
                     </exclusion>
@@ -374,10 +371,6 @@
                 <version>${rampart.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.apache.axis2</groupId>
-                        <artifactId>mex</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.woden</groupId>
                         <artifactId>woden-api</artifactId>
                     </exclusion>
@@ -388,10 +381,6 @@
                 <artifactId>rampart-core</artifactId>
                 <version>${rampart.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.axis2</groupId>
-                        <artifactId>mex</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>org.apache.woden</groupId>
                         <artifactId>woden-api</artifactId>
@@ -684,11 +673,6 @@
             <groupId>bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
             <version>${bcprov.jdk15.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>mex</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
 
         <!-- dependencies for xsltc in xalan -->

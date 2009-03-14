@@ -59,10 +59,6 @@
             <version>${rampart.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>mex</artifactId>
-                </exclusion>                
-                <exclusion>
                     <groupId>org.apache.woden</groupId>
                     <artifactId>woden-api</artifactId>
                 </exclusion>

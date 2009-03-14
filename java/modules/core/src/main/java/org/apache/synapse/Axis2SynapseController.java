@@ -268,15 +268,10 @@ public class Axis2SynapseController implements SynapseController {
 
                 TransportInDescription trsIn =
                         configurationContext.getAxisConfiguration().getTransportsIn().get(trp);
-
-                String msg = "Starting transport " + trsIn.getName();
-                if (trsIn.getParameter("port") != null) {
-                    msg += " on port " + trsIn.getParameter("port").getValue();
-                }
-                log.info(msg);
-
+                log.info("Starting transport " + trsIn.getName());
                 listenerManager.addListener(trsIn, false);
             }
+            
             information.setCreateNewInstance(true);
             initialize = true;
 

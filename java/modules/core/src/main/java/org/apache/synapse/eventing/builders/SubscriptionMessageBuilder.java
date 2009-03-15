@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.databinding.utils.ConverterUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;

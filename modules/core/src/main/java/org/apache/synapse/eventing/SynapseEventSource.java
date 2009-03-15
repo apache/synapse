@@ -21,7 +21,6 @@ package org.apache.synapse.eventing;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
@@ -99,25 +98,27 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @throws AxisFault
      */
     public void receive(MessageContext mc) throws AxisFault {
+        // Create synapse message context from the axis2 message context
         SynapseConfiguration synCfg = (SynapseConfiguration) mc.getConfigurationContext()
                 .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG).getValue();
         SynapseEnvironment synEnv = (SynapseEnvironment) mc.getConfigurationContext()
                 .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV).getValue();
         org.apache.synapse.MessageContext smc = new Axis2MessageContext(mc, synCfg, synEnv);
+        // initialisze the response message builder using the message context
         ResponseMessageBuilder messageBuilder = new ResponseMessageBuilder(mc);
 
         if (EventingConstants.WSE_SUBSCRIBE.equals(mc.getWSAAction())) {
             // add new subscription to the SynapseSubscription store through subscription manager
-            processSubscriptionRequest(smc, mc, messageBuilder);
+            processSubscriptionRequest(mc, messageBuilder);
         } else if (EventingConstants.WSE_UNSUBSCRIBE.equals(mc.getWSAAction())) {
             // Unsubscribe the matching subscription
-            processUnSubscribeRequest(smc, mc, messageBuilder);
+            processUnSubscribeRequest(mc, messageBuilder);
         } else if (EventingConstants.WSE_GET_STATUS.equals(mc.getWSAAction())) {
             // Responce with the status of the subscription
-            processGetStatusRequest(smc, mc, messageBuilder);
+            processGetStatusRequest(mc, messageBuilder);
         } else if (EventingConstants.WSE_RENEW.equals(mc.getWSAAction())) {
             // Renew subscription
-            processReNewRequest(smc, mc, messageBuilder);
+            processReNewRequest(mc, messageBuilder);
         } else {
             // Treat as an Event
             if (log.isDebugEnabled()) {
@@ -159,6 +160,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @param msgCtx message context
      */
     public void dispatchEvents(org.apache.synapse.MessageContext msgCtx) {
+
         List<SynapseSubscription> subscribers = subscriptionManager.getMatchingSubscribers(msgCtx);
         // Call event dispatcher
         msgCtx.getEnvironment().getExecutorService()
@@ -169,8 +171,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * Dispatching events async on a different thread
      */
     class EventDispatcher implements Runnable {
-        org.apache.synapse.MessageContext synCtx;
-        List<SynapseSubscription> subscribers;
+        private org.apache.synapse.MessageContext synCtx;
+        private List<SynapseSubscription> subscribers;
 
         EventDispatcher(org.apache.synapse.MessageContext synCtx,
                         List<SynapseSubscription> subscribers) {
@@ -197,16 +199,14 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Process the subscription message request
      *
-     * @param smc            synapse message context
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
      * @throws AxisFault
      */
-    private void processSubscriptionRequest(org.apache.synapse.MessageContext smc,
-                                            MessageContext mc,
+    private void processSubscriptionRequest(MessageContext mc,
                                             ResponseMessageBuilder messageBuilder)
             throws AxisFault {
-        SynapseSubscription subscription = SubscriptionMessageBuilder.createSubscription(smc);
+        SynapseSubscription subscription = SubscriptionMessageBuilder.createSubscription(mc);
         if (log.isDebugEnabled()) {
             log.debug("SynapseSubscription request recived  : " + subscription.getId());
         }
@@ -250,16 +250,14 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Process the UnSubscribe message request
      *
-     * @param smc            synapse message context
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
      * @throws AxisFault
      */
-    private void processUnSubscribeRequest(org.apache.synapse.MessageContext smc,
-                                           MessageContext mc,
+    private void processUnSubscribeRequest(MessageContext mc,
                                            ResponseMessageBuilder messageBuilder) throws AxisFault {
         SynapseSubscription subscription =
-                SubscriptionMessageBuilder.createUnSubscribeMessage(smc);
+                SubscriptionMessageBuilder.createUnSubscribeMessage(mc);
         if (log.isDebugEnabled()) {
             log.debug("UnSubscribe response recived for SynapseSubscription ID : " +
                     subscription.getId());
@@ -271,7 +269,6 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                         subscription.getId());
             }
             SOAPEnvelope soapEnvelope = messageBuilder.genUnSubscribeResponse(subscription);
-            RelatesTo relatesTo = new RelatesTo(subscription.getId());
             dispatchResponse(soapEnvelope, EventingConstants.WSE_UNSUBSCRIBE_RESPONSE,
                     mc, false);
         } else {
@@ -290,16 +287,14 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Process the GetStatus message request
      *
-     * @param smc            synapse message context
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
      * @throws AxisFault
      */
-    private void processGetStatusRequest(org.apache.synapse.MessageContext smc,
-                                         MessageContext mc,
+    private void processGetStatusRequest(MessageContext mc,
                                          ResponseMessageBuilder messageBuilder) throws AxisFault {
         SynapseSubscription subscription =
-                SubscriptionMessageBuilder.createGetStatusMessage(smc);
+                SubscriptionMessageBuilder.createGetStatusMessage(mc);
         if (log.isDebugEnabled()) {
             log.debug("GetStatus request recived for SynapseSubscription ID : " +
                     subscription.getId());
@@ -312,7 +307,6 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             }
             //send the responce
             SOAPEnvelope soapEnvelope = messageBuilder.genGetStatusResponse(subscription);
-            RelatesTo relatesTo = new RelatesTo(subscription.getId());
             dispatchResponse(soapEnvelope, EventingConstants.WSE_GET_STATUS_RESPONSE,
                     mc, false);
         } else {
@@ -331,16 +325,14 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Process the ReNew message request
      *
-     * @param smc            synapse message context
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
      * @throws AxisFault
      */
-    private void processReNewRequest(org.apache.synapse.MessageContext smc,
-                                     MessageContext mc,
+    private void processReNewRequest(MessageContext mc,
                                      ResponseMessageBuilder messageBuilder) throws AxisFault {
         SynapseSubscription subscription =
-                SubscriptionMessageBuilder.createRenewSubscribeMessage(smc);
+                SubscriptionMessageBuilder.createRenewSubscribeMessage(mc);
         if (log.isDebugEnabled()) {
             log.debug("ReNew request recived for SynapseSubscription ID : " +
                     subscription.getId());
@@ -355,7 +347,6 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 }
                 SOAPEnvelope soapEnvelope =
                         messageBuilder.genRenewSubscriptionResponse(subscription);
-                RelatesTo relatesTo = new RelatesTo(subscription.getId());
                 dispatchResponse(soapEnvelope, EventingConstants.WSE_RENEW_RESPONSE,
                         mc, false);
             } else {

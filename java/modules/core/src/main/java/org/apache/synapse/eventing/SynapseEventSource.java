@@ -251,14 +251,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             if (log.isDebugEnabled()) {
                 log.debug("Event recived");
             }
-            List<SynapseSubscription> subscribers = subscriptionManager.getMatchingSubscribers(smc);
-            for (SynapseSubscription subscription : subscribers) {
-                smc.setProperty(SynapseConstants.OUT_ONLY, "true");    // Set one way message for events
-                subscription.getEndpoint().send(MessageHelper.cloneMessageContext(smc));
-                if (log.isDebugEnabled()) {
-                    log.debug("Event push to  : " + subscription.getEndpointUrl());
-                }
-            }
+            dispatchEvents(smc);
         }
     }
 
@@ -285,6 +278,43 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             AxisEngine.sendFault(rmc);
         }else{
             AxisEngine.send(rmc);
+        }
+    }
+
+    /**
+     *
+     * @param msgCtx message context
+     */
+    public void dispatchEvents(org.apache.synapse.MessageContext msgCtx){
+        List<SynapseSubscription> subscribers = subscriptionManager.getMatchingSubscribers(msgCtx);
+        // Call event dispatcher
+        msgCtx.getEnvironment().getExecutorService()
+                .execute(new EventDispatcher(msgCtx, subscribers));
+    }
+    /**
+     * Dispatching events async on a different thread
+     */
+    class EventDispatcher implements Runnable {
+        org.apache.synapse.MessageContext synCtx;
+        List<SynapseSubscription> subscribers;
+
+        EventDispatcher(org.apache.synapse.MessageContext synCtx, List<SynapseSubscription> subscribers) {
+            this.synCtx = synCtx;
+            this.subscribers = subscribers;
+        }
+
+        public void run() {
+            for (SynapseSubscription subscription : subscribers) {
+                synCtx.setProperty(SynapseConstants.OUT_ONLY, "true");    // Set one way message for events
+                try {
+                    subscription.getEndpoint().send(MessageHelper.cloneMessageContext(synCtx));
+                } catch (AxisFault axisFault) {
+                    log.error("Event sending failure " + axisFault.toString());
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Event push to  : " + subscription.getEndpointUrl());
+                }
+            }
         }
     }
 }

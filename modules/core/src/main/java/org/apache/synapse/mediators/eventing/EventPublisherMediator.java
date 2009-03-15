@@ -40,11 +40,7 @@ public class EventPublisherMediator extends AbstractMediator {
             log.debug("Mediation for Event Publisher started");
         }
         SynapseEventSource eventSource = synCtx.getConfiguration().getEventSource(eventSourceName);
-        SynapseSubscriptionManager subscriptionManager = eventSource.getSubscriptionManager();
-        List<SynapseSubscription> subscribers = subscriptionManager.getMatchingSubscribers(synCtx);
-        // Call event dispatcher
-        synCtx.getEnvironment().getExecutorService()
-                .execute(new EventDispatcher(synCtx, subscribers));
+        eventSource.dispatchEvents(synCtx);
         return true;
     }
 
@@ -56,30 +52,4 @@ public class EventPublisherMediator extends AbstractMediator {
         this.eventSourceName = eventSourceName;
     }
 
-    /**
-     * Dispatching events async on a different thread
-     */
-    class EventDispatcher implements Runnable {
-        MessageContext synCtx;
-        List<SynapseSubscription> subscribers;
-
-        EventDispatcher(MessageContext synCtx, List<SynapseSubscription> subscribers) {
-            this.synCtx = synCtx;
-            this.subscribers = subscribers;
-        }
-
-        public void run() {
-            for (SynapseSubscription subscription : subscribers) {
-                synCtx.setProperty(SynapseConstants.OUT_ONLY, "true");    // Set one way message for events
-                try {
-                    subscription.getEndpoint().send(MessageHelper.cloneMessageContext(synCtx));
-                } catch (AxisFault axisFault) {
-                    log.error("Event sending failure " + axisFault.toString());
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug("Event push to  : " + subscription.getEndpointUrl());
-                }
-            }
-        }
-    }
 }

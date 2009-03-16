@@ -194,7 +194,8 @@ public class SubscriptionMessageBuilder {
                     setExpirationFault(subscription);
                 }
                 Calendar calendarNow = Calendar.getInstance();
-                if (calendarNow.before(calendarExpires)) {
+                if ((isValidDate(expiryElem.getText(), calendarExpires)) &&
+                        (calendarNow.before(calendarExpires))) {
                     subscription.setExpires(calendarExpires);
                 } else {
                     setExpirationFault(subscription);
@@ -304,7 +305,7 @@ public class SubscriptionMessageBuilder {
                     setExpirationFault(subscription);
                 }
                 Calendar calendarNow = Calendar.getInstance();
-                if (calendarNow.before(calendarExpires)) {
+                if ((isValidDate(expiryElem.getText(),calendarExpires))&&(calendarNow.before(calendarExpires))) {
                     subscription.setExpires(calendarExpires);
                 } else {
                     setExpirationFault(subscription);
@@ -405,5 +406,27 @@ public class SubscriptionMessageBuilder {
         setErrorSubCode("InvalidExpirationTime");
         setErrorReason("The expiration time requested is invalid");
         subscription.setId(null);
+    }
+
+    /**
+     * Check is a valid date, this check required due to Java calendar use the Julion date to create
+     * dates, so feb-31 take as a valid date and converts to march-03
+     *
+     * @param original
+     * @param converted
+     * @return true || false
+     */
+    private static boolean isValidDate(String original, Calendar converted) {
+        try{
+        String check = ConverterUtil.convertToString(converted);
+        if (original.equals(check)) {
+            return true;
+        } else {
+            return false;
+        }
+        }catch(Exception e){
+            log.error("Converting the date to string, "+e.toString());
+            return false;
+        }
     }
 }

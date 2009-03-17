@@ -490,6 +490,32 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       recovered after a failure.
     </p>
     <p>
+        Endpoint can be in one of the four states Active, TimeOut, Suspended and
+        Switch Off. Endpoint can be active which represent the Active state of the
+        endpoint. With the new endpoint enhancements there is possibility to retry
+        in case of endpoint invocation failure. This behavior can be configured
+        at the endpoint level through synapse endpoint API. Configuration is called
+        'markForSuspension'. 'errorCodes' represent a list
+        of error codes. If these error codes are received from the endpoint,
+        the endpoint will be suspended. 'retriesBeforeSuspension' represents
+        the number of re-tries in case of a timeout, caused by the above listed error codes.
+        'retryDelay' is the delay between re-tries, in milli seconds. If the endpoint
+        required to retry it is moved to TimeOut state. If the endpoint fails in
+        subsequent re-tries it'll move to Suspended state. If endpoint succeeded in
+        further re-tries it'll move into Active state. Suspended state defines
+        configuration 'suspendOnFailure'. 'initialDuration' represent the duration that the endpoint
+        is suspended for the first time after receiving the suspend error codes.
+        'progressionFactor' is the duration to suspend can vary from the first time
+        suspension to the subsequent time. The factor value decides the suspense duration
+        variance between subsequent suspensions. 'maximumDuration' the maximum
+        duration that the endpoint is suspended after the receiving the suspend error codes.
+        Finally an endpoint can be in the Switch off state, where the endpoint is moved to
+        maintenance. State changes between Switch off and other states only can be done
+        manually through JMX based API that is provided. Endpoint which is in
+        'Switch Off' state can only be moved to 'Active' state and it too can only be
+        done through JMX.
+    </p>	
+    <p>
       Address endpoints can timeout if responses fail to arrive at Synapse by a
       predefined timeout-duration specified in seconds. The timeout action
       specifies whether to discard responses that arrives late, or to trigger a
@@ -524,9 +550,18 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     &lt;action&gt;discard|fault&lt;/action&gt;
   &lt;/timeout&gt;?
   
-  &lt;suspendDurationOnFailure&gt;
-    <em>suspend duration in seconds</em>
-  &lt;/suspendDurationOnFailure&gt;?
+  &lt;markForSuspension&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+    &lt;/markForSuspension&gt;
+
+  &lt;suspendOnFailure&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+    &lt;/suspendOnFailure&gt;
 &lt;/address&gt;</pre>
     <p>
       Following are some sample address URI definitions.
@@ -570,9 +605,18 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     &lt;action&gt;discard|fault&lt;/action&gt;
   &lt;/timeout&gt;?
 
-  &lt;suspendDurationOnFailure&gt;
-    <em>suspend duration in seconds</em>
-  &lt;/suspendDurationOnFailure&gt;?
+   &lt;markForSuspension&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+    &lt;/markForSuspension&gt;
+
+  &lt;suspendOnFailure&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+    &lt;/suspendOnFailure&gt;
 &lt;/default&gt;</pre>
     <h4>
       <a name="wsdl-endpoint" id="wsdl-endpoint">WSDL Endpoint</a>
@@ -592,11 +636,24 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
   &lt;enableRM [policy="key"]/&gt;?
   &lt;enableSec [policy="key"]/&gt;?
   &lt;enableAddressing/&gt;?
-  &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
+  
   &lt;timeout&gt;
     &lt;duration&gt;timeout-duration&lt;/duration&gt;
     &lt;action&gt;discard|fault&lt;/action&gt;
   &lt;/timeout&gt;?
+  &lt;markForSuspension&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+    &lt;/markForSuspension&gt;
+
+  &lt;suspendOnFailure&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+    &lt;/suspendOnFailure&gt; 
+	
 &lt;/wsdl&gt;</pre>
     <h4>
       <a name="load-balanced-endpoint" id="load-balanced-endpoint">Load
@@ -2094,3 +2151,4 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
     <p/>
   </body>
 </document>  
+

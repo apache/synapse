@@ -305,7 +305,8 @@ public class SubscriptionMessageBuilder {
                     setExpirationFault(subscription);
                 }
                 Calendar calendarNow = Calendar.getInstance();
-                if ((isValidDate(expiryElem.getText(),calendarExpires))&&(calendarNow.before(calendarExpires))) {
+                if ((isValidDate(expiryElem.getText(), calendarExpires)) &&
+                        (calendarNow.before(calendarExpires))) {
                     subscription.setExpires(calendarExpires);
                 } else {
                     setExpirationFault(subscription);
@@ -417,15 +418,15 @@ public class SubscriptionMessageBuilder {
      * @return true || false
      */
     private static boolean isValidDate(String original, Calendar converted) {
-        try{
-        String check = ConverterUtil.convertToString(converted);
-        if (original.equals(check)) {
-            return true;
-        } else {
-            return false;
-        }
-        }catch(Exception e){
-            log.error("Converting the date to string, "+e.toString());
+        try {
+            String check = ConverterUtil.convertToString(converted);
+            if (original.equals(check)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Converting the date to string, " + e.toString());
             return false;
         }
     }

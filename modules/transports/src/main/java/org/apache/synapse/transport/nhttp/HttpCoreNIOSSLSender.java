@@ -28,6 +28,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axiom.om.OMElement;
 
 import javax.net.ssl.*;
@@ -97,7 +98,13 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             }
         }
 
+        boolean novalidatecert = ParamUtils.getOptionalParamBoolean(transportOut, "novalidatecert", false);
+
         if (trustParam != null) {
+            if (novalidatecert) {
+                log.warn("Ignoring novalidatecert parameter since a truststore has been specified");
+            }
+            
             OMElement tsEle      = trustParam.getParameterElement().getFirstElement();
             String location      = tsEle.getFirstChildWithName(new QName("Location")).getText();
             String type          = tsEle.getFirstChildWithName(new QName("Type")).getText();
@@ -128,6 +135,9 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
                     } catch (IOException ignore) {}
                 }
             }
+        } else if (novalidatecert) {
+            log.warn("Server certificate validation (trust) has been disabled. DO NOT USE IN PRODUCTION!");
+            trustManagers = new TrustManager[] { new NoValidateCertTrustManager() };
         }
 
         try {

@@ -21,7 +21,7 @@ package org.apache.synapse.aspects.statistics;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.aspects.AuditConfigurable;
+import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 
@@ -76,21 +76,21 @@ public class StatisticsRecord {
     /**
      * Collecting statistics for a particular component
      *
-     * @param auditConfigurable audit configurable component
+     * @param aspectConfigurable audit configurable component
      */
-    public void collect(AuditConfigurable auditConfigurable) {
+    public void collect(AspectConfigurable aspectConfigurable) {
 
-        if (isValid(auditConfigurable)) {
+        if (isValid(aspectConfigurable)) {
 
-            String auditID = auditConfigurable.getAuditId();
+            String auditID = aspectConfigurable.getAuditId();
             if (log.isDebugEnabled()) {
                 log.debug("Start to collect statistics for : " + auditID);
             }
-            if (auditConfigurable instanceof Endpoint) {
+            if (aspectConfigurable instanceof Endpoint) {
                 endPointsStatisticsRecordMap.put(auditID, new StatisticsLog(auditID));
-            } else if (auditConfigurable instanceof ProxyService) {
+            } else if (aspectConfigurable instanceof ProxyService) {
                 proxyServicesStatisticsRecordMap.put(auditID, new StatisticsLog(auditID));
-            } else if (auditConfigurable instanceof Mediator) {
+            } else if (aspectConfigurable instanceof Mediator) {
                 mediatorsStatisticsRecordMap.put(auditID, new StatisticsLog(auditID));
             }
         }
@@ -99,37 +99,37 @@ public class StatisticsRecord {
     /**
      * Reporting statistics for a particular component
      *
-     * @param auditConfigurable audit configurable component
+     * @param aspectConfigurable audit configurable component
      */
-    public void commit(AuditConfigurable auditConfigurable) {
+    public void commit(AspectConfigurable aspectConfigurable) {
 
-        if (isValid(auditConfigurable)) {
+        if (isValid(aspectConfigurable)) {
 
-            String auditID = auditConfigurable.getAuditId();
+            String auditID = aspectConfigurable.getAuditId();
             if (log.isDebugEnabled()) {
                 log.debug("Reporting statistics for : " + auditID);
             }
-            if (auditConfigurable instanceof Endpoint) {
+            if (aspectConfigurable instanceof Endpoint) {
                 commit(auditID, endPointsStatisticsRecordMap);
-            } else if (auditConfigurable instanceof ProxyService) {
+            } else if (aspectConfigurable instanceof ProxyService) {
                 commit(auditID, proxyServicesStatisticsRecordMap);
-            } else if (auditConfigurable instanceof Mediator) {
+            } else if (aspectConfigurable instanceof Mediator) {
                 commit(auditID, mediatorsStatisticsRecordMap);
             }
         }
     }
 
-    private boolean isValid(AuditConfigurable auditConfigurable) {
+    private boolean isValid(AspectConfigurable aspectConfigurable) {
 
-        if (auditConfigurable == null) {
+        if (aspectConfigurable == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Invalid aspects configuration , It is null.");
             }
             return false;
         }
 
-        if (auditConfigurable.isStatisticsEnable()) {
-            String auditID = auditConfigurable.getAuditId();
+        if (aspectConfigurable.isStatisticsEnable()) {
+            String auditID = aspectConfigurable.getAuditId();
             if (auditID == null || "".equals(auditID)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid aspects configuration , Audit name is null.");

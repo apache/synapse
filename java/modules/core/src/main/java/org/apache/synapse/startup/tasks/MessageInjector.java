@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.AuditHelper;
+import org.apache.synapse.aspects.AspectHelper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.startup.Task;
@@ -145,7 +145,7 @@ public class MessageInjector implements Task, ManagedLifecycle {
 		}
 
         MessageContext mc = synapseEnvironment.createMessageContext();
-        AuditHelper.setGlobalAudit(mc);
+        AspectHelper.setGlobalAudit(mc);
         mc.pushFaultHandler(new MediatorFaultHandler(mc.getFaultSequence()));
         mc.setTo(new EndpointReference(to));
         if (format == null) {

@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit;
+package org.apache.synapse.aspects;
 
 /**
  * Audit configuration
@@ -26,7 +26,7 @@ public class AuditConfiguration implements AuditConfigurable {
 
     /* Whether statistics enable */
     private boolean statisticsEnable = false;
-    /* Identifier for a particular audit configuration */
+    /* Identifier for a particular aspects configuration */
     private String auditId;
 
     public AuditConfiguration(String auditId, boolean statisticsEnable) {

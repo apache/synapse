@@ -19,12 +19,12 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.*;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.audit.AuditConfigurable;
-import org.apache.synapse.audit.AuditConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.*;
+import org.apache.synapse.aspects.AuditConfigurable;
+import org.apache.synapse.aspects.AuditConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
 
 /**
  * This is the superclass of all mediators, and defines common logging, tracing other aspects

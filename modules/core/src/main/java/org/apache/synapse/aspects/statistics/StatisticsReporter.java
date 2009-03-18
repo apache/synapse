@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.AuditConfigurable;
+import org.apache.synapse.aspects.AspectConfigurable;
 
 /**
  * A utility to process statistics
@@ -36,9 +36,9 @@ public class StatisticsReporter {
      * Initialize the audit details collection by setting a AuditConfiguration
      *
      * @param synCtx            Current Message through synapse
-     * @param auditConfigurable Instance that can be configured it's audit
+     * @param aspectConfigurable Instance that can be configured it's audit
      */
-    public static void collect(MessageContext synCtx, AuditConfigurable auditConfigurable) {
+    public static void collect(MessageContext synCtx, AspectConfigurable aspectConfigurable) {
 
         StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
         if (statisticsRecord == null) {
@@ -49,7 +49,7 @@ public class StatisticsReporter {
             statisticsRecord = StatisticsRecordFactory.getStatisticsRecord(synCtx);
             synCtx.setProperty(SynapseConstants.STATISTICS_STACK, statisticsRecord);
         }
-        statisticsRecord.collect(auditConfigurable);
+        statisticsRecord.collect(aspectConfigurable);
 
         StatisticsCollector collector = synCtx.getEnvironment().getStatisticsCollector();
         if (collector == null) {
@@ -69,13 +69,13 @@ public class StatisticsReporter {
      * Reporting audit for a particular resource
      *
      * @param synCtx            Current Message through synapse
-     * @param auditConfigurable Instance that can be configured it's audit
+     * @param aspectConfigurable Instance that can be configured it's audit
      */
-    public static void report(MessageContext synCtx, AuditConfigurable auditConfigurable) {
+    public static void report(MessageContext synCtx, AspectConfigurable aspectConfigurable) {
 
         StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
         if (statisticsRecord != null) {
-            statisticsRecord.commit(auditConfigurable);
+            statisticsRecord.commit(aspectConfigurable);
         }
     }
 

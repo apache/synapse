@@ -29,9 +29,9 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
  * Contains helper methods required for auditing.
  * This class need to evolved as any audit related things are adding
  */
-public class AuditHelper {
+public class AspectHelper {
 
-    private static final Log log = LogFactory.getLog(AuditHelper.class);
+    private static final Log log = LogFactory.getLog(AspectHelper.class);
 
     /**
      * Sets the Global audit configuration if it has been forced by setting
@@ -43,15 +43,15 @@ public class AuditHelper {
         if (XMLConfigConstants.STATISTICS_ENABLE.equals(
                 synCtx.getConfiguration().getProperty(SynapseConstants.SYNAPSE_AUDIT_STATE))) {
             
-            AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.SYNAPSE_AUDIT, true);
+            AspectConfigurable aspectConfigurable = new AspectConfiguration(SynapseConstants.SYNAPSE_AUDIT, true);
 
             if (log.isDebugEnabled()) {
                 log.debug("Global Audit is enabled. System-wide auditing will be occurred.");
             }
 
-            StatisticsReporter.collect(synCtx, auditConfigurable);
+            StatisticsReporter.collect(synCtx, aspectConfigurable);
             synCtx.setProperty(SynapseConstants.SYNAPSE_AUDIT_CONFIGURATION,
-                    auditConfigurable);
+                    aspectConfigurable);
         }
     }
 
@@ -62,14 +62,14 @@ public class AuditHelper {
      */
     public static void reportGlobalAudit(MessageContext synCtx) {
 
-        AuditConfigurable auditConfigurable = (AuditConfigurable) synCtx.getProperty(
+        AspectConfigurable aspectConfigurable = (AspectConfigurable) synCtx.getProperty(
                 SynapseConstants.SYNAPSE_AUDIT_CONFIGURATION);
         
-        if (auditConfigurable != null) {
+        if (aspectConfigurable != null) {
             if (log.isDebugEnabled()) {
                 log.debug("System-wide aspects record is reported.");
             }
-            StatisticsReporter.report(synCtx, auditConfigurable);
+            StatisticsReporter.report(synCtx, aspectConfigurable);
         }
     }
 }

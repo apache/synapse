@@ -22,8 +22,8 @@ package org.apache.synapse.mediators;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.aspects.AuditConfigurable;
-import org.apache.synapse.aspects.AuditConfiguration;
+import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 /**
@@ -31,7 +31,7 @@ import org.apache.synapse.core.SynapseEnvironment;
  * for all mediators who extend from this.
  * elements of a mediator class.
  */
-public abstract class AbstractMediator implements Mediator, AuditConfigurable, ManagedLifecycle {
+public abstract class AbstractMediator implements Mediator, AspectConfigurable, ManagedLifecycle {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
     protected Log log;
@@ -43,7 +43,7 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
      */
     protected int traceState = SynapseConstants.TRACING_UNSET;
 
-    private final AuditConfigurable auditConfigurable = new AuditConfiguration(
+    private final AspectConfigurable aspectConfigurable = new AspectConfiguration(
             SynapseConstants.ANONYMOUS_SEQUENCE);
 
     /**
@@ -278,23 +278,23 @@ public abstract class AbstractMediator implements Mediator, AuditConfigurable, M
     }
 
     public boolean isStatisticsEnable() {
-        return this.auditConfigurable.isStatisticsEnable();
+        return this.aspectConfigurable.isStatisticsEnable();
     }
 
     public void disableStatistics() {
-        this.auditConfigurable.disableStatistics();
+        this.aspectConfigurable.disableStatistics();
     }
 
     public void enableStatistics() {
-        this.auditConfigurable.disableStatistics();
+        this.aspectConfigurable.disableStatistics();
     }
 
     public String getAuditId() {
-        return this.auditConfigurable.getAuditId();
+        return this.aspectConfigurable.getAuditId();
     }
 
     public void setAuditId(String id) {
-        this.auditConfigurable.setAuditId(id);
+        this.aspectConfigurable.setAuditId(id);
     }
 
     public void init(SynapseEnvironment se) {

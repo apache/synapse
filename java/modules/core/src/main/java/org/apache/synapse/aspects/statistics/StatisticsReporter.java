@@ -16,13 +16,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statistics;
+package org.apache.synapse.aspects.statistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.audit.AuditConfigurable;
+import org.apache.synapse.aspects.AuditConfigurable;
 
 /**
  * A utility to process statistics

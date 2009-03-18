@@ -16,27 +16,38 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statistics.view;
+package org.apache.synapse.aspects.statistics.view;
 
-import org.apache.synapse.audit.statistics.StatisticsRecord;
+import org.apache.synapse.aspects.statistics.StatisticsRecord;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * PerUserViewStrategy - user domain name is used.
+ * Strategy for determine Statistics Views
  */
-public class PerUserDomainViewStrategy extends PerUserViewStrategy {
+public interface StatisticsViewStrategy {
 
+    /**
+     * Return a statistics view for all resource with given type
+     *
+     * @param statisticsRecords Statistics Data
+     * @param type              Type of resource
+     * @return A particular statistics view
+     */
     public Map<String, Map<String, Statistics>> determineView(
             List<StatisticsRecord> statisticsRecords,
-            int type) {
-        return determineView(statisticsRecords, type, DOMAIN);
-    }
+            int type);
 
-    public Map<String, Statistics> determineView(
-            String id, List<StatisticsRecord> statisticsRecords,
-            int type) {
-        return determineView(id, statisticsRecords, type, DOMAIN);
-    }
+    /**
+     * Return a statistics view for a resource with given type and given name
+     *
+     * @param id                The resource name or identifier
+     * @param statisticsRecords Statistics Data
+     * @param type              Type of resource
+     * @return A particular statistics view
+     */
+    public Map<String, Statistics> determineView(String id,
+                                                 List<StatisticsRecord> statisticsRecords,
+                                                 int type);
 }

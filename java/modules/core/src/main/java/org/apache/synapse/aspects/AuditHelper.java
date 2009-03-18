@@ -16,13 +16,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit;
+package org.apache.synapse.aspects;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.audit.statistics.StatisticsReporter;
+import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 
 /**
@@ -67,7 +67,7 @@ public class AuditHelper {
         
         if (auditConfigurable != null) {
             if (log.isDebugEnabled()) {
-                log.debug("System-wide audit record is reported.");
+                log.debug("System-wide aspects record is reported.");
             }
             StatisticsReporter.report(synCtx, auditConfigurable);
         }

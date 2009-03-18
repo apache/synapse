@@ -16,12 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.audit.statistics;
+package org.apache.synapse.aspects.statistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.audit.AuditConfigurable;
+import org.apache.synapse.aspects.AuditConfigurable;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 
@@ -123,7 +123,7 @@ public class StatisticsRecord {
 
         if (auditConfigurable == null) {
             if (log.isDebugEnabled()) {
-                log.debug("Invalid audit configuration , It is null.");
+                log.debug("Invalid aspects configuration , It is null.");
             }
             return false;
         }
@@ -132,7 +132,7 @@ public class StatisticsRecord {
             String auditID = auditConfigurable.getAuditId();
             if (auditID == null || "".equals(auditID)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Invalid audit configuration , Audit name is null.");
+                    log.debug("Invalid aspects configuration , Audit name is null.");
                 }
                 return false;
             }

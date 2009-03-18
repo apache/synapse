@@ -20,11 +20,11 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.audit.AuditConfigurable;
-import org.apache.synapse.audit.AuditConfiguration;
+import org.apache.synapse.aspects.AuditConfigurable;
+import org.apache.synapse.aspects.AuditConfiguration;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**

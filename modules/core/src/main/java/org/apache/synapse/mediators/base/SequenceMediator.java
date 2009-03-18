@@ -22,7 +22,7 @@ package org.apache.synapse.mediators.base;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.audit.statistics.StatisticsReporter;
+import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -87,7 +87,7 @@ public class SequenceMediator extends AbstractListMediator {
             // mediation through this sequence
             Mediator errorHandlerMediator = null;
 
-            // Setting Required property to collect the sequence audit
+            // Setting Required property to collect the sequence aspects
 
             try {
 

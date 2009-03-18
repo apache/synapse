@@ -30,7 +30,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.AuditHelper;
+import org.apache.synapse.aspects.AspectHelper;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.commons.util.TemporaryData;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -169,7 +169,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public void send(EndpointDefinition endpoint, MessageContext synCtx) {
         if (synCtx.isResponse()) {
 
-            AuditHelper.reportGlobalAudit(synCtx); 
+            AspectHelper.reportGlobalAudit(synCtx);
             
             if (endpoint != null) {
                

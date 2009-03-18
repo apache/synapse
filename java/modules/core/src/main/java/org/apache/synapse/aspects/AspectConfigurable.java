@@ -21,7 +21,7 @@ package org.apache.synapse.aspects;
 /**
  * Capability for configurable auditing
  */
-public interface AuditConfigurable {
+public interface AspectConfigurable {
 
     /**
      * Returns audit id , identifier for a particular audit

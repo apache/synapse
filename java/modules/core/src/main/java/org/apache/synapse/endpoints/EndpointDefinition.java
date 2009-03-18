@@ -20,8 +20,8 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.AuditConfigurable;
-import org.apache.synapse.aspects.AuditConfiguration;
+import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.AspectConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
  * An Endpoint definition contains the information about an endpoint. It is used by leaf
  * level endpoints to store this information (e.g. AddressEndpoint and WSDLEndpoint).
  */
-public class EndpointDefinition implements AuditConfigurable {
+public class EndpointDefinition implements AspectConfigurable {
 
     /** Who is the leaf level Endpoint which uses me? */
     private Endpoint leafEndpoint = null;
@@ -138,7 +138,7 @@ public class EndpointDefinition implements AuditConfigurable {
     /** A list of error codes which puts the endpoint into timeout mode */
     private final List<Integer> timeoutErrorCodes = new ArrayList<Integer>();
 
-    private AuditConfigurable auditConfigurable = new AuditConfiguration(SynapseConstants.ANONYMOUS_ENDPOINT);
+    private AspectConfigurable aspectConfigurable = new AspectConfiguration(SynapseConstants.ANONYMOUS_ENDPOINT);
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
@@ -501,22 +501,22 @@ public class EndpointDefinition implements AuditConfigurable {
     }
 
     public String getAuditId() {
-        return this.auditConfigurable.getAuditId();
+        return this.aspectConfigurable.getAuditId();
     }
 
     public void setAuditId(String id) {
-        this.auditConfigurable.setAuditId(id);
+        this.aspectConfigurable.setAuditId(id);
     }
 
     public boolean isStatisticsEnable() {
-        return this.auditConfigurable.isStatisticsEnable();
+        return this.aspectConfigurable.isStatisticsEnable();
     }
 
     public void disableStatistics() {
-        this.auditConfigurable.disableStatistics();
+        this.aspectConfigurable.disableStatistics();
     }
 
     public void enableStatistics() {
-        this.auditConfigurable.enableStatistics();
+        this.aspectConfigurable.enableStatistics();
     }
 }

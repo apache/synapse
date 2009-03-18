@@ -36,7 +36,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.AuditConfigurable;
+import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -159,8 +159,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
         Endpoint endpoint = (Endpoint) synapseOutMsgCtx.getProperty(
                 SynapseConstants.LAST_ENDPOINT);
-        if (endpoint instanceof AuditConfigurable) {
-            StatisticsReporter.report(synapseOutMsgCtx, (AuditConfigurable) endpoint);
+        if (endpoint instanceof AspectConfigurable) {
+            StatisticsReporter.report(synapseOutMsgCtx, (AspectConfigurable) endpoint);
         }
         
         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);

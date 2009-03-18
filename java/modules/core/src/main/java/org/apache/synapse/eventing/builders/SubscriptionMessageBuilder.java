@@ -411,7 +411,7 @@ public class SubscriptionMessageBuilder {
 
     /**
      * Check is a valid date, this check required due to Java calendar use the Julion date to create
-     * dates, so feb-31 take as a valid date and converts to march-03
+     * dates, so feb-31 take as a valid date and converts to march-03, ConverterUtil wont validate.
      *
      * @param original
      * @param converted

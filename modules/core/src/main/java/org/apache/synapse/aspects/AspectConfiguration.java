@@ -22,19 +22,19 @@ package org.apache.synapse.aspects;
  * Audit configuration
  * Currently contains only statistics configuration related things
  */
-public class AuditConfiguration implements AuditConfigurable {
+public class AspectConfiguration implements AspectConfigurable {
 
     /* Whether statistics enable */
     private boolean statisticsEnable = false;
     /* Identifier for a particular aspects configuration */
     private String auditId;
 
-    public AuditConfiguration(String auditId, boolean statisticsEnable) {
+    public AspectConfiguration(String auditId, boolean statisticsEnable) {
         this.statisticsEnable = statisticsEnable;
         this.auditId = auditId;
     }
 
-    public AuditConfiguration(String auditId) {
+    public AspectConfiguration(String auditId) {
         this.auditId = auditId;
     }
 

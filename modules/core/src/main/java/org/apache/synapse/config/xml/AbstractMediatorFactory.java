@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.AuditConfigurable;
+import org.apache.synapse.aspects.AspectConfigurable;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -107,9 +107,9 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
-                if (mediator instanceof AuditConfigurable) {
+                if (mediator instanceof AspectConfigurable) {
                     if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                        ((AuditConfigurable) mediator).enableStatistics();
+                        ((AspectConfigurable) mediator).enableStatistics();
                     }
                 }
             }

@@ -25,11 +25,11 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.audit.statistics.StatisticsReporter;
+import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.List;
 import java.util.Stack;
@@ -338,7 +338,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * @param synCtx the current message
      */
     protected void prepareForEndpointStatistics(MessageContext synCtx) {
-    // Setting Required property to collect the End Point audit
+    // Setting Required property to collect the End Point aspects
         if (definition != null && definition.isStatisticsEnable()) {
             StatisticsReporter.collect(synCtx, definition);
         }

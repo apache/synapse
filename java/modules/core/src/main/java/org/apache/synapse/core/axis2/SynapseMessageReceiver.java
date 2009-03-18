@@ -27,7 +27,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.audit.AuditHelper;
+import org.apache.synapse.aspects.AuditHelper;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 
 /**

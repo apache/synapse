@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.audit.AuditConfigurable;
+import org.apache.synapse.aspects.AuditConfigurable;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

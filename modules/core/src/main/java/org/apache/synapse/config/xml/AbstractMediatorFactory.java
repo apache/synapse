@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.Namable;
+import org.apache.synapse.Nameable;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfigurable;
@@ -111,8 +111,8 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 String name = null;
-                if (mediator instanceof Namable) {
-                    name = ((Namable) mediator).getName();
+                if (mediator instanceof Nameable) {
+                    name = ((Nameable) mediator).getName();
                 }
                 if (name == null || "".equals(name)) {
                     name = SynapseConstants.ANONYMOUS_SEQUENCE;

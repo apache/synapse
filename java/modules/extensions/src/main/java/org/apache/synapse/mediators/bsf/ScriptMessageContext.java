@@ -27,6 +27,7 @@ import javax.script.ScriptException;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -77,9 +78,15 @@ public class ScriptMessageContext implements MessageContext {
      */
 
     public void setPayloadXML(Object payload) throws OMException, ScriptException {
-        OMElement firstChild = mc.getEnvelope().getBody().getFirstElement();
-        firstChild.insertSiblingAfter(xmlHelper.toOMElement(payload));
-        firstChild.detach();
+        SOAPBody body = mc.getEnvelope().getBody();
+        OMElement firstChild = body.getFirstElement();
+        OMElement omElement = xmlHelper.toOMElement(payload);
+        if (firstChild == null) {
+            body.addChild(omElement);
+        } else {
+            firstChild.insertSiblingAfter(omElement);
+            firstChild.detach();
+        }
     }
 
     /**

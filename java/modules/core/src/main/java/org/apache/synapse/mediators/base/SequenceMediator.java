@@ -71,12 +71,14 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
         SynapseLog synLog = getLog(synCtx);
 
         if (isStatisticsEnable()) {
-            StatisticsReporter.reportForComponent(synCtx, getAspectConfiguration(), ComponentType.SEQUENCE);
+            StatisticsReporter.reportForComponent(synCtx,
+                    getAspectConfiguration(), ComponentType.SEQUENCE);
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Start : Sequence "
-                    + (name == null ? (key == null ? "<anonymous" : "key=<" + key) : "<" + name) + ">");
+                    + (name == null ? (key == null ? "<anonymous" : "key=<" + key) : "<"
+                    + name) + ">");
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());

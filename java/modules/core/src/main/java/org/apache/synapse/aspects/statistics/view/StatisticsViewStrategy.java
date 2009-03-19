@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.aspects.statistics.view;
 
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsRecord;
 
 import java.util.List;
@@ -35,9 +36,9 @@ public interface StatisticsViewStrategy {
      * @param type              Type of resource
      * @return A particular statistics view
      */
-    public Map<String, Map<String, Statistics>> determineView(
+    public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
-            int type);
+            ComponentType type);
 
     /**
      * Return a statistics view for a resource with given type and given name
@@ -47,7 +48,7 @@ public interface StatisticsViewStrategy {
      * @param type              Type of resource
      * @return A particular statistics view
      */
-    public Map<String, Statistics> determineView(String id,
-                                                 List<StatisticsRecord> statisticsRecords,
-                                                 int type);
+    public Map<String, InOutStatisticsView> determineView(String id,
+                                                          List<StatisticsRecord> statisticsRecords,
+                                                          ComponentType type);
 }

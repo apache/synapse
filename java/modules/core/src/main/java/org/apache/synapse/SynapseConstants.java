@@ -179,11 +179,11 @@ public final class SynapseConstants {
 
         public static final String STATISTICS_STACK ="synapse.statistics.stack";     
         
-        public static final String SYNAPSE_AUDIT_STATE = "synapse.aspects.state";
+        public static final String SYNAPSE_STATISTICS_STATE = "synapse.statistics.state";
     
-        public static final String SYNAPSE_AUDIT_CONFIGURATION = "synapse.aspects.configuration";
-        
-        public static final String SYNAPSE_AUDIT ="synapse.aspects";
+        public static final String SYNAPSE_ASPECT_CONFIGURATION = "synapse.aspects.configuration";
+
+        public static final String SYNAPSE_ASPECTS ="synapse.aspects";
 
     //- handling of timed out events from the callbacks -
         /** The System property that states the duration at which the timeout handler runs */
@@ -239,6 +239,9 @@ public final class SynapseConstants {
     
     /** A name to use for anonymous endpoints */
     public static final String ANONYMOUS_ENDPOINT = "AnonymousEndpoint";
+
+    /**A name to use for anonymous proxyservice  */
+    public static final String ANONYMOUS_PROXYSERVICE = "AnonymousProxyService";
 
     /* Constants related to the SAL endpoints */
 

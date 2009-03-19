@@ -82,10 +82,11 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         OMElement addressElement = epConfig.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
         if (addressElement != null) {
-            EndpointDefinition endpoint = createEndpointDefinition(addressElement);
-            addressEndpoint.setDefinition(endpoint);
+            EndpointDefinition definition = createEndpointDefinition(addressElement);
+            addressEndpoint.setDefinition(definition);
+            processAuditStatus(definition, addressEndpoint.getName(), epConfig);
         }
-        processAuditStatus(addressEndpoint, epConfig);
+
         return addressEndpoint;
     }
 

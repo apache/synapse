@@ -18,24 +18,22 @@
  */
 package org.apache.synapse.aspects;
 
+import org.apache.synapse.Identifiable;
+import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
+
 /**
- * Audit configuration
+ * Aspect configuration
  * Currently contains only statistics configuration related things
  */
-public class AspectConfiguration implements AspectConfigurable {
+public class AspectConfiguration implements StatisticsConfigurable, Identifiable {
 
     /* Whether statistics enable */
     private boolean statisticsEnable = false;
     /* Identifier for a particular aspects configuration */
-    private String auditId;
+    private String id;
 
-    public AspectConfiguration(String auditId, boolean statisticsEnable) {
-        this.statisticsEnable = statisticsEnable;
-        this.auditId = auditId;
-    }
-
-    public AspectConfiguration(String auditId) {
-        this.auditId = auditId;
+    public AspectConfiguration(String id) {
+        this.id = id;
     }
 
     public boolean isStatisticsEnable() {
@@ -54,11 +52,7 @@ public class AspectConfiguration implements AspectConfigurable {
         }
     }
 
-    public String getAuditId() {
-        return auditId;
-    }
-
-    public void setAuditId(String auditId) {
-        this.auditId = auditId;
+    public String getId() {
+        return id;
     }
 }

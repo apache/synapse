@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.aspects.statistics.view;
 
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsRecord;
 
 import java.util.List;
@@ -28,15 +29,15 @@ import java.util.Map;
  */
 public class PerUserDomainViewStrategy extends PerUserViewStrategy {
 
-    public Map<String, Map<String, Statistics>> determineView(
+    public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
-            int type) {
+            ComponentType type) {
         return determineView(statisticsRecords, type, DOMAIN);
     }
 
-    public Map<String, Statistics> determineView(
+    public Map<String, InOutStatisticsView> determineView(
             String id, List<StatisticsRecord> statisticsRecords,
-            int type) {
+            ComponentType type) {
         return determineView(id, statisticsRecords, type, DOMAIN);
     }
 }

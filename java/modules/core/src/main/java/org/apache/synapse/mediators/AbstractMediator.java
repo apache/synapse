@@ -43,8 +43,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable, 
      */
     protected int traceState = SynapseConstants.TRACING_UNSET;
 
-    private final AspectConfigurable aspectConfigurable = new AspectConfiguration(
-            SynapseConstants.ANONYMOUS_SEQUENCE);
+    private AspectConfiguration aspectConfiguration;
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -278,23 +277,38 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable, 
     }
 
     public boolean isStatisticsEnable() {
-        return this.aspectConfigurable.isStatisticsEnable();
+        return this.aspectConfiguration != null
+                && this.aspectConfiguration.isStatisticsEnable();
     }
 
     public void disableStatistics() {
-        this.aspectConfigurable.disableStatistics();
+        if (this.aspectConfiguration != null) {
+            this.aspectConfiguration.disableStatistics();
+        }
     }
 
     public void enableStatistics() {
-        this.aspectConfigurable.disableStatistics();
+        if (this.aspectConfiguration != null) {
+            this.aspectConfiguration.disableStatistics();
+        }
     }
 
-    public String getAuditId() {
-        return this.aspectConfigurable.getAuditId();
+    /**
+     * Configure aspects according to the given configuration
+     *
+     * @param aspectConfiguration AspectConfiguration instance
+     */
+    public void configure(AspectConfiguration aspectConfiguration) {
+       this.aspectConfiguration = aspectConfiguration;
     }
 
-    public void setAuditId(String id) {
-        this.aspectConfigurable.setAuditId(id);
+    /**
+     * Get the aspects  configuration
+     *
+     * @return AspectConfiguration instance
+     */
+    public AspectConfiguration getAspectConfiguration() {
+        return aspectConfiguration;
     }
 
     public void init(SynapseEnvironment se) {

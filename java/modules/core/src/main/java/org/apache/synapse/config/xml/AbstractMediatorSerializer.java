@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
 import org.apache.synapse.mediators.MediatorProperty;
 
 import javax.xml.namespace.QName;
@@ -76,9 +77,14 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
             mediatorOmElement.addAttribute(fac.createOMAttribute(
                 XMLConfigConstants.TRACE_ATTRIB_NAME, nullNS, traceValue));
         }
-        
+
         if (mediator instanceof AspectConfigurable) {
-            if (((AspectConfigurable) mediator).isStatisticsEnable()) {
+            StatisticsConfigurable statisticsConfigurable =
+                    ((AspectConfigurable) mediator).getAspectConfiguration();
+
+            if (statisticsConfigurable != null &&
+                    statisticsConfigurable.isStatisticsEnable()) {
+
                 mediatorOmElement.addAttribute(fac.createOMAttribute(
                         XMLConfigConstants.STATISTICS_ATTRIB_NAME, nullNS,
                         XMLConfigConstants.STATISTICS_ENABLE));

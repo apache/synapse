@@ -21,10 +21,12 @@ package org.apache.synapse.aspects.statistics.view;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.statistics.StatisticsLog;
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsRecord;
+import org.apache.synapse.aspects.statistics.StatisticsUpdateStrategy;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +43,12 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
         log = LogFactory.getLog(getClass());
     }
 
-    public Map<String, Map<String, Statistics>> determineView(
+    public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
-            int type,
-            int userIDType) {
+            ComponentType type, int userIDType) {
 
-        final Map<String, Map<String, Statistics>> statisticsMap =
-                new HashMap<String, Map<String, Statistics>>();
+        final Map<String, Map<String, InOutStatisticsView>> statisticsMap =
+                new HashMap<String, Map<String, InOutStatisticsView>>();
 
         if (statisticsRecords == null) {
             if (log.isDebugEnabled()) {
@@ -56,114 +57,70 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
             return statisticsMap;
         }
 
+        Map<String, InOutStatisticsView> perUserMap = new HashMap<String, InOutStatisticsView>();
+
         for (StatisticsRecord record : statisticsRecords) {
+            if (record != null) {
 
-            if (record == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Statistics record cannot be found.");
-                }
-                continue;
-            }
-
-            Map<String, StatisticsLog> statisticsLogMap = null;
-            switch (type) {
-                case StatisticsLog.ENDPOINT_STATISTICS: {
-                    statisticsLogMap = record.getAllEndpointStatisticsRecords();
-                    break;
-                }
-                case StatisticsLog.PROXY_SERVICE_STATISTICS: {
-                    statisticsLogMap = record.getAllProxyServiceStatisticsRecords();
-                    break;
-                }
-                case StatisticsLog.MEDIATOR_STATISTICS: {
-                    statisticsLogMap = record.getAllMediatorStatisticsRecords();
-                    break;
-                }
-            }
-
-            if (statisticsLogMap == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Statistics Logs cannot be found for statistics record :" + record);
-                }
-                continue;
-            }
-
-            String userID;
-            if (IP == userIDType) {
-                userID = record.getClientIP();
-            } else {
-                userID = record.getClientHost();
-            }
-
-            if (userID == null || "".equals(userID)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("user ID cannot be found.");
-                }
-                continue;
-            }
-
-            Map<String, Statistics> perResourceMap;
-            if (statisticsMap.containsKey(userID)) {
-                perResourceMap = statisticsMap.get(userID);
-            } else {
-                perResourceMap = new HashMap<String, Statistics>();
-                statisticsMap.put(userID, perResourceMap);
-            }
-
-            if (perResourceMap == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("There are not statistics for user ID : " + userID);
-                }
-                continue;
-            }
-
-            for (String rName : statisticsLogMap.keySet()) {
-
-                if (rName == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Resource name cannot be found.");
-                    }
-                    continue;
-                }
-
-                StatisticsLog statisticsLog = statisticsLogMap.get(rName);
-                if (statisticsLog == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Statistics Logs cannot be found for resource with given name " +
-                                rName);
-                    }
-                    continue;
-                }
-
-                Statistics statistics;
-                if (!perResourceMap.containsKey(rName)) {
-                    statistics = new Statistics(rName);
-                    perResourceMap.put(rName, statistics);
+                String userID;
+                if (IP == userIDType) {
+                    userID = record.getClientIP();
                 } else {
-                    statistics = perResourceMap.get(rName);
+                    userID = record.getClientHost();
                 }
 
-                if (statistics != null) {
-                    statistics.update(statisticsLog.getProcessingTime(), record.isFaultResponse());
+                if (userID == null || "".equals(userID)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("user ID cannot be found.");
+                    }
+                    continue;
                 }
+
+                Map<String, InOutStatisticsView> perResourceMap;
+                if (statisticsMap.containsKey(userID)) {
+                    perResourceMap = statisticsMap.get(userID);
+                } else {
+                    perResourceMap = new HashMap<String, InOutStatisticsView>();
+                    statisticsMap.put(userID, perResourceMap);
+                }
+
+                if (perResourceMap == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("There are not statistics for user ID : " + userID);
+                    }
+                    continue;
+                }
+
+                final StatisticsUpdateStrategy strategy = new StatisticsUpdateStrategy(record);
+                final Iterator<String> logIds = record.getAllLogIds(type);
+                while (logIds.hasNext()) {
+                    String id = logIds.next();
+
+                    InOutStatisticsView view;
+                    if (!perUserMap.containsKey(id)) {
+                        view = new InOutStatisticsView(id, userID);
+                        perUserMap.put(id, view);
+                    } else {
+                        view = perUserMap.get(id);
+                    }
+                    updateStatistics(id, type, view, strategy);
+                }
+
             }
         }
-
         return statisticsMap;
-
     }
 
-    public Map<String, Statistics> determineView(String id,
-                                                 List<StatisticsRecord> statisticsRecords,
-                                                 int type,
-                                                 int userIDType) {
+
+    public Map<String, InOutStatisticsView> determineView(String id,
+                                                          List<StatisticsRecord> statisticsRecords,
+                                                          ComponentType type, int userIDType) {
 
         if (id == null || "".equals(id)) {
             handleException("Resource Id cannot be null");
         }
 
-        Map<String, Statistics> statisticsMap = new HashMap<String, Statistics>();
-
+        Map<String, InOutStatisticsView> statisticsMap = new HashMap<String, InOutStatisticsView>();
         if (statisticsRecords == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Statistics records cannot be found.");
@@ -172,64 +129,44 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
         }
 
         for (StatisticsRecord record : statisticsRecords) {
+            if (record != null) {
 
-            if (record == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Statistics record cannot be found.");
+                String userID;
+                if (IP == userIDType) {
+                    userID = record.getClientIP();
+                } else {
+                    userID = record.getClientHost();
                 }
-                continue;
-            }
 
-            StatisticsLog statisticsLog = null;
-            switch (type) {
-                case StatisticsLog.ENDPOINT_STATISTICS: {
-                    statisticsLog = record.getEndpointStatisticsRecord(id);
-                    break;
+                if (userID == null || "".equals(userID)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("user ID cannot be found.");
+                    }
+                    continue;
                 }
-                case StatisticsLog.PROXY_SERVICE_STATISTICS: {
-                    statisticsLog = record.getProxyServiceStatisticsRecord(id);
-                    break;
+
+                InOutStatisticsView view;
+                if (statisticsMap.containsKey(userID)) {
+                    view = statisticsMap.get(id);
+                } else {
+                    view = new InOutStatisticsView(id, userID);
+                    statisticsMap.put(userID, view);
                 }
-                case StatisticsLog.MEDIATOR_STATISTICS: {
-                    statisticsLog = record.getMediatorStatisticsRecord(id);
-                    break;
-                }
-            }
-
-            if (statisticsLog == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Statistics Logs cannot be found for statistics record  " + record);
-                }
-                continue;
-            }
-
-            String userID;
-            if (IP == userIDType) {
-                userID = record.getClientIP();
-            } else {
-                userID = record.getClientHost();
-            }
-
-            if (userID == null || "".equals(userID)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("user ID cannot be found.");
-                }
-                continue;
-            }
-
-            Statistics statistics;
-            if (statisticsMap.containsKey(userID)) {
-                statistics = statisticsMap.get(userID);
-            } else {
-                statistics = new Statistics(userID);
-                statisticsMap.put(userID, statistics);
-            }
-
-            if (statistics != null) {
-                statistics.update(statisticsLog.getProcessingTime(), record.isFaultResponse());
+                updateStatistics(id, type, view, new StatisticsUpdateStrategy(record));
             }
         }
+
         return statisticsMap;
+    }
+
+    private void updateStatistics(String id, ComponentType type, InOutStatisticsView view,
+                                  StatisticsUpdateStrategy strategy) {
+        if (view != null) {
+            strategy.updateInFlowStatistics(id, type,
+                    view.getInStatistics());
+            strategy.updateOutFlowStatistics(id, type,
+                    view.getOutStatistics());
+        }
     }
 
     private void handleException(String msg) {

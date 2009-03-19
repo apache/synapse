@@ -18,55 +18,46 @@
  */
 package org.apache.synapse.aspects.statistics;
 
+import org.apache.synapse.aspects.ComponentType;
+
 /**
  *
  */
 public class StatisticsLog {
 
-    public static final int ENDPOINT_STATISTICS = 0;
-
-    public static final int PROXY_SERVICE_STATISTICS = 1;
-
-    public static final int MEDIATOR_STATISTICS = 2;
-
     private String id;
-    private long startTime = -1;
-    private long endTime = -1;
 
-    public StatisticsLog(String id) {
-        this(id, System.currentTimeMillis());
+    private ComponentType componentType;
+
+    private long time;
+
+    private boolean isResponse;
+
+    public StatisticsLog(String id, ComponentType componentType, boolean isResponse) {
+        this(id, System.currentTimeMillis(), componentType, isResponse);
     }
 
-    public StatisticsLog(String id, long startTime) {
+    public StatisticsLog(String id, long startTime, ComponentType componentType,
+                         boolean isResponse) {
         this.id = id;
-        this.startTime = startTime;
+        this.isResponse = isResponse;
+        this.time = startTime;
+        this.componentType = componentType;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public ComponentType getComponentType() {
+        return componentType;
     }
 
-    public long getStartTime() {
-        return startTime;
+    public long getTime() {
+        return time;
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
-    public long getProcessingTime() {
-        return this.endTime - this.startTime;
+    public boolean isResponse() {
+        return isResponse;
     }
 }

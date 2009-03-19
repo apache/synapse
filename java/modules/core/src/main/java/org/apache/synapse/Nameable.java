@@ -21,7 +21,7 @@ package org.apache.synapse;
 /**
  * Namable indicates whether an abstraction has a name.
  */
-public interface Namable {
+public interface Nameable {
     /**
      * Get the name of an abstraction
      *

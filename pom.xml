@@ -432,11 +432,6 @@
                 <artifactId>xmlsec</artifactId>
                 <version>${xmlsec.version}</version>
             </dependency>
-            <dependency>
-                <groupId>opensaml</groupId>
-                <artifactId>opensaml</artifactId>
-                <version>${opensaml.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.apache.sandesha2</groupId>
@@ -917,7 +912,6 @@
         <sandesha2.version>SNAPSHOT</sandesha2.version>
         <neethi.version>2.0.4</neethi.version>
         <wss4j.version>SNAPSHOT</wss4j.version>
-        <opensaml.version>1.1</opensaml.version>
         <xmlsec.version>1.4.2</xmlsec.version>
         <bcprov.jdk15.version>140</bcprov.jdk15.version>
 

@@ -19,6 +19,8 @@
 
 package org.apache.synapse.util.xpath;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.llom.OMDocumentImpl;
@@ -89,6 +91,35 @@ public class SynapseXPath extends AXIOMXPath {
      */
     public SynapseXPath(String xpathString) throws JaxenException {
         super(xpathString);
+    }
+
+    /**
+     * Construct an XPath expression from a given string and initialize its
+     * namespace context based on a given element.
+     * 
+     * @param element The element that determines the namespace context of the
+     *                XPath expression. See {@link #addNamespaces(OMElement)}
+     *                for more details.
+     * @param xpathExpr the string representation of the XPath expression.
+     * @throws JaxenException if there is a syntax error while parsing the expression
+     *                        or if the namespace context could not be set up
+     */
+    public SynapseXPath(OMElement element, String xpathExpr) throws JaxenException {
+        super(element, xpathExpr);
+    }
+
+    /**
+     * Construct an XPath expression from a given attribute.
+     * The string representation of the expression is taken from the attribute
+     * value, while the attribute's owner element is used to determine the
+     * namespace context of the expression. 
+     * 
+     * @param attribute the attribute to construct the expression from
+     * @throws JaxenException if there is a syntax error while parsing the expression
+     *                        or if the namespace context could not be set up
+     */
+    public SynapseXPath(OMAttribute attribute) throws JaxenException {
+        super(attribute);
     }
 
     public static SynapseXPath parseXPathString(String xPathStr) throws JaxenException {

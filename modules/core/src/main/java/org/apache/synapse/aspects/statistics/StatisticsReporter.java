@@ -20,12 +20,15 @@ package org.apache.synapse.aspects.statistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Identifiable;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.AspectConfiguration;
+import org.apache.synapse.aspects.AspectConfigurationDetectionStrategy;
+import org.apache.synapse.aspects.ComponentType;
 
 /**
- * A utility to process statistics
+ * A utility to report statistics
  */
 
 public class StatisticsReporter {
@@ -33,49 +36,46 @@ public class StatisticsReporter {
     private static final Log log = LogFactory.getLog(StatisticsReporter.class);
 
     /**
-     * Initialize the audit details collection by setting a AuditConfiguration
+     * Collects statistics for the given componenet
      *
-     * @param synCtx            Current Message through synapse
-     * @param aspectConfigurable Instance that can be configured it's audit
+     * @param synCtx        Current Message through synapse
+     * @param configurable  Instance that can be configured it's audit
+     * @param componentType Type of the componet need aspect
      */
-    public static void collect(MessageContext synCtx, AspectConfigurable aspectConfigurable) {
+    public static void reportForComponent(MessageContext synCtx,
+                                          StatisticsConfigurable configurable,
+                                          ComponentType componentType) {
 
-        StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
-        if (statisticsRecord == null) {
+        if (configurable != null && configurable.isStatisticsEnable()
+                && configurable instanceof Identifiable) {
 
-            if (log.isDebugEnabled()) {
-                log.debug("Setting statistics stack on the message context.");
+            StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
+            statisticsRecord.setOwner(componentType);
+            statisticsRecord.collect((Identifiable) configurable,
+                    componentType, synCtx.isResponse());
+
+            StatisticsCollector collector = getStatisticsCollector(synCtx);
+            if (!collector.contains(statisticsRecord)) {
+                collector.collect(statisticsRecord);
             }
-            statisticsRecord = StatisticsRecordFactory.getStatisticsRecord(synCtx);
-            synCtx.setProperty(SynapseConstants.STATISTICS_STACK, statisticsRecord);
-        }
-        statisticsRecord.collect(aspectConfigurable);
-
-        StatisticsCollector collector = synCtx.getEnvironment().getStatisticsCollector();
-        if (collector == null) {
-
-            if (log.isDebugEnabled()) {
-                log.debug("Setting statistics collector in the synapse environment.");
-            }
-            collector = new StatisticsCollector();
-            synCtx.getEnvironment().setStatisticsCollector(collector);
-        }
-        if (!collector.contains(statisticsRecord)) {
-            collector.collect(statisticsRecord);
         }
     }
 
     /**
-     * Reporting audit for a particular resource
+     * Collects statistics for any component
      *
-     * @param synCtx            Current Message through synapse
-     * @param aspectConfigurable Instance that can be configured it's audit
+     * @param synCtx Current Message through synapse
      */
-    public static void report(MessageContext synCtx, AspectConfigurable aspectConfigurable) {
-
-        StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
-        if (statisticsRecord != null) {
-            statisticsRecord.commit(aspectConfigurable);
+    public static void reportForAll(MessageContext synCtx) {
+        AspectConfiguration configuration =
+                AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx);
+        if (configuration != null && configuration.isStatisticsEnable()) {
+            StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
+            statisticsRecord.collect(configuration, ComponentType.ANY, synCtx.isResponse());
+            StatisticsCollector collector = getStatisticsCollector(synCtx);
+            if (!collector.contains(statisticsRecord)) {
+                collector.collect(statisticsRecord);
+            }
         }
     }
 
@@ -84,7 +84,7 @@ public class StatisticsReporter {
      *
      * @param synCtx synCtx  Current Message through synapse
      */
-    public static void reportFault(MessageContext synCtx) {
+    public static void reportFaultForAll(MessageContext synCtx) {
 
         StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
         if (statisticsRecord != null) {
@@ -96,6 +96,29 @@ public class StatisticsReporter {
     }
 
     private static StatisticsRecord getStatisticsRecord(MessageContext synCtx) {
-        return (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
+        StatisticsRecord statisticsRecord =
+                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
+        if (statisticsRecord == null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Setting statistics stack on the message context.");
+            }
+            statisticsRecord = StatisticsRecordFactory.getStatisticsRecord(synCtx);
+            synCtx.setProperty(SynapseConstants.STATISTICS_STACK, statisticsRecord);
+        }
+        return statisticsRecord;
+    }
+
+    private static StatisticsCollector getStatisticsCollector(MessageContext synCtx) {
+        StatisticsCollector collector = synCtx.getEnvironment().getStatisticsCollector();
+        if (collector == null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Setting statistics collector in the synapse environment.");
+            }
+            collector = new StatisticsCollector();
+            synCtx.getEnvironment().setStatisticsCollector(collector);
+        }
+        return collector;
     }
 }

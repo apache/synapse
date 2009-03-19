@@ -40,7 +40,8 @@ public class StatisticsRecordFactory {
     public static StatisticsRecord getStatisticsRecord(MessageContext synCtx) {
 
         String messageId = synCtx.getMessageID();
-        org.apache.axis2.context.MessageContext axisMC = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        org.apache.axis2.context.MessageContext axisMC = ((Axis2MessageContext) synCtx)
+                .getAxis2MessageContext();
         String remoteIP = (String) axisMC.getPropertyNonReplicable(
                 org.apache.axis2.context.MessageContext.REMOTE_ADDR);
         String domainName = (String) axisMC.getPropertyNonReplicable(NhttpConstants.REMOTE_HOST);

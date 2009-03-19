@@ -18,8 +18,11 @@
  */
 package org.apache.synapse.aspects.statistics;
 
-import org.apache.synapse.aspects.statistics.view.Statistics;
+import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.aspects.statistics.mbean.StatisticsView;
+import org.apache.synapse.aspects.statistics.view.InOutStatisticsView;
 import org.apache.synapse.aspects.statistics.view.StatisticsViewStrategy;
+import org.apache.synapse.commons.util.MBeanRegistrar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,11 @@ import java.util.Map;
 public class StatisticsCollector {
 
     private final List<StatisticsRecord> statisticsCollection = new ArrayList<StatisticsRecord>();
+
+    public StatisticsCollector() {
+        MBeanRegistrar.getInstance().registerMBean(new StatisticsView(this),
+                "StatisticsView", "StatisticsView");
+    }
 
     /**
      * Registering a statistics record
@@ -53,6 +61,13 @@ public class StatisticsCollector {
     }
 
     /**
+     * Clear all the existing statistics
+     */
+    public void clearStatistics() {
+        this.statisticsCollection.clear();
+    }
+
+    /**
      * Returns a particular statistics view according to a given strategy for a given
      * resource with particular type
      *
@@ -61,10 +76,10 @@ public class StatisticsCollector {
      * @param strategy Statistics viewing strategy
      * @return Statistics view
      */
-    public Map<String, Statistics> getStatistics(String id,
-                                                 int type,
-                                                 StatisticsViewStrategy strategy) {
-        return strategy.determineView(id, statisticsCollection, type);
+    public Map<String, InOutStatisticsView> getStatistics(String id,
+                                                          ComponentType type,
+                                                          StatisticsViewStrategy strategy) {
+        return strategy.determineView(id, getCopy(), type);
     }
 
     /**
@@ -74,9 +89,15 @@ public class StatisticsCollector {
      * @param strategy strategy Statistics viewing strategy
      * @return Statistics view
      */
-    public Map<String, Map<String, Statistics>> getStatistics(int type,
-                                                              StatisticsViewStrategy strategy) {
-        return strategy.determineView(statisticsCollection, type);
+    public Map<String, Map<String, InOutStatisticsView>> getStatistics(
+            ComponentType type,
+            StatisticsViewStrategy strategy) {
+        return strategy.determineView(getCopy(), type);
     }
 
+    private List<StatisticsRecord> getCopy() {
+        List<StatisticsRecord> records = new ArrayList<StatisticsRecord>();
+        records.addAll(statisticsCollection);
+        return records;
+    }
 }

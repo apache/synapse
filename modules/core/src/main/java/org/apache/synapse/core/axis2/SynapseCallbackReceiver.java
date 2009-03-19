@@ -36,7 +36,6 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -157,16 +156,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private void handleMessage(String messageID ,MessageContext response,
         org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
 
-        Endpoint endpoint = (Endpoint) synapseOutMsgCtx.getProperty(
-                SynapseConstants.LAST_ENDPOINT);
-        if (endpoint instanceof AspectConfigurable) {
-            StatisticsReporter.report(synapseOutMsgCtx, (AspectConfigurable) endpoint);
-        }
-        
         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
 
-            StatisticsReporter.reportFault(synapseOutMsgCtx);
+            StatisticsReporter.reportFaultForAll(synapseOutMsgCtx);
             // there is a sending fault. propagate the fault to fault handlers.
 
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
@@ -335,6 +328,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             if (dispatcher != null && dispatcher.isServerInitiatedSession()) {
                 dispatcher.updateSession(synapseInMessageContext);
             }
+
+            StatisticsReporter.reportForAll(synapseInMessageContext);
+            
             // send the response message through the synapse mediation flow
             try {
                 synapseOutMsgCtx.getEnvironment().injectMessage(synapseInMessageContext);

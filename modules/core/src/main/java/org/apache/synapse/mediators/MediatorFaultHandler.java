@@ -72,7 +72,7 @@ public class MediatorFaultHandler extends FaultHandler {
             name = faultMediator.getClass().getName();
         }
 
-        StatisticsReporter.reportFault(synCtx); 
+        StatisticsReporter.reportFaultForAll(synCtx);
         
         if (traceOrDebugOn) {
             traceOrDebugWarn(traceOn, "Executing fault handler mediator : " + name);

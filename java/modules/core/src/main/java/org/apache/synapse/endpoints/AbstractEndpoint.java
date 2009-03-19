@@ -25,6 +25,7 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.commons.util.MBeanRegistrar;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -338,9 +339,10 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * @param synCtx the current message
      */
     protected void prepareForEndpointStatistics(MessageContext synCtx) {
-    // Setting Required property to collect the End Point aspects
+    // Setting Required property to reportForComponent the End Point aspects
         if (definition != null && definition.isStatisticsEnable()) {
-            StatisticsReporter.collect(synCtx, definition);
+            StatisticsReporter.reportForComponent(synCtx, definition.getAspectConfiguration(),
+                    ComponentType.ENDPOINT);
         }
     }
 

@@ -21,10 +21,12 @@ package org.apache.synapse.aspects.statistics.view;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.aspects.statistics.StatisticsLog;
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsRecord;
+import org.apache.synapse.aspects.statistics.StatisticsUpdateStrategy;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,12 +37,12 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
 
     private static final Log log = LogFactory.getLog(SystemViewStrategy.class);
 
-    public Map<String, Map<String, Statistics>> determineView(
+    public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
-            int type) {
+            ComponentType type) {
 
-        final Map<String, Map<String, Statistics>> statisticsMap =
-                new HashMap<String, Map<String, Statistics>>();
+        final Map<String, Map<String, InOutStatisticsView>> statisticsMap =
+                new HashMap<String, Map<String, InOutStatisticsView>>();
 
         if (statisticsRecords == null) {
             if (log.isDebugEnabled()) {
@@ -49,88 +51,41 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
             return statisticsMap;
         }
 
-        Map<String, Statistics> perResourceMap = new HashMap<String, Statistics>();
+        final Map<String, InOutStatisticsView> perResourceMap =
+                new HashMap<String, InOutStatisticsView>();
 
         for (StatisticsRecord record : statisticsRecords) {
-
             if (record != null) {
 
-                Map<String, StatisticsLog> statisticsLogMap = null;
+                final StatisticsUpdateStrategy strategy = new StatisticsUpdateStrategy(record);
+                final Iterator<String> logIds = record.getAllLogIds(type);
+                while (logIds.hasNext()) {
+                    String id = logIds.next();
 
-                switch (type) {
-                    case StatisticsLog.ENDPOINT_STATISTICS: {
-                        statisticsLogMap = record.getAllEndpointStatisticsRecords();
-                        break;
-                    }
-                    case StatisticsLog.PROXY_SERVICE_STATISTICS: {
-                        statisticsLogMap = record.getAllProxyServiceStatisticsRecords();
-                        break;
-                    }
-                    case StatisticsLog.MEDIATOR_STATISTICS: {
-                        statisticsLogMap = record.getAllMediatorStatisticsRecords();
-                        break;
-                    }
-                }
-
-                if (statisticsLogMap == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Cannot find the statistics logs for : " + record);
-                    }
-                    continue;
-                }
-
-                for (String rName : statisticsLogMap.keySet()) {
-
-                    if (rName == null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Cannot find the resource name ");
-                        }
-                        continue;
-                    }
-
-                    StatisticsLog statisticsLog = statisticsLogMap.get(rName);
-                    if (statisticsLog == null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Cannot find the statistics log for resource with name : " +
-                                    rName);
-                        }
-                        continue;
-                    }
-
-                    Statistics statistics;
-
-                    if (!perResourceMap.containsKey(rName)) {
-
-                        statistics = new Statistics(rName);
-                        perResourceMap.put(rName, statistics);
-
+                    InOutStatisticsView view;
+                    if (!perResourceMap.containsKey(id)) {
+                        view = new InOutStatisticsView(id, Statistics.ALL);
+                        perResourceMap.put(id, view);
                     } else {
-                        statistics = perResourceMap.get(rName);
+                        view = perResourceMap.get(id);
                     }
-
-                    if (statistics != null) {
-                        statistics.update(statisticsLog.getProcessingTime(),
-                                record.isFaultResponse());
-                    }
+                    updateStatistics(id, type, view, strategy);
                 }
             }
-
         }
-
         statisticsMap.put(Statistics.ALL, perResourceMap);
         return statisticsMap;
-
     }
 
-    public Map<String, Statistics> determineView(String id,
-                                                 List<StatisticsRecord> statisticsRecords,
-                                                 int type) {
 
+    public Map<String, InOutStatisticsView> determineView(String id,
+                                                          List<StatisticsRecord> statisticsRecords,
+                                                          ComponentType type) {
         if (id == null || "".equals(id)) {
             handleException("Resource Id cannot be null");
         }
 
-        Map<String, Statistics> statisticsMap = new HashMap<String, Statistics>();
+        Map<String, InOutStatisticsView> statisticsMap = new HashMap<String, InOutStatisticsView>();
         if (statisticsRecords == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Statistics records cannot be found.");
@@ -138,35 +93,24 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
             return statisticsMap;
         }
 
-        Statistics statistics = new Statistics(Statistics.ALL);
+        InOutStatisticsView view = new InOutStatisticsView(id, Statistics.ALL);
         for (StatisticsRecord record : statisticsRecords) {
-
             if (record != null) {
-                StatisticsLog log = null;
-
-                switch (type) {
-                    case StatisticsLog.ENDPOINT_STATISTICS: {
-                        log = record.getEndpointStatisticsRecord(id);
-                        break;
-                    }
-                    case StatisticsLog.PROXY_SERVICE_STATISTICS: {
-                        log = record.getProxyServiceStatisticsRecord(id);
-                        break;
-                    }
-                    case StatisticsLog.MEDIATOR_STATISTICS: {
-                        log = record.getMediatorStatisticsRecord(id);
-                        break;
-                    }
-                }
-
-                if (log != null) {
-                    statistics.update(log.getProcessingTime(), record.isFaultResponse());
-                }
+                updateStatistics(id, type, view, new StatisticsUpdateStrategy(record));
             }
         }
-
-        statisticsMap.put(Statistics.ALL, statistics);
+        statisticsMap.put(Statistics.ALL, view);
         return statisticsMap;
+    }
+
+    private void updateStatistics(String id, ComponentType type, InOutStatisticsView view,
+                                  StatisticsUpdateStrategy strategy) {
+        if (view != null) {
+            strategy.updateInFlowStatistics(id, type,
+                    view.getInStatistics());
+            strategy.updateOutFlowStatistics(id, type,
+                    view.getOutStatistics());
+        }
     }
 
     private static void handleException(String msg) {

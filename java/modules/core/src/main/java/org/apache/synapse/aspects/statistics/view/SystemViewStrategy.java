@@ -108,8 +108,10 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
         if (view != null) {
             strategy.updateInFlowStatistics(id, type,
                     view.getInStatistics());
-            strategy.updateOutFlowStatistics(id, type,
-                    view.getOutStatistics());
+            if (type != ComponentType.ENDPOINT) {
+                strategy.updateOutFlowStatistics(id, type,
+                        view.getOutStatistics());
+            }
         }
     }
 

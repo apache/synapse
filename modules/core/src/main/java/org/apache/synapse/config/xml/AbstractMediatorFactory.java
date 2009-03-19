@@ -24,8 +24,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.Namable;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.AspectConfiguration;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -107,9 +110,18 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
+                String name = null;
+                if (mediator instanceof Namable) {
+                    name = ((Namable) mediator).getName();
+                }
+                if (name == null || "".equals(name)) {
+                    name = SynapseConstants.ANONYMOUS_SEQUENCE;
+                }
                 if (mediator instanceof AspectConfigurable) {
                     if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                        ((AspectConfigurable) mediator).enableStatistics();
+                        AspectConfiguration configuration = new AspectConfiguration(name);
+                        configuration.enableStatistics();
+                        ((AspectConfigurable) mediator).configure(configuration);
                     }
                 }
             }

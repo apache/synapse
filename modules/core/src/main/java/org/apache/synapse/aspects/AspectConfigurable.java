@@ -19,39 +19,21 @@
 package org.apache.synapse.aspects;
 
 /**
- * Capability for configurable auditing
+ * Capability for configurable aspects
  */
 public interface AspectConfigurable {
 
     /**
-     * Returns audit id , identifier for a particular audit
-     * Example , component name , endpoint name
+     * Configure aspects according to the given configuration
      *
-     * @return audit id
+     * @param aspectConfiguration AspectConfiguration instance
      */
-    public String getAuditId();
+    void configure(AspectConfiguration aspectConfiguration);
 
     /**
-     * Sets the identifier for a particular audit
+     * Get the aspects  configuration
      *
-     * @param id audit id
+     * @return AspectConfiguration instance
      */
-    public void setAuditId(String id);
-
-    /**
-     * Whether statistics has been enabled
-     *
-     * @return True if enable , o.w , false
-     */
-    public boolean isStatisticsEnable();
-
-    /**
-     * To disable statistics
-     */
-    public void disableStatistics();
-
-    /**
-     * To enable statistics
-     */
-    public void enableStatistics();
+    AspectConfiguration getAspectConfiguration();
 }

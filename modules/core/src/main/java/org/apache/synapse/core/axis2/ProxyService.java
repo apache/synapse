@@ -33,6 +33,8 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -76,7 +78,7 @@ import java.util.*;
  *    </parameter>?
  * </proxy-service>
  */
-public class ProxyService {
+public class ProxyService implements AspectConfigurable {
 
     private static final Log log = LogFactory.getLog(ProxyService.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
@@ -193,8 +195,9 @@ public class ProxyService {
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
-    protected int traceState = SynapseConstants.TRACING_UNSET;
+    private int traceState = SynapseConstants.TRACING_UNSET;
 
+    private AspectConfiguration aspectConfiguration;
 
     /**
      * Constructor
@@ -934,6 +937,14 @@ public class ProxyService {
 
     public void addPolicyInfo(PolicyInfo pi) {
         this.policies.add(pi);
+    }
+
+    public void configure(AspectConfiguration aspectConfiguration) {
+        this.aspectConfiguration = aspectConfiguration;
+    }
+
+    public AspectConfiguration getAspectConfiguration() {
+        return aspectConfiguration;
     }
 
     @Override

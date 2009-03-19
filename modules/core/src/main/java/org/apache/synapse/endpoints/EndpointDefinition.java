@@ -138,7 +138,7 @@ public class EndpointDefinition implements AspectConfigurable {
     /** A list of error codes which puts the endpoint into timeout mode */
     private final List<Integer> timeoutErrorCodes = new ArrayList<Integer>();
 
-    private AspectConfigurable aspectConfigurable = new AspectConfiguration(SynapseConstants.ANONYMOUS_ENDPOINT);
+    private AspectConfiguration aspectConfiguration;
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
@@ -500,23 +500,27 @@ public class EndpointDefinition implements AspectConfigurable {
         this.leafEndpoint = leafEndpoint;
     }
 
-    public String getAuditId() {
-        return this.aspectConfigurable.getAuditId();
-    }
-
-    public void setAuditId(String id) {
-        this.aspectConfigurable.setAuditId(id);
-    }
-
     public boolean isStatisticsEnable() {
-        return this.aspectConfigurable.isStatisticsEnable();
+        return this.aspectConfiguration != null && this.aspectConfiguration.isStatisticsEnable();
     }
 
     public void disableStatistics() {
-        this.aspectConfigurable.disableStatistics();
+        if (this.aspectConfiguration != null) {
+            this.aspectConfiguration.disableStatistics();
+        }
     }
 
     public void enableStatistics() {
-        this.aspectConfigurable.enableStatistics();
+        if (this.aspectConfiguration != null) {
+            this.aspectConfiguration.enableStatistics();
+        }
+    }
+
+    public void configure(AspectConfiguration aspectConfiguration) {
+        this.aspectConfiguration = aspectConfiguration;
+    }
+
+    public AspectConfiguration getAspectConfiguration() {
+        return this.aspectConfiguration;
     }
 }

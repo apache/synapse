@@ -22,7 +22,7 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
@@ -83,7 +83,7 @@ public class DefaultEndpointFactory extends EndpointFactory {
         if (defaultElement != null) {
             EndpointDefinition endpoint = createEndpointDefinition(defaultElement);
             defaultEndpoint.setDefinition(endpoint);
-            processAuditStatus(defaultEndpoint, defaultElement);
+            processAuditStatus(endpoint, defaultEndpoint.getName(),defaultElement);
         }
         return defaultEndpoint;
     }
@@ -134,17 +134,20 @@ public class DefaultEndpointFactory extends EndpointFactory {
         return endpointDefinition;
     }
     
-    protected void processAuditStatus(Endpoint endpoint ,OMElement epOmElement){
-        
+    protected void processAuditStatus(EndpointDefinition definition ,String name , OMElement epOmElement){
+
+        if (name == null || "".equals(name)) {
+            name = SynapseConstants.ANONYMOUS_ENDPOINT;
+        }
         OMAttribute statistics = epOmElement.getAttribute(
                 new QName(XMLConfigConstants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
-                if (endpoint instanceof AspectConfigurable) {
-                    if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                        ((AspectConfigurable) endpoint).enableStatistics();
-                    }
+                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                    AspectConfiguration aspectConfiguration = new AspectConfiguration(name);
+                    aspectConfiguration.enableStatistics();
+                    definition.configure(aspectConfiguration);
                 }
             }
         }

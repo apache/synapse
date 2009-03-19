@@ -25,7 +25,9 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.util.PolicyInfo;
@@ -297,6 +299,23 @@ public class ProxyServiceFactory {
                 }
             } else {
                 handleException("Invalid 'policy' element found under element 'policies'");
+            }
+        }
+
+        OMAttribute statistics = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
+                XMLConfigConstants.STATISTICS_ATTRIB_NAME));
+        if (statistics != null) {
+            String statisticsValue = statistics.getAttributeValue();
+            if (statisticsValue != null) {
+                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                    String nameString = proxy.getName();
+                    if (nameString == null || "".equals(nameString)) {
+                        nameString = SynapseConstants.ANONYMOUS_PROXYSERVICE;
+                    }
+                    AspectConfiguration aspectConfiguration = new AspectConfiguration(nameString);
+                    aspectConfiguration.enableStatistics();
+                    proxy.configure(aspectConfiguration);
+                }
             }
         }
 

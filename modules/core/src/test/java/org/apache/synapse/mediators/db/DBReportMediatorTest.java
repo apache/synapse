@@ -19,18 +19,18 @@
 
 package org.apache.synapse.mediators.db;
 
-import org.apache.synapse.mediators.AbstractMediatorTestCase;
-import org.apache.synapse.mediators.TestUtils;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.DBReportMediatorFactory;
-import junit.framework.TestSuite;
-import junit.framework.Test;
-import junit.extensions.TestSetup;
+import org.apache.synapse.mediators.AbstractMediatorTestCase;
+import org.apache.synapse.mediators.TestUtils;
 
-import java.sql.SQLException;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.io.File;
+import java.sql.SQLException;
 
 public class DBReportMediatorTest extends AbstractMediatorTestCase {    
 

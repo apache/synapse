@@ -21,7 +21,9 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Namable;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
@@ -38,7 +40,7 @@ import java.util.Stack;
  * sequence mediator, the errorHandler will not have a meaning, and if an error in
  * encountered in the referred sequence, its errorHandler would execute.
  */
-public class SequenceMediator extends AbstractListMediator {
+public class SequenceMediator extends AbstractListMediator implements Namable {
 
     /** The name of the this sequence */
     private String name = null;
@@ -69,7 +71,7 @@ public class SequenceMediator extends AbstractListMediator {
         SynapseLog synLog = getLog(synCtx);
 
         if (isStatisticsEnable()) {
-            StatisticsReporter.collect(synCtx, this);
+            StatisticsReporter.reportForComponent(synCtx, getAspectConfiguration(), ComponentType.SEQUENCE);
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
@@ -87,7 +89,7 @@ public class SequenceMediator extends AbstractListMediator {
             // mediation through this sequence
             Mediator errorHandlerMediator = null;
 
-            // Setting Required property to collect the sequence aspects
+            // Setting Required property to reportForComponent the sequence aspects
 
             try {
 
@@ -139,7 +141,8 @@ public class SequenceMediator extends AbstractListMediator {
             } finally {
 
                 if (isStatisticsEnable()) {
-                    StatisticsReporter.report(synCtx, this);
+                    StatisticsReporter.reportForComponent(synCtx,
+                            getAspectConfiguration(),ComponentType.SEQUENCE);
                 }
             }
 

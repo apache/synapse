@@ -20,13 +20,12 @@ package org.apache.synapse.aspects.statistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.aspects.AspectConfigurable;
-import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.Identifiable;
+import org.apache.synapse.aspects.ComponentType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Holds a record for statistics for current message
@@ -35,17 +34,11 @@ public class StatisticsRecord {
 
     private static final Log log = LogFactory.getLog(StatisticsRecord.class);
     private String id;
-
-    private final Map<String, StatisticsLog> endPointsStatisticsRecordMap =
-            new HashMap<String, StatisticsLog>();
-    private final Map<String, StatisticsLog> mediatorsStatisticsRecordMap =
-            new HashMap<String, StatisticsLog>();
-    private final Map<String, StatisticsLog> proxyServicesStatisticsRecordMap =
-            new HashMap<String, StatisticsLog>();
-
+    private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();
     private boolean isFaultResponse;
     private String clientIP;
     private String clientHost;
+    private ComponentType owner;
 
     public StatisticsRecord(String id, String clientIP, String clientHost) {
         this.id = id;
@@ -76,100 +69,50 @@ public class StatisticsRecord {
     /**
      * Collecting statistics for a particular component
      *
-     * @param aspectConfigurable audit configurable component
+     * @param identifiable  audit configurable component
+     * @param componentType The component that belong statistics
+     * @param isResponse    Is this Response or not
      */
-    public void collect(AspectConfigurable aspectConfigurable) {
+    public void collect(Identifiable identifiable, ComponentType componentType, boolean isResponse) {
 
-        if (isValid(aspectConfigurable)) {
+        if (isValid(identifiable)) {
 
-            String auditID = aspectConfigurable.getAuditId();
+            String auditID = identifiable.getId();
             if (log.isDebugEnabled()) {
-                log.debug("Start to collect statistics for : " + auditID);
+                log.debug("Start to reportForComponent statistics for : " + auditID);
             }
-            if (aspectConfigurable instanceof Endpoint) {
-                endPointsStatisticsRecordMap.put(auditID, new StatisticsLog(auditID));
-            } else if (aspectConfigurable instanceof ProxyService) {
-                proxyServicesStatisticsRecordMap.put(auditID, new StatisticsLog(auditID));
-            } else if (aspectConfigurable instanceof Mediator) {
-                mediatorsStatisticsRecordMap.put(auditID, new StatisticsLog(auditID));
-            }
+            statisticsLogs.add(new StatisticsLog(auditID, componentType, isResponse));
         }
     }
 
     /**
-     * Reporting statistics for a particular component
+     * Gets all the StatisticsLogs
      *
-     * @param aspectConfigurable audit configurable component
+     * @return A Iterator for all StatisticsLogs
      */
-    public void commit(AspectConfigurable aspectConfigurable) {
-
-        if (isValid(aspectConfigurable)) {
-
-            String auditID = aspectConfigurable.getAuditId();
-            if (log.isDebugEnabled()) {
-                log.debug("Reporting statistics for : " + auditID);
-            }
-            if (aspectConfigurable instanceof Endpoint) {
-                commit(auditID, endPointsStatisticsRecordMap);
-            } else if (aspectConfigurable instanceof ProxyService) {
-                commit(auditID, proxyServicesStatisticsRecordMap);
-            } else if (aspectConfigurable instanceof Mediator) {
-                commit(auditID, mediatorsStatisticsRecordMap);
-            }
-        }
+    public Iterator<StatisticsLog> getAllStatisticsLogs() {
+        final List<StatisticsLog> logs = new ArrayList<StatisticsLog>();
+        logs.addAll(statisticsLogs);
+        return logs.iterator();
     }
 
-    private boolean isValid(AspectConfigurable aspectConfigurable) {
-
-        if (aspectConfigurable == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Invalid aspects configuration , It is null.");
-            }
-            return false;
-        }
-
-        if (aspectConfigurable.isStatisticsEnable()) {
-            String auditID = aspectConfigurable.getAuditId();
-            if (auditID == null || "".equals(auditID)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Invalid aspects configuration , Audit name is null.");
+    /**
+     * Get all log ids related with a given component
+     *
+     * @param componentType The component that belong statistics
+     * @return A List of Log ids
+     */
+    public Iterator<String> getAllLogIds(ComponentType componentType) {
+        final List<String> logIds = new ArrayList<String>();
+        for (StatisticsLog startLog : statisticsLogs) {
+            if (startLog != null && startLog.getComponentType() == componentType) {
+                String id = startLog.getId();
+                if (id != null && !"".equals(id) && !logIds.contains(id)) {
+                    logIds.add(id);
                 }
-                return false;
             }
-            return true;
         }
-        return false;
-    }
-
-    private void commit(String auditID, Map<String, StatisticsLog> map) {
-        StatisticsLog log = map.get(auditID);
-        if (log != null) {
-            log.setEndTime(System.currentTimeMillis());
-        }
-    }
-
-    public StatisticsLog getEndpointStatisticsRecord(String name) {
-        return endPointsStatisticsRecordMap.get(name);
-    }
-
-    public StatisticsLog getMediatorStatisticsRecord(String name) {
-        return mediatorsStatisticsRecordMap.get(name);
-    }
-
-    public StatisticsLog getProxyServiceStatisticsRecord(String name) {
-        return proxyServicesStatisticsRecordMap.get(name);
-    }
-
-    public Map<String, StatisticsLog> getAllEndpointStatisticsRecords() {
-        return endPointsStatisticsRecordMap;
-    }
-
-    public Map<String, StatisticsLog> getAllMediatorStatisticsRecords() {
-        return mediatorsStatisticsRecordMap;
-    }
-
-    public Map<String, StatisticsLog> getAllProxyServiceStatisticsRecords() {
-        return proxyServicesStatisticsRecordMap;
+        return logIds.iterator();
     }
 
     public String toString() {
@@ -178,5 +121,36 @@ public class StatisticsRecord {
                 .append("[Remote  IP : ").append(clientIP).append(" ]")
                 .append("[Remote host : ").append(clientHost).append(" ]")
                 .toString();
+    }
+
+    public void clearLogs() {
+        statisticsLogs.clear();
+    }
+
+    public ComponentType getOwner() {
+        return owner;
+    }
+
+    public void setOwner(ComponentType owner) {
+        this.owner = owner;
+    }
+
+    private boolean isValid(Identifiable identifiable) {
+
+        if (identifiable == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid aspects configuration , It is null.");
+            }
+            return false;
+        }
+
+        String auditID = identifiable.getId();
+        if (auditID == null || "".equals(auditID)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid aspects configuration , Audit name is null.");
+            }
+            return false;
+        }
+        return true;
     }
 }

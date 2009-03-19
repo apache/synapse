@@ -115,7 +115,6 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
     public Map<String, InOutStatisticsView> determineView(String id,
                                                           List<StatisticsRecord> statisticsRecords,
                                                           ComponentType type, int userIDType) {
-
         if (id == null || "".equals(id)) {
             handleException("Resource Id cannot be null");
         }

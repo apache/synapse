@@ -962,7 +962,7 @@
             <email>saminda AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
-	<developer>
+	    <developer>
             <name>Afkham Azeez</name>
             <id>azeez</id>
             <email>azeez AT wso2.com</email>
@@ -1073,6 +1073,12 @@
             <id>veithen</id>
             <email>veithen AT apache.org</email>
             <url>http://www.linkedin.com/in/aveithen</url>
+        </developer>
+        <developer>
+            <name>Asanka Abeysinghe</name>
+            <id>asanka</id>
+            <email>asankaa AT wso2.com</email>
+            <organization>WSO2</organization>
         </developer>
     </developers>
 

@@ -25,6 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.eventing.SynapseSubscription;
 import org.apache.synapse.eventing.SynapseSubscriptionManager;
+import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.filters.XPathBasedEventFilter;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
@@ -93,9 +94,10 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
     public List<SynapseSubscription> getMatchingSubscribers(MessageContext mc) {
         final LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
         for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
-            XPathBasedEventFilter filter =
-                    (XPathBasedEventFilter) stringSubscriptionEntry.getValue().getSynapseFilter();
+            //TODO : pick the filter based on the dialect
+            XPathBasedEventFilter filter = new XPathBasedEventFilter();
             if (filter != null) {
+                filter.setResultValue(stringSubscriptionEntry.getValue().getFilterValue());
                 filter.setSourceXpath(topicXPath);
             }
             if (filter == null || filter.isSatisfied(mc)) {
@@ -119,7 +121,8 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
     public List<SynapseSubscription> getStaticSubscribers() {
         LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
         for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
-            if (stringSubscriptionEntry.getValue().isStaticEntry()) {
+            if ((stringSubscriptionEntry.getValue().getSubscriptionData().getProperty(
+                    SynapseEventingConstants.STATIC_ENTRY)).equals("true")) {
                 list.add(stringSubscriptionEntry.getValue());
             }
         }

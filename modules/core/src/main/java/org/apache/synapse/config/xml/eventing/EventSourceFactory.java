@@ -156,25 +156,15 @@ public class EventSourceFactory {
             OMElement elmFilter = elmSubscription.getFirstChildWithName(FILTER_QNAME);
             OMAttribute dialectAttr = elmFilter.getAttribute(FILTER_DIALECT_QNAME);
             if (dialectAttr != null && dialectAttr.getAttributeValue() != null) {
-                if (SynapseEventingConstants.TOPIC_FILTER_DIALECT
-                        .equals(dialectAttr.getAttributeValue())) {
-                    XPathBasedEventFilter filter = new XPathBasedEventFilter();
+
                     OMAttribute sourceAttr = elmFilter.getAttribute(FILTER_SOURCE_QNAME);
                     if (sourceAttr != null) {
-                        filter.setResultValue(sourceAttr.getAttributeValue());
+                        synapseSubscription.setFilterDialect(dialectAttr.getAttributeValue());
+                        synapseSubscription.setFilterValue(elmFilter.getText());
                     } else {
                         handleException(
                                 "Error in creating static subscription. Filter source not defined");
-                    }
-                    synapseSubscription.setFilter(filter);
-                    SubscriptionData subscriptionData = new SubscriptionData();
-                    subscriptionData.setProperty(SynapseEventingConstants.FILTER_VALUE,
-                            sourceAttr.getAttributeValue());
-                    subscriptionData.setProperty(SynapseEventingConstants.FILTER_DIALECT,
-                            dialectAttr.getAttributeValue());
-                    synapseSubscription.setSubscriptionData(subscriptionData);
-                }
-
+                    }             
             } else {
                 handleException(
                         "Error in creating static subscription. Filter dialect not defined");
@@ -183,13 +173,8 @@ public class EventSourceFactory {
             if (elmEndpoint != null) {
                 OMElement elmAddress = elmEndpoint.getFirstChildWithName(ADDRESS_QNAME);
                 if (elmAddress != null) {
-                    AddressEndpoint endpoint = new AddressEndpoint();
-                    EndpointDefinition def = new EndpointDefinition();
                     OMAttribute uriAttr = elmAddress.getAttribute(EP_URI_QNAME);
                     if (uriAttr != null) {
-                        def.setAddress(uriAttr.getAttributeValue());
-                        endpoint.setDefinition(def);
-                        synapseSubscription.setEndpoint(endpoint);
                         synapseSubscription.setEndpointUrl(uriAttr.getAttributeValue());
                         synapseSubscription.setAddressUrl(uriAttr.getAttributeValue());
                     } else {
@@ -219,7 +204,8 @@ public class EventSourceFactory {
             } else {
                 synapseSubscription.setExpires(null);
             }
-            synapseSubscription.setStaticEntry(true);
+            synapseSubscription.getSubscriptionData()
+                    .setProperty(SynapseEventingConstants.STATIC_ENTRY, "true");
             synapseEventSource.getSubscriptionManager().addSubscription(synapseSubscription);
         }
     }

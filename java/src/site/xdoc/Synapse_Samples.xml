@@ -361,8 +361,7 @@
 <br></br> Start the Axis2 server and deploy the SimpleStockQuoteService if not already deployed
 <br></br> </p>
 <p>Execute the Dumb Client as: </p>
-<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/services/StockQuote
-<br></br></pre>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/services/StockQuote</pre>
 <p>This time you will see Synapse receiving a message for which Synapse was set as the ultimate receiver of the message. Based on the 'To' EPR of http://localhost:8280/services/StockQuote, Synapse performs a match to the path '/StockQuote' and as the request matches the XPath expression of the filter mediator, the filter mediator's child mediators execute. This sends the message to a different endpoint as specified by the endpoint definition. The 'drop' mediator terminates further processing of the current message in a configuration. During response processing, the filter condition fails, and thus the implicit 'send' mediator forwards the response back to the client. </p>
 <h2>
 <a name="Sample2" id="Sample2">Sample 2: CBR with the Switch-case mediator, using message properties</a></h2>

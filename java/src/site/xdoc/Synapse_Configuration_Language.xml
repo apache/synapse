@@ -2090,6 +2090,8 @@ ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz[?vfs.passive=tru
       natural to the scripting language. For example when using JavaScript
       getPayloadXML and setPayloadXML, E4X XML objects, and when using Ruby,
       REXML documents.
+      The complete list of available methods can be found in the 
+      <a href="apidocs/org/apache/synapse/mediators/bsf/ScriptMessageContext.html">ScriptMessageContext Javadoc</a>.
     </p>
     <h3>
       Extensibility of Synapse

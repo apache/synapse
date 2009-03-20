@@ -89,9 +89,7 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
                 try {
                     s.execute("drop table audit");
                 } catch (SQLException ignore) {}
-                try {
-                    s.execute("create table audit(fromepr varchar(10), cnt int, toepr varchar(10), category varchar(10))");
-                } catch (SQLException ignore) {}
+                s.execute("create table audit(fromepr varchar(10), cnt int, toepr varchar(10), category varchar(10))");
                 s.close();
             }
 

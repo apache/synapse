@@ -20,6 +20,7 @@
 package org.apache.synapse.eventing;
 
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -31,6 +32,9 @@ import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -185,7 +189,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 synCtx.setProperty(SynapseConstants.OUT_ONLY,
                         "true");    // Set one way message for events
                 try {
-                    subscription.getEndpoint().send(MessageHelper.cloneMessageContext(synCtx));
+                    getEndpointFromURL(subscription.getEndpointUrl())
+                            .send(MessageHelper.cloneMessageContext(synCtx));
                 } catch (AxisFault axisFault) {
                     log.error("Event sending failure " + axisFault.toString());
                 }
@@ -365,8 +370,21 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                     SubscriptionMessageBuilder.getErrorCode(),
                     SubscriptionMessageBuilder.getErrorSubCode(),
                     SubscriptionMessageBuilder.getErrorReason(), "");
-            dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc,
-                    true);
+            dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc, true);
         }
+    }
+
+    /**
+     * Create a Endpoint for a given URL
+     *
+     * @param endpointUrl
+     * @return AddressEndpoint
+     */
+    private Endpoint getEndpointFromURL(String endpointUrl) {
+        AddressEndpoint endpoint = new AddressEndpoint();
+        EndpointDefinition def = new EndpointDefinition();
+        def.setAddress(endpointUrl.trim());
+        endpoint.setDefinition(def);
+        return endpoint;
     }
 }

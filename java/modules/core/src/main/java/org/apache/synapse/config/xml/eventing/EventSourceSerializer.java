@@ -86,11 +86,9 @@ public class EventSourceSerializer {
                 OMElement filterElem =
                         fac.createOMElement("filter", XMLConfigConstants.SYNAPSE_OMNAMESPACE);
                 filterElem.addAttribute(fac.createOMAttribute("source", nullNS,
-                        (String) staticSubscription.getSubscriptionData()
-                                .getProperty(SynapseEventingConstants.FILTER_VALUE)));
+                        (String) staticSubscription.getFilterValue()));
                 filterElem.addAttribute(fac.createOMAttribute("dialect", nullNS,
-                        (String) staticSubscription.getSubscriptionData()
-                                .getProperty(SynapseEventingConstants.FILTER_DIALECT)));
+                        (String) staticSubscription.getFilterDialect()));
                 staticSubElem.addChild(filterElem);
                 OMElement endpointElem =
                         fac.createOMElement("endpoint", XMLConfigConstants.SYNAPSE_OMNAMESPACE);

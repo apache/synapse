@@ -21,23 +21,17 @@ package org.apache.synapse.eventing.builders;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.databinding.utils.ConverterUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
-import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.SynapseSubscription;
-import org.apache.synapse.eventing.filters.XPathBasedEventFilter;
-import org.apache.synapse.util.xpath.SynapseXPath;
-import org.jaxen.JaxenException;
 import org.wso2.eventing.EventingConstants;
-import org.wso2.eventing.SubscriptionData;
 
 import javax.xml.namespace.QName;
 import java.util.Calendar;
@@ -59,8 +53,6 @@ public class SubscriptionMessageBuilder {
             new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_NOTIFY_TO);
     private static final QName ATT_DIALECT =
             new QName(XMLConfigConstants.NULL_NAMESPACE, EventingConstants.WSE_EN_DIALECT);
-    private static final QName ATT_XPATH =
-            new QName(XMLConfigConstants.NULL_NAMESPACE, EventingConstants.WSE_EN_XPATH);
     private static final QName IDENTIFIER =
             new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_IDENTIFIER);
     private static final QName EXPIRES =
@@ -134,15 +126,12 @@ public class SubscriptionMessageBuilder {
             if (deliveryElem != null) {
                 notifyToElem = deliveryElem.getFirstChildWithName(NOTIFY_TO_QNAME);
                 if (notifyToElem != null) {
-                    Endpoint ep = getEndpointFromWSAAddress(notifyToElem.getFirstElement());
-                    if (ep != null) {
-                        subscription = new SynapseSubscription(
-                                EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
-                        subscription.setEndpoint(ep);
-                        subscription.setAddressUrl(notifyToElem.getFirstElement().getText());
-                        subscription.setEndpointUrl(notifyToElem.getFirstElement().getText());
-                        subscription.setSubManagerURI(mc.getTo().getAddress());
-                    }
+                    subscription = new SynapseSubscription(
+                            EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
+                    subscription.setAddressUrl(notifyToElem.getFirstElement().getText());
+                    subscription.setEndpointUrl(notifyToElem.getFirstElement().getText());
+                    subscription.setSubManUrl(mc.getTo().getAddress());
+
                 } else {
                     handleException("NotifyTo element not found in the subscription message");
                 }
@@ -154,27 +143,8 @@ public class SubscriptionMessageBuilder {
             if (subscription != null && filterElem != null) {
                 OMAttribute dialectAttr = filterElem.getAttribute(ATT_DIALECT);
                 if (dialectAttr != null && dialectAttr.getAttributeValue() != null) {
-                    if (SynapseEventingConstants.TOPIC_FILTER_DIALECT
-                            .equals(dialectAttr.getAttributeValue())) {
-                        XPathBasedEventFilter filter = new XPathBasedEventFilter();
-                        filter.setResultValue(filterElem.getText());
-                        if (filterElem.getAttribute(ATT_XPATH) != null) {
-                            try {
-                                SynapseXPath xpath =
-                                        SynapseXPathFactory.getSynapseXPath(filterElem, ATT_XPATH);
-                                filter.setSourceXpath(xpath);
-                            } catch (JaxenException e) {
-                                handleException("Unable to create the SynapseEventFilter xpath", e);
-                            }
-                        }
-                        subscription.setFilter(filter);
-                        SubscriptionData subscriptionData = new SubscriptionData();
-                        subscriptionData.setProperty(SynapseEventingConstants.FILTER_VALUE,
-                                filterElem.getText());
-                        subscriptionData.setProperty(SynapseEventingConstants.FILTER_DIALECT,
-                                dialectAttr.getAttributeValue());
-                        subscription.setSubscriptionData(subscriptionData);
-                    }
+                    subscription.setFilterDialect(dialectAttr.getAttributeValue());
+                    subscription.setFilterValue(filterElem.getText());
                 } else {
                     handleException("Error in creating subscription. Filter dialect not defined");
                 }

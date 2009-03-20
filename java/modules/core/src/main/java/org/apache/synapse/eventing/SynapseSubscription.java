@@ -23,57 +23,24 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.util.UUIDGenerator;
 import org.wso2.eventing.EventingConstants;
 import org.wso2.eventing.Subscription;
+import org.wso2.eventing.SubscriptionData;
 
 /**
  * Bean that keep subscription and subscription metadata.
  */
 public class SynapseSubscription extends Subscription {
 
-    private SynapseEventFilter filter;
-    private Endpoint endpoint;
-    private boolean staticEntry;
-    private String subManagerURI;
 
     public SynapseSubscription() {
         this.setId(UUIDGenerator.getUUID());
         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
-        this.setStaticEntry(false);
+        SubscriptionData subscriptionData = new SubscriptionData();
+        subscriptionData.setProperty(SynapseEventingConstants.STATIC_ENTRY, "false");
+        this.setSubscriptionData(subscriptionData);
     }
 
     public SynapseSubscription(String deliveryMode) {
         this.setId(UUIDGenerator.getUUID());
         this.setDeliveryMode(deliveryMode);
-    }
-
-    public SynapseEventFilter getSynapseFilter() {
-        return filter;
-    }
-
-    public void setFilter(SynapseEventFilter filter) {
-        this.filter = filter;
-    }
-
-    public Endpoint getEndpoint() {
-        return endpoint;
-    }
-
-    public void setEndpoint(Endpoint endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public boolean isStaticEntry() {
-        return staticEntry;
-    }
-
-    public void setStaticEntry(boolean staticEntry) {
-        this.staticEntry = staticEntry;
-    }
-
-    public String getSubManagerURI() {
-        return subManagerURI;
-    }
-
-    public void setSubManagerURI(String subManagerURI) {
-        this.subManagerURI = subManagerURI;
     }
 }

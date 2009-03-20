@@ -84,14 +84,10 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
                 try {
                     s.execute("drop table destinations");
                 } catch (SQLException ignore) {}
-                try {
-                    s.execute("create table destinations(target varchar(10), source int, type varchar(10), category varchar(10))");
-                } catch (SQLException ignore) {}
-                try {
-                    s.execute("insert into destinations values ('svr1', 5, 'GOLD', 'A')");
-                    s.execute("insert into destinations values ('svr2', 5, 'SILVER', 'A')");
-                    s.execute("insert into destinations values ('svr3', 6, 'GOLD', 'B')");
-                } catch (SQLException ignore) {}
+                s.execute("create table destinations(target varchar(10), source int, type varchar(10), category varchar(10))");
+                s.execute("insert into destinations values ('svr1', 5, 'GOLD', 'A')");
+                s.execute("insert into destinations values ('svr2', 5, 'SILVER', 'A')");
+                s.execute("insert into destinations values ('svr3', 6, 'GOLD', 'B')");
                 s.close();
             }
 

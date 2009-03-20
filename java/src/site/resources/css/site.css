@@ -25,7 +25,7 @@ h2{
     background-color:#bcbcbc;
     text-indent:10px;
     margin-left:-15px;
-    margin-right:-5px;
+    margin-right:-15px;
     margin-top:-5px;
     color:#000000;
 }
@@ -176,6 +176,7 @@ p{
     margin-left:194px;
     margin-top:10px;
     padding-left:10px;
+    padding-right:10px;
 }
 .menu-bottom-left{
     background-image:url(../images/apache-synapse-menu-bottom.jpg);

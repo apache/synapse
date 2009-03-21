@@ -53,8 +53,10 @@
             <item name="Documentation" href="docs_index.html">
                 <item name="Quick Start Guide" href="Synapse_QuickStart.html"/>
                 <item name="Samples" href="Synapse_Samples.html"/>
+                <item name="Samples Setup" href="Synapse_Samples_Setup.html"/>
                 <item name="Extending Synapse" href="Synapse_Extending.html"/>
                 <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
+                <item name="Transports" href="transports.html"/>
                 <item name="Javadocs" href="apidocs/index.html"/>
             </item>
             <item name="Previous Versions" href="history.html">

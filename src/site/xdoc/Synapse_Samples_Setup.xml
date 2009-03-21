@@ -591,42 +591,14 @@ synapse.sh -sample &lt;n&gt;</pre>
     <h2 id="fixtransport">
       Configuring Synapse for the FIX Transport
     </h2>
-    <h3 id="fixtransport">
-      Setting up the FIX Transport
-    </h3>
-    <p>
-	To run the FIX samples used in this guide you need a local 
-    <a href="http://www.quickfixj.org">Quickfix/J</a> installation.
-    Download Quickfix/J from <a href="http://www.quickfixj.org/downloads">here</a>.
-    </p>
-    <p>
-      To enable the FIX transport for samples, you need to uncomment the FIX
-      transport sender and FIX transport receiver configurations in the 
-      SYNAPSE_HOME/repository/conf/axis2.xml. Simply locate and uncomment the
-      FIXTransportSender and FIXTransportListener sample configurations. Also
-      add the following jars to the Synapse class path (SYNAPSE_HOME/lib directory).
-    </p>
-	<ul>
-		<li>quickfixj-core.jar</li>
-		<li>quickfixj-msg-fix40.jar</li>
-		<li>quickfixj-msg-fix41.jar</li>
-		<li>quickfixj-msg-fix42.jar</li>
-		<li>quickfixj-msg-fix43.jar</li>
-		<li>quickfixj-msg-fix44.jar</li>
-		<li>mina-core-1.1.0.jar</li>
-		<li>slf4j-api-1.3.0.jar</li>
-        <li>slf4j-jdk14-1.3.0.jar</li>
-    </ul>
-    <p>
-      All these jars are shipped with the Quickfix/J binary distribution.
-    </p>
-    <p/>
     <h3 id="fixsamples">
       Configuring Synapse for FIX Samples
     </h3>
     <p>
-	In order to configure Synapse to run the FIX samples given in this
-	guide you will need to create some FIX configuration files as
+    In order to configure Synapse to run the FIX samples given in this guide you will need to
+    to enable the FIX transport as described in the <a href="transports.html#Setting_up_the_FIX_Transport">transport
+    documentation</a>.
+	In addition you will need to create some FIX configuration files as
 	specified below.
     </p>
     <p>
@@ -738,101 +710,6 @@ synapse.sh -sample &lt;n&gt;</pre>
     refer the <a href="http://www.quickfixj.org/quickfixj/usermanual/usage/configuration.html">Configuring Quickfix/J</a> section of the Quickfix/J 
     documentation.
     </p>
-    <h3 id="fixparameters">
-      FIX Transport Parameters
-    </h3>
-    <p>
-      This is the list of all parameters accepted by the FIX transport. Refer
-      the sample 257 and 258 to see how some of them are used in practice.
-    </p>
-    <ul>
-      <li>
-       transport.fix.AcceptorConfigURL - If a service needs to listen to incoming
-       FIX messages from a remote initiator then Synapse needs to create an acceptor.
-       This parameter should contain the URL of the file which contains the FIX
-       configuration for the acceptor. (See sample 257)
-      </li>
-      
-      <li>
-       transport.fix.InitiatorConfigURL - If a service needs to send FIX messages
-       to a remote acceptor Synapse should create an initiator. This parameter should
-       contain the URL of the file which contains the FIX configuration for the
-       initiator. (See sample 257)
-      </li>
-      
-      <li>
-       transport.fix.AcceptorMessageStore - The type of message store to be used
-       with the acceptor. Allowed values for this parameter are 'file', 'jdbc', 'memory'
-       and 'sleepycat'. If not specified memory based message store will be used by
-       default. Additional parameters required to configure each of the message stores
-       should be specified in the acceptor configuration file.
-      </li>
-
-      <li>
-       transport.fix.InitiatorMessageStore - Same as the above but applies only
-       for the initiators. Additional parameters required to configure each of
-       the message stores should be specified in the initiator configuration file.
-      </li>
-
-      <li>
-       transport.fix.AcceptorLogFactory - Specifies the transport level log factory
-       to be used to log messages going through the acceptor. FIX messages are logged
-       without putting them in SOAP envelopes at this level. Accepted values are
-       'console', 'file' and 'jdbc'. If not specified no logging will be done at the transport
-       level. Additional parameters required to configure each of the lof factories should be
-       specified in the acceptor configuration file.
-      </li>
-
-      <li>
-       transport.fix.InitiatorLogFactory - Specifies the transport level log factory
-       to be used to log messages going through the initiator. Functionality is similar
-       to the above. Additional parameters required to configure each of the lof factories
-       should be specified in the initiator configuration file.
-      </li>
-
-      <li>
-       transport.fix.ResponseDeliverToCompID - If a response FIX message sent from
-       Synapse to a remote FIX engine should be forwarded from the remote engine to
-       another party this parameter can be used to set the DeliverToCompID field
-       of the messages at Synapse.
-      </li>
-
-      <li>
-       transport.fix.ResponseDeliverToSubID -If a response FIX message sent from
-       Synapse to a remote FIX engine should be forwarded from the remote engine to
-       another party this parameter can be used to set the DeliverToSubID field
-       of the messages at Synapse.
-      </li>
-
-      <li>
-       transport.fix.ResponseDeliverToLocationID - If a response FIX message sent from
-       Synapse to a remote FIX engine should be forwarded from the remote engine to
-       another party this parameter can be used to set the DeliverToLocationID field
-       of the messages at Synapse.
-      </li>
-
-      <li>
-       transport.fix.ServiceName - Used when messages coming over a different protocol
-       has to be forwarded over FIX. The value must be equal to the name of the service
-       and the scope must be 'axis2-client' (See sample 258)
-      </li>
-
-      <li>
-       transport.fix.SendAllToInSequence - When there are multiple responses to a FIX
-       request and when we need only one of them to be sent to the original requester
-       this parameter has to be set to 'false'. This mostly comes handy when the original
-       requester is communicating over a different protocol (like HTTP). If this parameter
-       is not set to 'false' at such scenarios messages might get into a loop. (See
-       sample 258)
-      </li>
-
-      <li>
-       transport.fix.BeginStringValidation - When the FIX messages sent to Synapse should not
-       be forwarded to a FIX session with a different BeginString value this parameter can be
-       set to 'true'. Setting this parameter to 'true' will enforce this restriction.
-      </li>
-    </ul>
-    <p/>
     <h2 id="script">
       Configuring Synapse for Script Mediator Support
     </h2>

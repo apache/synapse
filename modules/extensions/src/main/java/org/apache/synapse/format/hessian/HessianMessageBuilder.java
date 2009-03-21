@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import javax.activation.DataHandler;
@@ -94,6 +95,9 @@ public class HessianMessageBuilder implements Builder {
             }
             OMText textData = factory.createOMText(dataHandler, true);
             element.addChild(textData);
+            
+            // indicate that message faults shall be handled as http 200
+            messageContext.setProperty(NhttpConstants.FAULTS_AS_HTTP_200, NhttpConstants.TRUE);
 
         } catch (IOException e) {
             String msg = "Unable to create the HessianDataSource";

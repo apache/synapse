@@ -82,7 +82,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>2.1-alpha-2</version>
                 <configuration>
                     <warName>synapse</warName>
                     <archive>
@@ -91,7 +91,7 @@
                     <outputDirectory>target</outputDirectory>
                     <webResources>
                         <resource>
-                            <directory>repository</directory>
+                            <directory>../../repository</directory>
                             <targetPath>WEB-INF/repository</targetPath>
                             <excludes>
                                 <exclude>conf/web.xml</exclude>
@@ -116,7 +116,7 @@
                             <!--</includes>-->
                         <!--</resource>-->
                         <resource>
-                            <directory>modules/core/src/main/resources</directory>
+                            <directory>../core/src/main/resources</directory>
                             <targetPath>WEB-INF/classes</targetPath>
                             <includes>
                                 <include>log4j.properties</include>
@@ -126,14 +126,14 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/mar/target</directory>
+                            <directory>../mar/target</directory>
                             <targetPath>WEB-INF/repository/modules</targetPath>
                             <includes>
                                 <include>synapse-${synapse.version}.mar</include>
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/war/target/temp/lib</directory>
+                            <directory>target/temp/lib</directory>
                             <targetPath>WEB-INF/repository/modules</targetPath>
                             <includes>
                                 <include>addressing-${addressing.version}.mar</include>
@@ -142,14 +142,14 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/distribution/src/main/release/docs</directory>
+                            <directory>../distribution/src/main/release/docs</directory>
                             <targetPath>docs</targetPath>
                             <includes>
                                 <include>release_notes.txt</include>
                             </includes>
                         </resource>
                         <resource>
-                            <directory>src/site/resources</directory>
+                            <directory>../../src/site/resources</directory>
                             <targetPath>docs</targetPath>
                             <includes>
                                 <include>Synapse_Configuration_Language.html</include>
@@ -196,35 +196,35 @@
                             <!--</includes>-->
                         <!--</resource>-->
                         <resource>
-                            <directory>modules/core/target</directory>
+                            <directory>../core/target</directory>
                             <targetPath>WEB-INF/lib</targetPath>
                             <includes>
                                 <include>synapse-core-${synapse.version}.jar</include>
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/samples/target</directory>
+                            <directory>../samples/target</directory>
                             <targetPath>WEB-INF/lib</targetPath>
                             <includes>
                                 <include>synapse-samples-${synapse.version}.jar</include>
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/extensions/target</directory>
+                            <directory>../extensions/target</directory>
                             <targetPath>WEB-INF/lib</targetPath>
                             <includes>
                                 <include>synapse-extensions-${synapse.version}.jar</include>
                             </includes>
                         </resource>
                         <resource>
-                            <directory>modules/transports/target</directory>
+                            <directory>../transports/target</directory>
                             <targetPath>WEB-INF/lib</targetPath>
                             <includes>
                                 <include>synapse-transports-${synapse.version}.jar</include>
                             </includes>
                         </resource>
                         <resource>
-                            <directory>repository/conf</directory>
+                            <directory>../../repository/conf</directory>
                             <targetPath>WEB-INF/conf</targetPath>
                             <includes>
                                 <include>axis2.xml</include>
@@ -232,7 +232,7 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>repository/conf</directory>
+                            <directory>../../repository/conf</directory>
                             <targetPath>WEB-INF</targetPath>
                             <includes>
                                 <include>web.xml</include>

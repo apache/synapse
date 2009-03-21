@@ -431,27 +431,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             HTTP.CONTENT_TYPE,
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
-        // return http 500 when a SOAP fault is returned
-        if (msgContext.getEnvelope().getBody().hasFault() || msgContext.isProcessingFault()) {
-            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        }
-
-        // if this is a dummy message to handle http 202 case with non-blocking IO
-        // set the status code to 202 and the message body to an empty byte array (see below)
-        if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
-            response.setStatusCode(HttpStatus.SC_ACCEPTED);
-        } else {
-            Object statusCode = msgContext.getProperty(NhttpConstants.HTTP_SC);
-            if (statusCode != null) {
-                try {
-                    response.setStatusCode(Integer.parseInt(
-                            msgContext.getProperty(NhttpConstants.HTTP_SC).toString()));
-                } catch (NumberFormatException e) {
-                    log.warn("Unable to set the HTTP Status Code from " +
-                            "the property HHTP_SC with value : " + statusCode);
-                }
-            }
-        }
+        response.setStatusCode(determineHttpStatusCode(msgContext, response));
 
         // set any transport headers
         Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
@@ -472,8 +452,11 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());
             OutputStream out = worker.getOutputStream();
 
+            /* 
+             * if this is a dummy message to handle http 202 case with non-blocking IO
+             * write an empty byte array as body
+             */ 
             if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
-                // see comment above on the reasoning
                 out.write(new byte[0]);
             } else {
                 messageFormatter.writeTo(msgContext, format, out, false);
@@ -519,6 +502,67 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 is.close();
             } catch (IOException ignore) {}
         }
+    }
+
+    /**
+     * Determine the HttpStatusCodedepending on the message type processed <br>
+     * (normal response versus fault response) as well as Axis2 message context properties set
+     * via Synapse configuration or MessageBuilders.
+     * 
+     * @see NhttpConstants.FAULTS_AS_HTTP_200
+     * @see NhttpConstants.HTTP_SC
+     * 
+     * @param msgContext the Axis2 message context 
+     * @param response the HTTP response object
+     * 
+     * @return the HTTP status code to set in the HTTP response object
+     */
+    private int determineHttpStatusCode(MessageContext msgContext, HttpResponse response) {
+        
+        int httpStatus = HttpStatus.SC_OK;
+        
+        // retrieve original status code (if present)
+        if (response.getStatusLine() != null) {
+            httpStatus = response.getStatusLine().getStatusCode();
+        }
+        
+        // if this is a dummy message to handle http 202 case with non-blocking IO
+        // set the status code to 202
+        if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
+            httpStatus = HttpStatus.SC_ACCEPTED;
+        } else {            
+            
+            // is this a fault message
+            boolean handleFault = 
+                msgContext.getEnvelope().getBody().hasFault() || msgContext.isProcessingFault();
+            
+            // shall faults be transmitted with HTTP 200
+            boolean faultsAsHttp200 =
+                NhttpConstants.TRUE.equals(
+                    msgContext.getProperty(NhttpConstants.FAULTS_AS_HTTP_200));
+            
+            // Set HTTP status code to 500 if this is a fault case and we shall not use HTTP 200
+            if (handleFault && !faultsAsHttp200) {
+                httpStatus = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+            }
+            
+            /* 
+             * Any status code previously set shall be overwritten with the value of the following
+             * message context property if it is set. 
+             */
+            Object statusCode = msgContext.getProperty(NhttpConstants.HTTP_SC);
+            if (statusCode != null) {
+                try {
+                    httpStatus = Integer.parseInt(
+                            msgContext.getProperty(NhttpConstants.HTTP_SC).toString());
+                } catch (NumberFormatException e) {
+                    log.warn("Unable to set the HTTP status code from the property " 
+                            + NhttpConstants.HTTP_SC + " with value: " + statusCode);
+                }
+            }
+        }
+        
+        return httpStatus;
     }
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {

@@ -19,14 +19,15 @@
 
 package org.apache.synapse.mediators.spring;
 
-import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.config.Entry;
-import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.Entry;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -40,7 +41,7 @@ import org.springframework.core.io.InputStreamResource;
  * refers to a Spring bean name, and also either a Spring configuration defined to Synapse
  * or an inlined Spring configuration.
  */
-public class SpringMediator extends AbstractMediator {
+public class SpringMediator extends AbstractMediator implements ManagedLifecycle {
 
     /**
      * The Spring bean ref to be used

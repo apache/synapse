@@ -36,7 +36,7 @@ import java.util.List;
  * the given list of cases. This is actually a list of sequences, and depending on the
  * selected case, the selected sequence gets executed.
  */
-public class SwitchMediator extends AbstractMediator {
+public class SwitchMediator extends AbstractMediator implements ManagedLifecycle {
 
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private SynapseXPath source = null;

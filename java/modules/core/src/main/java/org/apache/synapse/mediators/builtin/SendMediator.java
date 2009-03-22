@@ -88,14 +88,12 @@ public class SendMediator extends AbstractMediator {
         this.endpoint = endpoint;
     }
 
-    @Override
     public void init(SynapseEnvironment synapseEnvironment) {
         if (endpoint instanceof ManagedLifecycle) {
             ((ManagedLifecycle) endpoint).init(synapseEnvironment);
         }
     }
 
-    @Override
     public void destroy() {
         if (endpoint instanceof ManagedLifecycle) {
             ((ManagedLifecycle) endpoint).destroy();

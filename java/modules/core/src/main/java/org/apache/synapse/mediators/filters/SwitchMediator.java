@@ -45,7 +45,6 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
     /** The default switch case, if any */
     private SwitchCase defaultCase = null;
 
-    @Override
     public void init(SynapseEnvironment se) {
         for (ManagedLifecycle swCase : cases) {
             swCase.init(se);
@@ -55,7 +54,6 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
         }
     }
 
-    @Override
     public void destroy() {
         for (ManagedLifecycle swCase : cases) {
             swCase.destroy();

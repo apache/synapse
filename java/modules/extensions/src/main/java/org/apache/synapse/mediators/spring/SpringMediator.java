@@ -162,4 +162,7 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
         MessageContext synCtx = se.createMessageContext();
         buildAppContext(synCtx, getLog(synCtx));
     }
+
+    public void destroy() {
+    }
 }

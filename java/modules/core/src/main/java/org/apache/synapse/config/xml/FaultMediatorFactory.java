@@ -34,12 +34,12 @@ import java.net.URISyntaxException;
  * <p>
  * Configuration syntax:
  * <pre>
- * &lt;makefault [version="soap11|soap12|pox"] response=("true"|"false")&gt;
- *   &lt;code (value="literal" | expression="xpath")/&gt;?
- *   &lt;reason (value="literal" | expression="xpath")&gt;?
- *   &lt;node&gt;?
- *   &lt;role&gt;?
- *   &lt;detail&gt;?
+ * &lt;makefault [version="soap11|soap12|pox"] [response="true|false"]&gt;
+ *   &lt;code (value="literal" | expression="xpath")/&gt;
+ *   &lt;reason (value="literal" | expression="xpath")/&gt;
+ *   &lt;node&gt;...&lt;/node&gt;?
+ *   &lt;role&gt;...&lt;/role&gt;?
+ *   (&lt;detail expression="xpath"/&gt; | &lt;detail&gt;...&lt;/detail&gt;)?
  * &lt;/makefault&gt;
  * </pre>
  */

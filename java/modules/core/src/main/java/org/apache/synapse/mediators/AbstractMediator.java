@@ -24,14 +24,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.AspectConfiguration;
-import org.apache.synapse.core.SynapseEnvironment;
 
 /**
  * This is the superclass of all mediators, and defines common logging, tracing other aspects
  * for all mediators who extend from this.
  * elements of a mediator class.
  */
-public abstract class AbstractMediator implements Mediator, AspectConfigurable, ManagedLifecycle {
+public abstract class AbstractMediator implements Mediator, AspectConfigurable {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
     protected Log log;
@@ -309,11 +308,5 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable, 
      */
     public AspectConfiguration getAspectConfiguration() {
         return aspectConfiguration;
-    }
-
-    public void init(SynapseEnvironment se) {
-    }
-
-    public void destroy() {
     }
 }

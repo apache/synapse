@@ -253,7 +253,6 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         this.target = target;
     }
 
-    @Override
     public void init(SynapseEnvironment se) {
         if (target != null) {
             Endpoint endpoint = target.getEndpoint();
@@ -267,7 +266,6 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         }
     }
 
-    @Override
     public void destroy() {
         if (target != null) {
             Endpoint endpoint = target.getEndpoint();

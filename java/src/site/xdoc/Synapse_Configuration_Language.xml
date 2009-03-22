@@ -1355,10 +1355,10 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </h4>
 <pre xml:space="preserve"> &lt;makefault [version="soap11|soap12|pox"] [response="true|false"]&gt;
    &lt;code (value="literal" | expression="xpath")/&gt;
-   &lt;reason (value="literal" | expression="xpath")&gt;
-   &lt;node&gt;?
-   &lt;role&gt;?
-   &lt;detail&gt;?
+   &lt;reason (value="literal" | expression="xpath")/&gt;
+   &lt;node&gt;...&lt;/node&gt;?
+   &lt;role&gt;...&lt;/role&gt;?
+   (&lt;detail expression="xpath"/&gt; | &lt;detail&gt;...&lt;/detail&gt;)?
  &lt;/makefault&gt;</pre>
     <p>
       The &lt;makefault&gt; mediator transforms the current message into a fault
@@ -1370,6 +1370,8 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       1.2 or POX fault. At the same time if you specify the optional response
       attribute value as 'true' makefault will mark the mesage as a response
       regardless of whether the message is a request or a response.
+      The optional &lt;node&gt;, &lt;role&gt; and &lt;detail&gt; directives can
+      be used to set the corresponding elements in the resulting SOAP fault.
     </p>
     <p/>
     <h4>

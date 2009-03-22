@@ -1,20 +1,21 @@
 package org.apache.synapse.mediators.eip;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axis2.AxisFault;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axis2.AxisFault;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA. User: ruwan Date: Oct 3, 2007 Time: 7:26:09 AM To change this template
  * use File | Settings | File Templates.
  */
-public class SplitTestHelperMediator extends AbstractMediator {
+public class SplitTestHelperMediator extends AbstractMediator implements ManagedLifecycle {
 
     private List mediatedContext = new ArrayList();
     int msgcount;

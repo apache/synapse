@@ -24,6 +24,7 @@ import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.saaj.util.SAAJUtil;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
@@ -57,7 +58,7 @@ import java.io.IOException;
  *
  * @see org.apache.synapse.Mediator
  */
-public class CacheMediator extends AbstractMediator {
+public class CacheMediator extends AbstractMediator implements ManagedLifecycle {
 
     private String id = null;
     private String scope = CachingConstants.SCOPE_PER_HOST;// global

@@ -23,14 +23,15 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
@@ -50,7 +51,7 @@ import java.util.List;
  *      <target xpath="expression" | key="string"/>
  * </callout>
  */
-public class CalloutMediator extends AbstractMediator {
+public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
 
     private ServiceClient sc = null;
     private String serviceURL = null;
@@ -178,7 +179,6 @@ public class CalloutMediator extends AbstractMediator {
         return null;
     }
 
-    @Override
     public void init(SynapseEnvironment synEnv) {
         try {
             ConfigurationContext cfgCtx
@@ -193,7 +193,6 @@ public class CalloutMediator extends AbstractMediator {
         }
     }
 
-    @Override
     public void destroy() {
         try {
             sc.cleanup();

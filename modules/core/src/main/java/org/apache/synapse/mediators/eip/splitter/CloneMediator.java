@@ -153,7 +153,6 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         this.targets.add(target);
     }
 
-    @Override
     public void init(SynapseEnvironment se) {
 
         for (Target target : targets) {
@@ -168,7 +167,6 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         }
     }
 
-    @Override
     public void destroy() {
 
         for (Target target : targets) {

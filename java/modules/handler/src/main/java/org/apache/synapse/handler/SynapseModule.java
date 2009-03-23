@@ -19,22 +19,22 @@
 
 package org.apache.synapse.handler;
 
-import org.apache.axis2.modules.Module;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.AxisModule;
-import org.apache.axis2.description.AxisDescription;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.AxisFault;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.Policy;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.core.axis2.SynapseInitializationModule;
-import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.AxisDescription;
+import org.apache.axis2.description.AxisModule;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.modules.Module;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.SynapseInitializationModule;
 
 import java.io.File;
 
@@ -74,14 +74,14 @@ public class SynapseModule implements Module {
             Parameter synapseXml = configurationContext.getAxisConfiguration().getParameter(
                     SynapseConstants.Axis2Param.SYNAPSE_CONFIG_LOCATION);
             if (synapseHome != null && synapseHome.getValue() != null) {
-                ServerManager.getInstance().getInformation().setSynapseHome(synapseHome.getValue().toString());
+                ServerManager.getInstance().getConfigurationInformation().setSynapseHome(synapseHome.getValue().toString());
             }
             if (synapseXml != null && synapseXml.getValue() != null) {
-                ServerManager.getInstance().getInformation().setSynapseXMLLocation(synapseXml.getValue().toString());
+                ServerManager.getInstance().getConfigurationInformation().setSynapseXMLLocation(synapseXml.getValue().toString());
             }
         }
 
-        if (new File(ServerManager.getInstance().getInformation().getSynapseXMLLocation()).exists()) {
+        if (new File(ServerManager.getInstance().getConfigurationInformation().getSynapseXMLLocation()).exists()) {
             initializationModule = new org.apache.synapse.core.axis2.SynapseInitializationModule();
             initializationModule.init(configurationContext, axisModule);
 
@@ -107,7 +107,7 @@ public class SynapseModule implements Module {
         } else {
             handleException("Unable to initialize the Synapse initializationModule. Couldn't " +
                     "find the configuration file in the location "
-                    + ServerManager.getInstance().getInformation().getSynapseXMLLocation());
+                    + ServerManager.getInstance().getConfigurationInformation().getSynapseXMLLocation());
         }
     }
 

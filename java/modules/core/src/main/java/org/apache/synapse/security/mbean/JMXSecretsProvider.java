@@ -18,19 +18,19 @@
  */
 package org.apache.synapse.security.mbean;
 
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * SecretsMBean implemetaion
  */
-public class SecretsMBeanImplementation implements SecretsMBean {
+public class JMXSecretsProvider implements JMXSecretsProviderMBean {
 
-    private static final Log log = LogFactory.getLog(SecretsMBeanImplementation.class);
+    private static final Log log = LogFactory.getLog(JMXSecretsProvider.class);
     /* Secrets map - id vs secret */
     private final Map<String, String> secrets = new HashMap<String, String>();
 

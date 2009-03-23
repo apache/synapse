@@ -20,6 +20,7 @@ package org.apache.synapse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.util.MBeanRegistrar;
 
 /**
  * This is the core class that starts up a Synapse instance.
@@ -72,7 +73,7 @@ public class ServerManager {
                 .createSynapseController(configurationInformation);
 
         this.initialized = true;
-
+        registerMBean();
         doInit();
         return this.contextInformation.getServerState();
     }
@@ -200,6 +201,11 @@ public class ServerManager {
             log.error(msg);
             throw new SynapseException(msg);
         }
+    }
+
+    private void registerMBean() {
+        MBeanRegistrar.getInstance().registerMBean(new ServerManagerView(),
+                "ServerManager", "ServerManager");
     }
 
     /**

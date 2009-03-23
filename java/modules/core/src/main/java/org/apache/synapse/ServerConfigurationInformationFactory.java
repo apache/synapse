@@ -163,7 +163,7 @@ public class ServerConfigurationInformationFactory {
                 org.apache.axis2.Constants.AXIS2_REPO, true));
         information.setAxis2Xml(loadParameter(servletConfig,
                 org.apache.axis2.Constants.AXIS2_CONF, true));
-        information.setSynapseHome(loadParameter(servletConfig,
+        information.setServerName(loadParameter(servletConfig,
                 SynapseConstants.SERVER_NAME, false));
         information.setDeploymentMode(loadParameter(servletConfig,
                 SynapseConstants.DEPLOYMENT_MODE, false));

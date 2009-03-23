@@ -18,28 +18,28 @@
  */
 package org.apache.synapse.security.secret.handler;
 
+import org.apache.synapse.commons.util.MBeanRegistrar;
 import org.apache.synapse.commons.util.secret.AbstractSecretCallbackHandler;
 import org.apache.synapse.commons.util.secret.SingleSecretCallback;
-import org.apache.synapse.commons.util.MBeanRegistrar;
-import org.apache.synapse.security.mbean.SecretsMBeanImplementation;
+import org.apache.synapse.security.mbean.JMXSecretsProvider;
 
 /**
  * Get and propagates secrets that have been colleted through JMX Mean
  */
 public class JMXSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
-    private static SecretsMBeanImplementation secretsMBean;
+    private static JMXSecretsProvider JMXSecretsMBean;
 
     static {
-        secretsMBean = new SecretsMBeanImplementation();
-        MBeanRegistrar.getInstance().registerMBean(secretsMBean, "SecretsMBean",
-                "SecretsMBean");
+        JMXSecretsMBean = new JMXSecretsProvider();
+        MBeanRegistrar.getInstance().registerMBean(JMXSecretsMBean, "SecretsProvider",
+                "SecretsProvider");
     }
 
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
         String id = singleSecretCallback.getId();
         if (id != null && !"".equals(id)) {
-            singleSecretCallback.setSecret(secretsMBean.getSecret(id));
+            singleSecretCallback.setSecret(JMXSecretsMBean.getSecret(id));
         }
     }
 }

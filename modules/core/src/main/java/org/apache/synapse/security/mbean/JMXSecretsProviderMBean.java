@@ -21,7 +21,7 @@ package org.apache.synapse.security.mbean;
 /**
  * Managing MBean for secrct
  */
-public interface SecretsMBean {
+public interface JMXSecretsProviderMBean {
 
     /**
      * Add a secret through JMX

@@ -80,34 +80,12 @@ public class SynapseControllerFactory {
             fatal("Server Configuration Information is null");
         }
 
-        String synapseHome = information.getSynapseHome();
-        if (synapseHome == null || !new File(synapseHome).exists()) {
-            fatalOnParameterValidationFailure("Synapse home");
-        } else {
-            log.info("Using Synapse home as : " + synapseHome);
-        }
-
+        validatePath("Synapse home", information.getSynapseHome());
         if (information.isCreateNewInstance()) {
-            String axis2Repolocation = information.getAxis2RepoLocation();
-            if (axis2Repolocation == null || !new File(axis2Repolocation).exists()) {
-                fatalOnParameterValidationFailure("Axis2 repository");
-            } else {
-                log.info("Using the Axis2 Repository : " +
-                        new File(axis2Repolocation).getAbsolutePath());
-            }
-
-            String axis2Xml = information.getAxis2Xml();
-            if (axis2Xml == null || !new File(axis2Xml).exists()) {
-                fatalOnParameterValidationFailure("axis2.xml location");
-            } else {
-                log.info("Using the axis2.xml : " + new File(axis2Xml).getAbsolutePath());
-            }
+            validatePath("Axis2 repository", information.getAxis2RepoLocation());
+            validatePath("axis2.xml location", information.getAxis2Xml());
         }
-
-        String synapseXMLPath = information.getSynapseXMLLocation();
-        if (synapseXMLPath == null || !new File(synapseXMLPath).exists()) {
-            fatalOnParameterValidationFailure("synapse.xml path");
-        }
+        validatePath("synapse.xml location", information.getSynapseXMLLocation());
 
         String serverName = information.getServerName();
         if (serverName == null) {
@@ -128,10 +106,14 @@ public class SynapseControllerFactory {
                 (SynapseConfigUtils.getTimeoutHandlerInterval() / 1000) + "s");
     }
 
-    private static void fatalOnParameterValidationFailure(String msgPre) {
-        String msg = "The " + msgPre + " must be set as a system property or init-parameter";
-        log.fatal(msg);
-        throw new SynapseException(msg);
+    private static void validatePath(String msgPre, String path) {
+        if (path == null) {
+            fatal("The " + msgPre + " must be set as a system property or init-parameter");
+        } else if (!new File(path).exists()) {
+            fatal("The " + msgPre + " " + path + " doesn't exist");
+        } else {
+            log.info("Using " + msgPre + " : " + new File(path).getAbsolutePath());
+        }
     }
 
     private static void fatal(String msg) {

@@ -6,15 +6,15 @@ package org.apache.synapse.security.secret;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.secret.*;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.security.definition.factory.KeyStoreInformationFactory;
+import org.apache.synapse.security.mbean.SecretManagerAdmin;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
-import org.apache.synapse.security.mbean.SecretManagerAdmin;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.util.MBeanRegistrar;
-import org.apache.synapse.commons.util.secret.*;
 
 import java.util.Properties;
 
@@ -46,6 +46,13 @@ public class SecretManager {
     /* Prompt for identity store private key password*/
     private final static String IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT
             = "Identity Store Private Key Password > ";
+    /* ID for trust store password*/
+    private final static String TRUSTSTORE_PASSWORD_ID = "trust.store.pass";
+    /* ID for identity store password*/
+    private final static String IDENTITYSTORE_PASSWORD_ID = "identity.store.pass";
+    /* ID for identity store private key password*/
+    private final static String IDENTITYSTORE_PRIVATE_KEY_PASSWORD_ID
+            = "identity.key.pass";
     /* Dot string */
     private final static String DOT = ".";
 
@@ -134,11 +141,14 @@ public class SecretManager {
 
         // Creating required password class backs
         SingleSecretCallback trustStorePassSecretCallback
-                = new SingleSecretCallback(TRUSTSTORE_PASSWORD_PROMPT);
+                = new SingleSecretCallback(TRUSTSTORE_PASSWORD_PROMPT,
+                TRUSTSTORE_PASSWORD_ID);
         SingleSecretCallback identityStorePassSecretCallback
-                = new SingleSecretCallback(IDENTITYSTORE_PASSWORD_PROMPT);
+                = new SingleSecretCallback(IDENTITYSTORE_PASSWORD_PROMPT,
+                IDENTITYSTORE_PASSWORD_ID);
         SingleSecretCallback identityKeyPassSecretCallback
-                = new SingleSecretCallback(IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT);
+                = new SingleSecretCallback(IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT,
+                IDENTITYSTORE_PRIVATE_KEY_PASSWORD_ID);
 
         // Group all as a one callback
         MultiSecretCallback callback = new MultiSecretCallback();
@@ -159,8 +169,10 @@ public class SecretManager {
         trustStorePass = trustStorePassSecretCallback.getSecret();
 
         if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
-            log.info("Either Identity or Trust keystore password is mandotory" +
+            if (log.isDebugEnabled()) {
+                log.info("Either Identity or Trust keystore password is mandotory" +
                         " in order to initialized secret manager.");
+            }
             return;
         }
 

@@ -779,6 +779,133 @@ synapse.sh -sample &lt;n&gt;</pre>
       the required database driver jars to the Synapse classpath.
     </p>
     <p/>
+        <h2>Key Stores Configurations</h2>
+
+<div>
+<p>This configuration is to be used in any location that needs key stores. This is currently used
+    for creating https URL connections and configuring secret manager. This configuration can be
+    specified on synapse.properties. Following shows a sample.
+</p>
+
+<div>
+    <p>
+        <strong>KeyStores configurations
+            <br/>
+        </strong>
+    </p>
+    <pre># KeyStores configurations
+
+        keystore.identity.location=lib/identity.jks
+        keystore.identity.type=JKS
+        keystore.identity.alias=synapse
+        keystore.identity.storePassword=password
+        keystore.identity.keyPassword=password
+        #keystore.identity.parameters=enableHostnameVerifier=false;keyStoreCertificateFilePath=/home/esb.cer
+
+        keystore.trust.location=lib/trust.jks
+        keystore.trust.type=JKS
+        keystore.trust.alias=synapse
+        keystore.trust.storePassword=password
+        #keystore.trust.parameters=enableHostnameVerifier=false;keyStoreCertificateFilePath=/home/esb.cer
+
+    </pre>
+</div>
+<p>Note: In the case where use for configuring key store for secret manager, the passwords in the
+    above configurations act as only just alias. There are some mechanisms that can be used to
+    provide actual password for these aliases. Those are described under <strong>Securing Password</strong>.</p>
+</div>
+        <h2>Securing Password</h2>
+
+<div>
+<p>All secrets are managed using Secret Manager. Secret Manager keeps any number of secret
+    repositories.
+    Those are arranged in a cascade manger. Secrets can be accessed by providing alias for those.
+
+    Key Stores needed for Secret Manager and secret repositories need to be configured according to
+    the <strong>Key Stores Configurations</strong>. In this case, all the passwords in the key store configuration
+    contains only alias to refer actual password. For example
+    keystore.identity.storePassword=password
+    Here <strong>password</strong> is an alias and to be used to get actual password
+
+    In order to resolve above passwords (i.e. to get actual passwords); it is needed to provide a
+    ?password provider? for secret manager. In future, this will be moved into key store
+    configurations itself .This can be done by adding property to <strong>synapse.properties</strong>
+
+</p>
+
+<div>
+    <p>
+        <strong>Secret manager password provider
+            <br/>
+        </strong>
+    </p>
+    <pre>
+        secretManager.passwordProvider=org.apache.synapse.security.secret.handler.JMXSecretCallbackHandler
+    </pre>
+</div>
+<p>Note: In the case where use for configuring key store for secret manager, the passwords in the
+    above configurations act as only just alias. There are some mechanisms that can be used to
+    provide actual password for these aliases. Those are described under <strong>Securing Password</strong>.
+</p>
+<p>
+    The  <strong>password provider</strong> should be an implementation of
+     <strong>org.apache.synapse.commons.util.secret.SecretCallbackHandler</strong>.Synapse ships three
+    implementations that can be used for this purpose.
+
+    <ul>
+        <li>
+            org.apache.synapse.security.secret.handler.JMXSecretCallbackHandler
+        </li>
+        <li>
+            org.apache.synapse.security.secret.handler.JlineSecretCallbackHandler
+        </li>
+        <li>
+            org.apache.synapse.security.secret.handler.HardCodedSecretCallbackHandler
+        </li>
+    </ul>
+</p>
+ <p>Secret repository can be configured using <strong>synape.properties</strong>.</p>
+<div>
+    <p>
+        <strong>Secret repositories
+            <br/>
+        </strong>
+    </p>
+    <pre>secretRepositories=file
+
+        secretRepositories.file.provider=org.apache.synapse.security.secret.repository.filebased.FileBaseSecretRepositoryProvider
+        secretRepositories.file.location=cipher-text.properties
+
+    </pre>
+</div>
+<p>
+    Currently, there is only one secret repository and it is  <strong>FileBaseSecretRepository</strong>. It use
+    <strong>cipher-text.properties</strong> to keep secrets. A sample file is shown bellow.
+
+</p>
+<div>
+    <p>
+        <strong>Sample cipher-text.properties
+            <br/>
+        </strong>
+    </p>
+    <pre>aliases=synapse
+
+        # configuration per each plaintext
+        synapse.secret=EsY65tztE9R5b9pErVxLp8Br5d3ol6vRdWAkYHdc7XkZteGf37VJ+iNlCenqxYSEto0vcjpcmmzwf7K2wd9u3KQtVGKEoNLSe2LYZtrm3tKmGd6PX9YpdN72ml3JISNXPJ69yybFi6DVUIJfE5MFOd7gswWfCnkmZ3eJ6M1nuiI=
+        synapse.secret.algorithm=RSA
+        synapse.secret.alias=synapse
+        synapse.secret.keystore=identity
+
+
+    </pre>
+</div>
+<p>
+    To run synapse with secret manager, it is needed to set <strong>deployment mode</strong> into
+    <strong>production</strong> and this can be done using wrapper.conf. There is an inline document on that configuration about
+    where to set this value.
+</p>
+</div>
         <h2>Setting up Synapse DataSources</h2>
 
 <div>

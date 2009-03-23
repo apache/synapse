@@ -23,6 +23,8 @@ import org.apache.axiom.om.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.AspectConfigurable;
+import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
@@ -220,6 +222,20 @@ public class ProxyServiceSerializer {
             proxy.addAttribute(fac.createOMAttribute(
                     XMLConfigConstants.TRACE_ATTRIB_NAME, nullNS, traceValue));
         }
+
+        if (service instanceof AspectConfigurable) {
+            StatisticsConfigurable statisticsConfigurable =
+                    service.getAspectConfiguration();
+
+            if (statisticsConfigurable != null &&
+                    statisticsConfigurable.isStatisticsEnable()) {
+
+                proxy.addAttribute(fac.createOMAttribute(
+                        XMLConfigConstants.STATISTICS_ATTRIB_NAME, nullNS,
+                        XMLConfigConstants.STATISTICS_ENABLE));
+            }
+        }
+
         if (parent != null) {
             parent.addChild(proxy);
         }

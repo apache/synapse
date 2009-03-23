@@ -106,7 +106,7 @@ public class ServerManager {
      *
      * @return ServerConfigurationInformation insatnce
      */
-    public ServerConfigurationInformation getInformation() {
+    public ServerConfigurationInformation getConfigurationInformation() {
         assertInitialized();
         return configurationInformation;
     }

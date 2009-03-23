@@ -958,6 +958,30 @@ synapse.datasources.reportds.maxActive=100
 synapse.datasources.reportds.maxIdle=20
 synapse.datasources.reportds.maxWait=10000</pre>
 </div>
+ <p>To secure data sources password, it is need to use secret manager. Please first refer that
+    document before reading this. If the secret manager is used, then passwords that have been
+    specified are considered as aliases and those are used for picking actual passwords. To get
+    password securely, it is needed to set the password provider for each data source.
+    The
+    <strong>password provider</strong>
+    should be an implementation of
+    <strong>org.apache.synapse.commons.util.secret.SecretCallbackHandler</strong>. There are few
+    options but it is
+    recommended to use
+    <strong>org.apache.synapse.security.secret.handler.SecretManagerSecretCallbackHandler</strong>
+    in this case
+    (i.e. securing data source password).
+</p>
+<p>
+<strong>A sample configuration for above
+    <strong>lookupds</strong>
+    data source to use password provider
+    <br/>
+</strong>
+</p>
+<pre>
+synapse.datasources.lookupds.passwordProvider=org.apache.synapse.security.secret.handler.SecretManagerSecretCallbackHandler
+</pre>  
 </div>
 </body>
 </document>

@@ -22,7 +22,8 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -79,6 +80,17 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
             element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (endpointDefinition.isForceSOAP12()) {
             element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        }
+
+        StatisticsConfigurable statisticsConfigurable =
+                endpointDefinition.getAspectConfiguration();
+
+        if (statisticsConfigurable != null &&
+                statisticsConfigurable.isStatisticsEnable()) {
+
+            element.addAttribute(fac.createOMAttribute(
+                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, null,
+                    XMLConfigConstants.STATISTICS_ENABLE));
         }
 
     }

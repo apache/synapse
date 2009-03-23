@@ -22,31 +22,30 @@ package org.apache.synapse.config;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ServerConfigurationInformation;
-import org.apache.synapse.security.definition.KeyStoreInformation;
+import org.apache.synapse.*;
+import org.apache.synapse.aspects.statistics.StatisticsCollector;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
+import org.apache.synapse.security.definition.KeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.security.definition.factory.KeyStoreInformationFactory;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 import org.xml.sax.InputSource;
-
 import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
+import javax.activation.DataHandler;
 import javax.net.ssl.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
-import javax.activation.DataHandler;
 import java.io.*;
 import java.net.*;
-import java.security.NoSuchAlgorithmException;
 import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
 public class SynapseConfigUtils {
@@ -636,7 +635,7 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
-                    serverManager.getInformation();
+                    serverManager.getConfigurationInformation();
             if (information != null) {
                 return information.getSynapseHome();
             }
@@ -648,7 +647,7 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
-                    serverManager.getInformation();
+                    serverManager.getConfigurationInformation();
             if (information != null) {
                 return information.getServerName();
             }
@@ -660,12 +659,39 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
-                    serverManager.getInformation();
+                    serverManager.getConfigurationInformation();
             if (information != null) {
                 return information.getResolveRoot();
             }
         }
         return "";
+    }
+
+    /**
+     * Get the StatisticsCollector from synapse env.
+     *
+     * @return StatisticsCollector instance if there is any
+     */
+    public static StatisticsCollector getStatisticsCollector() {
+
+        ServerManager serverManager = ServerManager.getInstance();
+        if (serverManager.isInitialized()) {
+            ServerContextInformation information =
+                    serverManager.getContextInformation();
+            if (information != null) {
+                Object o = information.getServerContext();
+                if (o instanceof ConfigurationContext) {
+                    ConfigurationContext context = (ConfigurationContext) o;
+                    SynapseEnvironment environment =
+                            (SynapseEnvironment) context.getAxisConfiguration().getParameterValue(
+                                    SynapseConstants.SYNAPSE_ENV);
+                    if (environment != null) {
+                        return environment.getStatisticsCollector();
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public static OMElement stringToOM(String xml) {

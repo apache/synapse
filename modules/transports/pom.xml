@@ -187,14 +187,6 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- Workaround for SYNAPSE-400 -->
-        <dependency>
-            <groupId>org.apache.woden</groupId>
-            <artifactId>woden-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        
         <!-- HTTP transport dependencies -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

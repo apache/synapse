@@ -220,6 +220,7 @@ public class ServerHandler implements NHttpServiceHandler {
                 } else if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
+                    conn.resetOutput();
                     conn.requestInput();
                 }
             }
@@ -241,6 +242,7 @@ public class ServerHandler implements NHttpServiceHandler {
      */
     public void commitResponseHideExceptions(final NHttpServerConnection conn, final HttpResponse response) {
         try {
+            conn.suspendInput();
             httpProcessor.process(response, conn.getContext());
             conn.submitResponse(response);
         } catch (HttpException e) {
@@ -261,6 +263,7 @@ public class ServerHandler implements NHttpServiceHandler {
     public void commitResponse(final NHttpServerConnection conn,
         final HttpResponse response) throws IOException, HttpException {
         try {
+            conn.suspendInput();
             httpProcessor.process(response, conn.getContext());
             conn.submitResponse(response);
         } catch (HttpException e) {

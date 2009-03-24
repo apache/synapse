@@ -128,6 +128,8 @@ public class Axis2Sender {
                     OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
                 fac.createSOAPHeader(messageContext.getEnvelope());
             }
+
+            Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
             
             AxisEngine.send(messageContext);
 

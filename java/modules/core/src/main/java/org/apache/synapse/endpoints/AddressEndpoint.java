@@ -46,7 +46,9 @@ public class AddressEndpoint extends AbstractEndpoint {
     }
 
     public void onSuccess() {
-        getContext().onSuccess();
+        if (getContext() != null) {
+            getContext().onSuccess();
+        }
     }
 
     public void send(MessageContext synCtx) {

@@ -183,7 +183,11 @@ public class Axis2HttpRequest {
                 } else {
                     httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());    
                 }
-                ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(new BasicHttpEntity());
+                BasicHttpEntity entity = new BasicHttpEntity();
+                if (msgContext.isPropertyTrue(NhttpConstants.DISABLE_CHUNKING)) {
+                    entity.setChunked(false);
+                }
+                ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
             }
         }
 

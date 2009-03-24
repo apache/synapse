@@ -113,7 +113,7 @@ public class Axis2FlexibleMEPClient {
 
         // create a new MessageContext to be sent out as this should not corrupt the original
         // we need to create the response to the original message later on
-        MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx);
+        MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx, wsAddressingEnabled);
 
         if (log.isDebugEnabled()) {
             log.debug("Message [Original Request Message ID : " + synapseOutMessageContext.getMessageID()
@@ -317,12 +317,14 @@ public class Axis2FlexibleMEPClient {
         mepClient.execute(true);        
    }
 
-    private static MessageContext cloneForSend(MessageContext ori) throws AxisFault {
+    private static MessageContext cloneForSend(MessageContext ori, boolean wsAddressingEnabled) throws AxisFault {
 
         MessageContext newMC = MessageHelper.clonePartially(ori);
 
-        newMC.setEnvelope(ori.getEnvelope());        
-        MessageHelper.removeAddressingHeaders(newMC);
+        newMC.setEnvelope(ori.getEnvelope());
+        if (wsAddressingEnabled) {
+            MessageHelper.removeAddressingHeaders(newMC);
+        }
 
         newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
             ori.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));

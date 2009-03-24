@@ -331,4 +331,13 @@ public class Axis2FlexibleMEPClient {
 
         return newMC;
     }
+
+    public static void clearSecurtityProperties(Options options) {
+
+        Options current = options;
+        while (current != null && current.getProperty(SynapseConstants.RAMPART_POLICY) != null) {
+             current.setProperty(SynapseConstants.RAMPART_POLICY, null);
+             current = current.getParent();
+        }
+    }
 }

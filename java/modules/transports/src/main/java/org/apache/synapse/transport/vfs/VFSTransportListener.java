@@ -152,40 +152,40 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
         if (log.isDebugEnabled()) {
             log.debug("Scanning directory or file : " + fileURI);
         }
-      
+
         boolean wasError = true;
         int retryCount = 0;
         int maxRetryCount = entry.getMaxRetryCount();
         long reconnectionTimeout = entry.getReconnectTimeout();
-        
-        while(wasError) {
-          try {
-            retryCount++;
-            fileObject = fsManager.resolveFile(fileURI);
-            
-            if(fileObject == null) {
-              log.error("fileObject is null");
-              throw new FileSystemException("fileObject is null");
-            }
-            
-            wasError = false;
-                                
-          } catch(FileSystemException e) {
-            log.error("cannot resolve fileObject", e);
-            if(maxRetryCount <= retryCount)
-              processFailure("cannot resolve fileObject repeatedly: " + e.getMessage(), e, entry);
-              return;
-          }
-        
-          if(wasError) {
+
+        while (wasError) {
             try {
-              Thread.sleep(reconnectionTimeout);
-            } catch (InterruptedException e2) {
-              e2.printStackTrace();
+                retryCount++;
+                fileObject = fsManager.resolveFile(fileURI);
+
+                if (fileObject == null) {
+                    log.error("fileObject is null");
+                    throw new FileSystemException("fileObject is null");
+                }
+
+                wasError = false;
+
+            } catch (FileSystemException e) {
+                log.error("cannot resolve fileObject", e);
+                if (maxRetryCount <= retryCount)
+                    processFailure("cannot resolve fileObject repeatedly: " + e.getMessage(), e, entry);
+                return;
             }
-          }
-        }            
-        
+
+            if (wasError) {
+                try {
+                    Thread.sleep(reconnectionTimeout);
+                } catch (InterruptedException e2) {
+                    e2.printStackTrace();
+                }
+            }
+        }
+
         try {
             if (fileObject.exists() && fileObject.isReadable()) {
 

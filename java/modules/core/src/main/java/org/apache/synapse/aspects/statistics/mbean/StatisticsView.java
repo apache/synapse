@@ -56,6 +56,21 @@ public class StatisticsView implements StatisticsViewMBean {
                 ComponentType.PROXYSERVICE, systemViewStrategy));
     }
 
+    public List<String> getSystemEndpointsStats() {
+        return getAllStatsAsList(
+                this.collector.getStatistics(ComponentType.ENDPOINT, systemViewStrategy));
+    }
+
+    public List<String> getSystemSequncesStats() {
+        return getAllStatsAsList(
+                this.collector.getStatistics(ComponentType.SEQUENCE, systemViewStrategy));
+    }
+
+    public List<String> getSystemProxyServicesStats() {
+        return getAllStatsAsList(
+                this.collector.getStatistics(ComponentType.PROXYSERVICE, systemViewStrategy));
+    }
+
     public void clearAllStatistics() {
         this.collector.clearStatistics();
     }
@@ -68,5 +83,13 @@ public class StatisticsView implements StatisticsViewMBean {
             }
         }
         return returnList;
+    }
+
+    private List<String> getAllStatsAsList(Map<String, Map<String, InOutStatisticsView>> statsMap) {
+        List<String> tobeReturn = new ArrayList<String>();
+        for (Map<String, InOutStatisticsView> viewMap : statsMap.values()) {
+            tobeReturn.addAll(getAsList(viewMap));
+        }
+        return tobeReturn;
     }
 }

@@ -91,6 +91,9 @@ public class StatisticsReporter {
             if (log.isDebugEnabled()) {
                 log.debug("Reporting a fault : " + statisticsRecord);
             }
+            statisticsRecord.collect(
+                    new AspectConfiguration(SynapseConstants.SYNAPSE_ASPECTS),
+                    ComponentType.ANY, true);
             statisticsRecord.setFaultResponse(true);
         }
     }

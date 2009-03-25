@@ -24,14 +24,14 @@ import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
+import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.secret.SecretCallback;
 import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.util.secret.SecretLoadingModule;
-import org.apache.synapse.commons.util.secret.SecretCallback;
 import org.apache.synapse.commons.util.secret.SingleSecretCallback;
-import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * Factory for creating a DataSource based on information in DataSourceInformation
@@ -39,7 +39,7 @@ import java.util.List;
 public class DataSourceFactory {
 
     private final static Log log = LogFactory.getLog(DataSourceFactory.class);
-    private final static String PROMPT = "DataBase Password for ";
+
 
     private DataSourceFactory() {
     }
@@ -76,7 +76,8 @@ public class DataSourceFactory {
             SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
             secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHandler});
             SingleSecretCallback secretCallback =
-                    new SingleSecretCallback(PROMPT + information.getAlias());
+                    new SingleSecretCallback(DataSourceConfigurationConstants.PROMPT,
+                            password);
             SecretCallback[] secretCallbacks = new SecretCallback[]{secretCallback};
             secretLoadingModule.load(secretCallbacks);
             password = secretCallback.getSecret();

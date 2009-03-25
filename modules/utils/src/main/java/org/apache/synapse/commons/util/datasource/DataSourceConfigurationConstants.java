@@ -46,6 +46,7 @@ public class DataSourceConfigurationConstants {
     public final static String PROP_TESTONRETURN = "testOnReturn";
     public final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS =
             "timeBetweenEvictionRunsMillis";
+    public final static String PROMPT = "DataBase Password for ";
     public final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
     public final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
     public final static String PROP_TESTWHILEIDLE = "testWhileIdle";

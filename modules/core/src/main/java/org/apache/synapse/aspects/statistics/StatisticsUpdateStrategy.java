@@ -24,11 +24,12 @@ import org.apache.synapse.aspects.statistics.view.Statistics;
 import java.util.Iterator;
 
 /**
- *
+ * Updates the given statistics base on statistics logs in the given statistics record.
+ * This is to use only at viewing statistics
  */
 public class StatisticsUpdateStrategy {
 
-    private StatisticsRecord statisticsRecord;
+    private final StatisticsRecord statisticsRecord;
 
     public StatisticsUpdateStrategy(StatisticsRecord statisticsRecord) {
         this.statisticsRecord = statisticsRecord;

@@ -863,6 +863,24 @@ synapse.sh -sample &lt;n&gt;</pre>
             org.apache.synapse.security.secret.handler.HardCodedSecretCallbackHandler
         </li>
     </ul>
+    <p>
+        When use <strong>org.apache.synapse.security.secret.handler.JMXSecretCallbackHandler</strong>
+        , It is needed to use a JMX Console. Then , using JMX Console need to access the MBean
+        <strong>SecretsProvider</strong>
+        and add passwords for following keys. Therese is method to add secret in
+        <strong>SecretsProvider</strong>
+        MBean.
+
+        <ul>
+            <li>identity.store.pass</li>
+            <li>trust.store.pass</li>
+            <li>identity.key.pass</li>
+        </ul>
+
+        Note: These keys are only meaningful to SecretManager.
+
+        There is a <strong>ServerManager</strong> MBean that can be used to start synapse.
+    </p>
 </p>
  <p>Secret repository can be configured using <strong>synape.properties</strong>.</p>
 <div>

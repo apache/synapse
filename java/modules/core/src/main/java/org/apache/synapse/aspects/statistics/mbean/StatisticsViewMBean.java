@@ -31,5 +31,11 @@ public interface StatisticsViewMBean {
 
     List<String> getSystemProxyServiceStats(String id);
 
+    List<String> getSystemEndpointsStats();
+
+    List<String> getSystemSequncesStats();
+
+    List<String> getSystemProxyServicesStats();
+
     void clearAllStatistics();
 }

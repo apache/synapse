@@ -67,9 +67,12 @@ public class StatisticsReporter {
      * @param synCtx Current Message through synapse
      */
     public static void reportForAll(MessageContext synCtx) {
+
         AspectConfiguration configuration =
                 AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx);
+
         if (configuration != null && configuration.isStatisticsEnable()) {
+
             StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
             statisticsRecord.collect(configuration, ComponentType.ANY, synCtx.isResponse());
             StatisticsCollector collector = getStatisticsCollector(synCtx);

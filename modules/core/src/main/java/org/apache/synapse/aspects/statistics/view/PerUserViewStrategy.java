@@ -146,7 +146,7 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
 
                 InOutStatisticsView view;
                 if (statisticsMap.containsKey(userID)) {
-                    view = statisticsMap.get(id);
+                    view = statisticsMap.get(userID);
                 } else {
                     view = new InOutStatisticsView(id, userID);
                     statisticsMap.put(userID, view);

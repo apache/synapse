@@ -35,7 +35,7 @@ public class StatisticsCleaner {
 
     private StatisticsCollector collector;
     private long cleanInterval;
-    private long nextTime;
+    private long nextTime = -1;
     private boolean isCleanEnable = true;
 
     public StatisticsCleaner(StatisticsCollector collector) {
@@ -76,6 +76,10 @@ public class StatisticsCleaner {
             }
 
             long currentTime = System.currentTimeMillis();
+            if (nextTime == -1) {
+                nextTime = currentTime + cleanInterval;
+            }
+            
             if (nextTime <= currentTime) {
                 collector.clearStatistics();
                 nextTime = currentTime + cleanInterval;
@@ -84,7 +88,6 @@ public class StatisticsCleaner {
                     log.debug("There are no expired statistics to be cleaned.");
                 }
             }
-
         } catch (Throwable ignored) {
         }
     }

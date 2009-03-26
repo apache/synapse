@@ -43,32 +43,41 @@ public class StatisticsView implements StatisticsViewMBean {
 
     public List<String> getSystemEndpointStats(String id) {
         return getAsList(
-                this.collector.getStatistics(id, ComponentType.ENDPOINT, systemViewStrategy));
+                this.systemViewStrategy.determineView(id,
+                        collector.getStatisticsRecords(),
+                        ComponentType.ENDPOINT));
     }
 
     public List<String> getSystemSequnceStats(String id) {
-        return getAsList(this.collector.getStatistics(id,
-                ComponentType.SEQUENCE, systemViewStrategy));
+        return getAsList(this.systemViewStrategy.determineView(id,
+                collector.getStatisticsRecords(),
+                ComponentType.SEQUENCE));
     }
 
     public List<String> getSystemProxyServiceStats(String id) {
-        return getAsList(this.collector.getStatistics(id,
-                ComponentType.PROXYSERVICE, systemViewStrategy));
+        return getAsList(this.systemViewStrategy.determineView(id,
+                collector.getStatisticsRecords(),
+                ComponentType.PROXYSERVICE));
+
     }
 
     public List<String> getSystemEndpointsStats() {
         return getAllStatsAsList(
-                this.collector.getStatistics(ComponentType.ENDPOINT, systemViewStrategy));
+                this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
+                        ComponentType.ENDPOINT));
     }
 
     public List<String> getSystemSequncesStats() {
         return getAllStatsAsList(
-                this.collector.getStatistics(ComponentType.SEQUENCE, systemViewStrategy));
+                this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
+                        ComponentType.SEQUENCE));
     }
 
     public List<String> getSystemProxyServicesStats() {
         return getAllStatsAsList(
-                this.collector.getStatistics(ComponentType.PROXYSERVICE, systemViewStrategy));
+                this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
+                        ComponentType.PROXYSERVICE));
+
     }
 
     public void clearAllStatistics() {

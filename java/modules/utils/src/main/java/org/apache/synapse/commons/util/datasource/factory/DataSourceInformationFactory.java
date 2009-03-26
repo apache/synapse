@@ -24,9 +24,9 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.secret.SecretCallbackHandlerFactory;
 import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.secret.SecretCallbackHandlerFactory;
 
 import java.util.Properties;
 
@@ -101,7 +101,7 @@ public class DataSourceInformationFactory {
                 String.class);
 
         if (password != null && !"".equals(password)) {
-            information.setPassword(password);
+            information.setAliasPassword(password);
         }
 
         String dataSourceName = (String) MiscellaneousUtil.getProperty(

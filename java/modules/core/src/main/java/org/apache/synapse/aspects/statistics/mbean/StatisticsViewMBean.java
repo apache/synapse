@@ -21,7 +21,7 @@ package org.apache.synapse.aspects.statistics.mbean;
 import java.util.List;
 
 /**
- *
+ * A simple MBean for viewing statistics
  */
 public interface StatisticsViewMBean {
 

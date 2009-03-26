@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- *
+ * @see org.apache.synapse.aspects.statistics.mbean.StatisticsViewMBean
  */
 public class StatisticsView implements StatisticsViewMBean {
 

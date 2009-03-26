@@ -26,10 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.secret.SecretCallback;
-import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
-import org.apache.synapse.commons.util.secret.SecretLoadingModule;
-import org.apache.synapse.commons.util.secret.SingleSecretCallback;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -131,18 +127,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         String url = information.getUrl();
         String user = information.getUser();
 
-        String password = information.getPassword();
-        SecretCallbackHandler secretCallbackHandler = information.getPasswordProvider();
-        if (secretCallbackHandler != null) {
-            SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
-            secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHandler});
-            SingleSecretCallback secretCallback =
-                    new SingleSecretCallback(DataSourceConfigurationConstants.PROMPT,
-                            password);
-            SecretCallback[] secretCallbacks = new SecretCallback[]{secretCallback};
-            secretLoadingModule.load(secretCallbacks);
-            password = secretCallback.getSecret();
-        }
+        String password = information.getResolvedPassword();
         
         String maxActive = String.valueOf(information.getMaxActive());
         String maxIdle = String.valueOf(information.getMaxIdle());

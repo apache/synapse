@@ -220,7 +220,6 @@ public class ServerHandler implements NHttpServiceHandler {
                 } else if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
-                    conn.resetOutput();
                     conn.requestInput();
                 }
             }

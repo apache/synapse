@@ -49,15 +49,10 @@ public class StatisticsReporter {
         if (configurable != null && configurable.isStatisticsEnable()
                 && configurable instanceof Identifiable) {
 
-            StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
-            statisticsRecord.setOwner(componentType);
-            statisticsRecord.collect((Identifiable) configurable,
-                    componentType, synCtx.isResponse());
+            StatisticsRecord record = StatisticsReporter.getStatisticsRecord(synCtx);
+            record.setOwner(componentType);
+            collectStatistics(synCtx, record, configurable, componentType);
 
-            StatisticsCollector collector = getStatisticsCollector(synCtx);
-            if (!collector.contains(statisticsRecord)) {
-                collector.collect(statisticsRecord);
-            }
         }
     }
 
@@ -73,12 +68,8 @@ public class StatisticsReporter {
 
         if (configuration != null && configuration.isStatisticsEnable()) {
 
-            StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
-            statisticsRecord.collect(configuration, ComponentType.ANY, synCtx.isResponse());
-            StatisticsCollector collector = getStatisticsCollector(synCtx);
-            if (!collector.contains(statisticsRecord)) {
-                collector.collect(statisticsRecord);
-            }
+            StatisticsRecord record = StatisticsReporter.getStatisticsRecord(synCtx);
+            collectStatistics(synCtx, record, configuration, ComponentType.ANY);
         }
     }
 
@@ -102,6 +93,7 @@ public class StatisticsReporter {
     }
 
     private static StatisticsRecord getStatisticsRecord(MessageContext synCtx) {
+
         StatisticsRecord statisticsRecord =
                 (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
         if (statisticsRecord == null) {
@@ -115,7 +107,11 @@ public class StatisticsReporter {
         return statisticsRecord;
     }
 
-    private static StatisticsCollector getStatisticsCollector(MessageContext synCtx) {
+    private static void collectStatistics(MessageContext synCtx,
+                                          StatisticsRecord record,
+                                          StatisticsConfigurable configurable,
+                                          ComponentType componentType) {
+
         StatisticsCollector collector = synCtx.getEnvironment().getStatisticsCollector();
         if (collector == null) {
 
@@ -125,6 +121,12 @@ public class StatisticsReporter {
             collector = new StatisticsCollector();
             synCtx.getEnvironment().setStatisticsCollector(collector);
         }
-        return collector;
+
+        record.collect((Identifiable) configurable,
+                componentType, synCtx.isResponse());
+
+        if (!collector.contains(record)) {
+            collector.collect(record);
+        }
     }
 }

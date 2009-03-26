@@ -21,7 +21,7 @@ package org.apache.synapse.aspects.statistics;
 import org.apache.synapse.aspects.ComponentType;
 
 /**
- *
+ * Statistics at a break point
  */
 public class StatisticsLog {
 

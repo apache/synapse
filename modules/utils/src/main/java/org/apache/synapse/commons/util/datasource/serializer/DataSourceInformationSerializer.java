@@ -52,7 +52,7 @@ public class DataSourceInformationSerializer {
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME,
                 information.getUser());
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD,
-                information.getPassword());
+                information.getAliasPassword());
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXACTIVE,
                 String.valueOf(information.getMaxActive()));
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXIDLE,

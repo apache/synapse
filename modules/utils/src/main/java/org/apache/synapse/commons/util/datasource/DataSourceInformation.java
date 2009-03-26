@@ -19,7 +19,10 @@
 package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.synapse.commons.util.secret.SecretCallback;
 import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
+import org.apache.synapse.commons.util.secret.SecretLoadingModule;
+import org.apache.synapse.commons.util.secret.SingleSecretCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +36,7 @@ public class DataSourceInformation {
     public static final String BASIC_DATA_SOURCE = "BasicDataSource";
     public static final String PER_USER_POOL_DATA_SOURCE = "PerUserPoolDataSource";
     private String user;
-    private String password;
+    private String aliasPassword;
     private String datasourceName;
     private int maxActive = GenericObjectPool.DEFAULT_MAX_ACTIVE;
     private int maxIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
@@ -157,12 +160,35 @@ public class DataSourceInformation {
         this.user = user;
     }
 
-    public String getPassword() {
-        return password;
+    public String getAliasPassword() {
+        return aliasPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    /**
+     * Get actual password based on SecretCallbackHandler and alias password
+     * If SecretCallbackHandler is null, then returns alias password
+     * @return  Actual password
+     */
+    public String getResolvedPassword() {
+
+        if (passwordProvider != null) {
+            if (aliasPassword != null && !"".equals(aliasPassword)) {
+
+                SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
+                secretLoadingModule.init(new SecretCallbackHandler[]{passwordProvider});
+                SingleSecretCallback secretCallback =
+                        new SingleSecretCallback(DataSourceConfigurationConstants.PROMPT,
+                                aliasPassword);
+                SecretCallback[] secretCallbacks = new SecretCallback[]{secretCallback};
+                secretLoadingModule.load(secretCallbacks);
+                return secretCallback.getSecret();
+            }
+        }
+        return aliasPassword;
+    }
+
+    public void setAliasPassword(String aliasPassword) {
+        this.aliasPassword = aliasPassword;
     }
 
     public String getDatasourceName() {

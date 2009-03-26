@@ -18,6 +18,8 @@
  */
 package org.apache.synapse.aspects.statistics.view;
 
+import org.apache.synapse.aspects.ComponentType;
+
 /**
  * View of statistics as in and out
  */
@@ -27,10 +29,12 @@ public class InOutStatisticsView {
     private final Statistics outStatistics;
     private String resourceId;
     private String owner;
+    private ComponentType componentType;
 
-    public InOutStatisticsView(String id, String owner) {
+    public InOutStatisticsView(String id, String owner, ComponentType type) {
         this.resourceId = id;
         this.owner = owner;
+        this.componentType = type;
         this.inStatistics = new Statistics(id);
         this.outStatistics = new Statistics(id);
     }
@@ -51,9 +55,14 @@ public class InOutStatisticsView {
         return owner;
     }
 
+    public ComponentType getComponentType() {
+        return componentType;
+    }
+
     public String toString() {
 
         StringBuffer sb = new StringBuffer();
+        sb.append("[Statistics Category : ").append(componentType).append(" ]");
         sb.append("[ Owner Id :").append(owner).append(" ][ Resource ID : ")
                 .append(resourceId).append(" ]");
 
@@ -67,5 +76,4 @@ public class InOutStatisticsView {
         }
         return sb.toString();
     }
-
 }

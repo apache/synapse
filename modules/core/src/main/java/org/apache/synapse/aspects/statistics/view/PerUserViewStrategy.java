@@ -98,7 +98,7 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
 
                     InOutStatisticsView view;
                     if (!perUserMap.containsKey(id)) {
-                        view = new InOutStatisticsView(id, userID);
+                        view = new InOutStatisticsView(id, userID, type);
                         perUserMap.put(id, view);
                     } else {
                         view = perUserMap.get(id);
@@ -148,7 +148,7 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
                 if (statisticsMap.containsKey(userID)) {
                     view = statisticsMap.get(userID);
                 } else {
-                    view = new InOutStatisticsView(id, userID);
+                    view = new InOutStatisticsView(id, userID, type);
                     statisticsMap.put(userID, view);
                 }
                 updateStatistics(id, type, view, new StatisticsUpdateStrategy(record));

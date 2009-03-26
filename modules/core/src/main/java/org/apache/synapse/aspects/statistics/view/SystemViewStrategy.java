@@ -64,7 +64,7 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
 
                     InOutStatisticsView view;
                     if (!perResourceMap.containsKey(id)) {
-                        view = new InOutStatisticsView(id, Statistics.ALL);
+                        view = new InOutStatisticsView(id, Statistics.ALL, type);
                         perResourceMap.put(id, view);
                     } else {
                         view = perResourceMap.get(id);
@@ -93,7 +93,7 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
             return statisticsMap;
         }
 
-        InOutStatisticsView view = new InOutStatisticsView(id, Statistics.ALL);
+        InOutStatisticsView view = new InOutStatisticsView(id, Statistics.ALL, type);
         for (StatisticsRecord record : statisticsRecords) {
             if (record != null) {
                 updateStatistics(id, type, view, new StatisticsUpdateStrategy(record));

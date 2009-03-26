@@ -18,15 +18,11 @@
  */
 package org.apache.synapse.aspects.statistics;
 
-import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.mbean.StatisticsView;
-import org.apache.synapse.aspects.statistics.view.InOutStatisticsView;
-import org.apache.synapse.aspects.statistics.view.StatisticsViewStrategy;
 import org.apache.synapse.commons.util.MBeanRegistrar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Collects statistics and provides those collected data
@@ -68,36 +64,25 @@ public class StatisticsCollector {
     }
 
     /**
-     * Returns a particular statistics view according to a given strategy for a given
-     * resource with particular type
+     * Returns All collected statistics records
      *
-     * @param id       Resource id
-     * @param type     Type of the resource
-     * @param strategy Statistics viewing strategy
-     * @return Statistics view
+     * @return A list of StatisticsRecord
      */
-    public Map<String, InOutStatisticsView> getStatistics(String id,
-                                                          ComponentType type,
-                                                          StatisticsViewStrategy strategy) {
-        return strategy.determineView(id, getCopy(), type);
+    public List<StatisticsRecord> getStatisticsRecords() {
+        List<StatisticsRecord> records = new ArrayList<StatisticsRecord>();
+        records.addAll(statisticsCollection);
+        return records;
     }
 
     /**
-     * Returns a particular statistics view according to a given strategy for a given resource type
+     * Return and clear collected statistics records
      *
-     * @param type     type Type of the resource
-     * @param strategy strategy Statistics viewing strategy
-     * @return Statistics view
+     * @return A list of StatisticsRecord
      */
-    public Map<String, Map<String, InOutStatisticsView>> getStatistics(
-            ComponentType type,
-            StatisticsViewStrategy strategy) {
-        return strategy.determineView(getCopy(), type);
-    }
-
-    private List<StatisticsRecord> getCopy() {
+    public List<StatisticsRecord> getAndClearStatisticsRecords() {
         List<StatisticsRecord> records = new ArrayList<StatisticsRecord>();
         records.addAll(statisticsCollection);
+        statisticsCollection.clear();
         return records;
     }
 }

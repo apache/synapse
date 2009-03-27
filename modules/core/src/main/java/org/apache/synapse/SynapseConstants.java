@@ -139,6 +139,9 @@ public final class SynapseConstants {
         public static final String RESPONSE = "RESPONSE";
         /** The Synapse MC property that marks the message as a OUT_ONLY message */
         public static final String OUT_ONLY = "OUT_ONLY";
+        /** The Synapse MC property that states that existing WS-A headers in the envelope should
+        * be preserved */
+        public static final String PRESERVE_WS_ADDRESSING = "PRESERVE_WS_ADDRESSING";
 
         //-- error handling --
         /** An Axis2 message context property indicating a transport send failure */

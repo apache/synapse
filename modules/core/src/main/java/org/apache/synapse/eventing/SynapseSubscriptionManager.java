@@ -100,5 +100,5 @@ public abstract class SynapseSubscriptionManager implements SubscriptionManager 
 
     public String getPropertyValue(String name) {
         return properties.get(name);
-    }
+    }       
 }

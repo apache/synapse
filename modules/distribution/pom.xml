@@ -52,6 +52,13 @@
             <version>${pom.version}</version>
         </dependency>
 
+        <!-- Wrapper jars -->
+        <dependency>
+            <groupId>wrapper</groupId>
+            <artifactId>wrapper</artifactId>
+            <version>${wrapper.version}</version>
+        </dependency>
+
         <!-- Modules -->
         <dependency>
             <groupId>org.apache.rampart</groupId>

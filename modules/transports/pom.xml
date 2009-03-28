@@ -230,6 +230,70 @@
             <artifactId>quickfixj-msg-fix44</artifactId>
             <version>${qfj.version}</version>
         </dependency>
+        
+        <!-- Other dependencies -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs</artifactId>
+            <version>${commons.vfs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+            <version>${mina.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.qpid</groupId>
+            <artifactId>qpid-common</artifactId>
+            <version>${qpid.version}</version>
+            <exclusions>
+                <!-- Exclude commons-configuration because the transitive
+                     depedency on DOM4J causes problems. Anyway it is not
+                     really used and has disappeared in recent snapshots. -->
+                <exclusion>
+                    <groupId>commons-configuration</groupId>
+                    <artifactId>commons-configuration</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.qpid</groupId>
+            <artifactId>qpid-client</artifactId>
+            <version>${qpid.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.schlichtherle.io</groupId>
+            <artifactId>truezip</artifactId>
+            <version>${truezip.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons.net.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>${jsch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>oro</groupId>
+            <artifactId>oro</artifactId>
+            <version>${oro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons_io.version}</version>
+        </dependency>
     </dependencies>
 
     <properties>

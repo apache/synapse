@@ -27,9 +27,11 @@ import org.apache.synapse.eventing.SynapseSubscription;
 import org.apache.synapse.eventing.SynapseSubscriptionManager;
 import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.filters.XPathBasedEventFilter;
+import org.apache.synapse.eventing.filters.TopicBasedEventFilter;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.eventing.Subscription;
+import org.wso2.eventing.Event;
 import org.wso2.eventing.exceptions.EventException;
 
 import java.util.Calendar;
@@ -93,14 +95,18 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
 
     public List<SynapseSubscription> getMatchingSubscribers(MessageContext mc) {
         final LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
+        String evaluatedValue = null;
         for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
             //TODO : pick the filter based on the dialect
-            XPathBasedEventFilter filter = new XPathBasedEventFilter();
+            //XPathBasedEventFilter filter = new XPathBasedEventFilter();
+            TopicBasedEventFilter filter = new TopicBasedEventFilter();
             if (filter != null) {
                 filter.setResultValue(stringSubscriptionEntry.getValue().getFilterValue());
                 filter.setSourceXpath(topicXPath);
+                //evaluatedValue = topicXPath.stringValueOf(mc);
             }
-            if (filter == null || filter.isSatisfied(mc)) {
+            Event<MessageContext> event = new Event(mc);
+            if (filter == null || filter.match(event)) {
                 SynapseSubscription subscription = stringSubscriptionEntry.getValue();
                 Calendar current = Calendar.getInstance(); //Get current date and time
                 if (subscription.getExpires() != null) {
@@ -134,11 +140,24 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public boolean unsubscribe(Subscription subscription) throws EventException {
+    public boolean unsubscribe(String s) throws EventException {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+
     public String renew(Subscription subscription) throws EventException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public List<Subscription> getSubscriptions() throws EventException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public List<Subscription> getAllSubscriptions() throws EventException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public List<Subscription> getMatchingSubscriptions(String s) throws EventException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -156,6 +175,10 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
 
     public SynapseSubscription getSubscription(String id) {
         return store.get(id);
+    }
+
+    public Subscription getStatus(String s) throws EventException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public Subscription getStatus(Subscription subscription) throws EventException {

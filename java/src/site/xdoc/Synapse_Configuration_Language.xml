@@ -1377,16 +1377,31 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <h4>
       <a name="xslt" id="xslt">XSLT</a>
     </h4>
-<pre xml:space="preserve"> &lt;xslt key="string" [source="xpath"]&gt;
+<pre xml:space="preserve"> &lt;xslt key="string" [source="xpath"] [target="string"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
-   &lt;feature name="string" value="true| false" /&gt;*
+   &lt;feature name="string" value="true | false" /&gt;*
    &lt;attribute name="string" value="string" /&gt;*
  &lt;/xslt&gt;</pre>
     <p>
       The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
       selected element of the current message payload. If the source element is
-      not specified, it defaults to the first child of the soap body. Optionally
-      parameters (XSLT) could be passed into the transformations through the
+      not specified, it defaults to the first child of the SOAP body.
+      If no 'target' attribute is specified, the source node will be replaced
+      with the output of the transformation. Otherwise the output will be stored in
+      the specified property.
+    </p>
+    <p>
+      If the output method specified by the stylesheet is text (i.e. the stylesheet
+      has the following directive: <tt>&lt;xsl:output method="text"/&gt;</tt>),
+      then the output of the transformation is wrapped in an element with name
+      <tt>{http://ws.apache.org/commons/ns/payload}text</tt>. Note that when an
+      element with this name is present as the first child of the SOAP body of an
+      outgoing message, the JMS and VFS transports will automatically unwrap the
+      content and send it out as plain text. The XSLT mediator can therefore be used
+      for integration with systems relying on plain text messages.
+    </p>
+    <p>
+      Stylesheet parameters can be passed into the transformations through the
       'property' elements.
     </p>
     <p>

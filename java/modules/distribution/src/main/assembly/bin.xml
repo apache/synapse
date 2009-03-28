@@ -243,10 +243,8 @@
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
                 <exclude>org.apache.ant:ant:jar</exclude>
-                <exclude>org.apache.ant:ant-nodeps:jar</exclude>
                 <exclude>org.apache.ant:ant-launcher:jar</exclude>
                 <exclude>javax.servlet:servlet-api:jar</exclude>
-                <exclude>commons-discovery:commons-discovery:jar</exclude>
                 <!--<exclude>commons-cli:commons-cli:jar</exclude>-->
                 <exclude>xml-apis:xml-apis:jar</exclude>
                 <exclude>xerces:xercesImpl:jar</exclude>

@@ -177,7 +177,41 @@
 
 {VFS transport}
 
-* {Service parameters}
+* {Transport listener}
+
+  The VFS transport listener receives messages dropped in a given local or remote file system
+  location. The location is specified by a URL that either identifies a single file or a directory.
+  The transport listener will periodically poll the specified location and process any file(s)
+  found. After a file has been processed it will be deleted or moved to another location.
+
+  The transport is based on {{{http://commons.apache.org/vfs/}Apache Commons VFS}} and supports any
+  protocol for which a VFS provider is available. The transport is preconfigured with providers
+  for local files (<<<file:>>> scheme), HTTP, HTTPS, FTP and SFTP (i.e. file transfer over SSH).
+
+  There is a fundamental difference between the VFS transport and transports such as HTTP and it
+  is important to understand this difference to be able to use the VFS transport correctly.
+  The HTTP transport binds to a single protocol endpoint, i.e. a TCP port on which it accepts
+  incoming HTTP requests. These requests are then dispatched to the right service based on the
+  request URI. On the other hand, the VFS transport only receives the payload of a message, but no
+  additional information that could be used to dispatch the message to a service. This means that
+  file system locations must be explicitly mapped to services. This is done using a set of
+  service parameters.
+
+  For Synapse this means that the VFS transport listener can only be used in conjunction with proxy
+  services. The relevant service parameters are then specified as follows: 
+
++-------------------------------------+  
+<proxy name="MyVFSService" transports="vfs">
+    <parameter name="transport.vfs.FileURI">file:///var/spool/synapse/in</parameter>
+    <parameter name="transport.vfs.ContentType">application/xml</parameter>
+    ...
+    <target>
+        ...
+    </target>
+</proxy>
++-------------------------------------+  
+
+  The VFS transport recognizes the following service parameters:
 
   [<<<transport.vfs.FileURI>>> (Required)]
   The primary File (or Directory) URI in the vfs* transport format,
@@ -234,7 +268,58 @@
   [<<<transport.vfs.MoveTimestampFormat>>> (Optional)]
   Timestamp prefix format for processed file name. java.text.SimpleDateFormat compatible string. e.g. yyMMddHHmmss'-'
   
-* {VFS Transport URI examples}
+  [<<<transport.vfs.Streaming>>> (Optional)]
+  If this parameter is set to <<<true>>>, the transport will attempt to use a
+  <<<javax.activation.DataSource>>> (instead of a <<<java.io.InputStream>>>) object to pass
+  the content of the file to the message builder. Note that this is only supported by some
+  message builders, e.g. for plain text and binary.
+  
+  This allows processing of the message without storing the entire content in memory.
+  It also has two other side effects:
+  
+  * The incoming file (or connection in case of a remote file) will only
+    be opened on demand.
+    
+  * Since the data is not cached, the file might be read several times.
+  
+  []
+  
+  This option can be used to achieve streaming of large payloads. Note that this feature is
+  still somewhat experimental and might be superseded by a more flexible mechanism in a future
+  release.
+  
+  []
+  
+  Note that since the VFS endpoints are configured at the level of the service, there are no
+  transport parameters and the transport listener is enabled in <<<axis2.xml>>> simply as
+  follows:
+
++-------------------------------------+  
+<transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
++-------------------------------------+  
+
+* {Transport sender}
+
+  The VFS transport sender allows to write outgoing messages to local or remote files. As with
+  the listener, the transport sender supports any protocol for which there is a VFS provider.
+
+  The sender is enabled be the following directive in <<<axis2.xml>>>:
+
++-------------------------------------+  
+<transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
++-------------------------------------+  
+
+  To send a message using the VFS transport, the destination URI must start with <<<vfs:>>>
+  followed by a valid VFS URL. For example, in a Synapse mediation, one would use: 
+
++-------------------------------------+  
+<endpoint>
+    <address uri="vfs:file:///var/spool/synapse/out"/>
+</endpoint>
++-------------------------------------+
+
+  Other examples of valid VFS URLs are (see {{http://commons.apache.org/vfs/filesystems.html}} for
+  more samples):
 
   * <<<file:///directory/filename.ext>>>
   
@@ -248,8 +333,14 @@
 
   []
   
-  See {{http://commons.apache.org/vfs/filesystems.html}} for more samples.
+  It should be noted that by its nature, the VFS transport sender doesn't support synchronous
+  responses and should only be invoked using the out-only message exchange pattern.
+  In a Synapse mediation, this can be forced using the following mediator:
 
++-------------------------------------+  
+<property action="set" name="OUT_ONLY" value="true"/>
++-------------------------------------+  
+  
 {FIX transport}
 
   A general overview about the FIX transport can be found in the following articles:

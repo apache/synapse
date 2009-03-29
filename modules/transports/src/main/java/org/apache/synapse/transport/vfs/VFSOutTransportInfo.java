@@ -19,17 +19,12 @@
 
 package org.apache.synapse.transport.vfs;
 
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.sun.net.ssl.internal.www.protocol.https.Handler;
 
 /**
  * The VFS OutTransportInfo is a holder of information to send an outgoing message
@@ -56,11 +51,11 @@ public class VFSOutTransportInfo implements OutTransportInfo {
         
         Map<String,String> properties = BaseUtils.getEPRProperties(outFileURI);
         if(properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {
-          String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);
+            String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);
             maxRetryCount = Integer.parseInt(strMaxRetryCount);
         }
         if(properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {
-          String strReconnectTimeout = properties.get(VFSConstants.RECONNECT_TIMEOUT);
+            String strReconnectTimeout = properties.get(VFSConstants.RECONNECT_TIMEOUT);
             reconnectTimeout = Long.parseLong(strReconnectTimeout) * 1000;
         }        
         if (properties.containsKey(VFSConstants.APPEND)) {

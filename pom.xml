@@ -814,6 +814,8 @@
         <module>modules/xar-maven-plugin</module>
         <module>modules/experimental</module>
         <module>modules/distribution</module>
+        <module>modules/packaging/package-skeleton</module>
+        <module>modules/packaging/package-archetype</module>
     </modules>
 
     <properties>

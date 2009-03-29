@@ -79,6 +79,11 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     public void sendMessage(MessageContext msgCtx, String targetAddress,
         OutTransportInfo outTransportInfo) throws AxisFault {
 
+        if (waitForSynchronousResponse(msgCtx)) {
+            throw new AxisFault("The VFS transport doesn't support synchronous responses. " +
+            		"Please use the appropriate (out only) message exchange pattern.");
+        }
+
         VFSOutTransportInfo vfsOutInfo = null;
 
         if (targetAddress != null) {

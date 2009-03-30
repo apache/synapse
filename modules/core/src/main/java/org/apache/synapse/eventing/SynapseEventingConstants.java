@@ -25,5 +25,7 @@ package org.apache.synapse.eventing;
 public class SynapseEventingConstants {
     public static final String TOPIC_FILTER_DIALECT =
             "http://synapse.apache.org/eventing/dialect/topicFilter";
-    public static final String STATIC_ENTRY = "staticEntry";    
+    public static final String STATIC_ENTRY = "staticEntry";
+    public static final String SERVICE_TYPE = "serviceType";
+    public static final String EVENTING_ST  = "eventing";
 }

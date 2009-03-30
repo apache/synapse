@@ -85,18 +85,20 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         eventSourceService.setName(this.name);
         AxisOperation mediateOperation =
                 new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
-        AxisOperation subscribeOperation = new InOutAxisOperation(new QName("subscribe"));
+        AxisOperation eventOperation = new InOutAxisOperation(new QName("subscribe"));
 
         mediateOperation.setMessageReceiver(this);
-        subscribeOperation.setMessageReceiver(this);
-        subscribeOperation.setSoapAction(EventingConstants.WSE_SUBSCRIBE);
+        eventOperation.setMessageReceiver(this);
+        eventOperation.setSoapAction(EventingConstants.WSE_SUBSCRIBE);
 
         eventSourceService.addOperation(mediateOperation);
-        eventSourceService.addOperation(subscribeOperation);
+        eventSourceService.addOperation(eventOperation);
         axisCfg.addService(eventSourceService);
         //Set the service parameters
-        eventSourceService.addParameter("subscriptionManager", subscriptionManager);
-        eventSourceService.addParameter("serviceType", "eventing");
+        eventSourceService
+                .addParameter(EventingConstants.SUBSCRIPTION_MANAGER, subscriptionManager);
+        eventSourceService.addParameter(SynapseEventingConstants.SERVICE_TYPE,
+                SynapseEventingConstants.EVENTING_ST);
     }
 
     /**
@@ -135,7 +137,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 dispatchEvents(smc);
             }
         } catch (EventException e) {
-           handleException("Subscription manager processing error",e);
+            handleException("Subscription manager processing error", e);
         }
     }
 
@@ -177,7 +179,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         try {
             subscribers = subscriptionManager.getMatchingSubscriptions(event);
         } catch (EventException e) {
-            handleException("Matching subscriptions fetching error",e);
+            handleException("Matching subscriptions fetching error", e);
         }
 
         // Call event dispatcher

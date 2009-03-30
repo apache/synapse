@@ -301,7 +301,7 @@ public class ClientHandler implements NHttpClientHandler {
 
                if (c.getRemoteAddress() != null) {
                    return message + " For : " + c.getRemoteAddress().getHostAddress() + ":" +
-                           c.getRemotePort() + (axis2Request != null ? "For Request : "
+                           c.getRemotePort() + (axis2Request != null ? " For Request : "
                            + axis2Request : "");
                }
            }
@@ -608,12 +608,13 @@ public class ClientHandler implements NHttpClientHandler {
                 return;
             }
             case HttpStatus.SC_BAD_REQUEST : {
-                log.error("Received bad request: " + response.getStatusLine().getReasonPhrase());
+                log.error(getErrorMessage("Received bad request: "
+                        + response.getStatusLine().getReasonPhrase(), conn));
                 return;
             }
             case HttpStatus.SC_INTERNAL_SERVER_ERROR : {
-                log.error("Received an internal server error : " +
-                    response.getStatusLine().getReasonPhrase());
+                log.error(getErrorMessage("Received an internal server error : " +
+                        response.getStatusLine().getReasonPhrase(), conn));
                 processResponse(conn, context, response);
                 return;
             }
@@ -633,9 +634,9 @@ public class ClientHandler implements NHttpClientHandler {
                 return;
             }
             default : {
-                log.warn("Unexpected HTTP status code received : " +
-                    response.getStatusLine().getStatusCode() + " :: " +
-                    response.getStatusLine().getReasonPhrase());
+                log.warn(getErrorMessage("Unexpected HTTP status code received : " +
+                        response.getStatusLine().getStatusCode() + " :: " +
+                        response.getStatusLine().getReasonPhrase(), conn));
 
                 Header contentType = response.getFirstHeader(CONTENT_TYPE);
                 if (contentType != null) {
@@ -652,16 +653,17 @@ public class ClientHandler implements NHttpClientHandler {
                             log.debug("Received an unexpected response with a POX/REST payload");
                         }
                     } else {
-                        log.warn("Received an unexpected response - of content type : " +
-                            contentType.getValue() + " and status code : " +
-                            response.getStatusLine().getStatusCode() + " with reason : " +
-                            response.getStatusLine().getReasonPhrase());
+                        log.warn(getErrorMessage("Received an unexpected response - " +
+                                "of content type : " + contentType.getValue() +
+                                " and status code : " + response.getStatusLine().getStatusCode() +
+                                " with reason : " +
+                                response.getStatusLine().getReasonPhrase(), conn));
                     }
                 } else {
-                    log.warn("Received an unexpected response - of unknown content type " +
-                        " with status code : " +
-                        response.getStatusLine().getStatusCode() + " and reason : " +
-                        response.getStatusLine().getReasonPhrase());
+                    log.warn(getErrorMessage("Received an unexpected response - " +
+                            "of unknown content type with status code : " +
+                            response.getStatusLine().getStatusCode() + " and reason : " +
+                            response.getStatusLine().getReasonPhrase(), conn));
                 }
                 
                 processResponse(conn, context, response);

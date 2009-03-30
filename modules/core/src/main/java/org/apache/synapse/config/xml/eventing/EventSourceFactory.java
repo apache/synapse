@@ -35,6 +35,7 @@ import org.apache.synapse.eventing.SynapseSubscription;
 import org.apache.synapse.eventing.SynapseSubscriptionManager;
 import org.apache.synapse.eventing.filters.XPathBasedEventFilter;
 import org.wso2.eventing.SubscriptionData;
+import org.wso2.eventing.exceptions.EventException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -125,7 +126,13 @@ public class EventSourceFactory {
             handleException(
                     "SynapseSubscription Manager has not been specified for the event source");
         }
-        createStaticSubscriptions(elem, eventSource);
+
+        try {
+            createStaticSubscriptions(elem, eventSource);
+        } catch (EventException e) {
+            handleException("Static subscription creation failure",e);
+        }
+
         return eventSource;
     }
 
@@ -146,7 +153,8 @@ public class EventSourceFactory {
      * @param synapseEventSource
      */
     private static void createStaticSubscriptions(OMElement elem,
-                                                  SynapseEventSource synapseEventSource) {
+                                                  SynapseEventSource synapseEventSource)
+            throws EventException {
         for (Iterator iterator = elem.getChildrenWithName(SUBSCRIPTION_QNAME);
              iterator.hasNext();) {
             SynapseSubscription synapseSubscription = new SynapseSubscription();
@@ -206,7 +214,7 @@ public class EventSourceFactory {
             }
             synapseSubscription.getSubscriptionData()
                     .setProperty(SynapseEventingConstants.STATIC_ENTRY, "true");
-            synapseEventSource.getSubscriptionManager().addSubscription(synapseSubscription);
+                synapseEventSource.getSubscriptionManager().subscribe(synapseSubscription);
         }
     }
 }

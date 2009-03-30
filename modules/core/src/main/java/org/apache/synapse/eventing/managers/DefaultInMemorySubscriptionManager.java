@@ -32,6 +32,7 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.eventing.Subscription;
 import org.wso2.eventing.Event;
+import org.wso2.eventing.EventFilter;
 import org.wso2.eventing.exceptions.EventException;
 
 import java.util.Calendar;
@@ -45,22 +46,34 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManager {
 
-    private final Map<String, SynapseSubscription> store =
-            new ConcurrentHashMap<String, SynapseSubscription>();
+    private final Map<String, Subscription> store =
+            new ConcurrentHashMap<String, Subscription>();
     private String topicHeaderName;
     private String topicHeaderNS;
     private SynapseXPath topicXPath;
     private static final Log log = LogFactory.getLog(DefaultInMemorySubscriptionManager.class);
 
-    public String addSubscription(SynapseSubscription subs) {
-        if (subs.getId() == null) {
-            subs.setId(org.apache.axiom.om.util.UUIDGenerator.getUUID());
+    public List<Subscription> getStaticSubscribers() {
+        LinkedList<Subscription> list = new LinkedList<Subscription>();
+        for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
+            if ((stringSubscriptionEntry.getValue().getSubscriptionData().getProperty(
+                    SynapseEventingConstants.STATIC_ENTRY)).equals("true")) {
+                list.add(stringSubscriptionEntry.getValue());
+            }
         }
-        store.put(subs.getId(), subs);
-        return subs.getId();
+        return list;
     }
 
-    public boolean deleteSubscription(String id) {
+    public String subscribe(Subscription subscription) throws EventException {
+        if (subscription.getId() == null) {
+            subscription.setId(org.apache.axiom.om.util.UUIDGenerator.getUUID());
+        }
+        store.put(subscription.getId(), subscription);
+        return subscription.getId();
+
+    }
+
+    public boolean unsubscribe(String id) throws EventException {
         if (store.containsKey(id)) {
             store.remove(id);
             return true;
@@ -69,14 +82,9 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         }
     }
 
-    /**
-     * Renew the subscription by setting the expire date time
-     *
-     * @param subscription
-     * @return
-     */
-    public boolean renewSubscription(SynapseSubscription subscription) {
-        SynapseSubscription subscriptionOld = getSubscription(subscription.getId());
+
+    public boolean renew(Subscription subscription) throws EventException {
+        Subscription subscriptionOld = getSubscription(subscription.getId());
         if (subscriptionOld != null) {
             subscriptionOld.setExpires(subscription.getExpires());
             return true;
@@ -85,18 +93,26 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         }
     }
 
-    public List<SynapseSubscription> getSynapseSubscribers() {
-        LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
-        for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
+    public List<Subscription> getSubscriptions() throws EventException {
+        LinkedList<Subscription> list = new LinkedList<Subscription>();
+        for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
             list.add(stringSubscriptionEntry.getValue());
         }
         return list;
     }
 
-    public List<SynapseSubscription> getMatchingSubscribers(MessageContext mc) {
-        final LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
-        String evaluatedValue = null;
-        for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
+    public List<Subscription> getAllSubscriptions() throws EventException {
+        LinkedList<Subscription> list = new LinkedList<Subscription>();
+        for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
+            list.add(stringSubscriptionEntry.getValue());
+        }
+        return list;
+    }
+
+    public List<Subscription> getMatchingSubscriptions(Event<MessageContext> event)
+            throws EventException {
+        final LinkedList<Subscription> list = new LinkedList<Subscription>();
+        for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
             //TODO : pick the filter based on the dialect
             //XPathBasedEventFilter filter = new XPathBasedEventFilter();
             TopicBasedEventFilter filter = new TopicBasedEventFilter();
@@ -105,9 +121,8 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
                 filter.setSourceXpath(topicXPath);
                 //evaluatedValue = topicXPath.stringValueOf(mc);
             }
-            Event<MessageContext> event = new Event(mc);
             if (filter == null || filter.match(event)) {
-                SynapseSubscription subscription = stringSubscriptionEntry.getValue();
+                Subscription subscription = stringSubscriptionEntry.getValue();
                 Calendar current = Calendar.getInstance(); //Get current date and time
                 if (subscription.getExpires() != null) {
                     if (current.before(subscription.getExpires())) {
@@ -124,56 +139,7 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         return list;
     }
 
-    public List<SynapseSubscription> getStaticSubscribers() {
-        LinkedList<SynapseSubscription> list = new LinkedList<SynapseSubscription>();
-        for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
-            if ((stringSubscriptionEntry.getValue().getSubscriptionData().getProperty(
-                    SynapseEventingConstants.STATIC_ENTRY)).equals("true")) {
-                list.add(stringSubscriptionEntry.getValue());
-            }
-        }
-        return list;
-    }
-
-    @Deprecated
-    public String subscribe(Subscription subscription) throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public boolean unsubscribe(String s) throws EventException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-
-    public String renew(Subscription subscription) throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public List<Subscription> getSubscriptions() throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public List<Subscription> getAllSubscriptions() throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public List<Subscription> getMatchingSubscriptions(String s) throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public List<Subscription> getSubscribers() throws EventException {
-        LinkedList<Subscription> list = new LinkedList<Subscription>();
-        for (Map.Entry<String, SynapseSubscription> stringSubscriptionEntry : store.entrySet()) {
-            list.add(stringSubscriptionEntry.getValue());
-        }
-        return list;
-    }
-
-    public List<Subscription> getAllSubscribers() throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public SynapseSubscription getSubscription(String id) {
+    public Subscription getSubscription(String id) {
         return store.get(id);
     }
 
@@ -181,9 +147,6 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Subscription getStatus(Subscription subscription) throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     public void init() {
         try {

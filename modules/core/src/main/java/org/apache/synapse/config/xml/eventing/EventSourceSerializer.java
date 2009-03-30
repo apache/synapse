@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.SynapseSubscription;
+import org.wso2.eventing.Subscription;
 
 import java.util.Iterator;
 import java.util.List;
@@ -74,11 +75,11 @@ public class EventSourceSerializer {
             }
             evenSourceElem.addChild(subManagerElem);
             // Adding static subscriptions
-            List<SynapseSubscription> staticSubscriptionList =
+            List<Subscription> staticSubscriptionList =
                     eventSource.getSubscriptionManager().getStaticSubscribers();
-            for (Iterator<SynapseSubscription> iterator = staticSubscriptionList.iterator();
+            for (Iterator<Subscription> iterator = staticSubscriptionList.iterator();
                  iterator.hasNext();) {
-                SynapseSubscription staticSubscription = iterator.next();
+                Subscription staticSubscription = iterator.next();
                 OMElement staticSubElem =
                         fac.createOMElement("subscription", XMLConfigConstants.SYNAPSE_OMNAMESPACE);
                 staticSubElem.addAttribute(

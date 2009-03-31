@@ -83,16 +83,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     public void buildService(AxisConfiguration axisCfg) throws AxisFault {
         AxisService eventSourceService = new AxisService();
         eventSourceService.setName(this.name);
-        AxisOperation mediateOperation =
-                new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
-        AxisOperation eventOperation = new InOutAxisOperation(new QName("subscribe"));
-
-        mediateOperation.setMessageReceiver(this);
-        eventOperation.setMessageReceiver(this);
-        eventOperation.setSoapAction(EventingConstants.WSE_SUBSCRIBE);
-
-        eventSourceService.addOperation(mediateOperation);
-        eventSourceService.addOperation(eventOperation);
+        // Add wse operations 
+        addOperations(eventSourceService);
         axisCfg.addService(eventSourceService);
         //Set the service parameters
         eventSourceService
@@ -406,6 +398,47 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         def.setAddress(endpointUrl.trim());
         endpoint.setDefinition(def);
         return endpoint;
+    }
+
+    /**
+     * Set the operations avilable for EventSource service
+     *
+     * @param eventSourceService
+     * @throws AxisFault
+     */
+    private void addOperations(AxisService eventSourceService) throws AxisFault {
+        // Create operations
+        AxisOperation mediateOperation =
+                new InOutAxisOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
+        AxisOperation subscribeOperation =
+                new InOutAxisOperation(new QName(EventingConstants.WSE_SUBSCRIBE_OP));
+        AxisOperation unsubscribeOperation =
+                new InOutAxisOperation(new QName(EventingConstants.WSE_UNSUBSCRIBE_OP));
+        AxisOperation renewOperation =
+                new InOutAxisOperation(new QName(EventingConstants.WSE_RENEW_OP));
+        AxisOperation getStatusOperation =
+                new InOutAxisOperation(new QName(EventingConstants.WSE_GET_STATUS_OP));
+        AxisOperation subscriptionEndOperation =
+                new InOutAxisOperation(new QName(EventingConstants.WSE_SUBSCRIPTIONEND_OP));
+        // Assign the message reciver
+        mediateOperation.setMessageReceiver(this);
+        subscribeOperation.setMessageReceiver(this);
+        unsubscribeOperation.setMessageReceiver(this);
+        renewOperation.setMessageReceiver(this);
+        getStatusOperation.setMessageReceiver(this);
+        subscriptionEndOperation.setMessageReceiver(this);
+        // Set Soap Action
+        subscribeOperation.setSoapAction(EventingConstants.WSE_SUBSCRIBE);
+        unsubscribeOperation.setSoapAction(EventingConstants.WSE_UNSUBSCRIBE);
+        renewOperation.setSoapAction(EventingConstants.WSE_RENEW);
+        getStatusOperation.setSoapAction(EventingConstants.WSE_GET_STATUS);
+        // Add operations to the Service
+        eventSourceService.addOperation(mediateOperation);
+        eventSourceService.addOperation(subscribeOperation);
+        eventSourceService.addOperation(unsubscribeOperation);
+        eventSourceService.addOperation(renewOperation);
+        eventSourceService.addOperation(getStatusOperation);
+        eventSourceService.addOperation(subscriptionEndOperation);
     }
 
     private void handleException(String message, Exception e) {

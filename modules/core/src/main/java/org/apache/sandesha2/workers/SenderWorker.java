@@ -300,9 +300,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				transaction = null;
 			}
 
-			msgCtx.getOptions().setTimeOutInMilliSeconds(1000000);
-			
-			boolean processResponseForFaults = false ;
+			boolean processResponseForFaults = false;
 			try {
 				InvocationResponse response = InvocationResponse.CONTINUE;
 				

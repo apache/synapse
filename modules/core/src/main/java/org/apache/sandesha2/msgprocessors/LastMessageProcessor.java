@@ -116,6 +116,17 @@ public class LastMessageProcessor  implements MsgProcessor {
 			//says that the inbound msg of this was a LastMessage - so the new msg will also be a LastMessage
 			outMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.INBOUND_LAST_MESSAGE, Boolean.TRUE);
 			outMessageContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, msgContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL));
+
+			// when sending mail messages mail transport first check whether the "TO" header
+			// is present in the headers and if present use it.
+			// "TO" header of the incomming message actually represents the server itself. this causes
+			// reply to send to the servers mail address again.
+			// but if there is not transport headers it get the outtransport info target address.
+			if (msgContext.isServerSide()
+					&& (msgContext.getTransportIn() != null)
+					&& (msgContext.getTransportIn().getName().equals(Constants.TRANSPORT_MAIL))){
+				 outMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS, null);
+			}
 			
 			AxisEngine.send(outMessageContext);
 			TransportUtils.setResponseWritten(msgContext, true);

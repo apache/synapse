@@ -114,12 +114,12 @@ public class Axis2FlexibleMEPClient {
         // create a new MessageContext to be sent out as this should not corrupt the original
         // we need to create the response to the original message later on
         MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx,
-            (String) synapseOutMessageContext.getProperty(SynapseConstants.PRESERVE_WS_ADDRESSING));
+            (String) synapseOutMessageContext.getProperty(SynapseConstants.REMOVE_WS_ADDRESSING));
 
         if (log.isDebugEnabled()) {
-            log.debug("Message [Original Request Message ID : " + synapseOutMessageContext.getMessageID()
-                    + "]" + " [New Cloned Request Message ID : "
-                    + axisOutMsgCtx.getMessageID() + "]");
+            log.debug("Message [Original Request Message ID : "
+                    + synapseOutMessageContext.getMessageID() + "]"
+                    + " [New Cloned Request Message ID : " + axisOutMsgCtx.getMessageID() + "]");
         }
         // set all the details of the endpoint only to the cloned message context
         // so that we can use the original message context for resending through different endpoints
@@ -318,15 +318,16 @@ public class Axis2FlexibleMEPClient {
         mepClient.execute(true);        
    }
 
-    private static MessageContext cloneForSend(MessageContext ori, String preserveWSAdd) throws AxisFault {
+    private static MessageContext cloneForSend(MessageContext ori, String removeWSAdd)
+            throws AxisFault {
 
         MessageContext newMC = MessageHelper.clonePartially(ori);
 
         newMC.setEnvelope(ori.getEnvelope());
-        if (preserveWSAdd != null && Boolean.parseBoolean(preserveWSAdd)) {
-            newMC.setMessageID(ori.getMessageID());
-        } else {
+        if (removeWSAdd != null && Boolean.parseBoolean(removeWSAdd)) {
             MessageHelper.removeAddressingHeaders(newMC);
+        } else {
+            newMC.setMessageID(ori.getMessageID());
         }
 
         newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,

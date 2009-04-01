@@ -122,7 +122,7 @@ public class ServerManager {
     }
 
     /**
-     * Helper method that to do init
+     * Helper method to do the initialization
      */
     private void doInit() {
 
@@ -194,10 +194,8 @@ public class ServerManager {
 
     private void assertInitialized() {
         if (!initialized) {
-            String msg = "Server manager has not been initialized by giving " +
-                    "required configurations information." +
-                    "It is needed to initiate by giving required configurations information ," +
-                    " before access any operations";
+            String msg = "Server manager has not been initialized, it requires to be " +
+                    "initialized, with the required configurations before starting";
             log.error(msg);
             throw new SynapseException(msg);
         }

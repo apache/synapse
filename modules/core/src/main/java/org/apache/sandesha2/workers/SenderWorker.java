@@ -623,7 +623,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 				//we will not be setting the operation context here since this msgs may not be an application reply.
 				//we let other dispatchers find it.
-				int messageType = MsgInitializer.initializeMessage(msgCtx).getMessageType();
+				int messageType = MsgInitializer.initializeMessage(responseMessageContext).getMessageType();
 				RMMsgContext responseRMMessage = MsgInitializer.initializeMessage(responseMessageContext);
 				int responseMessageType = responseRMMessage.getMessageType();
 				if(log.isDebugEnabled()) log.debug("inboundMsgType" + responseMessageType + "outgoing message type " + messageType);

@@ -18,13 +18,14 @@
  */
 package org.apache.synapse;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Encapsulates server context information
  */
 public class ServerContextInformation {
+    
     /* Underlying server's context - EX : Axis2 ConfigurationConext */
     private Object serverContext;
     /* A map to hold any context information*/

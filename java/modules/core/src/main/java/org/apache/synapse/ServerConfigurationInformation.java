@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Encapsulates all server information 

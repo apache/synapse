@@ -47,24 +47,24 @@ public class SynapseControllerFactory {
 
     private static SynapseController loadSynapseController(
             ServerConfigurationInformation information) {
+
         String provider = information.getServerControllerProvider();
         try {
-
             Class aClass = SynapseControllerFactory.class.getClassLoader().loadClass(provider);
             Object instance = aClass.newInstance();
 
             if (instance != null && instance instanceof SynapseController) {
                 return (SynapseController) instance;
             } else {
-                fatal("Invalid class as SynapseController : Class Name : " + provider);
+                handleFatal("Invalid class as SynapseController : Class Name : " + provider);
             }
 
         } catch (ClassNotFoundException e) {
-            fatal("A SynapseController cannot be found for class name : " + provider, e);
+            handleFatal("A SynapseController cannot be found for class name : " + provider, e);
         } catch (IllegalAccessException e) {
-            fatal("Error creating a instance from class : " + provider, e);
+            handleFatal("Error creating a instance from class : " + provider, e);
         } catch (InstantiationException e) {
-            fatal("Error creating a instance from class : " + provider, e);
+            handleFatal("Error creating a instance from class : " + provider, e);
         }
         return null;
     }
@@ -77,51 +77,51 @@ public class SynapseControllerFactory {
     private static void validate(ServerConfigurationInformation information) {
 
         if (information == null) {
-            fatal("Server Configuration Information is null");
-        }
-
-        validatePath("Synapse home", information.getSynapseHome());
-        if (information.isCreateNewInstance()) {
-            validatePath("Axis2 repository", information.getAxis2RepoLocation());
-            validatePath("axis2.xml location", information.getAxis2Xml());
-        }
-        validatePath("synapse.xml location", information.getSynapseXMLLocation());
-
-        String serverName = information.getServerName();
-        if (serverName == null) {
-            try {
-                serverName = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException ignore) {
-            }
-            log.info("The server name was not specified, defaulting to : " + serverName);
+            handleFatal("Server Configuration Information is null");
         } else {
-            log.info("Using server name : " + serverName);
-        }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Using Server Configuration As : " + information);
-        }
+            validatePath("Synapse home", information.getSynapseHome());
+            if (information.isCreateNewInstance()) {
+                validatePath("Axis2 repository", information.getAxis2RepoLocation());
+                validatePath("axis2.xml location", information.getAxis2Xml());
+            }
+            validatePath("synapse.xml location", information.getSynapseXMLLocation());
 
-        log.info("The timeout handler will run every : " +
-                (SynapseConfigUtils.getTimeoutHandlerInterval() / 1000) + "s");
+            String serverName = information.getServerName();
+            if (serverName == null) {
+                try {
+                    serverName = InetAddress.getLocalHost().getHostName();
+                } catch (UnknownHostException ignore) {}
+                log.info("The server name was not specified, defaulting to : " + serverName);
+            } else {
+                log.info("Using server name : " + serverName);
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Using Server Configuration As : " + information);
+            }
+
+            log.info("The timeout handler will run every : " +
+                    (SynapseConfigUtils.getTimeoutHandlerInterval() / 1000) + "s");
+        }
     }
 
     private static void validatePath(String msgPre, String path) {
         if (path == null) {
-            fatal("The " + msgPre + " must be set as a system property or init-parameter");
+            handleFatal("The " + msgPre + " must be set as a system property or init-parameter");
         } else if (!new File(path).exists()) {
-            fatal("The " + msgPre + " " + path + " doesn't exist");
+            handleFatal("The " + msgPre + " " + path + " doesn't exist");
         } else {
             log.info("Using " + msgPre + " : " + new File(path).getAbsolutePath());
         }
     }
 
-    private static void fatal(String msg) {
+    private static void handleFatal(String msg) {
         log.fatal(msg);
         throw new SynapseException(msg);
     }
 
-    private static void fatal(String msg, Exception e) {
+    private static void handleFatal(String msg, Exception e) {
         log.fatal(msg, e);
         throw new SynapseException(msg, e);
     }

@@ -126,8 +126,8 @@ public class ServerConfigurationInformationFactory {
             information.setDeploymentMode(args[5]);
             information.setServerName(args[6]);
         }
-        return information;
 
+        return information;
     }
 
     /**

@@ -79,10 +79,16 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     public void sendMessage(MessageContext msgCtx, String targetAddress,
         OutTransportInfo outTransportInfo) throws AxisFault {
 
-        if (waitForSynchronousResponse(msgCtx)) {
-            throw new AxisFault("The VFS transport doesn't support synchronous responses. " +
-            		"Please use the appropriate (out only) message exchange pattern.");
-        }
+        // TODO: this check is too strict and breaks sample 254
+        // Need to check
+        //  - why this isn't detected by the unit tests
+        //  - why this works with JMS (the JMS transport sender uses the same method to determine
+        //    whether to wait for a response; if this change breaks sample 254, one would also
+        //    expect problems with sample 254 when substituting VFS by JMS)
+//        if (waitForSynchronousResponse(msgCtx)) {
+//            throw new AxisFault("The VFS transport doesn't support synchronous responses. " +
+//            		"Please use the appropriate (out only) message exchange pattern.");
+//        }
 
         VFSOutTransportInfo vfsOutInfo = null;
 

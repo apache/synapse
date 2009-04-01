@@ -88,6 +88,8 @@ public final class SynapseConstants {
     public static final String ADDRESSING_VERSION_FINAL = "final";
     public static final String ADDRESSING_VERSION_SUBMISSION = "submission";
 
+    public static final String ADDRESSING_ADDED_BY_SYNAPSE = "AddressingAddedBySynapse";
+
     /** The Axis2 client options property name for the Rampart service policy */
     public static final String RAMPART_POLICY = "rampartPolicy";
     /** The Axis2 client options property name for the Rampart in message policy */
@@ -141,7 +143,7 @@ public final class SynapseConstants {
         public static final String OUT_ONLY = "OUT_ONLY";
         /** The Synapse MC property that states that existing WS-A headers in the envelope should
         * be preserved */
-        public static final String PRESERVE_WS_ADDRESSING = "PRESERVE_WS_ADDRESSING";
+        public static final String REMOVE_WS_ADDRESSING = "REMOVE_WS_ADDRESSING";
 
         //-- error handling --
         /** An Axis2 message context property indicating a transport send failure */

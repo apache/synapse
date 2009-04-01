@@ -42,8 +42,7 @@ public class DataSourceInformationRepositoryHelper {
      * @param properties        DataSources configuration properties
      */
     public static void initializeDataSourceInformationRepository(
-            AxisConfiguration axisConfiguration,
-            Properties properties) {
+            AxisConfiguration axisConfiguration, Properties properties) {
 
         DataSourceInformationRepository repository =
                 getDataSourceInformationRepository(axisConfiguration);

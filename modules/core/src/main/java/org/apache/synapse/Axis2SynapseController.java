@@ -42,10 +42,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.core.axis2.SynapseMessageReceiver;
 import org.apache.synapse.eventing.SynapseEventSource;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Axis2 Based Synapse Controller
@@ -65,7 +62,7 @@ public class Axis2SynapseController implements SynapseController {
     /*Reference to the Synapse configuration */
     private SynapseEnvironment synapseEnvironment;
     /*Indicate initialization state */
-    private boolean initialize;
+    private boolean initialized;
     /* ServerConfiguration Information */
     private ServerConfigurationInformation information;
 
@@ -85,6 +82,7 @@ public class Axis2SynapseController implements SynapseController {
 
         if (contextInformation == null || contextInformation.getServerContext() == null ||
                 configurationInformation.isCreateNewInstance()) {
+
             if (log.isDebugEnabled()) {
                 log.debug("Initializing Synapse in a new axis2 server environment instance ");
             }
@@ -93,7 +91,7 @@ public class Axis2SynapseController implements SynapseController {
             Object context = contextInformation.getServerContext();
             if (context instanceof ConfigurationContext) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Initializing Synapse in a already created " +
+                    log.debug("Initializing Synapse in an already existing " +
                             "axis2 server environment instance");
                 }
                 configurationContext = (ConfigurationContext) context;
@@ -101,11 +99,11 @@ public class Axis2SynapseController implements SynapseController {
                         AddressingConstants.ADDR_VALIDATE_ACTION, Boolean.FALSE);
             } else {
                 handleFatal("Synapse startup initialization failed : Provided server context is" +
-                        " invalid,expected a Axis2 ConfigurationContext instance");
+                        " invalid, expected an Axis2 ConfigurationContext instance");
             }
         }
         initDefault();
-        initialize = true;
+        initialized = true;
     }
 
     /**
@@ -147,14 +145,14 @@ public class Axis2SynapseController implements SynapseController {
                     configurationContext.terminate();
                 }
             }
-            initialize = false;
+            initialized = false;
         } catch (Exception e) {
             log.error("Error stopping the Axis2 Based Server Environment", e);
         }
     }
 
     public boolean isInitialized() {
-        return initialize;
+        return initialized;
     }
 
     /**
@@ -245,7 +243,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * Create a Axis2 Based Server Environment
      *
-     * @param information (ServerConfigurationInformation instance
+     * @param information ServerConfigurationInformation instance
      */
     private void createNewInstance(ServerConfigurationInformation information) {
 
@@ -272,9 +270,6 @@ public class Axis2SynapseController implements SynapseController {
                 listenerManager.addListener(trsIn, false);
             }
             
-            information.setCreateNewInstance(true);
-            initialize = true;
-
         } catch (Throwable t) {
             handleFatal("Synapse startup failed...", t);
         }
@@ -364,8 +359,7 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     private void setupDataSources() {
-        java.util.Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
-
+        Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
         DataSourceInformationRepositoryHelper.
                 initializeDataSourceInformationRepository(
                         configurationContext.getAxisConfiguration(), synapseProperties);

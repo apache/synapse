@@ -18,8 +18,8 @@
  */
 package org.apache.synapse;
 
-import org.apache.synapse.security.secret.SecretManager;
 import org.apache.synapse.config.SynapsePropertiesLoader;
+import org.apache.synapse.security.secret.SecretManager;
 
 /**
  * Detects possible current server state
@@ -39,9 +39,14 @@ public class ServerStateDetectionStrategy {
                                            ServerConfigurationInformation information) {
         ServerState previousState = contextInformation.getServerState();
         String deploymentMode = information.getDeploymentMode();
+
+        // if the previous state is ServerState.UNDETERMINED it should be ServerState.INITIALIZABLE
         if (previousState == ServerState.UNDETERMINED) {
 
+            // if the server is running on production mode we need to initialize the secret manager 
+            // before the server state to be ServerState.INITIALIZABLE
             if (deploymentMode != null && PRODUCTION_MODE.equals(deploymentMode.trim())) {
+
                 SecretManager secretManager = SecretManager.getInstance();
                 if (secretManager.isInitialized()) {
                     return ServerState.INITIALIZABLE;
@@ -51,10 +56,13 @@ public class ServerStateDetectionStrategy {
                         return ServerState.INITIALIZABLE;
                     }
                 }
+                
             } else {
                 return ServerState.INITIALIZABLE;
             }
         }
+
+        // if the previous state is deterministic then the current state is the previous state
         return previousState;
     }
 }

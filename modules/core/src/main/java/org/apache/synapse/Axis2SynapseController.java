@@ -180,9 +180,8 @@ public class Axis2SynapseController implements SynapseController {
         try {
             configurationContext.getAxisConfiguration().addParameter(synapseEnvironmentParameter);
         } catch (AxisFault e) {
-            handleFatal("Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
-                    "' and/or '" + SynapseConstants.SYNAPSE_ENV +
-                    "'to the Axis2 configuration : " + e.getMessage(), e);
+            handleFatal("Could not set parameter '" + SynapseConstants.SYNAPSE_ENV +
+                    "' to the Axis2 configuration : " + e.getMessage(), e);
 
         }
         synapseEnvironment.setInitialized(true);
@@ -224,8 +223,7 @@ public class Axis2SynapseController implements SynapseController {
 
         } catch (AxisFault e) {
             handleFatal("Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
-                    "' and/or '" + SynapseConstants.SYNAPSE_ENV +
-                    "'to the Axis2 configuration : " + e.getMessage(), e);
+                    "' to the Axis2 configuration : " + e.getMessage(), e);
         }
         return synapseConfiguration;
     }
@@ -280,9 +278,9 @@ public class Axis2SynapseController implements SynapseController {
      *
      * @throws AxisFault For any in setup
      */
-    private void setupMainMediation() throws AxisFault {
+    private void setupMessageMediation() throws AxisFault {
 
-        log.info("Deploying the Synapse service..");
+        log.info("Deploying the Synapse service...");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();
         AxisService synapseService = new AxisService(SynapseConstants.SYNAPSE_SERVICE_NAME);
@@ -293,6 +291,7 @@ public class Axis2SynapseController implements SynapseController {
         List<String> transports = new ArrayList<String>();
         transports.add(Constants.TRANSPORT_HTTP);
         transports.add(Constants.TRANSPORT_HTTPS);
+        // todo: is this correct? this limits the message mediation to http/s
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
     }
@@ -310,6 +309,7 @@ public class Axis2SynapseController implements SynapseController {
                 thisServerName = "localhost";
             }
         }
+
         for (ProxyService proxy : synapseConfiguration.getProxyServices()) {
 
             // start proxy service if either,
@@ -335,7 +335,7 @@ public class Axis2SynapseController implements SynapseController {
 
     private void setupSynapse() throws AxisFault {
         addServerIPAndHostEnrties();
-        setupMainMediation();
+        setupMessageMediation();
         setupProxyServiceMediation();
         setupEventSources();
     }

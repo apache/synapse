@@ -19,13 +19,10 @@
 
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-import org.apache.http.params.HttpConnectionParams;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Properties;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Store and manage properties that tune the nhttp transport
@@ -132,11 +129,11 @@ public class NHttpConfiguration {
             val = props.getProperty(name);
         }
 
-        if (val != null && Integer.valueOf(val).intValue() > 0) {
+        if (val != null && Integer.valueOf(val) > 0) {
             if (log.isDebugEnabled()) {
                 log.debug("Using nhttp tuning parameter : " + name + " = " + val);
             }
-            return Integer.valueOf(val).intValue();
+            return Integer.valueOf(val);
         }        
         return def;
     }

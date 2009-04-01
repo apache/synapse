@@ -18,9 +18,9 @@
  */
 package org.apache.synapse;
 
+import org.apache.axis2.Constants;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.Constants;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -131,7 +131,8 @@ public class ServerConfigurationInformationFactory {
     }
 
     /**
-     * Factory method for create a ServerConfigurationInformation based on information from ServletConfig
+     * Factory method for create a ServerConfigurationInformation based on information
+     * from ServletConfig
      *
      * @param servletConfig ServletConfig instance
      * @return ServerConfigurationInformation instance
@@ -175,7 +176,7 @@ public class ServerConfigurationInformationFactory {
      * Helper method to get a value of a parameters in the AxisConfiguration
      *
      * @param axisConfiguration AxisConfiguration instance
-     * @param paramKey          The name / key of the parameter
+     * @param paramKey The name / key of the parameter
      * @return The value of the parameter
      */
     private static String getAxis2ParameterValue(AxisConfiguration axisConfiguration,
@@ -197,7 +198,7 @@ public class ServerConfigurationInformationFactory {
     /**
      * Utility method to extract command line arguments
      *
-     * @param cmd     Command line which capture all command line arguments
+     * @param cmd Command line which capture all command line arguments
      * @param argName Name of the argument to be extracted
      * @return value of the argument if there is , o.w null
      */
@@ -205,23 +206,29 @@ public class ServerConfigurationInformationFactory {
 
         if (cmd == null) {
             handleFatal("CommandLine is null");
-        }
+        } else {
 
-        if (argName == null || "".equals(argName)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Provided argument name is null. Returning null as value");
+            if (argName == null || "".equals(argName)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Provided argument name is null. Returning null as value");
+                }
+                return null;
             }
-            return null;
-        }
 
-        if (cmd.hasOption(argName)) {
-            return cmd.getOptionValue(argName);
+            if (cmd.hasOption(argName)) {
+                return cmd.getOptionValue(argName);
+            }
         }
         return null;
     }
 
-    /*
+    /**
      * Load synapse initialization parameters from servlet configuration
+     *
+     * @param servletConfig Servlet configuration with the init parameters
+     * @param name name of the init parameter to be loaded
+     * @param required whether this parameter is a required one or not
+     * @return value of the loaded parameter
      */
     private static String loadParameter(ServletConfig servletConfig, String name,
                                         boolean required) {
@@ -229,11 +236,12 @@ public class ServerConfigurationInformationFactory {
         if (System.getProperty(name) == null) {
 
             String value = servletConfig.getInitParameter(name);
-            log.debug("Init parameter '" + name + "' : " + value);
-
+            if (log.isDebugEnabled()) {
+                log.debug("Init parameter '" + name + "' : " + value);
+            }
+                
             if ((value == null || value.trim().length() == 0) && required) {
-                handleFatal("A valid system property or init parameter '" + name +
-                        "' is required");
+                handleFatal("A valid system property or init parameter '" + name + "' is required");
             } else {
                 return value;
             }

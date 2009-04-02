@@ -21,16 +21,13 @@ package org.apache.synapse.startup.quartz;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
-import org.apache.synapse.task.TaskDescription;
-import org.apache.synapse.task.TaskDescriptionRepository;
-import org.apache.synapse.task.TaskScheduler;
-import org.apache.synapse.task.TaskSchedulerFactory;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.task.*;
 
 import javax.xml.namespace.QName;
 import java.net.InetAddress;
@@ -52,8 +49,7 @@ public class SimpleQuartz extends AbstractStartup {
 
     private TaskDescription taskDescription;
 
-    private TaskDescriptionRepository repository;
-
+    private final TaskHelper taskHelper = TaskHelper.getInstance();
 
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
@@ -68,15 +64,18 @@ public class SimpleQuartz extends AbstractStartup {
             return;
         }
 
-        TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
-                SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
+        if (taskHelper.isInitialized()) {
 
-        if (taskScheduler != null && taskScheduler.isInitialized()) {
-            taskScheduler.deleteTask(taskDescription.getName(), taskDescription.getGroup());
-        }
+            TaskScheduler taskScheduler = taskHelper.getTaskScheduler();
 
-        if (repository != null) {
-            repository.removeTaskDescription(taskDescription.getName());
+            if (taskScheduler != null && taskScheduler.isInitialized()) {
+                taskScheduler.deleteTask(taskDescription.getName(), taskDescription.getGroup());
+            }
+
+            TaskDescriptionRepository repository = taskHelper.getTaskDescriptionRepository();
+            if (repository != null) {
+                repository.removeTaskDescription(taskDescription.getName());
+            }
         }
     }
 
@@ -87,7 +86,15 @@ public class SimpleQuartz extends AbstractStartup {
         }
 
         SynapseConfiguration synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
-        repository = synapseConfiguration.getTaskDescriptionRepository();
+
+        if (!taskHelper.isInitialized()) {
+            taskHelper.init(
+                    TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
+                            TaskConstants.TASK_DESCRIPTION_REPOSITORY),
+                    TaskSchedulerFactory.getTaskScheduler(TaskConstants.TASK_SCHEDULER));
+        }
+
+        TaskDescriptionRepository repository = taskHelper.getTaskDescriptionRepository();
 
         if (repository == null) {
             handleException("Task Description Repository can not found");

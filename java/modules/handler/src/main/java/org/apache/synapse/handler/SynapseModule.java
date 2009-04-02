@@ -53,8 +53,8 @@ public class SynapseModule implements Module {
      * @param axisModule - AxisModule describing handler initializationModule of Synapse
      * @throws AxisFault - incase of a failure in initiation
      */
-    public void init(ConfigurationContext configurationContext,
-                     AxisModule axisModule) throws AxisFault {
+    public void init(ConfigurationContext configurationContext, AxisModule axisModule)
+            throws AxisFault {
 
         log.info("Initializing the Synapse as a handler");
         ServerConfigurationInformation configurationInformation =
@@ -67,7 +67,7 @@ public class SynapseModule implements Module {
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {}
-    public boolean canSupportAssertion(Assertion assertion) {return false;}
+    public boolean canSupportAssertion(Assertion assertion) { return false; }
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {}
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {}
 }

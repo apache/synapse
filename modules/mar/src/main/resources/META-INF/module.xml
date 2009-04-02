@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<module name="synapse" class="org.apache.synapse.core.axis2.SynapseInitializationModule">
+<module name="synapse">
 
     <Description>
         This module dynamically set the Synapse dispatcher. Synapse service and

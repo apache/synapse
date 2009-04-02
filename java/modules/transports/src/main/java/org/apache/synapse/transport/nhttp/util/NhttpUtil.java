@@ -24,6 +24,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axiom.om.OMOutputFormat;
 
 import java.net.InetAddress;
@@ -100,14 +101,14 @@ public class NhttpUtil {
     public static OMOutputFormat getOMOutputFormat(MessageContext msgContext) {
 
         OMOutputFormat format = new OMOutputFormat();
-        msgContext.setDoingMTOM(BaseUtils.doWriteMTOM(msgContext));
-        msgContext.setDoingSwA(BaseUtils.doWriteSwA(msgContext));
-        msgContext.setDoingREST(BaseUtils.isDoingREST(msgContext));
+        msgContext.setDoingMTOM(TransportUtils.doWriteMTOM(msgContext));
+        msgContext.setDoingSwA(TransportUtils.doWriteSwA(msgContext));
+        msgContext.setDoingREST(TransportUtils.isDoingREST(msgContext));
         format.setSOAP11(msgContext.isSOAP11());
         format.setDoOptimize(msgContext.isDoingMTOM());
         format.setDoingSWA(msgContext.isDoingSwA());
 
-        format.setCharSetEncoding(BaseUtils.getCharSetEncoding(msgContext));
+        format.setCharSetEncoding(TransportUtils.getCharSetEncoding(msgContext));
         Object mimeBoundaryProperty = msgContext.getProperty(Constants.Configuration.MIME_BOUNDARY);
         if (mimeBoundaryProperty != null) {
             format.setMimeBoundary((String) mimeBoundaryProperty);

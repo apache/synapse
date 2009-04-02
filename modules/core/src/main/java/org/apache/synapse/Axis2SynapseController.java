@@ -41,6 +41,7 @@ import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.core.axis2.SynapseMessageReceiver;
 import org.apache.synapse.eventing.SynapseEventSource;
+import org.apache.synapse.task.*;
 
 import java.util.*;
 
@@ -102,7 +103,7 @@ public class Axis2SynapseController implements SynapseController {
                         " invalid, expected an Axis2 ConfigurationContext instance");
             }
         }
-        initDefault();
+        initDefault(contextInformation);
         initialized = true;
     }
 
@@ -112,6 +113,7 @@ public class Axis2SynapseController implements SynapseController {
     public void destroy() {
 
         try {
+            cleanupDefault();
             // stop all services
             if (information.isCreateNewInstance()) {  // only if we have created the server
 
@@ -340,10 +342,11 @@ public class Axis2SynapseController implements SynapseController {
         setupEventSources();
     }
 
-    private void initDefault() {
+    private void initDefault(ServerContextInformation contextInformation) {
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
         loadMediatorExtensions();
         setupDataSources();
+        setupTaskHelper(contextInformation);
     }
 
     private void loadMediatorExtensions() {
@@ -363,6 +366,47 @@ public class Axis2SynapseController implements SynapseController {
         DataSourceInformationRepositoryHelper.
                 initializeDataSourceInformationRepository(
                         configurationContext.getAxisConfiguration(), synapseProperties);
+    }
+
+    /**
+     *  Intialize TaskHelper - with any existing  TaskDescriptionRepository and TaskScheduler
+     *  or without those
+     * @param contextInformation  ServerContextInformation instance
+     */
+    private void setupTaskHelper(ServerContextInformation contextInformation) {
+
+        TaskHelper taskHelper = TaskHelper.getInstance();
+        if (taskHelper.isInitialized()) {
+            if (log.isDebugEnabled()) {
+                log.debug("TaskHelper has been already initialized.");
+            }
+            return;
+        }
+
+        Object repo = contextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
+        Object taskScheduler = contextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
+
+        if (repo instanceof TaskDescriptionRepository && taskScheduler instanceof TaskScheduler) {
+            taskHelper.init((TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
+        } else {
+
+            if (repo == null && taskScheduler == null) {
+                taskHelper.init(
+                        TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
+                                TaskConstants.TASK_DESCRIPTION_REPOSITORY),
+                        TaskSchedulerFactory.getTaskScheduler(TaskConstants.TASK_SCHEDULER));
+            } else {
+                handleFatal("Invalid property values for " +
+                        "TaskDescriptionRepository or / and TaskScheduler ");
+            }
+        }
+    }
+
+    private void cleanupDefault() {
+        TaskHelper taskHelper = TaskHelper.getInstance();
+        if (taskHelper.isInitialized()) {
+            taskHelper.cleanup();
+        }
     }
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {

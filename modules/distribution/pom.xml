@@ -100,6 +100,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
+        <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required
+             to deploy some modules => include this explicitly. -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-codegen</artifactId>
+        </dependency>
 
         <!-- Additional transports -->
         <dependency>

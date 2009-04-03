@@ -95,8 +95,10 @@ public class ClientHandler implements NHttpClientHandler {
     /**
      * Create an instance of this client connection handler using the Axis2 configuration
      * context and Http protocol parameters given
+     * 
      * @param cfgCtx the Axis2 configuration context
      * @param params the Http protocol parameters to adhere to
+     * @param metrics statistics collection metrics
      */
     public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params,
         final MetricsCollector metrics) {
@@ -125,8 +127,10 @@ public class ClientHandler implements NHttpClientHandler {
     /**
      * Submit a new request over an already established connection, which has been
      * 'kept alive'
+     *
      * @param conn the connection to use to send the request, which has been kept open
      * @param axis2Req the new request
+     * @throws ConnectionClosedException if the connection is closed by the other party
      */
     public void submitRequest(final NHttpClientConnection conn, Axis2HttpRequest axis2Req)
         throws ConnectionClosedException {
@@ -135,6 +139,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Invoked when the destination is connected
+     * 
      * @param conn the connection being processed
      * @param attachment the attachment set previously
      */
@@ -155,8 +160,10 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Process a new connection over an existing TCP connection or new
-     * @param conn
-     * @param axis2Req
+     * 
+     * @param conn HTTP connection to be processed
+     * @param axis2Req axis2 representation of the message in the connection
+     * @throws ConnectionClosedException if the connection is closed 
      */
     private void processConnection(final NHttpClientConnection conn,
         final Axis2HttpRequest axis2Req) throws ConnectionClosedException {
@@ -206,7 +213,8 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Handle connection close events
-     * @param conn
+     * 
+     * @param conn HTTP connection to be closed
      */
     public void closed(final NHttpClientConnection conn) {
         ConnectionPool.forget(conn);
@@ -234,6 +242,7 @@ public class ClientHandler implements NHttpClientHandler {
     /**
      * Handle connection timeouts by shutting down the connections. These are established
      * that have reached the SO_TIMEOUT of the socket
+     * 
      * @param conn the connection being processed
      */
     public void timeout(final NHttpClientConnection conn) {
@@ -261,6 +270,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Handle Http protocol violations encountered while reading from underlying channels
+     * 
      * @param conn the connection being processed
      * @param e the exception encountered
      */
@@ -273,6 +283,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Handle IO errors while reading or writing to underlying channels
+     * 
      * @param conn the connection being processed
      * @param e the exception encountered
      */
@@ -289,6 +300,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Include remote host and port information to an error message
+     * 
      * @param message the initial message
      * @param conn the connection encountering the error
      * @return the updated error message
@@ -368,9 +380,11 @@ public class ClientHandler implements NHttpClientHandler {
                 public void run() {
                     MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
                     try {
-                        AxisFault axisFault = (exceptionToRaise != null ?
-                            new AxisFault(errorMessage, exceptionToRaise) :
-                            new AxisFault(errorMessage));
+                        // This AxisFault is created to create the fault message context
+                        // noinspection ThrowableInstanceNeverThrown
+                        AxisFault axisFault = exceptionToRaise != null ?
+                                new AxisFault(errorMessage, exceptionToRaise) :
+                                new AxisFault(errorMessage);
 
                         MessageContext nioFaultMessageContext =
                             MessageContextBuilder.createFaultMessageContext(mc, axisFault);
@@ -414,6 +428,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Process ready input (i.e. response from remote server)
+     * 
      * @param conn connection being processed
      * @param decoder the content decoder in use
      */
@@ -475,6 +490,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Process ready output (i.e. write request to remote server)
+     * 
      * @param conn the connection being processed
      * @param encoder the encoder in use
      */
@@ -509,6 +525,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Process a response received for the request sent out
+     * 
      * @param conn the connection being processed
      */
     public void responseReceived(final NHttpClientConnection conn) {
@@ -673,14 +690,16 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Perform processing of the received response though Axis2
-     * @param conn
-     * @param context
-     * @param response
+     *
+     * @param conn HTTP connection to be processed
+     * @param context HTTP context associated with the connection
+     * @param response HTTP response associated with the connection
      */
     private void processResponse(final NHttpClientConnection conn, HttpContext context,
         HttpResponse response) {
 
-        ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+        ContentInputBuffer inputBuffer
+                = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
         context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
 
         BasicHttpEntity entity = new BasicHttpEntity();
@@ -700,21 +719,9 @@ public class ClientHandler implements NHttpClientHandler {
         workerPool.execute(task);        
     }
 
-    // ----------- utility methods -----------
-
-    private void handleException(String msg, Exception e, NHttpClientConnection conn) {
-        if (msg.toLowerCase().indexOf("reset") != -1) {
-            log.warn(msg);
-        } else {
-            log.error(msg, e);
-        }
-        if (conn != null) {
-            shutdownConnection(conn);
-        }
-    }
-
     /**
      * Shutdown the connection ignoring any IO errors during the process
+     * 
      * @param conn the connection to be shutdown
      */
     private void shutdownConnection(final NHttpClientConnection conn) {
@@ -735,6 +742,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     /**
      * Return the HttpProcessor for requests
+     *
      * @return the HttpProcessor that processes requests
      */
     private HttpProcessor getHttpProcessor() {
@@ -759,6 +767,19 @@ public class ClientHandler implements NHttpClientHandler {
         try {
             workerPool.shutdown(1000);
         } catch (InterruptedException ignore) {}
+    }
+
+    // ----------- utility methods -----------
+
+    private void handleException(String msg, Exception e, NHttpClientConnection conn) {
+        if (msg.toLowerCase().indexOf("reset") != -1) {
+            log.warn(msg);
+        } else {
+            log.error(msg, e);
+        }
+        if (conn != null) {
+            shutdownConnection(conn);
+        }
     }
 
     private MessageContext getMessageContext(final NHttpClientConnection conn) {

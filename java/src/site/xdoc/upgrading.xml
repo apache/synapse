@@ -22,7 +22,37 @@
         <title>Upgrade guide</title>
     </properties>
     <body>
+        <section name="General comments">
+            <p>If you are using custom extensions (mediators, startups, etc.) implemented in Java and
+            depending on Synapse APIs, you should go through the following process before upgrading
+            to a new release:</p>
+            <ol>
+                <li>Compile the extension with the libraries from the Synapse release you are
+                currently using and check for any deprecation warnings. You should change your code
+                to eliminate all those warnings. In general the Javadoc of the deprecated class or
+                method gives you a hint on how to change your code. Test all your changes with
+                your current Synapse release.</li>
+                <li>Recompile and test the extension with the libraries from the new Synapse release.
+                We try to avoid to introduce incompatible changes to Synapse's core APIs between
+                releases (except if the related classes or methods were deprecated in the previous
+                release). However, it is not always possible to maintain compatibility. In addition
+                your code might depend on features that are not part of the core API. Therefore, even
+                if you don't use deprecated methods and classes, there is no guarantee that your code
+                will not break when upgrading to a new release and you always need to recompile and test
+                them before deploying to the new release.</li>
+                <li>Upgrade your Synapse installation and deploy the new version of your extensions.</li>
+            </ol>
+            <p>If you are skipping releases when upgrading your installation, you might nevertheless want
+            to go through the first step for all the intermediate releases. This will make the migration
+            easier.</p>
+        </section>
         <section name="Upgrading from 1.2 to 1.3">
+          <subsection name="Endpoint URLs for proxy services">
+            <p>In release 1.3 the endpoint URLs for proxy services have changed from <tt>/soap</tt>
+            to <tt>/services</tt>. E.g. <tt>http://localhost:8280/services/StockQuote</tt> should be
+            used instead of <tt>http://localhost:8280/soap/StockQuote</tt>.</p>
+          </subsection>
+          <subsection name="MediatorDeployer">
             <p>Release 1.3 has enhanced capabilities for extension deployment. While in 1.2 extension
             deployment was limited to mediators bundled as simple JAR files, 1.3 extended this support
             to startups and defined a new archive format (XAR) that allows to bundle these extensions
@@ -49,6 +79,7 @@
 &lt;deployer extension="jar" directory="mediators" class="org.apache.synapse.core.axis2.ExtensionDeployer"/>
 &lt;deployer extension="xar" directory="extensions" class="org.apache.synapse.core.axis2.ExtensionDeployer"/>
 </pre>
+          </subsection>
         </section>
     </body>
 </document>

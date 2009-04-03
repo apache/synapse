@@ -44,6 +44,7 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -59,6 +60,8 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler;
+import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,6 +77,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -1015,10 +1019,22 @@ public class SandeshaUtil {
 		            
 		return targetEnv;
 	}
-	
-	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, List<MessageContext> msgsToSend)throws AxisFault{
-	    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
-	        log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");
+
+
+	/** 
+	* ReallocateMessages to a new sequence
+	* @param storageManager
+	* @param oldRMSBean
+	* @param msgsToSend
+	* @param transaction
+	* 
+	*/
+	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, 
+		List<MessageContext> msgsToSend, Transaction transaction)
+		throws AxisFault, SandeshaException{
+
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+			log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");
 	    
 		ConfigurationContext ctx = storageManager.getContext();
 		ServiceClient client = new ServiceClient(ctx,  null);
@@ -1027,30 +1043,68 @@ public class SandeshaUtil {
 		Options options = client.getOptions();
 		options.setTo(oldRMSBean.getToEndpointReference());
 		options.setReplyTo(oldRMSBean.getReplyToEndpointReference());
-		
-        //internal sequence ID is different
-        String internalSequenceID = oldRMSBean.getInternalSequenceID();
-        //we also need to obtain the sequenceKey from the internalSequenceID.
-        String oldSequenceKey = 
-          SandeshaUtil.getSequenceKeyFromInternalSequenceID(internalSequenceID, oldRMSBean.getToEndpointReference().getAddress());
-        //remove the old sequence key from the internal sequence ID
-        internalSequenceID = internalSequenceID.substring(0, internalSequenceID.length()-oldSequenceKey.length());
-        options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, 
-        		SandeshaUtil.getUUID()); //using a new sequence Key to differentiate from the old sequence 
-        options.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceID);
-        options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, oldRMSBean.getRMVersion());
-      	options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
-      	
-        //send the msgs - this will setup a new sequence to the same endpoint
-      	Iterator<MessageContext> it = msgsToSend.iterator();
-      	while(it.hasNext()){
-      		MessageContext msgCtx = (MessageContext)it.next();
-      		client.getOptions().setAction(msgCtx.getWSAAction());
-      		client.fireAndForget(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement());
-      	}
-      	
-	    if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
-	        log.debug("Exit: SandeshaUtil::reallocateMessagesToNewSequence");
+
+		//internal sequence ID is different
+		String internalSequenceID = oldRMSBean.getInternalSequenceID();
+
+		options.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceID);
+		options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, oldRMSBean.getRMVersion());
+		options.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+
+		//Update the RMSBean so as to mark it as reallocated if it isn't an RMSbean created for a previous reallocation
+		RMSBean originallyReallocatedRMSBean = SandeshaUtil.isLinkedToReallocatedRMSBean(storageManager, oldRMSBean.getInternalSequenceID());
+		if(originallyReallocatedRMSBean == null){
+			oldRMSBean.setReallocated(Sandesha2Constants.WSRM_COMMON.REALLOCATED);
+			storageManager.getRMSBeanMgr().update(oldRMSBean);
+		} else {
+			options.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, originallyReallocatedRMSBean.getInternalSequenceID());
+			originallyReallocatedRMSBean.setInternalSeqIDOfSeqUsedForReallocation(null);	
+			storageManager.getRMSBeanMgr().update(originallyReallocatedRMSBean);
+
+			//Setting this property so that the bean can be deleted
+			oldRMSBean.setReallocated(Sandesha2Constants.WSRM_COMMON.ORIGINAL_REALLOCATED_BEAN_COMPLETE);
+			oldRMSBean.setInternalSeqIDOfSeqUsedForReallocation(originallyReallocatedRMSBean.getInternalSequenceID());
+			storageManager.getRMSBeanMgr().update(oldRMSBean);
+		}
+
+		//Commit current transaction that wraps the manageFaultMsg as we are about to start
+		//resending msgs on a new seq and they will need to get a transaction on the 
+		//current thread
+		if(transaction != null && transaction.isActive()) transaction.commit();
+
+		//send the msgs - this will setup a new sequence to the same endpoint
+		Iterator<MessageContext> it = msgsToSend.iterator();
+
+		while(it.hasNext()){
+			MessageContext msgCtx = (MessageContext)it.next();
+
+			//Set the action
+			client.getOptions().setAction(msgCtx.getWSAAction());
+
+			//Set the message ID
+			client.getOptions().setMessageId(msgCtx.getMessageID());
+
+			//Get the AxisOperation
+			AxisOperation axisOperation = msgCtx.getAxisOperation();
+
+			//If it's oneway or async, reallocate
+			//Fail if replyTo is annonymous as this is currently not supported because in twoway we can't get responses back to th eold something
+			if(axisOperation.getAxisSpecificMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_ONLY){
+				client.fireAndForget(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement());
+			} else if (client.getOptions().getReplyTo().hasAnonymousAddress()){
+				oldRMSBean.setReallocated(Sandesha2Constants.WSRM_COMMON.REALLOCATION_FAILED);
+				storageManager.getRMSBeanMgr().update(oldRMSBean);
+				throw new SandeshaException(SandeshaMessageKeys.reallocationForSyncRequestReplyNotSupported);
+			} else {
+				MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
+				Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(msgCtx.getMessageID());	
+				client.setAxisService(msgCtx.getAxisService());
+				client.sendReceiveNonBlocking(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement(), (Callback)callback);
+			}
+		}
+
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::reallocateMessagesToNewSequence");
 	}
 
   /**
@@ -1274,6 +1328,18 @@ public class SandeshaUtil {
 		
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isInOrder, " + result);
 		return result;
+	}
+
+	public static RMSBean isLinkedToReallocatedRMSBean(StorageManager storageManager, String internalSeqID) throws SandeshaException {
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isLinkedToReallocatedRMSBean");
+ 
+		//Need to check if it's an RMSBean created for reallocation.
+		RMSBean finderBean = new RMSBean();
+		finderBean.setInternalSeqIDOfSeqUsedForReallocation(internalSeqID);
+		RMSBean reallocatedRMSBean = storageManager.getRMSBeanMgr().findUnique(finderBean);
+	
+		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Enter: SandeshaUtil::isLinkedToReallocatedRMSBean, ReallocatedRMSBean: " + reallocatedRMSBean);
+		return reallocatedRMSBean;
 	}
 
 }

@@ -443,8 +443,19 @@ public class SandeshaClient {
 			if (terminatedSequence) {		
 				// Delete the rmsBean
 				storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
+				
+				if(tran != null && tran.isActive()) tran.commit();
+				tran = storageManager.getTransaction();				
+				
+				//Need to check if it's an RMSBean created for reallocation.  If so we need to				
+				//delete the original RMSBean that was reallocated.				
+				RMSBean reallocatedRMSBean = SandeshaUtil.isLinkedToReallocatedRMSBean(storageManager, rmsBean.getInternalSequenceID());
+				if(reallocatedRMSBean != null){					
+					if (log.isDebugEnabled())
+						log.debug("Removing Reallocated RMSBean " + reallocatedRMSBean);
+					storageManager.getRMSBeanMgr().delete(reallocatedRMSBean.getCreateSeqMsgID());
+				}
 			}
-			
 			if(tran != null && tran.isActive()) tran.commit();
 			tran = null;
 		

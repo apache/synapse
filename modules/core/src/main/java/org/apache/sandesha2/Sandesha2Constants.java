@@ -245,6 +245,23 @@ public interface Sandesha2Constants {
 		String ENDPOINT = "Endpoint";
 		
 		String UNSUPPORTED_ELEMENT = "UnsupportedElement";
+		
+		//This is to identify an RMSBean that hasn't been reallocated
+		int NOT_REALLOCATED = 0;
+		
+		//This is to identify an RMSBean that is to be reallocated or has been reallocated
+		int REALLOCATED = 1;
+		
+		//This is to identify an RMSBean that was created for reallocation but then was reallocated itself
+		//That way we know it can be deleted
+		int ORIGINAL_REALLOCATED_BEAN_COMPLETE = 2;
+		
+		//This is to identify the RMS Bean that was created to reallocate another RMSBean 
+		int RMS_BEAN_USED_FOR_REALLOCATION = 3;
+		
+		//This is to identify an RMSBean that was attempted to be reallocated but for some reason the reallocation failed.
+		int REALLOCATION_FAILED = -1;
+		
 	}
 
 	public interface WSA {

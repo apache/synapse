@@ -154,7 +154,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		if(!rmsBeanMgr.update(rmsBean)){			
 			//Im not setting the createSeqBean sender bean to resend true as the reallocation of msgs will do this
 			try{
-				TerminateManager.terminateSendingSide(rmsBean, storageManager, true);
+				TerminateManager.terminateSendingSide(rmsBean, storageManager, true, transaction);
 			} catch(Exception e){
 				if (log.isDebugEnabled())
 					log.debug(e);					

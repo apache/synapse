@@ -177,8 +177,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (msgContext.getMessageID() == null)
 			msgContext.setMessageID(SandeshaUtil.getUUID());
 
-		
-
 		/*
 		 * Internal sequence id is the one used to refer to the sequence (since
 		 * actual sequence id is not available when first msg arrives) server
@@ -230,13 +228,47 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 
+		boolean autoStartNewSeqForReallocation = false;
 		//if this is an existing sequence then we need to do some checks first
 		if(rmsBean != null)
 		{
+			//If the sequence has been reallocated we need to find out the new internalSeqID.
+			//If the internalSeqID hasn't been set yet we should auto restart.  If it has a new
+			//internalSeqID we just send the message on the new reallocated sequence. 
+			int seqReallocated = rmsBean.isReallocated();
+			if(seqReallocated == Sandesha2Constants.WSRM_COMMON.REALLOCATED){
+				if (log.isDebugEnabled())
+					log.debug("ApplicationMsgProcessor: Reallocated Sequence: " + rmsBean.getSequenceID());
+				//Try and get the new internalSeqID
+				internalSequenceId = rmsBean.getInternalSeqIDOfSeqUsedForReallocation();
+				if(internalSequenceId != null){
+					if (log.isDebugEnabled())
+						log.debug("ApplicationMsgProcessor: InternalSeqID of new sequence: " + internalSequenceId);
+					rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceId);
+					rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+				} else {
+					autoStartNewSeqForReallocation = true;
+				}
+			} else if(seqReallocated == Sandesha2Constants.WSRM_COMMON.REALLOCATION_FAILED){
+				//We can't do anymore as we have already tried to reallocate this sequence.
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reallocationFailed, rmsBean.getSequenceID(),
+						"We have already attempted to reallocate this Sequence and we won't try again.  The sequance needs to be cleaned up manually."));
+			}
+
 			//see if the sequence is closed
-			if(rmsBean.isSequenceClosedClient() || rmsBean.isTerminateAdded() || rmsBean.isTimedOut()){
+			if(rmsBean.isSequenceClosedClient() || rmsBean.isTerminateAdded() || rmsBean.isTimedOut() || autoStartNewSeqForReallocation){
 				if(SandeshaUtil.isAutoStartNewSequence(msgContext)){
 					internalSequenceId = getSequenceID(rmMsgCtx, serverSide, true); //require a new sequence
+					if(autoStartNewSeqForReallocation){
+						if (log.isDebugEnabled())
+							log.debug("ApplicationMsgProcessor: autoStartNewSeqForReallocation: InternalSeqID of new sequence used for reallocation: " 
+										+ internalSequenceId);
+						rmsBean.setInternalSeqIDOfSeqUsedForReallocation(internalSequenceId);
+						storageManager.getRMSBeanMgr().update(rmsBean);
+						
+						if(tran != null && tran.isActive()) tran.commit();
+						tran = storageManager.getTransaction();		
+					}
 					if (log.isDebugEnabled())
 						log.debug("ApplicationMsgProcessor: auto start new sequence " + internalSequenceId + " :: " + rmsBean);
 					//set this new internal sequence ID on the msg
@@ -337,6 +369,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					if (rmsBean == null) {
 						rmsBean = SequenceManager.setupNewClientSequence(msgContext, internalSequenceId, storageManager);
 						rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, storageManager);
+
+						if(autoStartNewSeqForReallocation){
+							rmsBean.setReallocated(Sandesha2Constants.WSRM_COMMON.RMS_BEAN_USED_FOR_REALLOCATION);
+						}
+
 						if(rmsBean != null) outSequenceID = rmsBean.getSequenceID();
 						
 						if (rmsBean == null && appMsgProcTran != null && appMsgProcTran.isActive()) {
@@ -348,7 +385,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 							appMsgProcTran = storageManager.getTransaction();
 						}
 					}
-
 				}
 	
 			} else {
@@ -554,6 +590,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processOutMessage " + Boolean.TRUE);
+
 		return true;
 	}
 

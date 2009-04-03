@@ -619,7 +619,7 @@ public class FaultManager {
 					if (log.isDebugEnabled())
 						log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
 	
-					// Sending the message
+					//Sending the message
 					//having a surrounded try block will make sure that the error is logged here 
 					//and that this does not disturb the processing of a carrier message.
 					try {
@@ -671,7 +671,7 @@ public class FaultManager {
 		
 	}
 	
-	private static InvocationResponse manageIncomingFault (AxisFault fault, RMMsgContext rmMsgCtx, SOAPFault faultPart) throws AxisFault {
+	private static InvocationResponse manageIncomingFault (AxisFault fault, RMMsgContext rmMsgCtx, SOAPFault faultPart, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::manageIncomingFault");
 		InvocationResponse response = InvocationResponse.CONTINUE;
@@ -743,7 +743,7 @@ public class FaultManager {
 		} else if (Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE.equals(soapFaultSubcode) ||
 				Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED.equals(soapFaultSubcode) || 
 				Sandesha2Constants.SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER.equals(soapFaultSubcode)) {
-			processSequenceUnknownFault(rmMsgCtx, fault, identifier);
+			processSequenceUnknownFault(rmMsgCtx, fault, identifier, transaction);
 		} 
 		
 		// If the operation is an Sandesha In Only operation, or the fault is a recognised fault,
@@ -783,7 +783,7 @@ public class FaultManager {
 
 	    	// constructing the fault
 	    	AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart, rmMsgCtx);
-	    	response = manageIncomingFault (axisFault, rmMsgCtx, faultPart);
+	    	response = manageIncomingFault (axisFault, rmMsgCtx, faultPart, transaction);
 	    	
 	    	if(transaction != null && transaction.isActive()) transaction.commit();
 	    	transaction = null;
@@ -966,7 +966,7 @@ public class FaultManager {
 		// Cleanup sending side.
 		if (log.isDebugEnabled())
 			log.debug("Terminating sending sequence " + rmsBean);
-		TerminateManager.terminateSendingSide(rmsBean, storageManager, false);
+		TerminateManager.terminateSendingSide(rmsBean, storageManager, false, null);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::processCreateSequenceRefusedFault");
@@ -980,7 +980,7 @@ public class FaultManager {
 	 * @param fault
 	 * @param identifier 
 	 */
-	private static void processSequenceUnknownFault(RMMsgContext rmMsgCtx, AxisFault fault, String sequenceID) throws AxisFault {
+	private static void processSequenceUnknownFault(RMMsgContext rmMsgCtx, AxisFault fault, String sequenceID, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::processSequenceUnknownFault " + sequenceID);
 
@@ -998,16 +998,16 @@ public class FaultManager {
 			// Cleanup sending side.
 			if (log.isDebugEnabled())
 				log.debug("Terminating sending sequence " + rmsBean);
-			if(!TerminateManager.terminateSendingSide(rmsBean, storageManager, true)){
+			if(!TerminateManager.terminateSendingSide(rmsBean, storageManager, true, transaction)){
 				// We did not reallocate so we notify the clients of a failure
 				notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
+				
+				//Mark the RMSBean as reallocation failed and update last activation time
+				transaction = storageManager.getTransaction();
+				rmsBean.setLastActivatedTime(System.currentTimeMillis());
+				storageManager.getRMSBeanMgr().update(rmsBean);
+				if(transaction != null && transaction.isActive()) transaction.commit();
 			}
-			
-			// Update the last activated time.
-			rmsBean.setLastActivatedTime(System.currentTimeMillis());
-			
-			// Update the bean in the map
-			storageManager.getRMSBeanMgr().update(rmsBean);
 		}
 		else {
 			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);

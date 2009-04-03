@@ -427,7 +427,7 @@ public class Sender extends SandeshaThread {
 
 	private void deleteRMSBeans(List<RMSBean> rmsBeans, SandeshaPolicyBean propertyBean, long deleteTime)
 
-	throws SandeshaStorageException {
+	throws SandeshaStorageException, SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::deleteRMSBeans");
 
@@ -437,12 +437,24 @@ public class Sender extends SandeshaThread {
 			RMSBean rmsBean = (RMSBean) beans.next();
 			long timeNow = System.currentTimeMillis();
 			long lastActivated = rmsBean.getLastActivatedTime();
+
 			// delete sequences that have been timedout or deleted for more than
 			// the SequenceRemovalTimeoutInterval
-
-			if ((lastActivated + deleteTime) < timeNow) {
+			if (((lastActivated + deleteTime) < timeNow) &&
+				(rmsBean.isReallocated() == Sandesha2Constants.WSRM_COMMON.NOT_REALLOCATED)) {
 				if (log.isDebugEnabled())
 					log.debug("Removing RMSBean " + rmsBean);
+
+				//Need to check if it's an RMSBean created for reallocation.  If so we need to
+				//delete the original RMSBean that was reallocated.
+				RMSBean reallocatedRMSBean = SandeshaUtil.isLinkedToReallocatedRMSBean(storageManager, rmsBean.getInternalSequenceID());
+				
+				if(reallocatedRMSBean != null){
+					if (log.isDebugEnabled())
+						log.debug("Removing Reallocated RMSBean " + reallocatedRMSBean);
+					storageManager.getRMSBeanMgr().delete(reallocatedRMSBean.getCreateSeqMsgID());
+				}
+
 				storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
 				storageManager.removeMessageContext(rmsBean.getReferenceMessageStoreKey());
 			}
@@ -616,7 +628,7 @@ public class Sender extends SandeshaThread {
 					
 					// Mark the sequence as terminated
 					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(manager, id);
-					TerminateManager.terminateSendingSide(rmsBean, storageManager, false);
+					TerminateManager.terminateSendingSide(rmsBean, storageManager, false, null);
 					
 					if(log.isDebugEnabled()) log.debug("Sender::checkForOrphanMessages.  Orphaned message of type TERMINATE_SEQ or TERMINATE_SEQ_RESPONSE found.  Deleting this message with a sequence ID of : " + id);
 					// Delete the terminate sender bean.

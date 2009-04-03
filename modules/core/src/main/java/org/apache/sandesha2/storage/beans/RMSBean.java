@@ -19,6 +19,7 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 
@@ -152,6 +153,22 @@ public class RMSBean extends RMSequenceBean {
 	 * be ignored within the match method.
 	 */
 	private int rmsFlags = 0;
+	
+	/**
+	 * Indicates the reallocation state.  The states can be either:
+	 * notReallocated - The bean hasn't been reallocated
+	 * reallocated - The bean is to be reallocated
+	 * ReallocatedBeanComplete - The bean was created for reallocation but is no longer needed as itself has been reallocated
+	 * BeanUsedForReallocation - The bean was created for reallocation
+	 * ReallocationFailed - The reallocation of this bean failed
+	 */
+	private int reallocated = Sandesha2Constants.WSRM_COMMON.NOT_REALLOCATED;
+	
+	/**
+	 * Contains the internalSeqID of the seq that has sent the reallocated msgs
+	 */
+	private String internalSeqIDOfSeqUsedForReallocation = null;
+	
 	public static final int LAST_SEND_ERROR_TIME_FLAG = 0x00000001;
 	public static final int LAST_OUT_MSG_FLAG         = 0x00000010;
 	public static final int HIGHEST_OUT_MSG_FLAG      = 0x00000100;
@@ -195,7 +212,9 @@ public class RMSBean extends RMSequenceBean {
 		 terminationPauserForCS = beanToCopy.isTerminationPauserForCS();
 		 timedOut = beanToCopy.isTimedOut();
 		 transportTo = beanToCopy.getTransportTo();
-		 avoidAutoTermination = beanToCopy.isAvoidAutoTermination();		
+		 avoidAutoTermination = beanToCopy.isAvoidAutoTermination();	
+		 reallocated = beanToCopy.isReallocated();
+		 internalSeqIDOfSeqUsedForReallocation = beanToCopy.getInternalSeqIDOfSeqUsedForReallocation();
 	}
 
 	public String getCreateSeqMsgID() {
@@ -434,6 +453,8 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nClientCompletedMsgs: "); result.append(clientCompletedMessages);
 		result.append("\nAnonymous UUID     : "); result.append(anonymousUUID);
 		result.append("\nSOAPVersion  : "); result.append(soapVersion);
+		result.append("\nReallocated  : "); result.append(reallocated);
+		result.append("\nInternalSeqIDOfSeqUsedForReallocation  : "); result.append(internalSeqIDOfSeqUsedForReallocation);
 		return result.toString();
 	}
 	
@@ -478,6 +499,9 @@ public class RMSBean extends RMSequenceBean {
 		else if(bean.getAnonymousUUID() != null && !bean.getAnonymousUUID().equals(this.getAnonymousUUID()))
 			match = false;
 		
+		else if((bean.getInternalSeqIDOfSeqUsedForReallocation() != null && !bean.getInternalSeqIDOfSeqUsedForReallocation().equals(this.getInternalSeqIDOfSeqUsedForReallocation())))
+			match = false;
+		
 // Avoid matching on the error information
 //		else if((bean.rmsFlags & LAST_SEND_ERROR_TIME_FLAG) != 0 && bean.getLastSendErrorTimestamp() != this.getLastSendErrorTimestamp())
 //			match = false;
@@ -511,8 +535,26 @@ public class RMSBean extends RMSequenceBean {
 
 		else if((bean.rmsFlags & EXPECTED_REPLIES) != 0 && bean.getExpectedReplies() != this.getExpectedReplies())
 			match = false;
+		
+
 
 		return match;
+	}
+
+	public int isReallocated() {
+		return reallocated;
+	}
+
+	public void setReallocated(int reallocated) {
+		this.reallocated = reallocated;
+	}
+
+	public String getInternalSeqIDOfSeqUsedForReallocation() {
+		return internalSeqIDOfSeqUsedForReallocation;
+	}
+
+	public void setInternalSeqIDOfSeqUsedForReallocation(String internalSeqIDOfSeqUsedForReallocation) {
+		this.internalSeqIDOfSeqUsedForReallocation = internalSeqIDOfSeqUsedForReallocation;
 	}
 
 }

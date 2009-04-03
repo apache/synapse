@@ -153,17 +153,31 @@ public class PollingManager extends SandeshaThread {
 		} else {
 			if (log.isDebugEnabled())
 				log.debug("Polling rms " + beanToPoll);
+			
 			// The sequence is there, but we still only poll if we are expecting reply messages,
-			// or if we don't have clean ack state. (We assume acks are clean, and only unset
+			// if we don't have clean ack state or we are waiting for a terminateSeqResponse. (We assume acks are clean, and only unset
 			// this if we find evidence to the contrary).
 			boolean cleanAcks = true;
-			if (beanToPoll.getNextMessageNumber() > -1)
+			boolean waitingForTerminateSeqResponse = false;
+			long repliesExpected = 0;
+			
+			if (!force && beanToPoll.getNextMessageNumber() > -1) {
 				cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
-			long  repliesExpected = beanToPoll.getExpectedReplies();
-			if(beanToPoll.getSequenceID() != null){
-				if((force || !cleanAcks || repliesExpected > 0) && beanToPoll.getReferenceMessageStoreKey() != null){
-					pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+				if(cleanAcks){
+					repliesExpected = beanToPoll.getExpectedReplies();
+					if(repliesExpected == 0){
+						//Need to check if we are waiting for a terminateSeqResponse
+						if(beanToPoll.isTerminated() == false && beanToPoll.isTerminateAdded() == true){
+							waitingForTerminateSeqResponse = true;
+						}
+					}
 				}
+			}
+
+			if(beanToPoll.getSequenceID() != null){
+				if((force || !cleanAcks || repliesExpected > 0 || waitingForTerminateSeqResponse) && beanToPoll.getReferenceMessageStoreKey() != null){
+					pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+				} 
 			} else {
 				//If seqID is null on RMS bean then it must be an RMSBean waiting for a createSeqResponse and we want to poll for these
 		        pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
@@ -233,7 +247,7 @@ public class PollingManager extends SandeshaThread {
 			wireSeqId = rmBean.getSequenceID(); //this case could make us non-RSP compliant
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Debug: PollingManager::pollForSequence, wireAddress=" + wireAddress + ", wireSeqId=" + wireSeqId);
+		if(log.isDebugEnabled()) log.debug("Debug: PollingManager::pollForSequence, wireAddress=" + wireAddress + " wireSeqId=" + wireSeqId);
 		
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,context);
 		if(referenceMessage!=null){

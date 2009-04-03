@@ -47,6 +47,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -98,6 +99,15 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		//checks weather the ack request was a piggybacked one.
 		boolean piggybackedAckRequest = !(rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK_REQUEST);
+
+		//it is a piggybacked ackrequest so we can ignore as we will piggyback acks at every opportunity anyway
+		if(piggybackedAckRequest){
+			if (log.isDebugEnabled())
+			log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, it is a piggybacked ackrequest for seq " +
+					"so we can ignore as we will piggyback an ack " + Boolean.FALSE);
+			//No need to suspend. Just proceed.
+			return false;
+		}
 		
 		String sequenceId = ackRequested.getIdentifier().getIdentifier();
 
@@ -143,10 +153,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		
 		//creating the ack message. If the ackRequest was a standalone this will be a out (response) message 
 		MessageContext ackMsgCtx = null;
-//		if (piggybackedAckRequest)
-			ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(rmMsgCtx, ackOperation);
-//		else
-//			ackMsgCtx =MessageContextBuilder.createOutMessageContext (msgContext);
+		ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(rmMsgCtx, ackOperation);
 			
 		//setting up the RMMsgContext
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
@@ -196,65 +203,14 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			}
 
 		} else {
-			//If AcksTo is non-anonymous we will be adding a senderBean entry here. The sender is responsible 
-			//for sending it out.
-			
-			SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
-
-			String key = SandeshaUtil.getUUID();
-
-			// dumping to the storage will be done be Sandesha2 Transport Sender
-			// storageManager.storeMessageContext(key,ackMsgCtx);
-
-			SenderBean ackBean = new SenderBean();
-			ackBean.setMessageContextRefKey(key);
-			ackBean.setMessageID(ackMsgCtx.getMessageID());
-			
-			//acks are sent only once.
-			ackBean.setReSend(false);
-			
-			ackBean.setSequenceID(sequenceId);
-			
-			EndpointReference to = ackMsgCtx.getTo();
-			if (to!=null)
-				ackBean.setToAddress(to.getAddress());
-
-			// this will be set to true in the sender.
-			ackBean.setSend(true);
-
-			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 			SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
 
 			long ackInterval = propertyBean.getAcknowledgementInterval();
 
-			// Ack will be sent as stand alone, only after the ackknowledgement interval
+			// Ack will be sent as stand alone, only after the acknowledgement interval
 			long timeToSend = System.currentTimeMillis() + ackInterval;
 
-			// removing old acks.
-			SenderBean findBean = new SenderBean();
-			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			Collection<SenderBean> coll = senderBeanMgr.find(findBean);
-			Iterator<SenderBean> it = coll.iterator();
-
-			if (it.hasNext()) {
-				SenderBean oldAckBean = (SenderBean) it.next();
-				// If there is an old Ack. This Ack will be sent in the old timeToSend.
-				timeToSend = oldAckBean.getTimeToSend(); 
-				senderBeanMgr.delete(oldAckBean.getMessageID());
-			}
-
-			ackBean.setTimeToSend(timeToSend);
-
-			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-			
-			// passing the message through sandesha2sender
-		    SandeshaUtil.executeAndStore(ackRMMsgCtx, key, storageManager);
-
-			// inserting the new Ack.
-			senderBeanMgr.insert(ackBean);
-
-			msgContext.pause();			
+			AcknowledgementManager.addAckBeanEntry(ackRMMsgCtx, sequenceId, timeToSend, storageManager);
 		}
 		
 		if (log.isDebugEnabled())

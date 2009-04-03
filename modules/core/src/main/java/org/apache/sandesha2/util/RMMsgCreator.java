@@ -51,6 +51,7 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.wsrm.Accept;
+import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
@@ -141,33 +142,35 @@ public class RMMsgCreator {
 		// Check if this service includes 2-way operations
 		boolean twoWayService = false;
 		AxisService service = applicationMsgContext.getAxisService();
-        if (service != null) {
-            // if the user has specified this sequence as a one way sequence it should not
-            // append the sequence offer.
-            if (!JavaUtils.isTrue(applicationMsgContext.getOptions().getProperty(
-                    SandeshaClientConstants.ONE_WAY_SEQUENCE))) {
-                Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
-                if (p != null && p.getValue() != null) {
-                    twoWayService = ((Boolean) p.getValue()).booleanValue();
-                    if (log.isDebugEnabled()) log.debug("RMMsgCreator:: twoWayService " + twoWayService);
-                }
-            }
-        }
+		if (service != null) {
+			// if the user has specified this sequence as a one way sequence it should not
+			// append the sequence offer.
+			if (!JavaUtils.isTrue(applicationMsgContext.getOptions().getProperty(
+				SandeshaClientConstants.ONE_WAY_SEQUENCE))) {
+				Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
+				if (p != null && p.getValue() != null) {
+					twoWayService = ((Boolean) p.getValue()).booleanValue();
+					if (log.isDebugEnabled()) log.debug("RMMsgCreator:: twoWayService " + twoWayService);
+				}
+			}
+		}
 
 		// Adding sequence offer - if present. We send an offer if the client has assigned an
-		// id, or if we are using WS-RM 1.0 and the service contains out-in MEPs
-		boolean autoOffer = false;
-		if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) {
-			autoOffer = twoWayService;
-                        //There may not have been a way to confirm if an OUT_IN MEP is being used.
-			//Therefore doing an extra check to see what Axis is using.  If it's OUT_IN then we must offer.
+		// id, or if the service contains out-in MEPs
+		boolean autoOffer = twoWayService;
+
+		//There may not have been a way to confirm if an OUT_IN MEP is being used.
+		//Therefore doing an extra check to see what Axis is using.  If it's OUT_IN then we must offer.
+		if(applicationMsgContext.getOperationContext() != null && applicationMsgContext.getOperationContext().getAxisOperation() != null){
 			if(applicationMsgContext.getOperationContext().getAxisOperation().getAxisSpecificMEPConstant() == org.apache.axis2.wsdl.WSDLConstants.MEP_CONSTANT_OUT_IN
-			     || applicationMsgContext.getOperationContext().getAxisOperation().getAxisSpecificMEPConstant() == org.apache.axis2.wsdl.WSDLConstants.MEP_CONSTANT_OUT_OPTIONAL_IN){
+				|| applicationMsgContext.getOperationContext().getAxisOperation().getAxisSpecificMEPConstant() == org.apache.axis2.wsdl.WSDLConstants.MEP_CONSTANT_OUT_OPTIONAL_IN){
 				autoOffer = true;
 			}
-		} else {
-			// We also do some checking at this point to see if MakeConection is required to
-			// enable WS-RM 1.1, and write a warning to the log if it has been disabled.
+		}
+
+		// We also do some checking at this point to see if MakeConection is required to
+		// enable WS-RM 1.1, and write a warning to the log if it has been disabled.
+		if(Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespaceValue)) {
 			SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(context.getAxisConfiguration());
 			if(twoWayService && !policy.isEnableMakeConnection()) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionWarning);
@@ -187,26 +190,20 @@ public class RMMsgCreator {
 			Identifier identifier = new Identifier(rmNamespaceValue);
 			identifier.setIndentifer(offeredSequenceId);
 			offerPart.setIdentifier(identifier);
-			createSequencePart.setSequenceOffer(offerPart);
 			
 			if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespaceValue)) {
 				// We are going to send an offer, so decide which endpoint to include
 				EndpointReference offeredEndpoint = (EndpointReference) applicationMsgContext.getProperty(SandeshaClientConstants.OFFERED_ENDPOINT);
+				//If the offeredEndpoint hasn't been set then use the acksTo of the RMSBean
 				if (offeredEndpoint==null) {
-					EndpointReference replyTo = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
+					offeredEndpoint = rmsBean.getAcksToEndpointReference();
+				}
 				
-					if (replyTo!=null) {
-						offeredEndpoint = SandeshaUtil.cloneEPR(replyTo);
-					}
-				}
-				// Finally fall back to using an anonymous endpoint
-				if (offeredEndpoint==null) {
-					//The replyTo has already been set to a MC anon with UUID and so will use that same one for the offered endpoint  
-					offeredEndpoint = rmsBean.getReplyToEndpointReference();
-				}
 				Endpoint endpoint = new Endpoint (offeredEndpoint, rmNamespaceValue, addressingNamespace);
 				offerPart.setEndpoint(endpoint);
 			}
+			
+			createSequencePart.setSequenceOffer(offerPart);
 		}
 
 		EndpointReference toEPR = rmsBean.getToEndpointReference();
@@ -548,6 +545,45 @@ public class RMMsgCreator {
 		
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
 			log.debug("Exit: RMMsgCreator::addAckMessage " + applicationMsg);
+	}
+
+	/**
+	 * Adds an Ack Request for a specific sequence to the given application message.
+	 * 
+	 * @param applicationMsg The Message to which the AckRequest will be added
+	 * @param sequenceId - The sequence which we will request the ack for
+	 * @throws SandeshaException
+	 */
+	public static void addAckRequest(RMMsgContext applicationMsg, String sequenceId, RMSBean rmsBean)
+			throws SandeshaException {
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+			log.debug("Entry: RMMsgCreator::addAckRequest " + sequenceId);
+		
+		String rmVersion = rmsBean.getRMVersion();
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+		
+		AckRequested ackRequest = new AckRequested(rmNamespaceValue);	
+		
+		Identifier id = new Identifier(rmNamespaceValue);
+		id.setIndentifer(sequenceId);
+		ackRequest.setIdentifier(id);
+		ackRequest.setMustUnderstand(true);
+		applicationMsg.addAckRequested(ackRequest);
+
+		if (applicationMsg.getWSAAction()==null) {
+			applicationMsg.setAction(SpecSpecificConstants.getAckRequestAction(rmVersion));
+			applicationMsg.setSOAPAction(SpecSpecificConstants.getAckRequestSOAPAction(rmVersion));
+		}
+		
+		if(applicationMsg.getMessageId() == null) {
+			applicationMsg.setMessageId(SandeshaUtil.getUUID());
+		}
+				
+		// Ensure the message also contains the token that needs to be used
+		secureOutboundMessage(rmsBean, applicationMsg.getMessageContext());
+			
+		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) 
+			log.debug("Exit: RMMsgCreator::addAckRequest " + applicationMsg);
 	}
 	
 	

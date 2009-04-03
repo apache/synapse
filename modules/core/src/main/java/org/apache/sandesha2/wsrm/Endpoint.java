@@ -19,6 +19,8 @@
 
 package org.apache.sandesha2.wsrm;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -70,6 +72,15 @@ public class Endpoint implements IOMRMElement {
 					"EPR",
 					Sandesha2Constants.WSRM_COMMON.ENDPOINT);
 			throw new SandeshaException (message);
+		}
+		
+		// Sniff the addressing namespace from the Address child of the endpointElement
+		Iterator children = endpointElement.getChildElements();
+		while(children.hasNext() && addressingNamespaceValue == null) {
+			OMElement child = (OMElement) children.next();
+			if("Address".equals(child.getLocalName())) {
+				addressingNamespaceValue = child.getNamespace().getNamespaceURI();
+			}
 		}
 		
 		return this;

@@ -199,6 +199,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
 					if(rmsBean.isPollingMode()) {
 						rMDBean.setPollingMode(true);
+						rMDBean.setReplyToEndpointReference(rmsBean.getReplyToEndpointReference());
 					}
 				}
 				

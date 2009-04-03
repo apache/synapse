@@ -63,9 +63,10 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,rmsBean.getInternalSequenceID());
 
 		//shedulling a polling request for the response side.
-		if (rmsBean.getOfferedSequence()!=null) {
+		String offeredSeq = rmsBean.getOfferedSequence();
+		if (offeredSeq!=null) {
 			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
-			RMDBean rMDBean = rMDBeanMgr.retrieve(sequenceId);
+			RMDBean rMDBean = rMDBeanMgr.retrieve(offeredSeq);
 			
 			if (rMDBean!=null && rMDBean.isPollingMode()) {
 				PollingManager manager = storageManager.getPollingManager();

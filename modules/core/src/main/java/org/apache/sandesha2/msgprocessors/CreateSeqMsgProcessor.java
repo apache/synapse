@@ -178,58 +178,66 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	
 				// offered seq id
 				String offeredSequenceID = offer.getIdentifer().getIdentifier(); 
-				
-				boolean isValidseqID = isValidseqID(offeredSequenceID, context, createSeqRMMsg, storageManager);
-				boolean offerAccepted = true;
-				
-				RMSBean rMSBean = null;
-				//Before processing this offer any further we need to perform some extra checks 
-				//on the offered EP if WS-RM Spec 1.1 is being used
-				if(isValidseqID && Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmdBean.getRMVersion())){
-					Endpoint endpoint = offer.getEndpoint();
-					if (endpoint!=null) {
-						//Check to see if the offer endpoint has a value of WSA Anonymous
-						String addressingNamespace = (String) createSeqRMMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-						String endpointAddress = endpoint.getEPR().getAddress();
-						if(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace).equals(endpointAddress)){
-							//We will still accept this offer but we should warn the user that this MEP is not always reliable or efficient
-							if (log.isDebugEnabled())
-								log.debug("CSeq msg contains offer with an anonymous EPR");	
-							log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceMEPWarning, createSeqRMMsg.getMessageContext().getMessageID(), 
-									offeredSequenceID));
-						} 
-						
-						rMSBean = new RMSBean();
-						//Set the offered EP
-						rMSBean.setOfferedEndPoint(endpointAddress);
-						
-					} else {
-						//Don't accept the offer
-						if (log.isDebugEnabled())
-							log.debug("Offer Refused as it included a null endpoint");	
-						offerAccepted = false;
-					}
-				} else if (isValidseqID && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmdBean.getRMVersion())){
-					rMSBean = new RMSBean(); 
-				}
-				
+
+				//Need to see if this is a duplicate offer.
+				//If it is we can't accept the offer as we can't be sure it has come from the same client.
+				RMSBean finderBean = new RMSBean ();
+				finderBean.setSequenceID(offeredSequenceID);
+				RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(finderBean);
+				boolean offerAccepted = false;
 				String outgoingSideInternalSequenceId = SandeshaUtil
-				.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
+					.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
+
+				if(rMSBean != null){
+					if (log.isDebugEnabled())
+						log.debug("Duplicate offer so we can't accept as we can't be sure it's from the same client: " + offeredSequenceID);
+					offerAccepted = false;
+				} else {
+					boolean isValidseqID = isValidseqID(offeredSequenceID, context, createSeqRMMsg, storageManager);
+					offerAccepted = true;
 				
-				if(isValidseqID){
-					// Setting the CreateSequence table entry for the outgoing
-					// side.
-					rMSBean.setSequenceID(offeredSequenceID);	
-					rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
-					// this is a dummy value
-					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
+					//Before processing this offer any further we need to perform some extra checks 
+					//on the offered EP if WS-RM Spec 1.1 is being used
+					if(isValidseqID && Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmdBean.getRMVersion())){
+						Endpoint endpoint = offer.getEndpoint();
+						if (endpoint!=null) {
+							//Check to see if the offer endpoint has a value of WSA Anonymous
+							String addressingNamespace = (String) createSeqRMMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+							String endpointAddress = endpoint.getEPR().getAddress();
+							if(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace).equals(endpointAddress)){
+								//We will still accept this offer but we should warn the user that this MEP is not always reliable or efficient
+								if (log.isDebugEnabled())
+									log.debug("CSeq msg contains offer with an anonymous EPR");	
+								log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceMEPWarning, createSeqRMMsg.getMessageContext().getMessageID(), 
+										offeredSequenceID));
+							}
+							rMSBean = new RMSBean();							//Set the offered EP
+							rMSBean.setOfferedEndPoint(endpointAddress);
+						
+						} else {
+							//Don't accept the offer
+							if (log.isDebugEnabled())
+								log.debug("Offer Refused as it included a null endpoint");	
+							offerAccepted = false;
+						}
+					} else if (isValidseqID && Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmdBean.getRMVersion())){
+						rMSBean = new RMSBean(); 
+					}
+					if(isValidseqID){
+						// Setting the CreateSequence table entry for the outgoing
+						// side.
+						rMSBean.setSequenceID(offeredSequenceID);	
+						rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
+						// this is a dummy value
+						rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
 					
-					//Try inserting the new RMSBean
-					if(!storageManager.getRMSBeanMgr().insert(rMSBean)){
-						offerAccepted = false;
+						//Try inserting the new RMSBean
+						if(!storageManager.getRMSBeanMgr().insert(rMSBean)){
+							offerAccepted = false;
+						}
 					}
 				}
-				
+
 				if (offerAccepted) {
 					if(rmdBean.getToEndpointReference() != null){
 						rMSBean.setToEndpointReference(rmdBean.getToEndpointReference());

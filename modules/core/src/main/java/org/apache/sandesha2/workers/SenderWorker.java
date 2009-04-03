@@ -232,6 +232,17 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			transaction = storageManager.getTransaction();
 
+			//If this is an application msg we need to add an ackRequest to the header		
+			if(messageType == Sandesha2Constants.MessageTypes.APPLICATION){				
+				//Add an ackRequest				
+				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, senderBean.getSequenceID());				
+				RMMsgCreator.addAckRequest(rmMsgCtx, senderBean.getSequenceID(), rmsBean);								
+				if (transaction != null && transaction.isActive()) 					
+					transaction.commit();
+				
+				transaction = storageManager.getTransaction();			
+			}						
+			
 			//if this is a sync RM exchange protocol we always have to add an ack
 			boolean ackPresent = false;
 			Iterator it = rmMsgCtx.getSequenceAcknowledgements();
@@ -628,21 +639,22 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				int responseMessageType = responseRMMessage.getMessageType();
 				if(log.isDebugEnabled()) log.debug("inboundMsgType" + responseMessageType + "outgoing message type " + messageType);
 				 				
-				//if this is an application response msg in response to a make connection then we have to take care with the service context
-				if ((messageType == Sandesha2Constants.MessageTypes.APPLICATION && responseMessageType == Sandesha2Constants.MessageTypes.APPLICATION)
-					|| responseMessageType != Sandesha2Constants.MessageTypes.APPLICATION) {
-					if(log.isDebugEnabled()) log.debug("setting service ctx on msg as this is NOT a makeConnection>appResponse exchange pattern");
-					responseMessageContext.setServiceContext(msgCtx.getServiceContext());
-				}
-				else{
-                                        //Setting the AxisService object
+				//if this is an application response or createSeqResponse msg in response to a make connection then we have to take care with the service context
+				if(messageType == Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG 
+						&& (responseMessageType == Sandesha2Constants.MessageTypes.APPLICATION 
+								|| responseMessageType == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE)){
+				
+					//Setting the AxisService object
 					responseMessageContext.setAxisService(msgCtx.getAxisService());
 
-					//we cannot set service ctx for application response msgs since the srvc ctx will not match the op ctx, causing
+					//we cannot set service ctx for application response msgs or createSeqResponse msgs since the srvc ctx will not match the op ctx, causing
 					//problems with addressing
 					if(log.isDebugEnabled()) log.debug("NOT setting service ctx for response type " + messageType + ", current srvc ctx =" + responseMessageContext.getServiceContext());
+				}else {
+					if(log.isDebugEnabled()) log.debug("setting service ctx on msg as this is NOT a makeConnection>appResponse or makeConnection>createSeqResponse exchange pattern");
+					responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 				}
-				
+	
 				//If addressing is disabled we will be adding this message simply as the application response of the request message.
 				Boolean addressingDisabled = (Boolean) msgCtx.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
 				if (addressingDisabled!=null && Boolean.TRUE.equals(addressingDisabled)) {

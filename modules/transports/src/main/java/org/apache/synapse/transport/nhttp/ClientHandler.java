@@ -173,7 +173,8 @@ public class ClientHandler implements NHttpClientHandler {
             conn.getMetrics().reset();
 
             HttpContext context = conn.getContext();
-            ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+            ContentOutputBuffer outputBuffer
+                    = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
             axis2Req.setOutputBuffer(outputBuffer);
             context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);
 
@@ -452,12 +453,14 @@ public class ClientHandler implements NHttpClientHandler {
                     if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
                         MessageContext mc = getMessageContext(conn);
                         metrics.incrementMessagesReceived(mc);
-                        metrics.notifyReceivedMessageSize(mc, conn.getMetrics().getReceivedBytesCount());
+                        metrics.notifyReceivedMessageSize(
+                                mc, conn.getMetrics().getReceivedBytesCount());
                         metrics.notifySentMessageSize(mc, conn.getMetrics().getSentBytesCount());
                         metrics.reportResponseCode(mc, response.getStatusLine().getStatusCode());
                     } else {
                         metrics.incrementMessagesReceived();
-                        metrics.notifyReceivedMessageSize(conn.getMetrics().getReceivedBytesCount());
+                        metrics.notifyReceivedMessageSize(
+                                conn.getMetrics().getReceivedBytesCount());
                         metrics.notifySentMessageSize(conn.getMetrics().getSentBytesCount());
                     }
                 }
@@ -497,7 +500,8 @@ public class ClientHandler implements NHttpClientHandler {
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         HttpContext context = conn.getContext();
 
-        ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(REQUEST_SOURCE_BUFFER);
+        ContentOutputBuffer outBuf
+                = (ContentOutputBuffer) context.getAttribute(REQUEST_SOURCE_BUFFER);
         if (outBuf == null) return;
 
         try {
@@ -534,7 +538,8 @@ public class ClientHandler implements NHttpClientHandler {
         HttpResponse response = conn.getHttpResponse();
 
         // Have we sent out our request fully in the first place? if not, forget about it now..
-        Axis2HttpRequest req = (Axis2HttpRequest) conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
+        Axis2HttpRequest req
+                = (Axis2HttpRequest) conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
         
         if (req != null) {
             req.setCompleted(true);
@@ -542,7 +547,8 @@ public class ClientHandler implements NHttpClientHandler {
                 log.debug("Response Received for Request : " + req);
             }
             if (!req.isSendingCompleted()) {
-                req.getMsgContext().setProperty(NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
+                req.getMsgContext().setProperty(
+                        NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
                 SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
                         conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
                 if (outputBuffer != null) {

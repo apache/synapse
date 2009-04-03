@@ -20,7 +20,6 @@
 package org.apache.synapse.eventing;
 
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -96,7 +95,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Override the Message reciver method to accept subscriptions and events
      *
-     * @param mc
+     * @param mc message context
      * @throws AxisFault
      */
     public void receive(MessageContext mc) throws AxisFault {
@@ -140,7 +139,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @param responseAction WSE action for the response
      * @param mc             Message Context
      * @param faultMessage   Fault message
-     * @throws AxisFault
+     * @throws AxisFault     AxisFault
      */
     private void dispatchResponse(SOAPEnvelope soapEnvelope,
                                   String responseAction,
@@ -166,7 +165,6 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      */
     public void dispatchEvents(org.apache.synapse.MessageContext msgCtx) {
         Event<org.apache.synapse.MessageContext> event = new Event(msgCtx);
-
         List<Subscription> subscribers = null;
         try {
             subscribers = subscriptionManager.getMatchingSubscriptions(event);
@@ -214,7 +212,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      *
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
-     * @throws AxisFault
+     * @throws AxisFault     axis fault
+     * @throws EventException eventing exception
      */
     private void processSubscriptionRequest(MessageContext mc,
                                             ResponseMessageBuilder messageBuilder)
@@ -265,7 +264,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      *
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
-     * @throws AxisFault
+     * @throws AxisFault     axis fault
+     * @throws EventException eventing exception
      */
     private void processUnSubscribeRequest(MessageContext mc,
                                            ResponseMessageBuilder messageBuilder)
@@ -303,7 +303,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      *
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
-     * @throws AxisFault
+     * @throws AxisFault     axis fault
+     * @throws EventException event
      */
     private void processGetStatusRequest(MessageContext mc,
                                          ResponseMessageBuilder messageBuilder)
@@ -343,7 +344,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      *
      * @param mc             axis2 message context
      * @param messageBuilder respose message builder
-     * @throws AxisFault
+     * @throws AxisFault axis fault
+     * @throws EventException event exception
      */
     private void processReNewRequest(MessageContext mc,
                                      ResponseMessageBuilder messageBuilder)
@@ -389,8 +391,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Create a Endpoint for a given URL
      *
-     * @param endpointUrl
-     * @return AddressEndpoint
+     * @param endpointUrl      URL
+     * @return AddressEndpoint address endpoint
      */
     private Endpoint getEndpointFromURL(String endpointUrl) {
         AddressEndpoint endpoint = new AddressEndpoint();
@@ -403,8 +405,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     /**
      * Set the operations avilable for EventSource service
      *
-     * @param eventSourceService
-     * @throws AxisFault
+     * @param eventSourceService service
+     * @throws AxisFault         axis fault
      */
     private void addOperations(AxisService eventSourceService) throws AxisFault {
         // Create operations

@@ -31,9 +31,13 @@ import org.apache.axis2.transport.testkit.client.TestClient;
 import org.apache.axis2.transport.testkit.name.Name;
 import org.apache.axis2.transport.testkit.tests.Setup;
 import org.apache.axis2.transport.testkit.tests.Transient;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 @Name("java.io")
 public class VFSClient implements TestClient {
+    private static final Log log = LogFactory.getLog(VFSClient.class);
+    
     private @Transient File requestFile;
     
     @Setup @SuppressWarnings("unused")
@@ -49,11 +53,14 @@ public class VFSClient implements TestClient {
         // Create the file atomically (using move/rename) to avoid problems with the
         // listener starting to read the file too early.
         File tmpFile = new File(requestFile.getParent(), "." + requestFile.getName() + ".tmp");
+        log.debug("Writing message to temporary file " + tmpFile);
         OutputStream out = new FileOutputStream(tmpFile);
         out.write(message);
         out.close();
+        log.debug("Moving " + tmpFile + " to " + requestFile);
         if (!tmpFile.renameTo(requestFile)) {
             throw new IOException("Unable to rename " + tmpFile + " to " + requestFile);
         }
+        log.debug("Done.");
     }
 }

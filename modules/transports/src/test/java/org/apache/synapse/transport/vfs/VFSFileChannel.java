@@ -26,8 +26,12 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.transport.testkit.axis2.AxisServiceConfigurator;
 import org.apache.axis2.transport.testkit.tests.Setup;
 import org.apache.axis2.transport.testkit.tests.Transient;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class VFSFileChannel implements AxisServiceConfigurator {
+    private static final Log log = LogFactory.getLog(VFSFileChannel.class);
+    
     private final String path;
     private @Transient File requestFile;
     
@@ -51,8 +55,14 @@ public class VFSFileChannel implements AxisServiceConfigurator {
     
     protected static File preparePath(VFSTestEnvironment env, String path) {
         File file = new File(env.getRootDir(), path);
-        file.getParentFile().mkdirs();
-        file.delete();
+        File dir = file.getParentFile();
+        if (dir.exists()) {
+            log.debug("Deleting leftover file " + file);
+            file.delete();
+        } else {
+            log.debug("Creating directory " + dir);
+            dir.mkdirs();
+        }
         return file;
     }
     

@@ -26,8 +26,6 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.databinding.utils.ConverterUtil;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.eventing.SynapseEventingConstants;
-import org.apache.synapse.eventing.SynapseSubscription;
 import org.wso2.eventing.Subscription;
 
 import java.util.Iterator;
@@ -76,7 +74,7 @@ public class EventSourceSerializer {
             evenSourceElem.addChild(subManagerElem);
             // Adding static subscriptions
             List<Subscription> staticSubscriptionList =
-                    eventSource.getSubscriptionManager().getStaticSubscribers();
+                    eventSource.getSubscriptionManager().getStaticSubscriptions();
             for (Iterator<Subscription> iterator = staticSubscriptionList.iterator();
                  iterator.hasNext();) {
                 Subscription staticSubscription = iterator.next();

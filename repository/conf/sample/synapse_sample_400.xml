@@ -25,9 +25,10 @@
             <inSequence>
                 <iterate expression="//m0:getQuote/m0:request" preservePayload="true"
                          attachPath="//m0:getQuote"
-                         xmlns:m0="http://services.samples/xsd">
+                         xmlns:m0="http://services.samples">
                     <target>
                         <sequence>
+                            <property name="REMOVE_WS_ADDRESSING" value="true"/>
                             <send>
                                 <endpoint>
                                     <address
@@ -41,7 +42,7 @@
             <outSequence>
                 <aggregate>
                     <onComplete expression="//m0:getQuoteResponse"
-                                xmlns:m0="http://services.samples/xsd">
+                                xmlns:m0="http://services.samples">
                         <send/>
                     </onComplete>
                 </aggregate>

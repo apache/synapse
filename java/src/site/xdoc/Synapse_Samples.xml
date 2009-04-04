@@ -3858,9 +3858,10 @@ Discounted price: 138.77458254967408</pre>
             &lt;inSequence&gt;
                 &lt;iterate expression=&quot;//m0:getQuote/m0:request&quot; preservePayload=&quot;true&quot;
                          attachPath=&quot;//m0:getQuote&quot;
-                         xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
+                         xmlns:m0=&quot;http://services.samples&quot;&gt;
                     &lt;target&gt;
                         &lt;sequence&gt;
+                            &lt;property name="REMOVE_WS_ADDRESSING" value="true"/&gt;
                             &lt;send&gt;
                                 &lt;endpoint&gt;
                                     &lt;address
@@ -3874,7 +3875,7 @@ Discounted price: 138.77458254967408</pre>
             &lt;outSequence&gt;
                 &lt;aggregate&gt;
                     &lt;onComplete expression=&quot;//m0:getQuoteResponse&quot;
-                                xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
+                                xmlns:m0=&quot;http://services.samples&quot;&gt;
                         &lt;send/&gt;
                     &lt;/onComplete&gt;
                 &lt;/aggregate&gt;

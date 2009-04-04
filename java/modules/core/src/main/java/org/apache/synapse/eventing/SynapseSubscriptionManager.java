@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Subscription Manager for Synapse
+ * Subscription Manager for Synapse, addition to the core subscription manager in the API synapse
+ * adds the getStaticSubscriptions method. Static subscriptions are the subscriptions that can confi
+ * -gure in the Synapse configuration and loded in the startup.   
  */
 public abstract class SynapseSubscriptionManager implements SubscriptionManager<MessageContext> {
 
@@ -40,7 +42,7 @@ public abstract class SynapseSubscriptionManager implements SubscriptionManager<
      *
      * @return List of static subscriptions
      */
-    public abstract List<Subscription> getStaticSubscribers();
+    public abstract List<Subscription> getStaticSubscriptions();
 
 
     public void addProperty(String name, String value) {

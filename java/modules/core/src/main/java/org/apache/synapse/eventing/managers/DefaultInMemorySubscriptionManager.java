@@ -53,7 +53,7 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
     private SynapseXPath topicXPath;
     private static final Log log = LogFactory.getLog(DefaultInMemorySubscriptionManager.class);
 
-    public List<Subscription> getStaticSubscribers() {
+    public List<Subscription> getStaticSubscriptions() {
         LinkedList<Subscription> list = new LinkedList<Subscription>();
         for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
             if ((stringSubscriptionEntry.getValue().getSubscriptionData().getProperty(

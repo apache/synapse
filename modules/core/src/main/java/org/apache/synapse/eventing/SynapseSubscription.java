@@ -26,7 +26,9 @@ import org.wso2.eventing.Subscription;
 import org.wso2.eventing.SubscriptionData;
 
 /**
- * Bean that keep subscription and subscription metadata.
+ * Bean that keep subscription and subscription metadata. Addition to the subscription in the core
+ * API SynapseSubscription add the UUID as the subscription ID, add a new constructor to define the
+ * delivery mode. 
  */
 public class SynapseSubscription extends Subscription {
 

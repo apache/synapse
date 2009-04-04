@@ -52,6 +52,12 @@ import java.util.List;
 
 /**
  * Eventsource that accepts the event requests using a message reciver.
+ * Eventsource is responsible on two tasks accepting the subscriptions and subscription related
+ * reqests and dispatching events.
+ * Subscriptions conatines operations listed in the WS-Eventing specification. {SubscribeOP,
+ * UnsubscribeOP, RenewOP, GetstatusOP, SubscriptionEndOP}
+ * based on the action in the request eventsource identify the operation and send it for processing.
+ * Eventsource link with a suscription manager to store the subscriptions. 
  */
 public class SynapseEventSource extends SynapseMessageReceiver {
 

@@ -45,6 +45,10 @@ public class VFSClient implements TestClient {
         requestFile = channel.getRequestFile();
     }
     
+    public File getRequestFile() {
+        return requestFile;
+    }
+
     public ContentType getContentType(ClientOptions options, ContentType contentType) {
         return contentType;
     }

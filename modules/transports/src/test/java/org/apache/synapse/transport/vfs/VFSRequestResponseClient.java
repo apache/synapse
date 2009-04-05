@@ -39,7 +39,12 @@ public class VFSRequestResponseClient extends VFSClient implements RequestRespon
     
     public IncomingMessage<byte[]> sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
         send(message);
-        byte[] reply = VFSTestUtils.waitForFile(replyFile, 5000);
-        return reply == null ? null : new IncomingMessage<byte[]>(contentType, reply);
+        File requestFile = getRequestFile();
+        if (VFSTestUtils.waitForFileDeletion(requestFile, 5000)) {
+            return new IncomingMessage<byte[]>(contentType, VFSTestUtils.readFile(replyFile));
+        } else {
+            requestFile.delete();
+            return null;
+        }
     }
 }

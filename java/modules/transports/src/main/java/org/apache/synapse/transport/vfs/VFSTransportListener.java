@@ -266,7 +266,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     log.debug("Unable to access or read file or directory : " + fileURI);
                 }
             }
-
+            onPollCompletion(entry);
         } catch (FileSystemException e) {
             processFailure("Error checking for existence and readability : " + fileURI, e, entry);
         }

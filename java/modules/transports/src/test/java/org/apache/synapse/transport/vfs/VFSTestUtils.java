@@ -30,16 +30,31 @@ import de.schlichtherle.io.FileInputStream;
 public class VFSTestUtils {
     private VFSTestUtils() {}
     
+    public static boolean waitForFileDeletion(File file, int timeout) throws InterruptedException {
+        long time = System.currentTimeMillis();
+        while (System.currentTimeMillis() < time + timeout) {
+            if (!file.exists()) {
+                return true;
+            }
+            Thread.sleep(100);
+        }
+        return false;
+    }
+    
+    public static byte[] readFile(File file) throws IOException {
+        InputStream in = new FileInputStream(file);
+        try {
+            return IOUtils.toByteArray(in);
+        } finally {
+            in.close();
+        }
+    }
+    
     public static byte[] waitForFile(File file, int timeout) throws IOException, InterruptedException {
         long time = System.currentTimeMillis();
         while (System.currentTimeMillis() < time + timeout) {
             if (file.exists()) {
-                InputStream in = new FileInputStream(file);
-                try {
-                    return IOUtils.toByteArray(in);
-                } finally {
-                    in.close();
-                }
+                return readFile(file);
             }
             Thread.sleep(100);
         }

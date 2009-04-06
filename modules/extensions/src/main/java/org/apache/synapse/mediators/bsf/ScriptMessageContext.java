@@ -170,7 +170,7 @@ public class ScriptMessageContext implements MessageContext {
         mc.setEnvironment(se);
     }
 
-    public Map getContextEntries() {
+    public Map<String, Object> getContextEntries() {
         return mc.getContextEntries();
     }
 
@@ -350,7 +350,7 @@ public class ScriptMessageContext implements MessageContext {
         mc.setTracingState(tracingState);
     }
 
-    public Stack getFaultStack() {
+    public Stack<FaultHandler> getFaultStack() {
         return mc.getFaultStack();
     }
 

@@ -80,6 +80,13 @@
 &lt;deployer extension="xar" directory="extensions" class="org.apache.synapse.core.axis2.ExtensionDeployer"/>
 </pre>
           </subsection>
+          <subsection name="JMS transport">
+            <p>The way the JMS transport determines the content type of incoming messages has slightly changed
+            between Synapse 1.2 and 1.3. The mechanism is also more flexible. See SYNAPSE-304 and SYNAPSE-424
+            for the reasons of this change and refer to the
+            <a href="http://ws.apache.org/commons/transport/">WS-Commons Transport project</a> for
+            documentation.</p>
+          </subsection>
         </section>
     </body>
 </document>

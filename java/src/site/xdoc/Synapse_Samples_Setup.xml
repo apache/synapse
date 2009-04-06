@@ -828,7 +828,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     Here <strong>password</strong> is an alias and to be used to get actual password
 
     In order to resolve above passwords (i.e. to get actual passwords); it is needed to provide a
-    ?password provider? for secret manager. In future, this will be moved into key store
+    <strong>password provider</strong> for secret manager. In future, this will be moved into key store
     configurations itself .This can be done by adding property to <strong>synapse.properties</strong>
 
 </p>
@@ -1005,18 +1005,18 @@ synapse.datasources.lookupds.passwordProvider=org.apache.synapse.security.secret
 
 <div>
 <p>
-    This is a simple tool for Tool for encrypting and decrypting.
+    This is a simple tool for encrypting and decrypting simple texts such as passwords.
 
     The arguments that are inputs to this tool with their meanings are shown bellow.
     <ul>
-        <li><strong>keystore</strong> If keys are in a store ,it's location</li>
+        <li><strong>keystore</strong> If keys are in a store , it's location</li>
         <li><strong>storepass</strong> Password for access keyStore</li>
         <li><strong>keypass</strong> To get private key</li>
         <li><strong>alias</strong> Alias to identify key owner</li>
-        <li><strong>storetype</strong> Type of keyStore</li>
+        <li><strong>storetype</strong> Type of keyStore , Default is JKS </li>
         <li><strong>keyfile</strong> If key is in a file</li>
-        <li><strong>opmode</strong> encrypt or decrypt</li>
-        <li><strong>algorithm</strong> encrypt or decrypt algorithm</li>
+        <li><strong>opmode</strong> encrypt or decrypt , Default is encrypt </li>
+        <li><strong>algorithm</strong> encrypt or decrypt algorithm , Default is RSA</li>
         <li><strong>source</strong> Either cipher or plain text as an in-lined form</li>
         <li><strong>outencode</strong> Currently base64 and use for encode result</li>
         <li><strong>inencode</strong> Currently base64 and use to decode input</li>

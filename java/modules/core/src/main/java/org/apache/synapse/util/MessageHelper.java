@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -81,7 +80,7 @@ public class MessageHelper {
         }
         
         // Make deep copy of fault stack so that parent will not be lost it's fault stack
-        Stack faultStack = synCtx.getFaultStack();
+        Stack<FaultHandler> faultStack = synCtx.getFaultStack();
         if (!faultStack.isEmpty()) {
             
             List<FaultHandler> newFaultStack = new ArrayList<FaultHandler>();

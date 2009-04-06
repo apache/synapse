@@ -53,6 +53,11 @@ public class TaskDescriptionSerializer {
             task.addAttribute("class", taskDescription.getTaskClass(), NULL_OMNS);
         }
 
+        String group = taskDescription.getGroup();
+        if (group != null && !"".equals(group)) {
+            task.addAttribute("group", group, NULL_OMNS);
+        }
+
         List pinnedServers = taskDescription.getPinnedServers();
         if (pinnedServers != null && !pinnedServers.isEmpty()) {
             String pinnedServersStr = "" + pinnedServers.get(0);

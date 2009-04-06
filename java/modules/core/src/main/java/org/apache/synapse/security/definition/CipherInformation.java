@@ -31,7 +31,7 @@ public class CipherInformation {
     private static final Log log = LogFactory.getLog(CipherInformation.class);
 
     /* Default cipher algorithm*/
-    private static String DEFAULT_ALGORITHM = "RSA";
+    public static String DEFAULT_ALGORITHM = "RSA";
     /*Cipher algorithm */
     private String algorithm = DEFAULT_ALGORITHM;
     /* Cipher operation mode - encrypt or decrypt */

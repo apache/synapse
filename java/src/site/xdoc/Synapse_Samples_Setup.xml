@@ -1001,5 +1001,54 @@ synapse.datasources.reportds.maxWait=10000</pre>
 synapse.datasources.lookupds.passwordProvider=org.apache.synapse.security.secret.handler.SecretManagerSecretCallbackHandler
 </pre>  
 </div>
+<h2>Using CipherTool</h2>
+
+<div>
+<p>
+    This is a simple tool for Tool for encrypting and decrypting.
+
+    The arguments that are inputs to this tool with their meanings are shown bellow.
+    <ul>
+        <li><strong>keystore</strong> If keys are in a store ,it's location</li>
+        <li><strong>storepass</strong> Password for access keyStore</li>
+        <li><strong>keypass</strong> To get private key</li>
+        <li><strong>alias</strong> Alias to identify key owner</li>
+        <li><strong>storetype</strong> Type of keyStore</li>
+        <li><strong>keyfile</strong> If key is in a file</li>
+        <li><strong>opmode</strong> encrypt or decrypt</li>
+        <li><strong>algorithm</strong> encrypt or decrypt algorithm</li>
+        <li><strong>source</strong> Either cipher or plain text as an in-lined form</li>
+        <li><strong>outencode</strong> Currently base64 and use for encode result</li>
+        <li><strong>inencode</strong> Currently base64 and use to decode input</li>
+        <li><strong>trusted</strong>  Is KeyStore a trusted store? If presents this, consider as a trusted store</li>
+    </ul>
+</p>
+
+<p>The required scripts (
+    <strong>ciphertool.bat</strong>
+    and <strong>ciphertool.sh</strong>) are available in bin directory.
+</p>
+
+<div>
+    <p>
+        <strong>A simple encrypting sample
+            <br/>
+        </strong>
+    </p>
+    <p>
+        <strong>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password
+            <br/>
+        </strong>
+    </p>
+    <pre>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password
+
+        Using SYNAPSE_HOME: C:\Project\apache\synapse\synapse4\modules\distribution\ta
+        rget\synapse-SNAPSHOT
+        Using JAVA_HOME: C:\Program Files\Java\jdk1.5.0_14
+        Output :
+        UJqoweKO4+qL9ivJlDkjIBE4XOBuGSplkHAwjS3R/nUi7LH+/AH6jfu0rW74WrrjDE1LMaWDJvsEQvLFkTVCYMdm5rkqpkqxBsz0/q0o+OGF+e1taSF3OzmqmUxs1yEK0q7vFUbfDkRWW9frrP5UF9nMtl9H3brOm/YtbpgyLMw=
+    </pre>
+</div>
+</div>
 </body>
 </document>

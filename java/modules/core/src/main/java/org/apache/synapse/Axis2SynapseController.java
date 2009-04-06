@@ -85,7 +85,7 @@ public class Axis2SynapseController implements SynapseController {
                 configurationInformation.isCreateNewInstance()) {
 
             if (log.isDebugEnabled()) {
-                log.debug("Initializing Synapse in a new axis2 server environment instance ");
+                log.debug("Initializing Synapse in a new axis2 server environment instance");
             }
             createNewInstance(configurationInformation);
         } else {
@@ -293,7 +293,6 @@ public class Axis2SynapseController implements SynapseController {
         List<String> transports = new ArrayList<String>();
         transports.add(Constants.TRANSPORT_HTTP);
         transports.add(Constants.TRANSPORT_HTTPS);
-        // todo: is this correct? this limits the message mediation to http/s
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
     }

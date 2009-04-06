@@ -40,6 +40,7 @@
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
             <includes>
                 <include>synapse.sh</include>
+                <include>ciphertool.sh</include>
                 <include>synapse-daemon.sh</include>
             </includes>
             <fileMode>755</fileMode>
@@ -49,6 +50,7 @@
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
             <includes>
                 <include>synapse.bat</include>
+                <include>ciphertool.bat</include>
                 <include>install-synapse-service.bat</include>
                 <include>uninstall-synapse-service.bat</include>
             </includes>

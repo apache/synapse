@@ -353,22 +353,6 @@ public class MessageHelper {
         }
     }
 
-    public static void copyRMOptions(org.apache.axis2.context.MessageContext oriContext, Options targetOptions) {
-        Options oriOptions = oriContext.getOptions();
-        if (oriOptions.getProperty(SandeshaClientConstants.LAST_MESSAGE) != null) {
-            targetOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE,
-                    oriOptions.getProperty(SandeshaClientConstants.LAST_MESSAGE));
-        }
-        if (oriOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION) != null) {
-            targetOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,
-                    oriOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION));
-        }
-        if (oriOptions.getProperty(SandeshaClientConstants.SEQUENCE_KEY) != null) {
-            targetOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,
-                    oriOptions.getProperty(SandeshaClientConstants.SEQUENCE_KEY));
-         }
-    }
-
     /**
      * Get the Policy object for the given name from the Synapse configuration at runtime
      * @param synCtx the current synapse configuration to get to the synapse configuration

@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.security.definition.CipherInformation;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
+import org.apache.synapse.security.enumeration.KeyStoreType;
 import org.apache.synapse.security.wrappers.CipherWrapper;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
@@ -46,8 +47,9 @@ import java.security.Key;
  * <li>algorithm    encrypt or decrypt algorithm
  * <li>source       Either cipher or plain text as an in-lined form
  * <li>sourceFile   Source from a file
- * <li>outEncode    Currently base64
- * <li>inEncode     Currently base64
+ * <li>outencode    Currently base64
+ * <li>inencode     Currently base64
+ * <li>trusted      Is KeyStore a trusted store ? . if presents this , consider as a  trusted store
  * <ul>
  */
 public class CipherTool {
@@ -82,11 +84,15 @@ public class CipherTool {
     /* If  the target has to be written to a file*/
     public final static String TARGET_FILE = "targetfile";
     /* If  the output of cipher operation need to be encode - only base64*/
-    public final static String OUT_TYPE = "outtype";
+    public final static String OUT_TYPE = "outencode";
     /* If  the encode of the input type base64*/
-    public final static String IN_TYPE = "intype";
+    public final static String IN_TYPE = "inencode";
     /* Is this keyStore a trusted one */
     public final static String TRUSTED = "trusted";
+
+    public final static String SYMMETRIC = "symmetric";
+
+    public final static String ASYMMETRIC = "asymmetric";
 
     /* Operation mode */
     public final static String ENCRYPT = "encrypt";
@@ -106,12 +112,11 @@ public class CipherTool {
             // Loads the cipher relate information
             CipherInformation cipherInformation = getCipherInformation(cmd);
             //Key information must not contain any password
-            //Password for access private key
-            String keyPass = getArgument(cmd, KEY_PASS);
             // If Key need to be loaded from a file
-            String keyFile = getArgument(cmd, KEY_FILE);
+            String keyFile = getArgument(cmd, KEY_FILE, null);
             // Source  as an in-lined
-            String source = getArgument(cmd, SOURCE_IN_LINED);
+            String source = getArgument(cmd, SOURCE_IN_LINED, null);
+            assertEmpty(source, SOURCE_IN_LINED);
 
             boolean isTrusted = isArgumentPresent(cmd, TRUSTED);
 
@@ -125,6 +130,9 @@ public class CipherTool {
                     key = trustKeyStoreWrapper.getPublicKey();
                 } else {
                     IdentityKeyStoreWrapper storeWrapper = new IdentityKeyStoreWrapper();
+                    //Password for access private key
+                    String keyPass = getArgument(cmd, KEY_PASS, null);
+                    assertEmpty(keyPass, KEY_PASS);
                     storeWrapper.init(getIdentityKeyStoreInformation(cmd), keyPass);
                     if (ENCRYPT.equals(cipherInformation.getOperationMode())) {
                         key = storeWrapper.getPrivateKey();
@@ -151,11 +159,12 @@ public class CipherTool {
     /**
      * Utility method to extract command line arguments
      *
-     * @param cmd     Command line which capture all command line arguments
-     * @param argName Name of the argument to be extracted
+     * @param cmd          Command line which capture all command line arguments
+     * @param argName      Name of the argument to be extracted
+     * @param defaultValue The default value
      * @return value of the argument if there is , o.w null
      */
-    private static String getArgument(CommandLine cmd, String argName) {
+    private static String getArgument(CommandLine cmd, String argName, String defaultValue) {
 
         if (cmd == null) {
             handleException("CommandLine is null");
@@ -165,13 +174,13 @@ public class CipherTool {
             if (log.isDebugEnabled()) {
                 log.debug("Provided argument name is null. Returning null as value");
             }
-            return null;
+            return defaultValue;
         }
 
         if (cmd.hasOption(argName)) {
             return cmd.getOptionValue(argName);
         }
-        return null;
+        return defaultValue;
     }
 
     /**
@@ -205,11 +214,11 @@ public class CipherTool {
     private static CipherInformation getCipherInformation(CommandLine cmd) {
 
         CipherInformation information = new CipherInformation();
-        information.setAlgorithm(getArgument(cmd, ALGORITHM));
-        information.setOperationMode(getArgument(cmd, OP_MODE));
-        information.setInType(getArgument(cmd, IN_TYPE));
-        information.setOutType(getArgument(cmd, OUT_TYPE));
-        information.setType(getArgument(cmd, CIPHER_TYPE));
+        information.setAlgorithm(getArgument(cmd, ALGORITHM, CipherInformation.DEFAULT_ALGORITHM));
+        information.setOperationMode(getArgument(cmd, OP_MODE, ENCRYPT));
+        information.setInType(getArgument(cmd, IN_TYPE, BASE64));
+        information.setOutType(getArgument(cmd, OUT_TYPE, BASE64));
+        information.setType(getArgument(cmd, CIPHER_TYPE, null));
         return information;
 
     }
@@ -223,10 +232,16 @@ public class CipherTool {
     private static IdentityKeyStoreInformation getIdentityKeyStoreInformation(CommandLine cmd) {
 
         IdentityKeyStoreInformation information = new IdentityKeyStoreInformation();
-        information.setAlias(getArgument(cmd, ALIAS));
-        information.setLocation(getArgument(cmd, KEY_STORE));
-        information.setStoreType(getArgument(cmd, STORE_TYPE));
-        information.setKeyStorePassword(getArgument(cmd, STORE_PASS));
+        String alias = getArgument(cmd, ALIAS, null);
+        assertEmpty(alias, ALIAS);
+        information.setAlias(alias);
+        String keyStore = getArgument(cmd, KEY_STORE, null);
+        assertEmpty(keyStore, KEY_STORE);
+        information.setLocation(keyStore);
+        information.setStoreType(getArgument(cmd, STORE_TYPE, KeyStoreType.JKS.toString()));
+        String storePass = getArgument(cmd, STORE_PASS, null);
+        assertEmpty(storePass, STORE_PASS);
+        information.setKeyStorePassword(storePass);
         return information;
 
     }
@@ -240,10 +255,14 @@ public class CipherTool {
     private static TrustKeyStoreInformation getTrustKeyStoreInformation(CommandLine cmd) {
 
         TrustKeyStoreInformation information = new TrustKeyStoreInformation();
-        information.setAlias(getArgument(cmd, ALIAS));
-        information.setLocation(getArgument(cmd, KEY_STORE));
-        information.setStoreType(getArgument(cmd, STORE_TYPE));
-        information.setKeyStorePassword(getArgument(cmd, STORE_PASS));
+        information.setAlias(getArgument(cmd, ALIAS, null));
+        String keyStore = getArgument(cmd, KEY_STORE, null);
+        assertEmpty(keyStore, KEY_STORE);
+        information.setLocation(keyStore);
+        information.setStoreType(getArgument(cmd, STORE_TYPE, KeyStoreType.JKS.toString()));
+        String storePass = getArgument(cmd, STORE_PASS, null);
+        assertEmpty(storePass, STORE_PASS);
+        information.setKeyStorePassword(storePass);
         return information;
 
     }
@@ -347,4 +366,9 @@ public class CipherTool {
         throw new SynapseException(msg);
     }
 
+    private static void assertEmpty(String value, String key) {
+        if (value == null || "".equals(value)) {
+            handleException("The argument : " + key + " : cannot be null or empty.");
+        }
+    }
 }

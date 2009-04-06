@@ -77,9 +77,6 @@ if $os400; then
   export QIBM_MULTI_THREADED
 fi
 
-# Run the setup script
-ant -buildfile "$SYNAPSE_HOME/bin/build.xml" -q
-
 # update classpath
 SYNAPSE_CLASSPATH=""
 for f in "$SYNAPSE_HOME"/lib/synapse-*.jar

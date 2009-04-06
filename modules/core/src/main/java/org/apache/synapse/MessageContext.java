@@ -76,7 +76,7 @@ public interface MessageContext {
      * context has already used. This will not lookup for the entries in the Configuration.
      * @return the set of local entries in the context
      */
-    public Map getContextEntries();
+    public Map<String, Object> getContextEntries();
 
     /**
      * Sets the entries to the current context and not to the configuration. This can be
@@ -371,7 +371,7 @@ public interface MessageContext {
      */
     public void setTracingState(int tracingState);
 
-    public Stack getFaultStack();
+    public Stack<FaultHandler> getFaultStack();
 
     public void pushFaultHandler(FaultHandler fault);
 

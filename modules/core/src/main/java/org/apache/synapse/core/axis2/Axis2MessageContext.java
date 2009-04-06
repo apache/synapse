@@ -96,7 +96,7 @@ public class Axis2MessageContext implements MessageContext {
         this.synEnv = synEnv;
     }
 
-    public Map getContextEntries() {
+    public Map<String, Object> getContextEntries() {
         return localEntries;
     }
 
@@ -352,7 +352,7 @@ public class Axis2MessageContext implements MessageContext {
         this.tracingState= tracingState;
     }
 
-    public Stack getFaultStack() {
+    public Stack<FaultHandler> getFaultStack() {
         return this.faultStack;
     }
 

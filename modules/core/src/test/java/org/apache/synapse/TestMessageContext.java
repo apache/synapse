@@ -40,9 +40,9 @@ public class TestMessageContext implements MessageContext {
 
     private Map properties = new HashMap();
 
-    private Map localEntries = new HashMap();
+    private Map<String, Object> localEntries = new HashMap<String, Object>();
 
-    private Stack faultStack = new Stack();
+    private Stack<FaultHandler> faultStack = new Stack<FaultHandler>();
 
     private SynapseConfiguration synCfg = null;
 
@@ -70,11 +70,11 @@ public class TestMessageContext implements MessageContext {
         synEnv = se;
     }
 
-    public Map getContextEntries() {
+    public Map<String, Object> getContextEntries() {
         return localEntries;
     }
 
-    public void setContextEntries(Map entries) {
+    public void setContextEntries(Map<String, Object> entries) {
         this.localEntries = entries;
     }
 
@@ -285,7 +285,7 @@ public class TestMessageContext implements MessageContext {
     public void setSynapseContext(MessageContext env) {
     }
 
-    public Stack getFaultStack() {
+    public Stack<FaultHandler> getFaultStack() {
         return faultStack;
     }
 

@@ -121,6 +121,7 @@ public class MessageHelper {
 
         org.apache.axis2.context.MessageContext newMC = clonePartially(mc);
         newMC.setEnvelope(cloneSOAPEnvelope(mc.getEnvelope()));
+        newMC.setOptions(cloneOptions(mc.getOptions()));
         
         newMC.setServiceContext(mc.getServiceContext());
         newMC.setOperationContext(mc.getOperationContext());
@@ -199,11 +200,6 @@ public class MessageHelper {
             }
         }
 
-        for (Object o : ori.getOptions().getProperties().keySet()) {
-            String key = (String) o;
-            newMC.getOptions().setProperty(key, ori.getOptions().getProperty(key));
-        }
-
         Iterator itr = ori.getPropertyNames();
         while (itr.hasNext()) {
             String key = (String) itr.next();
@@ -251,6 +247,55 @@ public class MessageHelper {
         }
 
         return newEnvelope;
+    }
+
+    /**
+     * Clones the given {@link org.apache.axis2.client.Options} object. This is not a deep copy
+     * because this will be called for each and every message going out from synapse. The parent
+     * of the cloning options object is kept as a reference.
+     *
+     * @param options clonning object
+     * @return clonned Options object
+     */
+    public static Options cloneOptions(Options options) {
+
+        // create new options object and set the parent
+        Options clonedOptions = new Options(options.getParent());
+
+        // copy general options
+        clonedOptions.setCallTransportCleanup(options.isCallTransportCleanup());
+        clonedOptions.setExceptionToBeThrownOnSOAPFault(options.isExceptionToBeThrownOnSOAPFault());
+        clonedOptions.setManageSession(options.isManageSession());
+        clonedOptions.setSoapVersionURI(options.getSoapVersionURI());
+        clonedOptions.setTimeOutInMilliSeconds(options.getTimeOutInMilliSeconds());
+        clonedOptions.setUseSeparateListener(options.isUseSeparateListener());
+
+        // copy addressing related options
+        clonedOptions.setMessageId(options.getMessageId());
+        clonedOptions.setTo(options.getTo());
+        clonedOptions.setFrom(options.getFrom());
+        clonedOptions.setAction(options.getAction());
+        clonedOptions.setReplyTo(options.getReplyTo());
+        clonedOptions.setFaultTo(options.getFaultTo());
+        clonedOptions.setRelationships(options.getRelationships());
+
+        // copy transport related options
+        clonedOptions.setListener(options.getListener());
+        clonedOptions.setTransportIn(options.getTransportIn());
+        clonedOptions.setTransportInProtocol(options.getTransportInProtocol());
+        clonedOptions.setTransportOut(clonedOptions.getTransportOut());
+
+        // copy username and password options
+        clonedOptions.setUserName(options.getUserName());
+        clonedOptions.setPassword(options.getPassword());
+
+        // cloen the property set of the current options object
+        for (Object o : options.getProperties().keySet()) {
+            String key = (String) o;
+            clonedOptions.setProperty(key, options.getProperty(key));
+        }
+
+        return clonedOptions;
     }
 
     /**

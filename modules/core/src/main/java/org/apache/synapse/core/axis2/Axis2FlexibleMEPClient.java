@@ -242,7 +242,7 @@ public class Axis2FlexibleMEPClient {
                 new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :
                 new QName(AnonymousServiceFactory.OUT_IN_OPERATION));
 
-        Options clientOptions = new Options();
+        Options clientOptions = MessageHelper.cloneOptions(originalInMsgCtx.getOptions());
         clientOptions.setUseSeparateListener(separateListener);
         // if RM is requested,
         if (wsRMEnabled) {
@@ -252,6 +252,8 @@ public class Axis2FlexibleMEPClient {
                     SynapseConstants.SANDESHA_POLICY,
                         MessageHelper.getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
+            // todo: this wont be required now because we copy the full options cloned copy with
+            // todo: the parent of the options object as well
             MessageHelper.copyRMOptions(originalInMsgCtx, clientOptions);
         }
 

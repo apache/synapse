@@ -60,6 +60,12 @@ public class TaskDescriptionFactory {
                 handleException("Name for a task is required, missing name in the task");
             }
 
+            String group = el.getAttributeValue(
+                    new QName(NULL_NAMESPACE, "group"));
+            if (group != null) {
+                taskDescription.setGroup(group);
+            }
+
             // set the task class
             OMAttribute classAttr = el.getAttribute(new QName("class"));
             if (classAttr != null && classAttr.getAttributeValue() != null) {

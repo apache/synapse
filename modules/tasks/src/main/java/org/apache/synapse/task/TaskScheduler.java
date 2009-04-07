@@ -112,7 +112,7 @@ public class TaskScheduler {
      */
     public void start() {
 
-        validateInit();
+        assertInitialized();
         try {
             if (!scheduler.isStarted()) {
 
@@ -136,8 +136,8 @@ public class TaskScheduler {
     public void scheduleTask(TaskDescription taskDescription, Map<String,
             Object> resources, Class jobClass) {
 
-        validateInit();
-        validateStart();
+        assertInitialized();
+        assertStarted();
 
         if (taskDescription == null) {
             throw new SynapseTaskException("Task Description can not be found", log);
@@ -191,17 +191,19 @@ public class TaskScheduler {
      */
     public void shutDown() {
 
-        validateInit();
-        validateStart();
+        if (isInitialized()) {
 
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("ShutingDown Scheduler : " + scheduler.getMetaData());
+            try {
+                if (scheduler != null && scheduler.isStarted()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("ShutingDown Task Scheduler : " + scheduler.getMetaData());
+                    }
+                    scheduler.shutdown();
+                }
+                initialized = false;
+            } catch (SchedulerException e) {
+                throw new SynapseTaskException("Error ShutingDown task scheduler ", e, log);
             }
-            scheduler.shutdown();
-            initialized = false;
-        } catch (SchedulerException e) {
-            throw new SynapseTaskException("Error shutingDown scheduler ", e, log);
         }
     }
 
@@ -221,8 +223,8 @@ public class TaskScheduler {
      */
     public void deleteTask(String name, String group) {
 
-        validateInit();
-        validateStart();
+        assertInitialized();
+        assertStarted();
 
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task Name can not be null", log);
@@ -277,14 +279,14 @@ public class TaskScheduler {
                 append(name).append("]").append(schedulerMetaData).append(" ]").toString();
     }
 
-    private void validateInit() {
+    private void assertInitialized() {
 
         if (!initialized) {
             throw new SynapseTaskException("Scheduler has not been initialled yet", log);
         }
     }
 
-    private void validateStart() {
+    private void assertStarted() {
 
         try {
             if (!scheduler.isStarted()) {

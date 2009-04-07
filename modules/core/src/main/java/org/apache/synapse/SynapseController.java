@@ -23,7 +23,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 
 /**
  * The controller for synapse
- * Create and Destroy synapse artifacts in a particular environment
+ * Create, Start, Stop and Destroy synapse artifacts in a particular environment
  */
 public interface SynapseController {
 
@@ -47,6 +47,16 @@ public interface SynapseController {
      * @return true if the initialization has been success.
      */
     public boolean isInitialized();
+
+    /**
+     * Starts the synapse controller in turn the synapse server.
+     */
+    public void start();
+
+    /**
+     * Stops the synapse controller in turn the synapse server.
+     */
+    public void stop();
 
     /**
      * Create the SynapseEnvironment instance

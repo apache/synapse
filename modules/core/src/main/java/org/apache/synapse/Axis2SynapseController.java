@@ -113,9 +113,53 @@ public class Axis2SynapseController implements SynapseController {
     public void destroy() {
 
         try {
-            cleanupDefault();
-            // stop all services
             if (information.isCreateNewInstance()) {  // only if we have created the server
+
+                // destroy listener manager
+                if (listenerManager != null) {
+                    listenerManager.destroy();
+                }
+
+                // we need to call this method to clean the temp files we created.
+                if (configurationContext != null) {
+                    configurationContext.terminate();
+                }
+            }
+            initialized = false;
+        } catch (Exception e) {
+            log.error("Error stopping the Axis2 Based Server Environment", e);
+        }
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    /**
+     * Starts the listener manager if the axis2 instancec is created by the Synapse
+     */
+    public void start() {
+
+        if (information.isCreateNewInstance()) {
+            if (listenerManager != null) {
+                listenerManager.start();
+            } else {
+                handleFatal("Couldn't start Synapse, ListenerManager not found");
+            }
+        }
+    }
+
+    /**
+     * Cleanup the axis2 environment and stop the synapse environment.
+     */
+    public void stop() {
+        try {
+            cleanupDefault();
+            if (information.isCreateNewInstance()) {
+
+                if (listenerManager != null) {
+                    listenerManager.stop();
+                }
 
                 if (configurationContext != null &&
                         configurationContext.getAxisConfiguration() != null) {
@@ -135,26 +179,11 @@ public class Axis2SynapseController implements SynapseController {
                         }
                     }
                 }
-
-                // stop all transports
-                if (listenerManager != null) {
-                    listenerManager.stop();
-                    listenerManager.destroy();
-                }
-
-                // we need to call this method to clean the temp files we created.
-                if (configurationContext != null) {
-                    configurationContext.terminate();
-                }
             }
-            initialized = false;
-        } catch (Exception e) {
-            log.error("Error stopping the Axis2 Based Server Environment", e);
-        }
-    }
 
-    public boolean isInitialized() {
-        return initialized;
+        } catch (AxisFault e) {
+            log.error("Error stopping the Axis2 Environemnt");
+        }
     }
 
     /**
@@ -186,8 +215,8 @@ public class Axis2SynapseController implements SynapseController {
                     "' to the Axis2 configuration : " + e.getMessage(), e);
 
         }
-        synapseEnvironment.setInitialized(true);
         synapseConfiguration.init(synapseEnvironment);
+        synapseEnvironment.setInitialized(true);
         return synapseEnvironment;
     }
 
@@ -257,21 +286,16 @@ public class Axis2SynapseController implements SynapseController {
 
             listenerManager = configurationContext.getListenerManager();
             if (listenerManager == null) {
+                // create and initialize the listener manager but do not start
                 listenerManager = new ListenerManager();
                 listenerManager.init(configurationContext);
-            }
-
-            for (String trp : configurationContext.getAxisConfiguration()
-                    .getTransportsIn().keySet()) {
-
-                TransportInDescription trsIn =
-                        configurationContext.getAxisConfiguration().getTransportsIn().get(trp);
-                log.info("Starting transport " + trsIn.getName());
-                listenerManager.addListener(trsIn, false);
+                // do not use the listener manager shutdown hook, because it clashes with the
+                // SynapseServer shutdown hook.
+                listenerManager.setShutdownHookRequired(false);
             }
             
         } catch (Throwable t) {
-            handleFatal("Synapse startup failed...", t);
+            handleFatal("Failed to create a new Axis2 instance...", t);
         }
     }
 

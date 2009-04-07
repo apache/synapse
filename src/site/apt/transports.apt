@@ -182,7 +182,10 @@
   The VFS transport listener receives messages dropped in a given local or remote file system
   location. The location is specified by a URL that either identifies a single file or a directory.
   The transport listener will periodically poll the specified location and process any file(s)
-  found. After a file has been processed it will be deleted or moved to another location.
+  found. After a file has been processed it will be deleted or moved to another location. Note that
+  this is absolutely mandatory to prevent the listener from processing files multiple times.
+  Therefore the VFS transport listener can only be used in situations where it has write access to
+  the file system location and where deleting or moving the dropped files is acceptable.
 
   The transport is based on {{{http://commons.apache.org/vfs/}Apache Commons VFS}} and supports any
   protocol for which a VFS provider is available. The transport is preconfigured with providers
@@ -211,6 +214,11 @@
 </proxy>
 +-------------------------------------+  
 
+  In this example the file system location <<<file:///var/spool/synapse/in>>> is explicitly bound
+  to <<<MyVFSService>>>, i.e. any message dropped in that location will be predispatched to that
+  service, bypassing any other configured dispatch mechanisms that would apply to messages received
+  through HTTP.
+  
   The VFS transport recognizes the following service parameters:
 
   [<<<transport.vfs.FileURI>>> (Required)]
@@ -340,7 +348,43 @@
 +-------------------------------------+  
 <property action="set" name="OUT_ONLY" value="true"/>
 +-------------------------------------+  
+
+* {Using SFTP}
+
+  To avoid man-in-the-middle attacks, SSH clients will only connect to hosts with a known
+  host key. When connecting for the first time to an SSH server, a typical command line SSH client
+  would request confirmation from the user to add the server and its fingerprint to the list of known
+  hosts.
   
+  The VFS transports supports SFTP through the {{{http://www.jcraft.com/jsch/}JSch}} library
+  and this library also requires a list of known hosts. Since Synapse is not an interactive
+  process, it can't request confirmation from the user and is therefore unable to automatically add
+  a host to the list. This implies that the list of known hosts must be set up manually before the
+  transport can connect.
+
+  Jsch loads the list of known hosts from a file called <<<known_hosts>>> in the <<<.ssh>>>
+  subdirectory of the user's home directory, i.e. <<<$HOME/.ssh>>> in Unix and
+  <<<%HOMEPATH%\\.ssh>>> in Windows. The location and format of this file are compatible with
+  the {{{http://www.openssh.com/}OpenSSH}} client.
+
+  Since the file not only contains a list of hostnames but also the fingerprints of their host keys,
+  the easiest way to add a new host to that file is to simply use the OpenSSH client to open an SSH
+  session on the target host. The client will then ask to add the credentials to the
+  <<<known_hosts>>> file. Note that if the SSH server is configured to only allow SFTP sessions,
+  but no interactive sessions, the connection will actually fail. Since this doesn't rollback
+  the change to the <<<known_hosts>>> file, this error can be ignored.
+
+* {Known issues}
+
+  The VFS listener will start reading a file as soon as it appears in the configured location.
+  To avoid processing half written files, the creation of these files should be made atomic.
+  On most platforms this can be achieved by writing the data to a temporary file and then
+  moving the file to the target location. Note however that a move operation is only atomic
+  if the source and destination are on the same physical file system. The location for the
+  temporary file should be chosen with that constraint in mind.
+  
+  It should also be noted that the VFS transport sender doesn't create files atomically.
+
 {FIX transport}
 
   A general overview about the FIX transport can be found in the following articles:

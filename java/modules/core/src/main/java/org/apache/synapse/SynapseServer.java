@@ -53,29 +53,45 @@ public class SynapseServer {
             printUsage();
         }
 
+        log.info("Starting Apache Synapse...");
+
+        // create the server configuration using the commandline arguments
         ServerConfigurationInformation configurationInformation =
                 ServerConfigurationInformationFactory.createServerConfigurationInformation(args);
+
         ServerManager serverManager = ServerManager.getInstance();
         serverManager.init(configurationInformation, null);
-        serverManager.start();
-        addShutdownHook();
-        
-        // Put the main thread into wait state. This makes sure that the Synapse server
-        // doesn't stop immediately if ServerManager#start doesn't create any non daemon
-        // threads (see also SYNAPSE-425).
-        new CountDownLatch(1).await();
+
+        try {
+            serverManager.start();
+            addShutdownHook();
+            log.info("Apache Synapse started successfully");
+
+            // Put the main thread into wait state. This makes sure that the Synapse server
+            // doesn't stop immediately if ServerManager#start doesn't create any non daemon
+            // threads (see also SYNAPSE-425).
+            new CountDownLatch(1).await();
+
+        } catch (SynapseException e) {
+            log.error("Error starting Apache Synapse, trying a clean shutdown...", e);
+            serverManager.stop();
+            serverManager.destroy();
+        }
     }
 
     private static void addShutdownHook() {
         Thread shutdownHook = new Thread() {
             public void run() {
-                log.info("Shutting down Apache Synapse ...");
+                log.info("Shutting down Apache Synapse...");
                 try {
-                    ServerManager.getInstance().stop();
-                    log.info("Shutdown complete");
+                    ServerManager serverManager = ServerManager.getInstance();
+                    serverManager.stop();
+                    serverManager.destroy();
+                    log.info("Apache Synapse shutdown complete");
                     log.info("Halting JVM");
                 } catch (Exception e) {
-                    log.warn("Error occurred while shutting down Apache Synapse : " + e);
+                    log.error("Error occurred while shutting down Apache Synapse, " +
+                            "it may not be a clean shutdown", e);
                 }
             }
         };

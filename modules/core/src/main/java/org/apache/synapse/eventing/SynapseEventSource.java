@@ -170,17 +170,12 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @param msgCtx message context
      */
     public void dispatchEvents(org.apache.synapse.MessageContext msgCtx) {
-        Event<org.apache.synapse.MessageContext> event = new Event(msgCtx);
+
         List<Subscription> subscribers = null;
-        try {
-            subscribers = subscriptionManager.getMatchingSubscriptions(event);
-        } catch (EventException e) {
-            handleException("Matching subscriptions fetching error", e);
-        }
 
         // Call event dispatcher
         msgCtx.getEnvironment().getExecutorService()
-                .execute(new EventDispatcher(msgCtx, subscribers));
+                .execute(new EventDispatcher(msgCtx));
     }
 
     /**
@@ -188,16 +183,21 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      */
     class EventDispatcher implements Runnable {
         private org.apache.synapse.MessageContext synCtx;
-        private List<Subscription> subscribers;
+        private List<Subscription> subscriptions;
 
-        EventDispatcher(org.apache.synapse.MessageContext synCtx,
-                        List<Subscription> subscribers) {
+        EventDispatcher(org.apache.synapse.MessageContext synCtx) {
             this.synCtx = synCtx;
-            this.subscribers = subscribers;
         }
 
         public void run() {
-            for (Subscription subscription : subscribers) {
+            try {
+                Event<org.apache.synapse.MessageContext> event = new Event(synCtx);
+                subscriptions = subscriptionManager.getMatchingSubscriptions(event);
+            } catch (EventException e) {
+                handleException("Matching subscriptions fetching error", e);
+            }
+
+            for (Subscription subscription : subscriptions) {
                 synCtx.setProperty(SynapseConstants.OUT_ONLY,
                         "true");    // Set one way message for events
                 try {
@@ -434,7 +434,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         unsubscribeOperation.setMessageReceiver(this);
         renewOperation.setMessageReceiver(this);
         getStatusOperation.setMessageReceiver(this);
-        subscriptionEndOperation.setMessageReceiver(this);
+        subscriptionEndOperation.setMessageReceiver(this);        
         // Set Soap Action
         subscribeOperation.setSoapAction(EventingConstants.WSE_SUBSCRIBE);
         unsubscribeOperation.setSoapAction(EventingConstants.WSE_UNSUBSCRIBE);
@@ -447,6 +447,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         eventSourceService.addOperation(renewOperation);
         eventSourceService.addOperation(getStatusOperation);
         eventSourceService.addOperation(subscriptionEndOperation);
+        
     }
 
     private void handleException(String message, Exception e) {

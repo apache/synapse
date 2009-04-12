@@ -28,7 +28,6 @@ import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
 
 import java.sql.SQLException;
-import java.io.File;
 
 public class DBLookupMediatorTest extends AbstractMediatorTestCase {
 
@@ -53,9 +52,10 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
 
             protected void setUp() throws Exception {
 
-                File temp = File.createTempFile("temp", "delete");
-                temp.deleteOnExit();
-                String tempPath = temp.getParent();
+                String baseDir = System.getProperty("basedir");
+                if (baseDir == null) {
+                    baseDir = ".";
+                }
 
                 lookup = (DBLookupMediator)
                     new DBLookupMediatorFactory().createMediator(createOMElement(
@@ -63,7 +63,7 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
                             "  <connection>\n" +
                             "    <pool>\n" +
                             "      <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>\n" +
-                            "      <url>jdbc:derby:" + tempPath + "/derbyDB;create=true</url>\n" +
+                            "      <url>jdbc:derby:" + baseDir + "/target/derbyDB;create=true</url>\n" +
                             "      <user>user</user>\n" +
                             "      <password>pass</password>\n" +
                             "      <property name=\"initialsize\" value=\"2\"/>\n" +

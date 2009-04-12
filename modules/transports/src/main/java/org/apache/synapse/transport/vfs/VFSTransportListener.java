@@ -44,7 +44,6 @@ import javax.mail.internet.ParseException;
 import javax.xml.namespace.QName;
 
 import java.util.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -280,18 +279,18 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
      */
     private void moveOrDeleteAfterProcessing(final PollTableEntry entry, FileObject fileObject) {
 
-        String moveToDirectory = null;
+        String moveToDirectoryURI = null;
         try {
             switch (entry.getLastPollState()) {
                 case PollTableEntry.SUCCSESSFUL:
                     if (entry.getActionAfterProcess() == PollTableEntry.MOVE) {
-                        moveToDirectory = entry.getMoveAfterProcess();
+                        moveToDirectoryURI = entry.getMoveAfterProcess();
                     }
                     break;
 
                 case PollTableEntry.FAILED:
                     if (entry.getActionAfterFailure() == PollTableEntry.MOVE) {
-                        moveToDirectory = entry.getMoveAfterFailure();
+                        moveToDirectoryURI = entry.getMoveAfterFailure();
                     }
                     break;
                 
@@ -299,21 +298,22 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     return;
             }
 
-            if (moveToDirectory != null) {
-                String prefix = "";
+            if (moveToDirectoryURI != null) {
+                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI);
+                String prefix;
                 if(entry.getMoveTimestampFormat() != null) {
-                    Date now = new Date();
-                    prefix = entry.getMoveTimestampFormat().format(now);
+                    prefix = entry.getMoveTimestampFormat().format(new Date());
+                } else {
+                    prefix = "";
                 }
-                String destName = moveToDirectory + File.separator + prefix + fileObject.getName().getBaseName();
+                FileObject dest = moveToDirectory.resolveFile(prefix + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
-                    log.debug("Moving to file :" + destName);
+                    log.debug("Moving to file :" + dest.getName().getURI());
                 }
-                FileObject dest = fsManager.resolveFile(destName);
                 try {
                     fileObject.moveTo(dest);
                 } catch (FileSystemException e) {
-                    log.error("Error moving file : " + fileObject + " to " + moveToDirectory, e);
+                    log.error("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
                 }
             } else {
                 try {
@@ -330,7 +330,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             }
 
         } catch (FileSystemException e) {
-            log.error("Error resolving directory to move after processing : " + moveToDirectory, e);
+            log.error("Error resolving directory to move after processing : " + moveToDirectoryURI, e);
         }
     }
 

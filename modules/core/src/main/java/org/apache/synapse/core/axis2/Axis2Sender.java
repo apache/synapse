@@ -29,7 +29,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.rampart.handler.WSSHandlerConstants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -122,7 +121,7 @@ public class Axis2Sender {
             messageContext.setMessageID(UUIDGenerator.getUUID());
 
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
-            if (messageContext.isEngaged(WSSHandlerConstants.SECURITY_MODULE_NAME) &&
+            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME) &&
                 messageContext.getEnvelope().getHeader() == null) {
                 SOAPFactory fac = messageContext.isSOAP11() ?
                     OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();

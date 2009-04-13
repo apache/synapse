@@ -1955,7 +1955,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <h4>
       <a name="spring" id="spring">Spring mediator</a>
     </h4>
-<pre xml:space="preserve"> &lt;spring:spring bean="exampleBean1" key="string"/&gt;</pre>
+<pre xml:space="preserve"> &lt;spring:spring bean="exampleBean1" key="string" xmlns:spring="http://ws.apache.org/ns/synapse/spring"/&gt;</pre>
     <p>
       The &lt;spring&gt; element creates an instance of a mediator, which is
       managed by Spring. This Spring bean must implement the Mediator interface

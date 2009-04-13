@@ -219,7 +219,7 @@
             <artifactId>synapse-transports</artifactId>
         </dependency>
 
-        <!-- Rampart -->
+        <!-- Rampart
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
@@ -241,9 +241,9 @@
             <artifactId>xmlsec</artifactId>
         </dependency>
 
-        <!-- This is used by the CacheMediator. TODO: since axis2-saaj is based on
+        <- This is used by the CacheMediator. TODO: since axis2-saaj is based on
              Axiom, it should not be necessary to rely on SAAJ and we should try
-             to eliminate this dependency. -->
+             to eliminate this dependency. ->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-saaj</artifactId>
@@ -263,6 +263,6 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-local</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency-->
     </dependencies>
 </project>

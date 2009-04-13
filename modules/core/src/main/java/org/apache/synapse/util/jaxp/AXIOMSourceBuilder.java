@@ -22,14 +22,15 @@ package org.apache.synapse.util.jaxp;
 import javax.xml.transform.Source;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.jaxp.OMSource;
 
 /**
  * {@link SourceBuilder} implementation that transforms the AXIOM tree to SAX
- * using {@link AXIOMSource}.
+ * using {@link OMSource}.
  */
 public class AXIOMSourceBuilder implements SourceBuilder {
     public Source getSource(OMElement node) {
-        return new AXIOMSource(node);
+        return new OMSource(node);
     }
 
     public void release() {

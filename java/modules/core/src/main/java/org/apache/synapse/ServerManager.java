@@ -299,11 +299,11 @@ public class ServerManager {
 
             // stop the SynapseController
             synapseController.stop();
-            // destroy the created Synapse Environment
-            synapseController.destroySynapseEnvironment();
             // destroy the created Synapse Configuration
             synapseController.destroySynapseConfiguration();
-            
+            // destroy the created Synapse Environment
+            synapseController.destroySynapseEnvironment();
+
             chanageState(ServerState.STOPPED);
         } else {
             // if the server cannot be stopped just set the current state as the server state

@@ -242,7 +242,9 @@ public class Axis2FlexibleMEPClient {
                 new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :
                 new QName(AnonymousServiceFactory.OUT_IN_OPERATION));
 
-        Options clientOptions = MessageHelper.cloneOptions(originalInMsgCtx.getOptions());
+        // FIXME: this causes serious troubles (see SYNAPSE-525)
+//        Options clientOptions = MessageHelper.cloneOptions(originalInMsgCtx.getOptions());
+        Options clientOptions = new Options();
         clientOptions.setUseSeparateListener(separateListener);
         // if RM is requested,
         if (wsRMEnabled) {

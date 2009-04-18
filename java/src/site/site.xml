@@ -59,6 +59,7 @@
                 <item name="Deployment" href="deployment.html"/>
                 <item name="Transports" href="transports.html"/>
                 <item name="Javadocs" href="apidocs/index.html"/>
+                <item name="FAQ" href="faq.html"/>
             </item>
             <item name="Previous Versions" href="history.html">
                 <item name="Version 1.1.1" href="1_1_1/content.html"/>

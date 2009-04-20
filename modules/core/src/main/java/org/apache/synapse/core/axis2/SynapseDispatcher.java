@@ -36,8 +36,10 @@ import javax.xml.namespace.QName;
  */
 public class SynapseDispatcher extends AbstractDispatcher {
 
+    public static final String NAME = "SynapseDispatcher";
+
     public void initDispatcher() {
-        QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");
+        QName qn = new QName("http://synapse.apache.org", NAME);
         HandlerDescription hd = new HandlerDescription(qn.getLocalPart());
         super.init(hd);
     }

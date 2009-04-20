@@ -799,7 +799,6 @@
         <module>modules/utils</module>
         <module>modules/transports</module>
         <module>modules/tasks</module>
-        <module>modules/mar</module>
         <module>modules/core</module>
         <module>modules/extensions</module>
         <module>modules/samples</module>

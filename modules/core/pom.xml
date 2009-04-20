@@ -79,15 +79,10 @@
                         <configuration>
                             <tasks>
                                 <echo message="*** Creating a testing repository ***"/>
-
                                 <mkdir dir="target/test_repos"/>
                                 <mkdir dir="target/test_repos/synapse/modules"/>
                                 <mkdir dir="target/test_repos/synapse/services"/>
                                 <mkdir dir="target/test_repos/client/modules"/>
-
-                                <copy file="../mar/target/synapse-${version}.mar"
-                                    tofile="target/test_repos/synapse/modules/synapse-${version}.mar"/>
-
                             </tasks>
                         </configuration>
                         <goals>

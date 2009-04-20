@@ -24,10 +24,15 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.*;
+import org.apache.axis2.dispatchers.SOAPMessageBodyBasedDispatcher;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.Handler;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.engine.Phase;
 import org.apache.axis2.format.BinaryBuilder;
 import org.apache.axis2.format.PlainTextBuilder;
+import org.apache.axis2.phaseresolver.PhaseException;
+import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
@@ -36,10 +41,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
-import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.core.axis2.SynapseMessageReceiver;
+import org.apache.synapse.core.axis2.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.task.*;
 
@@ -136,10 +138,32 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     /**
-     * Starts the listener manager if the axis2 instancec is created by the Synapse
+     * Adds the synapse handlers to the inflow Dispatch phase and starts the listener manager
+     * if the axis2 instance is created by the Synapse
      */
     public void start() {
 
+        // add the Synapse handlers
+        if (configurationContext != null) {
+            List<Phase> inflowPhases
+                    = configurationContext.getAxisConfiguration().getInFlowPhases();
+            for (Phase inPhase : inflowPhases) {
+                // we are interested about the Dispatch phase in the inflow
+                if (PhaseMetadata.PHASE_DISPATCH.equals(inPhase.getPhaseName())) {
+                    try {
+                        inPhase.addHandler(prepareSynapseDispatcher());
+                        inPhase.addHandler(prepareMustUnderstandHandler());
+                    } catch (PhaseException e) {
+                        handleFatal("Couldn't start Synapse, " +
+                                "Cannot add the required Synapse handlers", e);
+                    }
+                }
+            }
+        } else {
+            handleFatal("Couldn't start Synapse, ConfigurationContext not found");
+        }
+
+        // if the axis2 instance is created by us, then start the listener manager
         if (information.isCreateNewInstance()) {
             if (listenerManager != null) {
                 listenerManager.start();
@@ -155,28 +179,54 @@ public class Axis2SynapseController implements SynapseController {
     public void stop() {
         try {
             cleanupDefault();
-            if (information.isCreateNewInstance()) {
 
-                if (listenerManager != null) {
-                    listenerManager.stop();
+            // first stop the listener manager
+            if (information.isCreateNewInstance() && listenerManager != null) {
+                listenerManager.stop();
+            }
+
+            // detach the synapse handlers
+            if (configurationContext != null) {
+                List<Phase> inflowPhases
+                        = configurationContext.getAxisConfiguration().getInFlowPhases();
+                for (Phase inPhase : inflowPhases) {
+                    // we are interested about the Dispatch phase in the inflow
+                    if (PhaseMetadata.PHASE_DISPATCH.equals(inPhase.getPhaseName())) {
+                        List<HandlerDescription> synapseHandlers
+                                = new ArrayList<HandlerDescription>();
+                        for (Handler handler : inPhase.getHandlers()) {
+                            if (SynapseDispatcher.NAME.equals(handler.getName()) ||
+                                    SynapseMustUnderstandHandler.NAME.equals(handler.getName())) {
+                                synapseHandlers.add(handler.getHandlerDesc());
+                            }
+                        }
+
+                        for (HandlerDescription handlerMD : synapseHandlers) {
+                            inPhase.removeHandler(handlerMD);
+                        }
+                    }
+                }
+            } else {
+                handleException("Couldn't detach the Synapse handlers, " +
+                        "ConfigurationContext not found.");
+            }
+
+            // continue stopping the axis2 environment if we created it
+            if (information.isCreateNewInstance() && configurationContext != null &&
+                    configurationContext.getAxisConfiguration() != null) {
+
+                Map<String, AxisService> serviceMap =
+                        configurationContext.getAxisConfiguration().getServices();
+                for (AxisService svc : serviceMap.values()) {
+                    svc.setActive(false);
                 }
 
-                if (configurationContext != null &&
-                        configurationContext.getAxisConfiguration() != null) {
-
-                    Map<String, AxisService> serviceMap =
-                            configurationContext.getAxisConfiguration().getServices();
-                    for (AxisService svc : serviceMap.values()) {
-                        svc.setActive(false);
-                    }
-
-                    // stop all modules
-                    Map<String, AxisModule> moduleMap =
-                            configurationContext.getAxisConfiguration().getModules();
-                    for (AxisModule mod : moduleMap.values()) {
-                        if (mod.getModule() != null && !"synapse".equals(mod.getName())) {
-                            mod.getModule().shutdown(configurationContext);
-                        }
+                // stop all modules
+                Map<String, AxisModule> moduleMap =
+                        configurationContext.getAxisConfiguration().getModules();
+                for (AxisModule mod : moduleMap.values()) {
+                    if (mod.getModule() != null && !"synapse".equals(mod.getName())) {
+                        mod.getModule().shutdown(configurationContext);
                     }
                 }
             }
@@ -365,6 +415,32 @@ public class Axis2SynapseController implements SynapseController {
         setupEventSources();
     }
 
+    private HandlerDescription prepareSynapseDispatcher() {
+        HandlerDescription handlerMD = new HandlerDescription(SynapseDispatcher.NAME);
+        // <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
+        PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
+        rule.setAfter(SOAPMessageBodyBasedDispatcher.NAME);
+        handlerMD.setRules(rule);
+        SynapseDispatcher synapseDispatcher = new SynapseDispatcher();
+        synapseDispatcher.initDispatcher();
+        handlerMD.setHandler(synapseDispatcher);
+        return handlerMD;
+    }
+
+    private HandlerDescription prepareMustUnderstandHandler() {
+        HandlerDescription handlerMD
+                = new HandlerDescription(SynapseMustUnderstandHandler.NAME);
+        // <order after="SynapseDispatcher" phase="Dispatch"/>
+        PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
+        rule.setAfter(SynapseDispatcher.NAME);
+        handlerMD.setRules(rule);
+        SynapseMustUnderstandHandler synapseMustUnderstandHandler
+                = new SynapseMustUnderstandHandler();
+        synapseMustUnderstandHandler.init(handlerMD);
+        handlerMD.setHandler(synapseMustUnderstandHandler);
+        return handlerMD;
+    }
+
     private void initDefault(ServerContextInformation contextInformation) {
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
         loadMediatorExtensions();
@@ -464,6 +540,11 @@ public class Axis2SynapseController implements SynapseController {
 
     private void handleFatal(String msg) {
         log.fatal(msg);
+        throw new SynapseException(msg);
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
         throw new SynapseException(msg);
     }
 }

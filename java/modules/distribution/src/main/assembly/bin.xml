@@ -112,13 +112,6 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>../../modules/mar/target</directory>
-            <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
-            <includes>
-                <include>synapse-${synapse.version}.mar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>src/main/release/docs</directory>
             <outputDirectory>synapse-${synapse.version}</outputDirectory>
             <includes>

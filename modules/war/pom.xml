@@ -162,13 +162,6 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>../mar/target</directory>
-                            <targetPath>WEB-INF/repository/modules</targetPath>
-                            <includes>
-                                <include>synapse-${synapse.version}.mar</include>
-                            </includes>
-                        </resource>
-                        <resource>
                             <directory>target/temp/lib</directory>
                             <targetPath>WEB-INF/repository/modules</targetPath>
                             <includes>

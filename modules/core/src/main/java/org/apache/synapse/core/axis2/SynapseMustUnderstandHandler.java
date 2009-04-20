@@ -34,6 +34,8 @@ import java.util.Iterator;
  * even with unprocessed mustUnderstand headers
  */
 public class SynapseMustUnderstandHandler extends AbstractHandler {
+
+    public static final String NAME = "SynapseMustUnderstandHandler";
     
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
 

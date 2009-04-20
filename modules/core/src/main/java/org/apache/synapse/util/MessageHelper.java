@@ -269,15 +269,6 @@ public class MessageHelper {
         clonedOptions.setTimeOutInMilliSeconds(options.getTimeOutInMilliSeconds());
         clonedOptions.setUseSeparateListener(options.isUseSeparateListener());
 
-        // copy addressing related options
-        clonedOptions.setMessageId(options.getMessageId());
-        clonedOptions.setTo(options.getTo());
-        clonedOptions.setFrom(options.getFrom());
-        clonedOptions.setAction(options.getAction());
-        clonedOptions.setReplyTo(options.getReplyTo());
-        clonedOptions.setFaultTo(options.getFaultTo());
-        clonedOptions.setRelationships(options.getRelationships());
-
         // copy transport related options
         clonedOptions.setListener(options.getListener());
         clonedOptions.setTransportIn(options.getTransportIn());

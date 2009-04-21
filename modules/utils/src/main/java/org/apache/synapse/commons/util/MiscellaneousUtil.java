@@ -70,58 +70,35 @@ public class MiscellaneousUtil {
      * @param type         Expected Type using Class
      * @return Value corresponding to the given property name
      */
-    public static Object getProperty(Properties properties, String name,
-                                     Object defaultValue, Class type) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Object> T getProperty(
+            Properties properties, String name, T defaultValue, Class<? extends T> type) {
 
-        Object result = properties.getProperty(name);
+        String result = properties.getProperty(name);
         if (result == null && defaultValue != null) {
             if (log.isDebugEnabled()) {
                 log.debug("The name with ' " + name + " ' cannot be found. " +
                         "Using default value " + defaultValue);
             }
-            result = defaultValue;
+            return defaultValue;
         }
 
         if (result == null || type == null) {
-            return result;
+            return null;
         }
 
         if (String.class.equals(type)) {
-
-            if (result instanceof String) {
-                return result;
-            } else {
-                handleException("Invalid type , expected String");
-            }
-
+                return (T) result;
         } else if (Boolean.class.equals(type)) {
-            if (result instanceof String) {
-                return Boolean.parseBoolean((String) result);
-            } else if (result instanceof Boolean) {
-                return result;
-            } else {
-                handleException("Invalid type , expected Boolean");
-            }
-
+                return (T) Boolean.valueOf(Boolean.parseBoolean(result));
         } else if (Integer.class.equals(type)) {
-            if (result instanceof String) {
-                return Integer.parseInt((String) result);
-            } else if (result instanceof Integer) {
-                return result;
-            } else {
-                handleException("Invalid type , expected Integer");
-            }
+                return (T) Integer.valueOf(Integer.parseInt(result));
         } else if (Long.class.equals(type)) {
-            if (result instanceof String) {
-                return Long.parseLong((String) result);
-            } else if (result instanceof Long) {
-                return result;
-            } else {
-                handleException("Invalid type , expected Long");
-            }
+                return (T) Long.valueOf(Long.parseLong(result));
         } else {
-            return result;
+            handleException("Unsupported type: " + type);
         }
+
         return null;
     }
 

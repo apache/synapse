@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -125,10 +126,10 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         String dsType = information.getType();
         String driver = information.getDriver();
         String url = information.getUrl();
-        String user = information.getUser();
 
-        String password = information.getResolvedPassword();
-        
+        String user = information.getSecretInformation().getUser();
+        String password = information.getSecretInformation().getResolvedPassword();
+
         String maxActive = String.valueOf(information.getMaxActive());
         String maxIdle = String.valueOf(information.getMaxIdle());
         String maxWait = String.valueOf(information.getMaxWait());
@@ -144,8 +145,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME,
                     driver));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_URL, url));
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_USER_NAME, user));
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_PASSWORD, password));
+            ref.add(new StringRefAddr(SecretConfigurationConstants.PROP_USER_NAME, user));
+            ref.add(new StringRefAddr(SecretConfigurationConstants.PROP_PASSWORD, password));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXACTIVE, maxActive));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXIDLE, maxIdle));
             ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXWAIT, maxWait));
@@ -191,7 +192,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER, driver));
             cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_URL, url));
             cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_USER, user));
-            cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_PASSWORD,
+            cpdsRef.add(new StringRefAddr(SecretConfigurationConstants.PROP_PASSWORD,
                     password));
 
             try {
@@ -424,7 +425,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             }
 
             StringBuffer buffer = new StringBuffer();
-            buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES);
+            buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS);
             buffer.append(DataSourceConfigurationConstants.DOT_STRING);
             if (name != null && !"".equals(name)) {
                 buffer.append(name);
@@ -568,7 +569,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
     private boolean isValid(Properties dsProperties) {
 
         String dataSources = MiscellaneousUtil.getProperty(dsProperties,
-                DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES, null);
+                DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS, null);
 
         if (dataSources != null && !"".equals(dataSources)) {
             String[] dataSourcesNames = dataSources.split(",");

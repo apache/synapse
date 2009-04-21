@@ -20,6 +20,7 @@ package org.apache.synapse.commons.util.datasource.serializer;
 
 import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
 
 import java.util.Properties;
 
@@ -40,7 +41,7 @@ public class DataSourceInformationSerializer {
 
         String alias = information.getAlias();
         StringBuffer buffer = new StringBuffer();
-        buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES);
+        buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS);
         buffer.append(DataSourceConfigurationConstants.DOT_STRING);
         buffer.append(alias);
         buffer.append(DataSourceConfigurationConstants.DOT_STRING);
@@ -49,10 +50,10 @@ public class DataSourceInformationSerializer {
         String prefix = buffer.toString();
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME,
                 information.getDatasourceName());
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME,
-                information.getUser());
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD,
-                information.getAliasPassword());
+        addProperty(properties, prefix + SecretConfigurationConstants.PROP_USER_NAME,
+                information.getSecretInformation().getUser());
+        addProperty(properties, prefix + SecretConfigurationConstants.PROP_PASSWORD,
+                information.getSecretInformation().getAliasPassword());
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXACTIVE,
                 String.valueOf(information.getMaxActive()));
         addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXIDLE,

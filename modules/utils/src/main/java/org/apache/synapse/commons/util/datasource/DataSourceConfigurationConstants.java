@@ -23,9 +23,7 @@ package org.apache.synapse.commons.util.datasource;
  */
 public class DataSourceConfigurationConstants {
 
-    public static final String PROP_USER_NAME = "username";
-    public static final String PROP_PASSWORD = "password";
-    public static final String PROP_PASSWORD_PROVIDER = "passwordProvider";
+    public static final String PROP_SYNAPSE_PREFIX_DS = "synapse.datasources";
     public static final String PROP_DRIVER_CLS_NAME = "driverClassName";
     public static final String PROP_DSNAME = "dsName";
     public static final String PROP_URL = "url";
@@ -46,7 +44,6 @@ public class DataSourceConfigurationConstants {
     public final static String PROP_TESTONRETURN = "testOnReturn";
     public final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS =
             "timeBetweenEvictionRunsMillis";
-    public final static String PROMPT = "DataBase Password for ";
     public final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
     public final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
     public final static String PROP_TESTWHILEIDLE = "testWhileIdle";
@@ -74,7 +71,6 @@ public class DataSourceConfigurationConstants {
     public static final String PROP_PROVIDER_URL = "providerUrl";
     public static final String DOT_STRING = ".";
     public static final String COMMA_STRING = ",";
-    public static final String PROP_SYNAPSE_DATASOURCES = "synapse.datasources";
     public static final String PROP_TYPE = "type";
     public static final String PROP_BASIC_DATA_SOURCE = "BasicDataSource";
     public static final String PROP_CLASS_NAME = "className";

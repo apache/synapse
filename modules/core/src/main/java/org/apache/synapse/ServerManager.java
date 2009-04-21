@@ -20,7 +20,7 @@ package org.apache.synapse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
 
 /**
  * This is the core class that starts up a Synapse instance.
@@ -338,4 +338,3 @@ public class ServerManager {
                 SynapseConstants.SERVER_MANAGER_MBEAN, SynapseConstants.SERVER_MANAGER_MBEAN);
     }
 }
-

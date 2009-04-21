@@ -19,10 +19,7 @@
 package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.synapse.commons.util.secret.SecretCallback;
-import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
-import org.apache.synapse.commons.util.secret.SecretLoadingModule;
-import org.apache.synapse.commons.util.secret.SingleSecretCallback;
+import org.apache.synapse.commons.util.secret.SecretInformation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +32,10 @@ public class DataSourceInformation {
 
     public static final String BASIC_DATA_SOURCE = "BasicDataSource";
     public static final String PER_USER_POOL_DATA_SOURCE = "PerUserPoolDataSource";
-    private String user;
-    private String aliasPassword;
+
+    private SecretInformation secretInformation;
     private String datasourceName;
+    private String alias;
     private int maxActive = GenericObjectPool.DEFAULT_MAX_ACTIVE;
     private int maxIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
     private long maxWait = GenericObjectPool.DEFAULT_MAX_WAIT;
@@ -60,8 +58,6 @@ public class DataSourceInformation {
     private int maxOpenPreparedStatements;
     private final Properties properties = new Properties();
     private String repositoryType = DataSourceConfigurationConstants.PROP_REGISTRY_MEMORY;
-    private String alias;
-    private SecretCallbackHandler passwordProvider;
 
     private long timeBetweenEvictionRunsMillis =
             GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
@@ -78,6 +74,30 @@ public class DataSourceInformation {
     private final Map<String, Object> parameters = new HashMap<String, Object>();
 
 
+    public SecretInformation getSecretInformation() {
+        return secretInformation;
+    }
+
+    public void setSecretInformation(SecretInformation secretInformation) {
+        this.secretInformation = secretInformation;
+    }
+
+    public String getDatasourceName() {
+        return datasourceName;
+    }
+
+    public void setDatasourceName(String datasourceName) {
+        this.datasourceName = datasourceName;
+    }
+    
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
     public int getMinIdle() {
         return minIdle;
     }
@@ -85,7 +105,6 @@ public class DataSourceInformation {
     public void setMinIdle(int minIdle) {
         this.minIdle = minIdle;
     }
-
 
     public int getDefaultTransactionIsolation() {
         return defaultTransactionIsolation;
@@ -150,53 +169,6 @@ public class DataSourceInformation {
 
     public void setMaxOpenPreparedStatements(int maxOpenPreparedStatements) {
         this.maxOpenPreparedStatements = maxOpenPreparedStatements;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getAliasPassword() {
-        return aliasPassword;
-    }
-
-    /**
-     * Get actual password based on SecretCallbackHandler and alias password
-     * If SecretCallbackHandler is null, then returns alias password
-     * @return  Actual password
-     */
-    public String getResolvedPassword() {
-
-        if (passwordProvider != null) {
-            if (aliasPassword != null && !"".equals(aliasPassword)) {
-
-                SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
-                secretLoadingModule.init(new SecretCallbackHandler[]{passwordProvider});
-                SingleSecretCallback secretCallback =
-                        new SingleSecretCallback(DataSourceConfigurationConstants.PROMPT,
-                                aliasPassword);
-                SecretCallback[] secretCallbacks = new SecretCallback[]{secretCallback};
-                secretLoadingModule.load(secretCallbacks);
-                return secretCallback.getSecret();
-            }
-        }
-        return aliasPassword;
-    }
-
-    public void setAliasPassword(String aliasPassword) {
-        this.aliasPassword = aliasPassword;
-    }
-
-    public String getDatasourceName() {
-        return datasourceName;
-    }
-
-    public void setDatasourceName(String datasourceName) {
-        this.datasourceName = datasourceName;
     }
 
     public int getMaxActive() {
@@ -357,23 +329,7 @@ public class DataSourceInformation {
         this.repositoryType = repositoryType;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
     public Map<String, Object> getAllParameters() {
         return this.parameters;
-    }
-
-    public SecretCallbackHandler getPasswordProvider() {
-        return passwordProvider;
-    }
-
-    public void setPasswordProvider(SecretCallbackHandler passwordProvider) {
-        this.passwordProvider = passwordProvider;
     }
 }

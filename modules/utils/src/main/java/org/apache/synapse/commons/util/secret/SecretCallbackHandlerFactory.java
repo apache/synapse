@@ -43,9 +43,7 @@ public class SecretCallbackHandlerFactory {
      */
     public static SecretCallbackHandler createSecretCallbackHandler(Properties properties,
                                                                     String key) {
-        String provider = MiscellaneousUtil.getProperty(
-                properties, key,
-                null);
+        String provider = MiscellaneousUtil.getProperty(properties, key, null);
         return createSecretCallbackHandler(provider);
 
     }

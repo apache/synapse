@@ -22,14 +22,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.security.definition.CipherInformation;
-import org.apache.synapse.security.tool.CipherTool;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.synapse.security.enumeration.CipherOperationMode;
+import org.apache.synapse.security.tool.EncodingHelper;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
-import java.io.ByteArrayInputStream;
+import javax.crypto.spec.SecretKeySpec;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,19 +47,20 @@ public class CipherWrapper {
     /* Underlying cipher instance*/
     private Cipher cipher;
     /* Bean containing information required for cipher */
-    private CipherInformation information;
+    private CipherInformation cipherInformation;
 
     /**
      * Cipher needs a key and some information to work. Therefore, constructs the cipher with
-     * providing those
+     * providing those.
      *
-     * @param information Encapsulated object contains all information required to cipher
-     * @param key         The key that will be used by the cipher either for encryption and encryption
+     * @param cipherInformation Encapsulated object contains all information required to cipher
+     * @param key               The key that will be used by the cipher either for encryption and 
+     *                          encryption
      */
-    public CipherWrapper(CipherInformation information, Key key) {
-        this.information = information;
-        String algorithm = information.getAlgorithm();
-        String opMode = information.getOperationMode();
+    public CipherWrapper(CipherInformation cipherInformation, Key key) {
+        this.cipherInformation = cipherInformation;
+        String algorithm = cipherInformation.getAlgorithm();
+        CipherOperationMode opMode = cipherInformation.getCipherOperationMode();
 
         if (log.isDebugEnabled()) {
             log.debug("Initializing cipher with algorithm " +
@@ -67,9 +68,9 @@ public class CipherWrapper {
         }
         try {
             cipher = Cipher.getInstance(algorithm);
-            if (CipherTool.ENCRYPT.equals(opMode)) {
+            if (opMode == CipherOperationMode.ENCRYPT) {
                 cipher.init(Cipher.ENCRYPT_MODE, key);
-            } else if (CipherTool.DECRYPT.equals(opMode)) {
+            } else if (opMode == CipherOperationMode.DECRYPT) {
                 cipher.init(Cipher.DECRYPT_MODE, key);
             } else {
                 handleException("Invalid mode : " + opMode);
@@ -87,6 +88,17 @@ public class CipherWrapper {
     }
 
     /**
+     * Constructs a cipher wrapper using the provided information and pass phrase.
+     * 
+     * @param cipherInformation Encapsulated object contains all information required to cipher
+     * @param passphrase        The pass phrase used to construct a secret key using the same algorithm
+     *                          that will be used to de- or encrypt data.
+     */
+    public CipherWrapper(CipherInformation cipherInformation, String passphrase) {
+        this(cipherInformation, new SecretKeySpec(passphrase.getBytes(), cipherInformation.getAlgorithm()));
+    }
+
+    /**
      * Returns the output of the cipher operation.
      * This expose the 'getSecret' abstraction and hide operation of the underlying cipher
      *
@@ -95,49 +107,48 @@ public class CipherWrapper {
      */
     public String getSecret(InputStream inputStream) {
 
-        if (CipherTool.BASE64.equals(information.getInType())) {
+        InputStream sourceStream = null;
+        if (cipherInformation.getInType() != null) {
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("base64 decoding on input  ");
-                }
-                inputStream = new ByteArrayInputStream(
-                        new BASE64Decoder().decodeBuffer(inputStream));
+                sourceStream = EncodingHelper.decode(inputStream, cipherInformation.getInType());
             } catch (IOException e) {
-                handleException("Error decoding input ", e);
+                handleException("IOError when decoding the input stream for cipher ", e);
             }
+        } else {
+            sourceStream = inputStream;
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CipherOutputStream out = new CipherOutputStream(baos, cipher);
 
-        byte[] buffer = new byte[8];
+        byte[] buffer = new byte[64];
         int length;
         try {
-            while ((length = inputStream.read(buffer)) != -1) {
+            while ((length = sourceStream.read(buffer)) != -1) {
                 out.write(buffer, 0, length);
             }
         } catch (IOException e) {
             handleException("IOError when reading the input stream for cipher ", e);
         } finally {
             try {
-                inputStream.close();
-                out.close();
+                sourceStream.close();
                 out.flush();
+                out.close();
             } catch (IOException ignored) {
-
+                // ignore exception
             }
         }
-
-        if (CipherTool.BASE64.equals(information.getOutType())) {
-            if (log.isDebugEnabled()) {
-                log.debug("base64 encoding on output ");
-            }
-            return new BASE64Encoder().encode(baos.toByteArray());
+        
+        String secret;
+        if (cipherInformation.getOutType() != null) {            
+            secret = EncodingHelper.encode(baos, cipherInformation.getOutType());
         } else {
-            return baos.toString();
+            secret = baos.toString();
         }
+        return secret;
     }
 
+    
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);

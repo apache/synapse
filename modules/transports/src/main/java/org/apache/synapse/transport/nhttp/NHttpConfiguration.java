@@ -27,7 +27,7 @@ import java.util.Properties;
 /**
  * Store and manage properties that tune the nhttp transport
  */
-public class NHttpConfiguration {
+public final class NHttpConfiguration {
 
     // defaults
     private static final int WORKERS_CORE_THREADS  = 20;

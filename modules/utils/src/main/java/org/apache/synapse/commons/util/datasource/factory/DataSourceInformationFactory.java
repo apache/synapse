@@ -26,7 +26,9 @@ import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.SynapseUtilException;
 import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
-import org.apache.synapse.commons.util.secret.SecretCallbackHandlerFactory;
+import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
+import org.apache.synapse.commons.util.secret.SecretInformation;
+import org.apache.synapse.commons.util.secret.SecretInformationFactory;
 
 import java.util.Properties;
 
@@ -60,7 +62,7 @@ public class DataSourceInformationFactory {
         }
 
         StringBuffer buffer = new StringBuffer();
-        buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES);
+        buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS);
         buffer.append(DataSourceConfigurationConstants.DOT_STRING);
         buffer.append(dsName);
         buffer.append(DataSourceConfigurationConstants.DOT_STRING);
@@ -82,60 +84,44 @@ public class DataSourceInformationFactory {
                     " cannot be found.");
         }
 
-        DataSourceInformation information = new DataSourceInformation();
-        information.setAlias(dsName);
+        DataSourceInformation datasourceInformation = new DataSourceInformation();
+        datasourceInformation.setAlias(dsName);
 
-        information.setDriver(driver);
-        information.setUrl(url);
-
-        // get other required properties
-        String user = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_USER_NAME, null,
-                String.class);
-        if (user != null && !"".equals(user)) {
-            information.setUser(user);
-        }
-
-        String password = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConfigurationConstants.PROP_PASSWORD, null,
-                String.class);
-
-        if (password != null && !"".equals(password)) {
-            information.setAliasPassword(password);
-        }
+        datasourceInformation.setDriver(driver);
+        datasourceInformation.setUrl(url);
 
         String dataSourceName = (String) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME, dsName,
                 String.class);
-        information.setDatasourceName(dataSourceName);
+        datasourceInformation.setDatasourceName(dataSourceName);
 
         String dsType = (String) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_TYPE,
                 DataSourceConfigurationConstants.PROP_BASIC_DATA_SOURCE, String.class);
 
-        information.setType(dsType);
+        datasourceInformation.setType(dsType);
 
         String repositoryType = (String) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_REGISTRY,
                 DataSourceConfigurationConstants.PROP_REGISTRY_MEMORY, String.class);
 
-        information.setRepositoryType(repositoryType);
+        datasourceInformation.setRepositoryType(repositoryType);
 
         Integer maxActive = (Integer) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_MAXACTIVE,
                 GenericObjectPool.DEFAULT_MAX_ACTIVE, Integer.class);
-        information.setMaxActive(maxActive);
+        datasourceInformation.setMaxActive(maxActive);
 
         Integer maxIdle = (Integer) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_MAXIDLE,
                 GenericObjectPool.DEFAULT_MAX_IDLE, Integer.class);
-        information.setMaxIdle(maxIdle);
+        datasourceInformation.setMaxIdle(maxIdle);
 
         Long maxWait = (Long) MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConfigurationConstants.PROP_MAXWAIT,
                 GenericObjectPool.DEFAULT_MAX_WAIT, Long.class);
 
-        information.setMaxWait(maxWait);
+        datasourceInformation.setMaxWait(maxWait);
 
         // Construct DriverAdapterCPDS reference
         String suffix = DataSourceConfigurationConstants.PROP_CPDSADAPTER +
@@ -143,19 +129,19 @@ public class DataSourceInformationFactory {
                 DataSourceConfigurationConstants.PROP_CLASS_NAME;
         String className = MiscellaneousUtil.getProperty(properties, prefix + suffix,
                 DataSourceConfigurationConstants.PROP_CPDSADAPTER_DRIVER);
-        information.addParameter(suffix, className);
+        datasourceInformation.addParameter(suffix, className);
         suffix = DataSourceConfigurationConstants.PROP_CPDSADAPTER +
                 DataSourceConfigurationConstants.DOT_STRING +
                 DataSourceConfigurationConstants.PROP_FACTORY;
         String factory = MiscellaneousUtil.getProperty(properties, prefix + suffix,
                 DataSourceConfigurationConstants.PROP_CPDSADAPTER_DRIVER);
-        information.addParameter(suffix, factory);
+        datasourceInformation.addParameter(suffix, factory);
         suffix = DataSourceConfigurationConstants.PROP_CPDSADAPTER +
                 DataSourceConfigurationConstants.DOT_STRING +
                 DataSourceConfigurationConstants.PROP_NAME;
         String name = MiscellaneousUtil.getProperty(properties, prefix + suffix,
                 "cpds");
-        information.addParameter(suffix, name);
+        datasourceInformation.addParameter(suffix, name);
 
         boolean defaultAutoCommit = (Boolean) MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConfigurationConstants.PROP_DEFAULTAUTOCOMMIT, true,
@@ -235,52 +221,61 @@ public class DataSourceInformationFactory {
                 prefix + DataSourceConfigurationConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
                 GenericKeyedObjectPool.DEFAULT_MAX_TOTAL, Integer.class);
 
-        information.setDefaultAutoCommit(defaultAutoCommit);
-        information.setDefaultReadOnly(defaultReadOnly);
-        information.setTestOnBorrow(testOnBorrow);
-        information.setTestOnReturn(testOnReturn);
-        information.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-        information.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
-        information.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-        information.setTestWhileIdle(testWhileIdle);
-        information.setMinIdle(minIdle);
-        information.setDefaultTransactionIsolation(defaultTransactionIsolation);
-        information.setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
-        information.setRemoveAbandoned(removeAbandoned);
-        information.setRemoveAbandonedTimeout(removeAbandonedTimeout);
-        information.setLogAbandoned(logAbandoned);
-        information.setPoolPreparedStatements(poolPreparedStatements);
-        information.setMaxOpenPreparedStatements(maxOpenPreparedStatements);
-        information.setInitialSize(initialSize);
+        datasourceInformation.setDefaultAutoCommit(defaultAutoCommit);
+        datasourceInformation.setDefaultReadOnly(defaultReadOnly);
+        datasourceInformation.setTestOnBorrow(testOnBorrow);
+        datasourceInformation.setTestOnReturn(testOnReturn);
+        datasourceInformation.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        datasourceInformation.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+        datasourceInformation.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        datasourceInformation.setTestWhileIdle(testWhileIdle);
+        datasourceInformation.setMinIdle(minIdle);
+        datasourceInformation.setDefaultTransactionIsolation(defaultTransactionIsolation);
+        datasourceInformation.setAccessToUnderlyingConnectionAllowed(
+                accessToUnderlyingConnectionAllowed);
+        datasourceInformation.setRemoveAbandoned(removeAbandoned);
+        datasourceInformation.setRemoveAbandonedTimeout(removeAbandonedTimeout);
+        datasourceInformation.setLogAbandoned(logAbandoned);
+        datasourceInformation.setPoolPreparedStatements(poolPreparedStatements);
+        datasourceInformation.setMaxOpenPreparedStatements(maxOpenPreparedStatements);
+        datasourceInformation.setInitialSize(initialSize);
 
         if (validationQuery != null && !"".equals(validationQuery)) {
-            information.setValidationQuery(validationQuery);
+            datasourceInformation.setValidationQuery(validationQuery);
         }
 
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
-            information.setDefaultCatalog(defaultCatalog);
+            datasourceInformation.setDefaultCatalog(defaultCatalog);
         }
 
-        information.addProperty(prefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
+        datasourceInformation.addProperty(
+                prefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
                 MiscellaneousUtil.getProperty(
                         properties, prefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
                         null));
         //Provider URL
-        information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
+        datasourceInformation.addProperty(
+                prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
                 MiscellaneousUtil.getProperty(
                         properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
                         null));
 
-        information.addProperty(prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
+        datasourceInformation.addProperty(
+                prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
                 MiscellaneousUtil.getProperty(
                         properties, prefix + DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
                         null));
 
-        information.setPasswordProvider(
-                SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
-                        prefix + DataSourceConfigurationConstants.PROP_PASSWORD_PROVIDER));
+        String passwordPrompt = (String) MiscellaneousUtil.getProperty(
+                properties, prefix + SecretConfigurationConstants.PROP_PASSWORD_PROMPT, 
+                "Password for datasource " + dsName, String.class);
 
-        return information;
+        SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(
+                properties, prefix, passwordPrompt);
+
+        datasourceInformation.setSecretInformation(secretInformation);
+
+        return datasourceInformation;
     }
 
     /**

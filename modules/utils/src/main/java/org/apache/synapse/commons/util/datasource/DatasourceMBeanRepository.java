@@ -20,9 +20,9 @@ package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.MBeanRegistrar;
-import org.apache.synapse.commons.util.MBeanRepository;
 import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
+import org.apache.synapse.commons.util.jmx.MBeanRepository;
 
 import java.util.HashMap;
 import java.util.Map;

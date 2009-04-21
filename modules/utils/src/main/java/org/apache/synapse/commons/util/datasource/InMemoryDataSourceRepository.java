@@ -23,9 +23,9 @@ package org.apache.synapse.commons.util.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.MBeanRepository;
 import org.apache.synapse.commons.util.SynapseUtilException;
 import org.apache.synapse.commons.util.datasource.factory.DataSourceFactory;
+import org.apache.synapse.commons.util.jmx.MBeanRepository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -52,28 +52,30 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
     }
 
     /**
-     * Keep DataSource in the Local store
+     * Keep DataSource in the Local store.
+     * 
+     * @param dataSourceInformation the information describing a data source
      *
      * @see DataSourceRepository#register(DataSourceInformation)
      */
-    public void register(DataSourceInformation information) {
+    public void register(DataSourceInformation dataSourceInformation) {
 
-        if (information == null) {
+        if (dataSourceInformation == null) {
             handleException("DataSourceInformation cannot be found.");
         }
 
-        DataSource dataSource = DataSourceFactory.createDataSource(information);
+        DataSource dataSource = DataSourceFactory.createDataSource(dataSourceInformation);
 
         if (dataSource == null) {
 
             if (log.isDebugEnabled()) {
                 log.debug("DataSource cannot be created or" +
-                        " found for DataSource Information " + information);
+                        " found for DataSource Information " + dataSourceInformation);
             }
             return;
         }
 
-        String name = information.getDatasourceName();
+        String name = dataSourceInformation.getDatasourceName();
 
         if (log.isDebugEnabled()) {
             log.debug("Registering a DatSource with name : " + name + " in Local Pool");

@@ -55,7 +55,7 @@ public class DataSourceInformationListFactory {
         }
 
         String dataSources = MiscellaneousUtil.getProperty(dsProperties,
-                DataSourceConfigurationConstants.PROP_SYNAPSE_DATASOURCES, null);
+                DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS, null);
 
         if (dataSources == null || "".equals(dataSources)) {
             if (log.isDebugEnabled()) {

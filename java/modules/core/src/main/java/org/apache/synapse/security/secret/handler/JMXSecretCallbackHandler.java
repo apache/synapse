@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.security.secret.handler;
 
-import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
 import org.apache.synapse.commons.util.secret.AbstractSecretCallbackHandler;
 import org.apache.synapse.commons.util.secret.SingleSecretCallback;
 import org.apache.synapse.security.mbean.JMXSecretsProvider;

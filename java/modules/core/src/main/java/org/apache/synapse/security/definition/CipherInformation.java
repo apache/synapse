@@ -20,28 +20,34 @@ package org.apache.synapse.security.definition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.security.tool.CipherTool;
+import org.apache.synapse.security.enumeration.CipherOperationMode;
+import org.apache.synapse.security.enumeration.EncodingType;
 
 /**
  * Encapsulates the cipher related information
  */
 public class CipherInformation {
 
+    /** Default cipher algorithm*/
+    public static final String DEFAULT_ALGORITHM = "RSA";
+
     private static final Log log = LogFactory.getLog(CipherInformation.class);
 
-    /* Default cipher algorithm*/
-    public static String DEFAULT_ALGORITHM = "RSA";
-    /*Cipher algorithm */
+    /* Cipher algorithm */
     private String algorithm = DEFAULT_ALGORITHM;
-    /* Cipher operation mode - encrypt or decrypt */
-    private String operationMode;
+
+    /* Cipher operation mode - ENCRYPT or DECRYPT */
+    private CipherOperationMode cipherOperationMode;
+
     /* Mode of operation - ECB,CCB,etc*/
     private String mode;
+
     /* Type of the input to the cipher */
-    private String inType;
-    /* Type of the output from the cipher - base64*/
-    private String outType;
+    private EncodingType inType;
+
+    /* Type of the output from the cipher*/
+    private EncodingType outType;
+
     /* Ciphering type - asymmetric , symmetric*/
     private String type;
 
@@ -51,26 +57,17 @@ public class CipherInformation {
 
     public void setAlgorithm(String algorithm) {
         if (algorithm == null || "".equals(algorithm)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Given algorithm is null, using a default one : RSA");
-            }
+            log.info("Given algorithm is null, using a default one : RSA");
         }
         this.algorithm = algorithm;
     }
 
-    public String getOperationMode() {
-        return operationMode;
+    public CipherOperationMode getCipherOperationMode() {
+        return cipherOperationMode;
     }
 
-    public void setOperationMode(String operationMode) {
-        if (operationMode == null || "".equals(operationMode)) {
-            handleException("Operation mode can not be null");
-        }
-        if (!CipherTool.ENCRYPT.equals(operationMode)
-                && !CipherTool.DECRYPT.equals(operationMode)) {
-            handleException("Invalid operation mode ' " + operationMode + " ' for cipher ");
-        }
-        this.operationMode = operationMode;
+    public void setCipherOperationMode(CipherOperationMode operationMode) {
+        this.cipherOperationMode = operationMode;
     }
 
     public String getMode() {
@@ -89,24 +86,19 @@ public class CipherInformation {
         this.type = type;
     }
 
-    public String getInType() {
+    public EncodingType getInType() {
         return inType;
     }
 
-    public void setInType(String inType) {
+    public void setInType(EncodingType inType) {
         this.inType = inType;
     }
 
-    public String getOutType() {
+    public EncodingType getOutType() {
         return outType;
     }
 
-    public void setOutType(String outType) {
+    public void setOutType(EncodingType outType) {
         this.outType = outType;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

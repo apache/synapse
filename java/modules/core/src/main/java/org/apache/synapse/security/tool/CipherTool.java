@@ -25,119 +25,143 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.security.definition.CipherInformation;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
+import org.apache.synapse.security.enumeration.CipherOperationMode;
+import org.apache.synapse.security.enumeration.EncodingType;
 import org.apache.synapse.security.enumeration.KeyStoreType;
 import org.apache.synapse.security.wrappers.CipherWrapper;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
 
+import javax.crypto.spec.SecretKeySpec;
+
 import java.io.*;
 import java.security.Key;
 
 /**
- * Tool for encrypting and decrypting.
- * Arguments and their meanings
+ * Tool for encrypting and decrypting. <br>
+ * <br>
+ * Arguments and their meanings:
  * <ul>
- * <li>keystore     If keys are in a store ,it's location
+ * <li>source       Either cipher or plain text as an in-lined form
+ * <li>sourceFile   Source from a file
+ * <li>passphrase   if a simple symmetric encryption using a pass phrase shall be used
+ * <li>keystore     If keys are in a store, it's location
  * <li>storepass    Password for access keyStore
  * <li>keypass      To get private key
  * <li>alias        Alias to identify key owner
  * <li>storetype    Type of keyStore
  * <li>keyfile      If key is in a file
- * <li>opmode       encrypt or decrypt
- * <li>algorithm    encrypt or decrypt algorithm
- * <li>source       Either cipher or plain text as an in-lined form
- * <li>sourceFile   Source from a file
- * <li>outencode    Currently base64
- * <li>inencode     Currently base64
  * <li>trusted      Is KeyStore a trusted store ? . if presents this , consider as a  trusted store
+ * <li>opmode       encrypt or decrypt
+ * <li>algorithm    encrypt or decrypt algorithm (default RSA)
+ * <li>outencode    Currently BASE64 or BIGINTEGER16
+ * <li>inencode     Currently BASE64 or BIGINTEGER16
+ * 
  * <ul>
  */
-public class CipherTool {
+public final class CipherTool {
+
+    /* The cipher or plain text as an in-lined */
+    private static final String SOURCE_IN_LINED = "source";
+
+    /* The the source from a file*/
+    private static final String SOURCE_FILE = "sourcefile";
+
+    /* Pass phrase to use for en- or decryption. */
+    private static final String PASSPHRASE = "passphrase";
+
+    /* The argument name for KeyStore location */
+    private static final String KEY_STORE = "keystore";
+
+    /* The KeyStore type*/
+    private static final String STORE_TYPE = "storetype";
+
+    /* The argument name for password to access KeyStore*/
+    private static final String STORE_PASS = "storepass";
+
+    /* The argument name for password for access private key */
+    private static final String KEY_PASS = "keypass";
+
+    /* The alias to identify key owner */
+    private static final String ALIAS = "alias";
+
+    /* If the key is from a file , then it's location*/
+    private static final String KEY_FILE = "keyfile";
+
+    /* The algorithm for encrypting or decrypting */
+    private static final String ALGORITHM = "algorithm";
+
+    /* The operation mode of cihper - encrypt or decrypt */
+    private static final String OP_MODE = "opmode";
+
+    /* The cipher type - asymmetric , symmetric */
+    private static final String CIPHER_TYPE = "ciphertype";
+
+    /* If  the target has to be written to a file*/
+    private static final String TARGET_FILE = "targetfile";
+
+    /* If  the output of cipher operation need to be encode - only base64*/
+    private static final String OUT_TYPE = "outencode";
+
+    /* If  the encode of the input type base64*/
+    private static final String IN_TYPE = "inencode";
+
+    /* Is this keyStore a trusted one */
+    private static final String TRUSTED = "trusted";
 
     private static Log log = LogFactory.getLog(CipherTool.class);
 
-    /* The argument name for KeyStore location */
-    public final static String KEY_STORE = "keystore";
-    /* The KeyStore type*/
-    public final static String STORE_TYPE = "storetype";
-    /* The argument name for password to access KeyStore*/
-    public final static String STORE_PASS = "storepass";
-    /* The argument name for password for access private key */
-    public final static String KEY_PASS = "keypass";
-    /* The alias to identify key owner */
-    public final static String ALIAS = "alias";
+    private CipherTool() {}
 
-    /* If the key is from a file , then it's location*/
-    public final static String KEY_FILE = "keyfile";
-
-    /* The algorithm for encrypting or decrypting */
-    public final static String ALGORITHM = "algorithm";
-    /* The operation mode of cihper - encrypt or decrypt */
-    public final static String OP_MODE = "opmode";
-    /* The cipher type - asymmetric , symmetric */
-    public final static String CIPHER_TYPE = "ciphertype";
-
-    /* The cipher or plain text as an in-lined */
-    public final static String SOURCE_IN_LINED = "source";
-    /* The the source from a file*/
-    public final static String SOURCE_FILE = "sourcefile";
-    /* If  the target has to be written to a file*/
-    public final static String TARGET_FILE = "targetfile";
-    /* If  the output of cipher operation need to be encode - only base64*/
-    public final static String OUT_TYPE = "outencode";
-    /* If  the encode of the input type base64*/
-    public final static String IN_TYPE = "inencode";
-    /* Is this keyStore a trusted one */
-    public final static String TRUSTED = "trusted";
-
-    public final static String SYMMETRIC = "symmetric";
-
-    public final static String ASYMMETRIC = "asymmetric";
-
-    /* Operation mode */
-    public final static String ENCRYPT = "encrypt";
-    public final static String DECRYPT = "decrypt";
-
-    public final static String BASE64 = "base64";
-
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // loads the options
         Options options = getOptions();
+
         // create the command line parser
         CommandLineParser parser = new GnuParser();
+
         // parse the command line arguments
         try {
             CommandLine cmd = parser.parse(options, args);
+
             // Loads the cipher relate information
             CipherInformation cipherInformation = getCipherInformation(cmd);
-            //Key information must not contain any password
-            // If Key need to be loaded from a file
-            String keyFile = getArgument(cmd, KEY_FILE, null);
+
             // Source  as an in-lined
             String source = getArgument(cmd, SOURCE_IN_LINED, null);
             assertEmpty(source, SOURCE_IN_LINED);
 
-            boolean isTrusted = isArgumentPresent(cmd, TRUSTED);
-
             Key key;
-            if (keyFile != null) {
-                key = getKey(keyFile);
+
+            // if pass phrase is specified, use simple symmetric en-/decryption
+            String passphrase = getArgument(cmd, PASSPHRASE, null);
+            if (passphrase != null) {
+                key = new SecretKeySpec(passphrase.getBytes(), cipherInformation.getAlgorithm());
             } else {
-                if (isTrusted) {
-                    TrustKeyStoreWrapper trustKeyStoreWrapper = new TrustKeyStoreWrapper();
-                    trustKeyStoreWrapper.init(getTrustKeyStoreInformation(cmd));
-                    key = trustKeyStoreWrapper.getPublicKey();
+                // Key information must not contain any password
+                // If Key need to be loaded from a file
+                String keyFile = getArgument(cmd, KEY_FILE, null);
+
+                boolean isTrusted = isArgumentPresent(cmd, TRUSTED);
+                if (keyFile != null) {
+                    key = getKey(keyFile);
                 } else {
-                    IdentityKeyStoreWrapper storeWrapper = new IdentityKeyStoreWrapper();
-                    //Password for access private key
-                    String keyPass = getArgument(cmd, KEY_PASS, null);
-                    assertEmpty(keyPass, KEY_PASS);
-                    storeWrapper.init(getIdentityKeyStoreInformation(cmd), keyPass);
-                    if (ENCRYPT.equals(cipherInformation.getOperationMode())) {
-                        key = storeWrapper.getPrivateKey();
+                    if (isTrusted) {
+                        TrustKeyStoreWrapper trustKeyStoreWrapper = new TrustKeyStoreWrapper();
+                        trustKeyStoreWrapper.init(getTrustKeyStoreInformation(cmd));
+                        key = trustKeyStoreWrapper.getPublicKey();
                     } else {
-                        key = storeWrapper.getPublicKey();
+                        IdentityKeyStoreWrapper storeWrapper = new IdentityKeyStoreWrapper();
+                        //Password for access private key
+                        String keyPass = getArgument(cmd, KEY_PASS, null);
+                        assertEmpty(keyPass, KEY_PASS);
+                        storeWrapper.init(getIdentityKeyStoreInformation(cmd), keyPass);
+                        if (cipherInformation.getCipherOperationMode() == CipherOperationMode.ENCRYPT) {
+                            key = storeWrapper.getPrivateKey();
+                        } else {
+                            key = storeWrapper.getPublicKey();
+                        }
                     }
                 }
             }
@@ -149,7 +173,8 @@ public class CipherTool {
             CipherWrapper cipherWrapper = new CipherWrapper(cipherInformation, key);
             ByteArrayInputStream in = new ByteArrayInputStream(source.getBytes());
 
-            System.out.println("Output : " + cipherWrapper.getSecret(in));
+            PrintStream out = System.out;
+            out.println("Output : " + cipherWrapper.getSecret(in));
 
         } catch (ParseException e) {
             handleException("Error passing arguments ", e);
@@ -214,13 +239,25 @@ public class CipherTool {
     private static CipherInformation getCipherInformation(CommandLine cmd) {
 
         CipherInformation information = new CipherInformation();
-        information.setAlgorithm(getArgument(cmd, ALGORITHM, CipherInformation.DEFAULT_ALGORITHM));
-        information.setOperationMode(getArgument(cmd, OP_MODE, ENCRYPT));
-        information.setInType(getArgument(cmd, IN_TYPE, BASE64));
-        information.setOutType(getArgument(cmd, OUT_TYPE, BASE64));
-        information.setType(getArgument(cmd, CIPHER_TYPE, null));
-        return information;
 
+        information.setAlgorithm(getArgument(cmd, ALGORITHM, CipherInformation.DEFAULT_ALGORITHM));
+
+        information.setCipherOperationMode(CipherOperationMode.valueOf(
+                getArgument(cmd, OP_MODE, CipherOperationMode.ENCRYPT.toString()).toUpperCase()));
+
+        String encInType = getArgument(cmd, IN_TYPE, null);
+        if (encInType != null) {
+            information.setInType(EncodingType.valueOf(encInType.toUpperCase()));
+        }
+        
+        String encOutType = getArgument(cmd, OUT_TYPE, null);
+        if (encOutType != null) {
+            information.setOutType(EncodingType.valueOf(encOutType.toUpperCase()));    
+        }
+
+        information.setType(getArgument(cmd, CIPHER_TYPE, null));
+
+        return information;
     }
 
     /**
@@ -242,8 +279,8 @@ public class CipherTool {
         String storePass = getArgument(cmd, STORE_PASS, null);
         assertEmpty(storePass, STORE_PASS);
         information.setKeyStorePassword(storePass);
-        return information;
 
+        return information;
     }
 
     /**
@@ -263,8 +300,8 @@ public class CipherTool {
         String storePass = getArgument(cmd, STORE_PASS, null);
         assertEmpty(storePass, STORE_PASS);
         information.setKeyStorePassword(storePass);
-        return information;
 
+        return information;
     }
 
     /**
@@ -276,6 +313,12 @@ public class CipherTool {
 
         Options options = new Options();
 
+        Option source = new Option(SOURCE_IN_LINED, true, "Plain text in-lined");
+        Option sourceFile = new Option(SOURCE_FILE, true, "Plain text from a file");
+
+        Option passphrase = new Option(PASSPHRASE, true, 
+                "Passphrase to use for symmetric en- or decryption.");
+        
         Option keyStore = new Option(KEY_STORE, true, "Private key entry KeyStore");
         Option storeType = new Option(STORE_TYPE, true, " KeyStore type");
         Option storePassword = new Option(STORE_PASS, true, "Password for keyStore access");
@@ -288,12 +331,14 @@ public class CipherTool {
         Option opMode = new Option(OP_MODE, true, "encrypt or decrypt");
 
         Option algorithm = new Option(ALGORITHM, true, "Algorithm to be used");
-        Option source = new Option(SOURCE_IN_LINED, true, "Plain text in-lined");
-        Option sourceFile = new Option(SOURCE_FILE, true, "Plain text from a file");
         Option targetFile = new Option(TARGET_FILE, true, "Target file");
         Option outType = new Option(OUT_TYPE, true, "Encode type for output");
         Option intType = new Option(IN_TYPE, true, "Encode type of input source");
 
+        options.addOption(source);
+        options.addOption(sourceFile);
+        
+        options.addOption(passphrase);
         options.addOption(keyStore);
         options.addOption(storeType);
         options.addOption(storePassword);
@@ -307,8 +352,6 @@ public class CipherTool {
         options.addOption(cipherType);
         options.addOption(opMode);
 
-        options.addOption(source);
-        options.addOption(sourceFile);
         options.addOption(targetFile);
         options.addOption(outType);
         options.addOption(intType);

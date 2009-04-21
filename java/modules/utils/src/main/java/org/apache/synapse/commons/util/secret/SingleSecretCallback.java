@@ -30,13 +30,13 @@ public class SingleSecretCallback implements SecretCallback {
     /* The Id to identify the context that secret is going to be used */
     private String id;
 
-    public SingleSecretCallback(String prompt) {
-        this.prompt = prompt;
+    public SingleSecretCallback(String id) {
+        this.id = id;
     }
 
     public SingleSecretCallback(String prompt, String id) {
-        this(prompt);
-        this.id = id;
+        this(id);
+        this.prompt = prompt;
     }
 
     public SingleSecretCallback() {

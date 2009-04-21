@@ -41,32 +41,32 @@ public class DataSourceFactory {
 
     /**
      * Factory method to create a DataSource based on provided information
-     * which is encapsulated in the  DataSourceInformation object
+     * which is encapsulated in the DataSourceInformation object.
      *
-     * @param information Information about DataSource
+     * @param dataSourceInformation Information about DataSource
      * @return DataSource Instance if one can be created ,
      *         otherwise null or exception if provided details are not valid or enough to create
      *         a DataSource
      */
-    public static DataSource createDataSource(DataSourceInformation information) {
+    public static DataSource createDataSource(DataSourceInformation dataSourceInformation) {
 
-        String dsType = information.getType();
-        String driver = information.getDriver();
+        String dsType = dataSourceInformation.getType();
+        String driver = dataSourceInformation.getDriver();
 
         if (driver == null || "".equals(driver)) {
             handleException("Database driver class name cannot be found.");
         }
 
-        String url = information.getUrl();
+        String url = dataSourceInformation.getUrl();
 
         if (url == null || "".equals(url)) {
             handleException("Database connection URL cannot be found.");
         }
 
-        String user = information.getUser();
-        String password = information.getResolvedPassword();
+        String user = dataSourceInformation.getSecretInformation().getUser();
+        String password = dataSourceInformation.getSecretInformation().getResolvedPassword();
 
-        int defaultTransactionIsolation = information.getDefaultTransactionIsolation();
+        int defaultTransactionIsolation = dataSourceInformation.getDefaultTransactionIsolation();
 
 
         if (DataSourceInformation.BASIC_DATA_SOURCE.equals(dsType)) {
@@ -83,39 +83,40 @@ public class DataSourceFactory {
                 basicDataSource.setPassword(password);
             }
 
-            basicDataSource.setMaxActive(information.getMaxActive());
-            basicDataSource.setMaxIdle(information.getMaxIdle());
-            basicDataSource.setMaxWait(information.getMaxWait());
-            basicDataSource.setMinIdle(information.getMinIdle());
-            basicDataSource.setDefaultAutoCommit(information.isDefaultAutoCommit());
-            basicDataSource.setDefaultReadOnly(information.isDefaultReadOnly());
-            basicDataSource.setTestOnBorrow(information.isTestOnBorrow());
-            basicDataSource.setTestOnReturn(information.isTestOnReturn());
-            basicDataSource.setTestWhileIdle(information.isTestWhileIdle());
+            basicDataSource.setMaxActive(dataSourceInformation.getMaxActive());
+            basicDataSource.setMaxIdle(dataSourceInformation.getMaxIdle());
+            basicDataSource.setMaxWait(dataSourceInformation.getMaxWait());
+            basicDataSource.setMinIdle(dataSourceInformation.getMinIdle());
+            basicDataSource.setDefaultAutoCommit(dataSourceInformation.isDefaultAutoCommit());
+            basicDataSource.setDefaultReadOnly(dataSourceInformation.isDefaultReadOnly());
+            basicDataSource.setTestOnBorrow(dataSourceInformation.isTestOnBorrow());
+            basicDataSource.setTestOnReturn(dataSourceInformation.isTestOnReturn());
+            basicDataSource.setTestWhileIdle(dataSourceInformation.isTestWhileIdle());
             basicDataSource.setMinEvictableIdleTimeMillis(
-                    information.getMinEvictableIdleTimeMillis());
+                    dataSourceInformation.getMinEvictableIdleTimeMillis());
             basicDataSource.setTimeBetweenEvictionRunsMillis(
-                    information.getTimeBetweenEvictionRunsMillis());
+                    dataSourceInformation.getTimeBetweenEvictionRunsMillis());
             basicDataSource.setNumTestsPerEvictionRun(
-                    information.getNumTestsPerEvictionRun());
+                    dataSourceInformation.getNumTestsPerEvictionRun());
             basicDataSource.setMaxOpenPreparedStatements(
-                    information.getMaxOpenPreparedStatements());
+                    dataSourceInformation.getMaxOpenPreparedStatements());
             basicDataSource.setAccessToUnderlyingConnectionAllowed(
-                    information.isAccessToUnderlyingConnectionAllowed());
-            basicDataSource.setInitialSize(information.getInitialSize());
-            basicDataSource.setPoolPreparedStatements(information.isPoolPreparedStatements());
+                    dataSourceInformation.isAccessToUnderlyingConnectionAllowed());
+            basicDataSource.setInitialSize(dataSourceInformation.getInitialSize());
+            basicDataSource.setPoolPreparedStatements(
+                    dataSourceInformation.isPoolPreparedStatements());
 
 
             if (defaultTransactionIsolation != -1) {
                 basicDataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
             }
 
-            String defaultCatalog = information.getDefaultCatalog();
+            String defaultCatalog = dataSourceInformation.getDefaultCatalog();
             if (defaultCatalog != null && !"".equals(defaultCatalog)) {
                 basicDataSource.setDefaultCatalog(defaultCatalog);
             }
 
-            String validationQuery = information.getValidationQuery();
+            String validationQuery = dataSourceInformation.getValidationQuery();
 
             if (validationQuery != null && !"".equals(validationQuery)) {
                 basicDataSource.setValidationQuery(validationQuery);
@@ -143,34 +144,34 @@ public class DataSourceFactory {
                 adapterCPDS.setPassword(password);
             }
 
-            adapterCPDS.setPoolPreparedStatements(information.isPoolPreparedStatements());
-            adapterCPDS.setMaxIdle(information.getMaxIdle());
+            adapterCPDS.setPoolPreparedStatements(dataSourceInformation.isPoolPreparedStatements());
+            adapterCPDS.setMaxIdle(dataSourceInformation.getMaxIdle());
 
 
             PerUserPoolDataSource perUserPoolDataSource = new PerUserPoolDataSource();
             perUserPoolDataSource.setConnectionPoolDataSource(adapterCPDS);
 
-            perUserPoolDataSource.setDefaultMaxActive(information.getMaxActive());
-            perUserPoolDataSource.setDefaultMaxIdle(information.getMaxIdle());
-            perUserPoolDataSource.setDefaultMaxWait((int) information.getMaxWait());
-            perUserPoolDataSource.setDefaultAutoCommit(information.isDefaultAutoCommit());
-            perUserPoolDataSource.setDefaultReadOnly(information.isDefaultReadOnly());
-            perUserPoolDataSource.setTestOnBorrow(information.isTestOnBorrow());
-            perUserPoolDataSource.setTestOnReturn(information.isTestOnReturn());
-            perUserPoolDataSource.setTestWhileIdle(information.isTestWhileIdle());
+            perUserPoolDataSource.setDefaultMaxActive(dataSourceInformation.getMaxActive());
+            perUserPoolDataSource.setDefaultMaxIdle(dataSourceInformation.getMaxIdle());
+            perUserPoolDataSource.setDefaultMaxWait((int) dataSourceInformation.getMaxWait());
+            perUserPoolDataSource.setDefaultAutoCommit(dataSourceInformation.isDefaultAutoCommit());
+            perUserPoolDataSource.setDefaultReadOnly(dataSourceInformation.isDefaultReadOnly());
+            perUserPoolDataSource.setTestOnBorrow(dataSourceInformation.isTestOnBorrow());
+            perUserPoolDataSource.setTestOnReturn(dataSourceInformation.isTestOnReturn());
+            perUserPoolDataSource.setTestWhileIdle(dataSourceInformation.isTestWhileIdle());
             perUserPoolDataSource.setMinEvictableIdleTimeMillis(
-                    (int) information.getMinEvictableIdleTimeMillis());
+                    (int) dataSourceInformation.getMinEvictableIdleTimeMillis());
             perUserPoolDataSource.setTimeBetweenEvictionRunsMillis(
-                    (int) information.getTimeBetweenEvictionRunsMillis());
+                    (int) dataSourceInformation.getTimeBetweenEvictionRunsMillis());
             perUserPoolDataSource.setNumTestsPerEvictionRun(
-                    information.getNumTestsPerEvictionRun());
+                    dataSourceInformation.getNumTestsPerEvictionRun());
 
             if (defaultTransactionIsolation != -1) {
                 perUserPoolDataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
             }
 
 
-            String validationQuery = information.getValidationQuery();
+            String validationQuery = dataSourceInformation.getValidationQuery();
 
             if (validationQuery != null && !"".equals(validationQuery)) {
                 perUserPoolDataSource.setValidationQuery(validationQuery);

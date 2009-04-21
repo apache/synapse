@@ -48,8 +48,7 @@ public class SynapseServer {
     public static void main(String[] args) throws Exception {
 
         // first check if we should print usage
-        if (args.length != 1 && args.length != 4 && args.length != 5 && args.length != 6
-                && args.length != 6 && args.length != 7) {
+        if (args.length <= 0 || args.length == 2 || args.length == 3 || args.length >= 8) {
             printUsage();
         }
 

@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
-import org.apache.synapse.commons.util.MBeanRegistrar;
+import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;

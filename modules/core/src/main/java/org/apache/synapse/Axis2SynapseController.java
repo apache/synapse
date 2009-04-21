@@ -36,6 +36,8 @@ import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
+import org.apache.synapse.commons.util.jmx.JmxInformation;
+import org.apache.synapse.commons.util.jmx.JmxInformationFactory;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
@@ -48,26 +50,36 @@ import org.apache.synapse.task.*;
 import java.util.*;
 
 /**
- * Axis2 Based Synapse Controller
+ * Axis2 Based Synapse Controller.
  *
- * @see org.apache.synapse.SynapseController
+ * @see  org.apache.synapse.SynapseController
  */
 public class Axis2SynapseController implements SynapseController {
 
     private static final Log log = LogFactory.getLog(Axis2SynapseController.class);
 
-    /*The Axis2 listener Manager */
+    private static final String JMX_AGENT_NAME = "jmx.agent.name";
+
+    /** The Axis2 listener Manager */
     private ListenerManager listenerManager;
-    /*The Axis2 configuration context used by Synapse */
+
+    /** The Axis2 configuration context used by Synapse */
     private ConfigurationContext configurationContext;
-    /*Reference to the Synapse configuration */
+
+    /** Reference to the Synapse configuration */
     private SynapseConfiguration synapseConfiguration;
-    /*Reference to the Synapse configuration */
+
+    /** Reference to the Synapse configuration */
     private SynapseEnvironment synapseEnvironment;
-    /*Indicate initialization state */
+
+    /** Indicate initialization state */
     private boolean initialized;
-    /* ServerConfiguration Information */
-    private ServerConfigurationInformation information;
+
+    /** ServerConfiguration Information */
+    private ServerConfigurationInformation serverConfigurationInformation;
+
+    /** JMX Adapter */
+    private JmxAdapter jmxAdapter;
 
     /**
      * Initiates the  Axis2 Based Server Environment
@@ -76,20 +88,26 @@ public class Axis2SynapseController implements SynapseController {
      * @param contextInformation       Server Context if the Axis2 Based Server
      *                                 Environment has been already set up.
      */
-    public void init(ServerConfigurationInformation configurationInformation,
+    public void init(ServerConfigurationInformation serverConfigurationInformation,
                      ServerContextInformation contextInformation) {
 
         log.info("Initializing Synapse at : " + new Date());
 
-        this.information = configurationInformation;
+        this.serverConfigurationInformation = serverConfigurationInformation;
+        
+        /* If no system property for the JMX agent is specified from outside, use a default one
+           to show all MBeans (including the Axis2-MBeans) within the Synapse tree */
+        if (System.getProperty(JMX_AGENT_NAME) == null) {
+            System.setProperty(JMX_AGENT_NAME, "org.apache.synapse");
+        }
 
         if (contextInformation == null || contextInformation.getServerContext() == null ||
-                configurationInformation.isCreateNewInstance()) {
+                serverConfigurationInformation.isCreateNewInstance()) {
 
             if (log.isDebugEnabled()) {
                 log.debug("Initializing Synapse in a new axis2 server environment instance");
             }
-            createNewInstance(configurationInformation);
+            createNewInstance(serverConfigurationInformation);
         } else {
             Object context = contextInformation.getServerContext();
             if (context instanceof ConfigurationContext) {
@@ -101,8 +119,8 @@ public class Axis2SynapseController implements SynapseController {
                 configurationContext.setProperty(
                         AddressingConstants.ADDR_VALIDATE_ACTION, Boolean.FALSE);
             } else {
-                handleFatal("Synapse startup initialization failed : Provided server context is" +
-                        " invalid, expected an Axis2 ConfigurationContext instance");
+                handleFatal("Synapse startup initialization failed : Provided server context is"
+                        + " invalid, expected an Axis2 ConfigurationContext instance");
             }
         }
         initDefault(contextInformation);
@@ -115,12 +133,14 @@ public class Axis2SynapseController implements SynapseController {
     public void destroy() {
 
         try {
-            if (information.isCreateNewInstance()) {  // only if we have created the server
+            if (serverConfigurationInformation.isCreateNewInstance()) {  // only if we have created the server
 
                 // destroy listener manager
                 if (listenerManager != null) {
                     listenerManager.destroy();
                 }
+
+                stopJmxAdapter();
 
                 // we need to call this method to clean the temp files we created.
                 if (configurationContext != null) {
@@ -164,11 +184,17 @@ public class Axis2SynapseController implements SynapseController {
         }
 
         // if the axis2 instance is created by us, then start the listener manager
-        if (information.isCreateNewInstance()) {
+        if (serverConfigurationInformation.isCreateNewInstance()) {
             if (listenerManager != null) {
                 listenerManager.start();
             } else {
                 handleFatal("Couldn't start Synapse, ListenerManager not found");
+            }
+            /* if JMX Adapter has been configured and started, output usage information rather
+               at the end of the startup process to make it more obvious */
+            if (jmxAdapter != null && jmxAdapter.isRunning()) {
+                log.info("Management using JMX available via: " 
+                        + jmxAdapter.getJmxInformation().getJmxUrl());
             }
         }
     }
@@ -181,7 +207,7 @@ public class Axis2SynapseController implements SynapseController {
             cleanupDefault();
 
             // first stop the listener manager
-            if (information.isCreateNewInstance() && listenerManager != null) {
+            if (serverConfigurationInformation.isCreateNewInstance() && listenerManager != null) {
                 listenerManager.stop();
             }
 
@@ -212,7 +238,7 @@ public class Axis2SynapseController implements SynapseController {
             }
 
             // continue stopping the axis2 environment if we created it
-            if (information.isCreateNewInstance() && configurationContext != null &&
+            if (serverConfigurationInformation.isCreateNewInstance() && configurationContext != null &&
                     configurationContext.getAxisConfiguration() != null) {
 
                 Map<String, AxisService> serviceMap =
@@ -278,7 +304,7 @@ public class Axis2SynapseController implements SynapseController {
 
     public SynapseConfiguration createSynapseConfiguration() {
 
-        String synapseXMLLocation = information.getSynapseXMLLocation();
+        String synapseXMLLocation = serverConfigurationInformation.getSynapseXMLLocation();
 
         if (synapseXMLLocation != null) {
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(synapseXMLLocation);
@@ -301,7 +327,6 @@ public class Axis2SynapseController implements SynapseController {
 
         try {
             configurationContext.getAxisConfiguration().addParameter(synapseConfigurationParameter);
-
         } catch (AxisFault e) {
             handleFatal("Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
                     "' to the Axis2 configuration : " + e.getMessage(), e);
@@ -322,17 +347,20 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * Create a Axis2 Based Server Environment
      *
-     * @param information ServerConfigurationInformation instance
+     * @param serverConfigurationInformation ServerConfigurationInformation instance
      */
-    private void createNewInstance(ServerConfigurationInformation information) {
+    private void createNewInstance(ServerConfigurationInformation serverConfigurationInformation) {
 
         try {
             configurationContext = ConfigurationContextFactory.
-                    createConfigurationContextFromFileSystem(information.getAxis2RepoLocation(),
-                            information.getAxis2Xml());
+                    createConfigurationContextFromFileSystem(
+                            serverConfigurationInformation.getAxis2RepoLocation(),
+                            serverConfigurationInformation.getAxis2Xml());
 
             configurationContext.setProperty(
                     AddressingConstants.ADDR_VALIDATE_ACTION, Boolean.FALSE);
+
+            startJmxAdapter();
 
             listenerManager = configurationContext.getListenerManager();
             if (listenerManager == null) {
@@ -377,9 +405,9 @@ public class Axis2SynapseController implements SynapseController {
     private void setupProxyServiceMediation() {
 
         log.info("Deploying Proxy services...");
-        String thisServerName = information.getServerName();
+        String thisServerName = serverConfigurationInformation.getServerName();
         if (thisServerName == null || "".equals(thisServerName)) {
-            thisServerName = information.getHostName();
+            thisServerName = serverConfigurationInformation.getHostName();
             if (thisServerName == null || "".equals(thisServerName)) {
                 thisServerName = "localhost";
             }
@@ -462,9 +490,8 @@ public class Axis2SynapseController implements SynapseController {
 
     private void setupDataSources() {
         Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
-        DataSourceInformationRepositoryHelper.
-                initializeDataSourceInformationRepository(
-                        configurationContext.getAxisConfiguration(), synapseProperties);
+        DataSourceInformationRepositoryHelper.initializeDataSourceInformationRepository(
+                configurationContext.getAxisConfiguration(), synapseProperties);
     }
 
     /**
@@ -518,8 +545,8 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     private void addServerIPAndHostEnrties() {
-        String hostName = information.getHostName();
-        String ipAddress = information.getIpAddress();
+        String hostName = serverConfigurationInformation.getHostName();
+        String ipAddress = serverConfigurationInformation.getIpAddress();
         if (hostName != null && !"".equals(hostName)) {
             Entry entry = new Entry(SynapseConstants.SERVER_HOST);
             entry.setValue(hostName);
@@ -530,6 +557,33 @@ public class Axis2SynapseController implements SynapseController {
             Entry entry = new Entry(SynapseConstants.SERVER_IP);
             entry.setValue(ipAddress);
             synapseConfiguration.addEntry(SynapseConstants.SERVER_IP, entry);
+        }
+    }
+
+    /**
+     * Starts the JMX Adaptor.
+     *
+     * @throws  SynapseException  if the JMX configuration is erroneous and/or the connector server
+     *                            cannot be started
+     */
+    private void startJmxAdapter() {
+        Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
+        JmxInformation jmxInformation = JmxInformationFactory.createJmxInformation(
+                synapseProperties, serverConfigurationInformation.getHostName());
+
+        // Start JMX Adapter only if at least a JMX JNDI port is configured
+        if (jmxInformation.getJndiPort() != -1) {
+            jmxAdapter = new JmxAdapter(jmxInformation);
+            jmxAdapter.start();
+        }
+    }
+
+    /**
+     * Stops the JMX Adaptor.
+     */
+    private void stopJmxAdapter() {
+        if (jmxAdapter != null) {
+            jmxAdapter.stop();
         }
     }
 

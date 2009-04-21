@@ -21,8 +21,9 @@ package org.apache.synapse.security.secret.repository.filebased;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.security.definition.CipherInformation;
+import org.apache.synapse.security.enumeration.CipherOperationMode;
+import org.apache.synapse.security.enumeration.EncodingType;
 import org.apache.synapse.security.secret.SecretRepository;
-import org.apache.synapse.security.tool.CipherTool;
 import org.apache.synapse.security.wrappers.CipherWrapper;
 import org.apache.synapse.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.security.wrappers.TrustKeyStoreWrapper;
@@ -41,15 +42,16 @@ public class FileBaseSecretRepository implements SecretRepository {
 
     private static Log log = LogFactory.getLog(FileBaseSecretRepository.class);
 
-    private final static String LOCATION = "location";
-    private final static String KEY_STORE = "keyStore";
-    private final static String DOT = ".";
-    private final static String SECRET = "secret";
-    private final static String ALIASES = "aliases";
-    private final static String ALGORITHM = "algorithm";
-    private final static String DEFAULT_ALGORITHM = "RSA";
-    private final static String TRUSTED = "trusted";
-    private final static String DEFAULT_CONF_LOCATION = "cipher-text.properties";
+    private static final String LOCATION = "location";
+    private static final String KEY_STORE = "keyStore";
+    private static final String DOT = ".";
+    private static final String SECRET = "secret";
+    private static final String ALIAS = "alias";
+    private static final String ALIASES = "aliases";
+    private static final String ALGORITHM = "algorithm";
+    private static final String DEFAULT_ALGORITHM = "RSA";
+    private static final String TRUSTED = "trusted";
+    private static final String DEFAULT_CONF_LOCATION = "cipher-text.properties";
 
     /* Parent secret repository */
     private SecretRepository parentRepository;
@@ -140,7 +142,7 @@ public class FileBaseSecretRepository implements SecretRepository {
             StringBuffer sbThree = new StringBuffer();
             sbThree.append(propKey);
             sbThree.append(DOT);
-            sbThree.append(CipherTool.ALIAS);
+            sbThree.append(ALIAS);
 
             //Loads the alias of a certificate
             String aliasOfCert = MiscellaneousUtil.getProperty(
@@ -163,8 +165,8 @@ public class FileBaseSecretRepository implements SecretRepository {
             //Creates a cipherInformation
             CipherInformation cipherInformation = new CipherInformation();
             cipherInformation.setAlgorithm(algorithm);
-            cipherInformation.setOperationMode(CipherTool.DECRYPT);
-            cipherInformation.setInType(CipherTool.BASE64);
+            cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
+            cipherInformation.setInType(EncodingType.BASE64);
 
             //Creates a cipher
             CipherWrapper cipherWrapper = new CipherWrapper(cipherInformation, key);

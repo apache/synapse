@@ -43,12 +43,6 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-module</artifactId>
-            <version>${pom.version}</version>
-            <type>mar</type>
-        </dependency>
-        <dependency>
             <groupId>wrapper</groupId>
             <artifactId>wrapper</artifactId>
             <version>${wrapper.version}</version>

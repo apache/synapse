@@ -38,7 +38,7 @@ import java.util.Stack;
 /**
  * An abstract base class for all Endpoint implementations
  */
-public abstract class AbstractEndpoint extends FaultHandler implements Endpoint, ManagedLifecycle {
+public abstract class AbstractEndpoint extends FaultHandler implements Endpoint {
 
     protected Log log;
     protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);

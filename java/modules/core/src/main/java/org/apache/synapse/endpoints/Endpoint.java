@@ -19,6 +19,7 @@
 
 package org.apache.synapse.endpoints;
 
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
  * endpoint url. Endpoints may contain zero or more endpoints in them and build up a hierarchical
  * structure of endpoints.
  */
-public interface Endpoint {
+public interface Endpoint extends ManagedLifecycle {
 
     /**
      * Sends the message context according to an endpoint specific behavior.

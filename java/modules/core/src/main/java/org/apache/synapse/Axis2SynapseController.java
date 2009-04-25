@@ -84,9 +84,9 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * Initiates the  Axis2 Based Server Environment
      *
-     * @param configurationInformation ServerConfigurationInformation Instance
-     * @param contextInformation       Server Context if the Axis2 Based Server
-     *                                 Environment has been already set up.
+     * @param serverConfigurationInformation ServerConfigurationInformation Instance
+     * @param contextInformation Server Context if the Axis2 Based Server Environment has been
+     *          already set up.
      */
     public void init(ServerConfigurationInformation serverConfigurationInformation,
                      ServerContextInformation contextInformation) {
@@ -277,13 +277,12 @@ public class Axis2SynapseController implements SynapseController {
             throw new SynapseException("Synapse startup failed", axisFault);
         }
 
-        Parameter synapseEnvironmentParameter = new Parameter(SynapseConstants.SYNAPSE_ENV, null);
         synapseEnvironment = new Axis2SynapseEnvironment(
                 configurationContext, synapseConfiguration);
-        synapseEnvironmentParameter.setValue(synapseEnvironment);
-
         MessageContextCreatorForAxis2.setSynEnv(synapseEnvironment);
-
+        
+        Parameter synapseEnvironmentParameter = new Parameter(
+                SynapseConstants.SYNAPSE_ENV, synapseEnvironment);
         try {
             configurationContext.getAxisConfiguration().addParameter(synapseEnvironmentParameter);
         } catch (AxisFault e) {
@@ -318,13 +317,11 @@ public class Axis2SynapseController implements SynapseController {
 
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
         synapseConfiguration.setAxisConfiguration(configurationContext.getAxisConfiguration());
-
-        // set the Synapse configuration and environment into the Axis2 configuration
-        Parameter synapseConfigurationParameter = new Parameter(
-                SynapseConstants.SYNAPSE_CONFIG, null);
-        synapseConfigurationParameter.setValue(synapseConfiguration);
         MessageContextCreatorForAxis2.setSynConfig(synapseConfiguration);
 
+        // set the Synapse configuration into the Axis2 configuration
+        Parameter synapseConfigurationParameter = new Parameter(
+                SynapseConstants.SYNAPSE_CONFIG, synapseConfiguration);
         try {
             configurationContext.getAxisConfiguration().addParameter(synapseConfigurationParameter);
         } catch (AxisFault e) {
@@ -533,6 +530,8 @@ public class Axis2SynapseController implements SynapseController {
         if (taskHelper.isInitialized()) {
             taskHelper.cleanup();
         }
+
+        stopJmxAdapter();
     }
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {

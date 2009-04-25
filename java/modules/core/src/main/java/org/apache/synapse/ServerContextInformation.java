@@ -18,6 +18,9 @@
  */
 package org.apache.synapse;
 
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +33,10 @@ public class ServerContextInformation {
     private Object serverContext;
     /* A map to hold any context information*/
     private final Map<String, Object> properties = new HashMap<String, Object>();
+    /* Keeps the SynapseConfiguration */
+    private SynapseConfiguration synapseConfiguration;
+    /* Keeps the SynapseEnvironment */
+    private SynapseEnvironment synapseEnvironment;
 
     private ServerState serverState = ServerState.UNDETERMINED;
 
@@ -62,5 +69,21 @@ public class ServerContextInformation {
 
     public void setServerState(ServerState serverState) {
         this.serverState = serverState;
+    }
+
+    public SynapseConfiguration getSynapseConfiguration() {
+        return synapseConfiguration;
+    }
+
+    public void setSynapseConfiguration(SynapseConfiguration synapseConfiguration) {
+        this.synapseConfiguration = synapseConfiguration;
+    }
+
+    public SynapseEnvironment getSynapseEnvironment() {
+        return synapseEnvironment;
+    }
+
+    public void setSynapseEnvironment(SynapseEnvironment synapseEnvironment) {
+        this.synapseEnvironment = synapseEnvironment;
     }
 }

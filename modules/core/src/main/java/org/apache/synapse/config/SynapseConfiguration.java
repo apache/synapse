@@ -857,9 +857,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
         // destroy the managed endpoints
         for (Endpoint endpoint : getDefinedEndpoints().values()) {
-            if (endpoint instanceof ManagedLifecycle) {
-                ((ManagedLifecycle) endpoint).destroy();
-            }
+            endpoint.destroy();
         }
 
         // destroy the startups
@@ -909,9 +907,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
         //initialize endpoints
         for (Endpoint endpoint : getDefinedEndpoints().values()) {
-            if (endpoint instanceof ManagedLifecycle) {
-                ((ManagedLifecycle) endpoint).init(se);
-            }
+            endpoint.init(se);
         }
 
          // initialize managed mediators
@@ -924,9 +920,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
         // initialize all the proxy services
         for (ProxyService proxy : getProxyServices()) {
 
-            if (proxy.getTargetInLineEndpoint() instanceof ManagedLifecycle) {
-                ((ManagedLifecycle) proxy.getTargetInLineEndpoint()).init(se);
-            }
+            proxy.getTargetInLineEndpoint().init(se);
 
             if (proxy.getTargetInLineInSequence() != null) {
                 proxy.getTargetInLineInSequence().init(se);

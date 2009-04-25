@@ -698,6 +698,12 @@
             <artifactId>wso2caching-core</artifactId>
             <version>${wso2caching.version}</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Eventing dependencies-->

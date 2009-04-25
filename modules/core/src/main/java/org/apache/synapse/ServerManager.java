@@ -273,9 +273,11 @@ public class ServerManager {
         if (serverState == ServerState.INITIALIZED || serverState == ServerState.STOPPED) {
 
             // creates the Synapse Configuration using the SynapseController
-            synapseController.createSynapseConfiguration();
+            contextInformation.setSynapseConfiguration(
+                    synapseController.createSynapseConfiguration());
             // creates the Synapse Environment using the SynapseController
-            synapseController.createSynapseEnvironment();
+            contextInformation.setSynapseEnvironment(
+                    synapseController.createSynapseEnvironment());
             // starts the SynapseController
             synapseController.start();
 
@@ -301,8 +303,10 @@ public class ServerManager {
             synapseController.stop();
             // destroy the created Synapse Configuration
             synapseController.destroySynapseConfiguration();
+            contextInformation.setSynapseConfiguration(null);
             // destroy the created Synapse Environment
             synapseController.destroySynapseEnvironment();
+            contextInformation.setSynapseEnvironment(null);
 
             chanageState(ServerState.STOPPED);
         } else {

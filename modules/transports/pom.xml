@@ -185,6 +185,12 @@
             <artifactId>axis2-transport-testkit</artifactId>
             <version>${axis2.transport.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <!-- HTTP transport dependencies -->

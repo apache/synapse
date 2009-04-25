@@ -530,8 +530,6 @@ public class Axis2SynapseController implements SynapseController {
         if (taskHelper.isInitialized()) {
             taskHelper.cleanup();
         }
-
-        stopJmxAdapter();
     }
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {

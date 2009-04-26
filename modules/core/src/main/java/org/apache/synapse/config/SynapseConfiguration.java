@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.datasource.InMemoryDataSourceRepository;
 import org.apache.synapse.commons.util.datasource.JNDIBasedDataSourceRepository;
 import org.apache.synapse.task.TaskDescriptionRepository;
@@ -877,7 +876,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
         
         // clear session information used for SA load balancing
         try {
-            RMIRegistryController.getInstance().shutDown();
             SALSessions.getInstance().reset();
             InMemoryDataSourceRepository.getInstance().clear();
             JNDIBasedDataSourceRepository registry = JNDIBasedDataSourceRepository.getInstance();

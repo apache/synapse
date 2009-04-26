@@ -248,11 +248,12 @@ public class ServerManager {
                 configurationInformation);
 
         if (serverState == ServerState.INITIALIZED || serverState == ServerState.STOPPED) {
-            // destroy the SynapseController
-            synapseController.destroy();
 
             // unregister the ServerManager MBean
             unRegisterMBean();
+
+            // destroy the SynapseController
+            synapseController.destroy();
 
             // mark as destroyed
             chanageState(ServerState.UNDETERMINED);

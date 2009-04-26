@@ -35,6 +35,7 @@ import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
 import org.apache.synapse.commons.util.jmx.JmxInformation;
 import org.apache.synapse.commons.util.jmx.JmxInformationFactory;
@@ -141,6 +142,7 @@ public class Axis2SynapseController implements SynapseController {
                 }
 
                 stopJmxAdapter();
+                RMIRegistryController.getInstance().shutDown();
 
                 // we need to call this method to clean the temp files we created.
                 if (configurationContext != null) {

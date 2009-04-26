@@ -147,6 +147,14 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public void setParameter(String paramName, String paramValue) throws EventException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getParameter(String paramName) throws EventException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
     public void init() {
         try {

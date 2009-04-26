@@ -82,7 +82,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>../../modules/core/src/main/resources</directory>
+            <directory>../../modules/distribution/src/main/conf</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>log4j.properties</include>

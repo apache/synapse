@@ -64,7 +64,7 @@ public class SynapseCommodityServiceTest extends TestCase {
         findAndReplace(
             new File("./../../repository/conf/axis2.xml"),
             new File("./target/test_repos/axis2.xml"),
-            "lib/", "src/main/resources/");
+            "lib/", "./../../modules/distribution/src/main/conf/");
 
         System.setProperty("jmx.agent.name", "synapse");
         ConfigurationContext synapseConfigCtx = ConfigurationContextFactory

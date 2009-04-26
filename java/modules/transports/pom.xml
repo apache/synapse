@@ -187,8 +187,8 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>com.sun.jmx</groupId>
+                    <artifactId>jmxri</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

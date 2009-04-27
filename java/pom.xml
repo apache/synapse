@@ -988,15 +988,15 @@
         <developer>
             <name>Asankha Perera</name>
             <id>asankha</id>
-            <email>asankha AT apache.com</email>
+            <email>asankha AT apache.org</email>
             <organization>AdroitLogic</organization>
             <url>http://adroitlogic.org</url>
         </developer>
         <developer>
             <name>Upul Godage</name>
             <id>upul</id>
-            <email>upul AT wso2.com</email>
-            <organization>WSO2</organization>
+            <email>upul AT apache.org</email>
+            <organization>Apache</organization>
         </developer>
         <developer>
             <name>Oleg Kalnichevski</name>

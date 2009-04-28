@@ -185,12 +185,6 @@
             <artifactId>axis2-transport-testkit</artifactId>
             <version>${axis2.transport.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun.jmx</groupId>
-                    <artifactId>jmxri</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         
         <!-- HTTP transport dependencies -->

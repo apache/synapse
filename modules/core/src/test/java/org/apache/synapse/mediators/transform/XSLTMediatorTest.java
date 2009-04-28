@@ -19,10 +19,6 @@
 
 package org.apache.synapse.mediators.transform;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerFactory;
 
@@ -77,30 +73,24 @@ public class XSLTMediatorTest extends TestCase {
         return suite;
     }
     
-    private static Set<String> testsToExclude = new HashSet<String>(
-            Arrays.asList("testSaxonDOOMSourceDOOMResult", "testSaxonDOOMSourceStreamResult",
-                    "testSaxonDOOMSourceAXIOMResult"));
-    
     private static void addGenericTests(TestSuite suite, final String processorName,
             final Class<? extends TransformerFactory> transformerFactoryClass) {
         
         for (final Class sbf : sourceBuilderFactories) {
             for (final Class rbf : resultBuilderFactories) {
                 String testName = "test" + processorName + shortName(sbf) + shortName(rbf);
-                if (!testsToExclude.contains(testName)) {
-                    suite.addTest(new TestCase(testName) {
-                        @Override
-                        public void runTest() throws Throwable {
-                            String oldTransformerFactory =
-                                TransformerFactory.newInstance().getClass().getName();
-                            System.setProperty(TransformerFactory.class.getName(),
-                                    transformerFactoryClass.getName());
-                            test(sbf, rbf);
-                            System.setProperty(TransformerFactory.class.getName(),
-                                    oldTransformerFactory);
-                        }
-                    });
-                }
+                suite.addTest(new TestCase(testName) {
+                    @Override
+                    public void runTest() throws Throwable {
+                        String oldTransformerFactory =
+                            TransformerFactory.newInstance().getClass().getName();
+                        System.setProperty(TransformerFactory.class.getName(),
+                                transformerFactoryClass.getName());
+                        test(sbf, rbf);
+                        System.setProperty(TransformerFactory.class.getName(),
+                                oldTransformerFactory);
+                    }
+                });
             }
         }
     }

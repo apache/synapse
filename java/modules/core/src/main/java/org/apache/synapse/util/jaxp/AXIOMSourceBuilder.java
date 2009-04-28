@@ -19,8 +19,6 @@
 
 package org.apache.synapse.util.jaxp;
 
-import javax.xml.transform.Source;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.jaxp.OMSource;
 
@@ -29,7 +27,7 @@ import org.apache.axiom.om.impl.jaxp.OMSource;
  * using {@link OMSource}.
  */
 public class AXIOMSourceBuilder implements SourceBuilder {
-    public Source getSource(OMElement node) {
+    public OMSource getSource(OMElement node) {
         return new OMSource(node);
     }
 

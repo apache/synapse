@@ -918,7 +918,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
         // initialize all the proxy services
         for (ProxyService proxy : getProxyServices()) {
 
-            proxy.getTargetInLineEndpoint().init(se);
+            if (proxy.getTargetInLineEndpoint() !=null){
+                proxy.getTargetInLineEndpoint().init(se);
+            }
 
             if (proxy.getTargetInLineInSequence() != null) {
                 proxy.getTargetInLineInSequence().init(se);

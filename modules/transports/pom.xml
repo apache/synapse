@@ -34,9 +34,9 @@
     <artifactId>synapse-transports</artifactId>
     <name>Apache Synapse - Transports</name>
     <description>Apache Synapse - Transports</description>
-    <packaging>bundle</packaging>
+    <packaging>pom</packaging>
 
-    <build>
+    <!--build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -58,7 +58,7 @@
                 </configuration>
             </plugin>
             
-            <!-- We need a repository with the addressing module for the UDP transport tests -->
+            <- We need a repository with the addressing module for the UDP transport tests >
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -128,7 +128,7 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build-->
 
     <profiles>
         <profile>
@@ -158,6 +158,13 @@
         </profile>
     </profiles>
 
+    <modules>
+        <module>core/nhttp</module>
+        <module>core/pipe</module>
+        <module>core/vfs</module>
+        <module>optional/fix</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
@@ -173,12 +180,6 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-base</artifactId>
         </dependency>
-        <!-- The HTTP NIO transport depends on a few methods from the blocking HTTP transport,
-             so we need to add this as an explicit dependency. -->
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-http</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
@@ -186,100 +187,10 @@
             <version>${axis2.transport.version}</version>
             <scope>test</scope>
         </dependency>
-        
-        <!-- HTTP transport dependencies -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>${httpcore.nio.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-nio</artifactId>
-            <version>${httpcore.nio.version}</version>
-        </dependency>
-        
-        <!-- FIX transport dependencies -->
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-core</artifactId>
-            <version>${qfj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-msg-fix40</artifactId>
-            <version>${qfj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-msg-fix41</artifactId>
-            <version>${qfj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-msg-fix42</artifactId>
-            <version>${qfj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-msg-fix43</artifactId>
-            <version>${qfj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-msg-fix44</artifactId>
-            <version>${qfj.version}</version>
-        </dependency>
-        
-        <!-- Other dependencies -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-vfs</artifactId>
-            <version>${commons.vfs.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>${mina.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>de.schlichtherle.io</groupId>
-            <artifactId>truezip</artifactId>
-            <version>${truezip.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>${commons.net.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>${jsch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>oro</groupId>
-            <artifactId>oro</artifactId>
-            <version>${oro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons_io.version}</version>
-        </dependency>
     </dependencies>
 
     <properties>
         <aspectj.version>1.6.1</aspectj.version>
-        <httpcore.nio.version>4.0</httpcore.nio.version>
-        <qfj.version>1.3.1</qfj.version>
     </properties>
 
 </project>

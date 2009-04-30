@@ -18,18 +18,11 @@ package org.apache.synapse.mediators.eventing;
 *  under the License.
 */
 
-import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.eventing.SynapseSubscription;
-import org.apache.synapse.eventing.SynapseSubscriptionManager;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.util.MessageHelper;
-
-import java.util.List;
 
 public class EventPublisherMediator extends AbstractMediator {
     private static final Log log = LogFactory.getLog(EventPublisherMediator.class);

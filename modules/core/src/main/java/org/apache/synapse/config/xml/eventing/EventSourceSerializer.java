@@ -30,6 +30,7 @@ import org.wso2.eventing.Subscription;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 /**
  * <eventSource name="blah">
@@ -62,7 +63,7 @@ public class EventSourceSerializer {
                     XMLConfigConstants.SYNAPSE_OMNAMESPACE);
             subManagerElem.addAttribute(fac.createOMAttribute("class", nullNS,
                     eventSource.getSubscriptionManager().getClass().getName()));
-            for (String name : eventSource.getSubscriptionManager().getPropertyNames()) {
+            for (String name : (Collection<String>)eventSource.getSubscriptionManager().getPropertyNames()) {
                 OMElement propElem =
                         fac.createOMElement("property", XMLConfigConstants.SYNAPSE_OMNAMESPACE);
                 propElem.addAttribute(fac.createOMAttribute("name", nullNS, name));

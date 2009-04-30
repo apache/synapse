@@ -45,6 +45,7 @@ import org.apache.synapse.util.MessageHelper;
 import org.wso2.eventing.EventingConstants;
 import org.wso2.eventing.Subscription;
 import org.wso2.eventing.Event;
+import org.wso2.eventing.SubscriptionManager;
 import org.wso2.eventing.exceptions.EventException;
 
 import javax.xml.namespace.QName;
@@ -62,7 +63,7 @@ import java.util.List;
 public class SynapseEventSource extends SynapseMessageReceiver {
 
     private String name;
-    private SynapseSubscriptionManager subscriptionManager;
+    private SubscriptionManager subscriptionManager;
     private static final Log log = LogFactory.getLog(SynapseEventSource.class);
 
     public SynapseEventSource(String name) {
@@ -77,11 +78,11 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         this.name = name;
     }
 
-    public SynapseSubscriptionManager getSubscriptionManager() {
+    public SubscriptionManager getSubscriptionManager() {
         return subscriptionManager;
     }
 
-    public void setSubscriptionManager(SynapseSubscriptionManager subscriptionManager) {
+    public void setSubscriptionManager(SubscriptionManager subscriptionManager) {
         this.subscriptionManager = subscriptionManager;
     }
 

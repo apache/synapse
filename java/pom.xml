@@ -247,7 +247,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-transports</artifactId>
+                <artifactId>synapse-nhttp-transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-vfs-transport</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -659,11 +664,12 @@
             <version>${commons-cli.version}</version>
         </dependency>
 
-        <!--dependency>
+        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>${commons-lang.version}</version>
-        </dependency-->
+            <scope>test</scope>
+        </dependency>
         
         <!-- Caching dependencies -->
         <dependency>

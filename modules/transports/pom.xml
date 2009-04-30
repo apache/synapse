@@ -249,26 +249,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.qpid</groupId>
-            <artifactId>qpid-common</artifactId>
-            <version>${qpid.version}</version>
-            <exclusions>
-                <!-- Exclude commons-configuration because the transitive
-                     depedency on DOM4J causes problems. Anyway it is not
-                     really used and has disappeared in recent snapshots. -->
-                <exclusion>
-                    <groupId>commons-configuration</groupId>
-                    <artifactId>commons-configuration</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.qpid</groupId>
-            <artifactId>qpid-client</artifactId>
-            <version>${qpid.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>de.schlichtherle.io</groupId>
             <artifactId>truezip</artifactId>
             <version>${truezip.version}</version>

@@ -27,8 +27,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-import org.apache.commons.lang.StringUtils;
-
 public final class ClasspathURLStreamHandler extends URLStreamHandler {
 
     public URLConnection openConnection(URL url) {
@@ -44,8 +42,8 @@ public final class ClasspathURLStreamHandler extends URLStreamHandler {
         public void connect() {}
 
         public InputStream getInputStream() throws IOException {
-            if (StringUtils.isNotEmpty(url.getHost())) {
-                throw new MalformedURLException("No host expected in classpath URLs");
+            if (url != null && url.getHost() != null) {
+                throw new MalformedURLException("No host available in classpath URLs");
             }
             InputStream is = ClasspathURLStreamHandler.class.getClassLoader().getResourceAsStream(url.getFile());
             if (is == null) {

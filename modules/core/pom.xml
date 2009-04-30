@@ -208,7 +208,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-transports</artifactId>
+            <artifactId>synapse-nhttp-transport</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-vfs-transport</artifactId>
         </dependency>
 
         <!-- Rampart

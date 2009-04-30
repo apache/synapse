@@ -25,16 +25,11 @@ import org.apache.axis2.databinding.utils.ConverterUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.PropertyHelper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.endpoints.AddressEndpoint;
-import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.SynapseSubscription;
-import org.apache.synapse.eventing.SynapseSubscriptionManager;
-import org.apache.synapse.eventing.filters.XPathBasedEventFilter;
-import org.wso2.eventing.SubscriptionData;
+import org.wso2.eventing.SubscriptionManager;
 import org.wso2.eventing.exceptions.EventException;
 
 import javax.xml.namespace.QName;
@@ -96,8 +91,8 @@ public class EventSourceFactory {
                 String className = clazz.getAttributeValue();
                 try {
                     Class subscriptionManagerClass = Class.forName(className);
-                    SynapseSubscriptionManager manager =
-                            (SynapseSubscriptionManager) subscriptionManagerClass.newInstance();
+                    SubscriptionManager manager =
+                            (SubscriptionManager) subscriptionManagerClass.newInstance();
                     Iterator itr = subscriptionManagerElem.getChildrenWithName(PROPERTIES_QNAME);
                     while (itr.hasNext()) {
                         OMElement propElem = (OMElement) itr.next();
@@ -106,17 +101,16 @@ public class EventSourceFactory {
                         String propValue =
                                 propElem.getAttribute(new QName("value")).getAttributeValue();
                         manager.addProperty(propName, propValue);
-                        PropertyHelper.setStaticProperty(propElem, manager);
                     }
                     eventSource.setSubscriptionManager(manager);
                     eventSource.getSubscriptionManager()
                             .init(); // Initialise before doing further processing, required for static subscriptions
                 } catch (ClassNotFoundException e) {
-                    handleException("SynapseSubscriptionManager class not found", e);
+                    handleException("SubscriptionManager class not found", e);
                 } catch (IllegalAccessException e) {
-                    handleException("Unable to access the SynapseSubscriptionManager object", e);
+                    handleException("Unable to access the SubscriptionManager object", e);
                 } catch (InstantiationException e) {
-                    handleException("Unable to instantiate the SynapseSubscriptionManager object",
+                    handleException("Unable to instantiate the SubscriptionManager object",
                             e);
                 }
             } else {

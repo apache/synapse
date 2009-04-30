@@ -23,34 +23,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.eventing.SynapseSubscription;
-import org.apache.synapse.eventing.SynapseSubscriptionManager;
 import org.apache.synapse.eventing.SynapseEventingConstants;
-import org.apache.synapse.eventing.filters.XPathBasedEventFilter;
 import org.apache.synapse.eventing.filters.TopicBasedEventFilter;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
-import org.wso2.eventing.Subscription;
 import org.wso2.eventing.Event;
-import org.wso2.eventing.EventFilter;
+import org.wso2.eventing.Subscription;
+import org.wso2.eventing.SubscriptionManager;
 import org.wso2.eventing.exceptions.EventException;
 
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  */
-public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManager {
+public class DefaultInMemorySubscriptionManager implements SubscriptionManager<MessageContext> {
 
     private final Map<String, Subscription> store =
             new ConcurrentHashMap<String, Subscription>();
     private String topicHeaderName;
     private String topicHeaderNS;
     private SynapseXPath topicXPath;
+    private final Map<String, String> properties = new HashMap<String, String>();
     private static final Log log = LogFactory.getLog(DefaultInMemorySubscriptionManager.class);
 
     public List<Subscription> getStaticSubscriptions() {
@@ -147,18 +142,18 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void setParameter(String paramName, String paramValue) throws EventException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public String getParameter(String paramName) throws EventException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
 
     public void init() {
         try {
             //TODO: pick values from the constants
+            topicHeaderName = getPropertyValue("topicHeaderName");
+            if(topicHeaderName==null){
+                handleException("Unable to create topic header topic header name is null");
+            }
+            topicHeaderNS = getPropertyValue("topicHeaderNS");
+            if(topicHeaderNS==null){
+                handleException("Unable to create topic header topic header namespace is null");
+            }
             topicXPath = new SynapseXPath(
                     "s11:Header/ns:" + topicHeaderName + " | s12:Header/ns:" + topicHeaderName);
             topicXPath.addNamespace("s11", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -167,24 +162,18 @@ public class DefaultInMemorySubscriptionManager extends SynapseSubscriptionManag
         } catch (JaxenException e) {
             handleException("Unable to create the topic header XPath", e);
         }
-
-
     }
 
-    public String getTopicHeaderName() {
-        return topicHeaderName;
+    public void addProperty(String name, String value) {
+        properties.put(name, value);
     }
 
-    public void setTopicHeaderName(String topicHeaderName) {
-        this.topicHeaderName = topicHeaderName;
+    public Collection<String> getPropertyNames() {
+        return properties.keySet();
     }
 
-    public String getTopicHeaderNS() {
-        return topicHeaderNS;
-    }
-
-    public void setTopicHeaderNS(String topicHeaderNS) {
-        this.topicHeaderNS = topicHeaderNS;
+    public String getPropertyValue(String name) {
+        return properties.get(name);
     }
 
     private void handleException(String message) {

@@ -18,6 +18,8 @@
  */
 package org.apache.synapse.commons.util.datasource.factory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryListener;
@@ -31,6 +33,8 @@ import java.util.Properties;
  */
 public class DataSourceInformationRepositoryFactory {
 
+    private static final Log log = LogFactory.getLog(DataSourceInformationRepositoryFactory.class);
+    
     /**
      * Factory method to create a DataSourceInformationRepository
      * Use 'DataSourceRepositoryManager' as RepositoryListener
@@ -41,32 +45,54 @@ public class DataSourceInformationRepositoryFactory {
     public static DataSourceInformationRepository createDataSourceInformationRepository(
             Properties properties) {
 
-        return createDataSourceInformationRepository(properties,
-                DataSourceRepositoryManager.getInstance());
+        return createDataSourceInformationRepository(
+                DataSourceRepositoryManager.getInstance(), properties);
     }
 
     /**
      * Factory method to create a DataSourceInformationRepository
      *
-     * @param properties DataSource properties
      * @param listener   DataSourceInformationRepositoryListener
-     * @return DataSourceInformationRepository instance
+     * @param properties DataSource properties
+     *
+     * @return a new, configured DataSourceInformationRepository instance
      */
     public static DataSourceInformationRepository createDataSourceInformationRepository(
-            Properties properties, DataSourceInformationRepositoryListener listener) {
+            DataSourceInformationRepositoryListener listener, Properties properties) {
 
-        List<DataSourceInformation> sourceInformationList =
-                DataSourceInformationListFactory.createDataSourceInformationList(properties);
-        DataSourceInformationRepository repository = new DataSourceInformationRepository();
-        repository.setRepositoryListener(listener);
-        if (properties != null && !properties.isEmpty()) {
-            repository.setConfigurationProperties(properties);
+        if (log.isDebugEnabled()) {
+            log.debug("Creating a new DataSourceInformationRepository");
         }
+        DataSourceInformationRepository datasourceInformationRepository = 
+            new DataSourceInformationRepository();
+        
+        datasourceInformationRepository.setRepositoryListener(listener);
+        setupDatasourceInformationRepository(datasourceInformationRepository, properties);
+        
+        return datasourceInformationRepository;
+    }
+    
+     /**
+     * Setup an existing datasource inforamtion repository adding the provided 
+     * datasource information.
+     *
+     * @param datasourceInformationRepository an existing data source information repository
+     * @param properties DataSource properties
+     */
+    public static void setupDatasourceInformationRepository(
+            DataSourceInformationRepository datasourceInformationRepository,
+            Properties properties) {
+        
+        if (properties != null && !properties.isEmpty()) {
+            datasourceInformationRepository.setConfigurationProperties(properties);
+        }
+        List<DataSourceInformation> sourceInformationList =
+            DataSourceInformationListFactory.createDataSourceInformationList(properties);
+        
         for (DataSourceInformation information : sourceInformationList) {
             if (information != null) {
-                repository.addDataSourceInformation(information);
+                datasourceInformationRepository.addDataSourceInformation(information);
             }
         }
-        return repository;
     }
 }

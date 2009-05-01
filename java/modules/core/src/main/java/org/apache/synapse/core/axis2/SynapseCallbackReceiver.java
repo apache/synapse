@@ -80,6 +80,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         timeOutTimer.schedule(timeoutHandler, 0, timeoutHandlerInterval);
     }
 
+    public int getCallbackCount() {
+        return callbackStore.size();
+    }
 
     public void addCallback(String MsgID, AxisCallback callback) {
         callbackStore.put(MsgID, callback);

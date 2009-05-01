@@ -41,5 +41,5 @@ public interface TaskJobDetailFactory {
      *         otherwise , return null
      */
     JobDetail createJobDetail(TaskDescription taskDescription, Map<String,
-            Object> resources, Class<Job> jobClass);
+            Object> resources, Class<? extends Job> jobClass);
 }

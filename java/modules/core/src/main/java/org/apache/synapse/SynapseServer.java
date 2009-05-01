@@ -73,8 +73,7 @@ public class SynapseServer {
 
         } catch (SynapseException e) {
             log.error("Error starting Apache Synapse, trying a clean shutdown...", e);
-            serverManager.stop();
-            serverManager.destroy();
+            serverManager.shutdown();
         }
     }
 
@@ -83,9 +82,7 @@ public class SynapseServer {
             public void run() {
                 log.info("Shutting down Apache Synapse...");
                 try {
-                    ServerManager serverManager = ServerManager.getInstance();
-                    serverManager.stop();
-                    serverManager.destroy();
+                    ServerManager.getInstance().shutdown();
                     log.info("Apache Synapse shutdown complete");
                     log.info("Halting JVM");
                 } catch (Exception e) {

@@ -109,7 +109,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
     protected void buildDataSource(OMElement elem, AbstractDBMediator mediator) {
 
-        OMElement pool = null;
+        OMElement pool;
         // get the 'pool' element and determine if we need to create a DataSource or
         // look up using JNDI
         try {
@@ -143,7 +143,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
         String dsName = getValue(pool, DSNAME_Q);
         mediator.addDataSourceProperty(DSNAME_Q, dsName);
-         DataSource dataSource = null;
+        DataSource dataSource = null;
         RepositoryBasedDataSourceFinder finder = RepositoryBasedDataSourceFinder.getInstance();
         if (finder.isInitialized()) {
             dataSource = RepositoryBasedDataSourceFinder.getInstance().find(dsName);

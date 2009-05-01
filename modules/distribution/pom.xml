@@ -59,6 +59,13 @@
             <version>${wrapper.version}</version>
         </dependency>
 
+        <!-- The distribution is configured for log4j. Normally, log4j should not
+             be a transitive dependency, so we need to declare it explicitly. -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+
         <!-- Modules -->
         <dependency>
             <groupId>org.apache.rampart</groupId>

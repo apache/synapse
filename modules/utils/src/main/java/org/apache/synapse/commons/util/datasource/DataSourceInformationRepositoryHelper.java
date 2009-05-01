@@ -1,4 +1,4 @@
-/*
+/**
  *  Licensed to the Apache Software Foundation (ASF) under one
  *  or more contributor license agreements.  See the NOTICE file
  *  distributed with this work for additional information
@@ -18,12 +18,6 @@
  */
 package org.apache.synapse.commons.util.datasource;
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
 import org.apache.synapse.commons.util.datasource.factory.DataSourceInformationRepositoryFactory;
 
 import java.util.Properties;
@@ -33,99 +27,34 @@ import java.util.Properties;
  */
 public class DataSourceInformationRepositoryHelper {
 
-    private static final Log log = LogFactory.getLog(DataSourceInformationRepositoryHelper.class);
-
     /**
-     * Initialize and register DataSourceInformationRepository with AxisConfiguration
+     * Initialize DataSourceInformationRepository.
      *
-     * @param axisConfiguration AxisConfiguration instance
-     * @param properties        DataSources configuration properties
+     * @param datasourceInformationRepository to be initialized
+     * @param properties DataSources configuration properties
+     * 
+     * @return the initialized datasource information repository
      */
-    public static void initializeDataSourceInformationRepository(
-            AxisConfiguration axisConfiguration, Properties properties) {
+    public static DataSourceInformationRepository initializeDataSourceInformationRepository(
+            DataSourceInformationRepository datasourceInformationRepository,
+            Properties properties) {
 
-        DataSourceInformationRepository repository =
-                getDataSourceInformationRepository(axisConfiguration);
-        DataSourceInformationRepositoryListener listener = null;
+        DataSourceInformationRepositoryListener repositoryListener = 
+                DataSourceRepositoryManager.getInstance();
 
-        if (repository != null) {
-            listener = repository.getRepositoryListener();
-        }
-
-        if (listener == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Creating a new DataSourceInformationRepositoryListener instance ");
-            }
-            listener = DataSourceRepositoryManager.getInstance();
-        }
-
-        if (listener instanceof DataSourceRepositoryManager) {
+        if (repositoryListener instanceof DataSourceRepositoryManager) {
             RepositoryBasedDataSourceFinder finder = RepositoryBasedDataSourceFinder.getInstance();
-            finder.init((DataSourceRepositoryManager) listener);
+            finder.init((DataSourceRepositoryManager) repositoryListener);
         }
 
-        if (repository == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Initiating a new DataSourceInformationRepository");
-            }
-            initializeDataSourceInformationRepository(axisConfiguration, properties, listener);
-        }
-    }
-
-    /**
-     * Initialize and register DataSourceInformationRepository with AxisConfiguration
-     *
-     * @param axisConfiguration AxisConfiguration instance
-     * @param properties        DataSources configuration properties
-     * @param listener          DataSourceInformationRepositoryListener instance
-     */
-    public static void initializeDataSourceInformationRepository(
-            AxisConfiguration axisConfiguration,
-            Properties properties,
-            DataSourceInformationRepositoryListener listener) {
-
-        DataSourceInformationRepository repository =
+        if (datasourceInformationRepository == null) {
+            datasourceInformationRepository = 
                 DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(
-                        properties, listener);
-        Parameter parameter = new Parameter(
-                DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY, repository);
-        try {
-            axisConfiguration.addParameter(parameter);
-        } catch (AxisFault axisFault) {
-            handleException("Error setting 'DataSourceInformationRepository' as" +
-                    " a parameter to axis2 configuration ", axisFault);
+                    repositoryListener, properties);
+        } else {
+            DataSourceInformationRepositoryFactory.setupDatasourceInformationRepository(
+                    datasourceInformationRepository, properties);
         }
-    }
-
-    /**
-     * Gets DataSourceInformationRepository that is kept in  AxisConfiguration
-     *
-     * @param axisConfiguration AxisConfiguration instance
-     * @return DataSourceInformationRepository instance if there any , otherwise null
-     */
-    public static DataSourceInformationRepository getDataSourceInformationRepository(
-            AxisConfiguration axisConfiguration) {
-
-        Parameter parameter = axisConfiguration.getParameter(
-                DataSourceConfigurationConstants.DATASOURCE_INFORMATION_REPOSITORY);
-        if (parameter != null) {
-            Object result = parameter.getValue();
-            if (!(result instanceof DataSourceInformationRepository)) {
-                handleException("Invalid type  '" + result.getClass().getName()
-                        + "' , expected : 'DataSourceInformationRepository'");
-            }
-            return (DataSourceInformationRepository) result;
-        }
-        return null;
-    }
-
-    private static void handleException(String msg, Throwable error) {
-        log.error(msg, error);
-        throw new SynapseUtilException(msg, error);
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseUtilException(msg);
+        return datasourceInformationRepository;
     }
 }

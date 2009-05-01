@@ -33,60 +33,85 @@ public interface SynapseController {
      * @param configurationInformation server information instance Information about the server
      * @param contextInformation    if there is a context already has been built.
      */
-    public void init(ServerConfigurationInformation configurationInformation,
+    void init(ServerConfigurationInformation configurationInformation,
                      ServerContextInformation contextInformation);
 
     /**
-     * Destroy event for destroy synapse
+     * Destroys the Synapse Controller.
      */
-    public void destroy();
+    void destroy();
 
     /**
-     * Explicit check for initialization
+     * Explicitly checks the initialization.
      *
-     * @return true if the initialization has been success.
+     * @return true if the initialization has been a success.
      */
-    public boolean isInitialized();
+    boolean isInitialized();
 
     /**
-     * Starts the synapse controller in turn the synapse server.
+     * Starts the synapse controller and in turn the synapse server.
      */
-    public void start();
+    void start();
 
     /**
-     * Stops the synapse controller in turn the synapse server.
+     * Stops the synapse controller and in turn the synapse server.
      */
-    public void stop();
+    void stop();
 
     /**
-     * Create the SynapseEnvironment instance
+     * Creates the SynapseEnvironment instance.
      *
      * @return SynapseEnvironment instance if success
      */
-    public SynapseEnvironment createSynapseEnvironment();
+    SynapseEnvironment createSynapseEnvironment();
 
     /**
-     * Destroy the SynapseEnvironment instance
+     * Destroys the SynapseEnvironment instance.
      */
-    public void destroySynapseEnvironment();
+    void destroySynapseEnvironment();
 
     /**
-     * Create the synapse configuration instance
-     *
-     * @return SynapseConfiguration instance if success
+     * Creates the Synapse configuration by reading and processing the synapse configuration file.
+     * 
+     * @return the synapse configuration
      */
-    public SynapseConfiguration createSynapseConfiguration();
+    SynapseConfiguration createSynapseConfiguration();
 
     /**
-     * Destroy the SynapseConfiguration instance
+     * Destroys the SynapseConfiguration instance
      */
-    public void destroySynapseConfiguration();
+    void destroySynapseConfiguration();
 
     /**
      * Returns underlying environment context
      *
      * @return Underlying environment context
      */
-    public Object getContext();
+    Object getContext();
 
+    /**
+     * Puts the Synapse Server into a maintenance mode pausing transport listeners, senders 
+     * and tasks.
+     */
+    void startMaintenance();
+
+    /**
+     * Recovers the Synapse Server from maintenance mode resuming transport listeners, senders 
+     * and tasks.
+     */
+    void endMaintenance();
+
+    /**
+     * Waits until it is safe to stop or the specified end time has been reached. A delay
+     * of <code>waitIntervalMillis</code> milliseconds is used between each subsequent check.
+     * If the state "safeToStop" is reached before the specified <code>endTime</code>, 
+     * the return value is true.
+     * 
+     * @param waitIntervalMillis the pause time (delay) in milliseconds between subsequent checks
+     * @param endTime            the time until which the checks need to finish successfully
+     * 
+     * @return true, if a safe state is reached before the specified <code>endTime</code>,
+     *         otherwise false (forceful stop required)
+     */
+    boolean waitUntilSafeToStop(long waitIntervalMillis, long endTime);
 }

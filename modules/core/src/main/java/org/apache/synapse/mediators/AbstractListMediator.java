@@ -98,7 +98,7 @@ public abstract class AbstractListMediator extends AbstractMediator
     public void init(SynapseEnvironment se) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Initializing child mediators");
+            log.debug("Initializing child mediators of mediator : " + getType());
         }
 
         for (Mediator mediator : mediators) {
@@ -113,7 +113,7 @@ public abstract class AbstractListMediator extends AbstractMediator
      */
     public void destroy() {
         if (log.isDebugEnabled()) {
-            log.debug("Destroying child mediators");
+            log.debug("Destroying child mediators of mediator : " + getType());
         }
 
         for (Mediator mediator : mediators) {

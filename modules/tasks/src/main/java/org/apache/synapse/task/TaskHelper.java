@@ -98,4 +98,26 @@ public class TaskHelper {
         taskDescriptionRepository.clear();
         taskScheduler.shutDown();
     }
+
+    public void pauseAll() {
+        if (taskScheduler != null) {
+            if(taskScheduler.isInitialized()) {
+                try {
+                    taskScheduler.pauseAll();
+                } catch (SynapseTaskException ignore) {
+                    // This exceptions has already been logged and we don't want to interrupt the flow
+                }
+            }
+        }
+    }
+
+    public void resumeAll() {
+        if (taskScheduler != null) {
+            try {
+                taskScheduler.resumeAll();
+            } catch (SynapseTaskException ignore) {
+                // This exceptions has already been logged and we don't want to interrupt the flow
+            }
+        }
+    }
 }

@@ -39,7 +39,7 @@ public class DefaultTaskJobDetailFactory implements TaskJobDetailFactory {
      * @see TaskJobDetailFactory
      */
     public JobDetail createJobDetail(TaskDescription taskDescription, Map<String,
-            Object> resources, Class<Job> jobClass) {
+            Object> resources, Class<? extends Job> jobClass) {
 
         if (taskDescription == null) {
             throw new SynapseTaskException("Task Description cannot be found.", log);

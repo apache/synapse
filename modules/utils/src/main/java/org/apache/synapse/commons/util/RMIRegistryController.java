@@ -1,6 +1,22 @@
 /**
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
  *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
  */
+
 package org.apache.synapse.commons.util;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +27,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,20 +56,22 @@ public class RMIRegistryController {
         try {
 
             String key = toKey(port);
-
-            if (registriesCache.containsKey(key)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("There is an RMI registry bound to given port :" + port);
+            
+            synchronized (registriesCache) {
+                if (registriesCache.containsKey(key)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("There is an RMI registry bound to given port :" + port);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            Registry locateRegistry = LocateRegistry.createRegistry(port);
-            if (locateRegistry == null) {
-                handleException("Unable to create a RMI registry with port : " + port);
-            }
+                Registry locateRegistry = LocateRegistry.createRegistry(port);
+                if (locateRegistry == null) {
+                    handleException("Unable to create a RMI registry with port : " + port);
+                }
 
-            registriesCache.put(key, locateRegistry);
+                registriesCache.put(key, locateRegistry);
+            }
 
         } catch (RemoteException e) {
             String msg = "Couldn't create a local registry(RMI) : port " + port +
@@ -68,14 +88,15 @@ public class RMIRegistryController {
     public void removeLocalRegistry(int port) {
 
         String key = toKey(port);
-        if (registriesCache.containsKey(key)) {
-            removeRegistry(key, registriesCache.get(key));
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("There is no RMi registry for port : " + port);
+        synchronized (registriesCache) {
+            if (registriesCache.containsKey(key)) {
+                removeRegistry(key, registriesCache.get(key));
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("There is no RMi registry for port : " + port);
+                }
             }
         }
-
     }
 
     /**
@@ -83,10 +104,13 @@ public class RMIRegistryController {
      */
     public void shutDown() {
 
-        for (String key : registriesCache.keySet()) {
-            removeRegistry(key, registriesCache.get(key));
+        synchronized (registriesCache) {
+            Collection<String> registryKeys = new ArrayList<String>(registriesCache.size());
+            registryKeys.addAll(registriesCache.keySet());
+            for (String key : registryKeys) {
+                removeRegistry(key, registriesCache.get(key));
+            }
         }
-        registriesCache.clear();
     }
 
     /**
@@ -95,16 +119,20 @@ public class RMIRegistryController {
      * @param key      The port of the RMI registry to be removed
      * @param registry Registry instance
      */
-    private static void removeRegistry(String key, Registry registry) {
+    private void removeRegistry(String key, Registry registry) {
 
         if (registry != null) {
-            try {
-                log.info("Removing the RMI registry bound to port : " + key);
-                UnicastRemoteObject.unexportObject(registry, true);
-            } catch (NoSuchObjectException e) {
-                String msg = "Error when stopping localregistry(RMI)";
-                handleException(msg, e);
+            synchronized (registriesCache) {
+                try {
+                    log.info("Removing the RMI registry bound to port : " + key);
+                    UnicastRemoteObject.unexportObject(registry, true);
+                    registriesCache.remove(key);
+                } catch (NoSuchObjectException e) {
+                    String msg = "Error when stopping localregistry(RMI)";
+                    handleException(msg, e);
+                }
             }
+            
         }
 
     }

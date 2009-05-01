@@ -27,6 +27,7 @@ import org.apache.axis2.description.OutOnlyAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -199,6 +200,7 @@ public class AnonymousServiceFactory {
 
         if (synapseCallbackReceiver == null) {
             synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg);
+            ServerManager.getInstance().setSynapseCallbackReceiver(synapseCallbackReceiver);
         }
         return synapseCallbackReceiver;
     }

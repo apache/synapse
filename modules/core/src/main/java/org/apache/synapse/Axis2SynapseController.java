@@ -36,6 +36,7 @@ import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.RMIRegistryController;
+import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
 import org.apache.synapse.commons.util.jmx.JmxInformation;
 import org.apache.synapse.commons.util.jmx.JmxInformationFactory;
@@ -78,19 +79,22 @@ public class Axis2SynapseController implements SynapseController {
 
     /** ServerConfiguration Information */
     private ServerConfigurationInformation serverConfigurationInformation;
-
+    
+    /** Datasource Repository */
+    private DataSourceInformationRepository dataSourceInformationRepository;
+    
     /** JMX Adapter */
     private JmxAdapter jmxAdapter;
 
     /**
-     * Initiates the  Axis2 Based Server Environment
+     * {@inheritDoc}
      *
      * @param serverConfigurationInformation ServerConfigurationInformation Instance
-     * @param contextInformation Server Context if the Axis2 Based Server Environment has been
-     *          already set up.
+     * @param serverContextInformation       Server Context if the Axis2 Based Server
+     *                                       Environment has been already set up.
      */
     public void init(ServerConfigurationInformation serverConfigurationInformation,
-                     ServerContextInformation contextInformation) {
+                     ServerContextInformation serverContextInformation) {
 
         log.info("Initializing Synapse at : " + new Date());
 
@@ -102,15 +106,15 @@ public class Axis2SynapseController implements SynapseController {
             System.setProperty(JMX_AGENT_NAME, "org.apache.synapse");
         }
 
-        if (contextInformation == null || contextInformation.getServerContext() == null ||
-                serverConfigurationInformation.isCreateNewInstance()) {
+        if (serverContextInformation == null || serverContextInformation.getServerContext() == null 
+                || serverConfigurationInformation.isCreateNewInstance()) {
 
             if (log.isDebugEnabled()) {
                 log.debug("Initializing Synapse in a new axis2 server environment instance");
             }
             createNewInstance(serverConfigurationInformation);
         } else {
-            Object context = contextInformation.getServerContext();
+            Object context = serverContextInformation.getServerContext();
             if (context instanceof ConfigurationContext) {
                 if (log.isDebugEnabled()) {
                     log.debug("Initializing Synapse in an already existing " +
@@ -124,17 +128,22 @@ public class Axis2SynapseController implements SynapseController {
                         + " invalid, expected an Axis2 ConfigurationContext instance");
             }
         }
-        initDefault(contextInformation);
+        
+        addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
+        deployMediatorExtensions();
+        initTaskHelper(serverContextInformation);
+        
         initialized = true;
     }
 
     /**
-     * Destroy the  Axis2 Based Server Environment
+     * {@inheritDoc}
      */
     public void destroy() {
 
         try {
-            if (serverConfigurationInformation.isCreateNewInstance()) {  // only if we have created the server
+            // only if we have created the server
+            if (serverConfigurationInformation.isCreateNewInstance()) {
 
                 // destroy listener manager
                 if (listenerManager != null) {
@@ -155,6 +164,9 @@ public class Axis2SynapseController implements SynapseController {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isInitialized() {
         return initialized;
     }
@@ -202,21 +214,58 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public void startMaintenance() {
+        log.info("Putting transport listners, senders and tasks into maintenence mode..");
+
+        // pause transport listers and senders
+        Axis2TransportHelper transportHelper = new Axis2TransportHelper(configurationContext);
+        transportHelper.pauseListeners();
+        transportHelper.pauseSenders();
+
+        // put tasks on hold
+        TaskHelper.getInstance().pauseAll();
+        
+        log.info("Entered maintenence mode");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void endMaintenance() {
+        log.info("Resuming transport listners, senders and tasks from maintenence mode...");
+
+        // resume transport listeners and senders
+        Axis2TransportHelper transportHelper = new Axis2TransportHelper(configurationContext);
+        transportHelper.resumeListeners();
+        transportHelper.resumeSenders();
+
+        // resume tasks
+        TaskHelper.getInstance().resumeAll();
+
+        log.info("Resumed normal operation from maintenence mode");
+    }
+
+    /**
      * Cleanup the axis2 environment and stop the synapse environment.
      */
     public void stop() {
         try {
-            cleanupDefault();
+            // stop tasks
+            if (TaskHelper.getInstance().isInitialized()) {
+                TaskHelper.getInstance().cleanup();
+            }
 
-            // first stop the listener manager
-            if (serverConfigurationInformation.isCreateNewInstance() && listenerManager != null) {
+            // stop the listener manager
+            if (listenerManager != null) {
                 listenerManager.stop();
             }
 
             // detach the synapse handlers
             if (configurationContext != null) {
-                List<Phase> inflowPhases
-                        = configurationContext.getAxisConfiguration().getInFlowPhases();
+                List<Phase> inflowPhases =
+                        configurationContext.getAxisConfiguration().getInFlowPhases();
                 for (Phase inPhase : inflowPhases) {
                     // we are interested about the Dispatch phase in the inflow
                     if (PhaseMetadata.PHASE_DISPATCH.equals(inPhase.getPhaseName())) {
@@ -240,9 +289,8 @@ public class Axis2SynapseController implements SynapseController {
             }
 
             // continue stopping the axis2 environment if we created it
-            if (serverConfigurationInformation.isCreateNewInstance() && configurationContext != null &&
-                    configurationContext.getAxisConfiguration() != null) {
-
+            if (serverConfigurationInformation.isCreateNewInstance() && configurationContext != null
+                    && configurationContext.getAxisConfiguration() != null) {
                 Map<String, AxisService> serviceMap =
                         configurationContext.getAxisConfiguration().getServices();
                 for (AxisService svc : serviceMap.values()) {
@@ -258,22 +306,22 @@ public class Axis2SynapseController implements SynapseController {
                     }
                 }
             }
-
         } catch (AxisFault e) {
             log.error("Error stopping the Axis2 Environemnt");
         }
     }
 
     /**
-     * Setup synapse in axis2 environment and then , creates and returns
-     * a SynapseEnvironment instance
+     * Setup synapse in axis2 environment and return the created instance.
      *
      * @return SynapseEnvironment instance
      */
     public SynapseEnvironment createSynapseEnvironment() {
 
         try {
-            setupSynapse();
+            deploySynapseService();
+            deployProxyServices();
+            deployEventSources();
         } catch (AxisFault axisFault) {
             log.fatal("Synapse startup failed...", axisFault);
             throw new SynapseException("Synapse startup failed", axisFault);
@@ -297,13 +345,28 @@ public class Axis2SynapseController implements SynapseController {
         return synapseEnvironment;
     }
 
+    /**
+     * Destroys the Synapse Environment by undeploying all Axis2 services.
+     */
     public void destroySynapseEnvironment() {
         if (synapseEnvironment != null) {
+            try {
+                undeploySynapseService();
+                undeployProxyServices();
+                undeployEventSources();
+            } catch (AxisFault e) {
+                handleFatal("t", e);
+            }
             synapseEnvironment.setInitialized(false);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SynapseConfiguration createSynapseConfiguration() {
+
+        setupDataSources();
 
         String synapseXMLLocation = serverConfigurationInformation.getSynapseXMLLocation();
 
@@ -330,13 +393,90 @@ public class Axis2SynapseController implements SynapseController {
             handleFatal("Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
                     "' to the Axis2 configuration : " + e.getMessage(), e);
         }
+        
+        addServerIPAndHostEnrties();
+        
         return synapseConfiguration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void destroySynapseConfiguration() {
         if (synapseConfiguration != null) {
             synapseConfiguration.destroy();
+            synapseConfiguration = null;
         }
+    }
+
+
+    /**
+     * Waits until it is safe to stop or the the specified end time has been reached. A delay
+     * of <code>waitIntervalMillis</code> milliseconds is used between each subsequent check.
+     * If the state "safeToStop" is reached before the specified <code>endTime</code>, 
+     * the return value is true.
+     * 
+     * @param waitIntervalMillis the pause time (delay) in milliseconds between subsequent checks
+     * @param endTime            the time until which the checks need to finish successfully
+     * 
+     * @return true, if a safe state is reached before the specified <code>endTime</code>,
+     *         otherwise false (forceful stop required)
+     */
+    public boolean waitUntilSafeToStop(long waitIntervalMillis, long endTime) {
+        
+        boolean safeToStop = false;
+        boolean forcefulStop = false;
+        Axis2TransportHelper transportHelper = new Axis2TransportHelper(configurationContext);
+
+        // wait until it is safe to shutdown (listeners and tasks are idle, no callbacks)
+        while (!safeToStop && !forcefulStop) {
+
+            int pendingListenerThreads = transportHelper.getPendingListenerThreadCount();
+            if (pendingListenerThreads > 0) {
+                log.info(new StringBuilder("Waiting for: ").append(pendingListenerThreads)
+                        .append(" listener threads to complete").toString());
+            }
+            int pendingSenderThreads = transportHelper.getPendingSenderThreadCount();
+            if (pendingSenderThreads > 0) {
+                log.info(new StringBuilder("Waiting for: ").append(pendingSenderThreads)
+                        .append(" listener threads to complete").toString());
+            }
+            int pendingTransportThreads = pendingListenerThreads + pendingSenderThreads;
+            
+            int pendingCallbacks = ServerManager.getInstance().getCallbackCount();
+            if (pendingCallbacks > 0) {
+                log.info("Waiting for: " + pendingCallbacks + " callbacks/replies..");
+            }
+
+            int runningTasks = TaskHelper.getInstance().getTaskScheduler().getRunningTaskCount();
+            if (runningTasks > 0) {
+                log.info("Waiting for : " + runningTasks + " tasks to complete..");
+            }
+
+            // it is safe to stop if all used listener threads, callbacks and tasks are zero
+            safeToStop = ((pendingTransportThreads + pendingCallbacks + runningTasks) == 0);
+
+            if (safeToStop) {
+                log.info("All transport threads and tasks are idle and no pending callbacks..");
+            } else {
+                if (System.currentTimeMillis() < endTime) {
+                    log.info(new StringBuilder("Waiting for a maximum of another ")
+                            .append((endTime - System.currentTimeMillis()) / 1000)
+                            .append(" seconds until transport threads and tasks become idle,")
+                            .append(" and callbacks complete..").toString());
+                    try {
+                        Thread.sleep(waitIntervalMillis);
+                    } catch (InterruptedException ignore) {
+                        // nothing to do here
+                    }
+                } else {
+                    // maximum time to wait is over, do a forceful stop
+                    forcefulStop = true;
+                }
+            }
+        }
+        
+        return !forcefulStop;
     }
 
     public Object getContext() {
@@ -363,9 +503,11 @@ public class Axis2SynapseController implements SynapseController {
 
             listenerManager = configurationContext.getListenerManager();
             if (listenerManager == null) {
+
                 // create and initialize the listener manager but do not start
                 listenerManager = new ListenerManager();
                 listenerManager.init(configurationContext);
+
                 // do not use the listener manager shutdown hook, because it clashes with the
                 // SynapseServer shutdown hook.
                 listenerManager.setShutdownHookRequired(false);
@@ -377,11 +519,11 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     /**
-     * Setup required setting for enable main message mediation
+     * Adds Synapse Service to Axis2 configuration which enables the main message mediation.
      *
-     * @throws AxisFault For any in setup
+     * @throws AxisFault if an error occurs during Axis2 service initialization
      */
-    private void setupMessageMediation() throws AxisFault {
+    private void deploySynapseService() throws AxisFault {
 
         log.info("Deploying the Synapse service...");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
@@ -397,11 +539,22 @@ public class Axis2SynapseController implements SynapseController {
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
     }
+    
+    /**
+     * Removes the Synapse Service from the Axis2 configuration.
+     *
+     * @throws AxisFault if an error occurs during Axis2 service removal
+     */
+    private void undeploySynapseService() throws AxisFault {
+        log.info("Undeploying the Synapse service...");
+        configurationContext.getAxisConfiguration().removeService(
+                SynapseConstants.SYNAPSE_SERVICE_NAME);
+    }
 
     /**
-     * Setup required setting for enable proxy message mediation
+     * Adds all Synapse proxy services to the Axis2 configuration.
      */
-    private void setupProxyServiceMediation() {
+    private void deployProxyServices() {
 
         log.info("Deploying Proxy services...");
         String thisServerName = serverConfigurationInformation.getServerName();
@@ -414,8 +567,7 @@ public class Axis2SynapseController implements SynapseController {
 
         for (ProxyService proxy : synapseConfiguration.getProxyServices()) {
 
-            // start proxy service if either,
-            // pinned server name list is empty
+            // start proxy service if either, pinned server name list is empty
             // or pinned server list has this server name
             List pinnedServers = proxy.getPinnedServers();
             if (pinnedServers != null && !pinnedServers.isEmpty()) {
@@ -434,71 +586,70 @@ public class Axis2SynapseController implements SynapseController {
             }
         }
     }
-
-    private void setupSynapse() throws AxisFault {
-        addServerIPAndHostEnrties();
-        setupMessageMediation();
-        setupProxyServiceMediation();
-        setupEventSources();
+    /**
+     * Removes all Synapse proxy services from the Axis2 configuration.
+     * 
+     * @throws AxisFault if an error occurs undeploying proxy services
+     */
+    private void undeployProxyServices() throws AxisFault {
+        
+        log.info("Undeploying Proxy services...");
+        
+        for (ProxyService proxy : synapseConfiguration.getProxyServices()) {
+            configurationContext.getAxisConfiguration().removeService(
+                    proxy.getName());
+        }
     }
 
-    private HandlerDescription prepareSynapseDispatcher() {
-        HandlerDescription handlerMD = new HandlerDescription(SynapseDispatcher.NAME);
-        // <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
-        PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
-        rule.setAfter(SOAPMessageBodyBasedDispatcher.NAME);
-        handlerMD.setRules(rule);
-        SynapseDispatcher synapseDispatcher = new SynapseDispatcher();
-        synapseDispatcher.initDispatcher();
-        handlerMD.setHandler(synapseDispatcher);
-        return handlerMD;
-    }
-
-    private HandlerDescription prepareMustUnderstandHandler() {
-        HandlerDescription handlerMD
-                = new HandlerDescription(SynapseMustUnderstandHandler.NAME);
-        // <order after="SynapseDispatcher" phase="Dispatch"/>
-        PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
-        rule.setAfter(SynapseDispatcher.NAME);
-        handlerMD.setRules(rule);
-        SynapseMustUnderstandHandler synapseMustUnderstandHandler
-                = new SynapseMustUnderstandHandler();
-        synapseMustUnderstandHandler.init(handlerMD);
-        handlerMD.setHandler(synapseMustUnderstandHandler);
-        return handlerMD;
-    }
-
-    private void initDefault(ServerContextInformation contextInformation) {
-        addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
-        loadMediatorExtensions();
-        setupDataSources();
-        setupTaskHelper(contextInformation);
-    }
-
-    private void loadMediatorExtensions() {
-        // this will deploy the mediators in the mediator extensions folder
+    /**
+     * Deploys the mediators in the mediator extensions folder.
+     */
+    private void deployMediatorExtensions() {
         log.info("Loading mediator extensions...");
         configurationContext.getAxisConfiguration().getConfigurator().loadServices();
     }
 
-    private void setupEventSources() throws AxisFault {
+    /**
+     * Deploys all event sources.
+     * 
+     * @throws AxisFault if an error occurs deploying the event sources.
+     */
+    private void deployEventSources() throws AxisFault {
+        log.info("Deploying EventSources...");
         for (SynapseEventSource eventSource : synapseConfiguration.getEventSources()) {
             eventSource.buildService(configurationContext.getAxisConfiguration());
         }
     }
+    
+    /**
+     * Undeploys all event sources.
+     * 
+     * @throws AxisFault if an error occurs undeploying the event sources.
+     */
+    private void undeployEventSources() throws AxisFault {
+        log.info("Undeploying EventSources...");
+        for (SynapseEventSource eventSource : synapseConfiguration.getEventSources()) {
+            configurationContext.getAxisConfiguration().removeService(eventSource.getName());
+        }
+    }
 
+    /** 
+     * Setups the data sources by either creating a new datasource information repository or 
+     * reusing an existing repository.
+     */
     private void setupDataSources() {
-        Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
-        DataSourceInformationRepositoryHelper.initializeDataSourceInformationRepository(
-                configurationContext.getAxisConfiguration(), synapseProperties);
+        Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
+            dataSourceInformationRepository = 
+                DataSourceInformationRepositoryHelper.initializeDataSourceInformationRepository(
+                        dataSourceInformationRepository, synapseProperties);
     }
 
     /**
-     *  Intialize TaskHelper - with any existing  TaskDescriptionRepository and TaskScheduler
+     *  Initialize TaskHelper - with any existing  TaskDescriptionRepository and TaskScheduler
      *  or without those
-     * @param contextInformation  ServerContextInformation instance
+     * @param serverContextInformation  ServerContextInformation instance
      */
-    private void setupTaskHelper(ServerContextInformation contextInformation) {
+    private void initTaskHelper(ServerContextInformation serverContextInformation) {
 
         TaskHelper taskHelper = TaskHelper.getInstance();
         if (taskHelper.isInitialized()) {
@@ -508,8 +659,9 @@ public class Axis2SynapseController implements SynapseController {
             return;
         }
 
-        Object repo = contextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
-        Object taskScheduler = contextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
+        Object repo = 
+            serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
+        Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
 
         if (repo instanceof TaskDescriptionRepository && taskScheduler instanceof TaskScheduler) {
             taskHelper.init((TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
@@ -524,13 +676,6 @@ public class Axis2SynapseController implements SynapseController {
                 handleFatal("Invalid property values for " +
                         "TaskDescriptionRepository or / and TaskScheduler ");
             }
-        }
-    }
-
-    private void cleanupDefault() {
-        TaskHelper taskHelper = TaskHelper.getInstance();
-        if (taskHelper.isInitialized()) {
-            taskHelper.cleanup();
         }
     }
 
@@ -557,6 +702,32 @@ public class Axis2SynapseController implements SynapseController {
             entry.setValue(ipAddress);
             synapseConfiguration.addEntry(SynapseConstants.SERVER_IP, entry);
         }
+    }
+
+    private HandlerDescription prepareSynapseDispatcher() {
+        HandlerDescription handlerMD = new HandlerDescription(SynapseDispatcher.NAME);
+        // <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
+        PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
+        rule.setAfter(SOAPMessageBodyBasedDispatcher.NAME);
+        handlerMD.setRules(rule);
+        SynapseDispatcher synapseDispatcher = new SynapseDispatcher();
+        synapseDispatcher.initDispatcher();
+        handlerMD.setHandler(synapseDispatcher);
+        return handlerMD;
+    }
+
+    private HandlerDescription prepareMustUnderstandHandler() {
+        HandlerDescription handlerMD
+                = new HandlerDescription(SynapseMustUnderstandHandler.NAME);
+        // <order after="SynapseDispatcher" phase="Dispatch"/>
+        PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
+        rule.setAfter(SynapseDispatcher.NAME);
+        handlerMD.setRules(rule);
+        SynapseMustUnderstandHandler synapseMustUnderstandHandler
+                = new SynapseMustUnderstandHandler();
+        synapseMustUnderstandHandler.init(handlerMD);
+        handlerMD.setHandler(synapseMustUnderstandHandler);
+        return handlerMD;
     }
 
     /**

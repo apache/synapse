@@ -31,15 +31,13 @@ public class AddressEndpoint extends AbstractEndpoint {
 
     public void onFault(MessageContext synCtx) {
 
-        // is this an actual leaf endpoint 
-        if (getParentEndpoint() != null) {
-            // is this really a fault or a timeout/connection close etc?
-            if (isTimeout(synCtx)) {
-                getContext().onTimeout();
-            } else if (isSuspendFault(synCtx)) {
-                getContext().onFault();
-            }
+        // is this really a fault or a timeout/connection close etc?
+        if (isTimeout(synCtx)) {
+            getContext().onTimeout();
+        } else if (isSuspendFault(synCtx)) {
+            getContext().onFault();
         }
+
         // this should be an ignored error if we get here
         setErrorOnMessage(synCtx, null, null);
         super.onFault(synCtx);

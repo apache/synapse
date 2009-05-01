@@ -18,22 +18,117 @@
  */
 package org.apache.synapse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @see org.apache.synapse.ServerManagerViewMBean
  */
 public class ServerManagerView implements ServerManagerViewMBean {
 
+    private static final Log log = LogFactory.getLog(ServerManagerView.class);
+
     private final ServerManager serverManager = ServerManager.getInstance();
 
-    public void start() {
-        if (serverManager.isInitialized()) {
+    /**
+     * {@inheritDoc}
+     */
+    public String getServerState() {
+        return serverManager.getServerState().toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void start()  throws Exception {
+        try {
+            Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
             serverManager.start();
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error performing a server start: " + ex.getMessage());
         }
     }
 
-    public void stop() {
-        if (serverManager.isInitialized()) {
+    /**
+     * {@inheritDoc}
+     */
+    public void stop() throws Exception {
+        try {
+            Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
             serverManager.stop();
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error performing a server stop: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void restart() throws Exception {
+        try {
+            log.info("Re-starting Synapse ..");
+            stop();
+            start();
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error performing restart: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdown() throws Exception {
+        try {
+            Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
+            serverManager.shutdown();
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error performing shutdown: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @param waitSeconds number of seconds to wait for a graceful stop before initiating
+     *                    a hard stop
+     */
+    public void stopGracefully(long waitSeconds) throws Exception {
+        try {
+            Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
+            serverManager.stopGracefully(waitSeconds * 1000);
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error performing graceful stop: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void startMaintenance() throws Exception {
+        try {
+            Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
+            serverManager.startMaintenance();
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error switching to maintenance mode: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void endMaintenance() throws Exception {
+        try {
+            Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
+            serverManager.endMaintenance();
+        } catch (Exception ex) {
+            // create a plain exception copying only the message
+            throw new Exception("Error switching back from maintenance mode: " + ex.getMessage());
         }
     }
 }

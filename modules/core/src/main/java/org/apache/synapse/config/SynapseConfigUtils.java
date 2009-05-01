@@ -635,7 +635,7 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
-                    serverManager.getConfigurationInformation();
+                    serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getSynapseHome();
             }
@@ -647,7 +647,7 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
-                    serverManager.getConfigurationInformation();
+                    serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getServerName();
             }
@@ -659,7 +659,7 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
-                    serverManager.getConfigurationInformation();
+                    serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getResolveRoot();
             }
@@ -677,7 +677,7 @@ public class SynapseConfigUtils {
         ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerContextInformation information =
-                    serverManager.getContextInformation();
+                    serverManager.getServerContextInformation();
             if (information != null) {
                 Object o = information.getServerContext();
                 if (o instanceof ConfigurationContext) {

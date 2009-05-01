@@ -20,9 +20,9 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.ServerConfigurationInformationFactory;
 import org.apache.synapse.ServerConfigurationInformation;
+import org.apache.synapse.ServerConfigurationInformationFactory;
+import org.apache.synapse.ServerManager;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -30,7 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 
 /**
  * When Synapse is deployed on a WAR container, this is the init servlet that kicks off the

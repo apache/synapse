@@ -37,7 +37,10 @@ public class TaskScheduler {
      * scheduler instance
      */
     private Scheduler scheduler;
-    /* determine whether scheduler has been initialized or not - Ready to schedule a Task or not */
+
+    /** 
+     * Determines whether scheduler has been initialized and is ready to schedule a task or not.
+     */
     private boolean initialized = false;
 
     /**
@@ -127,6 +130,34 @@ public class TaskScheduler {
     }
 
     /**
+     * Pauses all tasks.
+     * 
+     * @throws SynapseTaskException if an error occurs pausing all tasks.
+     */
+    public void pauseAll() {
+      
+        try {
+            assertInitialized();
+            assertStarted();
+            
+            scheduler.pauseAll();
+        } catch (SchedulerException e) {
+            throw new SynapseTaskException("Error pausing tasks ", e, log);
+        }
+    }
+    
+    public void resumeAll() {
+        try {
+            assertInitialized();
+            assertStarted();
+            
+            scheduler.resumeAll();
+        } catch (SchedulerException e) {
+            throw new SynapseTaskException("Error resuming tasks ", e, log);
+        }
+    }
+    
+    /**
      * Schedule a Task
      *
      * @param taskDescription TaskDescription , an information about Task
@@ -134,7 +165,7 @@ public class TaskScheduler {
      * @param jobClass        Quartz job class
      */
     public void scheduleTask(TaskDescription taskDescription, Map<String,
-            Object> resources, Class jobClass) {
+            Object> resources, Class<? extends Job> jobClass) {
 
         assertInitialized();
         assertStarted();
@@ -145,12 +176,6 @@ public class TaskScheduler {
 
         if (jobClass == null) {
             throw new SynapseTaskException("Job Class can not be found", log);
-        }
-
-        if (!Job.class.isAssignableFrom(jobClass)) {
-            throw new SynapseTaskException("Invalid Job Class : [ Expected " +
-                    Job.class.getName() + "]" +
-                    " [ Found " + jobClass.getName() + " ]", log);
         }
 
         if (triggerFactory == null) {
@@ -248,6 +273,19 @@ public class TaskScheduler {
             throw new SynapseTaskException("Error deleting a job with  [ Name :" + name + " ]" +
                     " [ Group :" + group + " ]");
         }
+    }
+    
+    public int getRunningTaskCount(){
+    
+        int runningTasks = 0;
+        try {
+            if (scheduler != null) {
+                runningTasks = scheduler.getCurrentlyExecutingJobs().size();
+            }
+        } catch (SchedulerException e) {
+            log.error("Error querying currently executing jobs", e);
+        }
+        return runningTasks;
     }
 
     /**

@@ -26,6 +26,7 @@ public enum ServerState {
     UNDETERMINED,
     INITIALIZABLE,
     INITIALIZED,
+    MAINTENANCE,
     STARTED,
     STOPPED
 }

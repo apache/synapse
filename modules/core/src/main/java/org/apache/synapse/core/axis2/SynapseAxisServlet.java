@@ -43,7 +43,7 @@ public class SynapseAxisServlet extends AxisServlet {
     public void init(ServletConfig config) throws ServletException {
         ServletContext servletContext = config.getServletContext();
         this.configContext = (ConfigurationContext) ServerManager.getInstance().
-                getContextInformation().getServerContext();
+                getServerContextInformation().getServerContext();
         this.axisConfiguration = this.configContext.getAxisConfiguration();
         servletContext.setAttribute(this.getClass().getName(), this);
         this.servletConfig = config;

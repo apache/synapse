@@ -21,6 +21,9 @@ package org.apache.synapse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
+import org.apache.synapse.core.axis2.SynapseCallbackReceiver;
+
+import java.util.Date;
 
 /**
  * This is the core class that starts up a Synapse instance.
@@ -31,7 +34,6 @@ import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
  * When the WAR deployment is used, the SynapseStartUpServlet servlet calls on this class to
  * initialize Synapse
  */
-
 public class ServerManager {
 
     private static final Log log = LogFactory.getLog(ServerManager.class);
@@ -46,16 +48,24 @@ public class ServerManager {
     private SynapseController synapseController;
 
     /* Server Configuration  */
-    private ServerConfigurationInformation configurationInformation;
+    private ServerConfigurationInformation serverConfigurationInformation;
 
     /* Server context */
-    private ServerContextInformation contextInformation;
+    private ServerContextInformation serverContextInformation;
 
     /**
      * Only represents whether server manager has been initialized by given required
      * configuration information - not server state or internal usage - DON"T PUT SETTER
      */
     private boolean initialized = false;
+
+    /**
+     * Save the TCCL of the initial thread that starts the ESB for future use. When JMX calls are
+     * received via RMI connections, re-start etc may otherwise fail due to classloading issues. 
+     */
+    private ClassLoader classLoader;
+
+    private SynapseCallbackReceiver synapseCallbackReceiver;
 
     /**
      * Gives the access to the singleton instance of the ServerManager
@@ -70,66 +80,77 @@ public class ServerManager {
      * Initializes the server, if we need to create a new axis2 instance, calling this will create
      * the new axis2 environment, but this won't start the transport lsiteners
      *
-     * @param configurationInformation ServerConfigurationInformation instance
-     * @param contextInformation       ServerContextInformation instance
+     * @param serverConfigurationInformation ServerConfigurationInformation instance
+     * @param serverContextInformation       ServerContextInformation instance
      * @return ServerState - State of the server which is
      *          {@link org.apache.synapse.ServerState#INITIALIZED}, if successful
      */
-    public synchronized ServerState init(ServerConfigurationInformation configurationInformation,
-                            ServerContextInformation contextInformation) {
+    public synchronized ServerState init(
+            ServerConfigurationInformation serverConfigurationInformation,
+            ServerContextInformation serverContextInformation) {
 
+        classLoader = Thread.currentThread().getContextClassLoader();
+        
         // sets the initializations parameters
-        this.configurationInformation = configurationInformation;
-        if (contextInformation == null) {
-            this.contextInformation = new ServerContextInformation();
+        this.serverConfigurationInformation = serverConfigurationInformation;
+
+        if (serverContextInformation == null) {
+            this.serverContextInformation = new ServerContextInformation();
         } else {
-            this.contextInformation = contextInformation;
+            this.serverContextInformation = serverContextInformation;
         }
-        this.synapseController = SynapseControllerFactory
-                .createSynapseController(configurationInformation);
+        synapseController = SynapseControllerFactory
+                .createSynapseController(serverConfigurationInformation);
 
         // does the initialization of the controller
         doInit();
-        this.initialized = true;
-        return this.contextInformation.getServerState();
+        initialized = true;
+
+        return this.serverContextInformation.getServerState();
     }
 
     /**
-     * Destroyes the Server instance. If the Server is stopped this will destroy the
+     * Shuts down the Server instance. If the Server is stopped this will shutdown the
      * ServerManager, and if it is running (i.e. in the STARTED state) this will first stop the
-     * ServerManager and destroy it in turn
+     * ServerManager and shutdown it in turn.
      * 
-     * @return the state after the destruction, {@link org.apache.synapse.ServerState#UNDETERMINED}
+     * @return the state after the shutdown, {@link org.apache.synapse.ServerState#UNDETERMINED}
      */
-    public synchronized ServerState destroy() {
+    public synchronized ServerState shutdown() {
 
-        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
-                configurationInformation);
+        ServerState serverState = ServerStateDetectionStrategy.currentState(
+                serverContextInformation, serverConfigurationInformation);
 
         switch (serverState) {
             // if the current state is INITIALIZED, then just destroy
             case INITIALIZED: {
-                doDestroy();
+                doShutdown();
                 break;
             }
             // if the current state is STOPPED, then again just destroy
             case STOPPED: {
-                doDestroy();
+                doShutdown();
                 break;
             }
             // if the current state is STARTED, then stop and destroy
             case STARTED: {
                 stop();
-                doDestroy();
+                doShutdown();
+                break;
+            }
+            // if the current state is MAINTENANCE, then stop and destroy
+            case MAINTENANCE: {
+                stop();
+                doShutdown();
                 break;
             }
         }
 
         // clear the instance parameters
         this.synapseController = null;
-        this.contextInformation = null;
-        this.configurationInformation = null;
-        
+        this.serverContextInformation = null;
+        this.serverConfigurationInformation = null;
+
         this.initialized = false;
         return ServerState.UNDETERMINED;
     }
@@ -145,10 +166,91 @@ public class ServerManager {
 
         // if the system is not initialized we are not happy
         assertInitialized();
-        
+
         // starts the system
-        doStart();
-        return this.contextInformation.getServerState();
+        ServerState serverState = ServerStateDetectionStrategy.currentState(
+                serverContextInformation, serverConfigurationInformation);
+
+        if (serverState == ServerState.INITIALIZED || serverState == ServerState.STOPPED) {
+
+            // creates the Synapse Configuration using the SynapseController
+            serverContextInformation.setSynapseConfiguration(
+                    synapseController.createSynapseConfiguration());
+
+            // creates the Synapse Environment using the SynapseController
+            serverContextInformation.setSynapseEnvironment(
+                    synapseController.createSynapseEnvironment());
+
+            // starts the SynapseController
+            synapseController.start();
+
+            changeState(ServerState.STARTED);
+            log.info("Server ready for processing...");
+        } else if (serverState == ServerState.STARTED) {
+            String message = "The server has already been started.";
+            handleException(message);
+        } else if (serverState == ServerState.MAINTENANCE) {
+            endMaintenance();
+        } else {
+            // if the server cannot be started just set the current state as the server state
+            changeState(serverState);
+        }
+
+        return this.serverContextInformation.getServerState();
+    }
+
+    /**
+     * Put transport listeners and senders into maintenance mode.
+     * 
+     * @return the state of the server after maintenance request, for a successful execution
+     *          {@link org.apache.synapse.ServerState#MAINTENANCE}
+     */
+    public synchronized ServerState startMaintenance() {
+
+        assertInitialized();
+
+        ServerState serverState = ServerStateDetectionStrategy.currentState(serverContextInformation,
+                serverConfigurationInformation);
+
+        // if the system is started we can enter the maintenance mode
+        if (serverState == ServerState.STARTED) {
+            synapseController.startMaintenance();
+            changeState(ServerState.MAINTENANCE);
+        } else if (serverState == ServerState.MAINTENANCE) {
+            String message = "The server is already in maintenance mode.";
+            handleException(message);
+        } else {
+            String message = "Couldn't enter maintenance mode, the server has not been started.";
+            handleException(message);
+        }
+
+        return serverContextInformation.getServerState();
+    }
+
+    /**
+     * Ends server maintenance resuming transport listeners, senders and tasks.
+     * 
+     * @return the state of the server after maintenance request, for a successful execution
+     *          {@link org.apache.synapse.ServerState#MAINTENANCE}
+     */
+    public synchronized ServerState endMaintenance() {
+
+        assertInitialized();
+
+        ServerState serverState = ServerStateDetectionStrategy.currentState(
+                serverContextInformation, serverConfigurationInformation);
+
+        // if the system is started we can enter the maintenance mode
+        if (serverState == ServerState.MAINTENANCE) {
+            synapseController.endMaintenance();
+            changeState(ServerState.STARTED);
+        } else {
+            String message = "Couldn't leave maintenance mode." 
+                    + " The server has not been in maintenance.";
+            handleException(message);
+        }
+
+        return serverContextInformation.getServerState();
     }
 
     /**
@@ -160,18 +262,71 @@ public class ServerManager {
      */
     public synchronized ServerState stop() {
 
-        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
-                configurationInformation);
+        assertInitialized();
+
+        ServerState serverState = ServerStateDetectionStrategy.currentState(
+                serverContextInformation, serverConfigurationInformation);
 
         // if the system is started then stop if not we are not happy
-        if (serverState == ServerState.STARTED) {
-            doStop();
+        if (serverState == ServerState.STARTED || serverState == ServerState.MAINTENANCE) {
+
+            // stop the SynapseController
+            synapseController.stop();
+
+            // destroy the created Synapse Environment
+            synapseController.destroySynapseEnvironment();
+            serverContextInformation.setSynapseEnvironment(null);
+
+            // destroy the created Synapse Configuration
+            synapseController.destroySynapseConfiguration();
+            serverContextInformation.setSynapseConfiguration(null);
+
+            changeState(ServerState.STOPPED);
         } else {
+            // if the server cannot be stopped just set the current state as the server state
+            changeState(serverState);
             String message = "Couldn't stop the ServerManager, it has not been started yet";
             handleException(message);
         }
-        
-        return this.contextInformation.getServerState();
+
+        return this.serverContextInformation.getServerState();
+    }
+
+    /**
+     * Perform a graceful stop of Synapse. Before the instance is stopped it will be put
+     * to maintenance mode.
+     *
+     * @param maxWaitMillis the maximum number of ms to wait until a graceful stop is achieved,
+     *                      before forcing a stop
+     * @return if successfull ServerState#STOPPED
+     *                      
+     * @throws SynapseException 
+     */
+    public synchronized ServerState stopGracefully(long maxWaitMillis) {
+
+        final long startTime = System.currentTimeMillis();
+        final long endTime = startTime + maxWaitMillis;
+        final long waitIntervalMillis = 2000;
+        log.info(new StringBuilder("Requesting a graceful shutdown at: ").append(new Date())
+                .append(" in a maximum of ").append(maxWaitMillis/1000)
+                .append(" seconds.").toString());
+
+        startMaintenance();
+
+        // wait until it is safe to to stop the server or the maximum time to wait is over
+        if (synapseController.waitUntilSafeToStop(waitIntervalMillis, endTime)) {
+            log.info(new StringBuilder("The instance could not be gracefully stopped in: ") 
+                    .append(maxWaitMillis / 1000)
+                    .append(" seconds. Performing an immediate stop...").toString());
+        }
+
+        stop();
+
+        log.info(new StringBuilder("Graceful stop request completed in ")
+                .append((System.currentTimeMillis() - startTime))
+                .append(" milliseconds.").toString());
+
+        return this.serverContextInformation.getServerState();
     }
 
     /**
@@ -180,20 +335,29 @@ public class ServerManager {
      *
      * @return the configuration information of the initialized system
      */
-    public ServerConfigurationInformation getConfigurationInformation() {
+    public ServerConfigurationInformation getServerConfigurationInformation() {
         assertInitialized();
-        return configurationInformation;
+        return serverConfigurationInformation;
     }
 
     /**
-     * Retunrs the ServerContextInformation, if the system is initialized and if not a Runtime
+     * Returns the ServerContextInformation, if the system is initialized and if not a Runtime
      * Exception of type {@link org.apache.synapse.SynapseException} will be thrown
      *
      * @return the context information of the initialized system
      */
-    public ServerContextInformation getContextInformation() {
+    public ServerContextInformation getServerContextInformation() {
         assertInitialized();
-        return contextInformation;
+        return serverContextInformation;
+    }
+
+    /** 
+     * Returns the context classloader of the original thread.
+     * 
+     * @return the context classloader of the original thread.
+     */
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 
     /**
@@ -207,12 +371,40 @@ public class ServerManager {
     }
 
     /**
+     * Retrieves the state of the server.
+     * 
+     * @return the state of the server
+     */
+    public ServerState getServerState() {
+        if (serverContextInformation != null) {
+            return serverContextInformation.getServerState();
+        }
+        return ServerState.UNDETERMINED;
+    }
+
+    /**
+     * Returns the number of current callbacks.
+     * 
+     * @return the number of current callbacks.
+     */
+    public int getCallbackCount() {
+        if (synapseCallbackReceiver != null) {
+            return synapseCallbackReceiver.getCallbackCount();
+        }
+        return 0;
+    }
+
+    public void setSynapseCallbackReceiver(SynapseCallbackReceiver synapseCallbackReceiver) {
+        this.synapseCallbackReceiver = synapseCallbackReceiver;
+    }
+
+    /**
      * Helper method for initializing the ServerManager
      */
     private void doInit() {
 
-        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
-                configurationInformation);
+        ServerState serverState = ServerStateDetectionStrategy.currentState(
+                serverContextInformation, serverConfigurationInformation);
 
         // if the server is ready for the initialization, this will make sure that we are not
         // calling the initialization on an already initialized/started system
@@ -222,30 +414,30 @@ public class ServerManager {
             registerMBean();
 
             // initializes the SynapseController
-            this.synapseController.init(configurationInformation, contextInformation);
+            this.synapseController.init(serverConfigurationInformation, serverContextInformation);
 
             // sets the server context and the controller context
-            if (this.contextInformation == null) {
-                this.contextInformation = new ServerContextInformation(
+            if (this.serverContextInformation == null) {
+                this.serverContextInformation = new ServerContextInformation(
                         this.synapseController.getContext());
-            } else if (this.contextInformation.getServerContext() == null) {
-                this.contextInformation.setServerContext(this.synapseController.getContext());
+            } else if (this.serverContextInformation.getServerContext() == null) {
+                this.serverContextInformation.setServerContext(this.synapseController.getContext());
             }
 
             // mark as initialized
-            chanageState(ServerState.INITIALIZED);
+            changeState(ServerState.INITIALIZED);
         } else {
             // if the server cannot be initialized just set the current state as the server state
-            chanageState(serverState);
+            changeState(serverState);
         }
     }
 
     /**
-     * Helper method for destroying the ServerManager
+     * Helper method to shutdown the the ServerManager
      */
-    private void doDestroy() {
-        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
-                configurationInformation);
+    private void doShutdown() {
+        ServerState serverState = ServerStateDetectionStrategy.currentState(
+                serverContextInformation, serverConfigurationInformation);
 
         if (serverState == ServerState.INITIALIZED || serverState == ServerState.STOPPED) {
 
@@ -256,68 +448,20 @@ public class ServerManager {
             synapseController.destroy();
 
             // mark as destroyed
-            chanageState(ServerState.UNDETERMINED);
+            changeState(ServerState.UNDETERMINED);
         } else {
             // if the server cannot be destroyed just set the current state as the server state
-            chanageState(serverState);
+            changeState(serverState);
         }
     }
 
     /**
-     * Helper method to start the ServerManager
+     * Changes the server state to the specified state.
+     * 
+     * @param serverState the new server state
      */
-    private void doStart() {
-
-        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
-                configurationInformation);
-
-        if (serverState == ServerState.INITIALIZED || serverState == ServerState.STOPPED) {
-
-            // creates the Synapse Configuration using the SynapseController
-            contextInformation.setSynapseConfiguration(
-                    synapseController.createSynapseConfiguration());
-            // creates the Synapse Environment using the SynapseController
-            contextInformation.setSynapseEnvironment(
-                    synapseController.createSynapseEnvironment());
-            // starts the SynapseController
-            synapseController.start();
-
-            chanageState(ServerState.STARTED);
-            log.info("Server ready for processing...");
-        } else {
-            // if the server cannot be started just set the current state as the server state
-            chanageState(serverState);
-        }
-    }
-
-    /**
-     * Helper method that to do stop
-     */
-    private void doStop() {
-
-        ServerState serverState = ServerStateDetectionStrategy.currentState(contextInformation,
-                configurationInformation);
-
-        if (serverState == ServerState.STARTED) {
-
-            // stop the SynapseController
-            synapseController.stop();
-            // destroy the created Synapse Configuration
-            synapseController.destroySynapseConfiguration();
-            contextInformation.setSynapseConfiguration(null);
-            // destroy the created Synapse Environment
-            synapseController.destroySynapseEnvironment();
-            contextInformation.setSynapseEnvironment(null);
-
-            chanageState(ServerState.STOPPED);
-        } else {
-            // if the server cannot be stopped just set the current state as the server state
-            chanageState(serverState);
-        }
-    }
-
-    private void chanageState(ServerState serverState) {
-        this.contextInformation.setServerState(serverState);
+    private void changeState(ServerState serverState) {
+        this.serverContextInformation.setServerState(serverState);
     }
 
     private void assertInitialized() {

@@ -53,26 +53,13 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>1.3.0</Bundle-Version>
-                        <Bundle-Name>org.apache.synapse.task</Bundle-Name>
-                        <Bundle-Vendor>Apache Software Foundation</Bundle-Vendor>
-                        <Bundle-Description>${pom.description}</Bundle-Description>
-                        <Bundle-SymbolicName>org.apache.synapse.tasks</Bundle-SymbolicName>
+                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Export-Package>
-                            org.apache.synapse.task.*;-split-package:=merge-last,
+                            org.apache.synapse.task.*,
                         </Export-Package>
                         <Import-Package>
-                            !javax.xml.namespace,                                                      
-                            org.apache.axiom.*,  
-                            org.apache.commons.logging,
-                            org.apache.log4j,
-                            javax.xml.namespace; version=0.0.0,      
-                            org.apache.synapse.utils.*,
-                            org.apache.commons.io.*,
-                            org.quartz.*,
-                            javax.transaction.*,
-                            org.apache.axiom.*,
-                            org.apache.commons.collections.*,
+                            !javax.xml.namespace,
+                            javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

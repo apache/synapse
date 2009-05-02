@@ -45,13 +45,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>1.0</Bundle-Version>
-                        <Bundle-Name>${pom.artifactId}</Bundle-Name>
-                        <Bundle-Vendor>Apache Software Foundation</Bundle-Vendor>
-                        <Bundle-Description>${pom.description}</Bundle-Description>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Export-Package>
-                            org.apache.synapse.transport.vfs.*;-split-package:=merge-last,
+                            org.apache.synapse.transport.vfs.*,
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,

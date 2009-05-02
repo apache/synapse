@@ -396,11 +396,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>1.3.0</Bundle-Version>
-                        <Bundle-Name>${pom.artifactId}</Bundle-Name>
-                        <Bundle-Vendor>Apache Software Foundation</Bundle-Vendor>
-                        <Bundle-Description>${pom.description}</Bundle-Description>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Private-Package>samples.*</Private-Package>
                     </instructions>
                 </configuration>

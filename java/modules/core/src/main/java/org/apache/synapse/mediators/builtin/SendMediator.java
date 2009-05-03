@@ -32,7 +32,7 @@ import org.apache.synapse.mediators.AbstractMediator;
  * behaviors are completely governed by that endpoint. If there is no endpoint available,
  * SendMediator will send the message to the implicitly stated destination.
  */
-public class SendMediator extends AbstractMediator {
+public class SendMediator extends AbstractMediator implements ManagedLifecycle {
 
     private Endpoint endpoint = null;
 

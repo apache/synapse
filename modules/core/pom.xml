@@ -183,5 +183,13 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-vfs-transport</artifactId>
         </dependency>
+        
+        <!-- This is used by the CacheMediator. TODO: since axis2-saaj is based on
+             Axiom, it should not be necessary to rely on SAAJ and we should try
+             to eliminate this dependency. -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-saaj</artifactId>
+        </dependency>
     </dependencies>
 </project>

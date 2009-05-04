@@ -192,7 +192,8 @@ public class SynapseEventSource extends SynapseMessageReceiver {
 
         public void run() {
             try {
-                Event<org.apache.synapse.MessageContext> event = new Event(synCtx);
+                MessageContext msgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                Event<MessageContext> event = new Event(msgCtx);
                 subscriptions = subscriptionManager.getMatchingSubscriptions(event);
             } catch (EventException e) {
                 handleException("Matching subscriptions fetching error", e);

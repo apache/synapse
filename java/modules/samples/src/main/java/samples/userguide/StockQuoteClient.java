@@ -60,6 +60,7 @@ public class StockQuoteClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.exit(0);
     }
 
     private static void printResult() throws Exception {
@@ -244,7 +245,6 @@ public class StockQuoteClient {
                         configContext.getListenerManager().stop();
                     }
                     serviceClient.cleanup();
-                    System.exit(0);
                 }
             }
         }

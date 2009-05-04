@@ -542,11 +542,12 @@ public class ClientHandler implements NHttpClientHandler {
                 = (Axis2HttpRequest) conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
         
         if (req != null) {
-            req.setCompleted(true);
             if (log.isDebugEnabled()) {
                 log.debug("Response Received for Request : " + req);
             }
-            if (!req.isSendingCompleted()) {
+            if (HttpStatus.SC_CONTINUE != response.getStatusLine().getStatusCode() &&
+                !req.isSendingCompleted()) {
+                req.setCompleted(true);                
                 req.getMsgContext().setProperty(
                         NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
                 SharedOutputBuffer outputBuffer = (SharedOutputBuffer)

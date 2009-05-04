@@ -89,14 +89,14 @@ public class SendMediator extends AbstractMediator implements ManagedLifecycle {
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {
-        if (endpoint instanceof ManagedLifecycle) {
-            ((ManagedLifecycle) endpoint).init(synapseEnvironment);
+        if (endpoint != null) {
+            endpoint.init(synapseEnvironment);
         }
     }
 
     public void destroy() {
-        if (endpoint instanceof ManagedLifecycle) {
-            ((ManagedLifecycle) endpoint).destroy();
+        if (endpoint != null) {
+            endpoint.destroy();
         }
     }
 }

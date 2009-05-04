@@ -19,19 +19,27 @@
 
 package org.apache.synapse.eventing.filters;
 
-import org.apache.synapse.MessageContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.SynapseException;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.eventing.EventFilter;
 import org.wso2.eventing.Event;
+import org.wso2.eventing.exceptions.EventException;
+import org.jaxen.JaxenException;
 
 /**
  * Topic baed event filter that match the subscription based on a given topic
  */
 public class TopicBasedEventFilter implements EventFilter<MessageContext> {
 
-    private SynapseXPath sourceXpath;
+    private AXIOMXPath sourceXpath;
     private String resultValue;
     private static final String FILTER_SEP = "/";
+ private static final Log log = LogFactory.getLog(TopicBasedEventFilter.class);
 
     public String getResultValue() {
         return resultValue;
@@ -45,7 +53,7 @@ public class TopicBasedEventFilter implements EventFilter<MessageContext> {
         return resultValue;
     }
 
-    public SynapseXPath getSourceXpath() {
+    public AXIOMXPath getSourceXpath() {
         return sourceXpath;
     }
 
@@ -55,12 +63,31 @@ public class TopicBasedEventFilter implements EventFilter<MessageContext> {
 
     public boolean match(Event<MessageContext> event) {
         MessageContext messageContext = event.getMessage();
-        String evaluatedValue = sourceXpath.stringValueOf(messageContext);
+        String evaluatedValue=null;
+        try {
+            OMElement topicNode = (OMElement) sourceXpath.selectSingleNode(messageContext.getEnvelope());
+            if (topicNode != null) {
+                evaluatedValue = topicNode.getText();
+            }
+        } catch (JaxenException e) {
+            handleException("Error creating topic xpath",e);
+        }     
+        if (evaluatedValue!=null){
         if (evaluatedValue.equals(resultValue)) {
             return true;
         } else if (evaluatedValue.startsWith((resultValue + FILTER_SEP).trim())) {
             return true;
         }
+        }
         return false;
+    }
+   private void handleException(String message) {
+        log.error(message);
+        throw new SynapseException(message);
+    }
+
+    private void handleException(String message, Exception e) {
+        log.error(message, e);
+        throw new SynapseException(message, e);
     }
 }

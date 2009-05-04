@@ -21,7 +21,7 @@ package org.apache.synapse.eventing.managers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.filters.TopicBasedEventFilter;

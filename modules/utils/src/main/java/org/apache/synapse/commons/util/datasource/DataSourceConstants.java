@@ -19,9 +19,9 @@
 package org.apache.synapse.commons.util.datasource;
 
 /**
- * To change this template use File | Settings | File Templates.
+ * 
  */
-public class DataSourceConfigurationConstants {
+public class DataSourceConstants {
 
     public static final String PROP_SYNAPSE_PREFIX_DS = "synapse.datasources";
     public static final String PROP_DRIVER_CLS_NAME = "driverClassName";

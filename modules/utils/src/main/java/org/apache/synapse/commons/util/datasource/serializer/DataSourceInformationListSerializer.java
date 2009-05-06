@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.commons.util.datasource.serializer;
 
-import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
+import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
 import java.util.List;
@@ -43,11 +43,11 @@ public class DataSourceInformationListSerializer {
             if (information != null) {
                 String name = information.getAlias();
                 dataSources.append(name);
-                dataSources.append(DataSourceConfigurationConstants.COMMA_STRING);
+                dataSources.append(DataSourceConstants.COMMA_STRING);
                 properties.putAll(DataSourceInformationSerializer.serialize(information));
             }
         }
-        properties.put(DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS,
+        properties.put(DataSourceConstants.PROP_SYNAPSE_PREFIX_DS,
                 dataSources.toString());
         return properties;
     }

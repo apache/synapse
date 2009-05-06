@@ -39,16 +39,10 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
 
     private final static Log log = LogFactory.getLog(InMemoryDataSourceRepository.class);
 
-    private static final InMemoryDataSourceRepository ourInstance
-            = new InMemoryDataSourceRepository();
     private final static Map<String, DataSource> dataSources = new HashMap<String, DataSource>();
     private final static MBeanRepository REPOSITORY = DatasourceMBeanRepository.getInstance();
 
-    public static InMemoryDataSourceRepository getInstance() {
-        return ourInstance;
-    }
-
-    private InMemoryDataSourceRepository() {
+    public InMemoryDataSourceRepository() {
     }
 
     /**

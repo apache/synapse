@@ -37,7 +37,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
-import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryHelper;
+import org.apache.synapse.commons.util.datasource.DataSourceHelper;
+import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.jmx.JmxInformation;
 import org.apache.synapse.commons.util.jmx.JmxInformationFactory;
 import org.apache.synapse.config.Entry;
@@ -79,10 +80,7 @@ public class Axis2SynapseController implements SynapseController {
 
     /** ServerConfiguration Information */
     private ServerConfigurationInformation serverConfigurationInformation;
-    
-    /** Datasource Repository */
-    private DataSourceInformationRepository dataSourceInformationRepository;
-    
+
     /** JMX Adapter */
     private JmxAdapter jmxAdapter;
 
@@ -132,7 +130,7 @@ public class Axis2SynapseController implements SynapseController {
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
         deployMediatorExtensions();
         initTaskHelper(serverContextInformation);
-        
+        initDataSourceHelper(serverContextInformation);
         initialized = true;
     }
 
@@ -365,8 +363,6 @@ public class Axis2SynapseController implements SynapseController {
      * {@inheritDoc}
      */
     public SynapseConfiguration createSynapseConfiguration() {
-
-        setupDataSources();
 
         String synapseXMLLocation = serverConfigurationInformation.getSynapseXMLLocation();
 
@@ -633,15 +629,23 @@ public class Axis2SynapseController implements SynapseController {
         }
     }
 
-    /** 
-     * Setups the data sources by either creating a new datasource information repository or 
+    /**
+     * Initating DataSourceHelper with a new datasource information repository or
      * reusing an existing repository.
+     *
+     * @param serverContextInformation ServerContextInformation instance
      */
-    private void setupDataSources() {
+    private void initDataSourceHelper(ServerContextInformation serverContextInformation) {
+        DataSourceHelper helper = DataSourceHelper.getInstance();
         Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
-            dataSourceInformationRepository = 
-                DataSourceInformationRepositoryHelper.initializeDataSourceInformationRepository(
-                        dataSourceInformationRepository, synapseProperties);
+        Object repo =
+                serverContextInformation.getProperty(
+                        DataSourceConstants.DATASOURCE_INFORMATION_REPOSITORY);
+        if (repo instanceof DataSourceInformationRepository) {
+            helper.init((DataSourceInformationRepository) repo, synapseProperties);
+        } else {
+            helper.init(null, synapseProperties);
+        }
     }
 
     /**

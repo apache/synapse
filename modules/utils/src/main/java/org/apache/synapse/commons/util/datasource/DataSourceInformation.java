@@ -57,7 +57,7 @@ public class DataSourceInformation {
     private boolean poolPreparedStatements = true;
     private int maxOpenPreparedStatements;
     private final Properties properties = new Properties();
-    private String repositoryType = DataSourceConfigurationConstants.PROP_REGISTRY_MEMORY;
+    private String repositoryType = DataSourceConstants.PROP_REGISTRY_MEMORY;
 
     private long timeBetweenEvictionRunsMillis =
             GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;

@@ -41,8 +41,6 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
     private static Log log = LogFactory.getLog(JNDIBasedDataSourceRepository.class);
 
-    private static final JNDIBasedDataSourceRepository ourInstance =
-            new JNDIBasedDataSourceRepository();
     private InitialContext initialContext;
     private Properties jndiProperties;
     private static final Map<String, InitialContext> perDataSourceICMap
@@ -50,10 +48,6 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
     private static final List<String> cachedNameList = new ArrayList<String>();
 
     private boolean initialized = false;
-
-    public static JNDIBasedDataSourceRepository getInstance() {
-        return ourInstance;
-    }
 
     public void init(Properties jndiEnv) {
 
@@ -70,10 +64,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             initialContext = createInitialContext(jndiProperties);
         }
     }
-
-    private JNDIBasedDataSourceRepository() {
-    }
-
+    
     /**
      * Register a DataSource in the JNDI tree
      *
@@ -142,14 +133,14 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             Reference ref = new Reference("javax.sql.DataSource",
                     "org.apache.commons.dbcp.BasicDataSourceFactory", null);
 
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME,
+            ref.add(new StringRefAddr(DataSourceConstants.PROP_DRIVER_CLS_NAME,
                     driver));
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_URL, url));
+            ref.add(new StringRefAddr(DataSourceConstants.PROP_URL, url));
             ref.add(new StringRefAddr(SecretConfigurationConstants.PROP_USER_NAME, user));
             ref.add(new StringRefAddr(SecretConfigurationConstants.PROP_PASSWORD, password));
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXACTIVE, maxActive));
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXIDLE, maxIdle));
-            ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXWAIT, maxWait));
+            ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXACTIVE, maxActive));
+            ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXIDLE, maxIdle));
+            ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXWAIT, maxWait));
 
             // set BasicDataSource specific parameters
             setBasicDataSourceParameters(ref, information);
@@ -174,24 +165,24 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
             // Construct DriverAdapterCPDS reference
             String className = (String) information.getParameter(
-                    DataSourceConfigurationConstants.PROP_CPDSADAPTER +
-                            DataSourceConfigurationConstants.DOT_STRING +
-                            DataSourceConfigurationConstants.PROP_CPDS_CLASS_NAME);
+                    DataSourceConstants.PROP_CPDSADAPTER +
+                            DataSourceConstants.DOT_STRING +
+                            DataSourceConstants.PROP_CPDS_CLASS_NAME);
             String factory = (String) information.getParameter(
-                    DataSourceConfigurationConstants.PROP_CPDSADAPTER +
-                            DataSourceConfigurationConstants.DOT_STRING +
-                            DataSourceConfigurationConstants.PROP_CPDS_FACTORY);
+                    DataSourceConstants.PROP_CPDSADAPTER +
+                            DataSourceConstants.DOT_STRING +
+                            DataSourceConstants.PROP_CPDS_FACTORY);
             String name = (String) information.getParameter(
-                    DataSourceConfigurationConstants.PROP_CPDSADAPTER +
-                            DataSourceConfigurationConstants.DOT_STRING +
-                            DataSourceConfigurationConstants.PROP_CPDS_NAME);
+                    DataSourceConstants.PROP_CPDSADAPTER +
+                            DataSourceConstants.DOT_STRING +
+                            DataSourceConstants.PROP_CPDS_NAME);
 
             Reference cpdsRef =
                     new Reference(className, factory, null);
 
-            cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DRIVER, driver));
-            cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_URL, url));
-            cpdsRef.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_USER, user));
+            cpdsRef.add(new StringRefAddr(DataSourceConstants.PROP_DRIVER, driver));
+            cpdsRef.add(new StringRefAddr(DataSourceConstants.PROP_URL, url));
+            cpdsRef.add(new StringRefAddr(DataSourceConstants.PROP_USER, user));
             cpdsRef.add(new StringRefAddr(SecretConfigurationConstants.PROP_PASSWORD,
                     password));
 
@@ -210,16 +201,16 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
                             null);
 
             ref.add(new BinaryRefAddr(
-                    DataSourceConfigurationConstants.PROP_JNDI_ENV,
+                    DataSourceConstants.PROP_JNDI_ENV,
                     MiscellaneousUtil.serialize(jndiEvn)));
             ref.add(new StringRefAddr(
-                    DataSourceConfigurationConstants.PROP_DATA_SOURCE_NAME, name));
+                    DataSourceConstants.PROP_DATA_SOURCE_NAME, name));
             ref.add(new StringRefAddr(
-                    DataSourceConfigurationConstants.PROP_DEFAULTMAXACTIVE, maxActive));
+                    DataSourceConstants.PROP_DEFAULTMAXACTIVE, maxActive));
             ref.add(new StringRefAddr(
-                    DataSourceConfigurationConstants.PROP_DEFAULTMAXIDLE, maxIdle));
+                    DataSourceConstants.PROP_DEFAULTMAXIDLE, maxIdle));
             ref.add(new StringRefAddr(
-                    DataSourceConfigurationConstants.PROP_DEFAULTMAXWAIT, maxWait));
+                    DataSourceConstants.PROP_DEFAULTMAXWAIT, maxWait));
 
             //set default jndiProperties for reference
             setCommonParameters(ref, information);
@@ -305,32 +296,32 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
      */
     private static void setCommonParameters(Reference reference, DataSourceInformation information) {
 
-        reference.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DEFAULTAUTOCOMMIT,
+        reference.add(new StringRefAddr(DataSourceConstants.PROP_DEFAULTAUTOCOMMIT,
                 String.valueOf(information.isDefaultAutoCommit())));
-        reference.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_DEFAULTREADONLY,
+        reference.add(new StringRefAddr(DataSourceConstants.PROP_DEFAULTREADONLY,
                 String.valueOf(information.isDefaultReadOnly())));
-        reference.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_TESTONBORROW,
+        reference.add(new StringRefAddr(DataSourceConstants.PROP_TESTONBORROW,
                 String.valueOf(information.isTestOnBorrow())));
-        reference.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_TESTONRETURN,
+        reference.add(new StringRefAddr(DataSourceConstants.PROP_TESTONRETURN,
                 String.valueOf(information.isTestOnReturn())));
         reference.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+                DataSourceConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
                 String.valueOf(information.getTimeBetweenEvictionRunsMillis())));
         reference.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_NUMTESTSPEREVICTIONRUN,
+                DataSourceConstants.PROP_NUMTESTSPEREVICTIONRUN,
                 String.valueOf(information.getNumTestsPerEvictionRun())));
         reference.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
+                DataSourceConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
                 String.valueOf(information.getMinEvictableIdleTimeMillis())));
         reference.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_TESTWHILEIDLE,
+                DataSourceConstants.PROP_TESTWHILEIDLE,
                 String.valueOf(information.isTestWhileIdle())));
 
         String validationQuery = information.getValidationQuery();
 
         if (validationQuery != null && !"".equals(validationQuery)) {
             reference.add(new StringRefAddr(
-                    DataSourceConfigurationConstants.PROP_VALIDATIONQUERY, validationQuery));
+                    DataSourceConstants.PROP_VALIDATIONQUERY, validationQuery));
         }
     }
 
@@ -349,35 +340,35 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
         if (defaultTransactionIsolation != -1) {
             ref.add(new StringRefAddr(
-                    DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION,
+                    DataSourceConstants.PROP_DEFAULTTRANSACTIONISOLATION,
                     String.valueOf(defaultTransactionIsolation)));
         }
 
-        ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MINIDLE,
+        ref.add(new StringRefAddr(DataSourceConstants.PROP_MINIDLE,
                 String.valueOf(information.getMaxIdle())));
         ref.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+                DataSourceConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
                 String.valueOf(information.isAccessToUnderlyingConnectionAllowed())));
         ref.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_REMOVEABANDONED,
+                DataSourceConstants.PROP_REMOVEABANDONED,
                 String.valueOf(information.isRemoveAbandoned())));
-        ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_REMOVEABANDONEDTIMEOUT,
+        ref.add(new StringRefAddr(DataSourceConstants.PROP_REMOVEABANDONEDTIMEOUT,
                 String.valueOf(information.getRemoveAbandonedTimeout())));
         ref.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_LOGABANDONED,
+                DataSourceConstants.PROP_LOGABANDONED,
                 String.valueOf(information.isLogAbandoned())));
         ref.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_POOLPREPAREDSTATEMENTS,
+                DataSourceConstants.PROP_POOLPREPAREDSTATEMENTS,
                 String.valueOf(information.isPoolPreparedStatements())));
-        ref.add(new StringRefAddr(DataSourceConfigurationConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
+        ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
                 String.valueOf(information.getMaxOpenPreparedStatements())));
         ref.add(new StringRefAddr(
-                DataSourceConfigurationConstants.PROP_INITIALSIZE, String.valueOf(
+                DataSourceConstants.PROP_INITIALSIZE, String.valueOf(
                         information.getInitialSize())));
 
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
             ref.add(new StringRefAddr
-                    (DataSourceConfigurationConstants.PROP_DEFAULTCATALOG, defaultCatalog));
+                    (DataSourceConstants.PROP_DEFAULTCATALOG, defaultCatalog));
         }
     }
 
@@ -411,9 +402,9 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
     private static Properties createJNDIEnvironment(Properties dsProperties, String name) {
 
-        String namingFactory = DataSourceConfigurationConstants.DEFAULT_IC_FACTORY;
+        String namingFactory = DataSourceConstants.DEFAULT_IC_FACTORY;
         String providerUrl = null;
-        int port = DataSourceConfigurationConstants.DEFAULT_PROVIDER_PORT;
+        int port = DataSourceConstants.DEFAULT_PROVIDER_PORT;
         String providerPort = null;
         // setting naming provider
         Properties jndiEvn = new Properties();  //This is needed for PerUserPoolDatasource
@@ -425,28 +416,28 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             }
 
             StringBuffer buffer = new StringBuffer();
-            buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS);
-            buffer.append(DataSourceConfigurationConstants.DOT_STRING);
+            buffer.append(DataSourceConstants.PROP_SYNAPSE_PREFIX_DS);
+            buffer.append(DataSourceConstants.DOT_STRING);
             if (name != null && !"".equals(name)) {
                 buffer.append(name);
-                buffer.append(DataSourceConfigurationConstants.DOT_STRING);
+                buffer.append(DataSourceConstants.DOT_STRING);
             }
             // The prefix for root level jndiProperties
             String rootPrefix = buffer.toString();
 
 
             namingFactory = MiscellaneousUtil.getProperty(
-                    dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_ICFACTORY,
-                    DataSourceConfigurationConstants.DEFAULT_IC_FACTORY);
+                    dsProperties, rootPrefix + DataSourceConstants.PROP_ICFACTORY,
+                    DataSourceConstants.DEFAULT_IC_FACTORY);
 
             //Provider URL
             providerUrl = MiscellaneousUtil.getProperty(
-                    dsProperties, rootPrefix + DataSourceConfigurationConstants.PROP_PROVIDER_URL,
+                    dsProperties, rootPrefix + DataSourceConstants.PROP_PROVIDER_URL,
                     null);
             providerPort =
                     MiscellaneousUtil.getProperty(dsProperties, rootPrefix +
-                            DataSourceConfigurationConstants.PROP_PROVIDER_PORT,
-                            String.valueOf(DataSourceConfigurationConstants.DEFAULT_PROVIDER_PORT));
+                            DataSourceConstants.PROP_PROVIDER_PORT,
+                            String.valueOf(DataSourceConstants.DEFAULT_PROVIDER_PORT));
 
         }
 
@@ -569,7 +560,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
     private boolean isValid(Properties dsProperties) {
 
         String dataSources = MiscellaneousUtil.getProperty(dsProperties,
-                DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS, null);
+                DataSourceConstants.PROP_SYNAPSE_PREFIX_DS, null);
 
         if (dataSources != null && !"".equals(dataSources)) {
             String[] dataSourcesNames = dataSources.split(",");

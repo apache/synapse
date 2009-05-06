@@ -32,16 +32,7 @@ public class RepositoryBasedDataSourceFinder {
     private final static Log log = LogFactory.getLog(RepositoryBasedDataSourceFinder.class);
     private DataSourceRepositoryManager dataSourceRepositoryManager;
     private boolean initialized;
-    private static final RepositoryBasedDataSourceFinder
-            REPOSITORY_BASED_DATA_SOURCE_FINDER = new RepositoryBasedDataSourceFinder();
-
-    private RepositoryBasedDataSourceFinder() {
-    }
-
-    public static RepositoryBasedDataSourceFinder getInstance() {
-        return REPOSITORY_BASED_DATA_SOURCE_FINDER;
-    }
-
+   
     public void init(DataSourceRepositoryManager dataSourceRepositoryManager) {
         this.dataSourceRepositoryManager = dataSourceRepositoryManager;
         this.initialized = true;

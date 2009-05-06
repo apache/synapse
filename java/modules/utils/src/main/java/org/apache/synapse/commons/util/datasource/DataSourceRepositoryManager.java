@@ -32,19 +32,14 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
 
     private static final Log log = LogFactory.getLog(DataSourceRepositoryManager.class);
 
-    private static final DataSourceRepositoryManager DATA_SOURCE_REPOSITORY_MANAGER
-            = new DataSourceRepositoryManager();
 
-    private static final DataSourceRepository IN_MEMORY_REPOSITORY
-            = InMemoryDataSourceRepository.getInstance();
-    private static final DataSourceRepository JNDI_REPOSITORY
-            = JNDIBasedDataSourceRepository.getInstance();
+    private InMemoryDataSourceRepository  inMemoryDataSourceRepository;
+    private JNDIBasedDataSourceRepository  jndiBasedDataSourceRepository;
 
-    public DataSourceRepositoryManager() {
-    }
-
-    public static DataSourceRepositoryManager getInstance() {
-        return DATA_SOURCE_REPOSITORY_MANAGER;
+    public DataSourceRepositoryManager(InMemoryDataSourceRepository inMemoryDataSourceRepository,
+                                       JNDIBasedDataSourceRepository jndiBasedDataSourceRepository) {
+        this.inMemoryDataSourceRepository = inMemoryDataSourceRepository;
+        this.jndiBasedDataSourceRepository = jndiBasedDataSourceRepository;
     }
 
     /**
@@ -59,13 +54,13 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
             handleException("DataSource name cannot be found.");
         }
 
-        DataSource result = IN_MEMORY_REPOSITORY.lookUp(name);
+        DataSource result = inMemoryDataSourceRepository.lookUp(name);
 
         if (result != null) {
             return result;
         }
-        if (JNDI_REPOSITORY.isInitialized()) {
-            return JNDI_REPOSITORY.lookUp(name);
+        if (jndiBasedDataSourceRepository.isInitialized()) {
+            return jndiBasedDataSourceRepository.lookUp(name);
         }
         return null;
     }
@@ -77,10 +72,10 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
         }
 
         String repositoryType = dataSourceInformation.getRepositoryType();
-        if (DataSourceConfigurationConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
-            JNDI_REPOSITORY.register(dataSourceInformation);
+        if (DataSourceConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
+            jndiBasedDataSourceRepository.register(dataSourceInformation);
         } else {
-            IN_MEMORY_REPOSITORY.register(dataSourceInformation);
+            inMemoryDataSourceRepository.register(dataSourceInformation);
         }
     }
 
@@ -88,22 +83,26 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
 
         String repositoryType = dataSourceInformation.getRepositoryType();
 
-        if (DataSourceConfigurationConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
-            JNDI_REPOSITORY.unRegister(dataSourceInformation.getDatasourceName());
+        if (DataSourceConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
+            jndiBasedDataSourceRepository.unRegister(dataSourceInformation.getDatasourceName());
         } else {
-            IN_MEMORY_REPOSITORY.unRegister(dataSourceInformation.getDatasourceName());
+            inMemoryDataSourceRepository.unRegister(dataSourceInformation.getDatasourceName());
         }
     }
 
     public void reConfigure(Properties confProperties) {
 
-        JNDI_REPOSITORY.init(confProperties);
-        IN_MEMORY_REPOSITORY.init(confProperties);
+        jndiBasedDataSourceRepository.init(confProperties);
+        inMemoryDataSourceRepository.init(confProperties);
     }
 
     public void clear() {
-        IN_MEMORY_REPOSITORY.clear();
-        JNDI_REPOSITORY.clear();
+        if (inMemoryDataSourceRepository.isInitialized()) {
+            inMemoryDataSourceRepository.clear();
+        }
+        if (jndiBasedDataSourceRepository.isInitialized()) {
+            jndiBasedDataSourceRepository.clear();
+        }
     }
 
     /**

@@ -24,10 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
-import org.apache.synapse.commons.util.datasource.DBPoolView;
-import org.apache.synapse.commons.util.datasource.DatasourceMBeanRepository;
-import org.apache.synapse.commons.util.datasource.RepositoryBasedDataSourceFinder;
-import org.apache.synapse.commons.util.datasource.DataSourceFinder;
+import org.apache.synapse.commons.util.datasource.*;
 import org.apache.synapse.commons.util.jmx.MBeanRepository;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.security.secret.SecretManager;
@@ -144,9 +141,11 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         String dsName = getValue(pool, DSNAME_Q);
         mediator.addDataSourceProperty(DSNAME_Q, dsName);
         DataSource dataSource = null;
-        RepositoryBasedDataSourceFinder finder = RepositoryBasedDataSourceFinder.getInstance();
+        RepositoryBasedDataSourceFinder finder = DataSourceHelper.getInstance()
+                .getRepositoryBasedDataSourceFinder();
+
         if (finder.isInitialized()) {
-            dataSource = RepositoryBasedDataSourceFinder.getInstance().find(dsName);
+            dataSource = finder.find(dsName);
         }
         if (dataSource != null) {
             MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();

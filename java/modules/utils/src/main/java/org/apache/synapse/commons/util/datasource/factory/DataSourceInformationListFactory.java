@@ -21,7 +21,7 @@ package org.apache.synapse.commons.util.datasource.factory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
+import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class DataSourceInformationListFactory {
         }
 
         String dataSources = MiscellaneousUtil.getProperty(dsProperties,
-                DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS, null);
+                DataSourceConstants.PROP_SYNAPSE_PREFIX_DS, null);
 
         if (dataSources == null || "".equals(dataSources)) {
             if (log.isDebugEnabled()) {

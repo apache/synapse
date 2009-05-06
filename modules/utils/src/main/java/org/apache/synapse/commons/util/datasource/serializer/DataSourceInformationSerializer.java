@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.commons.util.datasource.serializer;
 
-import org.apache.synapse.commons.util.datasource.DataSourceConfigurationConstants;
+import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
 
@@ -41,107 +41,107 @@ public class DataSourceInformationSerializer {
 
         String alias = information.getAlias();
         StringBuffer buffer = new StringBuffer();
-        buffer.append(DataSourceConfigurationConstants.PROP_SYNAPSE_PREFIX_DS);
-        buffer.append(DataSourceConfigurationConstants.DOT_STRING);
+        buffer.append(DataSourceConstants.PROP_SYNAPSE_PREFIX_DS);
+        buffer.append(DataSourceConstants.DOT_STRING);
         buffer.append(alias);
-        buffer.append(DataSourceConfigurationConstants.DOT_STRING);
+        buffer.append(DataSourceConstants.DOT_STRING);
 
         // Prefix for getting particular data source's properties
         String prefix = buffer.toString();
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DSNAME,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DSNAME,
                 information.getDatasourceName());
         addProperty(properties, prefix + SecretConfigurationConstants.PROP_USER_NAME,
                 information.getSecretInformation().getUser());
         addProperty(properties, prefix + SecretConfigurationConstants.PROP_PASSWORD,
                 information.getSecretInformation().getAliasPassword());
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXACTIVE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MAXACTIVE,
                 String.valueOf(information.getMaxActive()));
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXIDLE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MAXIDLE,
                 String.valueOf(information.getMaxIdle()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MAXWAIT,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MAXWAIT,
                 String.valueOf(information.getMaxWait()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DRIVER_CLS_NAME,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DRIVER_CLS_NAME,
                 String.valueOf(information.getDriver()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_URL,
+        addProperty(properties, prefix + DataSourceConstants.PROP_URL,
                 String.valueOf(information.getUrl()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TYPE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TYPE,
                 String.valueOf(information.getType()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTAUTOCOMMIT,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULTAUTOCOMMIT,
                 String.valueOf(information.isDefaultAutoCommit()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTREADONLY,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULTREADONLY,
                 String.valueOf(information.isDefaultReadOnly()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TESTONBORROW,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TESTONBORROW,
                 String.valueOf(information.isTestOnBorrow()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TESTONRETURN,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TESTONRETURN,
                 String.valueOf(information.isTestOnReturn()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_MINIDLE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MINIDLE,
                 String.valueOf(information.getMinIdle()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_INITIALSIZE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_INITIALSIZE,
                 String.valueOf(information.getInitialSize()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_DEFAULTTRANSACTIONISOLATION,
+                DataSourceConstants.PROP_DEFAULTTRANSACTIONISOLATION,
                 String.valueOf(information.getDefaultTransactionIsolation()));
 
         String defaultCatalog = information.getDefaultCatalog();
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
-            addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_DEFAULTCATALOG,
+            addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULTCATALOG,
                     String.valueOf(defaultCatalog));
         }
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+                DataSourceConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
                 String.valueOf(information.isAccessToUnderlyingConnectionAllowed()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_REMOVEABANDONED,
+        addProperty(properties, prefix + DataSourceConstants.PROP_REMOVEABANDONED,
                 String.valueOf(information.isRemoveAbandoned()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_REMOVEABANDONEDTIMEOUT,
+                DataSourceConstants.PROP_REMOVEABANDONEDTIMEOUT,
                 String.valueOf(information.getRemoveAbandonedTimeout()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_LOGABANDONED,
+        addProperty(properties, prefix + DataSourceConstants.PROP_LOGABANDONED,
                 String.valueOf(information.isLogAbandoned()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_POOLPREPAREDSTATEMENTS,
+                DataSourceConstants.PROP_POOLPREPAREDSTATEMENTS,
                 String.valueOf(information.isPoolPreparedStatements()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
+                DataSourceConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
                 String.valueOf(information.getMaxOpenPreparedStatements()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_REGISTRY,
+        addProperty(properties, prefix + DataSourceConstants.PROP_REGISTRY,
                 String.valueOf(information.getRepositoryType()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+                DataSourceConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
                 String.valueOf(information.getTimeBetweenEvictionRunsMillis()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_NUMTESTSPEREVICTIONRUN,
+                DataSourceConstants.PROP_NUMTESTSPEREVICTIONRUN,
                 String.valueOf(information.getNumTestsPerEvictionRun()));
 
         addProperty(properties, prefix +
-                DataSourceConfigurationConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
+                DataSourceConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
                 String.valueOf(information.getMinEvictableIdleTimeMillis()));
 
-        addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_TESTWHILEIDLE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TESTWHILEIDLE,
                 String.valueOf(information.isTestWhileIdle()));
 
         String validationQ = information.getValidationQuery();
         if (validationQ != null && !"".equals(validationQ)) {
-            addProperty(properties, prefix + DataSourceConfigurationConstants.PROP_VALIDATIONQUERY,
+            addProperty(properties, prefix + DataSourceConstants.PROP_VALIDATIONQUERY,
                     String.valueOf(validationQ));
         }
 

@@ -20,10 +20,7 @@ package org.apache.synapse.commons.util.datasource.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.datasource.DataSourceInformation;
-import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
-import org.apache.synapse.commons.util.datasource.DataSourceInformationRepositoryListener;
-import org.apache.synapse.commons.util.datasource.DataSourceRepositoryManager;
+import org.apache.synapse.commons.util.datasource.*;
 
 import java.util.List;
 import java.util.Properties;
@@ -44,9 +41,10 @@ public class DataSourceInformationRepositoryFactory {
      */
     public static DataSourceInformationRepository createDataSourceInformationRepository(
             Properties properties) {
-
         return createDataSourceInformationRepository(
-                DataSourceRepositoryManager.getInstance(), properties);
+                new DataSourceRepositoryManager(
+                    new InMemoryDataSourceRepository(),
+                    new JNDIBasedDataSourceRepository()), properties);
     }
 
     /**

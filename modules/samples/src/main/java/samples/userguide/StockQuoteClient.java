@@ -232,6 +232,7 @@ public class StockQuoteClient {
 
         } else if ("dualquote".equals(mode)) {
             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback());
+            printResult();
         } else {
             long i = 0;
             while (i < iterations || infinite) {

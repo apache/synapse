@@ -21,6 +21,7 @@ package org.apache.synapse.commons.util.datasource.serializer;
 import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
 import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
+import org.apache.synapse.commons.util.secret.SecretInformation;
 
 import java.util.Properties;
 
@@ -50,10 +51,23 @@ public class DataSourceInformationSerializer {
         String prefix = buffer.toString();
         addProperty(properties, prefix + DataSourceConstants.PROP_DSNAME,
                 information.getDatasourceName());
-        addProperty(properties, prefix + SecretConfigurationConstants.PROP_USER_NAME,
-                information.getSecretInformation().getUser());
-        addProperty(properties, prefix + SecretConfigurationConstants.PROP_PASSWORD,
-                information.getSecretInformation().getAliasPassword());
+
+        SecretInformation secretInformation = information.getSecretInformation();
+        if (secretInformation != null) {
+
+            String user = secretInformation.getUser();
+            if (user != null && !"".equals(user)) {
+                addProperty(properties, prefix + SecretConfigurationConstants.PROP_USER_NAME,
+                        user);
+            }
+
+            String password = secretInformation.getAliasPassword();
+            if (password != null && !"".equals(password)) {
+                addProperty(properties, prefix + SecretConfigurationConstants.PROP_PASSWORD,
+                        password);
+            }
+
+        }
         addProperty(properties, prefix + DataSourceConstants.PROP_MAXACTIVE,
                 String.valueOf(information.getMaxActive()));
         addProperty(properties, prefix + DataSourceConstants.PROP_MAXIDLE,

@@ -49,6 +49,8 @@ public class NhttpConstants {
 
     public static final String SEND_TIMEOUT = "SEND_TIMEOUT";
 
+    public static final String HIDDEN_SERVICE_PARAM_NAME = "hiddenService";
+
     /** An Axis2 message context property indicating a transport send failure */
     public static final String SENDING_FAULT = "SENDING_FAULT";
     /** The message context property name which holds the error code for the last encountered exception */

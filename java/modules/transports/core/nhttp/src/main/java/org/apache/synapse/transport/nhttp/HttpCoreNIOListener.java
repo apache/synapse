@@ -18,17 +18,20 @@
  */
 package org.apache.synapse.transport.nhttp;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.engine.AxisObserver;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.AxisEvent;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.SessionContext;
 import org.apache.axis2.description.*;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisEvent;
+import org.apache.axis2.engine.AxisObserver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.transport.base.*;
+import org.apache.axis2.transport.base.threads.NativeThreadFactory;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
@@ -41,16 +44,16 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-import org.apache.axiom.om.OMElement;
-import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ArrayList;
 
 /**
  * NIO transport listener for Axis2 based on HttpCore and NIO extensions
@@ -530,7 +533,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     private boolean ignoreService(AxisService service) {
-        return service.getName().startsWith("__"); // these are "private" services
+        // these are "private" services
+        return service.getName().startsWith("__") || JavaUtils.isTrueExplicitly(
+                service.getParameter(NhttpConstants.HIDDEN_SERVICE_PARAM_NAME));
     }
 
     // -------------- utility methods -------------

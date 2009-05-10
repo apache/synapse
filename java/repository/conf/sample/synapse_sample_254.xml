@@ -19,30 +19,30 @@
 
 <!-- Using the  file system as transport medium using VFS transport listener and sender -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-	<proxy name="StockQuoteProxy" transports="vfs">
-		<parameter name="transport.vfs.FileURI">file:///home/user/test/in</parameter> <!--CHANGE-->
-		<parameter name="transport.vfs.ContentType">text/xml</parameter>
-		<parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
-		<parameter name="transport.PollInterval">15</parameter>
-		<parameter name="transport.vfs.MoveAfterProcess">file:///home/user/test/original</parameter> <!--CHANGE-->
-		<parameter name="transport.vfs.MoveAfterFailure">file:///home/user/test/original</parameter> <!--CHANGE-->
-		<parameter name="transport.vfs.ActionAfterProcess">MOVE</parameter>
-		<parameter name="transport.vfs.ActionAfterFailure">MOVE</parameter>
+    <proxy name="StockQuoteProxy" transports="vfs">
+        <parameter name="transport.vfs.FileURI">file:///home/user/test/in</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.ContentType">text/xml</parameter>
+        <parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
+        <parameter name="transport.PollInterval">15</parameter>
+        <parameter name="transport.vfs.MoveAfterProcess">file:///home/user/test/original</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.MoveAfterFailure">file:///home/user/test/original</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.ActionAfterProcess">MOVE</parameter>
+        <parameter name="transport.vfs.ActionAfterFailure">MOVE</parameter>
 
-		<target>
-			<endpoint>
-				<address format="soap12" uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-		        </endpoint>
-			<outSequence>
-				<property name="transport.vfs.ReplyFileName"
-					  expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')" scope="transport"/>
-				<send>
-					<endpoint>
-						<address uri="vfs:file:///home/user/test/out"/> <!--CHANGE-->
-					</endpoint>
-				</send>
-			</outSequence>
-		</target>
-		<publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-	</proxy>
+        <target>
+            <endpoint>
+                <address format="soap12" uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+            <outSequence>
+                <property name="transport.vfs.ReplyFileName"
+                          expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')" scope="transport"/>
+                <send>
+                    <endpoint>
+                        <address uri="vfs:file:///home/user/test/out"/> <!--CHANGE-->
+                    </endpoint>
+                </send>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
 </definitions>

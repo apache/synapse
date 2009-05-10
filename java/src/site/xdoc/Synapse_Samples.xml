@@ -2304,34 +2304,35 @@ Transfer-Encoding: chunked
 0</pre>
 <h2>
 <a name="Sample254" id="Sample254">Sample 254: Using the file system as transport medium using VFS transport listener and sender</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-        &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;vfs&quot;&gt;
-                &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;file:///home/user/test/in&lt;/parameter&gt; &lt;!--CHANGE--&gt;
-                &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
-                &lt;parameter name=&quot;transport.vfs.FileNamePattern&quot;&gt;.*\.xml&lt;/parameter&gt;
-                &lt;parameter name=&quot;transport.PollInterval&quot;&gt;15&lt;/parameter&gt;
-                &lt;parameter name=&quot;transport.vfs.MoveAfterProcess&quot;&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
-                &lt;parameter name=&quot;transport.vfs.MoveAfterFailure&quot;&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
-                &lt;parameter name=&quot;transport.vfs.ActionAfterProcess&quot;&gt;MOVE&lt;/parameter&gt;
-                &lt;parameter name=&quot;transport.vfs.ActionAfterFailure&quot;&gt;MOVE&lt;/parameter&gt;
+<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+    <proxy name="StockQuoteProxy" transports="vfs">
+        <parameter name="transport.vfs.FileURI">file:///home/user/test/in</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.ContentType">text/xml</parameter>
+        <parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
+        <parameter name="transport.PollInterval">15</parameter>
+        <parameter name="transport.vfs.MoveAfterProcess">file:///home/user/test/original</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.MoveAfterFailure">file:///home/user/test/original</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.ActionAfterProcess">MOVE</parameter>
+        <parameter name="transport.vfs.ActionAfterFailure">MOVE</parameter>
 
-                &lt;target&gt;
-                        &lt;endpoint&gt;
-                                &lt;address format=&quot;soap12&quot; uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
-                        &lt;/endpoint&gt;
-                        &lt;outSequence&gt;
-                                &lt;property name=&quot;transport.vfs.ReplyFileName&quot;
-                                          expression=&quot;fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')&quot; scope=&quot;transport&quot;/&gt;
-                                &lt;send&gt;
-                                        &lt;endpoint&gt;
-                                                &lt;address uri=&quot;vfs:file:///home/user/test/out&quot;/&gt; &lt;!--CHANGE--&gt;
-                                        &lt;/endpoint&gt;
-                                &lt;/send&gt;
-                        &lt;/outSequence&gt;
-                &lt;/target&gt;
-                &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
-        &lt;/proxy&gt;
-&lt;/definitions&gt; </pre>
+        <target>
+            <endpoint>
+                <address format="soap12" uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+            <outSequence>
+                <property name="transport.vfs.ReplyFileName"
+                          expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')" scope="transport"/>
+                <property action="set" name="OUT_ONLY" value="true"/>
+                <send>
+                    <endpoint>
+                        <address uri="vfs:file:///home/user/test/out"/> <!--CHANGE-->
+                    </endpoint>
+                </send>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
+</definitions>]]></pre>
 <p>
 <strong>Objective: Using the file system as transport medium using VFS transport listener and sender</strong> </p>
 <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>

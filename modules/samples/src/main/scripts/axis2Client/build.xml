@@ -54,6 +54,8 @@
         ant jmsclient [-Djms_type=pox] [-Djms_dest=dynamicQueues/JMSPoxProxy] [-Djms_payload=MSFT]
         ant jmsclient [-Djms_type=binary] [-Djms_dest=dynamicQueues/JMSFileUploadProxy]
             [-Djms_payload=./../../repository/conf/sample/resources/mtom/asf-logo.gif]
+        ant jmsclient [-Djms_type=pox] [-Djms_dest=dynamicQueues/JMSPoxProxy] [-Djms_payload=MSFT]
+            [-Djms_msgcount=10000]
 
     ant optimizeclient
         A client that could send binary content using MTOM and SwA optimizations
@@ -128,6 +130,7 @@
     <property name="jms_dest" value=""/>
     <property name="jms_type" value=""/>
     <property name="jms_payload" value=""/>
+    <property name="jms_msgcount" value=""/>
     <property name="opt_mode" value=""/>
     <property name="opt_url" value=""/>
     <property name="opt_file" value=""/>
@@ -223,6 +226,7 @@
             <sysproperty key="jms_dest"    value="${jms_dest}"/>
             <sysproperty key="jms_type"    value="${jms_type}"/>
             <sysproperty key="jms_payload" value="${jms_payload}"/>
+            <sysproperty key="jms_msgcount" value="${jms_msgcount}"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
         </java>
     </target>

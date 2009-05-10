@@ -35,6 +35,9 @@ import java.io.InputStream;
 import java.io.IOException;
 
 public class GenericJMSClient {
+    private QueueConnection connection;
+    private QueueSession session;
+    private QueueSender sender;
 
     private static String getProperty(String name, String def) {
         String result = System.getProperty(name);
@@ -50,54 +53,37 @@ public class GenericJMSClient {
         String type  = getProperty("jms_type", "text");
         String param = getProperty("jms_payload",
             getRandom(100, 0.9, true) + " " + (int) getRandom(10000, 1.0, true) + " IBM");
+        String sMsgCount = getProperty("jms_msgcount", null);
 
         GenericJMSClient app = new GenericJMSClient();
+        int msgCount = sMsgCount == null ? 1 : Integer.parseInt(sMsgCount);
+        app.connect(dest);
         if ("text".equalsIgnoreCase(type)) {
-            app.sendTextMessage(dest, param);
+            for (int i=0; i<msgCount; i++) {
+                app.sendTextMessage(param);
+            }
         } else if ("binary".equalsIgnoreCase(type)) {
-            app.sendBytesMessage(dest, getBytesFromFile(param));
+            for (int i=0; i<msgCount; i++) {
+                app.sendBytesMessage(getBytesFromFile(param));
+            }
         } else if ("pox".equalsIgnoreCase(type)) {
-            app.sendTextMessage(dest, 
-                "<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
-                "    <m:order>\n" +
-                "        <m:price>" + getRandom(100, 0.9, true) + "</m:price>\n" +
-                "        <m:quantity>" + (int) getRandom(10000, 1.0, true) + "</m:quantity>\n" +
-                "        <m:symbol>" + param + "</m:symbol>\n" +
-                "    </m:order>\n" +
-                "</m:placeOrder>");
+            for (int i=0; i<msgCount; i++) {
+                app.sendTextMessage(
+                    "<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
+                    "    <m:order>\n" +
+                    "        <m:price>" + getRandom(100, 0.9, true) + "</m:price>\n" +
+                    "        <m:quantity>" + (int) getRandom(10000, 1.0, true) + "</m:quantity>\n" +
+                    "        <m:symbol>" + param + "</m:symbol>\n" +
+                    "    </m:order>\n" +
+                    "</m:placeOrder>");
+            }
         } else {
             System.out.println("Unknown JMS message type");
         }
+        app.shutdown();
     }
 
-    private void sendBytesMessage(String destName, byte[] payload) throws Exception {
-        InitialContext ic = getInitialContext();
-        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
-        QueueConnection connection = confac.createQueueConnection();
-        QueueSession session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
-        BytesMessage bm = session.createBytesMessage();
-        bm.writeBytes(payload);
-        QueueSender sender = session.createSender((Queue)ic.lookup(destName));
-        sender.send(bm);
-        sender.close();
-        session.close();
-        connection.close();
-    }
-
-    private void sendTextMessage(String destName, String payload) throws Exception {
-        InitialContext ic = getInitialContext();
-        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
-        QueueConnection connection = confac.createQueueConnection();
-        QueueSession session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
-        TextMessage tm = session.createTextMessage(payload);
-        QueueSender sender = session.createSender((Queue)ic.lookup(destName));
-        sender.send(tm);
-        sender.close();
-        session.close();
-        connection.close();
-    }
-
-    private InitialContext getInitialContext() throws NamingException {
+    private void connect(String destName) throws Exception {
         Properties env = new Properties();
         if (System.getProperty("java.naming.provider.url") == null) {
             env.put("java.naming.provider.url", "tcp://localhost:61616");
@@ -106,7 +92,28 @@ public class GenericJMSClient {
             env.put("java.naming.factory.initial",
                 "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         }
-        return new InitialContext(env);
+        InitialContext ic = new InitialContext(env);
+        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
+        connection = confac.createQueueConnection();
+        session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+        sender = session.createSender((Queue)ic.lookup(destName));
+    }
+
+    private void shutdown() throws Exception {
+        sender.close();
+        session.close();
+        connection.close();
+    }
+
+    private void sendBytesMessage(byte[] payload) throws Exception {
+        BytesMessage bm = session.createBytesMessage();
+        bm.writeBytes(payload);
+        sender.send(bm);
+    }
+
+    private void sendTextMessage(String payload) throws Exception {
+        TextMessage tm = session.createTextMessage(payload);
+        sender.send(tm);
     }
 
     public static byte[] getBytesFromFile(String fileName) throws IOException {

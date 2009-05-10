@@ -36,6 +36,7 @@
             <outSequence>
                 <property name="transport.vfs.ReplyFileName"
                           expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')" scope="transport"/>
+                <property action="set" name="OUT_ONLY" value="true"/>
                 <send>
                     <endpoint>
                         <address uri="vfs:file:///home/user/test/out"/> <!--CHANGE-->

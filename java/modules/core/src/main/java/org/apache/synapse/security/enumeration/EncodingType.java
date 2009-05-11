@@ -23,5 +23,5 @@ package org.apache.synapse.security.enumeration;
  */
 public enum EncodingType {
     BASE64,
-    BIGINTEGER16;
+    BIGINTEGER16
 }

@@ -23,5 +23,5 @@ package org.apache.synapse.security.enumeration;
  */
 public enum CipherOperationMode {
     ENCRYPT,
-    DECRYPT;
+    DECRYPT
 }

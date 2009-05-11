@@ -270,7 +270,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         EndpointReference epr = NhttpUtil.getDestinationEPR(msgContext);
         if (epr != null) {
-            if (!AddressingConstants.Final.WSA_NONE_URI.equals(epr.getAddress())) {
+            if (!epr.hasNoneAddress()) {
                 sendAsyncRequest(epr, msgContext);
             } else {
                 handleException("Cannot send message to " + AddressingConstants.Final.WSA_NONE_URI);

@@ -28,7 +28,6 @@
                          xmlns:m0="http://services.samples">
                     <target>
                         <sequence>
-                            <property name="REMOVE_WS_ADDRESSING" value="true"/>
                             <send>
                                 <endpoint>
                                     <address

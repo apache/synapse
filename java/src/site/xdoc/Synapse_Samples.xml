@@ -3862,7 +3862,6 @@ Discounted price: 138.77458254967408</pre>
                          xmlns:m0=&quot;http://services.samples&quot;&gt;
                     &lt;target&gt;
                         &lt;sequence&gt;
-                            &lt;property name="REMOVE_WS_ADDRESSING" value="true"/&gt;
                             &lt;send&gt;
                                 &lt;endpoint&gt;
                                     &lt;address

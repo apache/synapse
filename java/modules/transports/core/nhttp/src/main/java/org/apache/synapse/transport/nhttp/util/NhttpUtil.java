@@ -18,14 +18,12 @@
 */
 package org.apache.synapse.transport.nhttp.util;
 
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.Constants;
-import org.apache.axis2.transport.base.BaseUtils;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.transport.TransportUtils;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.http.HTTPConstants;
 
 import java.net.InetAddress;
 
@@ -83,11 +81,7 @@ public class NhttpUtil {
         if (transportURL != null) {
             return new EndpointReference(transportURL);
         } else if (
-            (msgContext.getTo() != null) &&
-                !AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(
-                    msgContext.getTo().getAddress()) &&
-                !AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(
-                    msgContext.getTo().getAddress())) {
+            (msgContext.getTo() != null) && !msgContext.getTo().hasAnonymousAddress()) {
             return msgContext.getTo();
         }
         return null;

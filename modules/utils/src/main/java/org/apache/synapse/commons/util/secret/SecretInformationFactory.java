@@ -42,7 +42,6 @@ public class SecretInformationFactory {
      * @param configurationPrefix The configuration prefix to use
      * @param passwordPrompt      A specific password prompt to use
      *                            (only for interactive authentication providers)
-     * 
      * @return SecretInformation instance
      */
     public static SecretInformation createSecretInformation(
@@ -50,14 +49,14 @@ public class SecretInformationFactory {
 
         SecretInformation secretInformation = new SecretInformation();
 
-        String user = (String) MiscellaneousUtil.getProperty(
+        String user = MiscellaneousUtil.getProperty(
                 properties, configurationPrefix + SecretConfigurationConstants.PROP_USER_NAME, null,
                 String.class);
         if (user != null && !"".equals(user)) {
             secretInformation.setUser(user);
         }
 
-        String password = (String) MiscellaneousUtil.getProperty(
+        String password = MiscellaneousUtil.getProperty(
                 properties, configurationPrefix + SecretConfigurationConstants.PROP_PASSWORD, null,
                 String.class);
 
@@ -66,20 +65,41 @@ public class SecretInformationFactory {
         }
 
         // set specific password provider if configured
-        SecretCallbackHandler passwordProvider = 
-            SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
-                    configurationPrefix + SecretConfigurationConstants.PROP_PASSWORD_PROVIDER);
+        SecretCallbackHandler passwordProvider =
+                SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
+                        configurationPrefix + SecretConfigurationConstants.PROP_PASSWORD_PROVIDER);
 
         // if no specific password provider configured, use default password provider
         if (passwordProvider == null) {
             passwordProvider = SecretCallbackHandlerFactory.createSecretCallbackHandler(
-                    properties, 
-                    SecretConfigurationConstants.GLOBAL_PREFIX 
-                    + SecretConfigurationConstants.PROP_PASSWORD_PROVIDER);
+                    properties,
+                    SecretConfigurationConstants.GLOBAL_PREFIX
+                            + SecretConfigurationConstants.PROP_PASSWORD_PROVIDER);
         }
         secretInformation.setPasswordProvider(passwordProvider);
         secretInformation.setPasswordPrompt(passwordPrompt);
 
+        return secretInformation;
+    }
+
+    /**
+     * Factory method to create a SecretInformation instance based on the given information
+     *
+     * @param secretProvider A SecretCallbackHandler implementation to use to get secrets
+     * @param aliasPassword  The  alias password
+     * @param passwordPrompt A specific password prompt to use
+     *                       (only for interactive authentication providers)
+     * @return SecretInformation instance
+     */
+    public static SecretInformation createSecretInformation(String secretProvider,
+                                                            String aliasPassword,
+                                                            String passwordPrompt) {
+
+        SecretInformation secretInformation = new SecretInformation();
+        secretInformation.setAliasPassword(aliasPassword);
+        secretInformation.setPasswordProvider(
+                SecretCallbackHandlerFactory.createSecretCallbackHandler(secretProvider));
+        secretInformation.setPasswordPrompt(passwordPrompt);
         return secretInformation;
     }
 }

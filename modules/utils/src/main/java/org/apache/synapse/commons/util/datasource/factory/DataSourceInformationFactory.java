@@ -90,34 +90,34 @@ public class DataSourceInformationFactory {
         datasourceInformation.setDriver(driver);
         datasourceInformation.setUrl(url);
 
-        String dataSourceName = (String) MiscellaneousUtil.getProperty(
+        String dataSourceName = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_DSNAME, dsName,
                 String.class);
         datasourceInformation.setDatasourceName(dataSourceName);
 
-        String dsType = (String) MiscellaneousUtil.getProperty(
+        String dsType = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_TYPE,
                 DataSourceConstants.PROP_BASIC_DATA_SOURCE, String.class);
 
         datasourceInformation.setType(dsType);
 
-        String repositoryType = (String) MiscellaneousUtil.getProperty(
+        String repositoryType = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_REGISTRY,
                 DataSourceConstants.PROP_REGISTRY_MEMORY, String.class);
 
         datasourceInformation.setRepositoryType(repositoryType);
 
-        Integer maxActive = (Integer) MiscellaneousUtil.getProperty(
+        Integer maxActive = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_MAXACTIVE,
                 GenericObjectPool.DEFAULT_MAX_ACTIVE, Integer.class);
         datasourceInformation.setMaxActive(maxActive);
 
-        Integer maxIdle = (Integer) MiscellaneousUtil.getProperty(
+        Integer maxIdle = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_MAXIDLE,
                 GenericObjectPool.DEFAULT_MAX_IDLE, Integer.class);
         datasourceInformation.setMaxIdle(maxIdle);
 
-        Long maxWait = (Long) MiscellaneousUtil.getProperty(
+        Long maxWait = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_MAXWAIT,
                 GenericObjectPool.DEFAULT_MAX_WAIT, Long.class);
 
@@ -143,51 +143,51 @@ public class DataSourceInformationFactory {
                 "cpds");
         datasourceInformation.addParameter(suffix, name);
 
-        boolean defaultAutoCommit = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean defaultAutoCommit = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_DEFAULTAUTOCOMMIT, true,
                 Boolean.class);
 
-        boolean defaultReadOnly = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean defaultReadOnly = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_DEFAULTREADONLY, false,
                 Boolean.class);
 
-        boolean testOnBorrow = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean testOnBorrow = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_TESTONBORROW, true,
                 Boolean.class);
 
-        boolean testOnReturn = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean testOnReturn = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_TESTONRETURN, false,
                 Boolean.class);
 
-        long timeBetweenEvictionRunsMillis = (Long) MiscellaneousUtil.getProperty(properties,
+        long timeBetweenEvictionRunsMillis = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
                 GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, Long.class);
 
-        int numTestsPerEvictionRun = (Integer) MiscellaneousUtil.getProperty(properties,
+        int numTestsPerEvictionRun = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_NUMTESTSPEREVICTIONRUN,
                 GenericObjectPool.DEFAULT_NUM_TESTS_PER_EVICTION_RUN, Integer.class);
 
-        long minEvictableIdleTimeMillis = (Long) MiscellaneousUtil.getProperty(properties,
+        long minEvictableIdleTimeMillis = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
                 GenericObjectPool.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS, Long.class);
 
-        boolean testWhileIdle = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean testWhileIdle = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_TESTWHILEIDLE, false,
                 Boolean.class);
 
         String validationQuery = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_VALIDATIONQUERY, null);
 
-        int minIdle = (Integer) MiscellaneousUtil.getProperty(properties,
+        int minIdle = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_MINIDLE,
                 GenericObjectPool.DEFAULT_MIN_IDLE,
                 Integer.class);
 
-        int initialSize = (Integer) MiscellaneousUtil.getProperty(
+        int initialSize = MiscellaneousUtil.getProperty(
                 properties, prefix + DataSourceConstants.PROP_INITIALSIZE, 0,
                 Integer.class);
 
-        int defaultTransactionIsolation = (Integer) MiscellaneousUtil.getProperty(properties,
+        int defaultTransactionIsolation = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_DEFAULTTRANSACTIONISOLATION, -1,
                 Integer.class);
 
@@ -195,29 +195,29 @@ public class DataSourceInformationFactory {
                 properties, prefix + DataSourceConstants.PROP_DEFAULTCATALOG, null);
 
         boolean accessToUnderlyingConnectionAllowed =
-                (Boolean) MiscellaneousUtil.getProperty(properties,
+                MiscellaneousUtil.getProperty(properties,
                         prefix +
                                 DataSourceConstants.
                                         PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
                         false, Boolean.class);
 
-        boolean removeAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean removeAbandoned = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_REMOVEABANDONED, false,
                 Boolean.class);
 
-        int removeAbandonedTimeout = (Integer) MiscellaneousUtil.getProperty(properties,
+        int removeAbandonedTimeout = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_REMOVEABANDONEDTIMEOUT, 300,
                 Integer.class);
 
-        boolean logAbandoned = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean logAbandoned = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_LOGABANDONED, false,
                 Boolean.class);
 
-        boolean poolPreparedStatements = (Boolean) MiscellaneousUtil.getProperty(properties,
+        boolean poolPreparedStatements = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_POOLPREPAREDSTATEMENTS, false,
                 Boolean.class);
 
-        int maxOpenPreparedStatements = (Integer) MiscellaneousUtil.getProperty(properties,
+        int maxOpenPreparedStatements = MiscellaneousUtil.getProperty(properties,
                 prefix + DataSourceConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
                 GenericKeyedObjectPool.DEFAULT_MAX_TOTAL, Integer.class);
 
@@ -266,8 +266,8 @@ public class DataSourceInformationFactory {
                         properties, prefix + DataSourceConstants.PROP_PROVIDER_PORT,
                         null));
 
-        String passwordPrompt = (String) MiscellaneousUtil.getProperty(
-                properties, prefix + SecretConfigurationConstants.PROP_PASSWORD_PROMPT, 
+        String passwordPrompt = MiscellaneousUtil.getProperty(
+                properties, prefix + SecretConfigurationConstants.PROP_PASSWORD_PROMPT,
                 "Password for datasource " + dsName, String.class);
 
         SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(

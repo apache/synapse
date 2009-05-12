@@ -25,4 +25,5 @@ public class SecretConfigurationConstants {
     public static final String PROP_PASSWORD = "password";
     public static final String PROP_PASSWORD_PROVIDER = "passwordProvider";
     public static final String PROP_PASSWORD_PROMPT = "passwordPrompt";
+    public static final String PROP_SECRET_CALLBACK_HANDLER = "SharedSecretCallbackHandler";
 }

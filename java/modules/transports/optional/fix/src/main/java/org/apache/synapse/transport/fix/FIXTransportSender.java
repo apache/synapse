@@ -28,6 +28,8 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.base.AbstractTransportSender;
 import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.base.threads.WorkerPool;
+import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
 import org.apache.commons.logging.LogFactory;
 import quickfix.*;
 import quickfix.field.*;
@@ -51,15 +53,10 @@ public class FIXTransportSender extends AbstractTransportSender {
 
     private FIXSessionFactory sessionFactory;
     private FIXOutgoingMessageHandler messageSender;
+    private WorkerPool workerPool;
 
     public FIXTransportSender() {
         this.log = LogFactory.getLog(this.getClass());
-    }
-
-
-    public void setSessionFactory(FIXSessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-        this.messageSender.setSessionFactory(sessionFactory);
     }
 
     /**
@@ -69,8 +66,23 @@ public class FIXTransportSender extends AbstractTransportSender {
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
         super.init(cfgCtx, transportOut);
+        this.sessionFactory = FIXSessionFactory.getInstance(new FIXApplicationFactory(cfgCtx));
+        this.workerPool = WorkerPoolFactory.getWorkerPool(
+                            10, 20, 5, -1, "FIX Sender Worker thread group", "FIX-Worker");
+        this.sessionFactory.setSenderThreadPool(this.workerPool);
         messageSender = new FIXOutgoingMessageHandler();
+        messageSender.setSessionFactory(this.sessionFactory);
         log.info("FIX transport sender initialized...");
+    }
+
+    public void stop() {
+        try {
+            this.workerPool.shutdown(10000);
+        } catch (InterruptedException e) {
+            log.warn("Thread interrupted while waiting for worker pool to shut down");
+        }
+        sessionFactory.disposeFIXInitiators();
+        super.stop();
     }
 
     /**

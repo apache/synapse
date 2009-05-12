@@ -60,14 +60,8 @@ public class FIXTransportListener extends AbstractTransportListener {
                      TransportInDescription trpInDesc) throws AxisFault {
 
         super.init(cfgCtx, trpInDesc);
-        //initialize the FIXSessionFactory
-        fixSessionFactory = new FIXSessionFactory(
-                new FIXApplicationFactory(this.cfgCtx, this.workerPool));
-        FIXTransportSender sender = (FIXTransportSender) cfgCtx.
-                getAxisConfiguration().getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
-        if (sender != null) {
-            sender.setSessionFactory(fixSessionFactory);
-        }
+        fixSessionFactory = FIXSessionFactory.getInstance(new FIXApplicationFactory(cfgCtx));
+        fixSessionFactory.setListenerThreadPool(this.workerPool);
         log.info("FIX transport listener initialized...");
     }
 

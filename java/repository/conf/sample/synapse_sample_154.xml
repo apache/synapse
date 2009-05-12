@@ -25,7 +25,7 @@
                 <send>
                     <endpoint>
                         <session type="simpleClientSession"/>
-                        <loadbalance algorithm="roundRobin">
+                        <loadbalance algorithm="org.apache.synapse.endpoints.algorithms.RoundRobin">
                             <endpoint>
                                 <address uri="http://localhost:9001/services/LBService1">
                                     <enableAddressing/>

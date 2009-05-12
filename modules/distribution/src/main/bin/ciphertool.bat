@@ -82,7 +82,7 @@ set _RUNJAVA="%JAVA_HOME%\bin\java"
 
 set JAVA_ENDORSED=".\lib\endorsed";"%JAVA_HOME%\jre\lib\endorsed";"%JAVA_HOME%\lib\endorsed"
 
-%_RUNJAVA% %JAVA_OPTS% -cp "%SYNAPSE_CLASSPATH%" -Djava.endorsed.dirs=%JAVA_ENDORSED%  org.apache.synapse.security.tool.CipherTool %*
+%_RUNJAVA% %JAVA_OPTS% -cp "%SYNAPSE_CLASSPATH%" -Djava.endorsed.dirs=%JAVA_ENDORSED%  org.apache.synapse.commons.security.tool.CipherTool %*
 endlocal
 :end
 

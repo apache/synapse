@@ -146,7 +146,6 @@
                             org.apache.synapse.mediators.*,
                             org.apache.synapse.metrics.*,
                             org.apache.synapse.registry.*,
-                            org.apache.synapse.security.*,
                             org.apache.synapse.startup.*,
                             org.apache.synapse.util.*,
                         </Export-Package>

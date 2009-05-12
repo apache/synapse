@@ -102,4 +102,4 @@ fi
 $JAVA_HOME/bin/java \
 -classpath "$SYNAPSE_CLASSPATH" \
 -Djava.endorsed.dirs="$SYNAPSE_HOME/lib/endorsed":"$JAVA_HOME/jre/lib/endorsed":"$JAVA_HOME/lib/endorsed" \
-org.apache.synapse.security.tool.CipherTool $*
+org.apache.synapse.commons.security.tool.CipherTool $*

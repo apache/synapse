@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import quickfix.*;
@@ -65,16 +66,29 @@ public class FIXSessionFactory {
     /** A Map containing all the FIX applications created for initiators, keyed by FIX EPR */
     private Map<String, Application> applicationStore;
     /** An ApplicationFactory handles creating FIX Applications (FIXIncomingMessageHandler Objects) */
-    private FIXApplicationFactory applicationFactory;
+    private static FIXApplicationFactory applicationFactory = null;
+
+    private WorkerPool listenerThreadPool;
+    private WorkerPool senderThreadPool;
 
     private Log log;
 
-    public FIXSessionFactory(FIXApplicationFactory applicationFactory) {
-        this.applicationFactory = applicationFactory;
+    private static FIXSessionFactory INSTANCE = new FIXSessionFactory();
+
+    public static FIXSessionFactory getInstance(FIXApplicationFactory af) {
+        if (applicationFactory == null) {
+            applicationFactory = af;
+        }
+        return INSTANCE;   
+    }
+
+    private FIXSessionFactory() {
         this.log = LogFactory.getLog(this.getClass());
         this.acceptorStore = new HashMap<String,Acceptor>();
         this.initiatorStore = new HashMap<String, Initiator>();
         this.applicationStore = new HashMap<String, Application>();
+        this.listenerThreadPool = null;
+        this.senderThreadPool = null;
     }
 
     /**
@@ -101,7 +115,7 @@ public class FIXSessionFactory {
                 MessageFactory messageFactory = new DefaultMessageFactory();
                 quickfix.LogFactory logFactory = getLogFactory(service, settings, true);
                 //Get a new FIX Application
-                Application messageHandler = applicationFactory.getFIXApplication(service, true);
+                Application messageHandler = applicationFactory.getFIXApplication(service, listenerThreadPool, true);
                 //Create a new FIX Acceptor
                 Acceptor acceptor = new SocketAcceptor(
                         messageHandler,
@@ -174,7 +188,7 @@ public class FIXSessionFactory {
         MessageStoreFactory storeFactory = getMessageStoreFactory(service, settings, false);
         MessageFactory messageFactory = new DefaultMessageFactory();
         //Get a new FIX application
-        Application messageHandler = applicationFactory.getFIXApplication(service, false);
+        Application messageHandler = applicationFactory.getFIXApplication(service, senderThreadPool, false);
 
         try {
            //Create a new FIX initiator
@@ -216,7 +230,7 @@ public class FIXSessionFactory {
                 MessageFactory messageFactory = new DefaultMessageFactory();
                 quickfix.LogFactory logFactory = getLogFactory(service, settings, true);
                 //Get a new FIX Application
-                Application messageHandler = applicationFactory.getFIXApplication(service, false);
+                Application messageHandler = applicationFactory.getFIXApplication(service, senderThreadPool, false);
 
                 Initiator initiator = new SocketInitiator(
                     messageHandler,
@@ -246,10 +260,10 @@ public class FIXSessionFactory {
             }
 
         } else {
-            String msg = "The " + FIXConstants.FIX_INITIATOR_CONFIG_URL_PARAM + " parameter is " +
-                    "not specified. Unable to initialize the initiator session at this stage.";
-            log.info(msg);
-            throw new AxisFault(msg);
+            // FIX initiator session is not configured
+            // It could be intentional - So not an error (we don't need initiators at all times)
+            log.info("The " + FIXConstants.FIX_INITIATOR_CONFIG_URL_PARAM + " parameter is " +
+                    "not specified. Unable to initialize the initiator session at this stage.");
         }
     }
 
@@ -273,6 +287,24 @@ public class FIXSessionFactory {
             //Remove the Acceptor from the store
             acceptorStore.remove(service.getName());
         }
+    }
+
+    /**
+     * Stops all the FIX initiators created so far and cleans up all the mappings
+     * related to them
+     */
+    public void disposeFIXInitiators() {
+        boolean debugEnabled = log.isDebugEnabled();
+
+        for (String key : initiatorStore.keySet()) {
+            initiatorStore.get(key).stop();
+            if (debugEnabled) {
+                log.debug("FIX initiator to the EPR " + key + " stopped");
+            }
+        }
+
+        initiatorStore.clear();
+        applicationStore.clear();
     }
 
     /**
@@ -443,6 +475,14 @@ public class FIXSessionFactory {
             }
         }
         return app;
+    }
+
+    public void setListenerThreadPool(WorkerPool listenerThreadPool) {
+        this.listenerThreadPool = listenerThreadPool;
+    }
+
+    public void setSenderThreadPool(WorkerPool senderThreadPool) {
+        this.senderThreadPool = senderThreadPool;
     }
 }
 

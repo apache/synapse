@@ -27,15 +27,12 @@ import quickfix.Application;
 public class FIXApplicationFactory {
 
     private ConfigurationContext cfgCtx;
-    private WorkerPool workerPool;
 
-    public FIXApplicationFactory(ConfigurationContext cfgCtx, WorkerPool workerPool) {
-
+    public FIXApplicationFactory(ConfigurationContext cfgCtx) {
         this.cfgCtx = cfgCtx;
-        this.workerPool = workerPool;
     }
 
-    public Application getFIXApplication(AxisService service, boolean acceptor) {
+    public Application getFIXApplication(AxisService service, WorkerPool workerPool, boolean acceptor) {
         return new FIXIncomingMessageHandler(cfgCtx, workerPool, service, acceptor);
     }
 }

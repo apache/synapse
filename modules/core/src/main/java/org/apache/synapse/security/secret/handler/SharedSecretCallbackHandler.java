@@ -20,28 +20,27 @@ package org.apache.synapse.security.secret.handler;
 
 import org.apache.synapse.commons.util.secret.AbstractSecretCallbackHandler;
 import org.apache.synapse.commons.util.secret.SingleSecretCallback;
-import org.apache.synapse.security.secret.SecretManager;
+import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
+import org.apache.synapse.commons.util.secret.SecretCallback;
 
 /**
- * SecretManager based secret provider , this can be used by other application
- * to get secret form  SecretManager
+ * SecretCallbackHandler that uses an existing SecretCallbackHandler instance
+ * provided when starting server
  */
-public class SecretManagerSecretCallbackHandler extends AbstractSecretCallbackHandler {
+public class SharedSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
-    private final SecretManager secretManager = SecretManager.getInstance();
+    private SecretCallbackHandler secretCallbackHandler =
+            SharedSecretCallbackHandlerCache.getInstance().getSecretCallbackHandler();
 
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
 
-        if (!secretManager.isInitialized()) {
+        if (secretCallbackHandler == null) {
             if (log.isWarnEnabled()) {
-                log.warn("SecretManager has not been initialized.Cannot collect secrets.");
+                log.warn("There is no shared SecretCallbackHandler. " +
+                        "Please use any other SecretCallbackHandler implementaions");
             }
             return;
         }
-
-        String id = singleSecretCallback.getId();
-        if (id != null && !"".equals(id)) {
-            singleSecretCallback.setSecret(secretManager.getSecret(id));
-        }
+        secretCallbackHandler.handle(new SecretCallback[]{singleSecretCallback});
     }
 }

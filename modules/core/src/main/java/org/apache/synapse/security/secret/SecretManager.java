@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
-import org.apache.synapse.commons.util.secret.*;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.security.definition.factory.KeyStoreInformationFactory;
@@ -35,24 +34,6 @@ public class SecretManager {
     private final static String PROP_SECRET_REPOSITORIES = "secretRepositories";
     /* Type of the secret repository */
     private final static String PROP_PROVIDER = "provider";
-    /* Property key secret manager */
-    private final static String PROP_SECRET_MANAGER = "secretManager";
-    /* Property key password provider */
-    private final static String PROP_PASSWORD_PROVIDER = "passwordProvider";
-    /* Prompt for trust store password*/
-    private final static String TRUSTSTORE_PASSWORD_PROMPT = "Trust Store Password > ";
-    /* Prompt for identity store password*/
-    private final static String IDENTITYSTORE_PASSWORD_PROMPT = "Identity Store Password > ";
-    /* Prompt for identity store private key password*/
-    private final static String IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT
-            = "Identity Store Private Key Password > ";
-    /* ID for trust store password*/
-    private final static String TRUSTSTORE_PASSWORD_ID = "trust.store.pass";
-    /* ID for identity store password*/
-    private final static String IDENTITYSTORE_PASSWORD_ID = "identity.store.pass";
-    /* ID for identity store private key password*/
-    private final static String IDENTITYSTORE_PRIVATE_KEY_PASSWORD_ID
-            = "identity.key.pass";
     /* Dot string */
     private final static String DOT = ".";
 
@@ -121,52 +102,22 @@ public class SecretManager {
             return;
         }
 
-        SecretCallbackHandler secretCallbackHandler =
-                SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
-                        PROP_SECRET_MANAGER + DOT + PROP_PASSWORD_PROVIDER);
 
-        if (secretCallbackHandler == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to find a SecretCallbackHandler and so " +
-                        " cannot get passwords required for " +
-                        "root level secret repositories - trust store password or  identity " +
-                        "store password and it's private key password");
-            }
-            return;
-        }
+        //Create a KeyStore Information  for private key entry KeyStore
+        IdentityKeyStoreInformation identityInformation =
+                KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
 
-        String identityStorePass;
-        String identityKeyPass;
-        String trustStorePass;
+        // Create a KeyStore Information for trusted certificate KeyStore
+        TrustKeyStoreInformation trustInformation =
+                KeyStoreInformationFactory.createTrustKeyStoreInformation(properties);
 
-        // Creating required password class backs
-        SingleSecretCallback trustStorePassSecretCallback
-                = new SingleSecretCallback(TRUSTSTORE_PASSWORD_PROMPT,
-                TRUSTSTORE_PASSWORD_ID);
-        SingleSecretCallback identityStorePassSecretCallback
-                = new SingleSecretCallback(IDENTITYSTORE_PASSWORD_PROMPT,
-                IDENTITYSTORE_PASSWORD_ID);
-        SingleSecretCallback identityKeyPassSecretCallback
-                = new SingleSecretCallback(IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT,
-                IDENTITYSTORE_PRIVATE_KEY_PASSWORD_ID);
 
-        // Group all as a one callback
-        MultiSecretCallback callback = new MultiSecretCallback();
-        callback.addSecretCallback(trustStorePassSecretCallback);
-        callback.addSecretCallback(identityStorePassSecretCallback);
-        callback.addSecretCallback(identityKeyPassSecretCallback);
-        SecretCallback[] secretCallbacks = new SecretCallback[]{callback};
-
-        // Create and initiating SecretLoadingModule
-        SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
-        secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHandler});
-
-        //load passwords
-        secretLoadingModule.load(secretCallbacks);
-
-        identityKeyPass = identityKeyPassSecretCallback.getSecret();
-        identityStorePass = identityStorePassSecretCallback.getSecret();
-        trustStorePass = trustStorePassSecretCallback.getSecret();
+        String identityKeyPass = identityInformation
+                .getKeyPasswordProvider().getResolvedPassword();
+        String identityStorePass = identityInformation
+                .getKeyStorePasswordProvider().getResolvedPassword();
+        String trustStorePass = trustInformation
+                .getKeyStorePasswordProvider().getResolvedPassword();
 
         if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
             if (log.isDebugEnabled()) {
@@ -176,18 +127,8 @@ public class SecretManager {
             return;
         }
 
-        //Create a KeyStore Information  for private key entry KeyStore
-        IdentityKeyStoreInformation keyStoreInformation =
-                KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
-        keyStoreInformation.setKeyStorePassword(identityStorePass);
-
-        // Create a KeyStore Information for trusted certificate KeyStore
-        TrustKeyStoreInformation trustInformation =
-                KeyStoreInformationFactory.createTrustKeyStoreInformation(properties);
-        trustInformation.setKeyStorePassword(trustStorePass);
-
         IdentityKeyStoreWrapper identityKeyStoreWrapper = new IdentityKeyStoreWrapper();
-        identityKeyStoreWrapper.init(keyStoreInformation, identityKeyPass);
+        identityKeyStoreWrapper.init(identityInformation, identityKeyPass);
 
         TrustKeyStoreWrapper trustKeyStoreWrapper = new TrustKeyStoreWrapper();
         trustKeyStoreWrapper.init(trustInformation);

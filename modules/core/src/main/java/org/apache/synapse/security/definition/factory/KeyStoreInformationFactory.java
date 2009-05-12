@@ -24,6 +24,7 @@ import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.KeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.secret.SecretInformationFactory;
 
 import java.util.Properties;
 
@@ -41,9 +42,9 @@ public class KeyStoreInformationFactory {
     /* Alias for private key entry KeyStore */
     private final static String IDENTITY_KEY_STORE_ALIAS = "keystore.identity.alias";
     /* Password for access keyStore*/
-    private final static String IDENTITY_KEY_STORE_PASSWORD = "keystore.identity.storePassword";
+    private final static String IDENTITY_KEY_STORE_PASSWORD = "keystore.identity.store";
     /* Password for get private key*/
-    private final static String IDENTITY_KEY_PASSWORD = "keystore.identity.keyPassword";
+    private final static String IDENTITY_KEY_PASSWORD = "keystore.identity.key";
 
     private final static String KEY_STORE_PARAMETERS = "keystore.identity.parameters";
 
@@ -54,9 +55,20 @@ public class KeyStoreInformationFactory {
     /* Alias for certificate KeyStore */
     private final static String TRUST_STORE_ALIAS = "keystore.trust.alias";
     /* Password for access TrustStore*/
-    private final static String TRUST_STORE_PASSWORD = "keystore.trust.storePassword";
+    private final static String TRUST_STORE_PASSWORD = "keystore.trust.store";
 
     private final static String TRUST_STORE_PARAMETERS = "keystore.trust.parameters";
+    /* Dot string */
+    private final static String DOT = ".";
+    /* Property key password provider */
+    private final static String PROP_PASSWORD_PROVIDER = "passwordProvider";
+    /* Prompt for trust store password*/
+    private final static String TRUSTSTORE_PASSWORD_PROMPT = "Trust Store Password > ";
+    /* Prompt for identity store password*/
+    private final static String IDENTITYSTORE_PASSWORD_PROMPT = "Identity Store Password > ";
+    /* Prompt for identity store private key password*/
+    private final static String IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT
+            = "Identity Store Private Key Password > ";
 
     /**
      * Creates a KeyStoreInformation using synapse properties
@@ -84,12 +96,17 @@ public class KeyStoreInformationFactory {
         keyStoreInformation.setStoreType(
                 MiscellaneousUtil.getProperty(properties,
                         IDENTITY_KEY_STORE_TYPE, null));
-        keyStoreInformation.setKeyStorePassword(
-                MiscellaneousUtil.getProperty(
-                        properties, IDENTITY_KEY_STORE_PASSWORD, null));
-        keyStoreInformation.setKeyPassword(
-                MiscellaneousUtil.getProperty(
-                        properties, IDENTITY_KEY_PASSWORD, null));
+
+        keyStoreInformation.setKeyStorePasswordProvider(
+                SecretInformationFactory.createSecretInformation(properties,
+                        IDENTITY_KEY_STORE_PASSWORD + DOT,
+                        IDENTITYSTORE_PASSWORD_PROMPT));
+
+        keyStoreInformation.setKeyPasswordProvider(
+                SecretInformationFactory.createSecretInformation(
+                        properties, IDENTITY_KEY_PASSWORD + DOT,
+                        IDENTITYSTORE_PRIVATE_KEY_PASSWORD_PROMPT));
+
         String parameterString = MiscellaneousUtil.getProperty(
                 properties, KEY_STORE_PARAMETERS, null);
 
@@ -124,8 +141,11 @@ public class KeyStoreInformationFactory {
         trustInformation.setStoreType(
                 MiscellaneousUtil.getProperty(properties,
                         TRUST_STORE_TYPE, null));
-        trustInformation.setKeyStorePassword(
-                MiscellaneousUtil.getProperty(properties, TRUST_STORE_PASSWORD, null));
+
+        trustInformation.setKeyStorePasswordProvider(
+                SecretInformationFactory.createSecretInformation(
+                        properties, TRUST_STORE_PASSWORD + DOT, TRUSTSTORE_PASSWORD_PROMPT));
+
         String parameterString = MiscellaneousUtil.getProperty(
                 properties, TRUST_STORE_PARAMETERS, null);
 

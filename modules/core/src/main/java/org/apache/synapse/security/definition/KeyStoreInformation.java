@@ -21,6 +21,7 @@ package org.apache.synapse.security.definition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.secret.SecretInformation;
 import org.apache.synapse.security.enumeration.KeyStoreType;
 import org.apache.synapse.security.interfaces.ICACertsLoader;
 import org.apache.synapse.security.interfaces.IKeyStoreLoader;
@@ -49,7 +50,7 @@ public abstract class KeyStoreInformation {
     /* KeyStore location */
     private String location;
     /* KeyStore Password to unlock KeyStore */
-    private String keyStorePassword;
+    private SecretInformation keyStorePasswordProvider;
     /* KeyStore provider */
     private String provider;
 
@@ -97,8 +98,8 @@ public abstract class KeyStoreInformation {
         this.provider = provider;
     }
 
-    public void setKeyStorePassword(String keyStorePassword) {
-        this.keyStorePassword = keyStorePassword;
+    public void setKeyStorePasswordProvider(SecretInformation keyStorePasswordProvider) {
+        this.keyStorePasswordProvider = keyStorePasswordProvider;
     }
 
     public void addParameter(String name, String value) {
@@ -119,7 +120,7 @@ public abstract class KeyStoreInformation {
         if (log.isDebugEnabled()) {
             log.debug("Loading KeyStore with type : " + storeType);
         }
-
+        String keyStorePassword = this.keyStorePasswordProvider.getResolvedPassword();
         switch (storeType) {
             case JKS:
                 IKeyStoreLoader jksKeyStoreLoader = new JKSKeyStoreLoader(location,
@@ -156,4 +157,7 @@ public abstract class KeyStoreInformation {
         throw new SynapseException(msg, e);
     }
 
+    public SecretInformation getKeyStorePasswordProvider() {
+        return keyStorePasswordProvider;
+    }
 }

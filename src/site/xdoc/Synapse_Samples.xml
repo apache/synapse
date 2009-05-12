@@ -1855,7 +1855,7 @@ Connection: Keep-Alive
                 &lt;send&gt;
                     &lt;endpoint&gt;
                         &lt;session type=&quot;simpleClientSession&quot;/&gt;
-                        &lt;loadbalance algorithm=&quot;roundRobin&quot;&gt;
+                        &lt;loadbalance algorithm=&quot;org.apache.synapse.endpoints.algorithms.RoundRobin&quot;&gt;
                             &lt;endpoint&gt;
                                 &lt;address uri=&quot;http://localhost:9001/services/LBService1&quot;&gt;
                                     &lt;enableAddressing/&gt;

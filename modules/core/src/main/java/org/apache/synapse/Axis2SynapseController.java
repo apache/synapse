@@ -36,8 +36,8 @@ import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.RMIRegistryController;
-import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
-import org.apache.synapse.commons.util.secret.SecretCallbackHandler;
+import org.apache.synapse.commons.security.SecurityConstants;
+import org.apache.synapse.commons.security.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.util.datasource.DataSourceInformationRepository;
 import org.apache.synapse.commons.util.datasource.DataSourceHelper;
 import org.apache.synapse.commons.util.datasource.DataSourceConstants;
@@ -51,7 +51,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.task.*;
-import org.apache.synapse.security.secret.handler.SharedSecretCallbackHandlerCache;
+import org.apache.synapse.commons.security.secret.handler.SharedSecretCallbackHandlerCache;
 
 import java.util.*;
 
@@ -662,7 +662,7 @@ public class Axis2SynapseController implements SynapseController {
         SharedSecretCallbackHandlerCache cache = SharedSecretCallbackHandlerCache.getInstance();
         Object handler =
                 information.getProperty(
-                        SecretConfigurationConstants.PROP_SECRET_CALLBACK_HANDLER);
+                        SecurityConstants.PROP_SECRET_CALLBACK_HANDLER);
         if (handler instanceof SecretCallbackHandler) {
             cache.setSecretCallbackHandler((SecretCallbackHandler) handler);
         }

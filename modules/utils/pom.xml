@@ -55,7 +55,7 @@
                     <instructions>
                         <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Export-Package>
-                            org.apache.synapse.commons.util.*,
+                            org.apache.synapse.commons.*,
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,

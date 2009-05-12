@@ -19,7 +19,7 @@
 package org.apache.synapse;
 
 import org.apache.synapse.config.SynapsePropertiesLoader;
-import org.apache.synapse.security.secret.SecretManager;
+import org.apache.synapse.commons.security.secret.SecretManager;
 
 /**
  * Detects possible current server state

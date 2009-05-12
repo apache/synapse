@@ -798,14 +798,14 @@ synapse.sh -sample &lt;n&gt;</pre>
         keystore.identity.location=lib/identity.jks
         keystore.identity.type=JKS
         keystore.identity.alias=synapse
-        keystore.identity.storePassword=password
-        keystore.identity.keyPassword=password
+        keystore.identity.store.password=password
+        keystore.identity.key.password=password
         #keystore.identity.parameters=enableHostnameVerifier=false;keyStoreCertificateFilePath=/home/esb.cer
 
         keystore.trust.location=lib/trust.jks
         keystore.trust.type=JKS
         keystore.trust.alias=synapse
-        keystore.trust.storePassword=password
+        keystore.trust.store.password=password
         #keystore.trust.parameters=enableHostnameVerifier=false;keyStoreCertificateFilePath=/home/esb.cer
 
     </pre>
@@ -822,30 +822,24 @@ synapse.sh -sample &lt;n&gt;</pre>
     Those are arranged in a cascade manger. Secrets can be accessed by providing alias for those.
 
     Key Stores needed for Secret Manager and secret repositories need to be configured according to
-    the <strong>Key Stores Configurations</strong>. In this case, all the passwords in the key store configuration
+    the<strong>Key Stores Configurations</strong>. In this case, all the passwords in the key store
+    configuration
     contains only alias to refer actual password. For example
     keystore.identity.storePassword=password
-    Here <strong>password</strong> is an alias and to be used to get actual password
+    Here
+    <strong>password</strong>
+    is an alias and to be used to get actual password
 
     In order to resolve above passwords (i.e. to get actual passwords); it is needed to provide a
-    <strong>password provider</strong> for secret manager. In future, this will be moved into key store
-    configurations itself .This can be done by adding property to <strong>synapse.properties</strong>
-
-</p>
-
-<div>
-    <p>
-        <strong>Secret manager password provider
-            <br/>
-        </strong>
-    </p>
+    <strong>password provider</strong>
+    for each keystore.
+    This can be done by adding property called
+    <strong>passwordProvider= any implementation of org.apache.synapse.commons.util.secret.SecretCallbackHandler
+    </strong>
+    Example
     <pre>
-        secretManager.passwordProvider=org.apache.synapse.security.secret.handler.JMXSecretCallbackHandler
+        keystore.identity.store.passwordProvider=org.apache.synapse.security.secret.handler.JMXSecretCallbackHandler
     </pre>
-</div>
-<p>Note: In the case where use for configuring key store for secret manager, the passwords in the
-    above configurations act as only just alias. There are some mechanisms that can be used to
-    provide actual password for these aliases. Those are described under <strong>Securing Password</strong>.
 </p>
 <p>
     The  <strong>password provider</strong> should be an implementation of
@@ -861,6 +855,9 @@ synapse.sh -sample &lt;n&gt;</pre>
         </li>
         <li>
             org.apache.synapse.security.secret.handler.HardCodedSecretCallbackHandler
+        </li>
+        <li>
+            org.apache.synapse.security.secret.handler.JBossEncryptionSecretCallbackHandler
         </li>
     </ul>
     <p>
@@ -1036,11 +1033,11 @@ synapse.datasources.lookupds.passwordProvider=org.apache.synapse.security.secret
         </strong>
     </p>
     <p>
-        <strong>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password
+        <strong>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password -outencode base64
             <br/>
         </strong>
     </p>
-    <pre>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password
+    <pre>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password -outencode base64
 
         Using SYNAPSE_HOME: C:\Project\apache\synapse\synapse4\modules\distribution\ta
         rget\synapse-SNAPSHOT

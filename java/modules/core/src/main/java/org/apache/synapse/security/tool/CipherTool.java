@@ -22,6 +22,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.secret.SecretInformation;
 import org.apache.synapse.security.definition.CipherInformation;
 import org.apache.synapse.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.security.definition.TrustKeyStoreInformation;
@@ -278,7 +279,9 @@ public final class CipherTool {
         information.setStoreType(getArgument(cmd, STORE_TYPE, KeyStoreType.JKS.toString()));
         String storePass = getArgument(cmd, STORE_PASS, null);
         assertEmpty(storePass, STORE_PASS);
-        information.setKeyStorePassword(storePass);
+        SecretInformation secretInformation = new SecretInformation();
+        secretInformation.setAliasPassword(storePass);
+        information.setKeyStorePasswordProvider(secretInformation);
 
         return information;
     }
@@ -299,7 +302,9 @@ public final class CipherTool {
         information.setStoreType(getArgument(cmd, STORE_TYPE, KeyStoreType.JKS.toString()));
         String storePass = getArgument(cmd, STORE_PASS, null);
         assertEmpty(storePass, STORE_PASS);
-        information.setKeyStorePassword(storePass);
+        SecretInformation secretInformation = new SecretInformation();
+        secretInformation.setAliasPassword(storePass);
+        information.setKeyStorePasswordProvider(secretInformation);
 
         return information;
     }

@@ -18,6 +18,8 @@
 */
 package org.apache.synapse.security.definition;
 
+import org.apache.synapse.commons.util.secret.SecretInformation;
+
 import javax.net.ssl.KeyManagerFactory;
 import java.security.KeyStore;
 
@@ -27,10 +29,10 @@ import java.security.KeyStore;
 public class IdentityKeyStoreInformation extends KeyStoreInformation {
 
     /* Password for access private key*/
-    private String keyPassword;
+    private SecretInformation keyPasswordProvider;
 
-    public void setKeyPassword(String keyPassword) {
-        this.keyPassword = keyPassword;
+    public void setKeyPasswordProvider(SecretInformation keyPasswordProvider) {
+        this.keyPasswordProvider = keyPasswordProvider;
     }
 
     /**
@@ -48,7 +50,7 @@ public class IdentityKeyStoreInformation extends KeyStoreInformation {
             KeyStore keyStore = this.getIdentityKeyStore();
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(
                     KeyManagerFactory.getDefaultAlgorithm());
-            keyManagerFactory.init(keyStore, keyPassword.toCharArray());
+            keyManagerFactory.init(keyStore, keyPasswordProvider.getResolvedPassword().toCharArray());
 
             return keyManagerFactory;
         } catch (Exception e) {
@@ -67,4 +69,7 @@ public class IdentityKeyStoreInformation extends KeyStoreInformation {
         return super.getKeyStore();
     }
 
+    public SecretInformation getKeyPasswordProvider() {
+        return keyPasswordProvider;
+    }
 }

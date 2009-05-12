@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
+import org.apache.synapse.commons.security.SecurityConstants;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -136,8 +136,8 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             ref.add(new StringRefAddr(DataSourceConstants.PROP_DRIVER_CLS_NAME,
                     driver));
             ref.add(new StringRefAddr(DataSourceConstants.PROP_URL, url));
-            ref.add(new StringRefAddr(SecretConfigurationConstants.PROP_USER_NAME, user));
-            ref.add(new StringRefAddr(SecretConfigurationConstants.PROP_PASSWORD, password));
+            ref.add(new StringRefAddr(SecurityConstants.PROP_USER_NAME, user));
+            ref.add(new StringRefAddr(SecurityConstants.PROP_PASSWORD, password));
             ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXACTIVE, maxActive));
             ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXIDLE, maxIdle));
             ref.add(new StringRefAddr(DataSourceConstants.PROP_MAXWAIT, maxWait));
@@ -183,7 +183,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             cpdsRef.add(new StringRefAddr(DataSourceConstants.PROP_DRIVER, driver));
             cpdsRef.add(new StringRefAddr(DataSourceConstants.PROP_URL, url));
             cpdsRef.add(new StringRefAddr(DataSourceConstants.PROP_USER, user));
-            cpdsRef.add(new StringRefAddr(SecretConfigurationConstants.PROP_PASSWORD,
+            cpdsRef.add(new StringRefAddr(SecurityConstants.PROP_PASSWORD,
                     password));
 
             try {

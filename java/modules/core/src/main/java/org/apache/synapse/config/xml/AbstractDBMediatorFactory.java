@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.db.Statement;
 import org.apache.synapse.commons.util.datasource.*;
 import org.apache.synapse.commons.util.jmx.MBeanRepository;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.synapse.security.secret.SecretManager;
+import org.apache.synapse.commons.security.secret.SecretManager;
 import org.jaxen.JaxenException;
 
 import javax.naming.Context;

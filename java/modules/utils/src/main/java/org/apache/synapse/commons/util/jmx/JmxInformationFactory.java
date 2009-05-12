@@ -22,9 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
-import org.apache.synapse.commons.util.secret.SecretInformation;
-import org.apache.synapse.commons.util.secret.SecretInformationFactory;
+import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.commons.security.secret.SecretInformationFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

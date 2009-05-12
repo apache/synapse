@@ -20,8 +20,8 @@ package org.apache.synapse.commons.util.datasource.serializer;
 
 import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
-import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
-import org.apache.synapse.commons.util.secret.SecretInformation;
+import org.apache.synapse.commons.security.SecurityConstants;
+import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import java.util.Properties;
 
@@ -57,13 +57,13 @@ public class DataSourceInformationSerializer {
 
             String user = secretInformation.getUser();
             if (user != null && !"".equals(user)) {
-                addProperty(properties, prefix + SecretConfigurationConstants.PROP_USER_NAME,
+                addProperty(properties, prefix + SecurityConstants.PROP_USER_NAME,
                         user);
             }
 
             String password = secretInformation.getAliasPassword();
             if (password != null && !"".equals(password)) {
-                addProperty(properties, prefix + SecretConfigurationConstants.PROP_PASSWORD,
+                addProperty(properties, prefix + SecurityConstants.PROP_PASSWORD,
                         password);
             }
 

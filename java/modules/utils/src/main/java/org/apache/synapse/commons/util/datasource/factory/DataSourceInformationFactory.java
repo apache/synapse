@@ -26,9 +26,9 @@ import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.SynapseUtilException;
 import org.apache.synapse.commons.util.datasource.DataSourceConstants;
 import org.apache.synapse.commons.util.datasource.DataSourceInformation;
-import org.apache.synapse.commons.util.secret.SecretConfigurationConstants;
-import org.apache.synapse.commons.util.secret.SecretInformation;
-import org.apache.synapse.commons.util.secret.SecretInformationFactory;
+import org.apache.synapse.commons.security.SecurityConstants;
+import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.commons.security.secret.SecretInformationFactory;
 
 import java.util.Properties;
 
@@ -267,7 +267,7 @@ public class DataSourceInformationFactory {
                         null));
 
         String passwordPrompt = MiscellaneousUtil.getProperty(
-                properties, prefix + SecretConfigurationConstants.PROP_PASSWORD_PROMPT,
+                properties, prefix + SecurityConstants.PROP_PASSWORD_PROMPT,
                 "Password for datasource " + dsName, String.class);
 
         SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(

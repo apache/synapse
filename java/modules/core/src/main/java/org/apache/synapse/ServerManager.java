@@ -21,8 +21,11 @@ package org.apache.synapse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
+import org.apache.synapse.commons.security.SecurityConstants;
+import org.apache.synapse.commons.security.secret.SecretManager;
 import org.apache.synapse.core.axis2.SynapseCallbackReceiver;
 
+import javax.management.NotCompliantMBeanException;
 import java.util.Date;
 
 /**
@@ -477,13 +480,29 @@ public class ServerManager {
         throw new SynapseException(msg);
     }
 
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
     private void registerMBean() {
         MBeanRegistrar.getInstance().registerMBean(new ServerManagerView(),
                 SynapseConstants.SERVER_MANAGER_MBEAN, SynapseConstants.SERVER_MANAGER_MBEAN);
+        try {
+            MBeanRegistrar.getInstance().registerMBean(
+                    new SecretManagerAdminMBeanImpl(),
+                    SecurityConstants.PROP_SECURITY_ADMIN_SERVICES,
+                    SecurityConstants.PROP_SECRET_MANAGER_ADMIN_MBEAN);
+        } catch (NotCompliantMBeanException e) {
+            handleException("Error registering SecretManagerAdminMBeanImpl", e);
+        }
     }
 
     private void unRegisterMBean() {
         MBeanRegistrar.getInstance().unRegisterMBean(
                 SynapseConstants.SERVER_MANAGER_MBEAN, SynapseConstants.SERVER_MANAGER_MBEAN);
+        MBeanRegistrar.getInstance().unRegisterMBean(
+                SecurityConstants.PROP_SECURITY_ADMIN_SERVICES,
+                SecurityConstants.PROP_SECRET_MANAGER_ADMIN_MBEAN);
     }
 }

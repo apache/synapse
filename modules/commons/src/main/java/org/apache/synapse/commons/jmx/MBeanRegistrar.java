@@ -20,7 +20,7 @@ package org.apache.synapse.commons.jmx;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -95,7 +95,7 @@ public class MBeanRegistrar {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
 }

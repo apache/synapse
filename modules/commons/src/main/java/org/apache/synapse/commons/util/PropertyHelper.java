@@ -22,6 +22,7 @@ package org.apache.synapse.commons.util;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.Method;
@@ -166,11 +167,11 @@ public class PropertyHelper {
 
     private static void handleException(String message, Throwable e) {
         log.error(message + e.getMessage());
-        throw new SynapseUtilException(message, e);
+        throw new SynapseCommonsException(message, e);
     }
 
     private static void handleException(String message) {
         log.error(message);
-        throw new SynapseUtilException(message);
+        throw new SynapseCommonsException(message);
     }
 }

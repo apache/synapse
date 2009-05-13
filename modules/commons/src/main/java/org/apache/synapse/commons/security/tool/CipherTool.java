@@ -31,7 +31,7 @@ import org.apache.synapse.commons.security.enumeration.KeyStoreType;
 import org.apache.synapse.commons.security.wrappers.CipherWrapper;
 import org.apache.synapse.commons.security.wrappers.IdentityKeyStoreWrapper;
 import org.apache.synapse.commons.security.wrappers.TrustKeyStoreWrapper;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -406,12 +406,12 @@ public final class CipherTool {
 
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
     private static void assertEmpty(String value, String key) {

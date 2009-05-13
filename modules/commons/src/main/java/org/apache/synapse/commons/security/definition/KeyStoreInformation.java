@@ -28,7 +28,7 @@ import org.apache.synapse.commons.security.keystore.CACertsLoader;
 import org.apache.synapse.commons.security.keystore.JKSKeyStoreLoader;
 import org.apache.synapse.commons.security.keystore.PKCS12KeyStoreLoader;
 import org.apache.synapse.commons.security.keystore.PKCS8KeyStoreLoader;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import java.security.KeyStore;
 import java.util.HashMap;
@@ -149,12 +149,12 @@ public abstract class KeyStoreInformation {
 
     protected void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
     protected void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 
     public SecretInformation getKeyStorePasswordProvider() {

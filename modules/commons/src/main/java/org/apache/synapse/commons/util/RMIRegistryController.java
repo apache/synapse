@@ -21,6 +21,7 @@ package org.apache.synapse.commons.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
@@ -158,7 +159,7 @@ public class RMIRegistryController {
      */
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 
     /**
@@ -168,7 +169,7 @@ public class RMIRegistryController {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
 }

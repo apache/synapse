@@ -20,7 +20,7 @@ package org.apache.synapse.commons.security.mbean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class JMXSecretsProvider implements JMXSecretsProviderMBean {
 
     private void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
 }

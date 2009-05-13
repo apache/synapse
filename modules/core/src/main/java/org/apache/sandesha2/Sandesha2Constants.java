@@ -537,7 +537,7 @@ public interface Sandesha2Constants {
 
 	int CLIENT_SLEEP_TIME = 10000;
 
-	int TERMINATE_DELAY = 100;
+	int TERMINATE_DELAY = 500;
 	
 	static final int TRANSPORT_WAIT_TIME = 60000;
 

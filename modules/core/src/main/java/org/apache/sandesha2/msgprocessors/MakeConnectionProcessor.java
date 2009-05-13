@@ -233,6 +233,8 @@ public class MakeConnectionProcessor implements MsgProcessor {
 					} else {
 						if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 							log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
+						// this property indicate synapse nhttp transport to send a 202 Accepted header
+                        rmMsgCtx.getMessageContext().setProperty("FORCE_SC_ACCEPTED", Constants.VALUE_TRUE);
 						return false;
 					}
 				} else {

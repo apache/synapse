@@ -1,4 +1,4 @@
-package org.apache.synapse.commons.util.jmx;
+package org.apache.synapse.commons.jmx;
 
 
 import org.apache.synapse.commons.security.secret.SecretInformation;

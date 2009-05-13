@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.SynapseUtilException;
 import org.apache.synapse.commons.datasource.factory.DataSourceFactory;
-import org.apache.synapse.commons.util.jmx.MBeanRepository;
+import org.apache.synapse.commons.jmx.MBeanRepository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;

@@ -60,8 +60,6 @@ public class KeyStoreInformationFactory {
     private final static String TRUST_STORE_PARAMETERS = "keystore.trust.parameters";
     /* Dot string */
     private final static String DOT = ".";
-    /* Property key password provider */
-    private final static String PROP_PASSWORD_PROVIDER = "passwordProvider";
     /* Prompt for trust store password*/
     private final static String TRUSTSTORE_PASSWORD_PROMPT = "Trust Store Password > ";
     /* Prompt for identity store password*/

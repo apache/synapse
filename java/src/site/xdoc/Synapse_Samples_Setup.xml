@@ -834,11 +834,11 @@ synapse.sh -sample &lt;n&gt;</pre>
     <strong>password provider</strong>
     for each keystore.
     This can be done by adding property called
-    <strong>passwordProvider= any implementation of org.apache.synapse.commons.security.secret.SecretCallbackHandler
+    <strong>secretProvider= any implementation of org.apache.synapse.commons.security.secret.SecretCallbackHandler
     </strong>
     Example
     <pre>
-        keystore.identity.store.passwordProvider=org.apache.synapse.commons.security.secret.handler.JMXSecretCallbackHandler
+        keystore.identity.store.secretProvider=org.apache.synapse.commons.security.secret.handler.JMXSecretCallbackHandler
     </pre>
 </p>
 <p>
@@ -995,7 +995,7 @@ synapse.datasources.reportds.maxWait=10000</pre>
 </strong>
 </p>
 <pre>
-    synapse.datasources.lookupds.passwordProvider=org.apache.synapse.commons.security.secret.handler.SecretManagerSecretCallbackHandler
+    synapse.datasources.lookupds.secretProvider=org.apache.synapse.commons.security.secret.handler.SecretManagerSecretCallbackHandler
 </pre>  
 </div>
 <h2>Using CipherTool</h2>

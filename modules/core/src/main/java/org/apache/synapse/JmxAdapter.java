@@ -21,8 +21,8 @@ package org.apache.synapse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.RMIRegistryController;
-import org.apache.synapse.commons.util.jmx.JmxInformation;
-import org.apache.synapse.commons.util.jmx.JmxSecretAuthenticator;
+import org.apache.synapse.commons.jmx.JmxInformation;
+import org.apache.synapse.commons.jmx.JmxSecretAuthenticator;
 
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;

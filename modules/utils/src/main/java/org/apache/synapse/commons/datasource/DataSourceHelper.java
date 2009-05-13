@@ -16,9 +16,9 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.datasource;
+package org.apache.synapse.commons.datasource;
 
-import org.apache.synapse.commons.util.datasource.factory.DataSourceInformationRepositoryFactory;
+import org.apache.synapse.commons.datasource.factory.DataSourceInformationRepositoryFactory;
 import org.apache.synapse.commons.util.SynapseUtilException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

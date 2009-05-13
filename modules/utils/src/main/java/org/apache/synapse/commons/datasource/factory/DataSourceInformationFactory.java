@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.datasource.factory;
+package org.apache.synapse.commons.datasource.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,8 +24,8 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.datasource.DataSourceConstants;
-import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.datasource.DataSourceConstants;
+import org.apache.synapse.commons.datasource.DataSourceInformation;
 import org.apache.synapse.commons.security.SecurityConstants;
 import org.apache.synapse.commons.security.secret.SecretInformation;
 import org.apache.synapse.commons.security.secret.SecretInformationFactory;

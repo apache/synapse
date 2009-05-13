@@ -16,11 +16,11 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.datasource.factory;
+package org.apache.synapse.commons.datasource.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.datasource.*;
+import org.apache.synapse.commons.datasource.*;
 
 import java.util.List;
 import java.util.Properties;

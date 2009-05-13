@@ -16,10 +16,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.datasource.serializer;
+package org.apache.synapse.commons.datasource.serializer;
 
-import org.apache.synapse.commons.util.datasource.DataSourceConstants;
-import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.datasource.DataSourceConstants;
+import org.apache.synapse.commons.datasource.DataSourceInformation;
 import org.apache.synapse.commons.security.SecurityConstants;
 import org.apache.synapse.commons.security.secret.SecretInformation;
 

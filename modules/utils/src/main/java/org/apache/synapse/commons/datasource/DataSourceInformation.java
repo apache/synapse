@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.datasource;
+package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.security.secret.SecretInformation;

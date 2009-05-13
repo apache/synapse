@@ -19,7 +19,7 @@
 /**
  * To change this template use File | Settings | File Templates.
  */
-package org.apache.synapse.commons.util.datasource;
+package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

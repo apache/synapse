@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util.datasource.factory;
+package org.apache.synapse.commons.datasource.factory;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS;
@@ -24,7 +24,7 @@ import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.SynapseUtilException;
-import org.apache.synapse.commons.util.datasource.DataSourceInformation;
+import org.apache.synapse.commons.datasource.DataSourceInformation;
 
 import javax.sql.DataSource;
 

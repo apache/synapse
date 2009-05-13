@@ -16,35 +16,35 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.util;
+package org.apache.synapse.commons;
 
 import org.apache.commons.logging.Log;
 
 /**
  *
  */
-public class SynapseUtilException extends RuntimeException {
+public class SynapseCommonsException extends RuntimeException {
 
     private static final long serialVersionUID = -7361599095528938810L;
 
-    public SynapseUtilException(String string) {
+    public SynapseCommonsException(String string) {
         super(string);
     }
 
-    public SynapseUtilException(String msg, Throwable e) {
+    public SynapseCommonsException(String msg, Throwable e) {
         super(msg, e);
     }
 
-    public SynapseUtilException(Throwable t) {
+    public SynapseCommonsException(Throwable t) {
         super(t);
     }
 
-    public SynapseUtilException(String msg, Log synLog) {
+    public SynapseCommonsException(String msg, Log synLog) {
         super(msg);
         synLog.error(msg);
     }
 
-    public SynapseUtilException(String msg, Throwable cause, Log synLog) {
+    public SynapseCommonsException(String msg, Throwable cause, Log synLog) {
         super(msg, cause);
         synLog.error(msg, cause);
     }

@@ -4,7 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.security.interfaces.IKeyStoreLoader;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import java.io.*;
 import java.security.*;
@@ -178,6 +178,6 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
 
     private void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 }

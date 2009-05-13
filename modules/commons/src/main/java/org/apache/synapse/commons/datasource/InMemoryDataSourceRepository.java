@@ -23,7 +23,7 @@ package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.datasource.factory.DataSourceFactory;
 import org.apache.synapse.commons.jmx.MBeanRepository;
 
@@ -116,7 +116,7 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
 

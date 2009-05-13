@@ -23,7 +23,7 @@ import org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS;
 import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.datasource.DataSourceInformation;
 
 import javax.sql.DataSource;
@@ -187,11 +187,11 @@ public class DataSourceFactory {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
     private static void handleException(String msg, Throwable throwable) {
         log.error(msg, throwable);
-        throw new SynapseUtilException(msg, throwable);
+        throw new SynapseCommonsException(msg, throwable);
     }
 }

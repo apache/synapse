@@ -19,7 +19,7 @@
 package org.apache.synapse.commons.security.secret;
 
 import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -89,7 +89,7 @@ public class SecretCallbackHandlerFactory {
      */
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 
     /**
@@ -99,6 +99,6 @@ public class SecretCallbackHandlerFactory {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 }

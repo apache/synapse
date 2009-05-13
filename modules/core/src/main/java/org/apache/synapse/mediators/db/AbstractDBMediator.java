@@ -25,7 +25,7 @@ import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.commons.util.datasource.DBPoolView;
+import org.apache.synapse.commons.datasource.DBPoolView;
 import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;

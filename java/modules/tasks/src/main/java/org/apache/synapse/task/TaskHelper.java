@@ -22,7 +22,7 @@ package org.apache.synapse.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 /**
  * Helper class to a share Scheduler and  TaskDescriptionRepository with in a single class space
@@ -85,7 +85,7 @@ public class TaskHelper {
         if (!initialized) {
             String msg = "Task helper has not been initialized, it requires to be initialized";
             log.error(msg);
-            throw new SynapseUtilException(msg);
+            throw new SynapseCommonsException(msg);
         }
     }
 

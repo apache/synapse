@@ -20,7 +20,7 @@ package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -158,7 +158,7 @@ public class DataSourceInformationRepository {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
     private void assertNull(String name, String msg) {

@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.security.definition.CipherInformation;
 import org.apache.synapse.commons.security.enumeration.CipherOperationMode;
 import org.apache.synapse.commons.security.tool.EncodingHelper;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -151,11 +151,11 @@ public class CipherWrapper {
     
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 }

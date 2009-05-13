@@ -4,7 +4,7 @@ package org.apache.synapse.commons.security.keystore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.security.interfaces.ICACertsLoader;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -74,6 +74,6 @@ public class CACertsLoader implements ICACertsLoader {
 
     private void handleException(String msg, Exception e) {
         log.error(msg, e);
-        throw new SynapseUtilException(msg, e);
+        throw new SynapseCommonsException(msg, e);
     }
 }

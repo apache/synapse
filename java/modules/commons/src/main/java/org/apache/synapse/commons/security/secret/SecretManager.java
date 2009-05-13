@@ -6,7 +6,7 @@ package org.apache.synapse.commons.security.secret;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.factory.KeyStoreInformationFactory;
@@ -212,7 +212,7 @@ public class SecretManager {
 
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 
     private boolean validatePasswords(String identityStorePass,

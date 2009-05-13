@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.util.SynapseUtilException;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.datasource.DataSourceInformation;
 import org.apache.synapse.commons.security.SecurityConstants;
@@ -285,6 +285,6 @@ public class DataSourceInformationFactory {
      */
     private static void handleException(String msg) {
         log.error(msg);
-        throw new SynapseUtilException(msg);
+        throw new SynapseCommonsException(msg);
     }
 }

@@ -68,14 +68,14 @@ public class SecretInformationFactory {
         // set specific password provider if configured
         SecretCallbackHandler passwordProvider =
                 SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
-                        configurationPrefix + SecurityConstants.PROP_PASSWORD_PROVIDER);
+                        configurationPrefix + SecurityConstants.PROP_SECRET_PROVIDER);
 
         // if no specific password provider configured, use default password provider
         if (passwordProvider == null) {
             passwordProvider = SecretCallbackHandlerFactory.createSecretCallbackHandler(
                     properties,
                     SecurityConstants.GLOBAL_PREFIX
-                            + SecurityConstants.PROP_PASSWORD_PROVIDER);
+                            + SecurityConstants.PROP_SECRET_PROVIDER);
         }
         secretInformation.setPasswordProvider(passwordProvider);
         secretInformation.setPasswordPrompt(passwordPrompt);

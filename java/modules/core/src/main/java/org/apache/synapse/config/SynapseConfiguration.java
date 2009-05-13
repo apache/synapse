@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.commons.util.datasource.DataSourceHelper;
+import org.apache.synapse.commons.datasource.DataSourceHelper;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
 import org.apache.synapse.task.TaskScheduler;

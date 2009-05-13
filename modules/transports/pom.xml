@@ -56,7 +56,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-utils</artifactId>
+            <artifactId>synapse-commons</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>commons-dbcp</groupId>

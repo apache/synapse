@@ -31,10 +31,10 @@
     </parent>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse-utils</artifactId>
+    <artifactId>synapse-commons</artifactId>
     
-    <name>Apache Synapse - Utility classes</name>
-    <description>Apache Synapse - Utility classes</description>
+    <name>Apache Synapse - Commons classes</name>
+    <description>Apache Synapse - Commons classes</description>
     <packaging>bundle</packaging>
 
     <build>

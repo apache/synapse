@@ -1,4 +1,4 @@
-package org.apache.synapse.commons.util.jmx;
+package org.apache.synapse.commons.jmx;
 
 public class JmxConfigurationConstants {
     

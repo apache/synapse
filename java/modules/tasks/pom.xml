@@ -73,7 +73,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-utils</artifactId>
+            <artifactId>synapse-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

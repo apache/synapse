@@ -20,9 +20,8 @@ package org.apache.synapse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.commons.security.SecurityConstants;
-import org.apache.synapse.commons.security.secret.SecretManager;
 import org.apache.synapse.core.axis2.SynapseCallbackReceiver;
 
 import javax.management.NotCompliantMBeanException;

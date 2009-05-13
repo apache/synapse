@@ -19,7 +19,7 @@
 package org.apache.synapse.aspects.statistics;
 
 import org.apache.synapse.aspects.statistics.mbean.StatisticsView;
-import org.apache.synapse.commons.util.jmx.MBeanRegistrar;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
 import java.util.ArrayList;
 import java.util.List;

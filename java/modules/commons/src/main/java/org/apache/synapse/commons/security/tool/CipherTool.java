@@ -280,7 +280,7 @@ public final class CipherTool {
         String storePass = getArgument(cmd, STORE_PASS, null);
         assertEmpty(storePass, STORE_PASS);
         SecretInformation secretInformation = new SecretInformation();
-        secretInformation.setAliasPassword(storePass);
+        secretInformation.setAliasSecret(storePass);
         information.setKeyStorePasswordProvider(secretInformation);
 
         return information;
@@ -303,7 +303,7 @@ public final class CipherTool {
         String storePass = getArgument(cmd, STORE_PASS, null);
         assertEmpty(storePass, STORE_PASS);
         SecretInformation secretInformation = new SecretInformation();
-        secretInformation.setAliasPassword(storePass);
+        secretInformation.setAliasSecret(storePass);
         information.setKeyStorePasswordProvider(secretInformation);
 
         return information;

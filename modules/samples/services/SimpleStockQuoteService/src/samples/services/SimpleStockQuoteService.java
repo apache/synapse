@@ -18,8 +18,10 @@
  */
 package samples.services;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleStockQuoteService {
+    private final AtomicInteger orderCount = new AtomicInteger();
 
     // in-out
     public GetQuoteResponse getQuote(GetQuote request) throws Exception {
@@ -66,7 +68,8 @@ public class SimpleStockQuoteService {
     // in only
     public void placeOrder(PlaceOrder order) {
         System.out.println(new Date() + " " + this.getClass().getName() +
-            "  :: Accepted order for : " + order.getQuantity() +
-            " stocks of " + order.getSymbol() + " at $ " + order.getPrice());
+            "  :: Accepted order #" + orderCount.incrementAndGet() + " for : " +
+            order.getQuantity() + " stocks of " + order.getSymbol() + " at $ " +
+            order.getPrice());
     }
 }

@@ -62,7 +62,7 @@ public class SecretInformationFactory {
                 String.class);
 
         if (password != null && !"".equals(password)) {
-            secretInformation.setAliasPassword(password);
+            secretInformation.setAliasSecret(password);
         }
 
         // set specific password provider if configured
@@ -77,8 +77,8 @@ public class SecretInformationFactory {
                     SecurityConstants.GLOBAL_PREFIX
                             + SecurityConstants.PROP_SECRET_PROVIDER);
         }
-        secretInformation.setPasswordProvider(passwordProvider);
-        secretInformation.setPasswordPrompt(passwordPrompt);
+        secretInformation.setSecretProvider(passwordProvider);
+        secretInformation.setSecretPrompt(passwordPrompt);
 
         return secretInformation;
     }
@@ -97,10 +97,10 @@ public class SecretInformationFactory {
                                                             String passwordPrompt) {
 
         SecretInformation secretInformation = new SecretInformation();
-        secretInformation.setAliasPassword(aliasPassword);
-        secretInformation.setPasswordProvider(
+        secretInformation.setAliasSecret(aliasPassword);
+        secretInformation.setSecretProvider(
                 SecretCallbackHandlerFactory.createSecretCallbackHandler(secretProvider));
-        secretInformation.setPasswordPrompt(passwordPrompt);
+        secretInformation.setSecretPrompt(passwordPrompt);
         return secretInformation;
     }
 }

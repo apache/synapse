@@ -25,10 +25,10 @@ package org.apache.synapse.commons.security.secret;
 public class SecretInformation {
 
     private String user;
-    private String aliasPassword;
-    private String passwordPrompt;
-    private SecretCallbackHandler passwordProvider;
-    
+    private String aliasSecret;
+    private String secretPrompt;
+    private SecretCallbackHandler secretProvider;
+
     public String getUser() {
         return user;
     }
@@ -37,20 +37,20 @@ public class SecretInformation {
         this.user = user;
     }
 
-    public String getAliasPassword() {
-        return aliasPassword;
+    public String getAliasSecret() {
+        return aliasSecret;
     }
 
-    public void setAliasPassword(String aliasPassword) {
-        this.aliasPassword = aliasPassword;
+    public void setAliasSecret(String aliasSecret) {
+        this.aliasSecret = aliasSecret;
     }
     
-    public String getPasswordPrompt() {
-        return passwordPrompt;
+    public String getSecretPrompt() {
+        return secretPrompt;
     }
 
-    public void setPasswordPrompt(String passwordPrompt) {
-        this.passwordPrompt = passwordPrompt;
+    public void setSecretPrompt(String secretPrompt) {
+        this.secretPrompt = secretPrompt;
     }
 
     /**
@@ -58,22 +58,22 @@ public class SecretInformation {
      * If SecretCallbackHandler is null, then returns alias password
      * @return  Actual password
      */
-    public String getResolvedPassword() {
+    public String getResolvedSecret() {
 
-        if (passwordProvider != null) {
-            if (aliasPassword != null && !"".equals(aliasPassword)) {
-                return getSecret(passwordProvider, aliasPassword, passwordPrompt);
+        if (secretProvider != null) {
+            if (aliasSecret != null && !"".equals(aliasSecret)) {
+                return getSecret(secretProvider, aliasSecret, secretPrompt);
             }
         }
-        return aliasPassword;
+        return aliasSecret;
     }
     
-    public SecretCallbackHandler getPasswordProvider() {
-        return passwordProvider;
+    public SecretCallbackHandler getSecretProvider() {
+        return secretProvider;
     }
 
-    public void setPasswordProvider(SecretCallbackHandler passwordProvider) {
-        this.passwordProvider = passwordProvider;
+    public void setSecretProvider(SecretCallbackHandler secretProvider) {
+        this.secretProvider = secretProvider;
     }
     
     private String getSecret(SecretCallbackHandler secretCallbackHanlder, String encryptedPassword, String prompt) {
@@ -87,5 +87,5 @@ public class SecretInformation {
         return secretCallback.getSecret();
     }
 
-    
+
 }

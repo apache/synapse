@@ -120,7 +120,7 @@ public abstract class KeyStoreInformation {
         if (log.isDebugEnabled()) {
             log.debug("Loading KeyStore with type : " + storeType);
         }
-        String keyStorePassword = this.keyStorePasswordProvider.getResolvedPassword();
+        String keyStorePassword = this.keyStorePasswordProvider.getResolvedSecret();
         switch (storeType) {
             case JKS:
                 IKeyStoreLoader jksKeyStoreLoader = new JKSKeyStoreLoader(location,

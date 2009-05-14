@@ -119,7 +119,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         String url = information.getUrl();
 
         String user = information.getSecretInformation().getUser();
-        String password = information.getSecretInformation().getResolvedPassword();
+        String password = information.getSecretInformation().getResolvedSecret();
 
         String maxActive = String.valueOf(information.getMaxActive());
         String maxIdle = String.valueOf(information.getMaxIdle());

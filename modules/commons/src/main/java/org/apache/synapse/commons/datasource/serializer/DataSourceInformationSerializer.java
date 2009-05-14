@@ -61,7 +61,7 @@ public class DataSourceInformationSerializer {
                         user);
             }
 
-            String password = secretInformation.getAliasPassword();
+            String password = secretInformation.getAliasSecret();
             if (password != null && !"".equals(password)) {
                 addProperty(properties, prefix + SecurityConstants.PROP_PASSWORD,
                         password);

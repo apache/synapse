@@ -64,7 +64,7 @@ public class DataSourceFactory {
         }
 
         String user = dataSourceInformation.getSecretInformation().getUser();
-        String password = dataSourceInformation.getSecretInformation().getResolvedPassword();
+        String password = dataSourceInformation.getSecretInformation().getResolvedSecret();
 
         int defaultTransactionIsolation = dataSourceInformation.getDefaultTransactionIsolation();
 

@@ -109,11 +109,11 @@ public class SecretManager {
 
 
         String identityKeyPass = identityInformation
-                .getKeyPasswordProvider().getResolvedPassword();
+                .getKeyPasswordProvider().getResolvedSecret();
         String identityStorePass = identityInformation
-                .getKeyStorePasswordProvider().getResolvedPassword();
+                .getKeyStorePasswordProvider().getResolvedSecret();
         String trustStorePass = trustInformation
-                .getKeyStorePasswordProvider().getResolvedPassword();
+                .getKeyStorePasswordProvider().getResolvedSecret();
 
         if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
             if (log.isDebugEnabled()) {

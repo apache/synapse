@@ -40,7 +40,7 @@ public class JmxSecretAuthenticator implements JMXAuthenticator {
         String password = (aCredentials[1] != null ? aCredentials[1] : "");
 
         // perform authentication
-        if (secretInformation.getUser().equals(username) && password.equals(secretInformation.getResolvedPassword())) {
+        if (secretInformation.getUser().equals(username) && password.equals(secretInformation.getResolvedSecret())) {
             return new Subject(true,
                 Collections.singleton(new JMXPrincipal(username)),
                 Collections.EMPTY_SET,

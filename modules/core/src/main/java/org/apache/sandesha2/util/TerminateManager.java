@@ -411,12 +411,14 @@ public class TerminateManager {
 		//If not get it from the To property.
 		
 		EndpointReference toEPR = null;
-		
-		if (rmsBean.getOfferedEndPoint() != null)
+				
+		if(rmsBean.getOfferedEndPointEPR() != null){
+			toEPR = rmsBean.getOfferedEndPointEPR();
+		} else if(rmsBean.getOfferedEndPoint() != null){
 			toEPR = new EndpointReference (rmsBean.getOfferedEndPoint());
+		}
 		
 		if (toEPR==null) {
-
 			if (rmsBean.getToEndpointReference()!=null) {
 				toEPR = rmsBean.getToEndpointReference();
 				if (toEPR == null) {

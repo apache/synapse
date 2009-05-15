@@ -264,10 +264,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 							log.debug("ApplicationMsgProcessor: autoStartNewSeqForReallocation: InternalSeqID of new sequence used for reallocation: " 
 										+ internalSequenceId);
 						rmsBean.setInternalSeqIDOfSeqUsedForReallocation(internalSequenceId);
-						storageManager.getRMSBeanMgr().update(rmsBean);
-						
-						if(tran != null && tran.isActive()) tran.commit();
-						tran = storageManager.getTransaction();		
+						storageManager.getRMSBeanMgr().update(rmsBean);	
 					}
 					if (log.isDebugEnabled())
 						log.debug("ApplicationMsgProcessor: auto start new sequence " + internalSequenceId + " :: " + rmsBean);

@@ -19,6 +19,7 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
@@ -82,6 +83,7 @@ public class RMSBean extends RMSequenceBean {
 	private String transportTo;
 
 	private String offeredEndPoint = null;
+	private EndpointReference offeredEndPointEPR = null;
 
 	private String offeredSequence = null;
 	
@@ -204,6 +206,7 @@ public class RMSBean extends RMSequenceBean {
 		 lastSendErrorTimestamp = beanToCopy.getLastSendErrorTimestamp();
 		 nextMessageNumber = beanToCopy.getNextMessageNumber();
 		 offeredEndPoint = beanToCopy.getOfferedEndPoint();
+		 offeredEndPointEPR = beanToCopy.getOfferedEndPointEPR();
 		 offeredSequence = beanToCopy.getOfferedSequence();
 		 referenceMessageStoreKey = beanToCopy.getReferenceMessageStoreKey();
 		 sequenceClosedClient = beanToCopy.isSequenceClosedClient();
@@ -444,7 +447,11 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
 		result.append("\nExpectedReplies  : "); result.append(expectedReplies);
 		result.append("\nTransportTo      : "); result.append(transportTo);
-		result.append("\nOfferedEndPoint  : "); result.append(offeredEndPoint);
+		if(offeredEndPointEPR != null){
+			result.append("\nOfferedEndPoint  : "); result.append(offeredEndPointEPR.getAddress());
+		} else {
+			result.append("\nOfferedEndPoint  : null");
+		}
 		result.append("\nOfferedSequence  : "); result.append(offeredSequence);
 		if (lastSendErrorTimestamp > 0) {
 			result.append("\nLastError        : "); result.append(lastSendError);
@@ -490,6 +497,9 @@ public class RMSBean extends RMSequenceBean {
 		else if(bean.getTransportTo() != null && !bean.getTransportTo().equals(this.getTransportTo()))
 			match = false;
 
+		else if(bean.getOfferedEndPointEPR() != null && !bean.getOfferedEndPointEPR().getAddress().equals(this.getOfferedEndPointEPR().getAddress()))
+			match = false;
+		
 		else if(bean.getOfferedEndPoint() != null && !bean.getOfferedEndPoint().equals(this.getOfferedEndPoint()))
 			match = false;
 
@@ -555,6 +565,15 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setInternalSeqIDOfSeqUsedForReallocation(String internalSeqIDOfSeqUsedForReallocation) {
 		this.internalSeqIDOfSeqUsedForReallocation = internalSeqIDOfSeqUsedForReallocation;
+	}
+
+	public EndpointReference getOfferedEndPointEPR() {
+		return offeredEndPointEPR;
+	}
+
+	public void setOfferedEndPointEPR(EndpointReference offeredEndPointEPR) {
+		this.offeredEndPointEPR = offeredEndPointEPR;
+		this.offeredEndPoint = offeredEndPointEPR.getAddress();
 	}
 
 }

@@ -232,6 +232,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			transaction = storageManager.getTransaction();
 
+			/*Removing the sending of AckRequested msgs as has performance impact.
+				It could be rewritten to send AckRequested headers infrequantly and
+				hence be less of a performance impact.  Functionally it 
+				may be required to interop with other implementations but until 
+				the problem occurs it's best not to do it at all and keep performance
+				as optimal as possible
 			//If this is an application msg we need to add an ackRequest to the header		
 			if(messageType == Sandesha2Constants.MessageTypes.APPLICATION){				
 				//Add an ackRequest				
@@ -241,7 +247,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					transaction.commit();
 				
 				transaction = storageManager.getTransaction();			
-			}						
+			} */
 			
 			//if this is a sync RM exchange protocol we always have to add an ack
 			boolean ackPresent = false;
@@ -315,7 +321,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			try {
 				InvocationResponse response = InvocationResponse.CONTINUE;
 				
-		        if(storageManager.requiresMessageSerialization()) {
+				if(storageManager.requiresMessageSerialization()) {
 					if(msgCtx.isPaused()) {
 						if (log.isDebugEnabled())
 							log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
@@ -639,10 +645,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				int responseMessageType = responseRMMessage.getMessageType();
 				if(log.isDebugEnabled()) log.debug("inboundMsgType" + responseMessageType + "outgoing message type " + messageType);
 				 				
-				//if this is an application response or createSeqResponse msg in response to a make connection then we have to take care with the service context
-				if(messageType == Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG 
+				//if this is a response msg in response to a make connection then we have to take care with the service context
+				if((messageType == Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG || messageType == Sandesha2Constants.MessageTypes.UNKNOWN)
 						&& (responseMessageType == Sandesha2Constants.MessageTypes.APPLICATION 
-								|| responseMessageType == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE)){
+								|| responseMessageType == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE
+								|| responseMessageType == Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE
+								|| responseMessageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE)){
 				
 					//Setting the AxisService object
 					responseMessageContext.setAxisService(msgCtx.getAxisService());

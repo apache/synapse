@@ -211,8 +211,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 								log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceMEPWarning, createSeqRMMsg.getMessageContext().getMessageID(), 
 										offeredSequenceID));
 							}
-							rMSBean = new RMSBean();							//Set the offered EP
-							rMSBean.setOfferedEndPoint(endpointAddress);
+							rMSBean = new RMSBean();
+							//Set the offered EP
+							rMSBean.setOfferedEndPointEPR(endpoint.getEPR());
 						
 						} else {
 							//Don't accept the offer

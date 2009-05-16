@@ -127,6 +127,16 @@ public abstract class KeyStoreWrapper {
     }
 
     /**
+     * Returns the key based on default key password
+     *
+     * @param alias The alias
+     * @return Key , if there is a one , otherwise null
+     */
+    protected Key getPrivateKey(String alias) {
+        return getKey(alias, keyPassword);
+    }
+
+    /**
      * Returns the public key for the given alias
      *
      * @param alias The alias of the certificate in the specified keyStore

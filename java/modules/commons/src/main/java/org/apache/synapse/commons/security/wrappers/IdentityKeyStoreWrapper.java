@@ -69,6 +69,19 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
     }
 
     /**
+     * Returns the private key based on initialization data
+     *
+     * @return PrivateKey if there is a one , otherwise null
+     */
+    public PrivateKey getPrivateKey(String alias) {
+        Key key = super.getPrivateKey(alias);
+        if (key instanceof PrivateKey) {
+            return (PrivateKey) key;
+        }
+        return null;
+    }
+
+    /**
      * Returns the secret key
      *
      * @param alias       The alias of the certificate in the specified keyStore

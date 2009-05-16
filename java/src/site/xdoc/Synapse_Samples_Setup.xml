@@ -1033,17 +1033,15 @@ synapse.datasources.reportds.maxWait=10000</pre>
         </strong>
     </p>
     <p>
-        <strong>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password -outencode base64
+        <strong>ciphertool.bat -source synapse -keystore lib\trust.jks -storepass password -alias synapse -outencode base64 -trusted
             <br/>
         </strong>
     </p>
-    <pre>ciphertool.bat -source testpass -keystore lib\identity.jks -storepass password -alias synapse -keypass password -outencode base64
-
-        Using SYNAPSE_HOME: C:\Project\apache\synapse\synapse4\modules\distribution\ta
-        rget\synapse-SNAPSHOT
+    <pre>ciphertool.bat -source synapse -keystore lib\trust.jks -storepass password -alias synapse -outencode base64 -trusted
+        Using SYNAPSE_HOME: C:\Project\apache\synapse\trunck2\modules\distribution\target\synapse-SNAPSHOT
         Using JAVA_HOME: C:\Program Files\Java\jdk1.5.0_14
-        Output :
-        UJqoweKO4+qL9ivJlDkjIBE4XOBuGSplkHAwjS3R/nUi7LH+/AH6jfu0rW74WrrjDE1LMaWDJvsEQvLFkTVCYMdm5rkqpkqxBsz0/q0o+OGF+e1taSF3OzmqmUxs1yEK0q7vFUbfDkRWW9frrP5UF9nMtl9H3brOm/YtbpgyLMw=
+        Output : VbwH1pePwf4XmUtCdIvO0MA/EZPl8YK+E0kGkMpFd7CbWKpR2h1evTv902zoVorbJbHsVDNXfuvUUGmQAptUl4GknAm4bgZsgQ/pbsRbXivRkNzg9JVqw3FzWkR2uN2ZCHSacC4IdUwOjSDOTQ+kH7se
+        58kt2xqJSax2a9pdL1w=
     </pre>
 </div>
 </div>

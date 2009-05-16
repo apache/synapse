@@ -159,9 +159,9 @@ public final class CipherTool {
                         assertEmpty(keyPass, KEY_PASS);
                         storeWrapper.init(getIdentityKeyStoreInformation(cmd), keyPass);
                         if (cipherInformation.getCipherOperationMode() == CipherOperationMode.ENCRYPT) {
-                            key = storeWrapper.getPrivateKey();
-                        } else {
                             key = storeWrapper.getPublicKey();
+                        } else {
+                            key = storeWrapper.getPrivateKey();
                         }
                     }
                 }

@@ -31,6 +31,7 @@ import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.io.ByteArrayInputStream;
 import java.security.PublicKey;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -148,7 +149,7 @@ public class FileBaseSecretRepository implements SecretRepository {
             String aliasOfCert = MiscellaneousUtil.getProperty(
                     cipherProperties, sbThree.toString(), null);
 
-            PublicKey key;
+            Key key;
             if (TRUSTED.equals(keyStore)) {
                 if (aliasOfCert == null) {
                     key = trust.getPublicKey();
@@ -157,9 +158,9 @@ public class FileBaseSecretRepository implements SecretRepository {
                 }
             } else {
                 if (aliasOfCert == null) {
-                    key = identity.getPublicKey();
+                    key = identity.getPrivateKey();
                 } else {
-                    key = identity.getPublicKey(aliasOfCert);
+                    key = identity.getPrivateKey(aliasOfCert); //TODO use password per 'alias'
                 }
             }
             //Creates a cipherInformation

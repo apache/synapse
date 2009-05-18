@@ -46,7 +46,7 @@ public class DiscountQuoteMediator extends AbstractMediator {
     public boolean mediate(MessageContext mc) {
 
         String price= mc.getEnvelope().getBody().getFirstElement().getFirstElement().
-                getFirstChildWithName(new QName("http://services.samples","last")).getText();
+                getFirstChildWithName(new QName("http://services.samples/xsd","last")).getText();
 
         //converting String properties into integers
         int discount=Integer.parseInt(discountFactor);
@@ -65,7 +65,7 @@ public class DiscountQuoteMediator extends AbstractMediator {
         String discountedPrice = lastPrice.toString();
 
         mc.getEnvelope().getBody().getFirstElement().getFirstElement().getFirstChildWithName
-                (new QName("http://services.samples","last")).setText(discountedPrice);
+                (new QName("http://services.samples/xsd","last")).setText(discountedPrice);
 
         System.out.println("Quote value discounted.");
         System.out.println("Original price: " + price);

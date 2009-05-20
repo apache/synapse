@@ -139,6 +139,14 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 			sql.append(clause);
 			sql.append("'");
 		}
+		epr = bean.getOfferedEndPointEPR();
+		if (epr != null) {
+			sql.append(op);
+			op = " and ";
+			sql.append(" offered_endpoint_epr_addr='");
+			sql.append(epr.getAddress());
+			sql.append("'");
+		}
 		clause = bean.getOfferedSequence();
 		if (clause != null) {
 			sql.append(op);
@@ -161,6 +169,14 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 			op = " and ";
 			sql.append(" client_completed_messages='");
 			sql.append(xrs.toString());
+			sql.append("'");
+		}
+		clause = bean.getInternalSeqIDOfSeqUsedForReallocation();
+		if (clause != null) {
+			sql.append(op);
+			op = " and ";
+			sql.append(" internalSeqIDOfSeqUsedForReallocation='");
+			sql.append(clause);
 			sql.append("'");
 		}
 		if ((bean.getRmsFlags() & RMSBean.LAST_SEND_ERROR_TIME_FLAG) != 0) {
@@ -276,6 +292,10 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 		if (obj != null) {
 			bean.setAcksToEndpointReference((EndpointReference) obj);
 		}
+		obj = getObject(rs, "offered_endpoint_epr");
+		if (obj != null) {
+			bean.setOfferedEndPointEPR((EndpointReference) obj);
+		}
 
 		bean.setRMVersion(rs.getString("rm_version"));
 		bean.setServiceName(rs.getString("service_name"));
@@ -314,6 +334,8 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 		bean.setSoapVersion(rs.getInt("soap_version"));
 		bean.setFlags(rs.getInt("flags"));
 		bean.setRmsFlags(rs.getInt("rms_flags"));
+		bean.setReallocated(rs.getInt("reallocated"));
+		bean.setInternalSeqIDOfSeqUsedForReallocation(rs.getString("internalSeqIDOfSeqUsedForReallocation"));
 		return bean;
 	}
 
@@ -363,7 +385,8 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 					"anonymous_uuid,last_send_error_timestamp,last_out_message,highest_out_message_number," +
 					"next_message_number,terminate_added,timed_out,sequence_closed_client," +
 					"expected_replies,soap_version,termination_pauser_for_cs,avoid_auto_termination," +
-					"rms_flags)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+					"rms_flags,offered_endpoint_epr_addr,offered_endpoint_epr,reallocated,internalSeqIDOfSeqUsedForReallocation)" +
+					"values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			pstmt.setString(1, bean.getCreateSeqMsgID());
 			pstmt.setString(2, bean.getSequenceID());
 			EndpointReference epr = bean.getToEndpointReference();
@@ -413,6 +436,12 @@ public class PersistentRMSBeanMgr extends PersistentBeanMgr implements RMSBeanMg
 			pstmt.setInt(37, bean.isTerminationPauserForCS() ? 1 : 0);
 			pstmt.setInt(38, bean.isAvoidAutoTermination() ? 1 : 0);
 			pstmt.setInt(39, bean.getRmsFlags());
+			epr = bean.getOfferedEndPointEPR();
+			pstmt.setString(40, epr != null ? epr.getAddress() : null);
+			bais = serialize(epr);
+			pstmt.setBinaryStream(41, bais, bais.available());
+			pstmt.setInt(42, bean.isReallocated());
+			pstmt.setString(43, bean.getInternalSeqIDOfSeqUsedForReallocation());
 			pstmt.execute();
 			pstmt.close();
 		} catch (Exception ex) {

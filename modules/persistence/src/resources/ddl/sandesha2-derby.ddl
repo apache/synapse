@@ -76,6 +76,8 @@ create table wsrm_rms (
 	client_completed_messages clob,
 	transport_to varchar(255),
 	offered_endpoint varchar(255),
+	offered_endpoint_epr_addr varchar(255),
+	offered_endpoint_epr blob,
 	offered_sequence varchar(255),
 	anonymous_uuid varchar(255),
 	last_send_error_timestamp bigint,
@@ -90,6 +92,8 @@ create table wsrm_rms (
 	termination_pauser_for_cs smallint,
 	avoid_auto_termination smallint,
 	rms_flags integer,
+	reallocated smallint,
+	internalSeqIDOfSeqUsedForReallocation varchar(255),
 	primary key (create_seq_msg_id)
 );
 	

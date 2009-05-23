@@ -31,6 +31,7 @@
         <parameter name="mail.pop3.socketFactory.class">javax.net.ssl.SSLSocketFactory</parameter>
         <parameter name="mail.pop3.socketFactory.fallback">false</parameter>
         <parameter name="mail.pop3.socketFactory.port">995</parameter>
+        <parameter name="transport.mail.ContentType">application/xml</parameter>
 
         <target>
             <inSequence>

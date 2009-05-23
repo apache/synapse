@@ -2397,46 +2397,46 @@ Transfer-Encoding: chunked
 <p>VFS transport listener will pick the file from the directory in the FTP server and send it to the Axis2 service. The file in the FTP directory will be deleted. The response will be sent to the given email address. </p>
 <h2>
 <a name="Sample256" id="Sample256">Sample 256: Proxy services with the mail transport </a></h2>
-<pre xml:space="preserve">&lt;!-- Using the mail transport --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;mailto&quot;&gt;
+<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+    <proxy name="StockQuoteProxy" transports="mailto">
 
-        &lt;parameter name=&quot;transport.mail.Address&quot;&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
-        &lt;parameter name=&quot;transport.mail.Protocol&quot;&gt;pop3&lt;/parameter&gt;
-        &lt;parameter name=&quot;transport.PollInterval&quot;&gt;5&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.host&quot;&gt;pop.gmail.com&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.port&quot;&gt;995&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.user&quot;&gt;synapse.demo.1&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.password&quot;&gt;mailpassword&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.socketFactory.class&quot;&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.socketFactory.fallback&quot;&gt;false&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.pop3.socketFactory.port&quot;&gt;995&lt;/parameter&gt;
+        <parameter name="transport.mail.Address">synapse.demo.1@gmail.com</parameter>
+        <parameter name="transport.mail.Protocol">pop3</parameter>
+        <parameter name="transport.PollInterval">5</parameter>
+        <parameter name="mail.pop3.host">pop.gmail.com</parameter>
+        <parameter name="mail.pop3.port">995</parameter>
+        <parameter name="mail.pop3.user">synapse.demo.1</parameter>
+        <parameter name="mail.pop3.password">mailpassword</parameter>
+        <parameter name="mail.pop3.socketFactory.class">javax.net.ssl.SSLSocketFactory</parameter>
+        <parameter name="mail.pop3.socketFactory.fallback">false</parameter>
+        <parameter name="mail.pop3.socketFactory.port">995</parameter>
+        <parameter name="transport.mail.ContentType">application/xml</parameter>
 
-        &lt;target&gt;
-            &lt;inSequence&gt;
-                &lt;property name=&quot;senderAddress&quot; expression=&quot;get-property('transport', 'From')&quot;/&gt;
-                &lt;log level=&quot;full&quot;&gt;
-                    &lt;property name=&quot;Sender Address&quot; expression=&quot;get-property('senderAddress')&quot;/&gt;
-                &lt;/log&gt;
-                &lt;send&gt;
-                    &lt;endpoint&gt;
-                        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
-                    &lt;/endpoint&gt;
-                &lt;/send&gt;
-            &lt;/inSequence&gt;
-            &lt;outSequence&gt;
-                &lt;property name=&quot;Subject&quot; value=&quot;Custom Subject for Response&quot; scope=&quot;transport&quot;/&gt;
-                &lt;header name=&quot;To&quot; expression=&quot;fn:concat('mailto:', get-property('senderAddress'))&quot;/&gt;
-                &lt;log level=&quot;full&quot;&gt;
-                    &lt;property name=&quot;message&quot; value=&quot;Response message&quot;/&gt;
-                    &lt;property name=&quot;Sender Address&quot; expression=&quot;get-property('senderAddress')&quot;/&gt;
-                &lt;/log&gt;
-                &lt;send/&gt;
-            &lt;/outSequence&gt;
-        &lt;/target&gt;
-        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
-    &lt;/proxy&gt;
-&lt;/definitions&gt; </pre>
+        <target>
+            <inSequence>
+                <property name="senderAddress" expression="get-property('transport', 'From')"/>
+                <log level="full">
+                    <property name="Sender Address" expression="get-property('senderAddress')"/>
+                </log>
+                <send>
+                    <endpoint>
+                        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                    </endpoint>
+                </send>
+            </inSequence>
+            <outSequence>
+                <property name="Subject" value="Custom Subject for Response" scope="transport"/>
+                <header name="To" expression="fn:concat('mailto:', get-property('senderAddress'))"/>
+                <log level="full">
+                    <property name="message" value="Response message"/>
+                    <property name="Sender Address" expression="get-property('senderAddress')"/>
+                </log>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
+</definitions>]]></pre>
 <p>
 <strong>Objective: Using the mail transport with Proxy services</strong> </p>
 <p>
@@ -2446,9 +2446,20 @@ Transfer-Encoding: chunked
 <p>Enable mail transport sender in the Synapse axis2.xml. See 
 <a href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport sender</a> </p>
 <p>Start the Synapse configuration numbered 256: i.e. synapse -sample 256 </p>
-<p>Send a plain/text email with the following body and any custom Subject from your mail account. </p>
-<pre xml:space="preserve">&lt;m0:getQuote xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;&lt;/m0:getQuote&gt; </pre>
+<p>Send an email with the following body and any custom Subject from your mail account. </p>
+<pre xml:space="preserve"><![CDATA[<getQuote xmlns="http://services.samples">
+   <request xmlns="http://services.samples/xsd">
+       <symbol>IBM</symbol>
+   </request>
+</getQuote>]]></pre>
 <p>After a few seconds (e.g. 30s), you should receive a POX response in your email account with the stock quote reply. </p>
+<p>Note that in this sample we used the <tt>transport.mail.ContentType</tt> property to make sure that the transport parses
+the request message as POX. If you remove this property, you may still be able to send requests using a standard
+mail client if instead of writing the XML in the body of the message, you add it as an attachment. In that case, you
+should use <tt>.xml</tt> as a suffix for the attachment and format the request as a SOAP 1.1 message. Indeed,
+for a file with suffix <tt>.xml</tt> the mail client will most likely use <tt>text/xml</tt> as the content type, exactly
+as required for SOAP 1.1. Sending a POX message using this approach will be a lot trickier, because most standard
+mail clients don't allow the user to explicitly set the content type.</p>
 <h2>
 <a name="Sample257" id="Sample257">Sample 257: Proxy services with the FIX transport </a></h2>
 <pre xml:space="preserve">&lt;!-- Using the FIX transport --&gt;

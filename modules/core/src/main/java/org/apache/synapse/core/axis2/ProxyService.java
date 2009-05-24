@@ -41,7 +41,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.PolicyInfo;
-import org.apache.synapse.util.resolver.CustomURIResolver;
+import org.apache.synapse.util.resolver.CustomXmlSchemaURIResolver;
 import org.apache.synapse.util.resolver.CustomWSDLLocator;
 import org.apache.synapse.util.resolver.ResourceMap;
 import org.xml.sax.InputSource;
@@ -367,7 +367,7 @@ public class ProxyService implements AspectConfigurable {
                         if (resourceMap != null) {
                             // if the resource map is available use it
                             wsdlToAxisServiceBuilder.setCustomResolver(
-                                new CustomURIResolver(resourceMap, synCfg));
+                                new CustomXmlSchemaURIResolver(resourceMap, synCfg));
                             // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
                             if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
                                 ((WSDL11ToAxisServiceBuilder)
@@ -380,7 +380,7 @@ public class ProxyService implements AspectConfigurable {
                             //if the resource map isn't available ,
                             //then each import URIs will be resolved using base URI 
                             wsdlToAxisServiceBuilder.setCustomResolver(
-                                new CustomURIResolver());
+                                new CustomXmlSchemaURIResolver());
                             // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
                             if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
                                 ((WSDL11ToAxisServiceBuilder)

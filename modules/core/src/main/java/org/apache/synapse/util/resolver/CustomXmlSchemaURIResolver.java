@@ -25,13 +25,13 @@ import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.xml.sax.InputSource;
 
 /**
- * Class that adapts a {@link ResourceMap} to {@link URIResolver}.
+ * Class that adapts a {@link ResourceMap} to XmlSchemas's {@link URIResolver}.
  */
-public class CustomURIResolver implements URIResolver {
+public class CustomXmlSchemaURIResolver implements URIResolver {
     private ResourceMap resourceMap;
     private SynapseConfiguration synCfg;
 
-    public CustomURIResolver() {
+    public CustomXmlSchemaURIResolver() {
     }
     
     /**
@@ -40,7 +40,7 @@ public class CustomURIResolver implements URIResolver {
      * @param resourceMap the resource map; may be null if no resource map is configured
      * @param synCfg the Synapse configuration
      */
-    public CustomURIResolver(ResourceMap resourceMap,
+    public CustomXmlSchemaURIResolver(ResourceMap resourceMap,
                                   SynapseConfiguration synCfg) {
         this();
         this.resourceMap = resourceMap;

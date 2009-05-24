@@ -21,6 +21,7 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -31,6 +32,7 @@ import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -189,10 +191,64 @@ public class ServerWorker implements Runnable {
     public void run() {
 
         String method = request.getRequestLine().getMethod().toUpperCase();
+        msgContext.setProperty(Constants.Configuration.HTTP_METHOD,
+            request.getRequestLine().getMethod());
+
+        String uri = request.getRequestLine().getUri();
+        String oriUri = uri;
+
+        if (uri.indexOf(cfgCtx.getServicePath()) != -1) {
+            // discard upto servicePath
+            uri = uri.substring(uri.indexOf(cfgCtx.getServicePath()) +
+                cfgCtx.getServicePath().length());
+            // discard [proxy] service name if any
+            int pos = uri.indexOf("/", 1);
+            if (pos > 0) {
+                uri = uri.substring(pos);
+            } else {
+                pos = uri.indexOf("?");
+                if (pos != -1) {
+                    uri = uri.substring(pos);
+                } else {
+                    uri = "";
+                }
+            }
+        } else {
+            // remove any absolute prefix if any
+            int pos = uri.indexOf("://");
+            if (pos != -1) {
+                uri = uri.substring(pos + 3);
+                pos = uri.indexOf("/");
+                if (pos != -1) {
+                    uri = uri.substring(pos + 1);
+                }
+            }
+        }
+        msgContext.setProperty(NhttpConstants.REST_URL_POSTFIX, uri);
+        String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));
+        if (servicePrefix.indexOf("://") == -1) {
+            HttpInetConnection inetConn = (HttpInetConnection) conn;
+            InetAddress localAddr = inetConn.getLocalAddress();
+            servicePrefix = (isHttps ? "https://" : "http://") +
+                localAddr.getHostName() + ":" + inetConn.getLocalPort() + servicePrefix;
+        }
+        msgContext.setProperty(NhttpConstants.SERVICE_PREFIX, servicePrefix);
+
+
         if ("GET".equals(method)) {
             processGet();
         } else if ("POST".equals(method)) {
-            processPost();
+            processEntityEnclosingMethod();
+        } else if ("PUT".equals(method)) {
+            processEntityEnclosingMethod();
+        } else if ("HEAD".equals(method)) {
+            processNonEntityEnclosingMethod();
+        } else if ("OPTIONS".equals(method)) {
+            processNonEntityEnclosingMethod();
+        } else if ("DELETE".equals(method)) {
+            processNonEntityEnclosingMethod();
+        } else if ("TRACE".equals(method)) {
+            processNonEntityEnclosingMethod();
         } else {
             handleException("Unsupported method : " + method, null);
         }
@@ -279,20 +335,41 @@ public class ServerWorker implements Runnable {
     /**
      *
      */
-    private void processPost() {
+    private void processEntityEnclosingMethod() {
 
         try {
             Header contentType = request.getFirstHeader(HTTP.CONTENT_TYPE);
+            String contentTypeStr = contentType != null ? contentType.getValue() : null;
+
+            String charSetEncoding = BuilderUtil.getCharSetEncoding(contentTypeStr);
+            msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
+
             Header soapAction  = request.getFirstHeader(SOAPACTION);
 
             HTTPTransportUtils.processHTTPPostRequest(
                 msgContext, is,
                 os,
-                (contentType != null ? contentType.getValue() : null),
+                contentTypeStr,
                 (soapAction != null  ? soapAction.getValue()  : null),
                 request.getRequestLine().getUri());
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);
+        }
+    }
+
+    /**
+     * Process HEAD, DELETE, TRACE, OPTIONS
+     */
+    private void processNonEntityEnclosingMethod() {
+
+        try {
+            RESTUtil.processURLRequest(
+                msgContext, os, null,
+                request.getRequestLine().getUri());
+
+        } catch (AxisFault e) {
+            handleException("Error processing " + request.getRequestLine().getMethod() +
+                " request for : " + request.getRequestLine().getUri(), e);
         }
     }
 
@@ -342,11 +419,6 @@ public class ServerWorker implements Runnable {
             }
         } else {
             msgContext.setTo(new EndpointReference(uri));
-        }
-
-        if ("GET".equalsIgnoreCase(request.getRequestLine().getMethod())) {
-            msgContext.setProperty(Constants.Configuration.HTTP_METHOD,
-                Constants.Configuration.HTTP_METHOD_GET);
         }
 
         if (uri.equals("/favicon.ico")) {
@@ -501,20 +573,14 @@ public class ServerWorker implements Runnable {
 
         } else {
             try {
-                if (RESTUtil.processURLRequest(
+                RESTUtil.processGETRequest(
                         msgContext, os, (request.getFirstHeader(SOAPACTION) != null ?
                         request.getFirstHeader(SOAPACTION).getValue() : null),
-                        request.getRequestLine().getUri(), cfgCtx, parameters)) {
-                    // If RestUtil succesfully decoded the request, do not let the output
-                    // stream close (as by default below) since we are serving this GET request
-                    // through the Synapse engine
-                    return;
-                } else {
-                    response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-                    response.addHeader(LOCATION, servicePath + "/");
-                    serverHandler.commitResponseHideExceptions(conn, response);
-                }
-                    
+                        request.getRequestLine().getUri(), cfgCtx, parameters);
+                // do not let the output stream close (as by default below) since
+                // we are serving this GET request through the Synapse engine
+                return;
+
             } catch (AxisFault axisFault) {
                 handleException("Error processing GET request for: " +
                         request.getRequestLine().getUri(), axisFault);

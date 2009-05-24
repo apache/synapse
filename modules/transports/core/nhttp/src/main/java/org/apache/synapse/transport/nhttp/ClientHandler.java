@@ -189,9 +189,11 @@ public class ClientHandler implements NHttpClientHandler {
             if (axis2Req.getTimeout() > 0) {
                 conn.setSocketTimeout(axis2Req.getTimeout());
             }
-            
-            conn.submitRequest(request);
+
+            context.setAttribute(NhttpConstants.ENDPOINT_PREFIX, axis2Req.getEndpointURLPrefix());
+            context.setAttribute(NhttpConstants.HTTP_REQ_METHOD, request.getRequestLine().getMethod());
             context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+            conn.submitRequest(request);
         } catch (ConnectionClosedException e) {
             throw e;
         } catch (IOException e) {
@@ -469,10 +471,15 @@ public class ClientHandler implements NHttpClientHandler {
                 if (context.getAttribute(NhttpConstants.DISCARD_ON_COMPLETE) != null) {
                     try {
                         // this is a connection we should not re-use
-                        conn.shutdown();
+                        ConnectionPool.forget(conn);
+                        shutdownConnection(conn);
+                        context.removeAttribute(RESPONSE_SINK_BUFFER);
+                        context.removeAttribute(REQUEST_SOURCE_BUFFER);
                     } catch (Exception ignore) {}
                 } else if (!connStrategy.keepAlive(response, context)) {
-                    conn.close();
+                    shutdownConnection(conn);
+                    context.removeAttribute(RESPONSE_SINK_BUFFER);
+                    context.removeAttribute(REQUEST_SOURCE_BUFFER);
                 } else {
                     ConnectionPool.release(conn);
                 }
@@ -537,17 +544,28 @@ public class ClientHandler implements NHttpClientHandler {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
 
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CONTINUE) {
+            if (log.isDebugEnabled()) {
+                log.debug("Received a 100 Continue response");
+            }
+            // according to the HTTP 1.1 specification HTTP status 100 continue implies that
+            // the response will be followed, and the client should just ignore the 100 Continue
+            // and wait for the response
+            return;
+        }
+
+
         // Have we sent out our request fully in the first place? if not, forget about it now..
         Axis2HttpRequest req
                 = (Axis2HttpRequest) conn.getContext().getAttribute(AXIS2_HTTP_REQUEST);
-        
+
         if (req != null) {
+            req.setCompleted(true);
+
             if (log.isDebugEnabled()) {
                 log.debug("Response Received for Request : " + req);
             }
-            if (HttpStatus.SC_CONTINUE != response.getStatusLine().getStatusCode() &&
-                !req.isSendingCompleted()) {
-                req.setCompleted(true);                
+            if (!req.isSendingCompleted()) {
                 req.getMsgContext().setProperty(
                         NhttpConstants.ERROR_CODE, NhttpConstants.SEND_ABORT);
                 SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
@@ -555,7 +573,11 @@ public class ClientHandler implements NHttpClientHandler {
                 if (outputBuffer != null) {
                     outputBuffer.shutdown();
                 }
-                log.warn("Remote server aborted request being sent and replied : " + conn);
+                if (log.isDebugEnabled()) {
+                    log.debug("Remote server aborted request being sent and replied : " + conn
+                        + " for request : " + conn.getContext().getAttribute(
+                        NhttpConstants.HTTP_REQ_METHOD));
+                }
                 context.setAttribute(NhttpConstants.DISCARD_ON_COMPLETE, Boolean.TRUE);
                 if (metrics != null) {
                     metrics.incrementFaultsSending(NhttpConstants.SEND_ABORT, req.getMsgContext());
@@ -631,38 +653,19 @@ public class ClientHandler implements NHttpClientHandler {
 
                 return;
             }
-            case HttpStatus.SC_BAD_REQUEST : {
-                log.error(getErrorMessage("Received bad request: "
-                        + response.getStatusLine().getReasonPhrase(), conn));
-                return;
-            }
-            case HttpStatus.SC_INTERNAL_SERVER_ERROR : {
-                log.error(getErrorMessage("Received an internal server error : " +
-                        response.getStatusLine().getReasonPhrase(), conn));
-                processResponse(conn, context, response);
-                return;
-            }
-            case HttpStatus.SC_CONTINUE : {
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Received a 100 Continue response");
-                }
-
-                // according to the HTTP 1.1 specification HTTP status 100 continue implies that
-                // the response will be followed, and the client should just ignore the 100 Continue
-                // and wait for the response
-                return;
-            }
             case HttpStatus.SC_OK : {
                 processResponse(conn, context, response);
                 return;
             }
             default : {
-                log.warn(getErrorMessage("Unexpected HTTP status code received : " +
+                if (log.isDebugEnabled()) {
+                    log.debug(getErrorMessage("HTTP status code received : " +
                         response.getStatusLine().getStatusCode() + " :: " +
                         response.getStatusLine().getReasonPhrase(), conn));
+                }
 
-                Header contentType = response.getFirstHeader(CONTENT_TYPE);
+                Header contentType = response.getFirstHeader(HTTP.CONTENT_TYPE);
                 if (contentType != null) {
                     if ((contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0)
                             || contentType.getValue().indexOf(
@@ -684,10 +687,12 @@ public class ClientHandler implements NHttpClientHandler {
                                 response.getStatusLine().getReasonPhrase(), conn));
                     }
                 } else {
-                    log.warn(getErrorMessage("Received an unexpected response - " +
-                            "of unknown content type with status code : " +
+                    if (log.isDebugEnabled()) {
+                        log.debug(getErrorMessage("Received a response - " +
+                            "without a content type with status code : " +
                             response.getStatusLine().getStatusCode() + " and reason : " +
                             response.getStatusLine().getReasonPhrase(), conn));
+                    }
                 }
                 
                 processResponse(conn, context, response);
@@ -705,21 +710,55 @@ public class ClientHandler implements NHttpClientHandler {
     private void processResponse(final NHttpClientConnection conn, HttpContext context,
         HttpResponse response) {
 
-        ContentInputBuffer inputBuffer
-                = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
-        context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
+        ContentInputBuffer inputBuffer = null;
+        MessageContext outMsgContext = (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT);
+        String endptPrefix = (String) context.getAttribute(NhttpConstants.ENDPOINT_PREFIX);
+        String requestMethod = (String) context.getAttribute(NhttpConstants.HTTP_REQ_METHOD);
+        int statusCode = response.getStatusLine().getStatusCode();
 
-        BasicHttpEntity entity = new BasicHttpEntity();
-        if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
-            entity.setChunked(true);
+        boolean expectEntityBody = false;
+        if (!"HEAD".equals(requestMethod) && !"OPTIONS".equals(requestMethod) &&
+            statusCode >= HttpStatus.SC_OK
+                && statusCode != HttpStatus.SC_NO_CONTENT
+                && statusCode != HttpStatus.SC_NOT_MODIFIED
+                && statusCode != HttpStatus.SC_RESET_CONTENT) {
+            expectEntityBody = true;
         }
-        response.setEntity(entity);
-        context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
+
+        if (expectEntityBody) {
+            inputBuffer
+                = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+            context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
+
+            BasicHttpEntity entity = new BasicHttpEntity();
+            if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
+                entity.setChunked(true);
+            }
+            response.setEntity(entity);
+            context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
+            
+        } else {
+            conn.resetInput();
+            conn.resetOutput();
+
+            if (context.getAttribute(NhttpConstants.DISCARD_ON_COMPLETE) != null ||
+                !connStrategy.keepAlive(response, context)) {
+                try {
+                    // this is a connection we should not re-use
+                    ConnectionPool.forget(conn);
+                    shutdownConnection(conn);
+                    context.removeAttribute(RESPONSE_SINK_BUFFER);
+                    context.removeAttribute(REQUEST_SOURCE_BUFFER);
+                } catch (Exception ignore) {}
+            } else {
+                ConnectionPool.release(conn);
+            }
+        }
 
         workerPool.execute(
-            new ClientWorker(cfgCtx, new ContentInputStream(inputBuffer), response,
-                (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
-
+            new ClientWorker(cfgCtx,
+                inputBuffer == null ? null : new ContentInputStream(inputBuffer),
+                response, outMsgContext, endptPrefix));
     }
 
     public void execute(Runnable task) {

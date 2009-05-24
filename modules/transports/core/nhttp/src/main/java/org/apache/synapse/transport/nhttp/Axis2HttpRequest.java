@@ -38,7 +38,6 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
-import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.commons.util.TemporaryData;
 
@@ -72,14 +71,16 @@ public class Axis2HttpRequest {
     OMOutputFormat format = null;
     private ContentOutputBuffer outputBuffer = null;
     /** ready to begin streaming? */
-    private boolean readyToStream = false;
+    private volatile boolean readyToStream = false;
     /** The sending of this request has fully completed */
-    private boolean sendingCompleted = false;
+    private volatile boolean sendingCompleted = false;
     /**
      * for request complete checking - request complete means the request has been fully sent
      * and the response it fully received
      */
-    private boolean completed = false;
+    private volatile boolean completed = false;
+    /** The URL prefix of the endpoint (to be used for Location header re-writing in the response)*/
+    private String endpointURLPrefix = null;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
         this.epr = epr;
@@ -127,33 +128,39 @@ public class Axis2HttpRequest {
         this.timeout = timeout;
     }
 
+    public String getEndpointURLPrefix() {
+        return endpointURLPrefix;
+    }
+
+    public void setEndpointURLPrefix(String endpointURLPrefix) {
+        this.endpointURLPrefix = endpointURLPrefix;
+    }
+
     /**
      * Create and return a new HttpPost request to the destination EPR
      * @return the HttpRequest to be sent out
      */
     public HttpRequest getRequest() throws IOException {
 
-        boolean doingGET = Constants.Configuration.HTTP_METHOD_GET.equals(
-            msgContext.getProperty(Constants.Configuration.HTTP_METHOD));
+        String httpMethod = (String) msgContext.getProperty(Constants.Configuration.HTTP_METHOD);
+        if (httpMethod == null) {
+            httpMethod = "POST";
+        }
+        endpointURLPrefix = (String) msgContext.getProperty(NhttpConstants.ENDPOINT_PREFIX);
         HttpRequest httpRequest = null;
-        if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
-            
-            if (doingGET) {
-                
-                httpRequest = new BasicHttpRequest(
-                    "GET", RESTUtil.getURI(
-                    msgContext, epr.getAddress()), HttpVersion.HTTP_1_0);
-                
-            } else {
 
-                if (msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH)) {
-                    httpRequest = new BasicHttpEntityEnclosingRequest(
-                        "POST", new URL(epr.getAddress()).getPath(), HttpVersion.HTTP_1_0);
-                } else {
-                   httpRequest = new BasicHttpEntityEnclosingRequest(
-                        "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
-                }
-                
+        if ("POST".equals(httpMethod) || "PUT".equals(httpMethod)) {
+
+            httpRequest = new BasicHttpEntityEnclosingRequest(
+                httpMethod,
+                msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH) ?
+                    new URL(epr.getAddress()).getPath() : epr.getAddress(),
+                msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
+                    HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
+
+            BasicHttpEntity entity = new BasicHttpEntity();
+
+            if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
                 TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
                 OutputStream out = serialized.getOutputStream();
                 try {
@@ -161,34 +168,26 @@ public class Axis2HttpRequest {
                 } finally {
                     out.close();
                 }
-                BasicHttpEntity entity = new BasicHttpEntity();
                 msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, serialized);
                 entity.setContentLength(serialized.getLength());
-                ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
-
-            }
-
-
-        } else {
-            
-            if (doingGET) {
-
-                httpRequest = new BasicHttpRequest(
-                    "GET", RESTUtil.getURI(msgContext, epr.getAddress()));
 
             } else {
-                if (msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH)) {
-                    httpRequest = new BasicHttpEntityEnclosingRequest(
-                        "POST", new URL(epr.getAddress()).getPath());
-                } else {
-                    httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());    
-                }
-                BasicHttpEntity entity = new BasicHttpEntity();
-                if (msgContext.isPropertyTrue(NhttpConstants.DISABLE_CHUNKING)) {
-                    entity.setChunked(false);
-                }
-                ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
+                entity.setChunked(!msgContext.isPropertyTrue(NhttpConstants.DISABLE_CHUNKING));
             }
+            ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
+
+            httpRequest.setHeader(
+                HTTP.CONTENT_TYPE,
+                messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+
+        } else {
+
+            httpRequest = new BasicHttpRequest(
+                httpMethod,
+                msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH) ?
+                    new URL(epr.getAddress()).getPath() : epr.getAddress(),
+                msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
+                    HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
         }
 
         // set any transport headers
@@ -228,10 +227,6 @@ public class Axis2HttpRequest {
             httpRequest.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
                 soapAction);
         }
-
-        httpRequest.setHeader(
-            HTTP.CONTENT_TYPE,
-            messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
         if (NHttpConfiguration.getInstance().isKeepAliveDisabled() ||
             msgContext.isPropertyTrue(NhttpConstants.NO_KEEPALIVE)) {

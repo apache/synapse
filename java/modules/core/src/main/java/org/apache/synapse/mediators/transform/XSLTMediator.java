@@ -39,6 +39,8 @@ import org.apache.synapse.util.jaxp.SourceBuilder;
 import org.apache.synapse.util.jaxp.SourceBuilderFactory;
 import org.apache.synapse.util.jaxp.StreamResultBuilderFactory;
 import org.apache.synapse.util.jaxp.StreamSourceBuilderFactory;
+import org.apache.synapse.util.resolver.CustomJAXPURIResolver;
+import org.apache.synapse.util.resolver.ResourceMap;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
@@ -143,6 +145,11 @@ public class XSLTMediator extends AbstractMediator {
                 = new ArrayList<MediatorProperty>();
 
     /**
+     * A resource map used to resolve xsl:import and xsl:include.
+     */
+    private ResourceMap resourceMap;
+
+    /**
      * The Template instance used to create a Transformer object. This is  thread-safe
      *
      * @see javax.xml.transform.Templates
@@ -225,6 +232,9 @@ public class XSLTMediator extends AbstractMediator {
             if (reCreate || cachedTemplates == null) {
                 // Set an error listener (SYNAPSE-307).
                 transFact.setErrorListener(new ErrorListenerImpl(synLog, "stylesheet parsing"));
+                // Allow xsl:import and xsl:include resolution
+                transFact.setURIResolver(new CustomJAXPURIResolver(resourceMap,
+                        synCtx.getConfiguration()));
                 try {
                     cachedTemplates = transFact.newTemplates(
                         SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
@@ -503,7 +513,14 @@ public class XSLTMediator extends AbstractMediator {
     public void setTargetPropertyName(String targetPropertyName) {
         this.targetPropertyName = targetPropertyName;
     }
-    
+
+    public ResourceMap getResourceMap() {
+        return resourceMap;
+    }
+
+    public void setResourceMap(ResourceMap resourceMap) {
+        this.resourceMap = resourceMap;
+    }
 }
 
 	

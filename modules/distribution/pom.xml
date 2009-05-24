@@ -130,6 +130,15 @@
             <artifactId>xmltask</artifactId>
             <version>1.14</version>
         </dependency>
+        
+        <!-- Patches -->
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-patches</artifactId>
+            <version>${pom.version}</version>
+            <classifier>jars</classifier>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <repositories>

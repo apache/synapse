@@ -427,10 +427,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
         MessageFormatter messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
-        response.setHeader(
-            HTTP.CONTENT_TYPE,
-            messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
-
+        Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
+        if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
+            response.setHeader(
+                HTTP.CONTENT_TYPE,
+                messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+        }
         response.setStatusCode(determineHttpStatusCode(msgContext, response));
 
         // set any transport headers
@@ -456,7 +458,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
              * if this is a dummy message to handle http 202 case with non-blocking IO
              * write an empty byte array as body
              */ 
-            if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
+            if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)
+                || Boolean.TRUE == noEntityBody) {
                 out.write(new byte[0]);
             } else {
                 messageFormatter.writeTo(msgContext, format, out, false);

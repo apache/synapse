@@ -40,6 +40,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.util.MessageHelper;
 
@@ -162,7 +163,9 @@ public class Axis2FlexibleMEPClient {
                 if(axisOutMsgCtx.isSOAP11()) {
                     SOAPUtils.convertSOAP11toSOAP12(axisOutMsgCtx);
                 }                
-                
+
+            } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {
+                axisOutMsgCtx.setDoingREST(true);
             }
 
             if (endpoint.isUseMTOM()) {
@@ -188,7 +191,16 @@ public class Axis2FlexibleMEPClient {
             }
             
             if (endpoint.getAddress() != null) {
-                axisOutMsgCtx.setTo(new EndpointReference(endpoint.getAddress()));
+                if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat()) &&
+                    axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX) != null) {
+                    axisOutMsgCtx.setTo(
+                        new EndpointReference(endpoint.getAddress() +
+                        axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX)
+                    ));
+                } else {
+                    axisOutMsgCtx.setTo(new EndpointReference(endpoint.getAddress()));
+                }
+                axisOutMsgCtx.setProperty(NhttpConstants.ENDPOINT_PREFIX, endpoint.getAddress());
             }
 
             if (endpoint.isUseSeparateListener()) {
@@ -197,7 +209,7 @@ public class Axis2FlexibleMEPClient {
         }
 
         if (wsAddressingEnabled) {
-            
+
             if (wsAddressingVersion != null &&
                     SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(wsAddressingVersion)) {
 

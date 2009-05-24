@@ -112,6 +112,10 @@ public class DefaultEndpointFactory extends EndpointFactory {
                 definition.setForceSOAP12(true);
                 definition.setFormat(SynapseConstants.FORMAT_SOAP12);
 
+            } else if (SynapseConstants.FORMAT_REST.equals(forceValue)) {
+                definition.setForceREST(true);
+                definition.setFormat(SynapseConstants.FORMAT_REST);
+
             } else {
                 handleException("force value -\"" + forceValue + "\" not yet implemented");
             }

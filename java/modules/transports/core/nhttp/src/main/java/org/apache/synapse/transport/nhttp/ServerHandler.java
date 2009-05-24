@@ -115,18 +115,19 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpRequest request = conn.getHttpRequest();
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
-        // Mark request as not yet fully read, to detect timeouts from harmless keepalive deaths
-        conn.getContext().setAttribute(NhttpConstants.REQUEST_READ, Boolean.FALSE);
-
         try {
             InputStream is;
             // Only create an input buffer and ContentInputStream if the request has content
             if (request instanceof HttpEntityEnclosingRequest) {
+                // Mark request as not yet fully read, to detect timeouts from harmless keepalive deaths
+                conn.getContext().setAttribute(NhttpConstants.REQUEST_READ, Boolean.FALSE);
+                
                 ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
                 context.setAttribute(REQUEST_SINK_BUFFER, inputBuffer);
                 is = new ContentInputStream(inputBuffer);
             } else {
                 is = null;
+                conn.getContext().removeAttribute(NhttpConstants.REQUEST_READ);
             }
             
             ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);

@@ -77,4 +77,10 @@ public class NhttpConstants {
     public static final int CONNECT_TIMEOUT    = 101508;
     public static final int SEND_ABORT         = 101509;
     // ********** DO NOT CHANGE THESE UNLESS CORRESPONDING SYNAPSE CONSTANT ARE CHANGED ************
+
+    public static final String REST_URL_POSTFIX = "REST_URL_POSTFIX";
+    public static final String SERVICE_PREFIX = "SERVICE_PREFIX";
+    public static final String HTTP_REQ_METHOD = "HTTP_REQ_METHOD";
+    public static final String NO_ENTITY_BODY = "NO_ENTITY_BODY";
+    public static final String ENDPOINT_PREFIX = "ENDPOINT_PREFIX";
 }

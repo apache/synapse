@@ -41,6 +41,9 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.PolicyInfo;
+import org.apache.synapse.util.resolver.CustomURIResolver;
+import org.apache.synapse.util.resolver.CustomWSDLLocator;
+import org.apache.synapse.util.resolver.ResourceMap;
 import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;

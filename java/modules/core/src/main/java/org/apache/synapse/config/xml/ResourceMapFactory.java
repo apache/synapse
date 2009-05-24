@@ -28,7 +28,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.axis2.ResourceMap;
+import org.apache.synapse.util.resolver.ResourceMap;
 
 /**
  * Creates a ResourceMap object based on a set of <tt>&lt;resource&gt;</tt> elements:

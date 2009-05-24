@@ -787,6 +787,7 @@
         <module>modules/core</module>
         <module>modules/extensions</module>
         <module>modules/samples</module>
+        <module>modules/patches</module>
         <module>modules/war</module>
         <module>modules/handler</module>
         <module>modules/xar-maven-plugin</module>

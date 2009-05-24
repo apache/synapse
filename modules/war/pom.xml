@@ -70,6 +70,13 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-mail</artifactId>
         </dependency>
+        
+        <!-- The patches -->
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-patches</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -78,7 +85,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.0-alpha-1</version>
+                <version>2.1</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -112,6 +119,20 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <!-- This will add the patches to WEB-INF/classes. This makes sure that they have priority
+                             over the original classes (which are still in the JARs in WEB-INF/lib). -->
+                        <id>unpack-patches</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>synapse-patches</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <excludes>META-INF/**/*</excludes>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -125,6 +146,7 @@
                         <addMavenDescriptor>false</addMavenDescriptor>
                     </archive>
                     <outputDirectory>target</outputDirectory>
+                    <packagingExcludes>WEB-INF/lib/synapse-patches-*.jar</packagingExcludes>
                     <webResources>
                         <resource>
                             <directory>../../repository</directory>

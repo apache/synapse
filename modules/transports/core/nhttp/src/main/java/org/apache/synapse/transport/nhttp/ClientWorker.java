@@ -59,6 +59,8 @@ public class ClientWorker implements Runnable {
     private InputStream in = null;
     /** the HttpResponse received */
     private HttpResponse response = null;
+    /** the endpoint URL prefix */
+    private String endpointURLPrefix = null;
 
     /**
      * Create the thread that would process the response message received for the outgoing message
@@ -68,11 +70,12 @@ public class ClientWorker implements Runnable {
      * @param outMsgCtx the original outgoing message context (i.e. corresponding request)
      */
     public ClientWorker(ConfigurationContext cfgCtx, InputStream in,
-        HttpResponse response, MessageContext outMsgCtx) {
+        HttpResponse response, MessageContext outMsgCtx, String endpointURLPrefix) {
 
         this.cfgCtx = cfgCtx;
         this.in = in;
         this.response = response;
+        this.endpointURLPrefix = endpointURLPrefix;
 
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().
@@ -116,7 +119,16 @@ public class ClientWorker implements Runnable {
                 Map headerMap = new HashMap();
                 for (int i=0; i<headers.length; i++) {
                     Header header = headers[i];
-                    headerMap.put(header.getName(), header.getValue());
+                    if ("Location".equals(header.getName())
+                        && endpointURLPrefix != null
+                        && outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX) != null) {
+                        
+                        headerMap.put(header.getName(),
+                            header.getValue().replaceAll(endpointURLPrefix,
+                                (String) outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX)));
+                    } else {
+                        headerMap.put(header.getName(), header.getValue());
+                    }
                 }
                 responseMsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
             }
@@ -144,58 +156,63 @@ public class ClientWorker implements Runnable {
 
             Header cType = response.getFirstHeader(HTTP.CONTENT_TYPE);
 
-            String contentType = "";
             if (cType != null) {
-                contentType = cType.getValue();
-            }
+                String contentType = cType.getValue();
 
-            String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
-            if (charSetEnc == null) {
-                charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
-            }
-
-            if (contentType.indexOf(HTTP.CHARSET_PARAM) > 0) {
-                responseMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEnc);
-            } else {
-                responseMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
-                    MessageContext.DEFAULT_CHAR_SET_ENCODING);
-            }
-            // workaround for Axis2 TransportUtils.createSOAPMessage() issue, where a response
-            // of content type "text/xml" is thought to be REST if !MC.isServerSide(). This
-            // question is still under debate and due to the timelines, I am commiting this
-            // workaround as Axis2 1.2 is about to be released and Synapse 1.0
-            responseMsgCtx.setServerSide(false);
-            try {
-                envelope = TransportUtils.createSOAPMessage(
-                        responseMsgCtx,
-                        HTTPTransportUtils.handleGZip(responseMsgCtx, in),
-                        contentType);
-            } catch (OMException e) {
-                // handle non SOAP and POX/REST payloads (probably text/html)
-                String errorMessage = "Unexpected response received. HTTP response code : "
-                    + this.response.getStatusLine().getStatusCode() + " HTTP status : "
-                    + this.response.getStatusLine().getReasonPhrase() + " exception : "
-                    + e.getMessage();
-
-                log.warn(errorMessage);
-                if (log.isDebugEnabled()) {
-                    log.debug(errorMessage, e);
-                    log.debug("Creating the SOAPFault to be injected...");
+                String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
+                if (charSetEnc == null) {
+                    charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
                 }
-                SOAPFactory factory = new SOAP11Factory();
-                envelope = factory.getDefaultFaultEnvelope();
-                SOAPFaultDetail detail = factory.createSOAPFaultDetail();
-                detail.setText(errorMessage);
-                envelope.getBody().getFault().setDetail(detail);
-                SOAPFaultReason reason = factory.createSOAPFaultReason();
-                reason.setText(errorMessage);
-                envelope.getBody().getFault().setReason(reason);
-                SOAPFaultCode code = factory.createSOAPFaultCode();
-                code.setText(Integer.toString(this.response.getStatusLine().getStatusCode()));
-                envelope.getBody().getFault().setCode(code);
+
+                responseMsgCtx.setProperty(
+                    Constants.Configuration.CHARACTER_SET_ENCODING,
+                    contentType.indexOf(HTTP.CHARSET_PARAM) > 0 ?
+                        charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);
+
+                // workaround for Axis2 TransportUtils.createSOAPMessage() issue, where a response
+                // of content type "text/xml" is thought to be REST if !MC.isServerSide(). This
+                // question is still under debate and due to the timelines, I am commiting this
+                // workaround as Axis2 1.2 is about to be released and Synapse 1.0
+                responseMsgCtx.setServerSide(false);
+                try {
+                    envelope = TransportUtils.createSOAPMessage(
+                            responseMsgCtx,
+                            HTTPTransportUtils.handleGZip(responseMsgCtx, in),
+                            contentType);
+
+                } catch (OMException e) {
+                    // handle non SOAP and POX/REST payloads (probably text/html)
+                    String errorMessage = "Unexpected response received. HTTP response code : "
+                        + this.response.getStatusLine().getStatusCode() + " HTTP status : "
+                        + this.response.getStatusLine().getReasonPhrase() + " exception : "
+                        + e.getMessage();
+
+                    log.warn(errorMessage);
+                    if (log.isDebugEnabled()) {
+                        log.debug(errorMessage, e);
+                        log.debug("Creating the SOAPFault to be injected...");
+                    }
+                    SOAPFactory factory = new SOAP11Factory();
+                    envelope = factory.getDefaultFaultEnvelope();
+                    SOAPFaultDetail detail = factory.createSOAPFaultDetail();
+                    detail.setText(errorMessage);
+                    envelope.getBody().getFault().setDetail(detail);
+                    SOAPFaultReason reason = factory.createSOAPFaultReason();
+                    reason.setText(errorMessage);
+                    envelope.getBody().getFault().setReason(reason);
+                    SOAPFaultCode code = factory.createSOAPFaultCode();
+                    code.setText(Integer.toString(this.response.getStatusLine().getStatusCode()));
+                    envelope.getBody().getFault().setCode(code);
+                }
+                responseMsgCtx.setServerSide(true);
+                responseMsgCtx.setEnvelope(envelope);
+
+            } else {
+                // there is no response entity-body
+                responseMsgCtx.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
+                responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
             }
-            responseMsgCtx.setServerSide(true);
-            responseMsgCtx.setEnvelope(envelope);
+
             // copy the HTTP status code as a message context property with the key HTTP_SC to be
             // used at the sender to set the propper status code when passing the message
             int statusCode = this.response.getStatusLine().getStatusCode();
@@ -204,6 +221,9 @@ public class ClientWorker implements Runnable {
                 responseMsgCtx.setProperty(NhttpConstants.FAULT_MESSAGE, NhttpConstants.TRUE);
             }
             responseMsgCtx.setProperty(NhttpConstants.NON_BLOCKING_TRANSPORT, true);
+            if (endpointURLPrefix != null) {
+                responseMsgCtx.setProperty(NhttpConstants.ENDPOINT_PREFIX, endpointURLPrefix);
+            }
 
             // process response received
             try {

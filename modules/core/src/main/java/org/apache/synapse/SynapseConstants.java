@@ -281,7 +281,8 @@ public final class SynapseConstants {
     public static final String FORMAT_GET = "get";
     public static final String FORMAT_SOAP11 = "soap11";
     public static final String FORMAT_SOAP12 = "soap12";    
-    
+    public static final String FORMAT_REST = "rest";    
+
     /** Synapse server instance name */
     public static final String SERVER_NAME = "serverName";
 

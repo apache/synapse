@@ -92,6 +92,10 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     private boolean forceSOAP12 = false;
     /**
+     * force REST on ?
+     */
+    private boolean forceREST = false;
+    /**
      * use MTOM *
      */
     private boolean useMTOM = false;
@@ -348,6 +352,14 @@ public class EndpointDefinition implements AspectConfigurable {
 
     public boolean isForceSOAP12() {
         return forceSOAP12;
+    }
+
+    public boolean isForceREST() {
+        return forceREST;
+    }
+
+    public void setForceREST(boolean forceREST) {
+        this.forceREST = forceREST;
     }
 
     public boolean isUseMTOM() {

@@ -34,6 +34,7 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
 import org.apache.axis2.util.Utils;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -126,8 +127,9 @@ public class RESTUtil {
      * @return boolean indication whether the operation was succesfull
      * @throws AxisFault - Thrown in case a fault occurs
      */
-    public static boolean processURLRequest(MessageContext msgContext, OutputStream out,
-                                            String soapAction, String requestURI, ConfigurationContext configurationContext,
+    public static void processGETRequest(MessageContext msgContext, OutputStream out,
+                                            String soapAction, String requestURI,
+                                            ConfigurationContext configurationContext,
                                             Map requestParameters) throws AxisFault {
 
         if ((soapAction != null) && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
@@ -138,17 +140,40 @@ public class RESTUtil {
         msgContext.setTo(new EndpointReference(requestURI));
         msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
         msgContext.setServerSide(true);
-        SOAPEnvelope envelope = createEnvelopeFromGetRequest(
-                requestURI, requestParameters, configurationContext);
+        msgContext.setDoingREST(true);
+        msgContext.setEnvelope(createEnvelopeFromGetRequest(
+                requestURI, requestParameters, configurationContext));
+        msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
+        AxisEngine.receive(msgContext);
+    }
 
-        if (envelope == null) {
-            return false;
-        } else {
-            msgContext.setDoingREST(true);
-            msgContext.setEnvelope(envelope);
-            AxisEngine.receive(msgContext);
-            return true;
+    /**
+     * Processes the HTTP GET request and builds the SOAP info-set of the REST message
+     *
+     * @param msgContext The MessageContext of the Request Message
+     * @param out The output stream of the response
+     * @param soapAction SoapAction of the request
+     * @param requestURI The URL that the request came to
+     * @param configurationContext The Axis Configuration Context
+     * @param requestParameters The parameters of the request message
+     * @return boolean indication whether the operation was succesfull
+     * @throws AxisFault - Thrown in case a fault occurs
+     */
+    public static void processURLRequest(MessageContext msgContext, OutputStream out,
+                                            String soapAction, String requestURI) throws AxisFault {
+
+        if ((soapAction != null) && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
+            soapAction = soapAction.substring(1, soapAction.length() - 1);
         }
+
+        msgContext.setSoapAction(soapAction);
+        msgContext.setTo(new EndpointReference(requestURI));
+        msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
+        msgContext.setServerSide(true);
+        msgContext.setDoingREST(true);
+        msgContext.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+        msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
+        AxisEngine.receive(msgContext);
     }
 
     /**
@@ -161,7 +186,7 @@ public class RESTUtil {
      * @return created SOAPEnvelope or null if cannot be processed
      * @throws AxisFault if the service represented by the GET request URL cannot be found
      */
-    public static SOAPEnvelope createEnvelopeFromGetRequest(String requestUrl, Map map,
+    private static SOAPEnvelope createEnvelopeFromGetRequest(String requestUrl, Map map,
                                                             ConfigurationContext configCtx) throws AxisFault {
 
         String[] values = Utils.parseRequestURLForServiceAndOperation(

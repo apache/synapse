@@ -180,15 +180,6 @@
         <!--<include>synapse.jar</include>-->
         <!--</includes>-->
         <!--</fileSet>-->
-
-        <fileSet>
-            <directory>../../patches</directory>
-            <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-                <include>patches.txt</include>                
-            </includes>
-        </fileSet>
     </fileSets>
     <files>
         <file>
@@ -234,6 +225,7 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
+                <exclude>org.apache.synapse:synapse-patches:zip:jars</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
@@ -257,6 +249,14 @@
                 <exclude>org.apache.qpid:qpid-client:jar</exclude>
                 <exclude>com.oopsconsultancy:xmltask:jar</exclude>
             </excludes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
+            <unpack>true</unpack>
+            <includes>
+                <include>org.apache.synapse:synapse-patches:zip:jars</include>
+            </includes>
         </dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>

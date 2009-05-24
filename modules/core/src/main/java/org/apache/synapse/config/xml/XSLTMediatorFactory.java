@@ -37,6 +37,7 @@ import java.util.Map;
  *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  *   &lt;feature name="string" value="true| false" /&gt;*
  *   &lt;attribute name="string" value="string" /&gt;*
+ *   &lt;resource location="..." key="..."/&gt;*
  * &lt;/transform&gt;
  * </pre>
  */
@@ -102,6 +103,8 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         }
         transformMediator.addAllProperties(
             MediatorPropertyFactory.getMediatorProperties(elem));
+
+        transformMediator.setResourceMap(ResourceMapFactory.createResourceMap(elem));
 
         return transformMediator;
     }

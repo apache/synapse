@@ -81,6 +81,9 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
         serializeMediatorProperties(xslt, mediator.getAttributes(), ATTRIBUTE_Q);
+        
+        ResourceMapSerializer.serializeResourceMap(xslt, mediator.getResourceMap());
+        
         if (parent != null) {
             parent.addChild(xslt);
         }

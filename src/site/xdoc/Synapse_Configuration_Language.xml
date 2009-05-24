@@ -1381,6 +1381,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
    &lt;feature name="string" value="true | false" /&gt;*
    &lt;attribute name="string" value="string" /&gt;*
+   &lt;resource location="..." key="..."/&gt;*
  &lt;/xslt&gt;</pre>
     <p>
       The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
@@ -1415,6 +1416,11 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       The 'attribute' element allows to define attributes which should be explicitly
       set to the TransformerFactory.
+    </p>
+    <p>
+      Finally, the 'resource' element can be used to resolve XSLT imports and includes from the
+      repository. It works in exactly the same way as the corresponding element in a
+      &lt;proxy&gt; definition.
     </p>
     <h4>
       <a name="xquery" id="xquery">XQuery</a>

@@ -31,6 +31,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.util.resolver.ResourceMap;
 import org.xml.sax.InputSource;
 
 public class ProxyServiceTest extends TestCase {

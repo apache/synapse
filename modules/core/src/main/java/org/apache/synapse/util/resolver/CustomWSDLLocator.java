@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.core.axis2;
+package org.apache.synapse.util.resolver;
 
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;

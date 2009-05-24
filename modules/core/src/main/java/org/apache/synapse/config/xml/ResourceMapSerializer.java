@@ -25,7 +25,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.core.axis2.ResourceMap;
+import org.apache.synapse.util.resolver.ResourceMap;
 
 /**
  * Creates a sequence of <tt>&lt;resource&gt;</tt> elements from a ResourceMap object:

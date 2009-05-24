@@ -73,10 +73,10 @@ public class Axis2SynapseController implements SynapseController {
     private ConfigurationContext configurationContext;
 
     /** Reference to the Synapse configuration */
-    private SynapseConfiguration synapseConfiguration;
+    protected SynapseConfiguration synapseConfiguration;
 
     /** Reference to the Synapse configuration */
-    private SynapseEnvironment synapseEnvironment;
+    protected SynapseEnvironment synapseEnvironment;
 
     /** Indicate initialization state */
     private boolean initialized;

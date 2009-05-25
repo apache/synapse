@@ -133,14 +133,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return config;
     }
 
-    private static void defineRegistry(SynapseConfiguration config, OMElement elem) {
+    public static void defineRegistry(SynapseConfiguration config, OMElement elem) {
         if (config.getRegistry() != null) {
             handleException("Only one remote registry can be defined within a configuration");
         }
         config.setRegistry(RegistryFactory.createRegistry(elem));
     }
 
-    private static void defineStartup(SynapseConfiguration config, OMElement elem) {
+    public static void defineStartup(SynapseConfiguration config, OMElement elem) {
         Startup startup = StartupFinder.getInstance().getStartup(elem);
         if (config.getStartup(startup.getName()) != null) {
             handleException("Duplicate startup with name : " + startup.getName());
@@ -148,7 +148,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         config.addStartup(startup);
     }
 
-    private static void defineProxy(SynapseConfiguration config, OMElement elem) {
+    public static void defineProxy(SynapseConfiguration config, OMElement elem) {
         ProxyService proxy = ProxyServiceFactory.createProxy(elem);
         if (config.getProxyService(proxy.getName()) != null) {
             handleException("Duplicate proxy service with name : " + proxy.getName());
@@ -156,7 +156,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         config.addProxyService(proxy.getName(), proxy);
     }
 
-    private static void defineEntry(SynapseConfiguration config, OMElement elem) {
+    public static void defineEntry(SynapseConfiguration config, OMElement elem) {
         Entry entry = EntryFactory.createEntry(elem);
         if (config.getLocalRegistry().get(entry.getKey()) != null) {
             handleException("Duplicate registry entry definition for key : " + entry.getKey());
@@ -198,7 +198,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
     }
 
-   private static void defineEventSource(SynapseConfiguration config, OMElement elem) {
+   public static void defineEventSource(SynapseConfiguration config, OMElement elem) {
         SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
         if (config.getEventSource(eventSource.getName()) != null) {
             handleException("Duplicate proxy service with name : " + eventSource.getName());
@@ -212,7 +212,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
      *
      * @param config the configuration to be updated
      */
-    private static void setDefaultMainSequence(SynapseConfiguration config) {
+    public static void setDefaultMainSequence(SynapseConfiguration config) {
         SequenceMediator main = new SequenceMediator();
         main.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
         main.addChild(new LogMediator());
@@ -232,7 +232,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
      *
      * @param config the configuration to be updated
      */
-    private static void setDefaultFaultSequence(SynapseConfiguration config) {
+    public static void setDefaultFaultSequence(SynapseConfiguration config) {
         SequenceMediator fault = new SequenceMediator();
         fault.setName(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY);
         LogMediator log = new LogMediator();

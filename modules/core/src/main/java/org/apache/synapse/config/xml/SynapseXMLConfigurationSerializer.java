@@ -103,7 +103,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         return definitions;
     }
 
-    private static void serializeEntries(OMElement definitions, Map entries) {
+    public static void serializeEntries(OMElement definitions, Map entries) {
         for (Object o : entries.keySet()) {
             if (o instanceof String) {
                 String key = (String) o;
@@ -113,7 +113,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         }
     }
 
-    private static void serializeStartups(OMElement definitions, Collection startups) {
+    public static void serializeStartups(OMElement definitions, Collection startups) {
         for (Object o : startups) {
             if (o instanceof Startup) {
                 Startup s = (Startup) o;
@@ -122,13 +122,13 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         }
     }
 
-    private static void serializeEndpoints(OMElement definitions, Map<String, Endpoint> endpoints) {
+    public static void serializeEndpoints(OMElement definitions, Map<String, Endpoint> endpoints) {
         for (Endpoint endpoint: endpoints.values()) {
             definitions.addChild(EndpointSerializer.getElementFromEndpoint(endpoint));
         }
     }
 
-    private static void serializeSequences(OMElement definitions, Map sequences) {
+    public static void serializeSequences(OMElement definitions, Map sequences) {
         for (Object o : sequences.keySet()) {
             if (o instanceof String) {
                 String key = (String) o;

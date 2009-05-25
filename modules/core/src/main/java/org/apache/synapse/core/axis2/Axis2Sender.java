@@ -116,9 +116,14 @@ public class Axis2Sender {
                 messageContext.setProperty(
                         AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
             }
-            
-            MessageHelper.removeAddressingHeaders(messageContext);
-            messageContext.setMessageID(UUIDGenerator.getUUID());
+
+            String preserveAddressing = (String) smc.getProperty(SynapseConstants.PRESERVE_WS_ADDRESSING);
+            if (Boolean.parseBoolean(preserveAddressing)) {
+                messageContext.setMessageID(smc.getMessageID());
+            } else {
+                MessageHelper.removeAddressingHeaders(messageContext);
+                messageContext.setMessageID(UUIDGenerator.getUUID());
+            }
 
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
             if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME) &&

@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
@@ -84,12 +85,9 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
                 = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(loadbalanceElement);
 
-        LoadbalanceAlgorithm algorithm = loadbalanceEndpoint.getAlgorithm();
-        String algorithmName = "roundRobin";
-        if (algorithm instanceof RoundRobin) {
-             algorithmName = "roundRobin";
-        }
-        loadbalanceElement.addAttribute("algorithm", algorithmName, null);
+        loadbalanceElement.addAttribute(XMLConfigConstants.LOADBALANCE_ALGORITHM,
+                loadbalanceEndpoint.getAlgorithm().getClass().getName(),
+                null);
 
         for (Endpoint childEndpoint : loadbalanceEndpoint.getChildren()) {
             loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));

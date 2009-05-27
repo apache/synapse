@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.eventing.SynapseSubscription;
 import org.wso2.eventing.EventingConstants;
+import org.wso2.eventing.Subscription;
 
 import javax.xml.namespace.QName;
 
@@ -202,7 +203,7 @@ public class ResponseMessageBuilder {
      * @param subscription
      * @return
      */
-    public SOAPEnvelope genGetStatusResponse(SynapseSubscription subscription) {
+    public SOAPEnvelope genGetStatusResponse(Subscription subscription) {
         SOAPEnvelope message = factory.getDefaultEnvelope();
         OMNamespace eventingNamespace = factory.createOMNamespace(EventingConstants.WSE_EVENTING_NS,
                 EventingConstants.WSE_EVENTING_PREFIX);

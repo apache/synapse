@@ -317,14 +317,13 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     private void processGetStatusRequest(MessageContext mc,
                                          ResponseMessageBuilder messageBuilder)
             throws AxisFault, EventException {
-        SynapseSubscription subscription =
+        Subscription subscription =
                 SubscriptionMessageBuilder.createGetStatusMessage(mc);
         if (log.isDebugEnabled()) {
             log.debug("GetStatus request recived for SynapseSubscription ID : " +
                     subscription.getId());
         }
-        subscription =
-                (SynapseSubscription) subscriptionManager.getSubscription(subscription.getId());
+        subscription = subscriptionManager.getSubscription(subscription.getId());
         if (subscription != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Sending GetStatus responce for SynapseSubscription ID : " +

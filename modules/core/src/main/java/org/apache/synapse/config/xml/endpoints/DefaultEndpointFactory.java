@@ -143,15 +143,15 @@ public class DefaultEndpointFactory extends EndpointFactory {
         if (name == null || "".equals(name)) {
             name = SynapseConstants.ANONYMOUS_ENDPOINT;
         }
+        AspectConfiguration aspectConfiguration = new AspectConfiguration(name);
+        definition.configure(aspectConfiguration);
         OMAttribute statistics = epOmElement.getAttribute(
                 new QName(XMLConfigConstants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    AspectConfiguration aspectConfiguration = new AspectConfiguration(name);
                     aspectConfiguration.enableStatistics();
-                    definition.configure(aspectConfiguration);
                 }
             }
         }

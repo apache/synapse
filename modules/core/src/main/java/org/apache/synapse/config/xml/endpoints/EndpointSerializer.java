@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -83,6 +84,17 @@ public abstract class EndpointSerializer {
                     null, XMLConfigConstants.TRACE_DISABLE));
         }
 
+        StatisticsConfigurable statisticsConfigurable =
+                endpointDefinition.getAspectConfiguration();
+
+        if (statisticsConfigurable != null &&
+                statisticsConfigurable.isStatisticsEnable()) {
+
+            element.addAttribute(fac.createOMAttribute(
+                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, null,
+                    XMLConfigConstants.STATISTICS_ENABLE));
+        }
+        
         if (endpointDefinition.isUseSwa()) {
             element.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
         } else if (endpointDefinition.isUseMTOM()) {

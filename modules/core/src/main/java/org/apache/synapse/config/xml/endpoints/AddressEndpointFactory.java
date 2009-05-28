@@ -109,7 +109,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         }
 
         extractCommonEndpointProperties(endpointDefinition, elem);
-        extractSpecificEndpointProperties(endpointDefinition,elem);
+        extractSpecificEndpointProperties(endpointDefinition, elem);
         return endpointDefinition;
     }
 }

@@ -137,7 +137,7 @@ public class ProxyServiceFactory {
         OMAttribute startOnLoad = elem.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "startOnLoad"));
         if (startOnLoad != null) {
-            proxy.setStartOnLoad(Boolean.valueOf(startOnLoad.getAttributeValue()).booleanValue());
+            proxy.setStartOnLoad(Boolean.valueOf(startOnLoad.getAttributeValue()));
         } else {
             proxy.setStartOnLoad(true);
         }
@@ -302,19 +302,20 @@ public class ProxyServiceFactory {
             }
         }
 
+        String nameString = proxy.getName();
+        if (nameString == null || "".equals(nameString)) {
+            nameString = SynapseConstants.ANONYMOUS_PROXYSERVICE;
+        }
+        AspectConfiguration aspectConfiguration = new AspectConfiguration(nameString);
+        proxy.configure(aspectConfiguration);
+
         OMAttribute statistics = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                 XMLConfigConstants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    String nameString = proxy.getName();
-                    if (nameString == null || "".equals(nameString)) {
-                        nameString = SynapseConstants.ANONYMOUS_PROXYSERVICE;
-                    }
-                    AspectConfiguration aspectConfiguration = new AspectConfiguration(nameString);
                     aspectConfiguration.enableStatistics();
-                    proxy.configure(aspectConfiguration);
                 }
             }
         }

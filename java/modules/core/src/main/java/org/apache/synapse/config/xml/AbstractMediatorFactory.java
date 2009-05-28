@@ -106,22 +106,24 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
             }
         }
 
-        OMAttribute statistics = mediatorOmElement.getAttribute(ATT_STATS);
-        if (statistics != null) {
-            String statisticsValue = statistics.getAttributeValue();
-            if (statisticsValue != null) {
-                String name = null;
-                if (mediator instanceof Nameable) {
-                    name = ((Nameable) mediator).getName();
-                }
-                if (name == null || "".equals(name)) {
-                    name = SynapseConstants.ANONYMOUS_SEQUENCE;
-                }
-                if (mediator instanceof AspectConfigurable) {
+        String name = null;
+        if (mediator instanceof Nameable) {
+            name = ((Nameable) mediator).getName();
+        }
+        if (name == null || "".equals(name)) {
+            name = SynapseConstants.ANONYMOUS_SEQUENCE;
+        }
+
+        if (mediator instanceof AspectConfigurable) {
+            AspectConfiguration configuration = new AspectConfiguration(name);
+            ((AspectConfigurable) mediator).configure(configuration);
+
+            OMAttribute statistics = mediatorOmElement.getAttribute(ATT_STATS);
+            if (statistics != null) {
+                String statisticsValue = statistics.getAttributeValue();
+                if (statisticsValue != null) {
                     if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                        AspectConfiguration configuration = new AspectConfiguration(name);
                         configuration.enableStatistics();
-                        ((AspectConfigurable) mediator).configure(configuration);
                     }
                 }
             }

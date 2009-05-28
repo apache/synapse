@@ -288,7 +288,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
 
     public void enableStatistics() {
         if (this.aspectConfiguration != null) {
-            this.aspectConfiguration.disableStatistics();
+            this.aspectConfiguration.enableStatistics();
         }
     }
 

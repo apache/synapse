@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
@@ -166,6 +167,8 @@ public class Axis2FlexibleMEPClient {
 
             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(true);
+            } else {
+                processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);
             }
 
             if (endpoint.isUseMTOM()) {
@@ -206,6 +209,8 @@ public class Axis2FlexibleMEPClient {
             if (endpoint.isUseSeparateListener()) {
                 axisOutMsgCtx.getOptions().setUseSeparateListener(true);
             }
+        } else {
+            processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);
         }
 
         if (wsAddressingEnabled) {
@@ -353,6 +358,18 @@ public class Axis2FlexibleMEPClient {
         while (current != null && current.getProperty(SynapseConstants.RAMPART_POLICY) != null) {
              current.setProperty(SynapseConstants.RAMPART_POLICY, null);
              current = current.getParent();
+        }
+    }
+
+    private static void processHttpGetMethod(MessageContext originalInMsgCtx,
+                                             MessageContext axisOutMsgCtx) {
+
+        String httpMethod = (String) originalInMsgCtx.getProperty(
+                Constants.Configuration.HTTP_METHOD);
+        if (Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)) {
+            axisOutMsgCtx.setProperty(
+                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
+                    HTTPConstants.MEDIA_TYPE_X_WWW_FORM);
         }
     }
 }

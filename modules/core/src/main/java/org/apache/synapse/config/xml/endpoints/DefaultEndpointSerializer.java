@@ -82,17 +82,6 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
             element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
         }
 
-        StatisticsConfigurable statisticsConfigurable =
-                endpointDefinition.getAspectConfiguration();
-
-        if (statisticsConfigurable != null &&
-                statisticsConfigurable.isStatisticsEnable()) {
-
-            element.addAttribute(fac.createOMAttribute(
-                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, null,
-                    XMLConfigConstants.STATISTICS_ENABLE));
-        }
-
     }
 
     public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {

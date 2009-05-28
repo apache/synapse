@@ -48,16 +48,16 @@ import java.net.URL;
  *         [statistics="enable|disable"] [trace="enable|disable"]&gt;
  *     &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
  *     &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
- *     
+ *
  *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
  *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
  *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
- *     
+ *
  *     &lt;timeout&gt;
  *       &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
  *       &lt;action&gt;discard|fault&lt;/action&gt;
  *     &lt;/timeout&gt;?
- *     
+ *
  *     &lt;suspendDurationOnFailure&gt;
  *       <em>suspend duration in seconds</em>
  *     &lt;/suspendDurationOnFailure&gt;?
@@ -65,7 +65,7 @@ import java.net.URL;
  * &lt;/endpoint&gt;
  * </pre>
  */
-public class WSDLEndpointFactory extends EndpointFactory {
+public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
     private static WSDLEndpointFactory instance = new WSDLEndpointFactory();
 
@@ -156,7 +156,6 @@ public class WSDLEndpointFactory extends EndpointFactory {
             OMElement descriptionElement = wsdlElement.getFirstChildWithName
                     (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "description"));
             if (endpoint == null && descriptionElement != null) {
-                wsdlEndpoint.setWsdlDoc(descriptionElement);
                 handleException("WSDL 2.0 Endpoints are currently not supported.");
             }
 
@@ -164,7 +163,8 @@ public class WSDLEndpointFactory extends EndpointFactory {
                 // for now, QOS information has to be provided explicitly.
                 extractCommonEndpointProperties(endpoint, wsdlElement);
                 extractSpecificEndpointProperties(endpoint, wsdlElement);
-                wsdlEndpoint.setDefinition(endpoint);
+                wsdlEndpoint.setDefinition(endpoint);                   
+                processAuditStatus(endpoint, wsdlEndpoint.getName(), wsdlElement);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");
             }

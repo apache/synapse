@@ -28,8 +28,11 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
 
 import javax.activation.FileDataSource;
@@ -47,6 +50,19 @@ public class MTOMSwAClient {
             result = def;
         }
         return result;
+    }
+
+    private static ServiceClient createServiceClient() throws AxisFault {
+        String repo = getProperty("repository", "client_repo");
+        if (repo != null && !"null".equals(repo)) {
+            ConfigurationContext configContext =
+                    ConfigurationContextFactory.
+                            createConfigurationContextFromFileSystem(repo,
+                                    repo + File.separator + "conf" + File.separator + "axis2.xml");
+            return new ServiceClient(configContext, null);
+        } else {
+            return new ServiceClient();
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -67,6 +83,7 @@ public class MTOMSwAClient {
 
         // let the server read the stream before exit
         Thread.sleep(1000);
+        System.exit(0);
     }
 
     public static MessageContext sendUsingSwA(String fileName, String targetEPR) throws IOException {
@@ -76,7 +93,7 @@ public class MTOMSwAClient {
         options.setAction("urn:uploadFileUsingSwA");
         options.setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
 
-        ServiceClient sender = new ServiceClient();
+        ServiceClient sender = createServiceClient();
         sender.setOptions(options);
         OperationClient mepClient = sender.createClient(ServiceClient.ANON_OUT_IN_OP);
 
@@ -139,7 +156,7 @@ public class MTOMSwAClient {
         request.addChild(image);
         payload.addChild(request);
 
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = createServiceClient();
         Options options = new Options();
         options.setTo(new EndpointReference(targetEPR));
         options.setAction("urn:uploadFileUsingMTOM");

@@ -21,6 +21,7 @@ package org.apache.synapse.transport.fix;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -301,6 +302,7 @@ public class FIXIncomingMessageHandler implements Application {
                 AxisOperation operation = service.getOperation(operationQName);
                 if (operation != null) {
                     msgCtx.setAxisOperation(operation);
+                    msgCtx.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
                     msgCtx.setSoapAction("urn:" + operation.getName().getLocalPart());
                 }
             }

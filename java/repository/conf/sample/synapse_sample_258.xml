@@ -39,6 +39,7 @@
       <parameter name="transport.fix.InitiatorConfigURL">file:/home/hiranya/Desktop/fix-config/synapse-sender.cfg</parameter>
       <parameter name="transport.fix.InitiatorMessageStore">file</parameter>
       <parameter name="transport.fix.SendAllToInSequence">false</parameter>
+      <parameter name="transport.fix.DropExtraResponses">true</parameter> 
    </proxy>
 </definitions>
 

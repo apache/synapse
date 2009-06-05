@@ -100,4 +100,6 @@ public class FIXConstants {
 
     public static final String FIX_BEGIN_STRING_VALIDATION = "transport.fix.BeginStringValidation";
 
+    public static final String FIX_DROP_EXTRA_RESPONSES = "transport.fix.DropExtraResponses";
+
 }

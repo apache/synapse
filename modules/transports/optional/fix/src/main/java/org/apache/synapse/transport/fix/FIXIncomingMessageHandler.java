@@ -66,6 +66,7 @@ public class FIXIncomingMessageHandler implements Application {
     private Map<SessionID, Integer> countersMap;
     private Queue<MessageContext> outgoingMessages;
     private boolean allNewApproach;
+    private boolean dropExtraResponses;
     private Semaphore semaphore;
 
     public FIXIncomingMessageHandler(ConfigurationContext cfgCtx, WorkerPool workerPool,
@@ -83,13 +84,18 @@ public class FIXIncomingMessageHandler implements Application {
 
     private void getResponseHandlingApproach() {
         Parameter param = service.getParameter(FIXConstants.FIX_RESPONSE_HANDLER_APPROACH);
-        if (param != null) {
-            if ("false".equals(param.getValue().toString())) {
-                allNewApproach = false;
-                return;
-            }
+        if (param != null && "false".equals(param.getValue().toString())) {
+            allNewApproach = false;
+        } else {
+            allNewApproach = true;
         }
-        allNewApproach = true;
+
+        Parameter dropResponsesParam = service.getParameter(FIXConstants.FIX_DROP_EXTRA_RESPONSES);
+        if (dropResponsesParam != null && "true".equals(dropResponsesParam.getValue().toString())) {
+            dropExtraResponses = true;
+        } else {
+            dropExtraResponses = false;
+        }
     }
 
     public void setOutgoingMessageContext(MessageContext msgCtx) {
@@ -366,10 +372,11 @@ public class FIXIncomingMessageHandler implements Application {
                     if (outMsgCtx != null) {
                         //handle as a response to an outgoing message
                         handleIncomingResponse(outMsgCtx);
-                    }
-                    else {
+                    } else if (!dropExtraResponses) {
                         //handle as a new request message
                         handleIncomingRequest();
+                    } else {
+                        log.debug("Dropping additional FIX response");
                     }
                 }
             }

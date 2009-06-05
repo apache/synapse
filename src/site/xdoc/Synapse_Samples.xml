@@ -2509,6 +2509,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
         &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:/home/synapse_user/fix-config/synapse-sender.cfg&lt;/parameter&gt;
         &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;file&lt;/parameter&gt;
         &lt;parameter name=&quot;transport.fix.SendAllToInSequence&quot;&gt;false&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.DropExtraResponses&quot;&gt;true&lt;/parameter&gt;
 
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -2822,7 +2823,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
         &lt;script language=&quot;js&quot; key=&quot;stockquoteScript&quot; function=&quot;transformRequest&quot;/&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
-                &lt;address uri=&quot;http://localhost:9000/soap/SimpleStockQuoteService&quot;/&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
     &lt;/in&gt;

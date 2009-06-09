@@ -409,6 +409,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 AxisOperation operation = service.getOperation(operationQName);
                 if (operation != null) {
                     msgContext.setAxisOperation(operation);
+                    msgContext.setAxisMessage(
+                            operation.getMessage(WSDL2Constants.MESSAGE_LABEL_IN));
                 }
             }
 

@@ -31,7 +31,7 @@ import java.util.Properties;
 public class DataSourceInformationRepositoryFactory {
 
     private static final Log log = LogFactory.getLog(DataSourceInformationRepositoryFactory.class);
-    
+
     /**
      * Factory method to create a DataSourceInformationRepository
      * Use 'DataSourceRepositoryManager' as RepositoryListener
@@ -43,8 +43,8 @@ public class DataSourceInformationRepositoryFactory {
             Properties properties) {
         return createDataSourceInformationRepository(
                 new DataSourceRepositoryManager(
-                    new InMemoryDataSourceRepository(),
-                    new JNDIBasedDataSourceRepository()), properties);
+                        new InMemoryDataSourceRepository(),
+                        new JNDIBasedDataSourceRepository()), properties);
     }
 
     /**
@@ -61,36 +61,36 @@ public class DataSourceInformationRepositoryFactory {
         if (log.isDebugEnabled()) {
             log.debug("Creating a new DataSourceInformationRepository");
         }
-        DataSourceInformationRepository datasourceInformationRepository = 
-            new DataSourceInformationRepository();
-        
+        DataSourceInformationRepository datasourceInformationRepository =
+                new DataSourceInformationRepository();
+
         datasourceInformationRepository.setRepositoryListener(listener);
         setupDatasourceInformationRepository(datasourceInformationRepository, properties);
-        
+
         return datasourceInformationRepository;
     }
-    
+
      /**
-     * Setup an existing datasource inforamtion repository adding the provided 
+     * Setup an existing datasource inforamtion repository adding the provided
      * datasource information.
      *
      * @param datasourceInformationRepository an existing data source information repository
      * @param properties DataSource properties
      */
     public static void setupDatasourceInformationRepository(
-            DataSourceInformationRepository datasourceInformationRepository,
-            Properties properties) {
-        
-        if (properties != null && !properties.isEmpty()) {
-            datasourceInformationRepository.setConfigurationProperties(properties);
-        }
-        List<DataSourceInformation> sourceInformationList =
-            DataSourceInformationListFactory.createDataSourceInformationList(properties);
-        
-        for (DataSourceInformation information : sourceInformationList) {
-            if (information != null) {
-                datasourceInformationRepository.addDataSourceInformation(information);
-            }
-        }
-    }
+             DataSourceInformationRepository datasourceInformationRepository,
+             Properties properties) {
+
+         if (properties != null) {
+             datasourceInformationRepository.setConfigurationProperties(properties);
+         }
+         List<DataSourceInformation> sourceInformationList =
+                 DataSourceInformationListFactory.createDataSourceInformationList(properties);
+
+         for (DataSourceInformation information : sourceInformationList) {
+             if (information != null) {
+                 datasourceInformationRepository.addDataSourceInformation(information);
+             }
+         }
+     }
 }

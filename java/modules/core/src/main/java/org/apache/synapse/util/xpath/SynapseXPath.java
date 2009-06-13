@@ -202,6 +202,9 @@ public class SynapseXPath extends AXIOMXPath {
 
                         textValue.append(
                             ((OMDocumentImpl) o).getOMDocumentElement().toString());
+                    } else if (o instanceof OMAttribute) {
+                        textValue.append(
+                            ((OMAttribute) o).getAttributeValue());
                     }
                 }
 

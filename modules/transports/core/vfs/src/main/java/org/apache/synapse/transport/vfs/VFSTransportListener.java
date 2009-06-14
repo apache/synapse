@@ -361,7 +361,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                         Long.valueOf(content.getLastModifiedTime()));
             } catch (FileSystemException ignore) {}
 
-            MessageContext msgContext = createMessageContext();
+            MessageContext msgContext = entry.createMessageContext();
             
             String contentType = entry.getContentType();
             if (BaseUtils.isBlank(contentType)) {
@@ -396,23 +396,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             }
 
             AxisService service = entry.getService();
-            if (service != null) {
-                msgContext.setAxisService(service);
-    
-                // find the operation for the message, or default to one
-                Parameter operationParam = service.getParameter(BaseConstants.OPERATION_PARAM);
-                QName operationQName = (
-                    operationParam != null ?
-                        BaseUtils.getQNameFromString(operationParam.getValue()) :
-                        BaseConstants.DEFAULT_OPERATION);
-    
-                AxisOperation operation = service.getOperation(operationQName);
-                if (operation != null) {
-                    msgContext.setAxisOperation(operation);
-                    msgContext.setAxisMessage(
-                            operation.getMessage(WSDL2Constants.MESSAGE_LABEL_IN));
-                }
-            }
 
             // does the service specify a default reply file URI ?
             // FIXME: we should look for the parameter in createPollTableEntry

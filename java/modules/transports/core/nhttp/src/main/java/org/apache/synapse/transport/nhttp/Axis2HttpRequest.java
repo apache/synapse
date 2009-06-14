@@ -21,6 +21,8 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.description.WSDL20DefaultValueHolder;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
@@ -179,6 +181,19 @@ public class Axis2HttpRequest {
             httpRequest.setHeader(
                 HTTP.CONTENT_TYPE,
                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+
+        } else if ("GET".equals(httpMethod)) {
+
+            URL reqURI = messageFormatter.getTargetAddress(
+                    msgContext, format, new URL(epr.getAddress()));
+            String path = reqURI.getPath() + "?" + reqURI.getQuery();
+
+            httpRequest = new BasicHttpRequest(httpMethod, path,
+                    msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
+                            HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
+
+            httpRequest.setHeader(HTTP.CONTENT_TYPE, messageFormatter.getContentType(
+                    msgContext, format, msgContext.getSoapAction()));
 
         } else {
 

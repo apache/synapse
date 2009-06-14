@@ -19,9 +19,13 @@
 package org.apache.synapse.transport.vfs;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.AbstractPollTableEntry;
+import org.apache.axis2.transport.base.ParamUtils;
 
 /**
  * Holds information about an entry in the VFS transport poll table used by the
@@ -70,59 +74,31 @@ public class PollTableEntry extends AbstractPollTableEntry {
         return fileURI;
     }
 
-    public void setFileURI(String fileURI) {
-        if (fileURI.startsWith(VFSConstants.VFS_PREFIX)) {
-            this.fileURI = fileURI.substring(VFSConstants.VFS_PREFIX.length());
-        } else {
-            this.fileURI = fileURI;
-        }
-    }
-
     public String getFileNamePattern() {
         return fileNamePattern;
-    }
-
-    public void setFileNamePattern(String fileNamePattern) {
-        this.fileNamePattern = fileNamePattern;
     }
 
     public String getContentType() {
         return contentType;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     public int getActionAfterProcess() {
         return actionAfterProcess;
-    }
-
-    public void setActionAfterProcess(int actionAfterProcess) {
-        this.actionAfterProcess = actionAfterProcess;
     }
 
     public int getActionAfterErrors() {
         return actionAfterErrors;
     }
 
-    public void setActionAfterErrors(int actionAfterErrors) {
-        this.actionAfterErrors = actionAfterErrors;
-    }
-
     public int getActionAfterFailure() {
         return actionAfterFailure;
-    }
-
-    public void setActionAfterFailure(int actionAfterFailure) {
-        this.actionAfterFailure = actionAfterFailure;
     }
 
     public String getMoveAfterProcess() {
         return moveAfterProcess;
     }
 
-    public void setMoveAfterProcess(String moveAfterProcess) {
+    private void setMoveAfterProcess(String moveAfterProcess) {
         if (moveAfterProcess == null) {
             this.moveAfterProcess = null;
         } else if (moveAfterProcess.startsWith(VFSConstants.VFS_PREFIX)) {
@@ -138,7 +114,7 @@ public class PollTableEntry extends AbstractPollTableEntry {
         return moveAfterErrors;
     }
 
-    public void setMoveAfterErrors(String moveAfterErrors) {
+    private void setMoveAfterErrors(String moveAfterErrors) {
         if (moveAfterErrors == null) {
             this.moveAfterErrors = null;
         } else if (moveAfterErrors.startsWith(VFSConstants.VFS_PREFIX)) {
@@ -152,7 +128,7 @@ public class PollTableEntry extends AbstractPollTableEntry {
         return moveAfterFailure;
     }
 
-    public void setMoveAfterFailure(String moveAfterFailure) {
+    private void setMoveAfterFailure(String moveAfterFailure) {
         if (moveAfterFailure == null) {
             this.moveAfterFailure = null;
         } else if (moveAfterFailure.startsWith(VFSConstants.VFS_PREFIX)) {
@@ -166,31 +142,78 @@ public class PollTableEntry extends AbstractPollTableEntry {
         return streaming;
     }
 
-    public void setStreaming(boolean streaming) {
-        this.streaming = streaming;
-    }
-
     public int getMaxRetryCount() {
       return maxRetryCount;
-    }
-
-    public void setMaxRetryCount(int maxRetryCount) {
-      this.maxRetryCount = maxRetryCount;
     }
 
     public long getReconnectTimeout() {
       return reconnectTimeout;
     }
 
-    public void setReconnectTimeout(long reconnectTimeout) {
-      this.reconnectTimeout = reconnectTimeout;
-    }
-
     public DateFormat getMoveTimestampFormat() {
         return moveTimestampFormat;
     }
 
-    public void setMoveTimestampFormat(DateFormat moveTimestampFormat) {
-        this.moveTimestampFormat = moveTimestampFormat;
+    @Override
+    public boolean loadConfiguration(ParameterInclude params) throws AxisFault {
+        fileURI = ParamUtils.getOptionalParam(params, VFSConstants.TRANSPORT_FILE_FILE_URI);
+        if (fileURI == null) {
+            return false;
+        } else {
+            if (fileURI.startsWith(VFSConstants.VFS_PREFIX)) {
+                fileURI = fileURI.substring(VFSConstants.VFS_PREFIX.length());
+            }
+            fileNamePattern = ParamUtils.getOptionalParam(params,
+                    VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN);
+            contentType = ParamUtils.getRequiredParam(params,
+                    VFSConstants.TRANSPORT_FILE_CONTENT_TYPE);
+            String option = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
+            actionAfterProcess =
+                VFSTransportListener.MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE;
+            option = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
+            actionAfterErrors =
+                VFSTransportListener.MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE;
+            option = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
+            actionAfterFailure =
+                VFSTransportListener.MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE;
+
+            String moveDirectoryAfterProcess = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+            setMoveAfterProcess(moveDirectoryAfterProcess);
+            String moveDirectoryAfterErrors = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
+            setMoveAfterErrors(moveDirectoryAfterErrors);
+            String moveDirectoryAfterFailure = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
+            setMoveAfterFailure(moveDirectoryAfterFailure);
+
+            String moveFileTimestampFormat = ParamUtils.getOptionalParam(
+                params, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
+            if(moveFileTimestampFormat != null) {
+                moveTimestampFormat = new SimpleDateFormat(moveFileTimestampFormat);
+            }
+
+            String strStreaming = ParamUtils.getOptionalParam(params, VFSConstants.STREAMING);
+            if (strStreaming != null) {
+                streaming = Boolean.parseBoolean(strStreaming);
+            }
+            
+            String strMaxRetryCount = ParamUtils.getOptionalParam(
+                params, VFSConstants.MAX_RETRY_COUNT);
+            if(strMaxRetryCount != null) {
+                maxRetryCount = Integer.parseInt(strMaxRetryCount);
+            }
+
+            String strReconnectTimeout = ParamUtils.getOptionalParam(
+                params, VFSConstants.RECONNECT_TIMEOUT);            
+            if(strReconnectTimeout != null) {
+                reconnectTimeout = Integer.parseInt(strReconnectTimeout) * 1000;
+            }
+            
+            return super.loadConfiguration(params);
+        }
     }
 }

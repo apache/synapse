@@ -20,7 +20,10 @@ package org.apache.synapse.transport.pipe;
 
 import java.io.File;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.description.ParameterInclude;
+import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axis2.transport.base.datagram.DatagramEndpoint;
 
 /**
@@ -34,16 +37,22 @@ public class PipeEndpoint extends DatagramEndpoint {
 		return pipe;
 	}
 
-	public void setPipe(File pipe) {
-		this.pipe = pipe;
-	}
-
 	public Protocol getProtocol() {
         return protocol;
     }
 
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
+    }
+
+    @Override
+    public boolean loadConfiguration(ParameterInclude params) throws AxisFault {
+        String name = ParamUtils.getOptionalParam(params, PipeConstants.NAME_KEY);
+        if (name == null) {
+            return false;
+        }
+        pipe = new File(name);
+        return super.loadConfiguration(params);
     }
 
     @Override

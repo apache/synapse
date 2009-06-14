@@ -454,10 +454,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());
             OutputStream out = worker.getOutputStream();
 
-            /* 
+            /*
              * if this is a dummy message to handle http 202 case with non-blocking IO
              * write an empty byte array as body
-             */ 
+             */
             if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)
                 || Boolean.TRUE == noEntityBody) {
                 out.write(new byte[0]);

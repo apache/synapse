@@ -246,7 +246,7 @@ public class ServerWorker implements Runnable {
         } else if ("OPTIONS".equals(method)) {
             processNonEntityEnclosingMethod();
         } else if ("DELETE".equals(method)) {
-            processNonEntityEnclosingMethod();
+            processGetAndDelete("DELETE");
         } else if ("TRACE".equals(method)) {
             processNonEntityEnclosingMethod();
         } else {
@@ -572,19 +572,8 @@ public class ServerWorker implements Runnable {
             }
 
         } else {
-            try {
-                RESTUtil.processGETRequest(
-                        msgContext, os, (request.getFirstHeader(SOAPACTION) != null ?
-                        request.getFirstHeader(SOAPACTION).getValue() : null),
-                        request.getRequestLine().getUri(), cfgCtx, parameters);
-                // do not let the output stream close (as by default below) since
-                // we are serving this GET request through the Synapse engine
-                return;
-
-            } catch (AxisFault axisFault) {
-                handleException("Error processing GET request for: " +
-                        request.getRequestLine().getUri(), axisFault);
-            }
+            processGetAndDelete("GET");
+            return;
         }
 
         // make sure that the output stream is flushed and closed properly
@@ -592,6 +581,23 @@ public class ServerWorker implements Runnable {
             os.flush();
             os.close();
         } catch (IOException ignore) {}
+    }
+
+    /**
+     * Calls the RESTUtil to process GET and DELETE Request
+     */
+    private void processGetAndDelete(String method) {
+        try {
+            RESTUtil.processGETRequest(
+                    msgContext, os, request.getRequestLine().getUri(),
+                    request.getFirstHeader(HTTP.CONTENT_TYPE));
+            // do not let the output stream close (as by default below) since
+            // we are serving this GET/DELETE request through the Synapse engine
+        } catch (AxisFault axisFault) {
+            handleException("Error processing " + method + " request for: " +
+                    request.getRequestLine().getUri(), axisFault);
+        }
+
     }
 
     private void handleBrowserException(String msg, Exception e) {

@@ -30,7 +30,6 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.AbstractPollingTransportListener;
 import org.apache.axis2.transport.base.ManagementSupport;
-import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
@@ -41,13 +40,10 @@ import org.apache.commons.vfs.impl.StandardFileSystemManager;
 
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
-import javax.xml.namespace.QName;
 
 import java.util.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
  * The "vfs" transport is a polling based transport - i.e. it gets kicked off at
@@ -395,17 +391,11 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 }
             }
 
-            AxisService service = entry.getService();
-
             // does the service specify a default reply file URI ?
-            // FIXME: we should look for the parameter in createPollTableEntry
-            //        and store the value in PollTableEntry as we do for the
-            //        other parameters
-            Parameter param = service.getParameter(VFSConstants.REPLY_FILE_URI);
-            if (param != null && param.getValue() != null) {
-                msgContext.setProperty(
-                    Constants.OUT_TRANSPORT_INFO,
-                    new VFSOutTransportInfo((String) param.getValue()));
+            String replyFileURI = entry.getReplyFileURI();
+            if (replyFileURI != null) {
+                msgContext.setProperty(Constants.OUT_TRANSPORT_INFO,
+                        new VFSOutTransportInfo(replyFileURI));
             }
 
             // Determine the message builder to use

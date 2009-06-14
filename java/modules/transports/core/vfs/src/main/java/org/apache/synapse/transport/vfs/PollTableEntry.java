@@ -39,6 +39,8 @@ public class PollTableEntry extends AbstractPollTableEntry {
 
     /** File or Directory to scan */
     private String fileURI;
+    /** The URI to send replies to. May be null. */
+    private String replyFileURI;
     /** file name pattern for a directory or compressed file entry */
     private String fileNamePattern;
     /** Content-Type to use for the message */
@@ -72,6 +74,10 @@ public class PollTableEntry extends AbstractPollTableEntry {
 
     public String getFileURI() {
         return fileURI;
+    }
+
+    public String getReplyFileURI() {
+        return replyFileURI;
     }
 
     public String getFileNamePattern() {
@@ -163,6 +169,7 @@ public class PollTableEntry extends AbstractPollTableEntry {
             if (fileURI.startsWith(VFSConstants.VFS_PREFIX)) {
                 fileURI = fileURI.substring(VFSConstants.VFS_PREFIX.length());
             }
+            replyFileURI = ParamUtils.getOptionalParam(params, VFSConstants.REPLY_FILE_URI);
             fileNamePattern = ParamUtils.getOptionalParam(params,
                     VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN);
             contentType = ParamUtils.getRequiredParam(params,

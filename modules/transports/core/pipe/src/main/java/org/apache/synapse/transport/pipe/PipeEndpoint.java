@@ -47,7 +47,8 @@ public class PipeEndpoint extends DatagramEndpoint {
     }
 
     @Override
-	public EndpointReference getEndpointReference(String ip) {
-		return new EndpointReference("pipe://" + pipe.getAbsolutePath() + "?contentType=" + getContentType());
+	public EndpointReference[] getEndpointReferences(String ip) {
+		return new EndpointReference[] { new EndpointReference("pipe://" + pipe.getAbsolutePath()
+		        + "?contentType=" + getContentType()) };
 	}
 }

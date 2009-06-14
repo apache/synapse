@@ -85,10 +85,14 @@ public class PipeListener extends AbstractDatagramTransportListener<PipeEndpoint
     }
 
     @Override
-    protected PipeEndpoint createEndpoint(AxisService service) throws AxisFault {
-        PipeEndpoint endpoint = new PipeEndpoint();
+    protected PipeEndpoint createEndpoint() {
+        return new PipeEndpoint();
+    }
+
+    @Override
+    protected void configureAndStartEndpoint(PipeEndpoint endpoint, AxisService service) throws AxisFault {
         endpoint.setPipe(new File(ParamUtils.getRequiredParam(service, PipeConstants.NAME_KEY)));
         endpoint.setProtocol(protocol);
-        return endpoint;
+        super.configureAndStartEndpoint(endpoint, service);
     }
 }

@@ -35,6 +35,7 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
 import org.apache.axis2.util.Utils;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.http.Header;
 
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -120,31 +121,21 @@ public class RESTUtil {
      *
      * @param msgContext The MessageContext of the Request Message
      * @param out The output stream of the response
-     * @param soapAction SoapAction of the request
      * @param requestURI The URL that the request came to
-     * @param configurationContext The Axis Configuration Context
-     * @param requestParameters The parameters of the request message
-     * @return boolean indication whether the operation was succesfull
+     * @param contentTypeHeader The contentType header of the request
      * @throws AxisFault - Thrown in case a fault occurs
      */
-    public static void processGETRequest(MessageContext msgContext, OutputStream out,
-                                            String soapAction, String requestURI,
-                                            ConfigurationContext configurationContext,
-                                            Map requestParameters) throws AxisFault {
+    public static void processGETRequest(MessageContext msgContext, OutputStream out, 
+                                         String requestURI, Header contentTypeHeader)
+            throws AxisFault {
 
-        if ((soapAction != null) && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
-            soapAction = soapAction.substring(1, soapAction.length() - 1);
-        }
-
-        msgContext.setSoapAction(soapAction);
         msgContext.setTo(new EndpointReference(requestURI));
         msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
         msgContext.setServerSide(true);
         msgContext.setDoingREST(true);
-        msgContext.setEnvelope(createEnvelopeFromGetRequest(
-                requestURI, requestParameters, configurationContext));
         msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
-        AxisEngine.receive(msgContext);
+        org.apache.axis2.transport.http.util.RESTUtil.processURLRequest(msgContext, out,
+                getContentType(contentTypeHeader));
     }
 
     /**
@@ -177,57 +168,16 @@ public class RESTUtil {
     }
 
     /**
-     * Creates the {@link SOAPEnvelope} from the GET URL request. REST message building inside
-     * synapse will be handled in this manner
-     *
-     * @param requestUrl GET URL of the request
-     * @param map query parameters of the GET request
-     * @param configCtx axis configuration context
-     * @return created SOAPEnvelope or null if cannot be processed
-     * @throws AxisFault if the service represented by the GET request URL cannot be found
+     * Given the contentType HTTP header it extracts the content-type of the request
      */
-    private static SOAPEnvelope createEnvelopeFromGetRequest(String requestUrl, Map map,
-                                                            ConfigurationContext configCtx) throws AxisFault {
-
-        String[] values = Utils.parseRequestURLForServiceAndOperation(
-                requestUrl, configCtx.getServiceContextPath());
-
-        if (values == null) {
-            return new SOAP11Factory().getDefaultEnvelope();
+    private static String getContentType(Header contentTypeHeader) {
+        String contentTypeStr = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
+        if (contentTypeStr != null) {
+            int index = contentTypeStr.indexOf(';');
+            if (index > 0) {
+                contentTypeStr = contentTypeStr.substring(0, index);
+            }
         }
-
-        if ((values[1] != null) && (values[0] != null)) {
-            String srvice = values[0];
-            AxisService service = configCtx.getAxisConfiguration().getService(srvice);
-            if (service == null) {
-                throw new AxisFault("service not found: " + srvice);
-            }
-            String operation = values[1];
-            SOAPFactory soapFactory = new SOAP11Factory();
-            SOAPEnvelope envelope = soapFactory.getDefaultEnvelope();
-            OMNamespace omNs = soapFactory.createOMNamespace(service.getSchemaTargetNamespace(),
-                    service.getSchemaTargetNamespacePrefix());
-            soapFactory.createOMNamespace(service.getSchemaTargetNamespace(),
-                    service.getSchemaTargetNamespacePrefix());
-            OMElement opElement;
-            if (operation.length() == 0) {
-                opElement = envelope.getBody();
-            } else {
-                opElement = soapFactory.createOMElement(operation, omNs);
-                envelope.getBody().addChild(opElement);
-            }
-
-            for (Object o : map.keySet()) {
-                String name = (String) o;
-                String value = (String) map.get(name);
-                OMElement omEle = soapFactory.createOMElement(name, omNs);
-
-                omEle.setText(value);
-                opElement.addChild(omEle);
-            }
-            return envelope;
-        } else {
-            return null;
-        }
+        return contentTypeStr;
     }
 }

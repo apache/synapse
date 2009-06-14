@@ -137,7 +137,7 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
                     Constants.Configuration.HTTP_METHOD_GET);
                 axisOutMsgCtx.setProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
-                        org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
+                        org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_X_WWW_FORM);
                 
             } else if (SynapseConstants.FORMAT_SOAP11.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(false);
@@ -211,6 +211,15 @@ public class Axis2FlexibleMEPClient {
             }
         } else {
             processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);
+        }
+
+        if (axisOutMsgCtx.isDoingREST()) {
+            if (axisOutMsgCtx.getProperty(WSDL2Constants.ATTR_WHTTP_LOCATION) == null
+                    && axisOutMsgCtx.getEnvelope().getBody().getFirstElement() != null) {
+                axisOutMsgCtx.setProperty(WSDL2Constants.ATTR_WHTTP_LOCATION,
+                        axisOutMsgCtx.getEnvelope().getBody().getFirstElement()
+                                .getQName().getLocalPart());
+            }
         }
 
         if (wsAddressingEnabled) {
@@ -370,6 +379,12 @@ public class Axis2FlexibleMEPClient {
             axisOutMsgCtx.setProperty(
                     org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
                     HTTPConstants.MEDIA_TYPE_X_WWW_FORM);
+            if (axisOutMsgCtx.getProperty(WSDL2Constants.ATTR_WHTTP_LOCATION) == null
+                    && axisOutMsgCtx.getEnvelope().getBody().getFirstElement() != null) {
+                axisOutMsgCtx.setProperty(WSDL2Constants.ATTR_WHTTP_LOCATION,
+                        axisOutMsgCtx.getEnvelope().getBody().getFirstElement()
+                                .getQName().getLocalPart());
+            }
         }
     }
 }

@@ -501,64 +501,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
     }
 
     @Override
-    protected PollTableEntry createPollTableEntry(ParameterInclude params) throws AxisFault {
-        String fileURI = ParamUtils.getOptionalParam(params, VFSConstants.TRANSPORT_FILE_FILE_URI);
-        if (fileURI == null) {
-            return null;
-        } else {
-            PollTableEntry entry = new PollTableEntry();
-            entry.setFileURI(fileURI);
-            entry.setFileNamePattern(ParamUtils.getOptionalParam(params,
-                    VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
-            entry.setContentType(ParamUtils.getRequiredParam(params,
-                    VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
-            String option = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
-            entry.setActionAfterProcess(
-                MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
-            entry.setActionAfterErrors(
-                MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
-            entry.setActionAfterFailure(
-                MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-
-            String moveDirectoryAfterProcess = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
-            entry.setMoveAfterProcess(moveDirectoryAfterProcess);
-            String moveDirectoryAfterErrors = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
-            entry.setMoveAfterErrors(moveDirectoryAfterErrors);
-            String moveDirectoryAfterFailure = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
-            entry.setMoveAfterFailure(moveDirectoryAfterFailure);
-
-            String moveFileTimestampFormat = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
-            if(moveFileTimestampFormat != null) {
-                DateFormat moveTimestampFormat = new SimpleDateFormat(moveFileTimestampFormat);
-                entry.setMoveTimestampFormat(moveTimestampFormat);
-            }
-
-            String strStreaming = ParamUtils.getOptionalParam(params, VFSConstants.STREAMING);
-            if (strStreaming != null) {
-                entry.setStreaming(Boolean.parseBoolean(strStreaming));
-            }
-            
-            String strMaxRetryCount = ParamUtils.getOptionalParam(
-                params, VFSConstants.MAX_RETRY_COUNT);
-            if(strMaxRetryCount != null)
-              entry.setMaxRetryCount(Integer.parseInt(strMaxRetryCount));
-
-            String strReconnectTimeout = ParamUtils.getOptionalParam(
-                params, VFSConstants.RECONNECT_TIMEOUT);            
-            if(strReconnectTimeout != null)
-              entry.setReconnectTimeout(Integer.parseInt(strReconnectTimeout) * 1000);
-            
-            return entry;
-            
-        }
+    protected PollTableEntry createEndpoint() {
+        return new PollTableEntry();
     }
 }

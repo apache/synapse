@@ -62,8 +62,8 @@ public class PollTableEntry extends AbstractPollTableEntry {
     private long reconnectTimeout;
 
     @Override
-    public EndpointReference getEndpointReference() {
-        return new EndpointReference("vfs:" + fileURI);
+    public EndpointReference[] getEndpointReferences(String ip) {
+        return new EndpointReference[] { new EndpointReference("vfs:" + fileURI) };
     }
 
     public String getFileURI() {

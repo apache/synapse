@@ -100,6 +100,63 @@ public class ThrottleMediatorTest extends TestCase {
             "        </throttle:ThrottleAssertion>\n" +
             "    </wsp:Policy>";
 
+    private static final String NEW_POLICY = "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\"\n" +
+            "            xmlns:throttle=\"http://www.wso2.org/products/wso2commons/throttle\">\n" +
+            "<throttle:MediatorThrottleAssertion>\n" +
+            "    <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\n" +
+            "    <wsp:Policy>\n" +
+            "        <throttle:ID throttle:type=\"IP\">other</throttle:ID>\n" +
+            "        <wsp:Policy>\n" +
+            "            <throttle:Control>\n" +
+            "                <wsp:Policy>\n" +
+            "                    <throttle:MaximumCount>8</throttle:MaximumCount>\n" +
+            "                    <throttle:UnitTime>800000</throttle:UnitTime>\n" +
+            "                    <throttle:ProhibitTimePeriod wsp:Optional=\"true\">10\n" +
+            "                    </throttle:ProhibitTimePeriod>\n" +
+            "                </wsp:Policy>\n" +
+            "            </throttle:Control>\n" +
+            "        </wsp:Policy>\n" +
+            "    </wsp:Policy>\n" +
+            "    <wsp:Policy>\n" +
+            "        <throttle:ID throttle:type=\"IP\">192.168.8.200-192.168.8.222</throttle:ID>\n" +
+            "        <wsp:Policy>\n" +
+            "            <throttle:Control>\n" +
+            "                <wsp:Policy>\n" +
+            "                    <throttle:MaximumCount>3</throttle:MaximumCount>\n" +
+            "                    <throttle:UnitTime>800000</throttle:UnitTime>\n" +
+            "                    <throttle:ProhibitTimePeriod wsp:Optional=\"true\">10000\n" +
+            "                    </throttle:ProhibitTimePeriod>\n" +
+            "                </wsp:Policy>\n" +
+            "            </throttle:Control>\n" +
+            "        </wsp:Policy>\n" +
+            "    </wsp:Policy>\n" +
+            "    <wsp:Policy>\n" +
+            "        <throttle:ID throttle:type=\"IP\">192.168.8.201</throttle:ID>\n" +
+            "        <wsp:Policy>\n" +
+            "            <throttle:Control>\n" +
+            "                <wsp:Policy>\n" +
+            "                    <throttle:MaximumCount>200</throttle:MaximumCount>\n" +
+            "                    <throttle:UnitTime>600000</throttle:UnitTime>\n" +
+            "                    <throttle:ProhibitTimePeriod wsp:Optional=\"true\"></throttle:ProhibitTimePeriod>\n" +
+            "                </wsp:Policy>\n" +
+            "            </throttle:Control>\n" +
+            "        </wsp:Policy>\n" +
+            "    </wsp:Policy>\n" +
+            "    <wsp:Policy>\n" +
+            "        <throttle:ID throttle:type=\"IP\">192.168.8.198</throttle:ID>\n" +
+            "        <wsp:Policy>\n" +
+            "            <throttle:Control>\n" +
+            "                <wsp:Policy>\n" +
+            "                    <throttle:MaximumCount>50</throttle:MaximumCount>\n" +
+            "                    <throttle:UnitTime>500000</throttle:UnitTime>\n" +
+            "                    <throttle:ProhibitTimePeriod wsp:Optional=\"true\"></throttle:ProhibitTimePeriod>\n" +
+            "                </wsp:Policy>\n" +
+            "            </throttle:Control>\n" +
+            "        </wsp:Policy>\n" +
+            "    </wsp:Policy>\n" +
+            "</throttle:MediatorThrottleAssertion>\n" +
+            "</wsp:Policy>";
+
     public ThrottleMediatorTest() {
         super(ThrottleMediatorTest.class.getName());
     }
@@ -171,7 +228,7 @@ public class ThrottleMediatorTest extends TestCase {
     }
 
     public void testMediateWithInLineXML() throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(NEW_POLICY.getBytes());
         StAXOMBuilder build = new StAXOMBuilder(in);
         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
         throttleMediator.setInLinePolicy(build.getDocumentElement());

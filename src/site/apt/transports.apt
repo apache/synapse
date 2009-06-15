@@ -64,10 +64,12 @@
 
 <transportSender name="http"  class="org.apache.synapse.transport.nhttp.HttpCoreNIOSender">
     <parameter name="non-blocking" locked="false">true</parameter>
+    <parameter name="warnOnHTTP500" locked="false">*</parameter>
 </transportSender>
 
 <transportSender name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender">
     <parameter name="non-blocking" locked="false">true</parameter>
+    <parameter name="warnOnHTTP500" locked="false">*</parameter>
     <parameter name="keystore" locked="false">
         <KeyStore>
             <Location>lib/identity.jks</Location>
@@ -134,6 +136,21 @@
 
 * {Transport sender parameters}
 
+  The following property can be used to control based on content-types whether the HTTP/HTTPS
+  sender shall output a warning for responses with HTTP status code 500.
+
+  [<<<warnOnHTTP500>>>] A list of content-types for which Synapse shall output a warning when 
+  receiving an HTTP 500 response (each value each seperated by a |).
+  By default Synapse outputs a warning for any HTTP 500 response, irrespective of the content-type.
+  Consequently, also for each SOAP fault a warning will be logged.
+  If only for specific content-types a warning shall be logged, please provide a |-separated 
+  list. To output the warning for messages which do not have a content-type set, please
+  use the value "none"!
+  
+  Example value: x-application/hessian|none
+
+  []
+
   The following properties can be used to configure the HTTP sender to use a proxy. They can
   be specified either as transport parameters in declared in <<<\<transportSender\>>>> or as
   system properties. 
@@ -150,7 +167,7 @@
   
   []
 
-  Note that the HTTPS sender has no proxy support yet.  
+  Note that the HTTPS sender has no proxy support yet.
   
   The following parameters are specific to the HTTP sender:
   

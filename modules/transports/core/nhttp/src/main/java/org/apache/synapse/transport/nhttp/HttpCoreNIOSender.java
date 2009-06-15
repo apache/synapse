@@ -143,6 +143,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                     + proxyHost + ":" + proxyPort + " bypassing : " + Arrays.toString(proxyBypassList));
             }
         }
+        
+        Parameter param = transportOut.getParameter("warnOnHTTP500");
+        if (param != null) {
+            String[] warnOnHttp500 = ((String) param.getValue()).split("\\|");
+            cfgCtx.setNonReplicableProperty("warnOnHTTP500", warnOnHttp500);
+        }
 
         HttpParams params = getClientParameters();
         try {

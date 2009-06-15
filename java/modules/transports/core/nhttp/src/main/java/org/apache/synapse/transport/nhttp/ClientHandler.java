@@ -84,6 +84,9 @@ public class ClientHandler implements NHttpClientHandler {
     /** the metrics collector */
     private MetricsCollector metrics = null;
 
+    /** Array of content types for which warnings are logged if HTTP status code is 500. */
+    private String[] warnOnHttp500;
+
     public static final String OUTGOING_MESSAGE_CONTEXT = "synapse.axis2_message_context";
     public static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
 
@@ -118,6 +121,11 @@ public class ClientHandler implements NHttpClientHandler {
             cfg.getClientKeepalive(),
             cfg.getClientQueueLen(),
             "Client Worker thread group", "HttpClientWorker");
+
+        Object contentTypeList = cfgCtx.getLocalProperty("warnOnHTTP500");
+        if (contentTypeList != null) {
+            warnOnHttp500 = (String[]) contentTypeList;
+        }
     }
 
     public void requestReady(final NHttpClientConnection conn) {
@@ -658,6 +666,14 @@ public class ClientHandler implements NHttpClientHandler {
                 processResponse(conn, context, response);
                 return;
             }
+            case HttpStatus.SC_INTERNAL_SERVER_ERROR: {
+                if (warnOnHttp500(response)) {
+                    log.warn(getErrorMessage("Received an internal server error : "
+                        + response.getStatusLine().getReasonPhrase(), conn));
+                }
+                processResponse(conn, context, response);
+                return;
+            }
             default : {
                 if (log.isDebugEnabled()) {
                     log.debug(getErrorMessage("HTTP status code received : " +
@@ -698,6 +714,48 @@ public class ClientHandler implements NHttpClientHandler {
                 processResponse(conn, context, response);
             }
         }
+    }
+
+    /**
+     * Checks whether the provided 500 response shall be logged as a warning.
+     * The behavior can be configured based on the content type of the message via a transport 
+     * parameter in axis2.xml named <code>warnOnHTTP500</code>.
+     *
+     * @param response an http 500 response
+     * 
+     * @return true, if a warning shall be logged, otherwise false
+     */
+    private boolean warnOnHttp500(final HttpResponse response) {
+        if (warnOnHttp500 == null || warnOnHttp500.length == 0) {
+            return true;
+        }
+
+        for (String contentType : warnOnHttp500) {
+            if (contentType == null || contentType.trim().equals("*")) {
+                return true;
+            }
+        }
+
+        // determine content type of the response message
+        Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE);
+        String messageContentType;
+        if (contentTypeHeader == null) {
+            messageContentType = "none";
+        } else {
+            messageContentType = contentTypeHeader.getValue();
+            if (messageContentType == null || messageContentType.trim().length() == 0) {
+                messageContentType = "none";
+            }
+        }
+
+        // test if one of the content types matches
+        for (String contentType : warnOnHttp500) {
+            if (messageContentType.startsWith(contentType)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

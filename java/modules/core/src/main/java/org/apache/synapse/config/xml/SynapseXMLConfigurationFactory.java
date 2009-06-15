@@ -27,6 +27,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.AspectConfiguration;
+import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -62,6 +64,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         SequenceMediator rootSequence = new SequenceMediator();
         rootSequence.setName(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY);
 
+        // aspect configuration
+        AspectConfiguration configuration = new AspectConfiguration(rootSequence.getName());
+        rootSequence.configure(configuration);
         Iterator iter = definitions.getChildren();
         
         while (iter.hasNext()) {
@@ -218,6 +223,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         main.addChild(new LogMediator());
         main.addChild(new DropMediator());
         config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, main);
+        // set the aspect configuration
+        AspectConfiguration configuration = new AspectConfiguration(main.getName());
+        main.configure(configuration);
     }
 
     /**
@@ -259,6 +267,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
         fault.addChild(log);
         fault.addChild(new DropMediator());
+
+        // set aspect configuration
+        AspectConfiguration configuration = new AspectConfiguration(fault.getName());
+        fault.configure(configuration);
+        
         config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
     }
 

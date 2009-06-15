@@ -30,6 +30,7 @@ public class FaultMediatorSerializationTest extends AbstractTestCase {
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";
     private static final String EMPTY = "";
+    private final static String DETAILS = "<test>Test Details</test><test2>Test2 Details</test2>";
 
     public FaultMediatorSerializationTest() {
         super(FaultMediatorSerializationTest.class.getName());
@@ -43,8 +44,20 @@ public class FaultMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, faultMediatorSerializer));
     }
 
+    public void testFaultMediatorSerializationSOAP11NonEmptyDetails() throws Exception {
+        String inputXml = getXmlOfMediatorForSOAP11(SOAP11, "ns2:Client", "reason", EMPTY, DETAILS);
+        assertTrue(serialization(inputXml, faultMediatorFactory, faultMediatorSerializer));
+        assertTrue(serialization(inputXml, faultMediatorSerializer));
+    }
+
     public void testFaultMediatorSerializationSOAP12() throws Exception {
         String inputXml = getXmlOfMediatorForSOAP12(SOAP12, "soap:Sender", "reason", EMPTY, EMPTY, EMPTY, "false");
+        assertTrue(serialization(inputXml, faultMediatorFactory, faultMediatorSerializer));
+        assertTrue(serialization(inputXml, faultMediatorSerializer));
+    }
+
+    public void testFaultMediatorSerializationSOAP12NonEmptyDetails() throws Exception {
+        String inputXml = getXmlOfMediatorForSOAP12(SOAP12, "soap:Sender", "reason", EMPTY, EMPTY, DETAILS, "false");
         assertTrue(serialization(inputXml, faultMediatorFactory, faultMediatorSerializer));
         assertTrue(serialization(inputXml, faultMediatorSerializer));
     }

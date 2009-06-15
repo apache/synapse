@@ -2289,7 +2289,7 @@ The sample Axis2 server displays a successful message on the receipt of the mess
 transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory\
 &amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory\
 &amp;java.naming.provider.url=tcp://localhost:61616\
-&amp;transport.jms.ContentTypeProperty=Content-Type&quot;</pre>
+&amp;transport.jms.ContentTypeProperty=Content-Type&amp;transport.jms.DestinationType=queue&quot;</pre>
 <pre xml:space="preserve">SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
 <p>The second example shows how Synapse could be made to respond with a HTTP 202 Accepted response to a request received. The proxy service simply logs the message received and acknowledges it. On the Synapse console you could see the logged message, and if TCPMon was used at the client, you would see the 202 Accepted response sent back to the client from Synapse </p>
 <pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8280/services/OneWayProxy</pre>

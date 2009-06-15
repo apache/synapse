@@ -28,6 +28,7 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 
 /**
  * Factory for {@link FaultMediator} instances.
@@ -189,8 +190,19 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                     handleException("Unable to build the XPath for fault detail " +
                             "from the expression : " + detailExpr.getAttributeValue(), e);
                 }
+            } else if (detail.getChildElements().hasNext()) {
+                Iterator it = detail.getChildElements();
+                while (it.hasNext()) {
+                    OMElement child = (OMElement) it.next();
+                    if (child != null) {
+                        faultMediator.addFaultDetailElement(child);
+                    }
+                }
             } else if (detail.getText() != null) {
                 faultMediator.setFaultDetail(detail.getText());
+            } else {
+                // we have an empty detail element
+                faultMediator.setFaultDetail("");
             }
         }
 

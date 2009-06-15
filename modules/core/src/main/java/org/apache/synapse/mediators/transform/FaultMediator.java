@@ -36,6 +36,8 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import javax.xml.namespace.QName;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This transforms the current message instance into a SOAP Fault message. The
@@ -80,7 +82,9 @@ public class FaultMediator extends AbstractMediator {
     /** The fault detail to be used */
     private String faultDetail = null;
     /** An XPath expression that will give the fault code QName at runtime */    
-    private SynapseXPath faultDetailExpr = null;
+    private SynapseXPath faultDetailExpr = null;    
+    /** array of fault detail elements */
+    private final List<OMElement> faultDetailElements = new ArrayList<OMElement>();
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -377,6 +381,12 @@ public class FaultMediator extends AbstractMediator {
             SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
             soapFaultDetail.setText(faultDetailExpr.stringValueOf(synCtx));
             fault.setDetail(soapFaultDetail);
+        } else if (!faultDetailElements.isEmpty()) {
+            SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
+            for (OMElement faultDetailElement : faultDetailElements) {
+                soapFaultDetail.addChild(faultDetailElement.cloneOMElement());
+            }
+            fault.setDetail(soapFaultDetail);
         } else if (fault.getDetail() != null) {
             // work around for a rampart issue in the following thread
             // http://www.nabble.com/Access-to-validation-error-message-tf4498668.html#a13284520
@@ -494,6 +504,14 @@ public class FaultMediator extends AbstractMediator {
 
     public void setFaultDetailExpr(SynapseXPath faultDetailExpr) {
         this.faultDetailExpr = faultDetailExpr;
+    }
+
+    public List<OMElement> getFaultDetailElements() {
+        return faultDetailElements;
+    }
+
+    public void addFaultDetailElement(OMElement element) {
+        faultDetailElements.add(element);
     }
 
     private void handleException(String msg) {

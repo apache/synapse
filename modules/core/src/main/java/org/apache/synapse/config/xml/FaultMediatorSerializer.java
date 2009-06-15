@@ -115,6 +115,13 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
         } else if (mediator.getFaultDetail() != null) {
             OMElement detail = fac.createOMElement("detail", synNS, fault);
             detail.setText(mediator.getFaultDetail());
+        } else if (!mediator.getFaultDetailElements().isEmpty()) {
+            OMElement detail = fac.createOMElement("detail", synNS, fault);
+            for (OMElement element : mediator.getFaultDetailElements()) {
+                if (element != null) {
+                    detail.addChild(element.cloneOMElement());
+                }
+            }
         }
 
         if (parent != null) {

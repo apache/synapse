@@ -27,21 +27,23 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.throttle.*;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 
 /**
  * Throttle Mediator Test - This class test throttling when policy has specified as both of
  * InLine and a registry key
- *
  */
 
 public class ThrottleMediatorTest extends TestCase {
@@ -50,7 +52,7 @@ public class ThrottleMediatorTest extends TestCase {
     private static final String POLICY = " <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\"\n" +
             "                xmlns:throttle=\"http://www.wso2.org/products/wso2commons/throttle\">\n" +
             "        <throttle:ThrottleAssertion>\n" +
-            "            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\n" +           
+            "            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\n" +
             "            <wsp:All>\n" +
             "                <throttle:ID throttle:type=\"IP\">other</throttle:ID>\n" +
             "                <wsp:ExactlyOne>\n" +
@@ -115,10 +117,22 @@ public class ThrottleMediatorTest extends TestCase {
                 OMAbstractFactory.getSOAP11Factory().createOMDocument();
         omDoc.addChild(envelope);
 
-        envelope.getBody().addChild(SynapseConfigUtils.stringToOM(payload));
+        envelope.getBody().addChild(createOMElement(payload));
 
         synMc.setEnvelope(envelope);
         return synMc;
+    }
+
+    public static OMElement createOMElement(String xml) {
+        try {
+            XMLStreamReader reader = XMLInputFactory
+                    .newInstance().createXMLStreamReader(new StringReader(xml));
+            StAXOMBuilder builder = new StAXOMBuilder(reader);
+            return builder.getDocumentElement();
+        }
+        catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void testMediate() throws Exception {
@@ -155,35 +169,36 @@ public class ThrottleMediatorTest extends TestCase {
         }
 
     }
+
     public void testMediateWithInLineXML() throws Exception {
-           ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
-           StAXOMBuilder build = new StAXOMBuilder(in);
-           ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
-           throttleMediator.setInLinePolicy(build.getDocumentElement());
-           MessageContext synCtx = createLightweightSynapseMessageContext("<empty/>");
-           synCtx.setProperty(REMOTE_ADDR, "192.168.8.212");
-           SynapseConfiguration synCfg = new SynapseConfiguration();
-           synCtx.setConfiguration(synCfg);
-           for (int i = 0; i < 6; i++) {
-               try {
-                   throttleMediator.mediate(synCtx);
-                   Thread.sleep(1000);
-               }
-               catch (Exception e) {
+        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
+        StAXOMBuilder build = new StAXOMBuilder(in);
+        ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
+        throttleMediator.setInLinePolicy(build.getDocumentElement());
+        MessageContext synCtx = createLightweightSynapseMessageContext("<empty/>");
+        synCtx.setProperty(REMOTE_ADDR, "192.168.8.212");
+        SynapseConfiguration synCfg = new SynapseConfiguration();
+        synCtx.setConfiguration(synCfg);
+        for (int i = 0; i < 6; i++) {
+            try {
+                throttleMediator.mediate(synCtx);
+                Thread.sleep(1000);
+            }
+            catch (Exception e) {
 
-                   if (i == 3) {
-                       assertTrue(e.getMessage().lastIndexOf("IP_BASE") > 0);
-                   }
-                   if (i == 4) {
-                       assertTrue(e.getMessage().lastIndexOf("IP_BASE") > 0);
-                   }
-                   if (i == 5) {
-                       assertTrue(e.getMessage().lastIndexOf("IP_BASE") > 0);
-                   }
-               }
-           }
+                if (i == 3) {
+                    assertTrue(e.getMessage().lastIndexOf("IP_BASE") > 0);
+                }
+                if (i == 4) {
+                    assertTrue(e.getMessage().lastIndexOf("IP_BASE") > 0);
+                }
+                if (i == 5) {
+                    assertTrue(e.getMessage().lastIndexOf("IP_BASE") > 0);
+                }
+            }
+        }
 
-       }
+    }
 
     public class ThrottleTestMediator extends AbstractMediator {
 
@@ -213,24 +228,28 @@ public class ThrottleMediatorTest extends TestCase {
 
             }
             //IP based throttling
-            String remoteIP = (String)synContext.getProperty(REMOTE_ADDR);
+            String remoteIP = (String) synContext.getProperty(REMOTE_ADDR);
             if (remoteIP == null) {
-                throw new ThrottleException("IP address of the caller can not find - Currently only support caller-IP base access control" +
+                throw new ThrottleException("IP address of the caller can not find - " +
+                        "Currently only support caller-IP base access control" +
                         "- Thottling will not happen ");
 
             } else {
                 ThrottleContext throttleContext
                         = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
                 if (throttleContext == null) {
-                    throw new ThrottleException("Can not find a configuartion for IP Based Throttle");
+                    throw new ThrottleException("Can not find a configuartion for " +
+                            "IP Based Throttle");
 
                 }
                 AccessRateController accessControler;
                 try {
-                    accessControler =new AccessRateController();
-                    boolean canAccess = accessControler.canAccess(throttleContext, remoteIP,ThrottleConstants.IP_BASE);
+                    accessControler = new AccessRateController();
+                    boolean canAccess = accessControler.canAccess(
+                            throttleContext, remoteIP, ThrottleConstants.IP_BASE).isAccessAllowed();
                     if (!canAccess) {
-                        throw new SynapseException("Access has currently been denied by the IP_BASE throttle for IP :\t" + remoteIP);
+                        throw new SynapseException("Access has currently been denied by" +
+                                " the IP_BASE throttle for IP :\t" + remoteIP);
                     }
                     return canAccess;
                 }
@@ -260,7 +279,7 @@ public class ThrottleMediatorTest extends TestCase {
                     reCreate = true;
                 }
                 policyOmElement = (OMElement) entryValue;
-            } else  if (inLinePolicy != null){
+            } else if (inLinePolicy != null) {
                 policyOmElement = inLinePolicy;
             }
             if (policyOmElement == null) {
@@ -280,8 +299,8 @@ public class ThrottleMediatorTest extends TestCase {
         protected void createThrottleMetaData(OMElement policyOmElement) {
 
             try {
-                throttle = ThrottlePolicyProcessor
-                        .processPolicy(PolicyEngine.getPolicy(policyOmElement));
+                throttle = ThrottleFactory.createMediatorThrottle(
+                        PolicyEngine.getPolicy(policyOmElement));
             }
             catch (ThrottleException e) {
 

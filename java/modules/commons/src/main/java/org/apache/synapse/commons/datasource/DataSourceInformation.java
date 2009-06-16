@@ -19,6 +19,7 @@
 package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import java.util.HashMap;
@@ -55,7 +56,7 @@ public class DataSourceInformation {
     private long removeAbandonedTimeout;
     private boolean logAbandoned = true;
     private boolean poolPreparedStatements = true;
-    private int maxOpenPreparedStatements;
+    private int maxOpenPreparedStatements = GenericKeyedObjectPool.DEFAULT_MAX_TOTAL;
     private final Properties properties = new Properties();
     private String repositoryType = DataSourceConstants.PROP_REGISTRY_MEMORY;
 

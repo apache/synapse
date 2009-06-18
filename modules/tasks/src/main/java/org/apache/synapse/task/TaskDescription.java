@@ -40,7 +40,7 @@ public class TaskDescription {
     private final List<String> pinnedServers = new ArrayList<String>();
     private final Set<OMElement> xmlProperties = new HashSet<OMElement>();
     private String name;
-    private String group;
+    private String group = DEFAULT_GROUP;
     private Date startTime;
     private Date endTime;
     private boolean volatility = true;

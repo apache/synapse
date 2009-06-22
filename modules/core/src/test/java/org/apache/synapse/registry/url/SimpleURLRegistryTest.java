@@ -21,10 +21,8 @@ package org.apache.synapse.registry.url;
 
 import junit.framework.TestCase;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.registry.Registry;
@@ -112,6 +110,22 @@ public class SimpleURLRegistryTest extends TestCase {
         
         OMNode node = reg.lookup(FILE2);
         node.serialize(new NullOutputStream());
+    }
+
+    public void testXPathEvaluationOnRegistryResource() throws Exception {
+        SimpleURLRegistry registry = new SimpleURLRegistry();
+        OMNode omNode =
+                registry.lookup(
+                        "file:src/test/resources/org/apache/synapse/core/registry/resource.xml");
+
+        assertNotNull(omNode);
+
+        AXIOMXPath xpath = new AXIOMXPath("//table/entry[@id='one']/value/child::text()");
+        OMNode node = (OMNode) xpath.selectSingleNode(omNode);
+
+        assertNotNull(node);
+        assertTrue(node instanceof OMText);
+        assertEquals("ValueOne", ((OMText) node).getText());
     }
 
     public void tearDown() throws Exception {

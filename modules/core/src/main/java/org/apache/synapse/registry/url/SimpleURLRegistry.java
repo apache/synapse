@@ -19,8 +19,7 @@
 
 package org.apache.synapse.registry.url;
 
-import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,6 +52,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
     private static final int MAX_KEYS = 200;
     private String root = "";
+    private final OMFactory omFactory = OMAbstractFactory.getOMFactory();
 
     public OMNode lookup(String key) {
 
@@ -122,7 +122,10 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             } finally {
                 try {
                     if (result != null && result.getParent() != null) {
+                        //TODO Replace following code with the correct code when synapse is moving to AXIOM 1.2.9
                         result.detach();
+                        OMDocument omDocument = omFactory.createOMDocument();
+                        omDocument.addChild(result);
                     }
                     inputStream.close();
                 } catch (IOException e) {

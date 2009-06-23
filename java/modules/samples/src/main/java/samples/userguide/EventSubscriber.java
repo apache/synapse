@@ -42,6 +42,7 @@ public class EventSubscriber {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.exit(0);
     }
 
     private static String getProperty(String name, String def) {

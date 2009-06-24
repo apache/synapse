@@ -84,7 +84,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         if (addressElement != null) {
             EndpointDefinition definition = createEndpointDefinition(addressElement);
             addressEndpoint.setDefinition(definition);
-            processAuditStatus(definition, addressEndpoint.getName(), epConfig);
+            processAuditStatus(definition, addressEndpoint.getName(), addressElement);
         }
 
         return addressEndpoint;

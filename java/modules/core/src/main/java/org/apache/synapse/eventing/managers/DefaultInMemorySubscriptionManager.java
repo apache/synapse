@@ -51,11 +51,9 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
 
     public List<Subscription> getStaticSubscriptions() {
         LinkedList<Subscription> list = new LinkedList<Subscription>();
-        for (Subscription stringSubscription : store.values()) {
-            SubscriptionData data = stringSubscription.getSubscriptionData();
-            if (data != null && "true".equals(data.getProperty(
-                    SynapseEventingConstants.STATIC_ENTRY))) {
-                list.add(stringSubscription);
+        for (Subscription storeSubscription : store.values()) {
+            if (storeSubscription.isStaticEntry()) {
+                list.add(storeSubscription);
             }
         }
         return list;

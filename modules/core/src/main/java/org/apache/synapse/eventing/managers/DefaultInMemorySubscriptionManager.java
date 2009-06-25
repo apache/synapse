@@ -30,6 +30,7 @@ import org.jaxen.JaxenException;
 import org.wso2.eventing.Event;
 import org.wso2.eventing.Subscription;
 import org.wso2.eventing.SubscriptionManager;
+import org.wso2.eventing.SubscriptionData;
 import org.wso2.eventing.exceptions.EventException;
 
 import java.util.*;
@@ -50,10 +51,11 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
 
     public List<Subscription> getStaticSubscriptions() {
         LinkedList<Subscription> list = new LinkedList<Subscription>();
-        for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
-            if ((stringSubscriptionEntry.getValue().getSubscriptionData().getProperty(
-                    SynapseEventingConstants.STATIC_ENTRY)).equals("true")) {
-                list.add(stringSubscriptionEntry.getValue());
+        for (Subscription stringSubscription : store.values()) {
+            SubscriptionData data = stringSubscription.getSubscriptionData();
+            if (data != null && "true".equals(data.getProperty(
+                    SynapseEventingConstants.STATIC_ENTRY))) {
+                list.add(stringSubscription);
             }
         }
         return list;

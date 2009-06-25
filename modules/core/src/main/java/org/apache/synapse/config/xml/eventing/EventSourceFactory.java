@@ -162,7 +162,7 @@ public class EventSourceFactory {
                     OMAttribute sourceAttr = elmFilter.getAttribute(FILTER_SOURCE_QNAME);
                     if (sourceAttr != null) {
                         synapseSubscription.setFilterDialect(dialectAttr.getAttributeValue());
-                        synapseSubscription.setFilterValue(elmFilter.getText());
+                        synapseSubscription.setFilterValue(sourceAttr.getAttributeValue());
                     } else {
                         handleException(
                                 "Error in creating static subscription. Filter source not defined");
@@ -206,9 +206,9 @@ public class EventSourceFactory {
             } else {
                 synapseSubscription.setExpires(null);
             }
-            synapseSubscription.getSubscriptionData()
-                    .setProperty(SynapseEventingConstants.STATIC_ENTRY, "true");
-                synapseEventSource.getSubscriptionManager().subscribe(synapseSubscription);
+
+            synapseSubscription.setStaticEntry(true);
+            synapseEventSource.getSubscriptionManager().subscribe(synapseSubscription);
         }
     }
 }

@@ -36,7 +36,12 @@ public class InOutStatisticsView {
         this.owner = owner;
         this.componentType = type;
         this.inStatistics = new Statistics(id);
-        this.outStatistics = new Statistics(id);
+        // endpoints doesn't contain an out view since it is just sending the message to one side
+        if (type.equals(ComponentType.ENDPOINT)) {
+            this.outStatistics = null;
+        } else {
+            this.outStatistics = new Statistics(id);
+        }
     }
 
     public Statistics getInStatistics() {

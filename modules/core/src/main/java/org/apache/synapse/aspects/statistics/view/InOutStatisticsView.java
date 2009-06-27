@@ -37,7 +37,7 @@ public class InOutStatisticsView {
         this.componentType = type;
         this.inStatistics = new Statistics(id);
         // endpoints doesn't contain an out view since it is just sending the message to one side
-        if (type.equals(ComponentType.ENDPOINT)) {
+        if (ComponentType.ENDPOINT.equals(type)) {
             this.outStatistics = null;
         } else {
             this.outStatistics = new Statistics(id);
@@ -76,7 +76,7 @@ public class InOutStatisticsView {
                     .append(inStatistics.toString()).append(" ]");
         }
 
-        if (outStatistics.getCount() != 0) {
+        if (outStatistics != null && outStatistics.getCount() != 0) {
             sb.append("[ OutFlow :  ").append(outStatistics.toString()).append(" ]");
         }
         return sb.toString();

@@ -119,7 +119,9 @@ public class FIXOutgoingMessageHandler {
         if (msgCtx != null && targetEPR != null) {
             FIXIncomingMessageHandler messageHandler = (FIXIncomingMessageHandler) sessionFactory.
                     getApplication(targetEPR);
-            messageHandler.setOutgoingMessageContext(msgCtx);
+            if (messageHandler != null) {
+                messageHandler.setOutgoingMessageContext(msgCtx);
+            }
         }
         Session.sendToTarget(message, sessionID);
     }

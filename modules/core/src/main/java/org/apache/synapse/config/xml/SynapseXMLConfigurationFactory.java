@@ -27,6 +27,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.registry.Registry;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.eventing.SynapseEventSource;
@@ -102,12 +103,16 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
         }
 
+        Registry localConfigReg = config.getRegistry();
         if (config.getLocalRegistry().isEmpty() && config.getProxyServices().isEmpty() &&
-                rootSequence.getList().isEmpty() && config.getRegistry() != null) {
-            OMNode remoteConfigNode = config.getRegistry().lookup("synapse.xml");
+                rootSequence.getList().isEmpty() && localConfigReg != null) {
+            OMNode remoteConfigNode = localConfigReg.lookup("synapse.xml");
             try {
                 config = XMLConfigurationBuilder.getConfiguration(SynapseConfigUtils
                     .getStreamSource(remoteConfigNode).getInputStream());
+                if (config.getRegistry() == null) {
+                    config.setRegistry(localConfigReg);
+                }
             } catch (XMLStreamException xse) {
                 throw new SynapseException("Problem loading remote synapse.xml ", xse);
             }

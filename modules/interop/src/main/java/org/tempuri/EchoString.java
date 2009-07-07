@@ -210,11 +210,9 @@ public class EchoString implements org.apache.axis2.databinding.ADBBean {
 	}
 	
     public void serialize(final QName parentQName,
-            final OMFactory factory,
             MTOMAwareXMLStreamWriter xmlWriter)throws XMLStreamException, ADBException{}
 
     public void serialize(final QName parentQName,
-            final OMFactory factory,
             MTOMAwareXMLStreamWriter xmlWriter,
             boolean serializeType)throws XMLStreamException, ADBException{}
 

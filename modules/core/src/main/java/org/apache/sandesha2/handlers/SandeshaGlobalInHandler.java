@@ -208,12 +208,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         	rmMsgCtx.setProperty(Constants.Configuration.DISABLE_RESPONSE_ACK, Boolean.TRUE);
         }
         
-        if (!msgNoPresentInList) {
-          serverCompletedMessageRanges.addRange(new Range(msgNo));
-          
-          storageManager.getRMDBeanMgr().update(bean);
-        }
-        else {
+        if (msgNoPresentInList){
            
           if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
               log.debug("Detected duplicate message " + msgNo);
@@ -262,7 +257,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       }
       
       if(transaction != null && transaction.isActive()) transaction.commit();
-      transaction = null;
+		transaction = null;
     }catch (RuntimeException e)
     {
     	

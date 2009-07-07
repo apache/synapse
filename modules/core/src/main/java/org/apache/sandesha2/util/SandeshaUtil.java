@@ -1035,7 +1035,6 @@ public class SandeshaUtil {
 
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");
-	    
 		ConfigurationContext ctx = storageManager.getContext();
 		ServiceClient client = new ServiceClient(ctx,  null);
 		
@@ -1088,10 +1087,20 @@ public class SandeshaUtil {
 			AxisOperation axisOperation = msgCtx.getAxisOperation();
 
 			//If it's oneway or async, reallocate
-			//Fail if replyTo is annonymous as this is currently not supported because in twoway we can't get responses back to th eold something
-			if(axisOperation.getAxisSpecificMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_ONLY){
+			EndpointReference replyTo = oldRMSBean.getReplyToEndpointReference();
+			int mep = axisOperation.getAxisSpecificMEPConstant();
+			if(mep == WSDLConstants.MEP_CONSTANT_OUT_ONLY){
 				client.fireAndForget(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement());
-			} else if (client.getOptions().getReplyTo().hasAnonymousAddress()){
+			} else if (replyTo == null || replyTo.hasAnonymousAddress()){
+				//It is sync2way and therefore we should fail
+				transaction = storageManager.getTransaction();
+
+				RMSBeanMgr mgr = storageManager.getRMSBeanMgr();
+
+				RMSBean finder = new RMSBean();
+				finder.setSequenceID(oldRMSBean.getSequenceID());
+				RMSBean bean = mgr.findUnique(finder);
+
 				oldRMSBean.setReallocated(Sandesha2Constants.WSRM_COMMON.REALLOCATION_FAILED);
 				storageManager.getRMSBeanMgr().update(oldRMSBean);
 				throw new SandeshaException(SandeshaMessageKeys.reallocationForSyncRequestReplyNotSupported);

@@ -482,6 +482,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						}
 					}
 				}
+				// Set the faultTo to anonymous to make sure we get Sandesha faults back.
+				if(mep == WSDLConstants.MEP_CONSTANT_OUT_ONLY
+					|| (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion) && replyTo == null)) {
+					if (log.isDebugEnabled()) 
+						log.debug("Setting the faultTo to anonymous as a oneWay MEP is being used and fault msgs can then be delivered back on the backchannel");
+					if(msgContext.getFaultTo() == null)
+						msgContext.setFaultTo(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
+				}
 			} 
 			
 			boolean startPolling = false;
@@ -501,7 +509,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				}
 			}
 
-			if (log.isDebugEnabled()) log.debug("App msg using replyTo EPR as " + msgContext.getReplyTo());
+			if (log.isDebugEnabled()) log.debug("App msg using replyTo EPR as " + msgContext.getReplyTo() + " and faultTo EPR as " + msgContext.getFaultTo());
 			
 			RelatesTo relatesTo = msgContext.getRelatesTo();
 			if(relatesTo != null) {

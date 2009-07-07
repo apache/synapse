@@ -22,6 +22,7 @@ package org.apache.sandesha2.msgprocessors;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -53,6 +54,8 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
@@ -173,7 +176,15 @@ public class SequenceProcessor {
 		EndpointReference replyTo = rmMsgCtx.getReplyTo();
 		if (log.isDebugEnabled())
 			log.debug("SequenceProcessor::processReliableMessage replyTo = " + replyTo);
-		
+
+		// Updating the server completed message ranges list
+		RangeString serverCompletedMessageRanges = bean.getServerCompletedMessages();
+		// See if the message is in the list of completed ranges
+		boolean msgNoPresentInList =  serverCompletedMessageRanges.isMessageNumberInRanges(msgNo);
+		if (!msgNoPresentInList){
+			 serverCompletedMessageRanges.addRange(new Range(msgNo));
+		}
+
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
 		long highestInMsgNo = bean.getHighestInMessageNumber();

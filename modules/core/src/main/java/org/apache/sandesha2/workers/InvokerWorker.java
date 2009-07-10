@@ -159,22 +159,24 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 						}
 					}
 				}
+
+				if(nextBean == null || nextWorker != null) {
+					//Remove the lock before we unlock the invokerBean
+					lock.removeWork(workId);
+
+					// Clean up the tran, in case we didn't pass it into the invoke method
+					if(tran != null) tran.commit();
+					tran = null;
+
+					break;
+				}
 		
 				// Clean up the tran, in case we didn't pass it into the invoke method
 				if(tran != null) tran.commit();
 				tran = null;
-						
-				if(nextBean == null || nextWorker != null) {
-					// We have run out of work, or the new worker has taken it on, so we can
-					// break out of the loop
-					break;
-				}
+		
 			}//end while
 					
-			if (workId !=null && lock!=null) {
-				lock.removeWork(workId);
-			}
-
 			// If we created another worker, set it running now that we have released the lock
 			if(nextWorker != null) {
 				lock.addWork(workId, nextWorker);

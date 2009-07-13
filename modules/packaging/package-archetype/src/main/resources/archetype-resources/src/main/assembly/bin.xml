@@ -55,4 +55,10 @@
             <directory>repository</directory>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>conf/log4j.properties</source>
+            <outputDirectory>lib</outputDirectory>
+        </file>
+    </files>
 </assembly>

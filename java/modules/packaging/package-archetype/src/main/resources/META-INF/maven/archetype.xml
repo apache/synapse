@@ -20,8 +20,9 @@
 <archetype>
     <id>synapse-package</id>
     <resources>
-        <resource>src\main\assembly\bin.xml</resource>
-        <resource>repository\conf\axis2.xml</resource>
-        <resource>repository\conf\synapse.xml</resource>
+        <resource>src/main/assembly/bin.xml</resource>
+        <resource>repository/conf/axis2.xml</resource>
+        <resource>repository/conf/synapse.xml</resource>
+        <resource>conf/log4j.properties</resource>
     </resources>
 </archetype>

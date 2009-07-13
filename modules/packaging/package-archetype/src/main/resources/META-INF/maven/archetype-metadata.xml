@@ -25,5 +25,8 @@
         <fileSet filtered="true" encoding="UTF-8">
             <directory>repository/conf</directory>
         </fileSet>
+        <fileSet filtered="false">
+            <directory>conf</directory>
+        </fileSet>
     </fileSets>
 </archetype-descriptor>

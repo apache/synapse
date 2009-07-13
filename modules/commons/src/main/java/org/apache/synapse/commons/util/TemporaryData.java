@@ -18,6 +18,7 @@ import java.io.*;
  * on demand. Since a temporary file may be created it is mandatory to
  * call {@link #release()} to discard the temporary data.
  */
+// TODO: replace this with org.apache.axiom.util.blob.OverflowBlob when the next release of Axiom is available
 public class TemporaryData {
     
     private static final Log log = LogFactory.getLog(TemporaryData.class);

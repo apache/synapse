@@ -823,7 +823,7 @@
         <commons.logging.version>1.1.1</commons.logging.version>
 
         <!-- addressing, rampart, neethi -->
-        <addressing.version>1.5-SNAPSHOT</addressing.version>
+        <addressing.version>1.5</addressing.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <sandesha2.version>SNAPSHOT</sandesha2.version>
         <neethi.version>2.0.4</neethi.version>

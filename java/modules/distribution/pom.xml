@@ -146,7 +146,7 @@
         <repository>
             <id>atlassian-developer-site</id>
             <name>Atlassian Maven 2 Contributor Repository</name>
-            <url>https://maven.atlassian.com/repository/public</url>
+            <url>http://maven.atlassian.com/repository/public</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

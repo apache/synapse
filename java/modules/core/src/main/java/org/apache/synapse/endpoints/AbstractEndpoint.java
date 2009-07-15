@@ -67,6 +67,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     /** The MBean managing the endpoint */
     EndpointView metricsMBean = null;
 
+    /** The name of the file where this endpoint is defined */
+    protected String fileName;
+
     protected AbstractEndpoint() {
         log = LogFactory.getLog(this.getClass());
     }
@@ -112,6 +115,14 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     public void setChildren(List<Endpoint> children) {
         this.children = children;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String toString() {

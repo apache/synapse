@@ -29,7 +29,6 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.aspects.AspectConfiguration;
-import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -50,11 +49,11 @@ import javax.xml.stream.XMLStreamException;
 import java.util.Iterator;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
-    
+
     private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
 
     public SynapseConfiguration getConfiguration(OMElement definitions) {
-        
+
         if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) {
             throw new SynapseException(
                     "Wrong QName for this configuration factory " + definitions.getQName());
@@ -69,7 +68,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         AspectConfiguration configuration = new AspectConfiguration(rootSequence.getName());
         rootSequence.configure(configuration);
         Iterator iter = definitions.getChildren();
-        
+
         while (iter.hasNext()) {
             Object o = iter.next();
             if (o instanceof OMElement) {
@@ -109,7 +108,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             OMNode remoteConfigNode = localConfigReg.lookup("synapse.xml");
             try {
                 config = XMLConfigurationBuilder.getConfiguration(SynapseConfigUtils
-                    .getStreamSource(remoteConfigNode).getInputStream());
+                        .getStreamSource(remoteConfigNode).getInputStream());
                 if (config.getRegistry() == null) {
                     config.setRegistry(localConfigReg);
                 }
@@ -143,38 +142,43 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return config;
     }
 
-    public static void defineRegistry(SynapseConfiguration config, OMElement elem) {
+    public static Registry defineRegistry(SynapseConfiguration config, OMElement elem) {
         if (config.getRegistry() != null) {
             handleException("Only one remote registry can be defined within a configuration");
         }
-        config.setRegistry(RegistryFactory.createRegistry(elem));
+        Registry registry = RegistryFactory.createRegistry(elem);
+        config.setRegistry(registry);
+        return registry;
     }
 
-    public static void defineStartup(SynapseConfiguration config, OMElement elem) {
+    public static Startup defineStartup(SynapseConfiguration config, OMElement elem) {
         Startup startup = StartupFinder.getInstance().getStartup(elem);
         if (config.getStartup(startup.getName()) != null) {
             handleException("Duplicate startup with name : " + startup.getName());
         }
         config.addStartup(startup);
+        return startup;
     }
 
-    public static void defineProxy(SynapseConfiguration config, OMElement elem) {
+    public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem) {
         ProxyService proxy = ProxyServiceFactory.createProxy(elem);
         if (config.getProxyService(proxy.getName()) != null) {
             handleException("Duplicate proxy service with name : " + proxy.getName());
         }
         config.addProxyService(proxy.getName(), proxy);
+        return proxy;
     }
 
-    public static void defineEntry(SynapseConfiguration config, OMElement elem) {
+   public static Entry defineEntry(SynapseConfiguration config, OMElement elem) {
         Entry entry = EntryFactory.createEntry(elem);
         if (config.getLocalRegistry().get(entry.getKey()) != null) {
             handleException("Duplicate registry entry definition for key : " + entry.getKey());
         }
         config.addEntry(entry.getKey(), entry);
+       return entry;
     }
 
-    public static void defineSequence(SynapseConfiguration config, OMElement ele) {
+    public static Mediator defineSequence(SynapseConfiguration config, OMElement ele) {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
@@ -189,12 +193,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             if (SynapseConstants.MANDATORY_SEQUENCE_KEY.equals(name)) {
                 config.setMandatorySequence(mediator);
             }
+            return mediator;
         } else {
             handleException("Invalid sequence definition without a name");
         }
+        return null;
     }
 
-    public static void defineEndpoint(SynapseConfiguration config, OMElement ele) {
+    public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
@@ -203,17 +209,20 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
             Endpoint endpoint = EndpointFactory.getEndpointFromElement(ele, false);
             config.addEndpoint(name.trim(), endpoint);
+            return endpoint;
         } else {
             handleException("Invalid endpoint definition without a name");
         }
+        return null;
     }
 
-   public static void defineEventSource(SynapseConfiguration config, OMElement elem) {
+    public static SynapseEventSource defineEventSource(SynapseConfiguration config, OMElement elem) {
         SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
         if (config.getEventSource(eventSource.getName()) != null) {
             handleException("Duplicate proxy service with name : " + eventSource.getName());
         }
         config.addEventSource(eventSource.getName(), eventSource);
+        return eventSource;
     }
 
     /**
@@ -276,7 +285,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         // set aspect configuration
         AspectConfiguration configuration = new AspectConfiguration(fault.getName());
         fault.configure(configuration);
-        
+
         config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
     }
 

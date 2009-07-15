@@ -202,6 +202,8 @@ public class ProxyService implements AspectConfigurable {
 
     private AspectConfiguration aspectConfiguration;
 
+    private String fileName;
+
     /**
      * Constructor
      *
@@ -948,6 +950,14 @@ public class ProxyService implements AspectConfigurable {
 
     public AspectConfiguration getAspectConfiguration() {
         return aspectConfiguration;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     @Override

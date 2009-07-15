@@ -32,6 +32,11 @@ public abstract class AbstractStartup implements Startup {
     protected String name = null;
 
     /**
+     * Holds the name of the file where this startup is defined
+     */
+    protected String fileName;
+
+    /**
      * This will return the name of the startup
      *
      * @return String representing the name
@@ -48,5 +53,24 @@ public abstract class AbstractStartup implements Startup {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Returns the name of the file where this startup is defined
+     *
+     * @return a file name as a string or null
+     */
+    public String getFileName() {
+        return fileName;
+    }
+
+
+    /**
+     * Set the name of the file name where this startup is defined
+     *
+     * @param fileName the name of the file as a string
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

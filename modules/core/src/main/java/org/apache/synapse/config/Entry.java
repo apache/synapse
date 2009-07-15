@@ -48,6 +48,8 @@ public class Entry {
     private long version;
     /** The local expiry time for the cached resource */
     private long expiryTime;
+    /** The name of the file where this entry is defined */
+    private String fileName;
 
     public Entry() {}
     
@@ -143,6 +145,14 @@ public class Entry {
 
     public void setExpiryTime(long expiryTime) {
         this.expiryTime = expiryTime;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public boolean isExpired() {

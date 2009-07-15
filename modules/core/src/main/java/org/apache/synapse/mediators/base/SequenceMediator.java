@@ -53,7 +53,9 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
     /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
     private boolean initialized = false;
     /** the registry key to load this definition if dynamic */
-    private String registryKey = null;   
+    private String registryKey = null;
+    /** The name of the file where this sequence is defined */
+    private String fileName;
 
     /**
      * If this mediator refers to another named Sequence, execute that. Else
@@ -274,5 +276,13 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
 
     public String getAuditId() {
         return getName();
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

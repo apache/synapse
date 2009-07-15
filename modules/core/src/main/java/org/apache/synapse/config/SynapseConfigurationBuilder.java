@@ -24,10 +24,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
+import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,25 +67,41 @@ public class SynapseConfigurationBuilder {
     /**
      * Build a Synapse configuration from a given XML configuration file
      *
-     * @param configFile the XML configuration
+     * @param configFile Path to the Synapse configuration file or directory
      * @return the Synapse configuration model
      */
     public static SynapseConfiguration getConfiguration(String configFile) {
 
-        // build the Synapse configuration parsing the XML config file
-        try {
-            SynapseConfiguration synCfg
-                    = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
-            log.info("Loaded Synapse configuration from : " + configFile);
-            synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
-            return synCfg;
-
-        } catch (FileNotFoundException fnf) {
-            handleException("Cannot load Synapse configuration from : " + configFile, fnf);
-        } catch (Exception e) {
-            handleException("Could not initialize Synapse : " + e.getMessage(), e);
+        File synapseConfigLocation = new File(configFile);
+        if (!synapseConfigLocation.exists()) {
+            throw new SynapseException("Unable to load the Synapse configuration from : " + configFile);
         }
-        return null;
+
+        SynapseConfiguration synCfg = null;
+        if (synapseConfigLocation.isFile()) {
+            // build the Synapse configuration parsing the XML config file
+            try {
+                synCfg = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
+                log.info("Loaded Synapse configuration from : " + configFile);
+                synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
+            } catch (Exception e) {
+                handleException("Could not initialize Synapse : " + e.getMessage(), e);
+            }
+
+        } else if (synapseConfigLocation.isDirectory()) {
+            // build the Synapse configuration by processing given directory hierarchy
+            try {
+                synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile);
+                log.info("Loaded Synapse configuration from the directory hierarchy at : " + configFile);
+                MultiXMLConfigurationSerializer s = new MultiXMLConfigurationSerializer("/home/hiranya/Desktop/myconf");
+                s.serialize(synCfg);
+            } catch (XMLStreamException e) {
+                handleException("Could not initialize Synapse : " + e.getMessage(), e);
+            }
+        }
+
+
+        return synCfg;
     }
 
     private static void handleException(String msg, Exception e) {

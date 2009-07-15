@@ -65,6 +65,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     private String name;
     private SubscriptionManager subscriptionManager;
     private static final Log log = LogFactory.getLog(SynapseEventSource.class);
+    private String fileName;
 
     public SynapseEventSource(String name) {
         this.name = name;
@@ -84,6 +85,14 @@ public class SynapseEventSource extends SynapseMessageReceiver {
 
     public void setSubscriptionManager(SubscriptionManager subscriptionManager) {
         this.subscriptionManager = subscriptionManager;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void buildService(AxisConfiguration axisCfg) throws AxisFault {

@@ -93,8 +93,6 @@ public class SynapseConfigurationBuilder {
             try {
                 synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile);
                 log.info("Loaded Synapse configuration from the directory hierarchy at : " + configFile);
-                MultiXMLConfigurationSerializer s = new MultiXMLConfigurationSerializer("/home/hiranya/Desktop/myconf");
-                s.serialize(synCfg);
             } catch (XMLStreamException e) {
                 handleException("Could not initialize Synapse : " + e.getMessage(), e);
             }

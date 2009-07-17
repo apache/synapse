@@ -34,7 +34,6 @@ import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.factory.KeyStoreInformationFactory;
 import org.apache.synapse.util.SynapseBinaryDataSource;
 import org.xml.sax.InputSource;
-import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
 import javax.activation.DataHandler;
 import javax.net.ssl.*;
@@ -376,7 +375,7 @@ public class SynapseConfigUtils {
         }
 
         try {
-            HttpsURLConnectionImpl connection = (HttpsURLConnectionImpl) url.openConnection();
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             //Create a SSLContext
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(keyManagers,

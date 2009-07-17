@@ -75,8 +75,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
         if (attrTarget != null) {
             String targetValue = attrTarget.getAttributeValue();
             if (targetValue != null && !"".equals(targetValue)) {
-                try {
-                    xQueryMediator.setQuerySource(targetValue);
+                try {                             
                     xQueryMediator.setTarget(SynapseXPathFactory.getSynapseXPath(elem, ATT_TARGET));
                 } catch (JaxenException e) {
                     handleException("Invalid XPath specified for the target attribute : " +

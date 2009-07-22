@@ -512,6 +512,9 @@ public class RMSBean extends RMSequenceBean {
 		else if((bean.getInternalSeqIDOfSeqUsedForReallocation() != null && !bean.getInternalSeqIDOfSeqUsedForReallocation().equals(this.getInternalSeqIDOfSeqUsedForReallocation())))
 			match = false;
 		
+		else if(bean.isReallocated() != this.isReallocated())
+			match = false;
+		
 // Avoid matching on the error information
 //		else if((bean.rmsFlags & LAST_SEND_ERROR_TIME_FLAG) != 0 && bean.getLastSendErrorTimestamp() != this.getLastSendErrorTimestamp())
 //			match = false;

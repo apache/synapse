@@ -120,7 +120,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 
     /**
-     * Add a named sequence into the local registry
+     * Add a named sequence into the local registry. If a sequence already exists by the specified
+     * key a runtime exception is thrown.
      *
      * @param key
      *            the name for the sequence
@@ -134,7 +135,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     /**
      * Allow a dynamic sequence to be cached and made available through the
-     * local registry
+     * local registry. If a sequence already exists by the specified
+     * key a runtime exception is thrown.
      *
      * @param key
      *            the key to lookup the sequence from the remote registry
@@ -247,7 +249,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            of the sequence to be removed
      */
     public void removeSequence(String key) {
-        localRegistry.remove(key);
+        Object sequence = localRegistry.get(key);
+        if (sequence instanceof Mediator) {
+            localRegistry.remove(key);
+        } else {
+            handleException("No sequence exists by the key/name : " + key);
+        }
     }
 
     /**
@@ -274,7 +281,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * Define a resource to the local registry. All static resources (e.g. URL
      * source) are loaded during this definition phase, and the inability to
      * load such a resource will not allow the definition of the resource to the
-     * local registry
+     * local registry. If an entry already exists by the specified key a runtime
+     * exception is thrown.
      *
      * @param key
      *            the key associated with the resource
@@ -408,7 +416,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            the key of the reference to be removed
      */
     public void removeEntry(String key) {
-        localRegistry.remove(key);
+        Object entry = localRegistry.get(key);
+        if (entry instanceof Entry) {
+            localRegistry.remove(key);
+        } else {
+            handleException("No entry exists by the key : " + key);
+        }
     }
 
     /**
@@ -441,7 +454,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Define a named endpoint with the given key
+     * Define a named endpoint with the given key. If an endpoint already exists by the specified
+     * name a runtime exception is thrown.
      *
      * @param key
      *            the key for the endpoint
@@ -454,7 +468,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Add a dynamic endpoint definition to the local registry
+     * Add a dynamic endpoint definition to the local registry. If an endpoint already exists by
+     * the specified name a runtime exception is thrown.
      *
      * @param key
      *            the key for the endpoint definition
@@ -539,17 +554,24 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Deletes the endpoint with the given key
+     * Deletes the endpoint with the given key. If an endpoint does not exist by the specified
+     * key a runtime exception is thrown.
      *
      * @param key
      *            of the endpoint to be deleted
      */
     public void removeEndpoint(String key) {
-        localRegistry.remove(key);
+        Object endpoint = localRegistry.get(key);
+        if (endpoint instanceof Endpoint) {
+            localRegistry.remove(key);
+        } else {
+            handleException("No endpoint exists by the key/name : " + key);
+        }
     }
 
     /**
-     * Add a Proxy service to the configuration
+     * Add a Proxy service to the configuration. If a proxy service already exists by the
+     * specified name a runtime exception is thrown.
      *
      * @param name
      *            the name of the Proxy service
@@ -557,7 +579,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            the Proxy service instance
      */
     public void addProxyService(String name, ProxyService proxy) {
-        proxyServices.put(name, proxy);
+        if (!proxyServices.containsKey(name)) {
+            proxyServices.put(name, proxy);
+        } else {
+            handleException("Duplicate proxy service by the name : " + name);
+        }
     }
 
     /**
@@ -572,7 +598,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Deletes the Proxy Service named with the given name
+     * Deletes the Proxy Service named with the given name. If a proxy service does not exist by
+     * the specified name a runtime exception is thrown.
      *
      * @param name
      *            of the Proxy Service to be deleted
@@ -720,21 +747,31 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
-     * Add a startup to the startups map in the configuration
+     * Add a startup to the startups map in the configuration. If a startup already exists by the
+     * specified name a runtime exception is thrown.
      *
      * @param startup - Startup object to be added 
      */
     public void addStartup(Startup startup) {
-        startups.put(startup.getName(), startup);
+        if (!startups.containsKey(startup.getName())) {
+            startups.put(startup.getName(), startup);
+        } else {
+            handleException("Duplicate startup by the name : " + startup.getName());
+        }
     }
 
     /**
-     * Removes the startup specified by the name
+     * Removes the startup specified by the name. If no startup exists by the specified name a
+     * runtime exception is thrown.
      * 
      * @param name - name of the startup that needs to be removed
      */
     public void removeStartup(String name) {
-        startups.remove(name);
+        if (startups.containsKey(name)) {
+            startups.remove(name);
+        } else {
+            handleException("No startup exists by the name : " + name);
+        }
     }
 
     /**
@@ -947,16 +984,39 @@ public class SynapseConfiguration implements ManagedLifecycle {
         return taskDescriptionRepository;
     }
 
+    /**
+     * Add an event source to the configuration. If an event source already exists by the
+     * specified name a runtime exception is thrown.
+     *
+     * @param name
+     *              name of the event source
+     * @param eventSource
+     *              the event source to be added
+     */
     public void addEventSource(String name, SynapseEventSource eventSource) {
-        eventSources.put(name, eventSource);
+        if (!eventSources.containsKey(name)) {
+            eventSources.put(name, eventSource);
+        } else {
+            handleException("Duplicate event source by the name : " + name);
+        }
     }
 
     public SynapseEventSource getEventSource(String name) {
         return eventSources.get(name);
     }
 
+    /**
+     * Remove an event source from the configuration. If the specified event source does not
+     * exist a runtime exception is thrown.
+     *
+     * @param name name of the event source to be removed
+     */
     public void removeEventSource(String name) {
-        eventSources.remove(name);
+        if (eventSources.containsKey(name)) {
+            eventSources.remove(name);
+        } else {
+            handleException("No event source exists by the name : " + name);
+        }
     }
 
     public Collection<SynapseEventSource> getEventSources() {

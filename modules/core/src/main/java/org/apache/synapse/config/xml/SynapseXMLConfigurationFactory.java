@@ -153,38 +153,26 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static Startup defineStartup(SynapseConfiguration config, OMElement elem) {
         Startup startup = StartupFinder.getInstance().getStartup(elem);
-        if (config.getStartup(startup.getName()) != null) {
-            handleException("Duplicate startup with name : " + startup.getName());
-        }
         config.addStartup(startup);
         return startup;
     }
 
     public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem) {
         ProxyService proxy = ProxyServiceFactory.createProxy(elem);
-        if (config.getProxyService(proxy.getName()) != null) {
-            handleException("Duplicate proxy service with name : " + proxy.getName());
-        }
         config.addProxyService(proxy.getName(), proxy);
         return proxy;
     }
 
    public static Entry defineEntry(SynapseConfiguration config, OMElement elem) {
         Entry entry = EntryFactory.createEntry(elem);
-        if (config.getLocalRegistry().get(entry.getKey()) != null) {
-            handleException("Duplicate registry entry definition for key : " + entry.getKey());
-        }
         config.addEntry(entry.getKey(), entry);
-       return entry;
+        return entry;
     }
 
     public static Mediator defineSequence(SynapseConfiguration config, OMElement ele) {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
-            if (config.getLocalRegistry().get(name) != null) {
-                handleException("Duplicate sequence definition : " + name);
-            }
             Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(ele);
             config.addSequence(name, mediator);
             // mandatory sequence is treated as a speciall sequence because it will be fetched for
@@ -204,9 +192,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
-            if (config.getLocalRegistry().get(name.trim()) != null) {
-                handleException("Duplicate endpoint definition : " + name);
-            }
             Endpoint endpoint = EndpointFactory.getEndpointFromElement(ele, false);
             config.addEndpoint(name.trim(), endpoint);
             return endpoint;
@@ -218,9 +203,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static SynapseEventSource defineEventSource(SynapseConfiguration config, OMElement elem) {
         SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
-        if (config.getEventSource(eventSource.getName()) != null) {
-            handleException("Duplicate event source with name : " + eventSource.getName());
-        }
         config.addEventSource(eventSource.getName(), eventSource);
         return eventSource;
     }

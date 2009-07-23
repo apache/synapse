@@ -632,8 +632,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
 
             public void failed(SessionRequest request) {
-                handleError(request, NhttpConstants.CONNECTION_FAILED,
-                    "Connection refused or failed for : " + request.getRemoteAddress());
+                handleError(request, NhttpConstants.CONNECTION_FAILED, 
+                    "Connection refused or failed for : " + request.getRemoteAddress() + ", " +
+                    "IO Exception occured : " + request.getException().getMessage());
             }
 
             public void timeout(SessionRequest request) {

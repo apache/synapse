@@ -219,7 +219,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     public static SynapseEventSource defineEventSource(SynapseConfiguration config, OMElement elem) {
         SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
         if (config.getEventSource(eventSource.getName()) != null) {
-            handleException("Duplicate proxy service with name : " + eventSource.getName());
+            handleException("Duplicate event source with name : " + eventSource.getName());
         }
         config.addEventSource(eventSource.getName(), eventSource);
         return eventSource;

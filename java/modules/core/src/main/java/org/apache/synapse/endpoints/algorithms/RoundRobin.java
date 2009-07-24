@@ -62,36 +62,34 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * Choose an active endpoint using the round robin algorithm. If there are no active endpoints
      * available, returns null.
      *
-     * @param synCtx MessageContext instance which holds all per-message properties
-     * @param  algorithmContext The context in which holds run time states related to the algorithm
+     * @param synCtx           MessageContext instance which holds all per-message properties
+     * @param algorithmContext The context in which holds run time states related to the algorithm
      * @return endpoint to send the next message
      */
     public Endpoint getNextEndpoint(MessageContext synCtx, AlgorithmContext algorithmContext) {
 
         Endpoint nextEndpoint;
         int attempts = 0;
-        synchronized (algorithmContext) {
-            int currentEPR = algorithmContext.getCurrentEndpointIndex();
-            do {
-                // two successive clients could get the same endpoint if not synchronized.
-                synchronized (this) {
-                    nextEndpoint = (Endpoint) endpoints.get(currentEPR);
+        int currentEPR = algorithmContext.getCurrentEndpointIndex();
+        do {
+            // two successive clients could get the same endpoint if not synchronized.
+            synchronized (this) {
+                nextEndpoint = (Endpoint) endpoints.get(currentEPR);
 
-                    if (currentEPR == endpoints.size() - 1) {
-                        currentEPR = 0;
-                    } else {
-                        currentEPR++;
-                    }
-                    algorithmContext.setCurrentEndpointIndex(currentEPR);
+                if (currentEPR == endpoints.size() - 1) {
+                    currentEPR = 0;
+                } else {
+                    currentEPR++;
                 }
+                algorithmContext.setCurrentEndpointIndex(currentEPR);
+            }
 
-                attempts++;
-                if (attempts > endpoints.size()) {
-                    return null;
-                }
+            attempts++;
+            if (attempts > endpoints.size()) {
+                return null;
+            }
 
-            } while (!nextEndpoint.readyToSend());
-        }
+        } while (!nextEndpoint.readyToSend());
 
         return nextEndpoint;
     }
@@ -113,7 +111,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
                 currentMemberIndex++;
             }
             algorithmContext.setCurrentEndpointIndex(currentMemberIndex);
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("Members       : " + members.size());
                 log.debug("Current member: " + current);
             }

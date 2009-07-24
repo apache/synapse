@@ -70,10 +70,10 @@ public class RoundRobin implements LoadbalanceAlgorithm {
 
         Endpoint nextEndpoint;
         int attempts = 0;
-        int currentEPR = algorithmContext.getCurrentEndpointIndex();
-        do {
-            // two successive clients could get the same endpoint if not synchronized.
-            synchronized (this) {
+        synchronized (algorithmContext) {
+            int currentEPR = algorithmContext.getCurrentEndpointIndex();
+            do {
+                // two successive clients could get the same endpoint if not synchronized.
                 nextEndpoint = (Endpoint) endpoints.get(currentEPR);
 
                 if (currentEPR == endpoints.size() - 1) {
@@ -82,14 +82,14 @@ public class RoundRobin implements LoadbalanceAlgorithm {
                     currentEPR++;
                 }
                 algorithmContext.setCurrentEndpointIndex(currentEPR);
-            }
 
-            attempts++;
-            if (attempts > endpoints.size()) {
-                return null;
-            }
+                attempts++;
+                if (attempts > endpoints.size()) {
+                    return null;
+                }
 
-        } while (!nextEndpoint.readyToSend());
+            } while (!nextEndpoint.readyToSend());
+        }
 
         return nextEndpoint;
     }

@@ -143,6 +143,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param entry
      *            the Entry object which holds meta information and the cached
      *            resource
+     *
+     * @deprecated
      */
     public void addSequence(String key, Entry entry) {
         assertAlreadyExists(key,ENTRY);
@@ -475,6 +477,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            the key for the endpoint definition
      * @param entry
      *            the actual endpoint definition to be added
+     *
+     * @deprecated
      */
     public void addEndpoint(String key, Entry entry) {
         assertAlreadyExists(key, ENTRY);
